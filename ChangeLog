@@ -1,3 +1,21 @@
+Fri Feb  5 13:42:30 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* semaphore.c: Comment format changes.
+
+Wed Feb  3 13:04:44 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* cleanup.c: Rename _pthread_*_cleanup() to pthread_*_cleanup().
+
+	* pthread.def: Ditto.
+	
+	* pthread.h: Ditto.
+
+	* pthread.def (pthread_cleanup_push): Remove from export list;
+	the function is defined as a macro under all compilers.
+	(pthread_cleanup_pop): Ditto.
+
+	* pthread.h: Remove #if defined().
+
 Wed Feb  3 10:13:48 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* sync.c (pthread_join): Check for NULL value_ptr arg;

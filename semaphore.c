@@ -68,7 +68,7 @@ _pthread_sem_init (_pthread_sem_t * sem, int pshared, unsigned int value)
       *      initial value of the semaphore is set to 'value'.
       *
       * RESULTS
-      *              0                       successfully created semaphore,
+      *              0               successfully created semaphore,
       *              EINVAL          'sem' is not a valid semaphore,
       *              ENOSPC          a required resource has been exhausted,
       *              ENOSYS          semaphores are not supported,
@@ -127,7 +127,7 @@ _pthread_sem_destroy (_pthread_sem_t * sem)
       *      This function destroys an unnamed semaphore.
       *
       * RESULTS
-      *              0                       successfully destroyed semaphore,
+      *              0               successfully destroyed semaphore,
       *              EINVAL          'sem' is not a valid semaphore,
       *              ENOSYS          semaphores are not supported,
       *              EBUSY           threads (or processes) are currently
@@ -163,7 +163,7 @@ _pthread_sem_trywait (_pthread_sem_t * sem)
       *      this function returns immediately with the error EAGAIN
       *
       * RESULTS
-      *              0                       successfully destroyed semaphore,
+      *              0               successfully decreased semaphore,
       *              EAGAIN          the semaphore was already locked,
       *              EINVAL          'sem' is not a valid semaphore,
       *              ENOSYS          semaphores are not supported,
