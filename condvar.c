@@ -46,8 +46,8 @@ pthread_cond_init(pthread_cond_t *cv, const pthread_condattr_t *attr)
   /* Initialize the count to 0. */
   cv->waiters_count = 0;
 
-  /* Initialize the "mutex". */
-  pthread_mutex_init(cv->waiters_count_lock);
+  /* Initialize the "mutex". FIXME: Check attributes arg. */
+  pthread_mutex_init(cv->waiters_count_lock, NULL);
 
   /* Create an auto-reset event. */
   cv->events[SIGNAL] = CreateEvent (NULL,     /* no security */
@@ -84,7 +84,7 @@ cond_wait(pthread_cond_t *cv, pthread_mutex_t *mutex, DWORD abstime)
 
   /* Avoid race conditions. */
   EnterCriticalSection (&cv->waiters_count_lock);
-  cv->waiters_count_++;
+  cv->waiters_count++;
   LeaveCriticalSection (&cv->waiters_count_lock);
 
   /* It's okay to release the mutex here since Win32 manual-reset
@@ -97,7 +97,7 @@ cond_wait(pthread_cond_t *cv, pthread_mutex_t *mutex, DWORD abstime)
      pthread_cond_signal() being called or pthread_cond_broadcast()
      being called. */
  
-  result = WaitForMultipleObjects (2, ev->events, FALSE, abstime);
+  result = WaitForMultipleObjects (2, cv->events, FALSE, abstime);
 
   EnterCriticalSection (&cv->waiters_count_lock);
   cv->waiters_count--;
@@ -156,9 +156,9 @@ pthread_cond_broadcast (pthread_cond_t *cv)
     }
 
   /* Avoid race conditions. */
-  EnterCriticalSection (&cv->waiters_count_lock_);
+  EnterCriticalSection (&cv->waiters_count_lock);
   have_waiters = (cv->waiters_count > 0);
-  LeaveCriticalSection (&cv->waiters_count_lock_);
+  LeaveCriticalSection (&cv->waiters_count_lock);
 
   if (have_waiters) {
     SetEvent(cv->events[BROADCAST]);

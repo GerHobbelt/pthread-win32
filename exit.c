@@ -6,6 +6,8 @@
  * a thread.
  */
 
+#include <windows.h>
+#include <process.h>
 #include "pthread.h"
 #include "implement.h"
 
@@ -33,6 +35,8 @@ _pthread_vacuum(void)
 void
 _pthread_exit(pthread_t thread, void * value, int return_code)
 {
+  int detachstate;
+
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_table_mutex);
 
@@ -53,7 +57,7 @@ _pthread_exit(pthread_t thread, void * value, int return_code)
      be deleted by the last waiting pthread_join() after this thread
      has terminated. */
 
-  if (pthread_attr_getdetachedstate(thread, &detachstate) == 0 
+  if (pthread_attr_getdetachstate(thread, &detachstate) == 0 
       && detachstate == PTHREAD_CREATE_DETACHED
       && thread->join_count == 0)
     {

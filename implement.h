@@ -18,15 +18,12 @@ enum {
 
 #define _PTHREAD_VALID(T) \
   ((T) != NULL \
-   && ((T)->ptstatus == _PTHREAD_NEW
+   && ((T)->ptstatus == _PTHREAD_NEW \
        || (T)->ptstatus == _PTHREAD_INUSE))
 
 /* Handler execution flags. */
 #define _PTHREAD_HANDLER_NOEXECUTE 0
 #define _PTHREAD_HANDLER_EXECUTE   1
-
-/* Handler popping schemes. */
-enum { _PTHREAD_HANDLER_POP_LIFO, _PTHREAD_HANDLER_POP_FIFO };
 
 /* Special value to mark attribute objects as valid. */
 #define _PTHREAD_ATTR_VALID 0xC0FFEE
@@ -35,7 +32,7 @@ enum { _PTHREAD_HANDLER_POP_LIFO, _PTHREAD_HANDLER_POP_FIFO };
 typedef struct _pthread_handler_node _pthread_handler_node_t;
 
 struct _pthread_handler_node {
-  _pthread_handler_node_t next;
+  _pthread_handler_node_t * next;
   void (* routine)(void *);
   void * arg;
 };
@@ -140,9 +137,21 @@ extern pthread_mutex_t _pthread_table_mutex;
 
 extern DWORD _pthread_threads_count;
 
-extern _pthread_threads_thread_t _pthread_threads_table[];
+extern _pthread_t * _pthread_virgins;
 
-extern pthread_mutex_t _pthread_threads_mutex_table[];
+extern int _pthread_virgin_next;
+
+extern pthread_t * _pthread_reuse;
+
+extern int _pthread_reuse_top;
+
+extern pthread_t * _pthread_win32handle_map;
+
+/* Per thread mutex locks. */
+extern pthread_mutex_t * _pthread_threads_mutex_table;
 
 #endif /* _IMPLEMENT_H */
+
+
+
 
