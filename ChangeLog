@@ -1,3 +1,31 @@
+1998-07-18  Ben Elliston  <bje@cygnus.com>
+
+	* condvar.c (pthread_condattr_init): Do not attempt to malloc any
+	storage; none is needed now that condattr_t is an empty struct.
+	(pthread_condattr_destory): Likewise; do not free storage.
+	(pthread_condattr_setpshared): No longer supported; return ENOSYS.
+	(pthread_condattr_getpshared): Likewise.
+	(pthread_cond_init): Implement with help from Douglas Schmidt.
+	Remember to initialise the cv's internal mutex.
+	(pthread_cond_wait): Likewise.
+	(pthread_cond_signal): Likewise.
+	(pthread_cond_broadcast): Likewise.
+	(pthread_cond_timedwait): Preliminary implementation, but I need
+	to see some API documentation for `WaitForMultipleObject'.
+	(pthread_destory): Implement.
+
+	* pthread.h (pthread_cond_init): Add function protoype.
+	(pthread_cond_broadcast): Likewise.
+	(pthread_cond_signal): Likewise.
+	(pthread_cond_timedwait): Likewise.
+	(pthread_cond_wait): Likewise.
+	(pthread_cond_destroy): Likewise.
+	(pthread_cond_t): Define this type.  Fix for u_int.  Do not assume
+	that the mutex contained withing the pthread_cond_t structure will
+	be a critical section.  Use our new POSIX type!
+
+	* implement.h (_pthread_condattr_t): Remove shared attribute.
+
 1998-07-17  Ben Elliston  <bje@cygnus.com>
 
 	* pthread.h (PTHREADS_PROCESS_PRIVATE): Remove.
