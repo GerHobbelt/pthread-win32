@@ -1,3 +1,10 @@
+SNAPSHOT 2003-08-19
+-------------------
+
+This snapshot fixes some accidental corruption to new test case sources.
+There are no changes to the library source code.
+
+
 SNAPSHOT 2003-08-15
 -------------------
 
