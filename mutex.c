@@ -650,7 +650,7 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
       if( mx->kind != PTHREAD_MUTEX_FAST_NP &&
           pthread_equal( mx->ownerThread, pthread_self() ) )
 	{
-          mx->lock_idx--;
+          (void) InterlockedDecrement( &mx->lock_idx );
 
           if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP )
             {
@@ -766,7 +766,7 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
 	    }
           else
             {
-              mx->lock_idx--;
+              (void) InterlockedDecrement( &mx->lock_idx );
               result = EBUSY;
             }
 
@@ -780,3 +780,4 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
 
   return(result);
 }
+

@@ -1,3 +1,11 @@
+2001-12-21  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	Contributed by - Alexander Terekhov <TEREKHOV@de.ibm.com>
+	
+	* mutex.c (pthread_mutex_lock): Decrementing lock_idx was
+	not thread-safe.
+	(pthread_mutex_trylock): Likewise.
+
 2001-10-26  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	Reported by -  prionx@juno.com
