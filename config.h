@@ -1,5 +1,8 @@
 /* config.h.in.  Generated automatically from configure.in by autoheader.  */
 
+#ifndef PTW32_CONFIG_H
+#define PTW32_CONFIG_H
+
 /* Do we know about the C type sigset_t? */
 #undef HAVE_SIGSET_T
 
@@ -27,6 +30,12 @@
 /* Define if you need to convert string parameters to unicode. (eg. WinCE)  */
 #undef NEED_UNICODE_CONSTS
 
+/* Do we know about type mode_t? */
+#undef HAVE_MODE_T
+
+/* Define if you have the timespec struct */
+#undef HAVE_STRUCT_TIMESPEC
+
 /* 
  * Target specific groups 
  */
@@ -38,4 +47,15 @@
 #define NEED_FTIME
 #define NEED_SEM
 #define NEED_UNICODE_CONSTS
+#endif
+
+#ifdef _UWIN
+#define HAVE_MODE_T
+#define HAVE_STRUCT_TIMESPEC
+#endif
+
+#ifdef __MINGW32__
+#define HAVE_MODE_T
+#endif
+
 #endif

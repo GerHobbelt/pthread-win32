@@ -1,3 +1,20 @@
+2000-12-29  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* GNUmakefile: Add mutex4 test; ensure libpthreadw32.a is
+	removed for "clean" target.
+	* Makefile: Add mutex4 test.
+
+	* exception3.c: Remove SEH code; automatically pass the test
+	under SEH (which is an N/A environment).
+
+	* mutex4.c: New test.
+
+	* eyal1.c (do_work_unit): Add a dummy "if" to force the
+	optimiser to retain code; reduce thread work loads.
+
+	* condvar8.c (main): Add an additional "assert" for debugging;
+	increase pthread_cond_signal timeout.
+
 2000-12-28  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* eyal1.c: Increase thread work loads.

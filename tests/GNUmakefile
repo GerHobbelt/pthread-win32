@@ -32,7 +32,7 @@ COPYFILES	= $(HDR) $(LIB) $(DLL)
 TESTS	= loadfree \
 	  mutex1 condvar1 condvar2 exit1 create1 equal1 \
 	  exit2 exit3 \
-	  join0 join1 join2 mutex2 mutex3 \
+	  join0 join1 join2 mutex2 mutex3 mutex4 \
 	  count1 once1 tsd1 self1 self2 cancel1 cancel2 eyal1 \
 	  condvar3 condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
@@ -57,6 +57,7 @@ create1.pass: mutex2.pass
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
 mutex3.pass: create1.pass
+mutex4.pass: mutex3.pass
 equal1.pass: create1.pass
 exit2.pass: create1.pass
 exit3.pass: create1.pass
@@ -122,7 +123,7 @@ clean:
 	- $(RM) pthread.h
 	- $(RM) semaphore.h
 	- $(RM) sched.h
-	- $(RM) *.a
+	- $(RM) libpthreadw32.a
 	- $(RM) *.e
 	- $(RM) *.obj
 	- $(RM) *.pdb

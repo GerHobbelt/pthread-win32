@@ -317,7 +317,7 @@ pthread_getspecific (pthread_key_t key)
       *      the thread, NULL is returned.
       *
       * RESULTS
-      *              key value
+      *              key value or NULL on failure
       *
       * ------------------------------------------------------
       */

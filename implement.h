@@ -124,6 +124,7 @@ struct pthread_attr_t_ {
 struct pthread_mutex_t_ {
   HANDLE mutex;
   CRITICAL_SECTION cs;
+  int lockCount;
   pthread_t ownerThread;
 };
 
