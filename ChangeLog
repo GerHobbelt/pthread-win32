@@ -1,7 +1,46 @@
+1999-08-19  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* private.c (_pthread_threadStart): Return exit status from
+	the application thread startup routine.
+	- Milan Gardian <mg@tatramed.sk>
+
+1999-08-18  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* exit.c (pthread_exit): Put status into pthread_t->exitStatus
+	- John Bossom <john.Bossom@cognos.com>
+	* private.c (_pthread_threadStart): Set pthread->exitStatus
+	on exit of try{} block.
+	- John Bossom <john.Bossom@cognos.com>
+	* sync.c (pthread_join): use pthread_exitStatus value if the
+	thread exit doesn't return a value (for Mingw32 CRTDLL
+	which uses endthread instead of _endthreadex).
+	- John Bossom <john.Bossom@cognos.com>
+
+Tue Aug 17 20:17:58 CDT 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+        * create.c (pthread_create): Add CRTDLL suppport.
+        * exit.c (pthread_exit): Likewise.
+        * private.c (_pthread_threadStart): Likewise.
+        (_pthread_threadDestroy): Likewise.
+        * sync.c (pthread_join): Likewise.
+        * tests/join1.c (main): Warn about partial support for CRTDLL.
+
+Tue Aug 17 20:00:08 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+        * Makefile.in (LD): Delete entry point.
+        * acconfig.h (STDCALL): Delete unused macro.
+        * configure.in: Remove test for STDCALL.
+        * config.h.in: Regenerate.
+        * errno.c (_errno): Fix self type.
+        * pthread.h (PT_STDCALL): Move from here to
+        * implement.h (PT_STDCALL): here.
+        (_pthread_threadStart): Fix prototype.
+        * private.c (_pthread_threadStart): Likewise.
+
 1999-08-14  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* exit.c (pthread_exit): Don't call pthread_self() but
-	get thread handle directly for efficiency.
+	get thread handle directly from TSD for efficiency.
 	
 1999-08-12  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 

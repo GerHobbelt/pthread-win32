@@ -159,7 +159,11 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
 
 #endif /* _MSC_VER */
 
-void *
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+unsigned PT_STDCALL
+#else
+void
+#endif
 _pthread_threadStart (ThreadParms * threadParms)
 {
   pthread_t self;
@@ -178,6 +182,11 @@ _pthread_threadStart (ThreadParms * threadParms)
   start = threadParms->start;
   arg = threadParms->arg;
 
+#if defined (__MINGW32__) && ! defined (__MSVCRT__)
+  /* beginthread does not return the thread id, and so we do it here. */
+  self->thread = GetCurrentThreadId ();
+#endif
+
   free (threadParms);
 
   pthread_setspecific (_pthread_selfThreadKey, self);
@@ -189,8 +198,7 @@ _pthread_threadStart (ThreadParms * threadParms)
     /*
      * Run the caller's routine;
      */
-    (*start) (arg);
-    status = (void *) 0;
+    status = (*start) (arg);
   }
   __except (ExceptionFilter(GetExceptionInformation(), ei))
   {
@@ -230,7 +238,7 @@ _pthread_threadStart (ThreadParms * threadParms)
      * Run the caller's routine;
      */
     (*start) (arg);
-    status = (void *) 0;
+    status = self->exitStatus = (void *) 0;
   }
   catch (Pthread_exception_cancel)
     {
@@ -244,7 +252,7 @@ _pthread_threadStart (ThreadParms * threadParms)
       /*
        * Thread was exited via pthread_exit().
        */
-      status = self->exceptionInformation;
+      status = self->exitStatus;
     }
   catch (...)
     {
@@ -270,12 +278,19 @@ _pthread_threadStart (ThreadParms * threadParms)
 
   _pthread_callUserDestroyRoutines(self);
 
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
   _endthreadex ((unsigned) status);
+#else
+  _endthread ();
+#endif
 
   /*
    * Never reached.
    */
-  return (status);
+
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+  return (unsigned) status;
+#endif
 
 }				/* _pthread_threadStart */
 
@@ -291,10 +306,13 @@ _pthread_threadDestroy (pthread_t thread)
 	  CloseHandle (thread->cancelEvent);
 	}
 
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+      /* See documentation for endthread vs endthreadex. */
       if( thread->threadH != 0 )
 	{
 	  CloseHandle( thread->threadH );
 	}
+#endif
 
       free (thread);
     }

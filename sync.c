@@ -128,6 +128,8 @@ pthread_join (pthread_t thread, void **value_ptr)
 
       stat = WaitForSingleObject (thread->threadH, INFINITE);
 
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+
       if (stat == WAIT_OBJECT_0)
 	{
 	  if (value_ptr != NULL
@@ -148,6 +150,23 @@ pthread_join (pthread_t thread, void **value_ptr)
 	{
 	  result = ESRCH;
 	}
+
+#else /* __MINGW32__ && ! __MSVCRT__ */
+
+      /*
+       * If using CRTDLL, the thread may have exited, and endthread
+       * will have closed the handle.
+       */
+      if (value_ptr != NULL)
+	*value_ptr = self->exitStatus;
+      
+      /*
+       * The result of making multiple simultaneous calls to
+       * pthread_join() specifying the same target is undefined.
+       */
+      _pthread_threadDestroy (thread);
+
+#endif /* __MINGW32__ && ! __MSVCRT__ */
     }
 
   return (result);

@@ -253,12 +253,6 @@ struct timespec {
 #define FALSE	0
 #endif /* !TRUE */
 
-#ifdef __MINGW32__
-#define PT_STDCALL
-#else
-#define PT_STDCALL __stdcall
-#endif
-
 /* 
  * This should perhaps be in autoconf or 
  * possibly fixed in Mingw32 to

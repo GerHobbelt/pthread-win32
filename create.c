@@ -125,6 +125,8 @@ pthread_create (pthread_t * tid,
     : PThreadStateSuspended;
 
   thread->keys = NULL;
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+
   thread->threadH = (HANDLE)
     _beginthreadex (
 		     (void *) NULL,	/* No security info             */
@@ -133,6 +135,27 @@ pthread_create (pthread_t * tid,
 		     parms,
 		     (unsigned) run ? 0 : CREATE_SUSPENDED,
 		     (unsigned *) &(thread->thread));
+
+#else /* __MINGW32__ && ! __MSVCRT__ */
+
+  thread->threadH = (HANDLE)
+    _beginthread (
+		   (void (*) (void *)) _pthread_threadStart,
+		   (unsigned) stackSize,	/* default stack size   */
+		   parms);
+
+  /* Make the return code to match _beginthreadex's.  */
+  if (thread->threadH == (HANDLE)-1L)
+    thread->threadH = NULL;
+  else if (! run)
+    {
+      /* beginthread does not allow for create flags, so we do it now.
+         Note that beginthread itself creates the thread in SUSPENDED
+	 mode, and then calls ResumeThread to start it.  */
+      SuspendThread (thread->threadH);
+    }
+
+#endif /* __MINGW32__ && ! __MSVCRT__ */
 
   result = (thread->threadH != 0) ? 0 : EAGAIN;
 
