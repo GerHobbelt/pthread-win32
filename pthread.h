@@ -125,8 +125,8 @@ typedef struct {
   pthread_mutex_t waiters_count_lock;
 } pthread_cond_t;
 
-typedef struct { void * ptr; } pthread_condattr_t;
-typedef struct { void * ptr; } pthread_mutexattr_t;
+typedef struct { void * dummy; } pthread_condattr_t;
+typedef struct { void * dummy; } pthread_mutexattr_t;
 
 typedef struct {
   unsigned short flag;
