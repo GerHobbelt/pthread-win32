@@ -64,7 +64,7 @@ pthread_getw32threadhandle_np(pthread_t thread)
 
 
 /*
- * Provide pthread_delay_np posix function for NT
+ * pthread_delay_np
  *
  * DESCRIPTION
  *
@@ -107,31 +107,66 @@ pthread_getw32threadhandle_np(pthread_t thread)
 int
 pthread_delay_np (struct timespec * interval)
 {
-  DWORD  wait_time, secs_in_millisecs, millisecs;
+  DWORD wait_time;
+  DWORD secs_in_millisecs;
+  DWORD millisecs;
+  DWORD status;
 
-  /*
-   * We are a cancelation point.
-   */
-  pthread_testcancel();
-
-  if (interval->tv_sec < 0 || interval->tv_nsec < 0)
+  if (interval == NULL)
     {
-      return (EINVAL);
+      return EINVAL;
     }
 
-  secs_in_millisecs = interval->tv_sec * 1000L;           /* convert secs to millisecs */
+  if (interval->tv_sec == 0L && interval->tv_nsec == 0L)
+    {
+      pthread_testcancel();
+      Sleep(0);
+      pthread_testcancel();
+    }
 
-  /*
-   * Pedantically, we're ensuring that we don't return before the time is up,
-   * even by a fraction of a millisecond.
-   */
-  millisecs = (interval->tv_nsec + 999999L) / 1000000L;    /* convert nanosecs to millisecs */
+  /* convert secs to millisecs */
+  secs_in_millisecs = interval->tv_sec * 1000L;
 
-  wait_time         = secs_in_millisecs + millisecs;
+  /* convert nanosecs to millisecs (rounding up) */
+  millisecs = (interval->tv_nsec + 999999L) / 1000000L;
 
-  Sleep(wait_time);
+  if (0 > (wait_time = secs_in_millisecs + millisecs))
+    {
+      return EINVAL;
+    }
 
-  pthread_testcancel();
+  if (self->cancelState == PTHREAD_CANCEL_ENABLE)
+    {
+      /*
+       * Async cancelation won't catch us until wait_time is up.
+       * Deferred cancelation will cancel us immediately.
+       */
+      if (WAIT_OBJECT_0 == 
+          (status = WaitForSingleObject(self->cancelEvent, wait_time)) )
+        {
+          /*
+           * Canceling!
+           */
+          (void) pthread_mutex_lock(&self->cancelLock);
+          if (self->state < PThreadStateCanceling)
+            {
+              self->state = PThreadStateCanceling;
+              self->cancelState = PTHREAD_CANCEL_DISABLE;
+              (void) pthread_mutex_unlock(&self->cancelLock);
+
+              ptw32_throw(PTW32_EPS_CANCEL);
+            }
+        }
+
+      if (status != WAIT_TIMEOUT)
+        {
+          return EINVAL;
+        }
+    }
+  else
+    {
+      Sleep( wait_time );
+    }
 
   return (0);
 }
