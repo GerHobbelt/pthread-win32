@@ -1,5 +1,9 @@
 Tue Jul 28 14:04:29 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* create.c (_pthread_start_call): Insert missing ")".
+	Add "us" arg to _pthread_exit() call.
+	(pthread_create): Modify to use new thread allocation scheme.
+
 	* private.c: Added detailed explanation of the new thread
 	allocation scheme.
 	(_pthread_new_thread): Totally rewritten to use
