@@ -1,3 +1,11 @@
+1998-07-20  Ben Elliston  <bje@cygnus.com>
+
+	* misc.c (pthread_once): Implement.
+
+	* pthread.h (_pthread_once_flag): Add new variable.
+	(_pthread_once_lock): Add new mutex lock to ensure integrity of
+	access to _pthread_once_flag.
+
 Mon Jul 20 02:31:05 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* private.c (_pthread_getthreadindex): Implement.
