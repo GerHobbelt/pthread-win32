@@ -31,7 +31,7 @@
 /* 
  * Function pointer to TryEnterCriticalSection if it exists; otherwise NULL 
  */
-BOOL (WINAPI *_pthread_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
+BOOL (WINAPI *ptw32_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
 
 /*
  * We use this to double-check that TryEnterCriticalSection works.
@@ -41,7 +41,7 @@ CRITICAL_SECTION cs;
 /*
  * Handle to kernel32.dll 
  */
-static HINSTANCE _pthread_h_kernel32;
+static HINSTANCE ptw32_h_kernel32;
 
 
 #ifdef _MSC_VER
@@ -82,25 +82,25 @@ DllMain (
       /*
        * The DLL is being mapped into the process's address space
        */
-      result = _pthread_processInitialize ();
+      result = ptw32_rocessInitialize ();
 
       /* Load KERNEL32 and try to get address of TryEnterCriticalSection */
-      _pthread_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
-      _pthread_try_enter_critical_section =
+      ptw32_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
+      ptw32_try_enter_critical_section =
 	(BOOL (PT_STDCALL *)(LPCRITICAL_SECTION))
 
 #if defined(NEED_UNICODE_CONSTS)
-	GetProcAddress(_pthread_h_kernel32,
+	GetProcAddress(ptw32_h_kernel32,
 		       (const TCHAR *)TEXT("TryEnterCriticalSection"));
 #else
-	GetProcAddress(_pthread_h_kernel32,
+	GetProcAddress(ptw32_h_kernel32,
 		       (LPCSTR) "TryEnterCriticalSection");
 #endif
 
-      if (_pthread_try_enter_critical_section != NULL)
+      if (ptw32_try_enter_critical_section != NULL)
         {
           InitializeCriticalSection(&cs);
-          if ((*_pthread_try_enter_critical_section)(&cs))
+          if ((*ptw32_try_enter_critical_section)(&cs))
             {
               LeaveCriticalSection(&cs);
             }
@@ -109,12 +109,12 @@ DllMain (
               /*
                * Not really supported (Win98?).
                */
-              _pthread_try_enter_critical_section = NULL;
+              ptw32_try_enter_critical_section = NULL;
             }
           DeleteCriticalSection(&cs);
         }
 
-      if (_pthread_try_enter_critical_section == NULL)
+      if (ptw32_try_enter_critical_section == NULL)
         {
           /*
            * If TryEnterCriticalSection is not being used, then free
@@ -130,8 +130,8 @@ DllMain (
            * provide TryEnterCriticalSection, the bug will be
            * effortlessly avoided.
            */
-          (void) FreeLibrary(_pthread_h_kernel32);
-          _pthread_h_kernel32 = 0;
+          (void) FreeLibrary(ptw32_h_kernel32);
+          ptw32_h_kernel32 = 0;
         }
       break;
 
@@ -152,9 +152,9 @@ DllMain (
       {
 	pthread_t self;
 
-	if (_pthread_processInitialized)
+	if (ptw32_processInitialized)
 	  {
-	    self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
+	    self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
 
 	    /*
 	     * Detached threads have their resources automatically
@@ -163,8 +163,8 @@ DllMain (
 	    if (self != NULL &&
 		self->detachState == PTHREAD_CREATE_DETACHED)
 	      {
-		pthread_setspecific (_pthread_selfThreadKey, NULL);
-		_pthread_threadDestroy (self);
+		pthread_setspecific (ptw32_selfThreadKey, NULL);
+		ptw32_threadDestroy (self);
 	      }
 
 	    if (fdwReason == DLL_PROCESS_DETACH)
@@ -172,11 +172,11 @@ DllMain (
 		/*
 		 * The DLL is being unmapped into the process's address space
 		 */
-		_pthread_processTerminate ();
+		ptw32_processTerminate ();
 
-                 if (_pthread_h_kernel32)
+                 if (ptw32_h_kernel32)
                    {
-                     (void) FreeLibrary(_pthread_h_kernel32);
+                     (void) FreeLibrary(ptw32_h_kernel32);
                    }
 	      }
 	  }

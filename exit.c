@@ -62,15 +62,15 @@ pthread_exit (void *value_ptr)
   /* If the current thread is implicit it was not started through
      pthread_create(), therefore we cleanup and end the thread
      here. Otherwise we raise an exception to unwind the exception
-     stack. The exception will be caught by _pthread_threadStart(),
+     stack. The exception will be caught by ptw32_threadStart(),
      which will cleanup and end the thread for us.
    */
 
-  self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
+  self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
 
   if (self == NULL || self->implicit)
     {
-      _pthread_callUserDestroyRoutines(self);
+      ptw32_allUserDestroyRoutines(self);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
       _endthreadex ((unsigned) value_ptr);
@@ -105,7 +105,7 @@ pthread_exit (void *value_ptr)
 
   (void) pthread_pop_cleanup( 1 );
 
-  _pthread_callUserDestroyRoutines(self);
+  ptw32_callUserDestroyRoutines(self);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
   _endthreadex ((unsigned) value_ptr);

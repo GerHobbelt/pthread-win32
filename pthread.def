@@ -1,12 +1,12 @@
 ; pthread.def
-; Last updated: $Date: 2000/08/14 03:43:09 $
+; Last updated: $Date: 2000/08/17 10:18:36 $
 
 ; Currently unimplemented functions are commented out.
 
 ;LIBRARY pthread
 
 EXPORTS
-_pthread_processInitialize
+ptw32_processInitialize
 ;pthread_atfork
 pthread_attr_destroy
 pthread_attr_getdetachstate
@@ -113,4 +113,4 @@ pthread_pop_cleanup
 ; Not for use directly. Needed by macros in pthread.h
 ; to return internal SEH code.
 ;
-_pthread_get_exception_services_code
+ptw32_get_exception_services_code

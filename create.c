@@ -74,7 +74,7 @@ pthread_create (pthread_t * tid,
   ThreadParms *parms = NULL;
   long stackSize;
 
-  if ((thread = _pthread_new()) == NULL)
+  if ((thread = ptw32_new()) == NULL)
     {
       goto FAIL0;
     }
@@ -141,7 +141,7 @@ pthread_create (pthread_t * tid,
     _beginthreadex (
 		     (void *) NULL,	/* No security info             */
 		     (unsigned) stackSize,	/* default stack size   */
-		     (unsigned (PT_STDCALL *) (void *)) _pthread_threadStart,
+		     (unsigned (PT_STDCALL *) (void *)) ptw32_threadStart,
 		     parms,
 		     (unsigned) CREATE_SUSPENDED,
 		     (unsigned *) &(thread->thread));
@@ -161,7 +161,7 @@ pthread_create (pthread_t * tid,
 
   thread->threadH = threadH = (HANDLE)
     _beginthread (
-		   (void (PT_STDCALL *) (void *)) _pthread_threadStart,
+		   (void (PT_STDCALL *) (void *)) ptw32_hreadStart,
 		   (unsigned) stackSize,	/* default stack size   */
 		   parms);
 
@@ -202,7 +202,7 @@ FAIL0:
   if (result != 0)
     {
 
-      _pthread_threadDestroy (thread);
+      ptw32_threadDestroy (thread);
       thread = NULL;
 
       if (parms != NULL)

@@ -147,14 +147,14 @@ pthread_self (void)
    * need to ensure there always is a self
    */
 
-  if ((self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey)) 
+  if ((self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey)) 
       == NULL)
     {
       /*
        * Need to create an implicit 'self' for the currently
        * executing thread.
        */
-      self = _pthread_new();
+      self = ptw32_new();
 
       if (self != NULL)
 	{
@@ -195,7 +195,7 @@ pthread_self (void)
 #endif
 	}
 
-      pthread_setspecific (_pthread_selfThreadKey, self);
+      pthread_setspecific (ptw32_elfThreadKey, self);
     }
 
   return (self);
@@ -260,7 +260,7 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
 
   handles[0] = waitHandle;
 
-  if ((self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey)) 
+  if ((self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey)) 
       != NULL)
     {
       /*
@@ -381,7 +381,7 @@ pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout)
 
 
 pthread_t
-_pthread_new (void)
+ptw32_new (void)
 {
   pthread_t t;
 
@@ -402,7 +402,7 @@ _pthread_new (void)
 
 #ifdef NEED_CALLOC
 void *
-_pthread_calloc(size_t n, size_t s) {
+ptw32_calloc(size_t n, size_t s) {
 	unsigned int m = n*s;
 	void *p;
 	

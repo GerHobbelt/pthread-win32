@@ -581,14 +581,14 @@ struct sched_param {
  * C++ and C built versions will not.
  */
 
-typedef struct _pthread_cleanup_t _pthread_cleanup_t;
+typedef struct ptw32_cleanup_t ptw32_cleanup_t;
 
-struct _pthread_cleanup_t
+struct ptw32_cleanup_t
 {
   void (*routine) (void *);
   void *arg;
 #if !defined(_MSC_VER) && !defined(__cplusplus)
-  _pthread_cleanup_t *prev;
+  ptw32_leanup_t *prev;
 #endif /* !_MSC_VER && ! __cplusplus */
 };
 
@@ -599,7 +599,7 @@ struct _pthread_cleanup_t
 
 #define pthread_cleanup_push( _rout, _arg ) \
 	{ \
-	    _pthread_cleanup_t	_cleanup; \
+	    ptw32_cleanup_t	_cleanup; \
 	    \
             _cleanup.routine	= (_rout); \
 	    _cleanup.arg	= (_arg); \
@@ -627,7 +627,7 @@ struct _pthread_cleanup_t
 
 #define pthread_cleanup_push( _rout, _arg ) \
 	{ \
-	    _pthread_cleanup_t	_cleanup; \
+	    ptw32_cleanup_t	_cleanup; \
             \
 	    pthread_push_cleanup( &_cleanup, (_rout), (_arg) ); \
 
@@ -787,9 +787,9 @@ void pthread_testcancel (void);
 int pthread_once (pthread_once_t * once_control,
 		  void (*init_routine) (void));
 
-_pthread_cleanup_t *pthread_pop_cleanup (int execute);
+ptw32_cleanup_t *pthread_pop_cleanup (int execute);
 
-void pthread_push_cleanup (_pthread_cleanup_t * cleanup,
+void pthread_push_cleanup (ptw32_cleanup_t * cleanup,
 			   void (*routine) (void *),
 			   void *arg);
 
@@ -970,7 +970,7 @@ int * _errno( void );
 /*
  * Get internal SEH tag
  */
-DWORD _pthread_get_exception_services_code(void);
+DWORD ptw32_get_exception_services_code(void);
 
 #if defined(_MSC_VER) && !defined(__cplusplus)
 
@@ -979,7 +979,7 @@ DWORD _pthread_get_exception_services_code(void);
  * propagate our internal exceptions up to the library's internal handlers.
  */
 #define __except( E ) \
-        __except( ( GetExceptionCode() == _pthread_get_exception_services_code() ) \
+        __except( ( GetExceptionCode() == ptw32_get_exception_services_code() ) \
 		 ? EXCEPTION_CONTINUE_SEARCH : ( E ) )
 
 #endif /* _MSC_VER && ! __cplusplus */

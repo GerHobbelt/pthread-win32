@@ -56,7 +56,7 @@ _mutex_check_need_init(pthread_mutex_t *mutex)
    * the number of processors + 1.
    *
    */
-  EnterCriticalSection(&_pthread_mutex_test_init_lock);
+  EnterCriticalSection(&ptw32_mutex_test_init_lock);
 
   /*
    * We got here possibly under race
@@ -80,7 +80,7 @@ _mutex_check_need_init(pthread_mutex_t *mutex)
       result = EINVAL;
     }
 
-  LeaveCriticalSection(&_pthread_mutex_test_init_lock);
+  LeaveCriticalSection(&ptw32_mutex_test_init_lock);
 
   return(result);
 }
@@ -140,7 +140,7 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
     }
   else
     {
-      if (_pthread_try_enter_critical_section != NULL
+      if (ptw32_ry_enter_critical_section != NULL
 	  || (attr != NULL
 	      && *attr != NULL
 	      && (*attr)->forcecs == 1)
@@ -234,7 +234,7 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
       /*
        * See notes in _mutex_check_need_init() above also.
        */
-      EnterCriticalSection(&_pthread_mutex_test_init_lock);
+      EnterCriticalSection(&ptw32_mutex_test_init_lock);
 
       /*
        * Check again.
@@ -258,7 +258,7 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
           result = EBUSY;
         }
 
-      LeaveCriticalSection(&_pthread_mutex_test_init_lock);
+      LeaveCriticalSection(&ptw32_mutex_test_init_lock);
     }
 
   return(result);
@@ -618,7 +618,7 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
     {
       if (mx->mutex == 0)
 	{
-	  if ((*_pthread_try_enter_critical_section)(&mx->cs) != TRUE)
+	  if ((*ptw32_try_enter_critical_section)(&mx->cs) != TRUE)
 	    {
 	      result = EBUSY;
 	    }

@@ -322,20 +322,20 @@ struct ThreadKeyAssoc {
 #endif /* _MSC_VER */
 
 /* Function pointer to TryEnterCriticalSection if it exists; otherwise NULL */
-extern BOOL (WINAPI *_pthread_try_enter_critical_section)(LPCRITICAL_SECTION);
+extern BOOL (WINAPI *ptw32_try_enter_critical_section)(LPCRITICAL_SECTION);
 
 /* Declared in global.c */
-extern int _pthread_processInitialized;
-extern pthread_key_t _pthread_selfThreadKey;
-extern pthread_key_t _pthread_cleanupKey;
-extern CRITICAL_SECTION _pthread_mutex_test_init_lock;
-extern CRITICAL_SECTION _pthread_cond_test_init_lock;
-extern CRITICAL_SECTION _pthread_rwlock_test_init_lock;
+extern int ptw32_processInitialized;
+extern pthread_key_t ptw32_elfThreadKey;
+extern pthread_key_t ptw32_cleanupKey;
+extern CRITICAL_SECTION ptw32_mutex_test_init_lock;
+extern CRITICAL_SECTION ptw32_cond_test_init_lock;
+extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
 
 /* Declared in misc.c */
 #ifdef NEED_CALLOC
-#define calloc(n, s) _pthread_calloc(n, s)
-void *_pthread_calloc(size_t n, size_t s);
+#define calloc(n, s) ptw32_calloc(n, s)
+void *ptw32_calloc(size_t n, size_t s);
 #endif
 
 
@@ -350,37 +350,37 @@ extern "C" {
  * =====================
  * =====================
  */
-int _pthread_processInitialize (void);
+int ptw32_processInitialize (void);
 
-void _pthread_processTerminate (void);
+void ptw32_processTerminate (void);
 
-void _pthread_threadDestroy (pthread_t tid);
+void ptw32_threadDestroy (pthread_t tid);
 
-void _pthread_cleanupStack (void);
+void ptw32_cleanupStack (void);
 
-pthread_t _pthread_new (void);
+pthread_t ptw32_new (void);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
 unsigned PT_STDCALL
 #else
 void
 #endif
-_pthread_threadStart (ThreadParms * threadParms);
+ptw32_threadStart (ThreadParms * threadParms);
 
-void _pthread_callUserDestroyRoutines (pthread_t thread);
+void ptw32_callUserDestroyRoutines (pthread_t thread);
 
-int _pthread_tkAssocCreate (ThreadKeyAssoc ** assocP,
+int ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
 			    pthread_t thread,
 			    pthread_key_t key);
 
-void _pthread_tkAssocDestroy (ThreadKeyAssoc * assoc);
+void ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
-int _pthread_sem_timedwait (sem_t * sem,
+int ptw32_sem_timedwait (sem_t * sem,
 			    const struct timespec * abstime);
 
 #ifdef NEED_SEM
-void _pthread_decrease_semaphore(sem_t * sem);
-BOOL _pthread_increase_semaphore(sem_t * sem,
+void ptw32_decrease_semaphore(sem_t * sem);
+BOOL ptw32_increase_semaphore(sem_t * sem,
                                  unsigned int n);
 #endif /* NEED_SEM */
 

@@ -28,7 +28,7 @@
 
 
 static void 
-_pthread_cancel_self(void)
+ptw32_cancel_self(void)
 {
 #if defined(_MSC_VER) && !defined(__cplusplus)
 
@@ -59,10 +59,10 @@ _pthread_cancel_self(void)
 
 
 /*
- * _pthread_cancel_thread implements asynchronous cancellation.
+ * ptw32_cancel_thread implements asynchronous cancellation.
  */
 static void 
-_pthread_cancel_thread(pthread_t thread)
+ptw32_ancel_thread(pthread_t thread)
 {
   HANDLE threadH = thread->threadH;
 
@@ -76,7 +76,7 @@ _pthread_cancel_thread(pthread_t thread)
       CONTEXT context;
       context.ContextFlags = CONTEXT_CONTROL;
       GetThreadContext(threadH, &context);
-      context.Eip = (DWORD) _pthread_cancel_self;
+      context.Eip = (DWORD) ptw32_cancel_self;
       SetThreadContext(threadH, &context);
 #endif
       ResumeThread(threadH);
@@ -128,7 +128,7 @@ pthread_setcancelstate (int state, int *oldstate)
       */
 {
   int result = 0;
-  pthread_t self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
+  pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
 
   if (self == NULL
       || (state != PTHREAD_CANCEL_ENABLE
@@ -158,7 +158,7 @@ pthread_setcancelstate (int state, int *oldstate)
     {
       ResetEvent(self->cancelEvent);
       (void) pthread_mutex_unlock(&self->cancelLock);
-      _pthread_cancel_self();
+      ptw32_cancel_self();
 
       /* Never reached */
     }
@@ -212,7 +212,7 @@ pthread_setcanceltype (int type, int *oldtype)
       */
 {
   int result = 0;
-  pthread_t self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
+  pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
 
   if (self == NULL
       || (type != PTHREAD_CANCEL_DEFERRED
@@ -242,7 +242,7 @@ pthread_setcanceltype (int type, int *oldtype)
     {
       ResetEvent(self->cancelEvent);
       (void) pthread_mutex_unlock(&self->cancelLock);
-      _pthread_cancel_self();
+      ptw32_cancel_self();
 
       /* Never reached */
     }
@@ -283,7 +283,7 @@ pthread_testcancel (void)
       * ------------------------------------------------------
       */
 {
-  pthread_t self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
+  pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
 
   if (self != NULL
       && self->cancelState == PTHREAD_CANCEL_ENABLE
@@ -355,7 +355,7 @@ pthread_cancel (pthread_t thread)
     }
 
   result = 0;
-  self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
+  self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
 
   /*
    * FIXME!!
@@ -384,12 +384,12 @@ pthread_cancel (pthread_t thread)
       if (cancel_self)
 	{
 	  (void) pthread_mutex_unlock(&self->cancelLock);
-	  _pthread_cancel_self();
+	  ptw32_cancel_self();
 
 	  /* Never reached */
 	}
 
-      _pthread_cancel_thread(thread);
+      ptw32_cancel_thread(thread);
     }
   else
     {

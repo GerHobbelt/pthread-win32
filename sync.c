@@ -154,7 +154,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 	       * The result of making multiple simultaneous calls to
 	       * pthread_join() specifying the same target is undefined.
 	       */
-	      _pthread_threadDestroy (thread);
+	      ptw32_threadDestroy (thread);
 	    }
 
 #else /* __MINGW32__ && ! __MSVCRT__ */
@@ -172,7 +172,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 	   * The result of making multiple simultaneous calls to
 	   * pthread_join() specifying the same target is undefined.
 	   */
-	  _pthread_threadDestroy (thread);
+	  ptw32_threadDestroy (thread);
 
 #endif /* __MINGW32__ && ! __MSVCRT__ */
 
