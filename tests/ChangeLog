@@ -1,12 +1,14 @@
 1999-02-23  Ross Johnson  <rpj@ise.canberra.edu.au>
 
-	* Template.c: Revamp.
+        * Template.c: Revamp.
 
-	* condvar1.c: Add.
+        * condvar1.c: Add.
 
-	* condvar2.c: Add.
+        * condvar2.c: Add.
 
-	* various: Cosmetic changes.
+        * Makefile: Add condvar1 condvar2 tests.
+
+        * exit1.c, exit2.c, exit3.c: Cosmetic changes.
 
 1999-02-23  Ross Johnson  <rpj@ise.canberra.edu.au>
 
