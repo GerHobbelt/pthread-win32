@@ -1,4 +1,11 @@
-This directory contains an implementation of pthreads for Win32, based on the
-Cygwin32 porting layer.
+This directory contains an implementation of pthreads for Win32.  If
+desired, it can work with the Cygwin32 porting layer to provide closer
+POSIX standards conformance (ie. by providing process control).
 
+There is a mailing list for discussing pthreads on Win32 which is
+manually operated at present.  Send mail to postmaster@air.net.au to
+request that you be subscribed.
+
+---
+Ben Elliston
 bje@cygnus.com
