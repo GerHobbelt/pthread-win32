@@ -42,9 +42,6 @@ pthread_setspecific(pthread_key_t key, void *value)
 void *
 pthread_getspecific(pthread_key_t key)
 {
-  /* FIXME: this code assumes that TlsGetValue returns NULL if the key
-     is not present in the TLS structure.  Confirm. */
-
   return TlsGetValue(key);
 }
 
@@ -53,4 +50,3 @@ pthread_key_delete(pthread_key_t key)
 {
   return (TlsFree(key) == FALSE) ? EINVAL : 0;
 }
-  
