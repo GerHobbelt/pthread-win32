@@ -41,6 +41,14 @@
 #define _WIN32_WINNT 0x400
 
 #include <windows.h>
+
+/*
+ * In case windows.h doesn't define it (e.g. WinCE perhaps)
+ */
+#ifndef PAPCFUNC
+# define PAPCFUNC (void CALLBACK (*)(DWORD))
+#endif
+
 /*
  * note: ETIMEDOUT is correctly defined in winsock.h
  */
