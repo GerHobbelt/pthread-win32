@@ -1,3 +1,7 @@
+Sun May 30 00:25:02 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* semaphore.h (mode_t): Conditionally typedef it.
+
 Fri May 28 13:33:05 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* condvar.c (pthread_cond_broadcast): Fix possible memory fault
