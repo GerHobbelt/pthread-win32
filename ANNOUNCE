@@ -63,7 +63,11 @@ On success, both routines return SCHED_OTHER.
 
 sched_rr_get_interval
 ---------------------
-Always returns -1 and sets errno to ENOTSUP.
+Always returns -1 and sets errno to ENOTSUP. This is
+implemented as a macro. It returns ENOTSUP rather than
+ENOSYS because sched_get_priority_max() and
+sched_get_priority_min() are supported, but only for
+SCHED_OTHER.
 
 
 pthread_attr_setschedpolicy
@@ -97,7 +101,7 @@ process. This behaviour is equivalent to the following
 Pthreads defaults:
 
 	Inheritance:	PTHREAD_EXPLICIT_SCHED
-	Priority:	THREAD_PRIORITY_NORMAL
+	Priority:		THREAD_PRIORITY_NORMAL
 
 These are also the defaults in pthreads-win32, and now
 reinforced by changes to the library which now actually
@@ -146,7 +150,7 @@ slight improvement for blocking lock operations. Since the
 type of mutex used internally is PTHREAD_MUTEX_DEFAULT, this
 also results in additional speed improvements to CVs and R/W
 lock operations. Subjective observation shows an
-improvement of approximately 30-35% in R/W locks
+improvement of up to 30-35% in R/W locks
 (from tests/rwlock7.c). This is compared to the
 already improved snapshot-2001-06-06.
 
@@ -163,9 +167,10 @@ unlocked or destroyed, an error will ultimately eventuate
 when the owner thread subsequently attempts to unlock or
 destroy the mutex.
 
-These changes appear to be consistent with both
-the behaviour exhibited by other implementations and their
+These changes are consistent with both the behaviour exhibited
+by PTHREAD_MUTEX_NORMAL in other implementations and their
 documentation, including the Open Group documentation.
+
 
 ------------
 Benchmarking
@@ -187,29 +192,51 @@ make clean GCE-bench
 UWIN:
 The benchtests are run as part of the testsuite.
 
-Currently these only provide timing for various
-synchronisation senarios for the different mutex types.
-Each test does timings for each of the implemented
-mutex types and, for reference, also repeats the same
-tests using the following:
 
-- Simple Critical Section
-- POSIX mutex implemented using a Critical Section
-- POSIX mutex implemented using a Win32 Mutex
+In this snapshot there are four benchtests timing
+various mutex senarios. They are:
 
-The later two represent the old implementation under
-WNT and W9x respectively.
+benchtest1 - Lock plus unlock on an unlocked mutex.
+benchtest2 - Lock plus unlock on a locked mutex.
+benchtest3 - Trylock on a locked mutex.
+benchtest4 - Trylock plus unlock on an unlocked mutex.
 
-The mutex types tested are:
+
+Each test times up to three alternate synchronisation
+implementations as a reference, and then times each of
+the four mutex types provided by the library. Each is
+described below:
+
+Simple Critical Section
+- uses a simple Win32 critical section. There is no
+additional overhead for this case as there is in the
+remaining cases.
+
+POSIX mutex implemented using a Critical Section
+- The old implementation which uses runtime adaptation
+depending on the Windows variant being run on. When
+the pthreads DLL was run on WinNT or higher then
+POSIX mutexes would use Win32 Critical Sections.
+
+POSIX mutex implemented using a Win32 Mutex
+- The old implementation which uses runtime adaptation
+depending on the Windows variant being run on. When
+the pthreads DLL was run on Win9x then POSIX mutexes
+would use Win32 Mutexes (because TryEnterCriticalSection
+is not implemented on Win9x).
+
 PTHREAD_MUTEX_DEFAULT
 PTHREAD_MUTEX_NORMAL
 PTHREAD_MUTEX_ERRORCHECK
 PTHREAD_MUTEX_RECURSIVE
+- The current implementation supports these mutex types.
+The underlying basis of POSIX mutexes is now the same
+irrespective of the Windows variant.
 
-The results from these tests indicate that is may be
-worthwhile re-introducing runtime adaptation of the
-underlying Win32 synchronisation mechanism for WinNT
-systems.
+
+In all benchtests, the operation is repeated a large
+number of times and an average is calculated. Loop
+overhead is measured and subtracted from all test times.
 
 
 ---------

@@ -498,7 +498,6 @@ sem_post_multiple (sem_t * sem, int count )
     {
       result = EINVAL;
     }
-  else
 
 #ifdef NEED_SEM
 
