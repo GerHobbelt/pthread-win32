@@ -22,6 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef _PTHREADS_H
 #define _PTHREADS_H
 
+#include <windows.h>
+#include <unistd.h>
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
@@ -35,7 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #endif /* SIG_BLOCK */
 
 #ifndef SIG_UNBLOCK 
-#define SIG_BLOCK 1
+#define SIG_UNBLOCK 1
 #endif /* SIG_UNBLOCK */
 
 #ifndef SIG_SETMASK
@@ -96,9 +99,9 @@ struct sched_param {
   int sched_priority;
 }
 
-typedef struct {
-  enum { SIGNAL, BROADCAST, NUM_EVENTS };
+enum { SIGNAL, BROADCAST, NUM_EVENTS };
 
+typedef struct {
   /* Signal and broadcast event HANDLEs. */
   HANDLE events[NUM_EVENTS];
 
