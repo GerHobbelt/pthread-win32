@@ -30,8 +30,6 @@
 /* changed include from <semaphore.h> to use local file during development */
 #include "semaphore.h"
 
-#include <semaphore.h>
-
 typedef enum {
   /*
    * This enumeration represents the state of the thread;
