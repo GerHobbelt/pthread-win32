@@ -41,41 +41,54 @@ TESTS	= loadfree \
 	  exit2 exit3 \
 	  join0 join1 join2 mutex2 mutex3 mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  count1 once1 tsd1 self2 cancel1 cancel2 eyal1 \
-	  condvar3 condvar3_1 condvar3_2 condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
+	  condvar3 condvar3_1 condvar3_2 condvar3_3 \
+	  condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 rwlock7 \
 	  context1 cancel3 cancel4 cancel5 \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
-	  exception1 exception2 \
-	  benchtest1 benchtest2 \
-	  exception3
+	  exception1 exception2 exception3
 
-PASSES	= $(TESTS:%=%.pass)
+BENCHTESTS = \
+	benchtest1 benchtest2 benchtest3 benchtest4
+
+PASSES		= $(TESTS:%=%.pass)
+BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
 
 default:
 	@ $(ECHO) Run one of the following command lines:
 	@ $(ECHO) nmake clean GCE   (to test using GNU C dll with C++ exception handling)
 	@ $(ECHO) nmake clean GC    (to test using GNU C dll with C cleanup code)
+	@ $(ECHO) nmake clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)
+	@ $(ECHO) nmake clean GC-bench    (to benchtest using GNU C dll with C cleanup code)
 
 auto:
 	@ $(MAKE) clean GCE
 	@ $(MAKE) clean GC
 
 GC:
-	$(MAKE) GCX=GC XXCFLAGS="-x c" all-GC
+	$(MAKE) GCX=GC XXCFLAGS="-x c" all-pass
 
 GCE:
-	$(MAKE) GCX=GCE XXCFLAGS="-mthreads -x c++" all-GCE
+	$(MAKE) GCX=GCE XXCFLAGS="-mthreads -x c++" all-pass
 
-all-GC: $(PASSES)
+GC-bench:
+	$(MAKE) GCX=GC XXCFLAGS="-x c" all-bench
+
+GCE-bench:
+	$(MAKE) GCX=GCE XXCFLAGS="-mthreads -x c++" all-bench
+
+all-pass: $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
-all-GCE: $(PASSES)
-	@ $(ECHO) ALL TESTS PASSED! Congratulations!
+all-bench: $(BENCHRESULTS)
+	@ $(ECHO) BENCH TESTS COMPLETED.
 
-benchtest1.pass: mutex3.pass
-benchtest2.pass: benchtest1.pass
+benchtest1.bench:
+benchtest2.bench:
+benchtest3.bench:
+benchtest4.bench:
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
 cancel2_1.pass: cancel2.pass
@@ -92,6 +105,7 @@ condvar2_1.pass: condvar2.pass join2.pass
 condvar3.pass: create1.pass condvar2.pass
 condvar3_1.pass: condvar3.pass join2.pass
 condvar3_2.pass: condvar3_1.pass
+condvar3_3.pass: condvar3_2.pass
 condvar4.pass: create1.pass
 condvar5.pass: condvar4.pass
 condvar6.pass: condvar5.pass
@@ -144,6 +158,12 @@ tsd1.pass: join1.pass
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
+%.bench: %.exe $(LIB) $(DLL) $(HDR)
+	@ $(ECHO) Running $*
+	$*
+	@ $(ECHO) Done
+	@ $(TOUCH) $@
+
 %.exe: %.c
 	@ $(ECHO) Compiling $@
 	@ $(ECHO) $(CC) $(CFLAGS) -o $@ $^ $(INCLUDES) -L. -lpthread$(GCX)
@@ -174,3 +194,4 @@ clean:
 	- $(RM) *.pdb
 	- $(RM) *.exe
 	- $(RM) *.pass
+	- $(RM) *.bench

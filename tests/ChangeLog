@@ -1,11 +1,18 @@
+2001-07-01  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* benchtest3.c: New; timing mutexes.
+	* benchtest4.c: New; time mutexes.
+	* condvar3_1.c: Fixed bug - Alexander Terekhov
+	* condvar3_3.c: New test.
+
 2001-06-25  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
-	priority1.c: New test.
-	priority2.c: New test.
-	inherit1.c: New test.
-	benchtest1.c: New; timing mutexes.
-	benchtest2.c: New; timing mutexes.
-	mutex4.c: Modified to test all mutex types.
+	* priority1.c: New test.
+	* priority2.c: New test.
+	* inherit1.c: New test.
+	* benchtest1.c: New; timing mutexes.
+	* benchtest2.c: New; timing mutexes.
+	* mutex4.c: Modified to test all mutex types.
 
 2001-06-8  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
