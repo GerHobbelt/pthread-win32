@@ -3,6 +3,12 @@ Fri Mar 12 08:34:15 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 	* eyal1.c (main): Fix trylock loop; was not waiting for thread to lock
 	the "started" mutex.
 
+Wed Mar 10 10:41:52 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* tryentercs.c: Apply typo patch from bje.
+
+	* tryentercs2.c: Ditto.
+
 Sun Mar  7 10:41:52 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* Makefile (condvar3, condvar4): Add tests.
