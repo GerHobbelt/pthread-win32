@@ -31,13 +31,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #undef _POSIX_THREAD_ATTR_STACKADDR
 #endif
 
+/* Thread scheduling policies */
+
+#define SCHED_OTHER 0
+#define SCHED_FIFO  1
+#define SCHED_RR    2
+
+#define SCHED_MIN   SCHED_OTHER
+#define SCHED_MAX   SCHED_RR
 
 /* Cancelability attributes */
 #define PTHREAD_CANCEL_ENABLE       0x00
 #define PTHREAD_CANCEL_DISABLE      0x01
-#define PTHREAD_CANCEL_ASYNCHRONOUS 0x02
-#define PTHREAD_CANCEL_DEFERRED     0x04
 
+#define PTHREAD_CANCEL_ASYNCHRONOUS 0x00
+#define PTHREAD_CANCEL_DEFERRED     0x01
 
 typedef HANDLE pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
@@ -51,11 +59,20 @@ typedef struct {
   size_t stacksize;                  /* PTHREAD_STACK_MIN */
 #endif
   int cancelability;                 /* PTHREAD_CANCEL_DISABLE
-					PTHREAD_CANCEL_ENABLE
-					PTHREAD_CANCEL_ASYNCHRONOUS
-					PTHREAD_CANCEL_DEFERRED
-					_PTHREAD_CANCEL_DEFAULTS */
+					PTHREAD_CANCEL_ENABLE */
+
+  int canceltype;                    /* PTHREAD_CANCEL_ASYNCHRONOUS
+					PTHREAD_CANCEL_DEFERRED */
+
+  int priority;
 } pthread_attr_t;
+
+/* I don't know why this structure isn't in some kind of namespace.
+   According to my O'Reilly book, this is what this struct is
+   called. */
+struct sched_param {
+  int sched_priority;
+}
 
 typedef struct {
   enum { SIGNAL, BROADCAST, NUM_EVENTS };
@@ -119,6 +136,30 @@ int pthread_attr_setstackaddr(pthread_attr_t *attr,
 int pthread_attr_getstackaddr(const pthread_attr_t *attr,
 			      void **stackaddr);
 
+int pthread_attr_getschedparam(const pthread_attr_t *attr,
+			       struct sched_param *param);
+
+int pthread_attr_setschedparam(pthread_attr_t *attr,
+			       const struct sched_param *param);
+
+int pthread_setschedparam(pthread_t thread,
+			  int policy,
+			  const struct sched_param *param);
+
+int pthread_getschedparam(pthread_t thread,
+			  int *policy,
+			  struct sched_param *param);
+
+int sched_get_priority_min(int policy);
+
+int sched_get_priority_max(int policy);
+
+int pthread_setcancelstate(int state,
+			   int *oldstate);
+
+int pthread_setcanceltype(int type,
+			  int *oldtype);
+
 /* Functions for manipulating cond. var. attribute objects. */
 
 int pthread_condattr_init(pthread_condattr_t *attr);
@@ -173,22 +214,6 @@ int pthread_mutex_lock(pthread_mutex_t *mutex);
 int pthread_mutex_trylock(pthread_mutex_t *mutex);
 
 int pthread_mutex_unlock(pthread_mutex_t *mutex);
-
-/* These functions cannot be implemented in terms of the Win32 API.
-   Fortunately they are optional.  Their implementation just returns
-   the correct error number. */
-
-int pthread_mutexattr_setprotocol(pthread_mutexattr_t *attr,
-				  int protocol);
-
-int pthread_mutexattr_getprotocol(const pthread_mutexattr_t *attr,
-				  int *protocol);
-
-int pthread_mutexattr_setprioceiling(pthread_mutexattr_t *attr,
-				      int prioceiling);
-
-int pthread_mutexattr_getprioceiling(const pthread_mutexattr_t *attr,
-				     int *ceiling);
 
 /* Primitives for thread-specific data (TSD). */
 
