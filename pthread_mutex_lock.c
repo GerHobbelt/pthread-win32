@@ -88,9 +88,10 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
     {
       pthread_t self = pthread_self();
 
-      if ((LONG) PTW32_INTERLOCKED_EXCHANGE(
-                   (LPLONG) &mx->lock_idx,
-		   (LONG) 1) == 0)
+      if ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                   (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+		   (PTW32_INTERLOCKED_LONG) 1,
+		   (PTW32_INTERLOCKED_LONG) 0) == 0)
 	{
 	  mx->recursive_count = 1;
 	  mx->ownerThread = self;
