@@ -1,5 +1,7 @@
 Sun Mar  7 10:41:52 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* Makefile (condvar3, condvar4): Add tests.
+
 	* condvar4.c (General): Reduce to simple test case; prerequisite
 	is condvar3.c; add description.
 
