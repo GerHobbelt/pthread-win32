@@ -1,4 +1,4 @@
-                 PTHREADS-WIN32 SNAPSHOT 2001-06-04
+                 PTHREADS-WIN32 SNAPSHOT 2001-06-06
                  ----------------------------------
        Web Site: http://sources.redhat.com/pthreads-win32/
       FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -6,14 +6,14 @@
 
 
 We are pleased to announce the availability of a new snapshot of
-Pthreads-win32, an Open Source Software (OSS) implementation of the
+Pthreads-win32, an Open Source Software implementation of the
 Threads component of the POSIX 1003.1c 1995 Standard for Microsoft's
 Win32 environment. Some functions from POSIX 1003.1b are also
 supported including semaphores. Other related functions include
 the set of read-write lock functions.
 
 Parts of the implementation also comply with the Open Group's
-Unix 98 specification for compatibility with major Unix
+Single Unix specification for compatibility with major Unix
 implementations and Linux.
 
 Pthreads-win32 is free software, distributed under the GNU Library

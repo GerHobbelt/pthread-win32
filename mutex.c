@@ -282,7 +282,7 @@ pthread_mutexattr_init (pthread_mutexattr_t * attr)
     }
 
   ma->pshared = PTHREAD_PROCESS_PRIVATE;
-  ma->kind = ptw32_mutex_default_kind;
+  ma->kind = PTHREAD_MUTEX_DEFAULT;
 
   *attr = ma;
 
