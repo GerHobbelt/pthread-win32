@@ -82,8 +82,15 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
 
 	      if (result == 0)
 		{
-		  (void) sem_destroy (&mx->wait_sema);
-		  free (mx);
+		  if (!CloseHandle (mx->event))
+		    {
+		      *mutex = mx;
+		      result = EINVAL;
+		    }
+		  else
+		    {
+		      free (mx);
+		    }
 		}
 	      else
 		{

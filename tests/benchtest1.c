@@ -179,7 +179,7 @@ main (int argc, char *argv[])
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
 
   printf( "%-45s %15ld %15.3f\n",
-	    "Simple Critical Section x 2",
+	    "Simple Critical Section",
           durationMilliSecs,
           (float) durationMilliSecs * 1E3 / ITERATIONS);
 

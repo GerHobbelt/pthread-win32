@@ -45,15 +45,12 @@
 
 
 static INLINE int
-ptw32_timed_semwait (sem_t * sem, const struct timespec *abstime)
+ptw32_timed_eventwait (HANDLE event, const struct timespec *abstime)
      /*
       * ------------------------------------------------------
       * DESCRIPTION
-      *      This function waits on a POSIX semaphore. If the
-      *      semaphore value is greater than zero, it decreases
-      *      its value by one. If the semaphore value is zero, then
-      *      the calling thread (or process) is blocked until it can
-      *      successfully decrease the value or until abstime.
+      *      This function waits on an event until signaled or until
+      *      abstime passes.
       *      If abstime has passed when this routine is called then
       *      it returns a result to indicate this.
       *
@@ -61,25 +58,16 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec *abstime)
       *      block until it can successfully decrease the value or
       *      until interrupted by a signal.
       *
-      *      Unlike sem_timedwait(), this routine is not a cancelation point.
-      *
-      *      Unlike sem_timedwait(), this routine is non-cancelable.
+      *      This routine is not a cancelation point.
       *
       * RESULTS
-      *              2               abstime has passed already
-      *              1               abstime timed out while waiting
-      *              0               successfully decreased semaphore,
-      *              -1              failed, error in errno.
-      * ERRNO
-      *              EINVAL          'sem' is not a valid semaphore,
-      *              ENOSYS          semaphores are not supported,
-      *              EINTR           the function was interrupted by a signal,
-      *              EDEADLK         a deadlock condition was detected.
+      *              0               successfully signaled,
+      *              ETIMEDOUT       abstime passed
+      *              EINVAL          'event' is not a valid event,
       *
       * ------------------------------------------------------
       */
 {
-  int result = 0;
 
 #ifdef NEED_FTIME
 
@@ -96,9 +84,9 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec *abstime)
   DWORD milliseconds;
   DWORD status;
 
-  if (sem == NULL)
+  if (event == NULL)
     {
-      result = EINVAL;
+      return EINVAL;
     }
   else
     {
@@ -156,45 +144,24 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec *abstime)
 
 	  if (((int) milliseconds) < 0)
 	    {
-	      return 2;
+	      return ETIMEDOUT;
 	    }
 	}
 
-#ifdef NEED_SEM
-
-      status = WaitForSingleObject ((*sem)->event, milliseconds);
-
-#else /* NEED_SEM */
-
-      status = WaitForSingleObject ((*sem)->sem, milliseconds);
-
-#endif
+      status = WaitForSingleObject (event, milliseconds);
 
       if (status == WAIT_OBJECT_0)
 	{
-
-#ifdef NEED_SEM
-
-	  ptw32_decrease_semaphore (sem);
-
-#endif /* NEED_SEM */
-
 	  return 0;
 	}
       else if (status == WAIT_TIMEOUT)
 	{
-	  return 1;
+	  return ETIMEDOUT;
 	}
       else
 	{
-	  result = EINVAL;
+	  return EINVAL;
 	}
-    }
-
-  if (result != 0)
-    {
-      errno = result;
-      return -1;
     }
 
   return 0;
@@ -206,7 +173,7 @@ int
 pthread_mutex_timedlock (pthread_mutex_t * mutex,
 			 const struct timespec *abstime)
 {
-  LONG c;
+  int result;
   pthread_mutex_t mx;
 
 #ifdef NEED_SEM
@@ -226,8 +193,6 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
    */
   if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
-      int result;
-
       if ((result = ptw32_mutex_check_need_init (mutex)) != 0)
 	{
 	  return (result);
@@ -238,51 +203,28 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 
   if (mx->kind == PTHREAD_MUTEX_NORMAL)
     {
-      if ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-		        (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
-		        (PTW32_INTERLOCKED_LONG) 0,
-		        (PTW32_INTERLOCKED_LONG) -1)) != -1)
+      if ((LONG) PTW32_INTERLOCKED_EXCHANGE(
+		   (LPLONG) &mx->lock_idx,
+		   (LONG) 1) != 0)
 	{
-          do
+          while ((LONG) PTW32_INTERLOCKED_EXCHANGE(
+                          (LPLONG) &mx->lock_idx,
+			  (LONG) -1) != 0)
             {
-              if (c == 1 ||
-                  (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-                           (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
-                           (PTW32_INTERLOCKED_LONG) 1,
-                           (PTW32_INTERLOCKED_LONG) 0) != -1)
-                {
-		  switch (ptw32_timed_semwait (&mx->wait_sema, abstime))
-		    {
-		    case 0:	/* We got woken up so try get the lock again. */
-		      {
-		        break;
-		      }
-		    case 1:	/* Timed out. */
-		    case 2:	/* abstime passed before we started to wait. */
-		      {
-		        return ETIMEDOUT;
-		      }
-		    default:
-		      {
-		        return errno;
-		      }
-		  }
+	      if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
+		{
+		  return result;
 		}
-            }
-          while ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-                               (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
-                               (PTW32_INTERLOCKED_LONG) 1,
-                               (PTW32_INTERLOCKED_LONG) -1)) != -1);
+	    }
 	}
     }
   else
     {
       pthread_t self = pthread_self();
 
-      if ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-                        (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
-		        (PTW32_INTERLOCKED_LONG) 0,
-		        (PTW32_INTERLOCKED_LONG) -1)) == -1)
+      if ((LONG) PTW32_INTERLOCKED_EXCHANGE(
+                   (LPLONG) &mx->lock_idx,
+		   (LONG) 1) == 0)
 	{
 	  mx->recursive_count = 1;
 	  mx->ownerThread = self;
@@ -302,36 +244,15 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 	    }
 	  else
 	    {
-              do
+              while ((LONG) PTW32_INTERLOCKED_EXCHANGE(
+                              (LPLONG) &mx->lock_idx,
+			      (LONG) -1) != 0)
                 {
-                  if (c == 1 ||
-                      (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-                               (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
-                               (PTW32_INTERLOCKED_LONG) 1,
-                               (PTW32_INTERLOCKED_LONG) 0) != -1)
-                    {
-		      switch (ptw32_timed_semwait (&mx->wait_sema, abstime))
-		        {
-		        case 0:	/* We got woken up so try get the lock again. */
-		          {
-		            break;
-		          }
-		        case 1:	/* Timed out. */
-		        case 2:	/* abstime passed before we started to wait. */
-		          {
-		            return ETIMEDOUT;
-		          }
-		        default:
-		          {
-		            return errno;
-		          }
-		      }
+		  if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
+		    {
+		      return result;
 		    }
-                }
-              while ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-                                   (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
-                                   (PTW32_INTERLOCKED_LONG) 1,
-                                   (PTW32_INTERLOCKED_LONG) -1)) != -1);
+		}
 
 	      mx->recursive_count = 1;
 	      mx->ownerThread = self;

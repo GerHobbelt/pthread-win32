@@ -182,15 +182,17 @@ struct sem_t_
 struct pthread_mutex_t_
 {
   LONG lock_idx;		/* Provides exclusive access to mutex state
-				   via the Interlocked* mechanism, as well
-				   as a count of the number of threads
-				   waiting on the mutex. */
+				   via the Interlocked* mechanism.
+				    0: unlocked/free.
+				    1: locked - no other waiters.
+				   -1: locked - with possible other waiters.
+				*/
   int recursive_count;		/* Number of unlocks a thread needs to perform
 				   before the lock is released (recursive
 				   mutexes only). */
   int kind;			/* Mutex type. */
   pthread_t ownerThread;
-  sem_t wait_sema;		/* Mutex release notification to waiting
+  HANDLE event;			/* Mutex release notification to waiting
 				   threads. */
 };
 
@@ -451,6 +453,8 @@ extern int ptw32_concurrency;
 
 extern int ptw32_features;
 
+extern BOOL ptw32_smp_system;  /* True: SMP system, False: Uni-processor system */
+
 extern CRITICAL_SECTION ptw32_thread_reuse_lock;
 extern CRITICAL_SECTION ptw32_mutex_test_init_lock;
 extern CRITICAL_SECTION ptw32_cond_list_lock;
@@ -486,7 +490,11 @@ extern "C"
 				      PTW32_INTERLOCKED_LONG value,
 				      PTW32_INTERLOCKED_LONG comparand);
 
-    DWORD
+  LONG WINAPI
+    ptw32_InterlockedExchange (LPLONG location,
+			       LONG value);
+
+  DWORD
     ptw32_RegisterCancelation (PAPCFUNC callback,
 			       HANDLE threadH, DWORD callback_arg);
 
@@ -560,8 +568,7 @@ extern "C"
 					      unsigned, void *);
   _CRTIMP void __cdecl _endthread (void);
   _CRTIMP unsigned long __cdecl _beginthreadex (void *, unsigned,
-						unsigned (__stdcall *) (void
-									*),
+						unsigned (__stdcall *) (void *),
 						void *, unsigned, unsigned *);
   _CRTIMP void __cdecl _endthreadex (unsigned);
 #       ifdef __cplusplus
@@ -574,10 +581,15 @@ extern "C"
 
 
 /*
- * When not building the inlined version of the dll.
+ * Defaults. Could be overridden when building the inlined version of the dll.
+ * See ptw32_InterlockedCompareExchange.c
  */
 #ifndef PTW32_INTERLOCKED_COMPARE_EXCHANGE
 #define PTW32_INTERLOCKED_COMPARE_EXCHANGE ptw32_interlocked_compare_exchange
+#endif
+
+#ifndef PTW32_INTERLOCKED_EXCHANGE
+#define PTW32_INTERLOCKED_EXCHANGE InterlockedExchange
 #endif
 
 

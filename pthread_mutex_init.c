@@ -80,18 +80,22 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
     }
   else
     {
-      mx->lock_idx = -1;
+      mx->lock_idx = 0;
       mx->recursive_count = 0;
       mx->kind = (attr == NULL || *attr == NULL
 		  ? PTHREAD_MUTEX_DEFAULT : (*attr)->kind);
       mx->ownerThread = NULL;
 
-      if (0 != sem_init (&mx->wait_sema, 0, 0))
-	{
-	  result = EAGAIN;
-	  free (mx);
-	  mx = NULL;
-	}
+      mx->event = CreateEvent (NULL, PTW32_FALSE,    /* manual reset = No */
+                              PTW32_FALSE,           /* initial state = not signaled */
+                              NULL);                 /* event name */
+
+      if (0 == mx->event)
+        {
+          result = ENOSPC;
+          free (mx);
+          mx = NULL;
+        }
     }
 
   *mutex = mx;

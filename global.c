@@ -51,6 +51,8 @@ int ptw32_concurrency = 0;
 /* What features have been auto-detaected */
 int ptw32_features = 0;
 
+BOOL ptw32_smp_system = PTW32_TRUE;  /* Safer if assumed true initially. */
+
 /* 
  * Function pointer to InterlockedCompareExchange if it exists, otherwise
  * it will be set at runtime to a substitute local version with the same

@@ -52,13 +52,45 @@ BOOL
 pthread_win32_process_attach_np ()
 {
   BOOL result = TRUE;
+  DWORD_PTR vProcessCPUs;
+  DWORD_PTR vSystemCPUs;
 
   result = ptw32_processInitialize ();
+
 #ifdef _UWIN
   pthread_count++;
 #endif
 
   ptw32_features = 0;
+
+
+#if defined(NEED_PROCESS_AFFINITY_MASK)
+
+  ptw32_smp_system = PTW32_FALSE;
+
+#else
+
+  if (GetProcessAffinityMask (GetCurrentProcess (),
+			      &vProcessCPUs, &vSystemCPUs))
+    {
+      int CPUs = 0;
+      DWORD_PTR bit;
+
+      for (bit = 1; bit != 0; bit <<= 1)
+	{
+	  if (vSystemCPUs & bit)
+	    {
+	      CPUs++;
+	    }
+	}
+      ptw32_smp_system = (CPUs > 1);
+    }
+  else
+    {
+      ptw32_smp_system = PTW32_FALSE;
+    }
+
+#endif
 
 #ifndef TEST_ICE
 
