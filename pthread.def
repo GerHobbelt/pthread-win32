@@ -6,6 +6,7 @@
 LIBRARY pthread
 
 EXPORTS
+_pthread_processInitialize
 ;pthread_atfork
 pthread_attr_destroy
 pthread_attr_getdetachstate
@@ -108,3 +109,4 @@ pthreadCancelableTimedWait
 ;
 pthread_push_cleanup
 pthread_pop_cleanup
+

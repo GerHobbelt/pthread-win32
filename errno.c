@@ -24,7 +24,7 @@
  * MA 02111-1307, USA
  */
 
-#if ! defined( _REENTRANT ) && ! defined( _MT )
+#if (! defined(HAVE_ERRNO)) || (! defined( _REENTRANT ) && ! defined( _MT ))
 
 #include "pthread.h"
 #include "implement.h"
@@ -79,4 +79,4 @@ int * _errno( void )
 
 } /* _errno */
 
-#endif /* !_REENTRANT && !_MT */
+#endif /* (! HAVE_ERRNO) || (!_REENTRANT && !_MT) */

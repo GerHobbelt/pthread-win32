@@ -28,8 +28,11 @@
 #if !defined( SEMAPHORE_H )
 #define SEMAPHORE_H
 
-#include <process.h>
+#ifdef NEED_ERRNO
+#include "need_errno.h"
+#else
 #include <errno.h>
+#endif
 
 #define _POSIX_SEMAPHORES
 
@@ -42,7 +45,15 @@ extern "C"
 typedef unsigned int mode_t;
 #endif
 
+#ifdef NEED_SEM
+typedef struct {
+	unsigned int	value;
+	pthread_mutex_t mutex;
+	HANDLE	event;
+} sem_t;
+#else /* NEED_SEM */
 typedef HANDLE sem_t;
+#endif /* NEED_SEM */
 
 int sem_init (sem_t * sem,
 	      int pshared,

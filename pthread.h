@@ -215,7 +215,12 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <windows.h>
+
+#ifndef NEED_FTIME
 #include <time.h>
+#else /* NEED_FTIME */
+/* use native WIN32 time API */
+#endif /* NEED_FTIME */
 
 #if HAVE_SIGNAL_H
 #include <signal.h>
@@ -242,15 +247,24 @@ struct timespec {
 #define SIG_SETMASK 2
 #endif /* SIG_SETMASK */
 
-
 #include <process.h>
-#include <errno.h>
 
-#ifdef _WIN32
-#ifndef ETIMEDOUT
-#define ETIMEDOUT 19981220     /* Let's hope this is unique */
+/*
+ * note: ETIMEDOUT is correctly defined in winsock.h on winCE
+ */
+#ifdef HAVE_WINSOCK_H
+#include <winsock.h>
 #endif
-#endif /* _WIN32 */
+
+#ifdef NEED_ERRNO
+#include "need_errno.h"
+#else
+#include <errno.h>
+#endif
+
+#ifndef ETIMEDOUT
+#define ETIMEDOUT 19981220     /* FIXME: Need the proper value here. */
+#endif
 
 #ifdef _MSC_VER
 /*
@@ -263,6 +277,13 @@ struct timespec {
 #define TRUE	!FALSE
 #define FALSE	0
 #endif /* !TRUE */
+
+#ifdef __MINGW32__
+#define PT_STDCALL
+#else
+#define PT_STDCALL __stdcall
+#endif
+
 
 /* 
  * This should perhaps be in autoconf or 
@@ -704,6 +725,12 @@ struct _pthread_cleanup_t
  */
 
 /*
+ * Useful if an application wants to statically link
+ * the lib rather than load the DLL at run-time.
+ */
+int pthread_win32_initialize_np(void);
+
+/*
  * PThread Attribute Functions
  */
 int pthread_attr_init (pthread_attr_t * attr);
@@ -902,7 +929,7 @@ int pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
 /*
  * Thread-Safe C Runtime Library Mappings.
  */
-#if ! defined( _REENTRANT ) && ! defined( _MT )
+#if (! defined(NEED_ERRNO)) || (! defined( _REENTRANT ) && ! defined( _MT ))
 int * _errno( void );
 #endif
 

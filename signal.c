@@ -23,7 +23,8 @@
  * MA 02111-1307, USA
  */
 
-#include <errno.h>
+/* errno.h or a replacement file is included by pthread.h */
+//#include <errno.h>
 
 #include "pthread.h"
 #include "implement.h"

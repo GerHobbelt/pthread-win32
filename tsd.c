@@ -26,6 +26,11 @@
 #include "pthread.h"
 #include "implement.h"
 
+/* TLS_OUT_OF_INDEXES not defined on WinCE */
+#ifndef TLS_OUT_OF_INDEXES
+#define TLS_OUT_OF_INDEXES 0xffffffff
+#endif
+
 int
 pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
      /*

@@ -30,7 +30,9 @@
 
 #endif /* !_MSC_VER && !__cplusplus && __GNUC__ */
 
+#ifndef NEED_FTIME
 #include <sys/timeb.h>
+#endif
 #include "pthread.h"
 #include "semaphore.h"
 #include "implement.h"
@@ -60,6 +62,17 @@ _pthread_processInitialize (void)
       * ------------------------------------------------------
       */
 {
+	if (_pthread_processInitialized) {
+		/* 
+		 * ignore if already initialized. this is useful for 
+		 * programs that uses a non-dll pthread
+		 * library. such programs must call _pthread_processInitialize() explicitely,
+		 * since this initialization routine is automatically called only when
+		 * the dll is loaded.
+		 */
+		return TRUE;
+	}
+
   _pthread_processInitialized = TRUE;
 
   /*
@@ -586,6 +599,46 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 }				/* _pthread_callUserDestroyRoutines */
 
 
+
+#ifdef NEED_FTIME
+
+/*
+ * time between jan 1, 1601 and jan 1, 1970 in units of 100 nanoseconds
+ */
+#define TIMESPEC_TO_FILETIME_OFFSET \
+          ( ((LONGLONG) 27111902 << 32) + (LONGLONG) 3577643008 )
+
+static void
+timespec_to_filetime(const struct timespec *ts, FILETIME *ft)
+     /*
+      * -------------------------------------------------------------------
+      * converts struct timespec
+      * where the time is expressed in seconds and nanoseconds from Jan 1, 1970.
+      * into FILETIME (as set by GetSystemTimeAsFileTime), where the time is
+      * expressed in 100 nanoseconds from Jan 1, 1601,
+      * -------------------------------------------------------------------
+      */
+{
+	*(LONGLONG *)ft = ts->tv_sec * 10000000 + (ts->tv_nsec + 50) / 100 + TIMESPEC_TO_FILETIME_OFFSET;
+}
+
+static void
+filetime_to_timespec(const FILETIME *ft, struct timespec *ts)
+     /*
+      * -------------------------------------------------------------------
+      * converts FILETIME (as set by GetSystemTimeAsFileTime), where the time is
+      * expressed in 100 nanoseconds from Jan 1, 1601,
+      * into struct timespec
+      * where the time is expressed in seconds and nanoseconds from Jan 1, 1970.
+      * -------------------------------------------------------------------
+      */
+{
+	ts->tv_sec = (int)((*(LONGLONG *)ft - TIMESPEC_TO_FILETIME_OFFSET) / 10000000);
+	ts->tv_nsec = (int)((*(LONGLONG *)ft - TIMESPEC_TO_FILETIME_OFFSET - ((LONGLONG)ts->tv_sec * (LONGLONG)10000000)) * 100);
+}
+
+#endif /* NEED_FTIME */
+
 int
 _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
      /*
@@ -628,15 +681,21 @@ _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
 {
   int result = 0;
 
+#ifdef NEED_FTIME
+
+  struct timespec currSysTime;
+
+#else /* NEED_FTIME */
 #if defined(__MINGW32__)
 
   struct timeb currSysTime;
 
-#else
+#else /* __MINGW32__ */
 
   struct _timeb currSysTime;
 
-#endif
+#endif /* __MINGW32__ */
+#endif /* NEED_FTIME */
 
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
   const DWORD MILLISEC_PER_SEC = 1000;
@@ -659,18 +718,56 @@ _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
 	   */
 
 	  /* get current system time */
+
+#ifdef NEED_FTIME
+
+	  {
+	    FILETIME ft;
+	    SYSTEMTIME st;
+
+	    GetSystemTime(&st);
+            SystemTimeToFileTime(&st, &ft);
+	    /*
+             * GetSystemTimeAsFileTime(&ft); would be faster,
+             * but it does not exist on WinCE
+             */
+
+	    filetime_to_timespec(&ft, &currSysTime);
+	  }
+
+	  /*
+           * subtract current system time from abstime
+           */
+	  milliseconds = (abstime->tv_sec - currSysTime.tv_sec) * MILLISEC_PER_SEC;
+	  milliseconds += ((abstime->tv_nsec - currSysTime.tv_nsec) + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
+
+#else /* NEED_FTIME */
 	  _ftime(&currSysTime);
 
-	  /* subtract current system time from abstime */
+	  /*
+           * subtract current system time from abstime
+           */
 	  milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
-	  milliseconds += (abstime->tv_nsec / NANOSEC_PER_MILLISEC) -
+	  milliseconds += ((abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC) -
 	    currSysTime.millitm;
+
+#endif /* NEED_FTIME */
+
 
 	  if (((int) milliseconds) < 0)
 	    milliseconds = 0;
 	}
 
+#ifdef NEED_SEM
+
+      result = (pthreadCancelableTimedWait (sem->event, milliseconds));
+
+#else /* NEED_SEM */
+
       result = (pthreadCancelableTimedWait (*sem, milliseconds));
+
+#endif
+
     }
 
   if (result != 0)
@@ -680,6 +777,12 @@ _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
       return -1;
 
     }
+
+#ifdef NEED_SEM
+
+  _pthread_decrease_semaphore(sem);
+
+#endif /* NEED_SEM */
 
   return 0;
 
