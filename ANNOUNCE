@@ -1,5 +1,5 @@
 
-                 PTHREADS-WIN32 SNAPSHOT 1999-05-30
+                 PTHREADS-WIN32 SNAPSHOT 1999-08-12
                  ----------------------------------
        Web Site: http://sourceware.cygnus.com/pthreads-win32/
       FTP Site: ftp://sourceware.cygnus.com/pub/pthreads-win32
@@ -15,9 +15,6 @@ supported including semaphores.
 Pthreads-win32 is free software, distributed under the GNU Library
 General Public License (LGPL).
 
-Pthreads-win32 is based substantially on a Win32 pthreads
-implementation contributed by John E. Bossom <jebossom@cognos.com>.
-
 Please see the 'Acknowledgements' section at the end of this
 announcement for the list of contributors.
 
@@ -25,15 +22,15 @@ announcement for the list of contributors.
 Change Summary (since the last snapshot)
 ----------------------------------------
 
-Some minor bugs have been fixed. See the ChangeLog file for details.
+(See the ChangeLog file for details.)
 
-Some more POSIX 1b functions are now included but only return an
-error (ENOSYS) if called. They are:
+Fixed exception stack cleanup if calling pthread_exit()
+- (Lorin Hochstein and John Bossom).
 
-	sem_open
-	sem_close
-	sem_unlink
-	sem_getvalue
+Fixed bugs in condition variables - (Peter Slacik):
+	- additional contention checks
+	- properly adjust number of waiting threads after timed
+	  condvar timeout.
 
 
 Level of standards conformance
@@ -346,17 +343,21 @@ The implementation of condition variables is derived from the work
 of Douglas Schmidt et al
 (http://www.cs.wustl.edu/~schmidt/win32-cv-1.html).
 
-Project Contributors (in order of appearance):
+Contributors (in approximate order of appearance)
 
-Ben Elliston <bje@cygnus.com>
-Ross Johnson <rpj@ise.canberra.edu.au>
-Robert Colquhoun <rjc@trump.net.au>
-John E. Bossom <John.Bossom@cognos.com>
-Anders Norlander <anorland@hem2.passagen.se>
-Tor Lillqvist <tml@iki.fi>
-Kevin Ruland <Kevin.Ruland@anheuser-busch.com>
+Ben Elliston		bje@cygnus.com
+Ross Johnson		rpj@ise.canberra.edu.au
+Robert Colquhoun	rjc@trump.net.au
+John E. Bossom		John.Bossom@cognos.com
+Anders Norlander	anorland@hem2.passagen.se
+Tor Lillqvist		tml@iki.fi
+Kevin Ruland		Kevin.Ruland@anheuser-busch.com
+Mike Russo		miker@eai.com
+Mark E. Armstrong	avail@pacbell.net
+Lorin Hochstein		lmh@xiphos.ca
+Peter Slacik		Peter.Slacik@tatramed.sk
 
-Others who have contributed patches are attributed in the ChangeLog file.
+If you aren't on the list and believe you should be let me know.
 
 Enjoy!
 
