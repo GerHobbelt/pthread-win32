@@ -9,7 +9,7 @@
 #include "implement.h"
 
 int
-pthread_mutex_init(pthread_mutex_t *mutex, pthread_mutex_attr_t *attr)
+pthread_mutex_init(pthread_mutex_t *mutex, pthread_mutexattr_t *attr)
 {
   if (mutex == NULL)
     {

@@ -1,3 +1,28 @@
+Tue Aug  4 16:57:58 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* private.c (_pthread_delete_thread): Fix typo. Add missing ';'.
+
+	* global.c (_pthread_virgins): Change types from pointer to 
+	array pointer.
+	(_pthread_reuse): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
+	* implement.h(_pthread_virgins): Change types from pointer to 
+	array pointer.
+	(_pthread_reuse): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
+	* private.c (_pthread_delete_thread): Fix "entry" should be "thread".
+
+	* misc.c (pthread_self): Add extern for _pthread_threadID_TlsIndex.
+
+	* global.c: Add comment.
+
+	* misc.c (pthread_once): Fix member -> dereferences.
+	Change _pthread_once_flag to once_control->flag in "if" test.
+
 Tue Aug  4 00:09:30 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* implement.h(_pthread_virgins): Add extern.

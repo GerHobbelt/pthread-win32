@@ -126,7 +126,7 @@ _pthread_new_thread(pthread_t * thread)
     {
       if (_pthread_virgin_next < PTHREAD_THREADS_MAX)
 	{
-	  new_thread = _pthread_virgin[_pthread_virgin_next++];
+	  new_thread = (pthread_t) &_pthread_virgins[_pthread_virgin_next++];
 	}
       else
 	{
@@ -163,15 +163,15 @@ _pthread_delete_thread(_pthread_t * thread)
   if (thread != NULL
       && thread->ptstatus == _PTHREAD_EXITED)
     {
-      pthread_attr_destroy(&(entry->attr));
+      pthread_attr_destroy(&(thread->attr));
       thread->win32handle = NULL;
-      thread_ptstatus = _PTHREAD_REUSE;
+      thread->ptstatus = _PTHREAD_REUSE;
 
       _pthread_reuse[++_pthread_reuse_top] = thread;
     }
   else
     {
-      return EINVAL
+      return EINVAL;
     }
   return 0;
 }

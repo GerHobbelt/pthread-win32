@@ -30,6 +30,9 @@ const int _pthread_cancel_disable      = 1;
 const int _pthread_cancel_asynchronous = 0;
 const int _pthread_cancel_deferred     = 1;
 
+
+/* Declare variables which are global to all threads in the process. */
+
 /* FIXME: This is temporary. */
 #define PTHREAD_MUTEX_INITIALIZER {0}
 
@@ -38,15 +41,22 @@ pthread_mutex_t _pthread_table_mutex = PTHREAD_MUTEX_INITIALIZER;
 DWORD _pthread_threads_count = 0;
 
 /* Per thread management storage. See comments in private.c */
-_pthread_t * _pthread_virgins;
+/* An array of struct _pthread */
+_pthread_t _pthread_virgins[];
 
+/* Index to the next available previously unused struct _pthread */
 int _pthread_virgin_next = 0;
 
-pthread_t * _pthread_reuse;
+/* An array of pointers to struct _pthread */
+pthread_t _pthread_reuse[];
 
+/* Index to the first available reusable pthread_t. */
 int _pthread_reuse_top = -1;
 
-pthread_t * _pthread_win32handle_map;
+/* An array of pointers to struct _pthread indexed by hashing
+   the Win32 handle. */
+pthread_t _pthread_win32handle_map[];
 
 /* Per thread mutex locks. */
-pthread_mutex_t * _pthread_threads_mutex_table;
+pthread_mutex_t _pthread_threads_mutex_table[];
+

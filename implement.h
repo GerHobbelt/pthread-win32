@@ -137,18 +137,24 @@ extern pthread_mutex_t _pthread_table_mutex;
 
 extern DWORD _pthread_threads_count;
 
-extern _pthread_t * _pthread_virgins;
+/* An array of struct _pthread */
+extern _pthread_t _pthread_virgins[];
 
+/* Index to the next available previously unused struct _pthread */
 extern int _pthread_virgin_next;
 
-extern pthread_t * _pthread_reuse;
+/* An array of pointers to struct _pthread */
+extern pthread_t _pthread_reuse[];
 
+/* Index to the first available reusable pthread_t. */
 extern int _pthread_reuse_top;
 
-extern pthread_t * _pthread_win32handle_map;
+/* An array of pointers to struct _pthread indexed by hashing
+   the Win32 handle. */
+extern pthread_t _pthread_win32handle_map[];
 
 /* Per thread mutex locks. */
-extern pthread_mutex_t * _pthread_threads_mutex_table;
+extern pthread_mutex_t _pthread_threads_mutex_table[];
 
 #endif /* _IMPLEMENT_H */
 

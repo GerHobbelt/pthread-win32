@@ -25,12 +25,12 @@ pthread_once(pthread_once_t *once_control,
      the DLL is unloaded. */
 
   /* An atomic test-and-set of the "once" flag. */
-  EnterCriticalSection(once_control.lock);
-  if (_pthread_once_flag == 0)
+  EnterCriticalSection(once_control->lock);
+  if (once_control->flag == 0)
     {
       flag = once_control->flag = 1;
     }
-  LeaveCriticalSection(once_control.lock);
+  LeaveCriticalSection(once_control->lock);
 
   if (flag)
     {
@@ -45,6 +45,8 @@ pthread_t
 pthread_self(void)
 {
   pthread_t ret;
+  /* This TLS index is allocated on DLL load by dll.c */
+  extern DWORD _pthread_threadID_TlsIndex;
  
   ret = (pthread_t) TlsGetValue(_pthread_threadID_TlsIndex);
 
