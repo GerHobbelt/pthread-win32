@@ -1,3 +1,7 @@
+Mon Oct 12 02:12:29 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* tsd1.c: New. Test TSD using 1 key and 2 threads.
+
 1998-09-13  Ben Elliston  <bje@cygnus.com>
 
 	* eyal1.c: New file; contributed by Eyal Lebedinsky
@@ -17,4 +21,3 @@
 	* exit2.c: New file; test pthread_exit() harder.
 
 	* exit1.c: New file; test pthread_exit().
-
