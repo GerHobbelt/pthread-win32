@@ -28,31 +28,6 @@
 #ifndef _SCHED_H
 #define _SCHED_H
 
-#ifdef _MSC_VER
-/*
- * Disable following warnings when including Windows headers
- *
- * warning C4115: named type definition in parentheses
- * warning C4116: unnamed type definition in parentheses
- * warning C4127: conditional expression is constant
- * warning C4201: nonstandard extension used : nameless struct/union
- * warning C4214: nonstandard extension used : bit field types other than int
- * warning C4514: unreferenced inline function has been removed
- */
-#pragma warning( disable : 4115 4116 4127 4201 4214 4514)
-#endif
-
-#include <windows.h>
-//#include <process.h>
-//#include <errno.h>
-
-#ifdef _MSC_VER
-/*
- * Re-enable all but 4127, 4514
- */
-#pragma warning( default : 4115 4116 4201 4214)
-#endif
-
 #ifdef __cplusplus
 extern "C"
 {

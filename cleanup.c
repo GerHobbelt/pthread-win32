@@ -25,23 +25,18 @@
  * MA 02111-1307, USA
  */
 
-#if !defined(_MSC_VER) && !defined(__cplusplus) && defined(__GNUC__)
-
-#warning Compile __FILE__ as C++ or thread cancellation will not work properly.
-
-#endif /* !_MSC_VER && !__cplusplus && __GNUC__ */
-
 #include "pthread.h"
 #include "implement.h"
 
+
 /*
- * The functions pthread_pop_cleanup and pthread_push_cleanup
+ * The functions ptw32_pop_cleanup and ptw32_push_cleanup
  * are implemented here for applications written in C with no
  * SEH or C++ destructor support. 
  */
 
 ptw32_cleanup_t *
-pthread_pop_cleanup (int execute)
+ptw32_pop_cleanup (int execute)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -76,62 +71,11 @@ pthread_pop_cleanup (int execute)
       if (execute && (cleanup->routine != NULL))
         {
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
-
-          __try
-	    {
-	      /*
-	       * Run the caller's cleanup routine.
-	       */
-	      (*cleanup->routine) (cleanup->arg);
-	    }
-          __except (EXCEPTION_EXECUTE_HANDLER)
-	    {
-	      /*
-	       * A system unexpected exception had occurred
-	       * running the user's cleanup routine.
-	       * We get control back within this block.
-	       */
-	    }
-      
-#else /* _MSC_VER && ! __cplusplus */
-
-#ifdef __cplusplus
-
-	  try
-	    {
-	      /*
-	       * Run the caller's cleanup routine.
-	       */
-	      (*cleanup->routine) (cleanup->arg);
-	    }
-	  catch(...)
-	    {
-	      /*
-	       * A system unexpected exception had occurred
-	       * running the user's cleanup routine.
-	       * We get control back within this block.
-	       */
-	    }
-
-#else /* __cplusplus */
-      
-	  /*
-	   * Run the caller's cleanup routine and FIXME: hope for the best.
-	   */
 	  (*cleanup->routine) (cleanup->arg);
-
-#endif /* __cplusplus && ! __cplusplus */
-
-#endif /* _MSC_VER */
 
         }
 
-#if !defined(_MSC_VER) && !defined(__cplusplus)
-
       pthread_setspecific (ptw32_cleanupKey, (void *) cleanup->prev);
-
-#endif /* !_MSC_VER && !__cplusplus */
 
     }
 
@@ -141,8 +85,8 @@ pthread_pop_cleanup (int execute)
 
 
 void
-pthread_push_cleanup (ptw32_cleanup_t * cleanup,
-		      void (*routine) (void *),
+ptw32_push_cleanup (ptw32_cleanup_t * cleanup,
+		      ptw32_cleanup_callback_t routine,
 		      void *arg)
      /*
       * ------------------------------------------------------
@@ -174,7 +118,7 @@ pthread_push_cleanup (ptw32_cleanup_t * cleanup,
       *              b) when the thread acts on a cancellation request,
       *              c) or when the thrad calls pthread_cleanup_pop with a nonzero
       *                 'execute' argument
-      *      NOTE: pthread_push_cleanup, pthread_pop_cleanup must be paired
+      *      NOTE: pthread_push_cleanup, ptw32_pop_cleanup must be paired
       *                in the same lexical scope.
       *
       * RESULTS
@@ -187,14 +131,8 @@ pthread_push_cleanup (ptw32_cleanup_t * cleanup,
   cleanup->routine = routine;
   cleanup->arg = arg;
 
-#if !defined(_MSC_VER) && !defined(__cplusplus)
-
   cleanup->prev = (ptw32_cleanup_t *) pthread_getspecific (ptw32_cleanupKey);
-
-#endif /* !_MSC_VER && !__cplusplus */
 
   pthread_setspecific (ptw32_cleanupKey, (void *) cleanup);
 
 }                               /* ptw32_push_cleanup */
-
-

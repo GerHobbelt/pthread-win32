@@ -23,9 +23,6 @@
  * MA 02111-1307, USA
  */
 
-/* errno.h or a replacement file is included by pthread.h */
-//#include <errno.h>
-
 #include "pthread.h"
 #include "implement.h"
 
@@ -104,10 +101,6 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
       goto FAIL0;
     }
 
-  mx->mutex = 0;
-  mx->lockCount = 0;
-  mx->ownerThread = NULL;
-
   if (attr != NULL
       && *attr != NULL
       && (*attr)->pshared == PTHREAD_PROCESS_SHARED
@@ -125,61 +118,27 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 
 #error ERROR [__FILE__, line __LINE__]: Process shared mutexes are not supported yet.
 
-      mx->mutex = CreateMutex(NULL, FALSE, "FIXME FIXME FIXME");
-
-      if (mx->mutex == 0)
-	{
-	  result = EAGAIN;
-	}
 
 #else
 
       result = ENOSYS;
+      goto FAIL0;
 
 #endif /* _POSIX_THREAD_PROCESS_SHARED */
+
     }
-  else
+
+  mx->lock_idx = PTW32_MUTEX_LOCK_IDX_INIT;
+  mx->recursive_count = 0;
+  mx->kind = attr == NULL || *attr == NULL ? ptw32_mutex_default_kind : (*attr)->kind;
+  mx->ownerThread = NULL;
+  InitializeCriticalSection( &mx->try_lock_cs );
+  mx->wait_sema = CreateSemaphore( NULL, 0, 1, NULL );
+
+  if( NULL == mx->wait_sema )
     {
-      if (ptw32_try_enter_critical_section != NULL
-	  || (attr != NULL
-	      && *attr != NULL
-	      && (*attr)->forcecs == 1)
-	  )
-	{
-	  /* 
-	   * Create a critical section. 
-	   */
-	  InitializeCriticalSection(&mx->cs);
-
-	  /*
-	   * Check that it works ok - since InitializeCriticalSection doesn't
-	   * return success or failure.
-	   */
-	  if ((*ptw32_try_enter_critical_section)(&mx->cs))
-	    {
-	      LeaveCriticalSection(&mx->cs);
-	    }
-	  else
-	    {
-	      DeleteCriticalSection(&mx->cs);
-	      result = EAGAIN;
-	    }
-	}
-      else
-	{
-	  /*
-	   * Create a mutex that can only be used within the
-	   * current process
-	   */
-	  mx->mutex = CreateMutex (NULL,
-				   FALSE,
-				   NULL);
-
-	  if (mx->mutex == 0)
-	    {
-	      result = EAGAIN;
-	    }
-	}
+      DeleteCriticalSection( &mx->try_lock_cs );
+      result = EAGAIN;
     }
 
   if (result != 0 && mx != NULL)
@@ -213,8 +172,11 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
     {
       mx = *mutex;
 
-      if ((result = pthread_mutex_trylock(&mx)) == 0)
+      result = pthread_mutex_trylock(&mx);
+
+      if (result == 0 || pthread_equal( mx->ownerThread, pthread_self() ) )
         {
+
           /*
            * FIXME!!!
            * The mutex isn't held by another thread but we could still
@@ -224,20 +186,12 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
            */
           *mutex = NULL;
 
-          pthread_mutex_unlock(&mx);
-
-          if (mx->mutex == 0)
-            {
-              DeleteCriticalSection(&mx->cs);
-            }
-          else
-            {
-              result = (CloseHandle (mx->mutex) ? 0 : EINVAL);
-            }
+          result = pthread_mutex_unlock(&mx);
 
           if (result == 0)
             {
-              mx->mutex = 0;
+              DeleteCriticalSection( &mx->try_lock_cs );
+              CloseHandle( mx->wait_sema );
               free(mx);
             }
           else
@@ -321,6 +275,9 @@ pthread_mutexattr_init (pthread_mutexattr_t * attr)
       result = ENOMEM;
     }
 
+  ma->pshared = PTHREAD_PROCESS_PRIVATE;
+  ma->kind = ptw32_mutex_default_kind;
+
   *attr = ma;
 
   return (result);
@@ -360,7 +317,6 @@ pthread_mutexattr_destroy (pthread_mutexattr_t * attr)
   if (attr == NULL || *attr == NULL)
     {
       result = EINVAL;
-
     }
   else
     {
@@ -506,6 +462,7 @@ pthread_mutexattr_setpshared (pthread_mutexattr_t * attr,
         {
           result = 0;
         }
+
       (*attr)->pshared = pshared;
     }
   else
@@ -519,10 +476,136 @@ pthread_mutexattr_setpshared (pthread_mutexattr_t * attr,
 
 
 int
+pthread_mutexattr_settype (pthread_mutexattr_t * attr,
+						   int kind)
+     /*
+      * ------------------------------------------------------
+      *
+      * DOCPUBLIC
+      * The pthread_mutexattr_settype() and
+      * pthread_mutexattr_gettype() functions  respectively set and
+      * get the mutex type  attribute. This attribute is set in  the
+      * type parameter to these functions.
+      *
+      * PARAMETERS
+      *      attr
+      *              pointer to an instance of pthread_mutexattr_t
+      *
+      *      type
+      *              must be one of:
+      *
+      *                      PTHREAD_MUTEX_DEFAULT
+      *
+      *                      PTHREAD_MUTEX_NORMAL
+      *
+      *                      PTHREAD_MUTEX_ERRORCHECK
+      *
+      *                      PTHREAD_MUTEX_RECURSIVE
+      *
+      * DESCRIPTION
+      * The pthread_mutexattr_settype() and
+      * pthread_mutexattr_gettype() functions  respectively set and
+      * get the mutex type  attribute. This attribute is set in  the
+      * type  parameter to these functions. The default value of the
+      * type  attribute is  PTHREAD_MUTEX_DEFAULT.
+      * 
+      * The type of mutex is contained in the type  attribute of the
+      * mutex attributes. Valid mutex types include:
+      *
+      * PTHREAD_MUTEX_NORMAL
+      *          This type of mutex does  not  detect  deadlock.  A
+      *          thread  attempting  to  relock  this mutex without
+      *          first unlocking it will  deadlock.  Attempting  to
+      *          unlock  a  mutex  locked  by  a  different  thread
+      *          results  in  undefined  behavior.  Attempting   to
+      *          unlock  an  unlocked  mutex  results  in undefined
+      *          behavior.
+      * 
+      * PTHREAD_MUTEX_ERRORCHECK
+      *          This type of  mutex  provides  error  checking.  A
+      *          thread  attempting  to  relock  this mutex without
+      *          first unlocking it will return with  an  error.  A
+      *          thread  attempting to unlock a mutex which another
+      *          thread has locked will return  with  an  error.  A
+      *          thread attempting to unlock an unlocked mutex will
+      *          return with an error.
+      *
+      * PTHREAD_MUTEX_DEFAULT
+      *          Same as PTHREAD_MUTEX_NORMAL.
+      * 
+      * PTHREAD_MUTEX_RECURSIVE
+      *          A thread attempting to relock this  mutex  without
+      *          first  unlocking  it  will  succeed in locking the
+      *          mutex. The relocking deadlock which can occur with
+      *          mutexes of type  PTHREAD_MUTEX_NORMAL cannot occur
+      *          with this type of mutex. Multiple  locks  of  this
+      *          mutex  require  the  same  number  of  unlocks  to
+      *          release  the  mutex  before  another  thread   can
+      *          acquire the mutex. A thread attempting to unlock a
+      *          mutex which another thread has locked will  return
+      *          with  an  error. A thread attempting to  unlock an
+      *          unlocked mutex will return  with  an  error.  This
+      *          type  of mutex is only supported for mutexes whose
+      *          process        shared         attribute         is
+      *          PTHREAD_PROCESS_PRIVATE.
+      *
+      * RESULTS
+      *              0               successfully set attribute,
+      *              EINVAL          'attr' or 'type' is invalid,
+      *
+      * ------------------------------------------------------
+      */
+{
+  int result = 0;
+
+  if ((attr != NULL && *attr != NULL))
+    {
+      switch (kind)
+        {
+        case PTHREAD_MUTEX_FAST_NP:
+        case PTHREAD_MUTEX_RECURSIVE_NP:
+        case PTHREAD_MUTEX_ERRORCHECK_NP:
+          (*attr)->kind = kind;
+          break;
+        default:
+          result = EINVAL;
+          break;
+        }
+    }
+  else
+    {
+      result = EINVAL;
+    }
+  
+  return (result);
+}                               /* pthread_mutexattr_settype */
+
+
+int
+pthread_mutexattr_gettype (pthread_mutexattr_t * attr,
+                           int *kind)
+{
+  int result = 0;
+
+  if (attr != NULL && *attr != NULL && kind != NULL)
+    {
+      *kind = (*attr)->kind;
+    }
+  else
+    {
+      result = EINVAL;
+    }
+
+  return (result);
+}
+
+
+int
 pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   int result = 0;
   pthread_mutex_t mx;
+
 
   if (mutex == NULL || *mutex == NULL)
     {
@@ -542,25 +625,33 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
 
   mx = *mutex;
 
-  if (result == 0)
+  if( 0 == InterlockedIncrement( &mx->lock_idx ) )
     {
-      if (mx->mutex == 0)
-	{
-	  EnterCriticalSection(&mx->cs);
-	}
-      else
-	{
-	  result = (WaitForSingleObject(mx->mutex, INFINITE) 
-		    == WAIT_OBJECT_0)
-	    ? 0
-	    : EINVAL;
-	}
-    }
-
-  if (result == 0)
-    {
+      mx->recursive_count = 1;
       mx->ownerThread = pthread_self();
-      mx->lockCount++;
+    }
+  else
+    {
+      if( mx->kind != PTHREAD_MUTEX_FAST_NP &&
+          pthread_equal( mx->ownerThread, pthread_self() ) )
+	{
+          mx->lock_idx--;
+
+          if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP )
+            {
+              mx->recursive_count++;
+            }
+          else
+            {
+              result = EDEADLK;
+            }
+        }
+      else
+        {
+          WaitForSingleObject( mx->wait_sema, INFINITE );
+          mx->recursive_count = 1;
+          mx->ownerThread = pthread_self();
+        }
     }
 
   return(result);
@@ -586,38 +677,22 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
    */
   if (mx != (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
     {
-      pthread_t self = pthread_self();
-
-      if (pthread_equal(mx->ownerThread, self))
+      if (pthread_equal(mx->ownerThread, pthread_self()))
 	{
-	  int oldCount = mx->lockCount;
-	  pthread_t oldOwner = mx->ownerThread;
-
-	  if (mx->lockCount > 0)
-	    {
-	      mx->lockCount--;
-	    }
-
-	  if (mx->lockCount == 0)
+          if( mx->kind != PTHREAD_MUTEX_RECURSIVE_NP ||
+              0 == --mx->recursive_count )
 	    {
 	      mx->ownerThread = NULL;
-	    }
 	      
-	  if (mx->mutex == 0)
-	    {
-	      LeaveCriticalSection(&mx->cs);
-	    }
-	  else
-	    {
-	      if (!ReleaseMutex(mx->mutex))
+              EnterCriticalSection( &mx->try_lock_cs );
+
+              if( InterlockedDecrement( &mx->lock_idx ) >= 0 )
 		{
-		  result = EINVAL;
-		  /*
-		   * Put things back the way they were.
-		   */
-		  mx->lockCount = oldCount;
-		  mx->ownerThread = oldOwner;
+                  /* Someone is waiting on that mutex */
+                  ReleaseSemaphore( mx->wait_sema, 1, NULL );
 		}
+
+              LeaveCriticalSection( &mx->try_lock_cs );
 	    }
 	}
       else
@@ -659,32 +734,28 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
 
   if (result == 0)
     {
-      if (mx->mutex == 0)
+      /* Try to lock only if mutex seems available */
+      if( PTW32_MUTEX_LOCK_IDX_INIT == mx->lock_idx )
 	{
-	  if ((*ptw32_try_enter_critical_section)(&mx->cs) != TRUE)
+          EnterCriticalSection( &mx->try_lock_cs );
+
+          if( 0 == InterlockedIncrement( &mx->lock_idx ) )
 	    {
-	      result = EBUSY;
+              mx->recursive_count = 1;
+              mx->ownerThread = pthread_self();
 	    }
-	}
+          else
+            {
+              mx->lock_idx--;
+              result = EBUSY;
+            }
+
+          LeaveCriticalSection( &mx->try_lock_cs );
+        }
       else
-	{
-	  DWORD status;
-
-	  status = WaitForSingleObject (mx->mutex, 0);
-
-	  if (status != WAIT_OBJECT_0)
-	    {
-	      result = ((status == WAIT_TIMEOUT)
-			? EBUSY
-			: EINVAL);
-	    }
-	}
-    }
-
-  if (result == 0)
-    {
-      mx->ownerThread = pthread_self();
-      mx->lockCount++;
+        {
+          result = EBUSY;
+        }
     }
 
   return(result);

@@ -315,6 +315,8 @@ main (int argc, char *argv[])
       else
 	printf ("failed %d\n", tcs[i].stat);
 
+      assert(pthread_mutex_unlock(&tcs[i].mutex_start) == 0);
+
       assert(pthread_mutex_destroy (&tcs[i].mutex_start) == 0);
       assert(pthread_mutex_destroy (&tcs[i].mutex_started) == 0);
       assert(pthread_mutex_destroy (&tcs[i].mutex_end) == 0);

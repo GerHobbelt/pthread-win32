@@ -112,6 +112,8 @@ main()
 
 #else /* defined(__cplusplus) */
 
+#include <stdio.h>
+
 int
 main()
 {

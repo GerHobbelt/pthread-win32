@@ -1,5 +1,5 @@
 ; pthread.def
-; Last updated: $Date: 2000/12/28 05:32:07 $
+; Last updated: $Date: 2001/05/31 02:01:47 $
 
 ; Currently unimplemented functions are commented out.
 
@@ -13,7 +13,7 @@ pthread_attr_getdetachstate
 ;pthread_attr_getinheritsched
 pthread_attr_getschedparam
 ;pthread_attr_getschedpolicy
-;pthread_attr_getscope
+pthread_attr_getscope
 pthread_attr_getstackaddr
 pthread_attr_getstacksize
 pthread_attr_init
@@ -21,12 +21,12 @@ pthread_attr_setdetachstate
 ;pthread_attr_setinheritsched
 pthread_attr_setschedparam
 ;pthread_attr_setschedpolicy
-;pthread_attr_setscope
+pthread_attr_setscope
 pthread_attr_setstackaddr
 pthread_attr_setstacksize
 pthread_cancel
 ;
-; These are implemented as macros
+; These two are implemented as macros
 ;
 ;pthread_cleanup_pop
 ;pthread_cleanup_push
@@ -45,6 +45,7 @@ pthread_create
 pthread_detach
 pthread_equal
 pthread_exit
+pthread_getconcurrency
 pthread_getschedparam
 pthread_getspecific
 pthread_join
@@ -55,10 +56,12 @@ pthread_mutexattr_destroy
 ;pthread_mutexattr_getprioceiling
 ;pthread_mutexattr_getprotocol
 pthread_mutexattr_getpshared
+pthread_mutexattr_gettype
 pthread_mutexattr_init
 ;pthread_mutexattr_setprioceiling
 ;pthread_mutexattr_setprotocol
 pthread_mutexattr_setpshared
+pthread_mutexattr_settype
 pthread_mutexattr_destroy
 pthread_mutex_init
 pthread_mutex_destroy
@@ -69,6 +72,7 @@ pthread_once
 pthread_self
 pthread_setcancelstate
 pthread_setcanceltype
+pthread_setconcurrency
 pthread_setschedparam
 pthread_setspecific
 ;pthread_sigmask
@@ -101,7 +105,6 @@ pthread_rwlock_unlock
 ;
 ; Non-portable but useful
 ;
-pthread_mutexattr_setforcecs_np
 pthread_getw32threadhandle_np
 pthread_delay_np
 pthreadCancelableWait
@@ -114,8 +117,8 @@ pthread_win32_thread_detach_np
 ;
 ; Needed if !defined(_MSC_VER) && !defined(__cplusplus)
 ;
-pthread_push_cleanup
-pthread_pop_cleanup
+ptw32_push_cleanup
+ptw32_pop_cleanup
 ;
 ; Not for use directly. Needed by macros in pthread.h
 ; to return internal SEH code.

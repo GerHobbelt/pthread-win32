@@ -18,23 +18,28 @@
 # MA 02111-1307, USA
 #
 
-GLANG	= c++
+#RM	= rm
+#MV	= mv
+#CP	= cp
 
 RM	= erase
 MV	= rename
 CP	= copy
 
 CC	= gcc
+CXX	= g++
 
 AR	= ar
 
-LD	= gcc -mdll
-
-#OPT	= -g -O0
 OPT	= -O3
+#OPT	= -O2 -DNDEBUG -finline-functions
+
+GC_CFLAGS	= -D__CLEANUP_C
+GCE_CFLAGS	= -D__CLEANUP_CXX -x c++ -mthreads
 
 ## Mingw32
-CFLAGS	= $(OPT) -x $(GLANG) -I. -mthreads -D_WIN32_WINNT=0x400 -DHAVE_CONFIG_H -DPTW32_BUILD -Wall
+MAKE	= make
+CFLAGS	= $(OPT) -I. -D_WIN32_WINNT=0x400 -DHAVE_CONFIG_H -DPTW32_BUILD -Wall
 
 ## Cygwin G++
 #CFLAGS	= $(OPT) -x $(GLANG) -fhandle-exceptions -D_WIN32_WINNT=0x400 -I. -DHAVE_CONFIG_H -DPTW32_BUILD -Wall
@@ -45,15 +50,31 @@ OBJS	= attr.o cancel.o cleanup.o condvar.o create.o dll.o errno.o \
 
 INCL	= implement.h semaphore.h pthread.h windows.h
 
-DLL     = pthreadGCE.dll
+GC_DLL 	= pthreadGC.dll
+GCE_DLL = pthreadGCE.dll
 
-LIBS	= libpthreadw32.a
+GC_LIB	= libpthreadGC.a
+GCE_LIB = libpthreadGCE.a
 
 
-all:	$(LIBS)
+all:
+	@ echo Run one of the following command lines:
+	@ echo make clean GCE   (to build the GNU C dll with C++ exception handling)
+	@ echo make clean GC    (to build the GNU C dll with C cleanup code)
 
-$(LIBS): $(DLL)
-	dlltool --def pthread.def --output-lib $@ --dllname $(DLL)
+auto:
+	@ $(MAKE) clean GCE
+	@ $(MAKE) clean GC
+
+GC:
+		$(MAKE) CLEANUP_FLAGS="$(GC_CFLAGS)" $(GC_DLL)
+
+GCE:
+		$(MAKE) CLEANUP_FLAGS="$(GCE_CFLAGS)" $(GCE_DLL)
+
+tests:
+	@ cd tests
+	@ $(MAKE) auto
 
 %.pre: %.c
 	$(CC) -E -o $@ $(CFLAGS) $^
@@ -61,22 +82,28 @@ $(LIBS): $(DLL)
 %.s: %.c
 	$(CC) -c $(CFLAGS) -Wa,-ahl $^ > $@
 
-.SUFFIXES: .dll
+.SUFFIXES: .dll .c .o
 
-$(DLL): $(OBJS)
-	$(LD) -o $@ $^ -Wl,--base-file,$*.base
-	dlltool --base-file=$*.base --def pthread.def --output-exp $*.exp --dllname $@
-	$(LD) -o $@ $^ -Wl,--base-file,$*.base,$*.exp
-	dlltool --base-file=$*.base --def pthread.def --output-exp $*.exp --dllname $@
-	$(LD) -o $@ $^ -Wl,$*.exp
+.c.o:;		 $(CC) -c -o $@ $(CFLAGS) $(CLEANUP_FLAGS) $<
+
+
+$(GC_DLL): $(OBJS)
+	$(CC) $(OPT) -shared -o $@ $^
+	dlltool -k --dllname $@ --output-lib $(GC_LIB) --def pthread.def
+
+$(GCE_DLL): $(OBJS)
+	$(CXX) $(OPT) -mthreads -shared -o $@ $^
+	dlltool -k --dllname $@ --output-lib $(GCE_LIB) --def pthread.def
 
 clean:
 	-$(RM) *~
 	-$(RM) *.o 
 	-$(RM) *.exe
-	-$(RM) $(DLL:.dll=.base)
-	-$(RM) $(DLL:.dll=.exp)
 
-realclean:
-	-$(RM) $(LIBS)
-	-$(RM) $(DLL) 
+realclean: clean
+	-$(RM) $(GC_LIB)
+	-$(RM) $(GCE_LIB)
+	-$(RM) $(GC_DLL)
+	-$(RM) $(GCE_DLL)
+
+
