@@ -52,7 +52,7 @@ pthread_create(pthread_t *thread,
 	       void * (*start_routine) (void *), 
 	       void * arg)
 {
-  HANDLE   handle = NULL;
+  HANDLE   handle = (HANDLE) NULL;
   unsigned flags;
   void *   security = NULL;
   DWORD  threadID;
@@ -90,7 +90,7 @@ pthread_create(pthread_t *thread,
 	}
 
       /* We call a generic wrapper which then calls the start routine. */
-      new_thread->call.routine = start_routine;
+      new_thread->call.routine = (unsigned (*)(void *)) start_routine;
       new_thread->call.arg = arg;
 
       /* Start running, not suspended. */
@@ -103,7 +103,7 @@ pthread_create(pthread_t *thread,
 				       flags,
 				       &threadID);
 
-      if (handle == NULL)
+      if (handle == (HANDLE) NULL)
 	{
 	  ret = EAGAIN;
 	}
