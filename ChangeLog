@@ -1,3 +1,7 @@
+2003-12-10  Philippe Di Cristo  <philipped@voicebox.com>
+
+	* sem_timedwait.c (sem_timedwait): Fix timeout calculations.
+
 2003-09-14  Ross Johnson  <ross@callisto.canberra.edu.au>
 
 	* pthread_setschedparam.c (pthread_setschedparam): Attempt to map
