@@ -67,8 +67,13 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 	    {
 	      if (idx < 0)
 		{
-		  /* Someone may be waiting on that mutex */
-		  if (SetEvent (mx->event) == 0)
+		  /*
+		   * Someone may be waiting on that mutex.
+		   * Pulse event on an auto-reset event will
+		   * release one waiter if possible, otherwise
+		   * it will just reset the event.
+		   */
+		  if (PulseEvent (mx->event) == 0)
 		    {
 		      result = EINVAL;
 		    }

@@ -1,3 +1,8 @@
+2004-10-21  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* pthread_mutex_unlock.c (pthread_mutex_unlock): Must use PulseEvent()
+	rather than SetEvent() to reset the event if there are no waiters.
+
 2004-10-19  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* sem_init.c (sem_init): New semaphore model based on the same idea
