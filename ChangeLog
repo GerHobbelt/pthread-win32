@@ -1,3 +1,8 @@
+2000-01-06  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* Makefile: Remove inconsistencies in 'cl' args
+	- Erik Hensema <erik.hensema@group2000.nl>
+
 2000-01-04  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* private.c (_pthread_get_exception_services_code): New; returns
