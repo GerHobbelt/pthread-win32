@@ -1,4 +1,23 @@
-2004-05-20  Ross Johnson  <ross@special.ise.canberra.edu.au>
+2004-06-21  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* pthread.h (PTHREAD_RECURSIVE_MUTEX_INITIALIZER): Mutex
+	initialiser added for compatibility with Linux threads and
+	others; currently not included in SUSV3.
+	* pthread.h (PTHREAD_ERRORCHECK_MUTEX_INITIALIZER): Likewise.
+	* pthread.h (PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP): Likewise.
+	* pthread.h (PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP): Likewise.
+
+	* ptw32_mutex_check_need_init.c (ptw32_mutex_check_need_init): 
+	Add new initialisers.
+
+	* pthread_mutex_lock.c (pthread_mutex_lock): Check for new
+	initialisers.
+	* pthread_mutex_trylock.c (pthread_mutex_trylock): Likewise.
+	* pthread_mutex_timedlock.c (pthread_mutex_timedlock): Likewise.
+	* pthread_mutex_unlock.c (pthread_mutex_unlock): Likewise.
+	* pthread_mutex_destroy.c (pthread_mutex_destroy): Likewise.
+
+2004-05-20  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* README.NONPORTABLE: Document pthread_win32_test_features_np().
 	* FAQ: Update various answers.

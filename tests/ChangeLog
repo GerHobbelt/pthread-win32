@@ -1,4 +1,14 @@
-2004-05-21  Ross Johnson  <ross@special.ise.canberra.edu.au>
+2004-06-21  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* mutex2r.c: New test.
+	* mutex2e.c: New test.
+	* mutex3r.c: New test.
+	* mutex3e.c: New test.
+	* mutex6s.c: New test.
+	* mutex6rs.c: New test.
+	* mutex6es.c: New test.
+
+2004-05-21  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* join3.c: New test.
 

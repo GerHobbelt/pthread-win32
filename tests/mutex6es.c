@@ -1,8 +1,6 @@
-/*
- * pthread_mutex_unlock.c
+/* 
+ * mutex6es.c
  *
- * Description:
- * This translation unit implements mutual exclusion (mutex) primitives.
  *
  * --------------------------------------------------------------------------
  *
@@ -32,62 +30,65 @@
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *
+ * --------------------------------------------------------------------------
+ *
+ * Tests PTHREAD_MUTEX_ERRORCHECK static mutex type.
+ * Thread locks mutex twice (recursive lock).
+ * This should fail with an EDEADLK error.
+ * The second unlock attempt should fail with an EPERM error.
+ *
+ * Depends on API functions: 
+ *      pthread_create()
+ *      pthread_join()
+ *      pthread_mutexattr_init()
+ *      pthread_mutexattr_destroy()
+ *      pthread_mutexattr_settype()
+ *      pthread_mutexattr_gettype()
+ *      pthread_mutex_init()
+ *      pthread_mutex_destroy()
+ *	pthread_mutex_lock()
+ *	pthread_mutex_unlock()
  */
 
-#include "pthread.h"
-#include "implement.h"
+#include "test.h"
 
+static int lockCount = 0;
 
-int
-pthread_mutex_unlock (pthread_mutex_t * mutex)
+static pthread_mutex_t mutex = PTHREAD_ERRORCHECK_MUTEX_INITIALIZER;
+
+void * locker(void * arg)
 {
-  int result = 0;
-  pthread_mutex_t mx;
+  assert(pthread_mutex_lock(&mutex) == 0);
+  lockCount++;
+  assert(pthread_mutex_lock(&mutex) == EDEADLK);
+  lockCount++;
+  assert(pthread_mutex_unlock(&mutex) == 0);
+  assert(pthread_mutex_unlock(&mutex) == EPERM);
 
-  if (mutex == NULL || *mutex == NULL)
-    {
-      return EINVAL;
-    }
-
-  mx = *mutex;
-
-  /*
-   * If the thread calling us holds the mutex then there is no
-   * race condition. If another thread holds the
-   * lock then we shouldn't be in here.
-   */
-  if (mx < PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
-    {
-      if (mx->ownerThread == (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS
-	  || pthread_equal (mx->ownerThread, pthread_self ()))
-	{
-	  if (mx->kind != PTHREAD_MUTEX_RECURSIVE_NP
-	      || 0 == --mx->recursive_count)
-	    {
-	      mx->ownerThread = NULL;
-	      EnterCriticalSection (&mx->wait_cs);
-
-	      if (InterlockedDecrement (&mx->lock_idx) >= 0)
-		{
-		  /* Someone is waiting on that mutex */
-		  if (sem_post (&mx->wait_sema) != 0)
-		    {
-		      result = errno;
-		    }
-		}
-
-	      LeaveCriticalSection (&mx->wait_cs);
-	    }
-	}
-      else
-	{
-	  result = EPERM;
-	}
-    }
-  else
-    {
-      result = EINVAL;
-    }
-
-  return (result);
+  return (void *) 555;
 }
+ 
+int
+main()
+{
+  pthread_t t;
+  int result = 0;
+
+  assert(mutex == PTHREAD_ERRORCHECK_MUTEX_INITIALIZER);
+
+  assert(pthread_create(&t, NULL, locker, NULL) == 0);
+
+  assert(pthread_join(t, (void **) &result) == 0);
+  assert(result == 555);
+
+  assert(lockCount == 2);
+
+  assert(pthread_mutex_destroy(&mutex) == 0);
+
+  exit(0);
+
+  /* Never reached */
+  return 0;
+}
+

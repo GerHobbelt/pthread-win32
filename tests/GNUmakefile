@@ -76,7 +76,9 @@ TESTS	= sizes loadfree \
 	  kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
 	  join0 join1 join2 join3 \
-	  mutex2 mutex3 mutex4 mutex6 mutex6n mutex6e mutex6r \
+	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
+	  mutex4 mutex6 mutex6n mutex6e mutex6r \
+	  mutex6s mutex6es mutex6rs \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
 	  count1 once1 tsd1 self2 cancel1 cancel2 \
 	  delay1 delay2 eyal1 \
@@ -203,13 +205,20 @@ mutex1n.pass: mutex1.pass
 mutex1e.pass: mutex1.pass
 mutex1r.pass: mutex1.pass
 mutex2.pass: mutex1.pass
+mutex2r.pass: mutex2.pass
+mutex2e.pass: mutex2.pass
 mutex3.pass: create1.pass
+mutex3r.pass: mutex3.pass
+mutex3e.pass: mutex3.pass
 mutex4.pass: mutex3.pass
 mutex5.pass:
 mutex6.pass: mutex4.pass
 mutex6n.pass: mutex4.pass
 mutex6e.pass: mutex4.pass
 mutex6r.pass: mutex4.pass
+mutex6s.pass: mutex6.pass
+mutex6rs.pass: mutex6r.pass
+mutex6es.pass: mutex6e.pass
 mutex7.pass: mutex6.pass
 mutex7n.pass: mutex6n.pass
 mutex7e.pass: mutex6e.pass

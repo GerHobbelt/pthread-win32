@@ -1,4 +1,4 @@
-		 PTHREADS-WIN32 SNAPSHOT 2004-05-16
+		 PTHREADS-WIN32 SNAPSHOT 2004-06-22
 		 ----------------------------------
 	 Web Site: http://sources.redhat.com/pthreads-win32/
 	FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -258,6 +258,8 @@ The following functions are implemented:
       ---------------------------
       PTHREAD_ONCE_INIT
       PTHREAD_MUTEX_INITIALIZER
+      PTHREAD_RECURSIVE_MUTEX_INITIALIZER	(also: PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP)
+      PTHREAD_ERRORCHECK_MUTEX_INITIALIZER	(also: PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP)
       PTHREAD_COND_INITIALIZER
       PTHREAD_RWLOCK_INITIALIZER
       PTHREAD_SPINLOCK_INITIALIZER

@@ -75,8 +75,7 @@ DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD) = NULL;
 CRITICAL_SECTION ptw32_thread_reuse_lock;
 
 /*
- * Global lock for testing internal state of PTHREAD_MUTEX_INITIALIZER
- * created mutexes.
+ * Global lock for testing internal state of statically declared mutexes.
  */
 CRITICAL_SECTION ptw32_mutex_test_init_lock;
 

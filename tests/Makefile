@@ -82,12 +82,14 @@ EHFLAGS	=
 PASSES= sizes.pass  loadfree.pass \
 	  semaphore1.pass  semaphore2.pass  self1.pass  mutex5.pass  \
 	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  mutex2.pass  mutex3.pass  \
+	  mutex2r.pass  mutex2e.pass  mutex3r.pass  mutex3e.pass  \
 	  condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
 	  exit1.pass  create1.pass  create2.pass  reuse1.pass  reuse2.pass  equal1.pass  \
 	  kill1.pass  valid1.pass  valid2.pass  \
 	  exit2.pass  exit3.pass  exit4  exit5  \
 	  join0.pass  join1.pass  join2.pass join3.pass  \
 	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
+	  mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
 	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
 	  mutex8.pass  mutex8n.pass  mutex8e.pass  mutex8r.pass  \
 	  count1.pass  once1.pass  tsd1.pass  \
@@ -287,13 +289,20 @@ mutex1n.pass: mutex1.pass
 mutex1e.pass: mutex1.pass
 mutex1r.pass: mutex1.pass
 mutex2.pass: mutex1.pass
+mutex2r.pass: mutex2.pass
+mutex2e.pass: mutex2.pass
 mutex3.pass: create1.pass
+mutex3r.pass: mutex3.pass
+mutex3e.pass: mutex3.pass
 mutex4.pass: mutex3.pass
 mutex5.pass:
 mutex6.pass: mutex4.pass
 mutex6n.pass: mutex4.pass
 mutex6e.pass: mutex4.pass
 mutex6r.pass: mutex4.pass
+mutex6s.pass: mutex6.pass
+mutex6rs.pass: mutex6r.pass
+mutex6es.pass: mutex6e.pass
 mutex7.pass: mutex6.pass
 mutex7n.pass: mutex6n.pass
 mutex7e.pass: mutex6e.pass

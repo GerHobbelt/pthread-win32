@@ -55,7 +55,7 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
    * again inside the guarded section of ptw32_mutex_check_need_init()
    * to avoid race conditions.
    */
-  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+  if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
       result = ptw32_mutex_check_need_init (mutex);
     }

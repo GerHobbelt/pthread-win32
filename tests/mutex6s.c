@@ -1,8 +1,6 @@
-/*
- * pthread_mutex_unlock.c
+/* 
+ * mutex6s.c
  *
- * Description:
- * This translation unit implements mutual exclusion (mutex) primitives.
  *
  * --------------------------------------------------------------------------
  *
@@ -32,62 +30,64 @@
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *
+ * --------------------------------------------------------------------------
+ *
+ * Test the default (type not set) static mutex type.
+ * Should be the same as PTHREAD_MUTEX_NORMAL.
+ * Thread locks mutex twice (recursive lock).
+ * Locking thread should deadlock on second attempt.
+ *
+ * Depends on API functions: 
+ *	pthread_mutex_lock()
+ *	pthread_mutex_trylock()
+ *	pthread_mutex_unlock()
  */
 
-#include "pthread.h"
-#include "implement.h"
+#include "test.h"
 
+static int lockCount = 0;
 
-int
-pthread_mutex_unlock (pthread_mutex_t * mutex)
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void * locker(void * arg)
 {
-  int result = 0;
-  pthread_mutex_t mx;
+  assert(pthread_mutex_lock(&mutex) == 0);
+  lockCount++;
 
-  if (mutex == NULL || *mutex == NULL)
-    {
-      return EINVAL;
-    }
+  /* Should wait here (deadlocked) */
+  assert(pthread_mutex_lock(&mutex) == 0);
+  lockCount++;
+  assert(pthread_mutex_unlock(&mutex) == 0);
 
-  mx = *mutex;
+  return 0;
+}
+ 
+int
+main()
+{
+  pthread_t t;
+
+  assert(mutex == PTHREAD_MUTEX_INITIALIZER);
+
+  assert(pthread_create(&t, NULL, locker, NULL) == 0);
+
+  Sleep(1000);
+
+  assert(lockCount == 1);
 
   /*
-   * If the thread calling us holds the mutex then there is no
-   * race condition. If another thread holds the
-   * lock then we shouldn't be in here.
+   * Should succeed even though we don't own the lock
+   * because FAST mutexes don't check ownership.
    */
-  if (mx < PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
-    {
-      if (mx->ownerThread == (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS
-	  || pthread_equal (mx->ownerThread, pthread_self ()))
-	{
-	  if (mx->kind != PTHREAD_MUTEX_RECURSIVE_NP
-	      || 0 == --mx->recursive_count)
-	    {
-	      mx->ownerThread = NULL;
-	      EnterCriticalSection (&mx->wait_cs);
+  assert(pthread_mutex_unlock(&mutex) == 0);
 
-	      if (InterlockedDecrement (&mx->lock_idx) >= 0)
-		{
-		  /* Someone is waiting on that mutex */
-		  if (sem_post (&mx->wait_sema) != 0)
-		    {
-		      result = errno;
-		    }
-		}
+  Sleep (1000);
 
-	      LeaveCriticalSection (&mx->wait_cs);
-	    }
-	}
-      else
-	{
-	  result = EPERM;
-	}
-    }
-  else
-    {
-      result = EINVAL;
-    }
+  assert(lockCount == 2);
 
-  return (result);
+  exit(0);
+
+  /* Never reached */
+  return 0;
 }

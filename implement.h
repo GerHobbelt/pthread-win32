@@ -45,8 +45,8 @@
 /*
  * In case windows.h doesn't define it (e.g. WinCE perhaps)
  */
-#ifndef PAPCFUNC
-# define PAPCFUNC (void CALLBACK (*)(DWORD))
+#ifdef WINCE
+typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #endif
 
 /*
