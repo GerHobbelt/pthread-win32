@@ -48,6 +48,8 @@ See the file "ANNOUNCE" for more information including standards
 conformance details and list of supported routines.
 
 
+------------------------------------------------------------------------------
+
 Q 2	Which of the several dll versions do I use?
 ---	or,
 	What are all these pthread*.dll and pthread*.lib files?
@@ -90,6 +92,8 @@ There are a couple of reasons:
   useful to people who want to play with or study application
   behaviour under these conditions.
 
+
+------------------------------------------------------------------------------
 
 Q 3	What is the library naming convention?
 ---
@@ -140,6 +144,8 @@ The GNU library archive file names have changed to:
 	libpthreadGCE.a
 	libpthreadGC.a
 
+
+------------------------------------------------------------------------------
 
 Q 4	Cleanup code default style or: it used to work when I built
 ---	the library myself, but now it doesn't - why?
@@ -208,13 +214,16 @@ __CLEANUP_C++ explicitly using a compiler option and link with
 pthreadVCE.dll as you did before.
 
 
+------------------------------------------------------------------------------
+
 Q 5	Why is the default library version now less exception-friendly?
 ---
 
-Because no commercial Unix POSIX threads implementation allows you to
-choose to have stack unwinding. Therefore, providing it in pthread-win32
-as a default is dangerous. We still provide the choice but 
-you must now consciously make it.
+Because most commercial Unix POSIX threads implementations don't allow you to
+choose to have stack unwinding. (Compaq's TRU64 Unix is possibly an exception.)
+
+Therefore, providing it in pthread-win32 as a default could be dangerous. We
+still provide the choice but you must now consciously make it.
 
 WHY NOT REMOVE THE EXCEPTIONS VERSIONS OF THE LIBRARY ALTOGETHER?
 There are a few reasons:
@@ -231,122 +240,26 @@ There are a few reasons:
   nearly as visible to people who may have a use for it.
 
 
+------------------------------------------------------------------------------
+
 Q 6	Should I use Cygwin or Mingw32 as a development environment?
 ---
 
 Important: see Q7 also.
 
-In short, use Mingw32 with the MSVCRT library to build applications that use
-the DLL. Cygwin's own internal support for POSIX threads is growing. Consult
-that project's documentation for more information.
+Use Mingw32 with the MSVCRT library to build applications that use
+the pthreads DLL.
 
-Date: Mon, 07 Dec 1998 15:11:37 +0100
-From: Anders Norlander <anorland@hem2.passagen.se>
-To: Ross Johnson <rpj@ise.canberra.edu.au>
-Cc: pthreads-win32 <pthreads-win32@air.net.au>
-Subject: Re: pthreads-win32: TryEnterCriticalSection patch (fwd)
-
-Ross Johnson wrote:
-> 
-> Anders,
-> 
-> You said you're using GCC. Is that from cygwin32 or mingw32? What is your
-> environment (so I can perhaps help other people out)? We have problems
-> with cygwin32 et al that have been built on Win95. They're missing
-> _{begin,end}threadex.
-
-Ross,
-
-I use mingw32 when compiling pthreads-win32, but unlike most people I
-use MSVCRT as the C library instead of CRTDLL. For those that don't
-feel like configuring and building the necessary components themselves,
-Mumit Khan has released an add on for mingw32 to make it use MSVCRT40.
-It is available at his ftp site, follow the minw32 links at
-http://www.xraylith.wisc.edu/~khan/software/gnu-win32/
-
-For cygwin it is a completely different matter. I suppose
-pthreads-win32 uses _beginthreadex and _endthreadex because the Win32
-docs say that programs calling functions in the C library should not
-use CreateThread and ExitThread. However, this applies only to
-Microsoft's (and possibly others) multithreaded C libraries that need
-to keep track of per thread data, it does not apply to cygwin.
-This code solves the problem:
-
-/* Check for old and new versions of cygwin */
-#if defined(__CYGWIN32__) || defined(__CYGWIN__)
-/* Macro uses args so we can cast start_proc to LPTHREAD_START_ROUTINE
-   in order to avoid warnings because of return type */
-#define _beginthreadex(security, stack_size, start_proc, arg, flags,
-pid) \
-CreateThread(security, stack_size, (LPTHREAD_START_ROUTINE) start_proc,
-\
-             arg, flags, pid)
-#define _endthreadex ExitThread
-#endif
-
-I would be extremely careful using threads with cygwin, since it is
-not (yet) threadsafe.
-
-Regards,
-Anders
+Cygwin's own internal support for POSIX threads is growing.
+Consult that project's documentation for more information.
 
 ------------------------------------------------------------------------------
 
 Q 7	Now that pthreads-win32 builds under Mingw32, why do I get
 ---	memory access violations (segfaults)?
 
-Note: issue resolved.
-The latest Mingw32 package has thread-safe exception handling.
-Make sure you also read A 6 below to get a fully working build.
-
-
-The following email exchange describes the problem. Until this issue
-is resolved people without the Microsoft compiler can obtain the current
-MSVC prebuilt DLL (pthread.{dll,lib,h}) at:
-
-ftp://sources.redhat.com/pub/pthreads-win32/dll-latest 
-
-Date: Wed, 10 Feb 1999 13:21:01 -0000
-From: "Ruland, Kevin" <Kevin.Ruland@anheuser-busch.com>
-Reply-To: POSIX threads on Win32 <pthreads-win32@air.net.au>
-To: 'POSIX threads on Win32' <pthreads-win32@air.net.au>
-Subject: Mingw32 exceptions not thread safe.
-
-Hello everyone.
-
-I asked Mumit Khan, maintainer of egcs for mingw and assorted guru, about
-the Known Problem listed below.  
-
-> Known problems
-> --------------
-> 
-> There is an unresolved bug which shows up as a segmentation fault
-> (memory access violation) when the library is built using g++. Build
-> the test program "eyal1.c" and run with an argument of "2" or
-> greater. The argument is the number of threads to run, excluding the
-> main thread, so the bug appears with 2 or more worker threads.
-> 
-> Kevin Ruland has traced the exception to the try/catch blocks in
-> ptw32_threadStart().
-> 
-
-The official word is:
-
-<Quote Mumit Khan [khan@xraylith.wisc.edu]>
-EGCS-1.1.1 for win32 (either cygwin or crtdll/msvc runtimes) do not have
-thread-safe exception support. 
-
-For Cygwin, it'll happen when Cygwin runtime has mature thread safety and
-pthread is fully integrated. Then it's just a matter of rebuilding GCC (or
-just libgcc in this) with thread safe EH support.
-
-For Mingw crtdll/msvc, someone needs to write the thread-wrapper for win32
-threads. Anyone who knows win32 threads should be able to do this without
-much trouble at all. It's low on my priority list, so unless someone else
-volunteers, it'll have to wait.
-<\Quote>
-
-Kevin
+The latest Mingw32 package has thread-safe exception handling (see Q10).
+Also, see Q6 above.
 
 ------------------------------------------------------------------------------
 
@@ -362,7 +275,9 @@ Q 8	How do I use pthread.dll for Win32 (Visual C++ 5.0)
 > Thank you,
 >
 
-You should have a .dll, .lib, .def, and three .h files.
+You should have a .dll, .lib, .def, and three .h files. It is recommended
+that you use pthreadVC.dll, rather than pthreadVCE.dll or pthreadVSE.dll
+(see Q2 above).
 
 The .dll can go in any directory listed in your PATH environment
 variable, so putting it into C:\WINDOWS should work.
@@ -467,123 +382,12 @@ Ross
 
 ------------------------------------------------------------------------------
  
-Q 10	Thread won't block after two calls to mutex_lock
-----
 
-> i was testing this pthread for win32 in my prog.
-> when i checked if it was blocking mutex_lock calls, i was surprised when it
-> didnt lock
-> 
-> pthread_mutex_t DBlock;
-> 
-> pthread_mutex_init( &DBlock, NULL );
-> pthread_mutex_lock( &DBlock );
-> pthread_mutex_lock( &DBlock );
-> 
-> ^^ these two calls didnt block
+Q 10	How do I create thread-safe applications using
+----    pthreadGCE.dll, libpthreadw32.a and Mingw32?
 
-POSIX leaves the result "undefined" for a thread that tries
-to recursively lock the same mutex (one that it owns already).
-That means the actual semantics are left up to the
-implementation, but should not be relied upon for code that
-will be ported to different POSIX threads implementations.
-
-In the pthreads-win32 implementation a thread won't deadlock
-itself by relocking the mutex. Subsequent calls to
-pthread_mutex_lock() as in your example above increment
-the lock count but the thread continues on. Consequently,
-the thread must ensure that it unlocks the mutex once for
-each lock operation. That is, pthreads-win32 mutexes are
-always recursive.
-
-You may want to look at the other synchronisation devices
-available in the library, such as condition variables or
-read-write locks.
-
-Ross
-
-------------------------------------------------------------------------------
- 
-Q 11	How do I generate pthreadGCE.dll and libpthreadw32.a for use with Mingw32?
-----
-
-Once you've followed Thomas Pfaff's instructions below to fix
-Mingw32, then you can simply run "make" to build the library and dll.
-
-
-From - Sat Dec  9 22:56:10 2000
-From: "Thomas Pfaff" <tpfaff@gmx.net>
-To: <mingw-users@lists.sourceforge.net>, <pthreads-win32@sources.redhat.com>
-Subject: mingw32 DLLs, threads and exceptions HOWTO
-Date: Thu, 7 Dec 2000 11:12:43 +0100
-
-Dear all,
-
-this is a summary that should help users to have thread safe exception
-handling over DLL exported functions.
-If you don't care about c++ exceptions you can stop reading here.
-
-The first time i struggled with c++ exceptions was when i tried to throw an
-exception in a dll exported function where the exception handler resides in
-the program module.
-Instead of catching the exception the program stopped with an abnormal
-termination.
-The reason was that the exception code is in libgcc.a. Since this is a
-static library the code and some static variables are both in the dll and in
-the program module, each module runs in its own context.
-It was Franco Bez that pointed me in the right direction, that is convert
-libgcc.a into a dll.
-
-That done i tried to build the pthreads-win32 library, but some tests failed
-with an access violation. Due to the fact that the dll was not build
-was -mthreads support, eh_context_static instead of eh_context_specific (the
-mthreads version) was used for exception handling.
-I did a rebuild of the gcc dll with -mthreads, now all tests are passed
-(except a nonportable exception test that relies on a MSVC feature).
-
-To build the gcc dll i did the following steps.
-
-1. create a temporary directory libgcc
-2. copy libgcc.a from gcc-2.95.2\lib\gcc-lib\i386-mingw32\gcc-2.95.2 to that
-directory
-3. ar -x libgcc.a
-4. create a directory tmp and move __main.o, _exit.o and __dummy.o in that
-directory
-5. build the dll
-gcc -shared -mthreads -o gcc.dll *.o
-strip gcc.dll
-Move this dll into your gcc\bin directory
-6. Move _chkstk.o and frame.o to the tmp directory, otherwise you break the
-builtin alloca.
-7. Build the import library libgcc.a
-dllwrap --export-all --dllname=gcc.dll --output-def=libgcc.def --output-lib=
-libgcc.a *.o
-ar -q libgcc.a tmp/*.o
-strip --strip-debug libgcc.a
-ranlib libgcc.a
-8. save your old libgcc.a, copy the new libgcc.a into
-gcc-2.95.2\lib\gcc-lib\i386-mingw32\gcc-2.95.2
-
-I am using gcc-2.95.2-1 with Mumits patched binutils-19990818-1and msvcrt
-runtime-2000-03-27.
-I don't know if this is still required with the current binutils and gcc
-since i have seen no sources until now.
-
-I believe that these steps are at least necessary if you are trying to use
-the pthreads-win32 library (which is required if you want to use gtk+ on
-win32).
-They will make mingw32 a real replacement for MSVC (at least for me).
-
-What is left:
-
-1. Include the mingwm10.dll function into the gcc.dll to have only one dll
-left.
-2. make -mthreads and -fnative-struct default compiler options.
-3. convert libstdc++ to a dll by adding the declspec dllexport and dllimport
-to every class definition.
-
-Regards,
-    Thomas
+See Thomas Pfaff's email at:
+http://sources.redhat.com/ml/pthreads-win32/2002/msg00000.html
 
 ------------------------------------------------------------------------------
  

@@ -27,8 +27,8 @@
  */
 
 /*
- * Strategy for implementing pthread_kill()
- * ========================================
+ * Possible future strategy for implementing pthread_kill()
+ * ========================================================
  *
  * Win32 does not implement signals.
  * Signals are simply software interrupts.
@@ -124,10 +124,10 @@ pthread_sigmask(int how, sigset_t const *set, sigset_t *oset)
   if (set != NULL)
     {
       unsigned int i;
-	
+
       /* FIXME: this code assumes that sigmask is an even multiple of
-	 the size of a long integer. */ 
-         
+	 the size of a long integer. */
+
       unsigned long *src = (unsigned long const *) set;
       unsigned long *dest = (unsigned long *) &(thread->sigmask);
 
@@ -167,7 +167,7 @@ int sigwait(const sigset_t *set,
 }
 
 int sigaction(int signum,
-	      const  struct  sigaction  *act,
+	      const  struct  sigaction	*act,
 	      struct sigaction *oldact)
 {
 }

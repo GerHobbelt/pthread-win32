@@ -91,7 +91,7 @@ ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
   return(result);
 }
 
-INLINE int
+int
 pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 {
   int result = 0;
@@ -138,20 +138,20 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
       mx->lock_idx = PTW32_MUTEX_LOCK_IDX_INIT;
       mx->recursive_count = 0;
       mx->kind = (attr == NULL || *attr == NULL
-                  ? PTHREAD_MUTEX_DEFAULT
-                  : (*attr)->kind);
+		  ? PTHREAD_MUTEX_DEFAULT
+		  : (*attr)->kind);
       mx->ownerThread = NULL;
 
       if ( 0 != sem_init( &mx->wait_sema, 0, 0 ))
-        {
-          result = EAGAIN;
-          free(mx);
-          mx = NULL;
-        }
+	{
+	  result = EAGAIN;
+	  free(mx);
+	  mx = NULL;
+	}
       else
-        {
-          InitializeCriticalSection( &mx->wait_cs );
-        }
+	{
+	  InitializeCriticalSection( &mx->wait_cs );
+	}
     }
 
   *mutex = mx;
@@ -762,7 +762,7 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec * abstime)
 }				/* ptw32_timed_semwait */
 
 
-INLINE int
+int
 pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   int result = 0;
@@ -829,7 +829,7 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
 }
 
 
-INLINE int
+int
 pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 {
   int result = 0;
@@ -907,27 +907,27 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 		      EnterCriticalSection(&mx->wait_cs);
 
 		      /*
-                       * If we timeout, it is up to us to adjust lock_idx to say
-                       * we're no longer waiting. If the mutex was also unlocked
-                       * while we were timing out, and we simply return ETIMEDOUT,
-                       * then wait_sema would be left in a state that is not consistent
-                       * with the state of lock_idx.
-                       *
+		       * If we timeout, it is up to us to adjust lock_idx to say
+		       * we're no longer waiting. If the mutex was also unlocked
+		       * while we were timing out, and we simply return ETIMEDOUT,
+		       * then wait_sema would be left in a state that is not consistent
+		       * with the state of lock_idx.
+		       *
 		       * We must check to see if wait_sema has just been posted
-                       * but we can't just call sem_getvalue - we must compete for
-                       * the semaphore using sem_trywait(), otherwise we would need
-                       * additional critical sections elsewhere, which would make the
-                       * logic too inefficient.
-                       *
-                       * If sem_trywait returns EAGAIN then either wait_sema
-                       * was given directly to another waiting thread or
-                       * another thread has called sem_*wait() before us and
-                       * taken the lock. Then we MUST decrement lock_idx and return
-                       * ETIMEDOUT.
-                       *
-                       * Otherwise we MUST return success (because we have effectively
-                       * acquired the lock that would have been ours had we not
-                       * timed out), and NOT decrement lock_idx.
+		       * but we can't just call sem_getvalue - we must compete for
+		       * the semaphore using sem_trywait(), otherwise we would need
+		       * additional critical sections elsewhere, which would make the
+		       * logic too inefficient.
+		       *
+		       * If sem_trywait returns EAGAIN then either wait_sema
+		       * was given directly to another waiting thread or
+		       * another thread has called sem_*wait() before us and
+		       * taken the lock. Then we MUST decrement lock_idx and return
+		       * ETIMEDOUT.
+		       *
+		       * Otherwise we MUST return success (because we have effectively
+		       * acquired the lock that would have been ours had we not
+		       * timed out), and NOT decrement lock_idx.
 		       *
 		       * We can almost guarrantee that EAGAIN is the only
 		       * possible error, so no need to test errno.
@@ -945,10 +945,10 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 		  case 2: /* abstime had passed before we started to wait. */
 		    {
 		      /*
-                       * If we timeout, it is up to us to adjust lock_idx to say
-                       * we're no longer waiting. wait_sema has not been touched.
-                       */
-                      (void) InterlockedDecrement( &mx->lock_idx );
+		       * If we timeout, it is up to us to adjust lock_idx to say
+		       * we're no longer waiting. wait_sema has not been touched.
+		       */
+		      (void) InterlockedDecrement( &mx->lock_idx );
 		      result = ETIMEDOUT;
 		      break;
 		    }
@@ -966,7 +966,7 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 }
 
 
-INLINE int
+int
 pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   int result = 0;
@@ -979,7 +979,7 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
 
   mx = *mutex;
 
-  /* 
+  /*
    * If the thread calling us holds the mutex then there is no
    * race condition. If another thread holds the
    * lock then we shouldn't be in here.
@@ -1020,7 +1020,7 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
   return(result);
 }
 
-INLINE int
+int
 pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
   int result = 0;

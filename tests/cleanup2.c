@@ -103,11 +103,17 @@ mythread(void * arg)
   assert(bag->started == 0);
   bag->started = 1;
 
+#ifdef _MSC_VER
+#pragma inline_depth(0)
+#endif
   pthread_cleanup_push(increment_pop_count, (void *) &pop_count);
 
   sched_yield();
 
   pthread_cleanup_pop(1);
+#ifdef _MSC_VER
+#pragma inline_depth(8)
+#endif
 
   return (void *) result;
 }

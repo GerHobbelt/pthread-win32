@@ -27,10 +27,10 @@ announcement for the list of contributors.
 Changes since the last snapshot
 -------------------------------
 
-Cleanup code default style. (IMPORTANT - with apologies for the length)
+Cleanup code default style. (IMPORTANT)
 ----------------------------------------------------------------------
 Previously, if not defined, the cleanup style was determined automatically
-from the compiler used, and one of the following was defined accordingly:
+from the compiler/language, and one of the following was defined accordingly:
 
 	__CLEANUP_SEH	MSVC only
 	__CLEANUP_CXX	C++, including MSVC++, GNU G++
@@ -46,13 +46,14 @@ caught by a handler in the thread startup routine, so that the
 the correct stack unwinding occurs regardless of where the thread
 is when it's canceled or exits via pthread_exit().
 
-In this snapshot, unless the build explicitly defines (e.g. via a
-compiler option) __CLEANUP_SEH, __CLEANUP_CXX, or __CLEANUP_C, then
+In this and future snapshots, unless the build explicitly defines (e.g.
+via a compiler option) __CLEANUP_SEH, __CLEANUP_CXX, or __CLEANUP_C, then
 the build NOW always defaults to __CLEANUP_C style cleanup. This style
 uses setjmp/longjmp in the cancelation and pthread_exit implementations,
 and therefore won't do stack unwinding even when linked to applications
-that have it (e.g. C++ apps). This is for consistency with most/all
-commercial Unix POSIX threads implementations.
+that have it (e.g. C++ apps). This is for consistency with most
+current commercial Unix POSIX threads implementations. Compaq's TRU64
+may be an exception (no pun intended) and possible future trend.
 
 Although it was not clearly documented before, it is still necessary to
 build your application using the same __CLEANUP_* define as was
@@ -62,7 +63,11 @@ defines require the following library versions:
 
 	__CLEANUP_SEH	pthreadVSE.dll
 	__CLEANUP_CXX	pthreadVCE.dll or pthreadGCE.dll
-	__CLEANUP_C		pthreadVC.dll or pthreadGC.dll
+	__CLEANUP_C	pthreadVC.dll or pthreadGC.dll
+
+E.g. regardless of whether your app is C or C++, if you link with
+pthreadVC.lib or libpthreadGC.a, then you must define __CLEANUP_C.
+
 
 THE POINT OF ALL THIS IS: if you have not been defining one of these
 explicitly, then the defaults as described at the top of this
@@ -72,14 +77,14 @@ THIS NOW CHANGES, as has been explained above, but to try to make this
 clearer here's an example:
 
 If you were building your application with MSVC++ i.e. using C++
-exceptions (rather than SEH) and not explicitly defining one of
-__CLEANUP_*, then __CLEANUP_C++ was defined for you in pthread.h.
+exceptions and not explicitly defining one of __CLEANUP_*, then
+__CLEANUP_C++ was automatically defined for you in pthread.h.
 You should have been linking with pthreadVCE.dll, which does
 stack unwinding.
 
 If you now build your application as you had before, pthread.h will now
-set __CLEANUP_C as the default style, and you will need to link
-with pthreadVC.dll. Stack unwinding will now NOT occur when a thread
+automatically set __CLEANUP_C as the default style, and you will need to
+link with pthreadVC.dll. Stack unwinding will now NOT occur when a thread
 is canceled, or the thread calls pthread_exit().
 
 Your application will now most likely behave differently to previous
@@ -132,34 +137,37 @@ is not available on i386 CPUs. This library (from snapshot
 20010712 onwards) is therefore no longer supported on i386
 processor platforms.
 
-rwlocks
--------
-Rwlockattr functions have been added.
+New routines
+------------
+For source code portability only, rwlocks cannot be process shared yet.
+        pthread_rwlockattr_init()
+        pthread_rwlockattr_destroy()
+        pthread_rwlockattr_setpshared()
+        pthread_rwlockattr_getpshared()
 
-Restored pthread_rwlock_wrlock() as a cancelation point as permitted
-by POSIX 1003.1j. (Was prematurely disabled in the last snapshot.)
+As defined in the new POSIX standard, and the Single Unix Spec version 3:
+        sem_timedwait()
+        pthread_mutex_timedlock()
 
-First attempt at removing inclusion of windows.h in pthread.h
--------------------------------------------------------------
-This is done to prevent conflicts reported by some people.
+pthread.h no longer includes windows.h
+--------------------------------------
+This was done to prevent conflicts.
 
-Succeeded for all MSVC and the GNU C builds, but not yet for
-GNU C++. One unresolved error from the linker prevents the later.
-Only HANDLE and DWORD need to be defined in pthread.h. Safeguards
-are used to avoid redefinition errors in application builds.
+HANDLE, DWORD, and NULL are temporarily defined within pthread.h if
+they are not already.
 
 Bug fixes
 ---------
-Fixed potential NULL pointer dereferences in pthread_mutexattr_init,
+* Fixed potential NULL pointer dereferences in pthread_mutexattr_init,
 pthread_mutexattr_getpshared, pthread_barrierattr_init,
 pthread_barrierattr_getpshared, and pthread_condattr_getpshared.
 - Scott McCaskill <scott@magruder.org>
 
-Removed potential race condition in pthread_mutex_trylock and
+* Removed potential race condition in pthread_mutex_trylock and
 pthread_mutex_lock;
 - Alexander Terekhov <TEREKHOV@de.ibm.com>
 
-The behaviour of pthread_mutex_trylock in relation to
+* The behaviour of pthread_mutex_trylock in relation to
 recursive mutexes was inconsistent with commercial implementations.
 Trylock would return EBUSY if the lock was owned already by the
 calling thread regardless of mutex type. Trylock now increments the
@@ -167,6 +175,22 @@ recursion count and returns 0 for RECURSIVE mutexes, and will
 return EDEADLK rather than EBUSY for ERRORCHECK mutexes. This is
 consistent with Solaris.
 - Thomas Pfaff <tpfaff@gmx.net>
+
+* Found a fix for the library and workaround for applications for
+the known bug #2, i.e. where __CLEANUP_CXX or __CLEANUP_SEH is defined.
+See the "Known Bugs in this snapshot" section below.
+
+This could be made transparent to applications by replacing the macros that
+define the current C++ and SEH versions of pthread_cleanup_push/pop
+with the C version, but AFAIK cleanup handlers would not then run in the
+correct sequence with destructors and exception cleanup handlers when
+an exception occurs.
+
+* Cancelation once started in a thread cannot now be inadvertantly
+double canceled. That is, once a thread begins it's cancelation run,
+cancelation is disabled and a subsequent cancel request will
+return an error (ESRCH).
+
 
 ---------------------------
 Known bugs in this snapshot
@@ -181,6 +205,34 @@ Known bugs in this snapshot
 
 2. Cancellation problems in optimised code
    - Milan Gardian
+
+   Workaround [rpj - 2 Feb 2002]
+   -----------------------------
+   The problem disappears when /Ob0 is used, i.e. /O2 /Ob0 works OK.
+
+   So the inlining optimisation is interfering with the way that cleanup
+   handlers are run. In order to confirm this, the following use of pragmas
+   gets around the problem but I don't know how to make it transparent, in say,
+   pthread.h where pthread_cleanup_push is a macro that expands (in the C++ case) to
+   a local object instantiation with handlerFunc as the destructor (see pthread.h):
+
+   #pragma inline_depth(0)
+     pthread_cleanup_push(handlerFunc, (void *) &arg);
+
+        /* ... */
+
+     pthread_cleanup_pop(0);
+   #pragma inline_depth(8)
+
+   The pragma is also needed (and now used) within the library itself wherever
+   cleanup handlers are used (condvar.c and rwlock.c).
+
+   Use of these pragmas allows compiler optimisation /O2 to be used for
+   both the library and applications.
+   [/rpj]
+
+   Original problem description
+   ----------------------------
 
    The cancellation (actually, cleanup-after-cancel) tests fail when using VC
    (professional) optimisation switches (/O1 or /O2) in pthreads library. I
@@ -309,7 +361,8 @@ The following functions are implemented:
       pthread_mutex_init
       pthread_mutex_destroy
       pthread_mutex_lock
-      pthread_mutex_trylock      
+      pthread_mutex_trylock
+      pthread_mutex_timedlock
       pthread_mutex_unlock
 
       ---------------------------
@@ -370,6 +423,7 @@ The following functions are implemented:
       sem_post
       sem_wait
       sem_trywait
+      sem_timedwait
       sem_open               (returns an error ENOSYS)
       sem_close              (returns an error ENOSYS)
       sem_unlink             (returns an error ENOSYS)
@@ -410,7 +464,9 @@ The following functions are implemented:
       pthread_mutexattr_getkind_np
       pthread_mutexattr_setkind_np      (types: PTHREAD_MUTEX_FAST_NP,
                                                 PTHREAD_MUTEX_ERRORCHECK_NP,
-                                                PTHREAD_MUTEX_RECURSIVE_NP)
+                                                PTHREAD_MUTEX_RECURSIVE_NP,
+                                                PTHREAD_MUTEX_ADAPTIVE_NP,
+                                                PTHREAD_MUTEX_TIMED_NP)
       pthread_num_processors_np
       pthread_win32_process_attach_np   (Required when statically linking the library)
       pthread_win32_process_detach_np   (Required when statically linking the library)
@@ -532,21 +588,15 @@ MSVC using C setjmp/longjmp works. Distribute pthreadVC.dll with your applicatio
 
 
 Mingw32:
-You need gcc-2.95.2-1 modified as per pthreads-win32 FAQ answer (6), with
-binutils-19990818-1 and msvcrt runtime-2000-03-27. Mingw32 must use
-the thread-safe MSVCRT library (see the FAQ). You need to distribute
-the gcc.dll DLL from Mingw32 with your application.
+See FAQ Questions 6 and 10.
 
 Mingw using C++ EH works. Distribute pthreadGCE.dll with your application.
 Mingw using C setjmp/longjmp works. Distribute pthreadGC.dll with your application.
 
 
 Cygwin: (http://sourceware.cygnus.com/cygwin/)
-Cygwin aims to provide a complete POSIX environment on top of Win32, including
-threads. When this is complete, developers using Cygwin will not need
-pthreads-win32. At this time, Cygwin has preliminary support for multithreaded
-development, however, this is not turned on by default. We have not tested
-pthreads-win32 against Cygwin.
+Developers using Cygwin will not need pthreads-win32 since it has POSIX threads
+support. Refer to its documentation for details and extent.
 
 
 UWIN:

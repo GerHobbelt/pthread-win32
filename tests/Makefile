@@ -10,6 +10,8 @@ ECHO	= @echo
 
 CPHDR	= pthread.h semaphore.h sched.h
 
+OPTIM	= /O2
+
 # C++ Exceptions
 VCEFLAGS	= /GX /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
 VCELIB	= pthreadVCE.lib
@@ -25,7 +27,7 @@ VCDLL	= pthreadVC.dll
 # C++ Exceptions in application - using VC version of pthreads dll
 VCXFLAGS	= /GX /TP /D__CLEANUP_C
 
-CFLAGS= /W3 /WX /MT /nologo /Yd /Zi -D_WIN32_WINNT=0x400
+CFLAGS= $(OPTIM) /W3 /WX /MT /nologo /Yd /Zi -D_WIN32_WINNT=0x400
 LFLAGS= /INCREMENTAL:NO
 INCLUDES=-I.
 BUILD_DIR=..
@@ -47,6 +49,7 @@ PASSES= loadfree.pass \
 	  join0.pass  join1.pass  join2.pass  \
 	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
 	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
+	  mutex8.pass  mutex8n.pass  mutex8e.pass  mutex8r.pass  \
 	  count1.pass  once1.pass  tsd1.pass  \
 	  self2.pass  \
 	  cancel1.pass  cancel2.pass  \
@@ -57,7 +60,7 @@ PASSES= loadfree.pass \
 	  errno1.pass  \
 	  rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  rwlock5.pass  rwlock6.pass  rwlock7.pass  \
 	  context1.pass  \
-	  cancel3.pass  cancel4.pass  cancel5.pass  \
+	  cancel3.pass  cancel4.pass  cancel5.pass  cancel6a.pass  cancel6d.pass  \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
@@ -152,6 +155,7 @@ clean:
 	- $(RM) *.obj
 	- $(RM) *.pdb
 	- $(RM) *.o
+	- $(RM) *.asm
 	- $(RM) *.exe
 	- $(RM) *.pass
 	- $(RM) *.bench
@@ -171,6 +175,8 @@ cancel2.pass: cancel1.pass
 cancel3.pass: context1.pass
 cancel4.pass: cancel3.pass
 cancel5.pass: cancel3.pass
+cancel6a.pass: cancel3.pass
+cancel6d.pass: cancel3.pass
 cleanup0.pass: cancel5.pass
 cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
@@ -221,6 +227,10 @@ mutex7.pass: mutex6.pass
 mutex7n.pass: mutex6n.pass
 mutex7e.pass: mutex6e.pass
 mutex7r.pass: mutex6r.pass
+mutex8.pass: mutex7.pass
+mutex8n.pass: mutex7n.pass
+mutex8e.pass: mutex7e.pass
+mutex8r.pass: mutex7r.pass
 once1.pass: create1.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass

@@ -13,6 +13,8 @@ LIBDEST=$(DEVROOT)
 
 DLLS	= pthreadVCE.dll pthreadVSE.dll pthreadVC.dll
 
+OPTIM	= /O2
+
 # C++ Exceptions
 VCEFLAGS	= /GX /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
 #Structured Exceptions
@@ -20,8 +22,8 @@ VSEFLAGS	= /D__CLEANUP_SEH
 #C cleanup code
 VCFLAGS	= /D__CLEANUP_C
 
-#CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DPTW32_BUILD /DTEST_ICE
-CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DPTW32_BUILD
+#CFLAGS	= $(OPTIM) /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DPTW32_BUILD /DTEST_ICE
+CFLAGS	= $(OPTIM) /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DPTW32_BUILD
 
 OBJ=  attr.obj \
 	barrier.obj \

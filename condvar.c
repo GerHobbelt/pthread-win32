@@ -920,6 +920,9 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
    */
   cleanup_args.signaled = 0;
 
+#ifdef _MSC_VER
+#pragma inline_depth(0)
+#endif
   pthread_cleanup_push(ptw32_cond_wait_cleanup, (void *) &cleanup_args);
 
   /*
@@ -935,13 +938,13 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
        *              timeout, or
        *              thread cancellation
        *
-       * Note: 
+       * Note:
        *
        *      sem_timedwait is a cancellation point,
-       *      hence providing the mechanism for making 
-       *      pthread_cond_wait a cancellation point. 
+       *      hence providing the mechanism for making
+       *      pthread_cond_wait a cancellation point.
        *      We use the cleanup mechanism to ensure we
-       *      re-lock the mutex and adjust (to)unblock(ed) waiters 
+       *      re-lock the mutex and adjust (to)unblock(ed) waiters
        *      counts if we are cancelled, timed out or signalled.
        */
       if (sem_timedwait(&(cv->semBlockQueue), abstime) != 0)
@@ -959,6 +962,9 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
    * Always cleanup
    */
   pthread_cleanup_pop(1);
+#ifdef _MSC_VER
+#pragma inline_depth(8)
+#endif
 
   /*
    * "result" can be modified by the cleanup handler.
@@ -969,7 +975,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
 
 
 static INLINE int
-ptw32_cond_unblock (pthread_cond_t * cond, 
+ptw32_cond_unblock (pthread_cond_t * cond,
                     int unblockAll)
      /*
       * Notes.

@@ -355,9 +355,20 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
           if (self != NULL && !self->implicit)
             {
               /*
-               * Thread started with pthread_create
+               * Thread started with pthread_create.
+               * Make sure we haven't been async-canceled in the meantime.
                */
-	      ptw32_throw(PTW32_EPS_CANCEL);
+              (void) pthread_mutex_lock(&self->cancelLock);
+              if (self->state < PThreadStateCanceling)
+                {
+                  self->state = PThreadStateCanceling;
+                  self->cancelState = PTHREAD_CANCEL_DISABLE;
+                  (void) pthread_mutex_unlock(&self->cancelLock);
+                  ptw32_throw(PTW32_EPS_CANCEL);
+
+                  /* Never reached */
+                }
+              (void) pthread_mutex_unlock(&self->cancelLock);
             }
 
           /* Should never get to here. */

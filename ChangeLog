@@ -1,3 +1,26 @@
+2002-02-02  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* cancel.c: Rearranged some code and introduced checks
+	to disable cancelation at the start of a thread's cancelation
+	run to prevent double cancelation. The main problem
+	arises if a thread is canceling and then receives a subsequent
+	async cancel request.
+	* private.c: Likewise.
+	* condvar.c: Place pragmas around cleanup_push/pop to turn
+	off inline optimisation (/Obn where n>0 - MSVC only). Various
+	optimisation switches in MSVC turn this on, which interferes with
+	the way that cleanup handlers are run in C++ EH and SEH
+	code. Application code compiled with inline optimisation must
+	also wrap cleanup_push/pop blocks with the pragmas, e.g.
+	  #pragma inline_depth(0)
+	  pthread_cleanup_push(...)
+	    ...
+	  pthread_cleanup_pop(...)
+	  #pragma inline_depth(8)
+	* rwlock.c: Likewise.
+	* mutex.c: Remove attempts to inline some functions.
+	* signal.c: Modify misleading comment.
+
 2002-02-01  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* semaphore.c (sem_trywait): Fix missing errno return

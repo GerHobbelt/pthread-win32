@@ -116,12 +116,18 @@ mythread(void * arg)
 
   assert(pthread_mutex_lock(&cvthing.lock) == 0);
 
+#ifdef _MSC_VER
+#pragma inline_depth(0)
+#endif
   pthread_cleanup_push(pthread_mutex_unlock, (void *) &cvthing.lock);
 
   while (! (cvthing.shared > 0))
     assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == 0);
 
   pthread_cleanup_pop(0);
+#ifdef _MSC_VER
+#pragma inline_depth(8)
+#endif
 
   assert(cvthing.shared > 0);
 

@@ -89,6 +89,7 @@ static void
 #ifdef __CLEANUP_C
 __cdecl
 #endif
+
 increment_pop_count(void * arg)
 {
   int * c = (int *) arg;
@@ -112,6 +113,9 @@ mythread(void * arg)
 
   assert(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL) == 0);
 
+#ifdef _MSC_VER
+#pragma inline_depth(0)
+#endif
   pthread_cleanup_push(increment_pop_count, (void *) &pop_count);
   /*
    * We don't have true async cancelation - it relies on the thread
@@ -123,6 +127,9 @@ mythread(void * arg)
     Sleep(100);
 
   pthread_cleanup_pop(0);
+#ifdef _MSC_VER
+#pragma inline_depth(8)
+#endif
 
   return (void *) result;
 }
