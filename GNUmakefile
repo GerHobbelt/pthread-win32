@@ -30,13 +30,13 @@ AR	= ar
 
 LD	= gcc -mdll
 
-OPT	= -g -O0 -x $(GLANG)
+OPT	= -g -O0
 
 ## Mingw32
-CFLAGS	= $(OPT) -I. -mthreads -DHAVE_CONFIG_H -DPTW32_BUILD -Wall
+CFLAGS	= $(OPT) -x $(GLANG) -I. -mthreads -D_WIN32_WINNT=0x400 -DHAVE_CONFIG_H -DPTW32_BUILD -Wall
 
 ## Cygwin G++
-#CFLAGS	= $(OPT) -fhandle-exceptions -I. -DHAVE_CONFIG_H -DPTW32_BUILD -Wall
+#CFLAGS	= $(OPT) -x $(GLANG) -fhandle-exceptions -D_WIN32_WINNT=0x400 -I. -DHAVE_CONFIG_H -DPTW32_BUILD -Wall
 
 OBJS	= attr.o cancel.o cleanup.o condvar.o create.o dll.o errno.o \
 	  exit.o fork.o global.o misc.o mutex.o nonportable.o \
