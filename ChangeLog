@@ -1,7 +1,48 @@
+Wed Jan 13 09:34:52 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* build.bat: Delete old binaries before compiling/linking.
+
+Tue Jan 12 09:58:38 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* dll.c: The Microsoft compiler pragmas probably are more
+	appropriately protected by _MSC_VER than by _WIN32.
+	- Tor Lillqvist <tml@iki.fi>.
+
+	* condvar.c (pthread_cond_timedwait): Fix function description
+	comments.
+
+	* pthread.h: Define ETIMEDOUT. This should be returned by
+	pthread_cond_timedwait which is not implemented yet as of
+	snapshot-1999-01-04-1305. It was implemented in the older version.
+	The Microsoft compiler pragmas probably are more appropriately
+	protected by _MSC_VER than by _WIN32.
+	- Tor Lillqvist <tml@iki.fi>.
+
+	* pthread.def: pthread_mutex_destroy was missing from the def file
+	- Tor Lillqvist <tml@iki.fi>.
+
+	* condvar.c (pthread_cond_broadcast): Ensure we only wait on threads
+	if there were any waiting on the condition.
+	I think pthread_cond_broadcast should do the WaitForSingleObject
+	only if cv->waiters > 0? Otherwise it seems to hang, at least in the
+	testg thread program from glib.
+	- Tor Lillqvist <tml@iki.fi>. 
+
+	* semaphore.c (sem_post): Correct typo in comment.
+
+Mon Jan 11 20:33:19 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h: Re-arrange conditional compile of pthread_cleanup-*
+	macros.
+
+	* cleanup.c (_pthread_push_cleanup): Provide conditional 
+	compile of cleanup->prev.
+
 1999-01-11  Ben Elliston  <bje@cygnus.com>
 
 	* condvar.c (pthread_cond_init): Invert logic when testing the
 	return value from calloc().
+	- Tor Lillqvist <tml@iki.fi>.
 
 Sat Jan  9 14:32:08 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 

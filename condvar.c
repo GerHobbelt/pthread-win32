@@ -543,20 +543,37 @@ pthread_cond_timedwait (pthread_cond_t * cond,
       *      initial value of the semaphore is 'value'
       *
       * PARAMETERS
-      *      sem
-      *              pointer to an instance of sem_t
+      *      cond
+      *              pointer to an instance of pthread_cond_t
+      *
+      *      mutex
+      *              pointer to an instance of pthread_mutex_t
+      *
+      *      abstime
+      *              pointer to an instance of (const struct timespec)
       *
       *
       * DESCRIPTION
-      *      This function  initializes an unnamed semaphore. The
-      *      initial value of the semaphore is set to 'value'.
+      *      This function waits on a condition variable either until
+      *      awakened by a signal or broadcast; or until the time
+      *      specified by abstime passes.
+      *
+      *      NOTES:
+      *      1)      The function must be called with 'mutex' LOCKED
+      *               by the calling thread, or undefined behaviour
+      *              will result.
+      *
+      *      2)      This routine atomically releases 'mutex' and causes
+      *              the calling thread to block on the condition variable.
+      *              The blocked thread may be awakened by 
+      *                      pthread_cond_signal or 
+      *                      pthread_cond_broadcast.
       *
       * RESULTS
-      *              0               successfully created semaphore,
-      *              EINVAL          'sem' is not a valid semaphore,
-      *              ENOSPC          a required resource has been exhausted,
-      *              ENOSYS          semaphores are not supported,
-      *              EPERM           the process lacks appropriate privilege
+      *              0               caught condition; mutex released,
+      *              EINVAL          'cond' or 'mutex' is invalid,
+      *              EINVAL          different mutexes for concurrent waits,
+      *              EINVAL          mutex is not held by the calling thread,
       *
       * ------------------------------------------------------
       */
@@ -636,13 +653,13 @@ pthread_cond_broadcast (pthread_cond_t * cond)
       *      waking all current waiters.
       *
       * PARAMETERS
-      *      sem
+      *      cond
       *              pointer to an instance of pthread_cond_t
       *
       *
       * DESCRIPTION
-      *      This function  initializes an unnamed semaphore. The
-      *      initial value of the semaphore is set to 'value'.
+      *      This function signals a condition variable, waking
+      *      all waiting threads.
       *
       *      NOTES:
       *      1)      This function MUST be called under the protection
@@ -657,7 +674,8 @@ pthread_cond_broadcast (pthread_cond_t * cond)
       *              not be able to respond
       *
       * RESULTS
-      *              0               successfully created semaphore,
+      *              0               successfully signalled condition to all
+      *                              waiting threads,
       *              EINVAL          'cond' is invalid
       *              ENOSPC          a required resource has been exhausted,
       *
@@ -679,7 +697,7 @@ pthread_cond_broadcast (pthread_cond_t * cond)
       result = sem_post (&(cv->sema));
     }
 
-  if (result == 0)
+  if (cv->waiters > 0 && result == 0)
     {
       /*
        * Wait for all the awakened threads to acquire their part of

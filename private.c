@@ -121,6 +121,8 @@ _pthread_threadStart (ThreadParms * threadParms)
 
   pthread_setspecific (_pthread_selfThreadKey, tid);
 
+#ifdef _WIN32
+
   __try
   {
     /*
@@ -137,6 +139,41 @@ _pthread_threadStart (ThreadParms * threadParms)
      */
     status = -1;
   }
+
+#else /* _WIN32 */
+
+#ifdef __cplusplus
+
+  try
+  {
+    /*
+     * Run the caller's routine;
+     */
+    (*start) (arg);
+    status = 0;
+  }
+  catch (...)
+  {
+    /*
+     * A system unexpected exception had occurred running the user's
+     * routine. We get control back within this block.
+     */
+    status = -1;
+  }
+
+#else /* __cplusplus */
+
+#error Warning: Compile __FILE__ as C++ or thread cancellation will not work.
+
+  /*
+   * Run the caller's routine;
+   */
+  (*start) (arg);
+  status = 0;
+
+#endif /* __cplusplus */
+
+#endif /* _WIN32 */
 
   pthread_exit ((void *) status);
 
