@@ -240,7 +240,7 @@ ptw32_threadStart (ThreadParms * threadParms)
   void *(*start) (void *);
   void *arg;
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
   DWORD ei[] = {0,0,0};
 #endif
 
@@ -354,6 +354,7 @@ ptw32_threadStart (ThreadParms * threadParms)
        */
       status = self->exitStatus = PTHREAD_CANCELED;
       (void) pthread_mutex_destroy(&self->cancelLock);
+      (void) set_terminate(ptw32_oldTerminate);
       ptw32_callUserDestroyRoutines(self);
       throw;
 
@@ -361,6 +362,8 @@ ptw32_threadStart (ThreadParms * threadParms)
        * Never reached.
        */
     }
+
+  (void) set_terminate(ptw32_oldTerminate);
 
 #else /* __cplusplus */
 
@@ -375,7 +378,32 @@ ptw32_threadStart (ThreadParms * threadParms)
 #endif /* _MSC_VER */
 
   (void) pthread_mutex_destroy(&self->cancelLock);
-  ptw32_callUserDestroyRoutines(self);
+
+#if 1
+  if (self->detachState == PTHREAD_CREATE_DETACHED)
+    {
+      /*
+       * We need to cleanup the pthread now in case we have
+       * been statically linked, in which case the cleanup
+       * in dllMain won't get done. Joinable threads will
+       * be cleaned up by pthread_join().
+       *
+       * Note that implicitly created pthreads (those created
+       * for Win32 threads which have called pthreads routines)
+       * must be cleaned up explicitly by the application 
+       * (by calling pthread_win32_thread_detach_np()) if
+       * this library has been statically linked. For the dll,
+       * dllMain will do the cleanup automatically.
+       */
+      (void) pthread_win32_thread_detach_np ();
+    }
+  else
+    {
+      ptw32_callUserDestroyRoutines (self);
+    }
+#else
+  ptw32_callUserDestroyRoutines (self);
+#endif
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
   _endthreadex ((unsigned) status);
@@ -611,21 +639,15 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 
 #if defined(_MSC_VER) && !defined(__cplusplus)
 
-		      __try
-		      {
 			/*
 			 * Run the caller's cleanup routine.
+			 *
+			 * If an exception occurs we let the system handle it
+			 * as an unhandled exception. Since we are leaving the
+			 * thread we should not get any internal pthreads
+			 * exceptions.
 			 */
 			(*(k->destructor)) (value);
-		      }
-		      __except (EXCEPTION_EXECUTE_HANDLER)
-		      {
-			/*
-			 * A system unexpected exception had occurred
-			 * running the user's destructor.
-			 * We get control back within this block.
-			 */
-		      }
 
 #else  /* _MSC_VER && !__cplusplus */
 #ifdef __cplusplus
@@ -640,10 +662,15 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 		      catch (...)
 		      {
 			/*
-			 * A system unexpected exception had occurred
+			 * A system unexpected exception has occurred
 			 * running the user's destructor.
-			 * We get control back within this block.
+			 * We get control back within this block in case
+			 * the application has set up it's own terminate
+			 * handler. Since we are leaving the thread we
+			 * should not get any internal pthreads
+			 * exceptions.
 			 */
+			terminate();
 		      }
 
 #else  /* __cplusplus */

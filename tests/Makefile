@@ -33,7 +33,7 @@ EHFLAGS	=
 # stop.
 
 PASSES= loadfree.pass \
-	  mutex1.pass  mutex2.pass  mutex3.pass \
+	  mutex1.pass  mutex2.pass  mutex3.pass mutex4.pass \
 	  condvar1.pass  condvar2.pass  \
 	  exit1.pass  create1.pass  equal1.pass  \
 	  exit2.pass  exit3.pass  \
@@ -112,6 +112,7 @@ create1.pass: mutex2.pass
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
 mutex3.pass: create1.pass
+mutex4.pass: mutex3.pass
 equal1.pass: create1.pass
 exit2.pass: create1.pass
 exit3.pass: create1.pass

@@ -105,6 +105,8 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
     }
 
   mx->mutex = 0;
+  mx->lockCount = 0;
+  mx->ownerThread = NULL;
 
   if (attr != NULL
       && *attr != NULL
@@ -586,7 +588,7 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
     {
       pthread_t self = pthread_self();
 
-      if (pthread_equal(mx->ownerThread, self) == 0)
+      if (pthread_equal(mx->ownerThread, self))
 	{
 	  int oldCount = mx->lockCount;
 	  pthread_t oldOwner = mx->ownerThread;

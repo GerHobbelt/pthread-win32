@@ -93,10 +93,6 @@ mythread(void * arg)
 
   assert(pthread_mutex_lock(&cvthing.lock) == 0);
 
-  /*
-   * pthread_cond_timedwait is a cancelation point and we
-   * going to cancel one deliberately.
-   */
   pthread_cleanup_push(pthread_mutex_unlock, (void *) &cvthing.lock);
 
   while (! (cvthing.shared > 0))
@@ -135,7 +131,7 @@ main()
   abstime.tv_sec = currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
-  abstime.tv_sec += 5;
+  abstime.tv_sec += 10;
 
   assert((t[0] = pthread_self()) != NULL);
 
@@ -179,6 +175,8 @@ main()
        * Give threads time to complete.
        */
       Sleep(1000);
+
+      assert(awoken == (i - 1));
     }
 
 

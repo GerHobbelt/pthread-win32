@@ -131,10 +131,10 @@ pthread_join (pthread_t thread, void **value_ptr)
     {
       /*
        * Pthread_join is a cancelation point.
-       * If we are cancelled then our target thread must not be
+       * If we are canceled then our target thread must not be
        * detached (destroyed). This is guarranteed because
        * pthreadCancelableWait will not return if we
-       * are cancelled.
+       * are canceled.
        */
       result = pthreadCancelableWait(thread->threadH);
 

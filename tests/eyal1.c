@@ -63,7 +63,7 @@ typedef struct thread_control	TC;
 
 static TC		*tcs = NULL;
 static int		nthreads = 10;
-static int		nwork = 1000;
+static int		nwork = 100;
 static int		quiet = 0;
 
 static int		todo = -1;
@@ -86,7 +86,7 @@ die (int ret)
 }
 
 
-static void
+static double
 waste_time (int n)
 {
   int		i;
@@ -98,6 +98,7 @@ waste_time (int n)
     {
       f = 2 * f * f / (f * f);
     }
+  return f;
 }
 
 static int
@@ -105,6 +106,7 @@ do_work_unit (int who, int n)
 {
   int		i;
   static int	nchars = 0;
+  double	f = 0.0;
 
   if (quiet)
     i = 0;
@@ -131,7 +133,11 @@ do_work_unit (int who, int n)
   }
 
   n = rand () % 10000;	/* ignore incoming 'n' */
-  waste_time (n);
+  f = waste_time (n);
+
+  /* This prevents the statement above from being optimised out */
+  if (f > 0.0)
+    return(n);
 
   return (n);
 }

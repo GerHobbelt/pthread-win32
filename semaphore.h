@@ -28,7 +28,26 @@
 #if !defined( SEMAPHORE_H )
 #define SEMAPHORE_H
 
-#ifdef NEED_ERRNO
+/*
+ * This is a duplicate of what is in the autoconf config.h,
+ * which is only used when building the pthread-win32 libraries.
+ */
+
+#ifndef PTW32_CONFIG_H
+#  if defined(WINCE)
+#    define NEED_ERRNO
+#    define NEED_SEM
+#  endif
+#  if defined(_UWIN) || defined(__MINGW32__)
+#    define HAVE_MODE_T
+#  endif
+#endif
+
+/*
+ *
+ */
+
+#ifdef NEED_SEM
 #include "need_errno.h"
 #else
 #include <errno.h>
@@ -41,7 +60,7 @@ extern "C"
 {
 #endif                          /* __cplusplus */
 
-#if defined(_MSC_VER)
+#ifndef HAVE_MODE_T
 typedef unsigned int mode_t;
 #endif
 

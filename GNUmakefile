@@ -52,12 +52,6 @@ LIBS	= libpthreadw32.a
 
 all:	$(LIBS)
 
-fake.a:
-	@ $(CP) pthreadVCE.dll $(DLL)
-	dlltool --def pthread.def --output-lib $@ --dllname $(DLL)
-	@-$(RM) $(LIBS)
-	$(MV) fake.a $(LIBS)
-
 $(LIBS): $(DLL)
 	dlltool --def pthread.def --output-lib $@ --dllname $(DLL)
 
@@ -78,10 +72,11 @@ $(DLL): $(OBJS)
 
 clean:
 	-$(RM) *~
-	-$(RM) $(LIBS)
 	-$(RM) *.o 
 	-$(RM) *.exe
-	-$(RM) $(DLL) 
 	-$(RM) $(DLL:.dll=.base)
 	-$(RM) $(DLL:.dll=.exp)
-	-$(RM) fake.a
+
+realclean:
+	-$(RM) $(LIBS)
+	-$(RM) $(DLL) 
