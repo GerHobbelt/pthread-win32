@@ -1,3 +1,43 @@
+Sat Jul 25 00:00:13 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* create.c (_pthread_start_call): Set thread priority.  Ensure our
+ 	thread entry is removed from the thread table but only if
+ 	pthread_detach() was called and there are no waiting joins.
+	(pthread_create): Set detach flag in thread entry if the 
+	thread is created PTHREAD_CREATE_DETACHED.
+
+	* pthread.h (pthread_attr_t): Rename member "detachedstate".
+
+	* attr.c (pthread_attr_init): Rename attr members.
+
+	* exit.c (pthread_exit): Fix indirection mistake.
+
+	* implement.h (_PTHREAD_THREADS_TABLE_INDEX): Add.
+
+	* exit.c (_pthread_vacuum): Fix incorrect args to
+	_pthread_handler_pop_all() calls.
+	Make thread entry removal conditional.
+
+	* sync.c (pthread_join): Add multiple join and async detach handling.
+
+	* implement.h (_PTHREAD_THREADS_TABLE_INDEX): Add.
+
+	* global.c (_pthread_threads_mutex_table): Add.
+
+	* implement.h (_pthread_once_flag): Remove.
+	(_pthread_once_lock): Ditto.
+	(_pthread_threads_mutex_table): Add.
+
+	* global.c (_pthread_once_flag): Remove.
+	(_pthread_once_lock): Ditto.
+
+	* sync.c (pthread_join): Fix tests involving new return value
+	from _pthread_find_thread_entry().
+	(pthread_detach): Ditto.
+
+	* private.c (_pthread_find_thread_entry): Failure return code
+	changed from -1 to NULL.
+
 Fri Jul 24 23:09:33 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* create.c (pthread_create): Change . to -> in sigmask memcpy() args.

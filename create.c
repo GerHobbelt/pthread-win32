@@ -14,30 +14,35 @@
 #include "implement.h"
 
 unsigned
-_pthread_start_call(void * thisarg)
+_pthread_start_call(void * us_arg)
 {
   /* We're now in a running thread. Any local variables here are on
      this threads private stack so we're safe to leave data in them
      until we leave. */
-  _pthread_threads_thread__t * this;
+  _pthread_threads_thread__t * us;
+  pthread_mutex_t * us_thread_mutex;
   _pthread_call_t * call;
   unsigned (*func)(void *);
   void * arg;
   unsigned ret;
   int from;
 
-  this = (_pthread_threads_thread__t *) thisarg;
+  us = (_pthread_threads_thread__t *) us_arg;
 
-  if (this->detached == PTHREAD_CREATE_DETACHED)
+  /* FIXME: For now, if priority setting fails then at least ensure
+     that our records reflect true reality. */
+  if (SetThreadPriority((HANDLE) us->thread, us->attr.priority) == FALSE)
     {
-      (void) CloseHandle(this->thread);
+      us->attr.priority = GetThreadPriority((HANDLE) us->thread);
     }
 
-  func = this->call.routine;
-  arg = this->call.arg;
+  func = us->call.routine;
+  arg = us->call.arg;
+
+  us_thread_mutex = _PTHREAD_THREAD_MUTEX(us);
 
   /* FIXME: Should we be using sigsetjmp() here instead. */
-  from = setjmp(this->call.env);
+  from = setjmp(us->call.env);
 
   if (from == 0)
     {
@@ -45,6 +50,21 @@ _pthread_start_call(void * thisarg)
       ret = (*func)(arg);
 
       _pthread_vacuum();
+
+      /* Remove the thread entry on exit only if pthread_detach()
+	 was called and there are no waiting joins. */
+
+      /* CRITICAL SECTION */
+      pthread_mutex_lock(us_thread_mutex);
+
+      if (us->detach == TRUE
+	  && us->join_count == 0)
+	{
+	  _pthread_delete_thread_entry(us);
+	}
+
+      pthread_mutex_lock(us_thread_mutex);
+      /* END CRITICAL SECTION */
     }
   else
     {
@@ -52,10 +72,26 @@ _pthread_start_call(void * thisarg)
 	 func() called pthread_exit() which called longjmp(). */
       _pthread_vacuum();
 
-      /* Never returns. */
-      _endthreadex(0);
+      /* Remove the thread entry on exit only if pthread_detach()
+	 was called and there are no waiting joins. */
+
+      /* CRITICAL SECTION */
+      pthread_mutex_lock(us_thread_mutex);
+
+      if (us->detach == TRUE
+	  && us->join_count == 0)
+	{
+	  _pthread_delete_thread_entry(us);
+	}
+
+      pthread_mutex_lock(us_thread_mutex);
+      /* END CRITICAL SECTION */
+
+      ret = 0;
     }
 
+  /* From Win32's point of view we always return naturally from our
+     start routine and so it should clean up it's own thread residue. */
   return ret;
 }
 
@@ -78,9 +114,9 @@ pthread_create(pthread_t *thread,
     {
       attr_copy = &(this->attr);
 
+      /* Map given attributes otherwise just use default values. */
       if (attr != NULL) 
 	{
-	  /* Map attributes. */
 	  if (attr_copy->stacksize == 0)
 	    {
 	      attr_copy->stacksize = PTHREAD_STACK_MIN;
@@ -88,12 +124,14 @@ pthread_create(pthread_t *thread,
 
 	  attr_copy->cancelstate = attr->cancelstate;
 	  attr_copy->canceltype = attr->canceltype;
-	  attr_copy->detached = attr->detached;
+	  attr_copy->detachedstate = attr->detachedstate;
 	  attr_copy->priority = attr->priority;
 
 #if HAVE_SIGSET_T
 	  memcpy(&(attr_copy->sigmask), &(attr->sigmask), sizeof(sigset_t)); 
 #endif /* HAVE_SIGSET_T */
+
+	  this->detach = (attr->detachedstate == PTHREAD_CREATE_DETACHED);
 	}
 
       /* Start running, not suspended. */

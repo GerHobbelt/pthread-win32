@@ -15,8 +15,8 @@ pthread_mutex_t _pthread_count_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 DWORD _pthread_threads_count = 0;
 
+/* Per thread management storage. */
 _pthread_threads_thread_t _pthread_threads_table[PTHREAD_THREADS_MAX];
 
-unsigned short _pthread_once_flag;
-
-pthread_mutex_t _pthread_once_lock = PTHREAD_MUTEX_INITIALIZER;
+/* Per thread mutex locks. */
+pthread_mutex_t _pthread_threads_mutex_table[PTHREAD_THREADS_MAX];

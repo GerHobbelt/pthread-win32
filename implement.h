@@ -38,10 +38,22 @@ typedef struct {
   jmpbuf env;
 } _pthread_call_t;
 
+/* Macro to return the address of the thread entry of the calling thread. */
 #define _PTHREAD_THIS (_pthread_find_thread_entry(pthread_this()))
 
+/* Macro to compute the address of a given handler stack. */
 #define _PTHREAD_STACK(stack) \
   ((_pthread_handler_node_t *) &(_PTHREAD_THIS)->cleanupstack + stack);
+
+/* Macro to compute the table index of a thread entry from it's entry
+   address. */
+#define _PTHREAD_THREADS_TABLE_INDEX(this) \
+  ((_pthread_threads_table_t *) this - \
+   (_pthread_threads_table_t *) _pthread_threads_threads_table)
+
+/* Macro to compute the address of a per-thread mutex lock. */
+#define _PTHREAD_THREAD_MUTEX(this) \
+   (&_pthread_threads_mutex_table[_PTHREAD_THREADS_TABLE_INDEX(this)])
 
 /* An element in the thread table. */
 typedef struct _pthread_threads_thread _pthread_threads_thread_t;
@@ -52,6 +64,7 @@ struct _pthread_threads_thread {
   _pthread_call_t             call;
   int                         cancelthread;
   void **                     joinvalueptr;
+  int                         join_count;
   _pthread_handler_node_t *   cleanupstack;
   _pthread_handler_node_t *   destructorstack;
   _pthread_handler_node_t *   forkpreparestack;
@@ -102,10 +115,7 @@ extern DWORD _pthread_threads_count;
 
 extern _pthread_threads_thread_t _pthread_threads_table[];
 
-extern unsigned short _pthread_once_flag;
-
-extern pthread_mutex_t _pthread_once_lock;
-
+extern pthread_mutex_t _pthread_threads_mutex_table[];
 
 #endif /* _IMPLEMENT_H */
 
