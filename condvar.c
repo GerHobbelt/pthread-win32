@@ -299,7 +299,7 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
 
   cv = (pthread_cond_t) calloc (1, sizeof (*cv));
 
-  if (cv != NULL)
+  if (cv == NULL)
     {
       result = ENOMEM;
       goto FAIL0;
