@@ -1,3 +1,7 @@
+Sep 16 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* rwlock6.c: New test.
+
 Sep 15 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* rwlock1.c: New test.
