@@ -136,8 +136,9 @@ struct sem_t_ {
 
 #define PTW32_OBJECT_AUTO_INIT ((void *) -1)
 #define PTW32_OBJECT_INVALID   NULL
-#define PTW32_SPIN_UNLOCKED    ((void *) 1)
-#define PTW32_SPIN_LOCKED      ((void *) 2)
+#define PTW32_SPIN_UNLOCKED    (1)
+#define PTW32_SPIN_LOCKED      (2)
+#define PTW32_SPIN_INTERLOCK_MASK (~3L)
 
 struct pthread_mutex_t_ {
   LONG lock_idx;

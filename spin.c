@@ -34,18 +34,26 @@
  * using a non-simple struct for spinlocks.
  */
 #define PTW32_SPIN_SPINS(_lock) \
-  (0 == (_lock->u.mx & (pthread_mutex_t) ~(PTW32_OBJECT_INVALID | PTW32_SPIN_UNLOCK | PTW32_SPIN_LOCKED)))
+  (0 == ((long) ((_lock->u).mx) & ~(PTW32_SPIN_LOCKED | PTW32_SPIN_UNLOCKED | (long) PTW32_OBJECT_INVALID)))
 
 
 int
 pthread_spin_init(pthread_spinlock_t *lock, int pshared)
 {
+  pthread_spinlock_t s;
   int CPUs = 1;
   int result = 0;
 
-  if (lock == NULL)
+  if (lock == NULL || *lock == NULL)
     {
       return EINVAL;
+    }
+
+  s = (pthread_spinlock_t) calloc(1, sizeof(*s));
+
+  if (s == NULL)
+    {
+      return ENOMEM;
     }
 
   (void) pthread_getprocessors_np(&CPUs);
@@ -76,7 +84,7 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
 
         }
 
-      lock->u.interlock = PTW32_SPIN_UNLOCKED;
+      s->u.interlock = PTW32_SPIN_UNLOCKED;
     }
   else
     {
@@ -86,29 +94,33 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
       if (0 == result)
         {
           ma->pshared = pshared;
-          result = pthread_mutex_init(&(lock->u.mx), &ma);
+          result = pthread_mutex_init(&(s->u.mx), &ma);
         }
     }
 
 FAIL0:
-
+  *lock = (0 == result ? s : NULL);
   return(result);
 }
 
 int
 pthread_spin_destroy(pthread_spinlock_t *lock)
 {
-  if (lock == NULL)
+  pthread_spinlock_t s;
+
+  if (lock == NULL || *lock == NULL)
     {
       return EINVAL;
     }
 
-  if (PTW32_SPIN_SPINS(lock))
+  s = *lock;
+
+  if (PTW32_SPIN_SPINS(s))
     {
       if ( PTW32_SPIN_UNLOCKED !=
-           InterlockedCompareExchange((LPLONG) &(lock->u.interlock),
-                                      (LPLONG) PTW32_OBJECT_INVALID,
-                                      (LPLONG) PTW32_SPIN_UNLOCKED))
+           InterlockedCompareExchange((LPLONG) &(s->u.interlock),
+                                      (LONG) PTW32_OBJECT_INVALID,
+                                      (LONG) PTW32_SPIN_UNLOCKED))
         {
           return EINVAL;
         }
@@ -119,7 +131,7 @@ pthread_spin_destroy(pthread_spinlock_t *lock)
     }
   else
     {
-      return pthread_mutex_destroy(&(lock->u.mx));
+      return pthread_mutex_destroy(&(s->u.mx));
     }
 }
 
@@ -127,24 +139,28 @@ pthread_spin_destroy(pthread_spinlock_t *lock)
 int
 pthread_spin_lock(pthread_spinlock_t *lock)
 {
-  if (lock == NULL)
+  pthread_spinlock_t s;
+
+  if (lock == NULL || *lock == NULL)
     {
       return EINVAL;
     }
 
-  if (PTW32_SPIN_SPINS(lock))
+  s = *lock;
+
+  if (PTW32_SPIN_SPINS(s))
     {
       while ( PTW32_SPIN_UNLOCKED !=
-              InterlockedCompareExchange((LPLONG) &(lock->u.interlock),
-                                         (LPLONG) PTW32_SPIN_LOCKED,
-                                         (LPLONG) PTW32_SPIN_UNLOCKED) )
+              InterlockedCompareExchange((LPLONG) &(s->u.interlock),
+                                         (LONG) PTW32_SPIN_LOCKED,
+                                         (LONG) PTW32_SPIN_UNLOCKED) )
         {
           /* Spin */
         }
     }
   else
     {
-      return pthread_mutex_lock(&(lock->u.mx));
+      return pthread_mutex_lock(&(s->u.mx));
     }
 
   return 0;
@@ -153,17 +169,21 @@ pthread_spin_lock(pthread_spinlock_t *lock)
 int
 pthread_spin_unlock(pthread_spinlock_t *lock)
 {
-  if (lock == NULL)
+  pthread_spinlock_t s;
+
+  if (lock == NULL || lock == NULL)
     {
       return EINVAL;
     }
 
-  if (PTW32_SPIN_SPINS(lock))
+  s = *lock;
+
+  if (PTW32_SPIN_SPINS(s))
     {
       if (PTW32_SPIN_LOCKED !=
-          InterlockedCompareExchange((LPLONG) &(lock->u.interlock),
-                                     (LPLONG) PTW32_SPIN_UNLOCKED,
-                                     (LPLONG) PTW32_SPIN_LOCKED ) )
+          InterlockedCompareExchange((LPLONG) &(s->u.interlock),
+                                     (LONG) PTW32_SPIN_UNLOCKED,
+                                     (LONG) PTW32_SPIN_LOCKED ) )
         {
           return 0;
         }
@@ -174,24 +194,28 @@ pthread_spin_unlock(pthread_spinlock_t *lock)
     }
   else
     {
-      return pthread_mutex_unlock(&(lock->u.mx));
+      return pthread_mutex_unlock(&(s->u.mx));
     }
 }
 
 int
 pthread_spin_trylock(pthread_spinlock_t *lock)
 {
-  if (lock == NULL)
+  pthread_spinlock_t s;
+
+  if (lock == NULL || *lock == NULL)
     {
       return EINVAL;
     }
 
-  if (PTW32_SPIN_SPINS(lock))
+  s = *lock;
+
+  if (PTW32_SPIN_SPINS(s))
     {
       if (PTW32_SPIN_UNLOCKED !=
-          InterlockedCompareExchange((LPLONG) &(lock->u.interlock),
-                                     (LPLONG) PTW32_SPIN_LOCKED,
-                                     (LPLONG) PTW32_SPIN_UNLOCKED ) )
+          InterlockedCompareExchange((LPLONG) &(s->u.interlock),
+                                     (LONG) PTW32_SPIN_LOCKED,
+                                     (LONG) PTW32_SPIN_UNLOCKED ) )
         {
           return EBUSY;
         }
@@ -202,6 +226,6 @@ pthread_spin_trylock(pthread_spinlock_t *lock)
     }
   else
     {
-      return pthread_mutex_trylock(&(lock->u.mx));
+      return pthread_mutex_trylock(&(s->u.mx));
     }
 }

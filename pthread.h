@@ -361,8 +361,9 @@ typedef struct pthread_condattr_t_ *pthread_condattr_t;
 #endif
 typedef struct pthread_rwlock_t_ *pthread_rwlock_t;
 typedef struct pthread_rwlockattr_t_ *pthread_rwlockattr_t;
-typedef struct pthread_spinlock_t_ pthread_spinlock_t;
+typedef struct pthread_spinlock_t_ *pthread_spinlock_t;
 typedef struct pthread_barrier_t_ *pthread_barrier_t;
+typedef struct pthread_barrierattr_t_ *pthread_barrierattr_t;
 
 /*
  * ====================
@@ -810,7 +811,7 @@ int pthread_mutex_unlock (pthread_mutex_t * mutex);
 /*
  * Spinlock Functions
  */
-int pthread_spin_init (pthread_spinlock_t * lock);
+int pthread_spin_init (pthread_spinlock_t * lock, int pshared);
 
 int pthread_spin_destroy (pthread_spinlock_t * lock);
 

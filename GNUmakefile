@@ -44,9 +44,9 @@ CFLAGS	= $(OPT) -I. -D_WIN32_WINNT=0x400 -DHAVE_CONFIG_H -DPTW32_BUILD -Wall
 ## Cygwin G++
 #CFLAGS	= $(OPT) -x $(GLANG) -fhandle-exceptions -D_WIN32_WINNT=0x400 -I. -DHAVE_CONFIG_H -DPTW32_BUILD -Wall
 
-OBJS	= attr.o cancel.o cleanup.o condvar.o create.o dll.o errno.o \
+OBJS	= attr.o barrier.o cancel.o cleanup.o condvar.o create.o dll.o errno.o \
 	  exit.o fork.o global.o misc.o mutex.o nonportable.o \
-	  private.o rwlock.o sched.o semaphore.o signal.o sync.o tsd.o
+	  private.o rwlock.o sched.o semaphore.o signal.o spin.o sync.o tsd.o
 
 INCL	= implement.h semaphore.h pthread.h windows.h
 
