@@ -112,13 +112,13 @@ ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
 
   pthread_mutex_unlock (&(key->threadsLock));
 
-  if (thread != NULL)
+  if (thread.p != NULL)
     {
       /*
        * Register assoc with thread
        */
-      assoc->nextKey = (ThreadKeyAssoc *) thread->keys;
-      thread->keys = (void *) assoc;
+      assoc->nextKey = (ThreadKeyAssoc *) ((ptw32_thread_t *)thread.p)->keys;
+      ((ptw32_thread_t *)thread.p)->keys = (void *) assoc;
     }
 
   *assocP = assoc;

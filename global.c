@@ -40,7 +40,8 @@
 
 
 int ptw32_processInitialized = PTW32_FALSE;
-pthread_t ptw32_threadReuseTop = PTW32_THREAD_REUSE_BOTTOM;
+ptw32_thread_t * ptw32_threadReuseTop = PTW32_THREAD_REUSE_EMPTY;
+ptw32_thread_t * ptw32_threadReuseBottom = PTW32_THREAD_REUSE_EMPTY;
 pthread_key_t ptw32_selfThreadKey = NULL;
 pthread_key_t ptw32_cleanupKey = NULL;
 pthread_cond_t ptw32_cond_list_head = NULL;

@@ -69,21 +69,34 @@ pthread_testcancel (void)
       */
 {
   pthread_t self = pthread_self ();
+  ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
 
-  (void) pthread_mutex_lock (&self->cancelLock);
-
-  if (self != NULL
-      && self->cancelState != PTHREAD_CANCEL_DISABLE
-      && WaitForSingleObject (self->cancelEvent, 0) == WAIT_OBJECT_0)
+  if (sp == NULL)
     {
-      /*
-       * Canceling!
-       */
-      self->state = PThreadStateCanceling;
-      self->cancelState = PTHREAD_CANCEL_DISABLE;
-      (void) pthread_mutex_unlock (&self->cancelLock);
+      return;
+    }
+
+  /*
+   * Pthread_cancel() will have set sp->state to PThreadStateCancelPending
+   * and set an event, so no need to enter kernel space if
+   * sp->state != PThreadStateCancelPending - that only slows us down.
+   */
+  if (sp->state != PThreadStateCancelPending)
+    {
+      return;
+    }
+
+  (void) pthread_mutex_lock (&sp->cancelLock);
+
+  if (sp->cancelState != PTHREAD_CANCEL_DISABLE)
+    {
+      ResetEvent(sp->cancelEvent);
+      sp->state = PThreadStateCanceling;
+      (void) pthread_mutex_unlock (&sp->cancelLock);
+      sp->cancelState = PTHREAD_CANCEL_DISABLE;
+      (void) pthread_mutex_unlock (&sp->cancelLock);
       ptw32_throw (PTW32_EPS_CANCEL);
     }
 
-  (void) pthread_mutex_unlock (&self->cancelLock);
+  (void) pthread_mutex_unlock (&sp->cancelLock);
 }				/* pthread_testcancel */

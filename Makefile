@@ -14,9 +14,10 @@ DLLS	= pthreadVCE.dll pthreadVSE.dll pthreadVC.dll
 INLINED_STAMPS	= pthreadVCE.stamp pthreadVSE.stamp pthreadVC.stamp
 
 OPTIM	= /O2
+#OPTIM	=
 
-#CFLAGS	= /W3 /MD /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H /DTEST_ICE
-CFLAGS	= /W3 /MD /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
+CFLAGS	= /W3 /MD /nologo /Yd /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
+#CFLAGS	= /W3 /MD /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
 
 # C++ Exceptions
 VCEFLAGS	= /GX /TP /D__CLEANUP_CXX $(CFLAGS)

@@ -80,9 +80,8 @@ sem_t s;
 void *
 thr (void * arg)
 {
-  assert(pthread_detach(pthread_self()) == 0);
   assert(sem_wait(&s) == 0);
-
+  assert(pthread_detach(pthread_self()) == 0);
   return NULL;
 }
 
@@ -91,19 +90,21 @@ main()
 {
 	int value = 0;
 	int i;
-	pthread_t t[MAX_COUNT];
+	pthread_t t[MAX_COUNT+1];
 
-  assert(sem_init(&s, PTHREAD_PROCESS_PRIVATE, 0) == 0);
+	assert(sem_init(&s, PTHREAD_PROCESS_PRIVATE, 0) == 0);
 	assert(sem_getvalue(&s, &value) == 0);
+//	printf("Value = %d\n", value);	fflush(stdout);
 	assert(value == 0);
-//	  printf("Value = %ld\n", value);
 
 	for (i = 1; i <= MAX_COUNT; i++)
 		{
-			assert(pthread_create(&t[i-1], NULL, thr, NULL) == 0);
-			sched_yield();
-			assert(sem_getvalue(&s, &value) == 0);
-//			  printf("Value = %ld\n", value);
+			assert(pthread_create(&t[i], NULL, thr, NULL) == 0);
+			do {
+			  sched_yield();
+			  assert(sem_getvalue(&s, &value) == 0);
+			} while (value != -i);
+//			printf("Value = %d\n", value); fflush(stdout);
 			assert(-value == i);
 		}
 
@@ -111,7 +112,7 @@ main()
 		{
 			assert(sem_post(&s) == 0);
 			assert(sem_getvalue(&s, &value) == 0);
-//			  printf("Value = %ld\n", value);
+//			printf("Value = %d\n", value);	fflush(stdout);
 			assert(-value == i);
 		}
 

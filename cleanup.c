@@ -73,7 +73,7 @@ ptw32_pop_cleanup (int execute)
       * ------------------------------------------------------
       */
 {
-  ptw32_cleanup_t *cleanup = NULL;
+  ptw32_cleanup_t *cleanup;
 
   cleanup = (ptw32_cleanup_t *) pthread_getspecific (ptw32_cleanupKey);
 
@@ -106,7 +106,7 @@ ptw32_push_cleanup (ptw32_cleanup_t * cleanup,
       *      popped and invoked with the argument 'arg' when
       *              a) the thread exits by calling 'pthread_exit',
       *              b) when the thread acts on a cancellation request,
-      *              c) or when the thrad calls pthread_cleanup_pop with a nonzero
+      *              c) or when the thread calls pthread_cleanup_pop with a nonzero
       *                 'execute' argument
       *
       * PARAMETERS

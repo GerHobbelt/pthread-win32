@@ -1,3 +1,69 @@
+SNAPSHOT 2004-11-03
+-------------------
+
+DLLs produced from this snapshot cannot be used with older applications without
+recompiling the application, due to a change to pthread_t to provide unique POSIX
+thread IDs.
+
+Although this snapshot passes the extended test suite, many of the changes are
+fairly major, and some applications may show different behaviour than previously,
+so adopt with care. Hopefully, any changed behaviour will be due to the library
+being better at it's job, not worse.
+
+Bug fixes
+---------
+
+* pthread_create() no longer accepts NULL as the thread reference arg.
+A segfault (memory access fault) will result, and no thread will be
+created.
+
+* pthread_barrier_wait() no longer acts as a cancelation point.
+
+* Fix potential race condition in pthread_once()
+- Tristan Savatier  <tristan at mpegtv.com>
+
+* Changes to pthread_cond_destroy() exposed some coding weaknesses in several
+test suite mini-apps because pthread_cond_destroy() now returns EBUSY if the CV
+is still in use.
+
+New features
+------------
+
+* Added for compatibility:
+PTHREAD_RECURSIVE_MUTEX_INITIALIZER,
+PTHREAD_ERRORCHECK_MUTEX_INITIALIZER,
+PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
+PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP
+
+* Initial support for Digital Mars compiler
+- Anuj Goyal  <anuj.goyal at gmail.com>
+
+* Faster Mutexes. These have been been rewritten following a model provided by
+Alexander Terekhov that reduces kernel space checks, and eliminates some additional
+critical sections used to manage a race between timedlock expiration and unlock.
+Please be aware that the new mutexes do not enforce strict absolute FIFO scheduling
+of mutexes, however any out-of-order lock acquisition should be very rare.
+
+* Faster semaphores. Following a similar model to mutexes above, these have been
+rewritten to use preliminary users space checks.
+
+* sem_getvalue() now returns the number of waiters.
+
+* The POSIX thread ID now has much stronger uniqueness characteristics. The library
+garrantees not to reuse the same thread ID for at least 2^(wordsize) thread
+destruction/creation cycles.
+
+New tests
+---------
+
+* semaphore4.c: Tests cancelation of the new sem_wait().
+
+* semaphore4t.c: Likewise for sem_timedwait().
+
+* rwlock8.c: Tests and times the slow execution paths of r/w locks, and the CVs,
+mutexes, and semaphores that they're built on.
+
+
 SNAPSHOT 2004-05-16
 -------------------
 

@@ -98,7 +98,6 @@ static void
 #ifdef __CLEANUP_C
 __cdecl
 #endif
-
 increment_pop_count(void * arg)
 {
   int * c = (int *) arg;
@@ -150,7 +149,7 @@ main()
   int i;
   pthread_t t[NUMTHREADS + 1];
 
-  assert((t[0] = pthread_self()) != NULL);
+  assert((t[0] = pthread_self()).p != NULL);
 
   for (i = 1; i <= NUMTHREADS; i++)
     {

@@ -1,3 +1,16 @@
+2004-10-29  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* semaphore4.c: New test.
+	* semaphore4t.c: New test.
+	* Debug.dsp (et al): Created MSVC Workspace project to aid debugging.
+	* All: Many tests have been modified to work with the new pthread
+	ID type; some other corrections were made after some library
+	functions were semantically strengthened. For example,
+	pthread_cond_destroy() no longer destroys a busy CV, which
+	required minor redesigns of some tests, including some where
+	the mutex associated with the CV was not locked during
+	signaling and broadcasting.
+
 2004-10-23  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* condvar3.c: Fixed mutex operations that were incorrectly

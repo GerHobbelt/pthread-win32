@@ -69,7 +69,7 @@ pthread_equal (pthread_t t1, pthread_t t2)
    * We also accept NULL == NULL - treating NULL as a thread
    * for this special case, because there is no error that we can return.
    */
-  result = ( t1 == t2 );
+  result = ( t1.p == t2.p && t1.x == t2.x );
 
   return (result);
 

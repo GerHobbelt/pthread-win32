@@ -1,5 +1,5 @@
 /*
- * File: reuse2.c
+ * File: semaphore4.c
  *
  *
  * --------------------------------------------------------------------------
@@ -33,18 +33,18 @@
  *
  * --------------------------------------------------------------------------
  *
- * Test Synopsis:
- * - Test that thread reuse works for detached threads.
- * - Analyse thread struct reuse.
+ * Test Synopsis: Verify sem_getvalue returns the correct number of waiters
+ * after threads are cancelled.
+ * - 
  *
  * Test Method (Validation or Falsification):
- * -
+ * - Validation
  *
  * Requirements Tested:
- * -
+ * - 
  *
  * Features Tested:
- * -
+ * - 
  *
  * Cases Tested:
  * -
@@ -53,9 +53,7 @@
  * -
  *
  * Environment:
- * - This test is implementation specific
- * because it uses knowledge of internals that should be
- * opaque to an application.
+ * -
  *
  * Input:
  * - None.
@@ -76,88 +74,65 @@
 
 #include "test.h"
 
-/*
- */
+#define MAX_COUNT 100
 
-enum {
-	NUMTHREADS = 10000
-};
+sem_t s;
 
-
-static long done = 0;
-
-void * func(void * arg)
+void *
+thr (void * arg)
 {
-  sched_yield();
-
-  InterlockedIncrement(&done);
-
-  return (void *) 0; 
+  assert(sem_wait(&s) == 0);
+  return NULL;
 }
- 
+
 int
 main()
 {
-  pthread_t t[NUMTHREADS];
-  pthread_attr_t attr;
-  int i;
-  unsigned int notUnique = 0,
-	       totalHandles = 0,
-	       reuseMax = 0,
-	       reuseMin = NUMTHREADS;
+	int value = 0;
+	int i;
+	pthread_t t[MAX_COUNT+1];
 
-  assert(pthread_attr_init(&attr) == 0);
-  assert(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) == 0);
+	assert(sem_init(&s, PTHREAD_PROCESS_PRIVATE, 0) == 0);
+	assert(sem_getvalue(&s, &value) == 0);
+//	printf("Value = %d\n", value);	fflush(stdout);
+	assert(value == 0);
 
-  for (i = 0; i < NUMTHREADS; i++)
-    {
-      assert(pthread_create(&t[i], &attr, func, NULL) == 0);
-    }
+	for (i = 1; i <= MAX_COUNT; i++)
+		{
+			assert(pthread_create(&t[i], NULL, thr, NULL) == 0);
+			do {
+			  sched_yield();
+			  assert(sem_getvalue(&s, &value) == 0);
+			} while (value != -i);
+//			printf("Value = %d\n", value); fflush(stdout);
+			assert(-value == i);
+		}
 
-  while (NUMTHREADS > done)
-    Sleep(100);
+	assert(sem_getvalue(&s, &value) == 0);
+	assert(-value == MAX_COUNT);
+//printf("value = %d\n", -value); fflush(stdout);
+	assert(pthread_cancel(t[50]) == 0);
+	  {
+	    int result;
+	    assert(pthread_join(t[50], (void **) &result) == 0);
+//	    printf("result = %d\n", result); fflush(stdout);
+	  }
+	assert(sem_getvalue(&s, &value) == 0);
+//printf("value = %d\n", -value); fflush(stdout);
+	assert(-value == (MAX_COUNT - 1));
 
-  Sleep(100);
+	for (i = MAX_COUNT - 2; i >= 0; i--)
+		{
+			assert(sem_post(&s) == 0);
+			assert(sem_getvalue(&s, &value) == 0);
+//			printf("Value = %d\n", value);	fflush(stdout);
+			assert(-value == i);
+		}
 
-  /*
-   * Analyse reuse by computing min and max number of times pthread_create()
-   * returned the same pthread_t value.
-   */
-  for (i = 0; i < NUMTHREADS; i++)
-    {
-      if (t[i].p != NULL)
-        {
-          unsigned int j, thisMax;
-
-          thisMax = t[i].x;
-
-          for (j = i+1; j < NUMTHREADS; j++)
-            if (t[i].p == t[j].p)
-              {
-		if (t[i].x == t[j].x)
-		  notUnique++;
-                if (thisMax < t[j].x)
-                  thisMax = t[j].x;
-                t[j].p = NULL;
-              }
-
-          if (reuseMin > thisMax)
-            reuseMin = thisMax;
-
-          if (reuseMax < thisMax)
-            reuseMax = thisMax;
-        }
-    }
-
-  for (i = 0; i < NUMTHREADS; i++)
-    if (t[i].p != NULL)
-      totalHandles++;
-
-  printf("For %d total threads:\n", NUMTHREADS);
-  printf("Non-unique IDs = %d\n", notUnique);
-  printf("Reuse maximum  = %d\n", reuseMax);
-  printf("Reuse minimum  = %d\n", reuseMin);
-  printf("Total handles  = %d\n", totalHandles);
+	for (i = 1; i <= MAX_COUNT; i++)
+	  if (i != 50)
+	    assert(pthread_join(t[i], NULL) == 0);
 
   return 0;
 }
+

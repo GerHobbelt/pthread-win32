@@ -42,20 +42,21 @@
 void
 ptw32_threadDestroy (pthread_t thread)
 {
-  struct pthread_t_ threadCopy;
+  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
+  ptw32_thread_t threadCopy;
 
-  if (thread != NULL)
+  if (tp != NULL)
     {
-      (void) pthread_mutex_lock (&thread->cancelLock);
-      thread->state = PThreadStateLast;
-      (void) pthread_mutex_unlock (&thread->cancelLock);
+      (void) pthread_mutex_lock (&tp->cancelLock);
+      tp->state = PThreadStateLast;
+      (void) pthread_mutex_unlock (&tp->cancelLock);
 
       ptw32_callUserDestroyRoutines (thread);
 
       /*
        * Copy thread state so that the thread can be atomically NULLed.
        */
-      memcpy (&threadCopy, thread, sizeof (threadCopy));
+      memcpy (&threadCopy, tp, sizeof (threadCopy));
 
       /*
        * Thread ID structs are never freed. They're NULLed and reused.

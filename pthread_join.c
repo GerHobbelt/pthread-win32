@@ -82,6 +82,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 {
   int result;
   pthread_t self;
+  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
 
   /*
    * Possibilities for the target thread on entry to pthread_join():
@@ -134,13 +135,13 @@ pthread_join (pthread_t thread, void **value_ptr)
    * so that we can use the reuse_lock to ensure the thread isn't destroyed
    * and reused before we've finished with the POSIX thread struct.
    */
-  if (NULL == thread
-      || NULL == thread->threadH
-      || THREAD_PRIORITY_ERROR_RETURN == GetThreadPriority (thread->threadH))
+  if (tp == NULL
+      || NULL == tp->threadH
+      || THREAD_PRIORITY_ERROR_RETURN == GetThreadPriority (tp->threadH))
     {
       result = ESRCH;
     }
-  else if (PTHREAD_CREATE_DETACHED == thread->detachState)
+  else if (PTHREAD_CREATE_DETACHED == tp->detachState)
     {
       result = EINVAL;
     }
@@ -152,7 +153,9 @@ pthread_join (pthread_t thread, void **value_ptr)
 
       LeaveCriticalSection (&ptw32_thread_reuse_lock);
 
-      if (NULL == (self = pthread_self ()))
+      self = pthread_self();
+
+      if (NULL == self.p)
 	{
 	  result = ENOENT;
 	}
@@ -169,7 +172,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 	   * pthreadCancelableWait will not return if we
 	   * are canceled.
 	   */
-	  result = pthreadCancelableWait (thread->threadH);
+	  result = pthreadCancelableWait (tp->threadH);
 
 	  if (0 == result)
 	    {
@@ -177,7 +180,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 #if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
 
 	      if (value_ptr != NULL
-		  && !GetExitCodeThread (thread->threadH, (LPDWORD) value_ptr))
+		  && !GetExitCodeThread (tp->threadH, (LPDWORD) value_ptr))
 		{
 		  result = ESRCH;
 		}
@@ -198,7 +201,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 	       */
 	      if (value_ptr != NULL)
 		{
-		  *value_ptr = thread->exitStatus;
+		  *value_ptr = tp->exitStatus;
 		}
 
 	      /*

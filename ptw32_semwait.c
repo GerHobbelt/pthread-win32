@@ -41,7 +41,7 @@
 #include "implement.h"
 
 
-INLINE int
+int
 ptw32_semwait (sem_t * sem)
      /*
       * ------------------------------------------------------

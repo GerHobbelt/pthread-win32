@@ -53,7 +53,7 @@ ptw32_throw (DWORD exception)
    * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
    * unnecessarily.
    */
-  pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
+  ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
 #ifdef __CLEANUP_SEH
   DWORD exceptionInformation[3];
@@ -65,7 +65,7 @@ ptw32_throw (DWORD exception)
       exit (1);
     }
 
-  if (NULL == self || self->implicit)
+  if (NULL == sp || sp->implicit)
     {
       /*
        * We're inside a non-POSIX initialised Win32 thread
@@ -81,7 +81,7 @@ ptw32_throw (DWORD exception)
 	  exitCode = (unsigned) PTHREAD_CANCELED;
 	  break;
 	case PTW32_EPS_EXIT:
-	  exitCode = (unsigned) self->exitStatus;;
+	  exitCode = (unsigned) sp->exitStatus;;
 	  break;
 	}
 
@@ -109,7 +109,7 @@ ptw32_throw (DWORD exception)
 #ifdef __CLEANUP_C
 
   ptw32_pop_cleanup_all (1);
-  longjmp (self->start_mark, exception);
+  longjmp (sp->start_mark, exception);
 
 #else /* __CLEANUP_C */
 

@@ -75,6 +75,7 @@ pthread_detach (pthread_t thread)
       */
 {
   int result;
+  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
 
   /* This is the proper way to test for a valid thread. */
   result = pthread_kill (thread, 0);
@@ -83,14 +84,14 @@ pthread_detach (pthread_t thread)
       return result;
     }
 
-  if (thread->detachState == PTHREAD_CREATE_DETACHED)
+  if (tp->detachState == PTHREAD_CREATE_DETACHED)
     {
       result = EINVAL;
     }
   else
     {
       result = 0;
-      thread->detachState = PTHREAD_CREATE_DETACHED;
+      tp->detachState = PTHREAD_CREATE_DETACHED;
     }
 
   return (result);

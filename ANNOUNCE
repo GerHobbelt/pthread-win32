@@ -1,4 +1,4 @@
-		 PTHREADS-WIN32 SNAPSHOT 2004-06-22
+		 PTHREADS-WIN32 SNAPSHOT 2004-11-03
 		 ----------------------------------
 	 Web Site: http://sources.redhat.com/pthreads-win32/
 	FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -22,13 +22,14 @@ General Public License (LGPL).
 
 Acknowledgements
 ----------------
-This library is based substantially on a Win32 pthreads
+This library is based originally on a Win32 pthreads
 implementation contributed by John Bossom <John.Bossom@cognos.com>.
 
 The implementation of Condition Variables uses algorithms developed
 by Alexander Terekhov and Louis Thomas.
 
-The implementation of POSIX mutexes has been improved by Thomas Pfaff.
+The implementation of POSIX mutexes has been improved by Thomas Pfaff
+and later by Alexander Terekhov.
 
 The implementation of Spinlocks and Barriers was contributed
 by Ross Johnson.

@@ -69,7 +69,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
   ThreadKeyAssoc *
     assoc;
 
-  if (thread != NULL)
+  if (thread.p != NULL)
     {
       /*
        * Run through all Thread<-->Key associations
@@ -82,7 +82,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
        *      by the current thread and must be released; otherwise
        *      the assoc will be destroyed when the key is destroyed.
        */
-      nextP = (ThreadKeyAssoc **) & (thread->keys);
+      nextP = (ThreadKeyAssoc **) &((ptw32_thread_t *)thread.p)->keys;
       assoc = *nextP;
 
       while (assoc != NULL)
@@ -90,8 +90,9 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 
 	  if (pthread_mutex_lock (&(assoc->lock)) == 0)
 	    {
-	      pthread_key_t
-		k;
+	      pthread_key_t k;
+	      pthread_t nil = {NULL, 0};
+
 	      if ((k = assoc->key) != NULL)
 		{
 		  /*
@@ -101,8 +102,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 		   * key is valid and we can call the destroy
 		   * routine;
 		   */
-		  void *
-		    value = NULL;
+		  void * value = NULL;
 
 		  value = pthread_getspecific (k);
 		  if (value != NULL && k->destructor != NULL)
@@ -146,7 +146,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 	       * mark assoc->thread as NULL to indicate the
 	       * thread no longer references this association
 	       */
-	      assoc->thread = NULL;
+	      assoc->thread = nil;
 
 	      /*
 	       * Remove association from the pthread_t chain

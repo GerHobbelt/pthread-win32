@@ -37,10 +37,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-#if 1
-#include <stdio.h>
-#endif
-
 #ifdef _MSC_VER
 /* 
  * lpvReserved yields an unreferenced formal parameter;
@@ -86,6 +82,7 @@ DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
       result = pthread_win32_process_detach_np ();
       break;
     }
+
   return (result);
 
 }				/* DllMain */

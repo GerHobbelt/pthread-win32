@@ -82,7 +82,7 @@ static int washere = 0;
 void * func(void * arg)
 {
   washere = 1;
-  return (void *) 0; 
+  return arg; 
 }
  
 int
@@ -107,11 +107,16 @@ main()
   for (i = 1; i < NUMTHREADS; i++)
     {
       washere = 0;
-      assert(pthread_create(&t, &attr, func, NULL) == 0);
+      assert(pthread_create(&t, &attr, func, (void *) i) == 0);
       pthread_join(t, &result);
-      assert(result == 0);
+      assert((int) result == i);
       assert(washere == 1);
-      assert(t == last_t);
+      /* thread IDs should be unique */
+      assert(!pthread_equal(t, last_t));
+      /* thread struct pointers should be the same */
+      assert(t.p == last_t.p);
+      /* thread handle reuse counter should be different by one */
+      assert(t.x == last_t.x+1);
       last_t = t;
     }
 

@@ -84,6 +84,7 @@ pthread_create (pthread_t * tid,
       */
 {
   pthread_t thread;
+  ptw32_thread_t * tp;
   register pthread_attr_t a;
   HANDLE threadH = 0;
   int result = EAGAIN;
@@ -98,7 +99,7 @@ pthread_create (pthread_t * tid,
    * Make sure that the assignment below can't be optimised out by the compiler.
    * This is assured by conditionally assigning *tid again at the end.
    */
-  *tid = NULL;
+  tid->x = 0;
 
   if (attr != NULL)
     {
@@ -109,12 +110,14 @@ pthread_create (pthread_t * tid,
       a = NULL;
     }
 
-  if ((thread = ptw32_new ()) == NULL)
+  if ((thread = ptw32_new ()).p == NULL)
     {
       goto FAIL0;
     }
 
-  priority = thread->sched_priority;
+  tp = (ptw32_thread_t *) thread.p;
+
+  priority = tp->sched_priority;
 
   if ((parms = (ThreadParms *) malloc (sizeof (*parms))) == NULL)
     {
@@ -128,12 +131,12 @@ pthread_create (pthread_t * tid,
   if (a != NULL)
     {
       stackSize = a->stacksize;
-      thread->detachState = a->detachstate;
+      tp->detachState = a->detachstate;
       priority = a->param.sched_priority;
 
 #if HAVE_SIGSET_T
 
-      thread->sigmask = a->sigmask;
+      tp->sigmask = a->sigmask;
 
 #endif /* HAVE_SIGSET_T */
 
@@ -162,7 +165,7 @@ pthread_create (pthread_t * tid,
 	   * system adjustment. This is not the case for POSIX threads.
 	   */
 	  pthread_t self = pthread_self ();
-	  priority = self->sched_priority;
+	  priority = ((ptw32_thread_t *) self.p)->sched_priority;
 	}
 
 #endif
@@ -176,29 +179,30 @@ pthread_create (pthread_t * tid,
       stackSize = PTHREAD_STACK_MIN;
     }
 
-  thread->state = run ? PThreadStateInitial : PThreadStateSuspended;
+  tp->state = run ? PThreadStateInitial : PThreadStateSuspended;
 
-  thread->keys = NULL;
+  tp->keys = NULL;
 
   /*
    * Threads must be started in suspended mode and resumed if necessary
    * after _beginthreadex returns us the handle. Otherwise we set up a
    * race condition between the creating and the created threads.
    * Note that we also retain a local copy of the handle for use
-   * by us in case thread->threadH gets NULLed later but before we've
+   * by us in case thread.p->threadH gets NULLed later but before we've
    * finished with it here.
    */
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__) 
 
-  thread->threadH = threadH = (HANDLE) _beginthreadex ((void *) NULL,	/* No security info             */
-						       (unsigned) stackSize,	/* default stack size   */
-						       ptw32_threadStart,
-						       parms,
-						       (unsigned)
-						       CREATE_SUSPENDED,
-						       (unsigned *) &(thread->
-								      thread));
+  tp->threadH =
+    threadH =
+    (HANDLE) _beginthreadex ((void *) NULL,	/* No security info             */
+			     (unsigned) stackSize,	/* default stack size   */
+			     ptw32_threadStart,
+			     parms,
+			     (unsigned)
+			     CREATE_SUSPENDED,
+			     (unsigned *) &(tp->thread));
 
   if (threadH != 0)
     {
@@ -219,17 +223,19 @@ pthread_create (pthread_t * tid,
    * This lock will force pthread_threadStart() to wait until we have
    * the thread handle and have set the priority.
    */
-  (void) pthread_mutex_lock (&thread->cancelLock);
+  (void) pthread_mutex_lock (&tp->cancelLock);
 
-  thread->threadH = threadH = (HANDLE) _beginthread (ptw32_threadStart, (unsigned) stackSize,	/* default stack size   */
-						     parms);
+  tp->threadH =
+    threadH =
+    (HANDLE) _beginthread (ptw32_threadStart, (unsigned) stackSize,	/* default stack size   */
+			   parms);
 
   /*
    * Make the return code match _beginthreadex's.
    */
   if (threadH == (HANDLE) - 1L)
     {
-      thread->threadH = threadH = 0;
+      tp->threadH = threadH = 0;
     }
   else
     {
@@ -249,7 +255,7 @@ pthread_create (pthread_t * tid,
 	}
     }
 
-  (void) pthread_mutex_unlock (&thread->cancelLock);
+  (void) pthread_mutex_unlock (&tp->cancelLock);
 
 #endif /* __MINGW32__ && ! __MSVCRT__ */
 
@@ -270,7 +276,7 @@ FAIL0:
     {
 
       ptw32_threadDestroy (thread);
-      thread = NULL;
+      tp = NULL;
 
       if (parms != NULL)
 	{

@@ -73,7 +73,7 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 		   * release one waiter if possible, otherwise
 		   * it will just reset the event.
 		   */
-		  if (PulseEvent (mx->event) == 0)
+		  if (SetEvent (mx->event) == 0)
 		    {
 		      result = EINVAL;
 		    }
@@ -94,13 +94,13 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 	      if (mx->kind != PTHREAD_MUTEX_RECURSIVE
 		  || 0 == --mx->recursive_count)
 		{
-		  mx->ownerThread = NULL;
+		  mx->ownerThread.p = NULL;
 
 		  if ((LONG) PTW32_INTERLOCKED_EXCHANGE ((LPLONG) &mx->lock_idx,
 							 (LONG) 0) < 0)
 		    {
 		      /* Someone may be waiting on that mutex */
-		      if (PulseEvent (mx->event) == 0)
+		      if (SetEvent (mx->event) == 0)
 			{
 			  result = EINVAL;
 			}

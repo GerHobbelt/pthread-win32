@@ -62,10 +62,9 @@ ptw32_processTerminate (void)
       * ------------------------------------------------------
       */
 {
-  pthread_t thread, nextThread;
-
   if (ptw32_processInitialized)
     {
+      ptw32_thread_t * tp, * tpNext;
 
       if (ptw32_selfThreadKey != NULL)
 	{
@@ -89,12 +88,12 @@ ptw32_processTerminate (void)
 
       EnterCriticalSection (&ptw32_thread_reuse_lock);
 
-      thread = ptw32_threadReuseTop;
-      while (thread != PTW32_THREAD_REUSE_BOTTOM)
+      tp = ptw32_threadReuseTop;
+      while (tp != PTW32_THREAD_REUSE_EMPTY)
 	{
-	  nextThread = thread->prevReuse;
-	  free (thread);
-	  thread = nextThread;
+	  tpNext = tp->prevReuse;
+	  free (tp);
+	  tp = tpNext;
 	}
 
       LeaveCriticalSection (&ptw32_thread_reuse_lock);

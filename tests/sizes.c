@@ -8,7 +8,8 @@ main()
 {
   printf("Sizes of pthreads-win32 structs\n");
   printf("-------------------------------\n");
-  printf("%30s %4d\n", "pthread_t_", sizeof(struct pthread_t_));
+  printf("%30s %4d\n", "pthread_t", sizeof(pthread_t));
+  printf("%30s %4d\n", "ptw32_thread_t", sizeof(ptw32_thread_t));
   printf("%30s %4d\n", "pthread_attr_t_", sizeof(struct pthread_attr_t_));
   printf("%30s %4d\n", "sem_t_", sizeof(struct sem_t_));
   printf("%30s %4d\n", "pthread_mutex_t_", sizeof(struct pthread_mutex_t_));

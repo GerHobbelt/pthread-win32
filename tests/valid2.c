@@ -76,15 +76,9 @@
 int
 main()
 {
-  pthread_t ptrToNull = NULL;
-  /* This should be bigger than a pthread handle. */
-  char corruptDummy[1000];
+  pthread_t NullThread = PTW32_THREAD_NULL_ID;
 
-  memset(corruptDummy, 0x5A, sizeof(corruptDummy));
-
-  assert(pthread_kill(NULL, 0) == ESRCH);
-  assert(pthread_kill(ptrToNull, 0) == ESRCH);
-  assert(pthread_kill((pthread_t) corruptDummy, 0) == ESRCH);
+  assert(pthread_kill(NullThread, 0) == ESRCH);
 
   return 0;
 }

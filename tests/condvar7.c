@@ -159,7 +159,7 @@ main()
 
   cvthing.shared = 0;
 
-  assert((t[0] = pthread_self()) != NULL);
+  assert((t[0] = pthread_self()).p != NULL);
 
   assert(cvthing.notbusy == PTHREAD_COND_INITIALIZER);
 
@@ -174,7 +174,7 @@ main()
 
   abstime.tv_sec += 10;
 
-  assert((t[0] = pthread_self()) != NULL);
+  assert((t[0] = pthread_self()).p != NULL);
 
   awoken = 0;
 
@@ -196,15 +196,15 @@ main()
    */
   Sleep(1000);
 
-  assert(pthread_mutex_lock(&cvthing.lock) == 0);
-
-  cvthing.shared++;
-
   /*
    * Cancel one of the threads.
    */
-  assert(pthread_cancel(t[3]) == 0);
-  Sleep(500);
+  assert(pthread_cancel(t[1]) == 0);
+  assert(pthread_join(t[1], NULL) == 0);
+
+  assert(pthread_mutex_lock(&cvthing.lock) == 0);
+
+  cvthing.shared++;
 
   /*
    * Signal all remaining waiting threads.
@@ -214,9 +214,10 @@ main()
   assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
   /*
-   * Give threads time to complete.
+   * Wait for all threads to complete.
    */
-  Sleep(2000);
+  for (i = 2; i <= NUMTHREADS; i++)
+    assert(pthread_join(t[i], NULL) == 0);
 
   /* 
    * Cleanup the CV.

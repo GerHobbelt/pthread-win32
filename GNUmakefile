@@ -46,8 +46,8 @@ CP	= cp -f
 
 AR	= ar
 
-#OPT	= -g
-#OPT	= -O3 -DTEST_ICE
+#OPT	= -g -O0
+#OPT	= -O3
 OPT	= -O3 -finline-functions
 XOPT	=
 
