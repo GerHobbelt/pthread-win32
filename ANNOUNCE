@@ -1,0 +1,322 @@
+
+                PTHREADS-WIN32 SNAPSHOT 1999-03-15
+                ----------------------------------
+       Web Site: http://sourceware.cygnus.com/pthreads-win32/
+        Coordinator: Ross Johnson <rpj@ise.canberra.edu.au>
+
+
+We are pleased to announce the availability of Pthreads-win32, an
+Open Source Software (OSS) implementation of the Threads component
+of the POSIX 1003.1c 1996 Standard for Microsoft's Win32
+environment.
+
+Pthreads-win32 is free software, distributed under the GNU Library
+General Public License (LGPL).
+
+This is the first general announcement of the library in workable
+form. We expect it to be stable in the real world having passed it's
+own test suite, however, if you do find bugs in the library please
+let us know either via the mailing list (see below), or by emailing
+the coordinator directly (see above).
+
+Pthreads-win32 is based substantially on a Win32 pthreads
+implementation contributed by John E. Bossom <jebossom@cognos.com>.
+
+Please see the 'Acknowledgements' section at the end of this
+announcement for the list of contributors.
+
+
+Level of standards conformance
+------------------------------
+
+The following POSIX 1003.1c 1996 options are defined:
+
+      _POSIX_THREADS
+      _POSIX_THREAD_SAFE_FUNCTIONS
+      _POSIX_THREAD_ATTR_STACKSIZE
+
+
+The following POSIX 1003.1c 1996 options are not defined:
+
+      _POSIX_THREAD_ATTR_STACKADDR
+      _POSIX_THREAD_PRIORITY_SCHEDULING
+      _POSIX_THREAD_PRIO_INHERIT
+      _POSIX_THREAD_PRIO_PROTECT
+      _POSIX_THREAD_PROCESS_SHARED
+
+
+The following functions are implemented:
+
+      ---------------------------
+      PThreads
+      ---------------------------
+      pthread_attr_init
+      pthread_attr_destroy
+      pthread_attr_getdetachstate
+      pthread_attr_getstackaddr
+      pthread_attr_getstacksize
+      pthread_attr_setdetachstate
+      pthread_attr_setstackaddr
+      pthread_attr_setstacksize
+
+      pthread_create
+      pthread_detach
+      pthread_equal
+      pthread_exit
+      pthread_join
+      pthread_once
+      pthread_self
+
+      pthread_cancel
+      pthread_cleanup_pop
+      pthread_cleanup_push
+      pthread_setcancelstate
+      pthread_setcanceltype
+      pthread_testcancel
+          
+      ---------------------------
+      Thread Specific Data   
+      ---------------------------
+      pthread_key_create
+      pthread_key_delete
+      pthread_setspecific
+      pthread_getspecific
+                
+      ---------------------------
+      Mutexes
+      ---------------------------
+      pthread_mutexattr_init
+      pthread_mutexattr_destroy
+      pthread_mutexattr_getpshared
+      pthread_mutexattr_setpshared
+
+      pthread_mutex_init
+      pthread_mutex_destroy
+      pthread_mutex_lock
+      pthread_mutex_trylock      
+      pthread_mutex_unlock
+
+      ---------------------------
+      Condition Variables
+      ---------------------------
+      pthread_condattr_init
+      pthread_condattr_destroy
+      pthread_condattr_getpshared
+      pthread_condattr_setpshared
+
+      pthread_cond_init
+      pthread_cond_destroy
+      pthread_cond_wait
+      pthread_cond_timedwait
+      pthread_cond_signal
+      pthread_cond_broadcast  
+
+      ---------------------------
+      RealTime Scheduling
+      ---------------------------
+      pthread_attr_getschedparam  
+      pthread_attr_setschedparam  
+      pthread_getschedparam
+      pthread_setschedparam
+      sched_get_priority_max
+      sched_get_priority_min
+      
+      ---------------------------
+      Signals
+      ---------------------------
+      pthread_sigmask
+
+      ---------------------------
+      Static Initializers (macros)
+      ---------------------------
+      PTHREAD_ONCE_INIT
+      PTHREAD_MUTEXINITIALIZER
+      PTHREAD_COND_INITIALIZER   
+      
+      ---------------------------
+      Thread-Safe C Runtime Library (macros)
+      ---------------------------
+      strtok_r
+      asctime_r
+      ctime_r
+      gmtime_r
+      localtime_r
+      rand_r
+
+
+The following functions are not implemented:
+      
+      ---------------------------
+      RealTime Scheduling
+      ---------------------------
+      pthread_attr_getinheritsched
+      pthread_attr_getschedpolicy
+      pthread_attr_getscope
+      pthread_attr_setinheritsched
+      pthread_attr_setschedpolicy
+      pthread_attr_setscope
+      pthread_mutex_getprioceiling
+      pthread_mutex_setprioceiling
+      pthread_mutex_attr_getprioceiling
+      pthread_mutex_attr_getprotocol
+      pthread_mutex_attr_setprioceiling
+      pthread_mutex_attr_setprotocol
+      
+      ---------------------------
+      Fork Handlers
+      ---------------------------
+      pthread_atfork
+
+      ---------------------------
+      Stdio
+      --------------------------- 
+      flockfile
+      ftrylockfile
+      funlockfile
+      getc_unlocked
+      getchar_unlocked  
+      putc_unlocked
+      putchar_unlocked
+
+      ---------------------------
+      Thread-Safe C Runtime Library
+      ---------------------------
+      readdir_r
+      getgrgid_r
+      getgrnam_r
+      getpwuid_r
+      getpwnam_r
+      
+      ---------------------------
+      Signals
+      ---------------------------
+      pthread_kill
+      sigtimedwait
+      sigwait
+      sigwaitinfo
+      
+      
+The library includes two non-API functions for creating cancellation
+points in applications and libraries:
+      
+      pthreadCancelableWait
+      pthreadCancelableTimedWait
+
+      
+Availability
+------------ 
+
+For the prebuilt DLL, export libs (for both MSVC and Mingw32), and
+pthread.h:
+
+ftp://sourceware.cygnus.com/pub/pthreads-win32/pthreads-dll-1999-03-15
+
+Source tree:
+      
+ftp://sourceware.cygnus.com/pub/pthreads-win32/pthreads-snap-1999-03-15.tar.gz
+      
+Source files are available in unpacked form at:
+      
+ftp://sourceware.cygnus.com/pub/pthreads-win32/sources
+
+      
+Mailing List 
+------------  
+      
+There is a mailing list for discussing pthreads on Win32. To join,
+send email to:
+
+        pthreads-win32-subscribe@sourceware.cygnus.com
+      
+
+Application Development Environments
+------------------------------------
+      
+MSVC:
+MSVC can be used of course.
+      
+Mingw32: (ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/egcs-1.1.1/)
+Mingw32 must use the thread-safe MSVCRT library. You can link
+against the export library libpthread32.a built under Mingw32
+together with the version of pthread.dll built with MSVC.
+      
+Cygwin: (http://sourceware.cygnus.com/cygwin/)
+Cygwin does not have thread-safe libraries and should not be used
+for threaded applications.
+      
+Generally:
+For convenience, the following pre-built files can be downloaded from
+the FTP site:
+
+        ftp://sourceware.cygnus.com/pub/pthreads-win32/dll-latest/
+
+        pthread.h       - the standard include file
+        pthread.dll     - built with MSVC cl compiler
+        pthread.lib     - built with MSVC cl compiler
+        libpthread32.a  - built with Mingw32 (use with MSVC pthread.dll)
+      
+These are the only files you need in order to build POSIX threads
+applications for Win32 using either MSVC or Mingw32.
+      
+See the FAQ file in the source tree for additional information.
+
+      
+Building the library with MSVC
+-------------------------------  
+      
+There is currently no Makefile for building the library under MSVC.
+There is a batch file "buildlib.bat" which will build the library.
+      
+
+Why you can't build the library with Cygwin or Mingw32 (yet)
+------------------------------------------------------------
+      
+The library makes use of exception handling internally (Win32 SEH if
+compiled with MSVC and C++ EH otherwise). Unfortunately, current
+versions of egcs (g++) do not have thread-safe exception handling
+and therefore the DLL pthread.dll cannot be built under either
+Mingw32 or Cygwin.
+      
+      
+Documentation
+-------------
+      
+Currently, there is no documentation included in the package apart
+from the copious comments in the source code.
+
+For POSIX Thread API programming, several reference books are
+available:  
+
+        Programming with POSIX Threads
+        David R. Butenhof
+        Addison-Wesley (pub)
+
+        Pthreads Programming
+        By Bradford Nichols, Dick Buttlar & Jacqueline Proulx Farrell
+        O'Reilly (pub)
+      
+
+Acknowledgements
+----------------
+      
+This library is based substantially on a Win32 pthreads
+implementation contributed by John Bossom <John.Bossom@cognos.com>.
+      
+The implementation of condition variables is derived from the work
+of Douglas Schmidt et al
+(http://www.cs.wustl.edu/~schmidt/win32-cv-1.html).
+
+Project Contributors (in order of appearance):
+
+Ben Elliston <bje@cygnus.com>
+Ross Johnson <rpj@ise.canberra.edu.au>
+Robert Colquhoun <rjc@trump.net.au>
+John E. Bossom <John.Bossom@cognos.com>
+Anders Norlander <anorland@hem2.passagen.se>
+Tor Lillqvist <tml@iki.fi>
+Kevin Ruland <Kevin.Ruland@anheuser-busch.com>
+
+      
+Enjoy!
+
+Ross Johnson
