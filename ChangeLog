@@ -1,5 +1,14 @@
 2001-07-05  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
+	* barrier.c: Remove static initialisation - irrelevent
+	for this object.
+	* pthread.h (PTHREAD_BARRIER_INITIALIZER): Removed.
+	* rwlock.c (pthread_rwlock_wrlock): This routine is
+	not a cancelation point - disable deferred
+	cancelation around call to pthread_cond_wait().
+
+2001-07-05  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
 	* spin.c: New module implementing spin locks.
 	* barrier.c: New module implementing barriers.
 	* pthread.h (_POSIX_SPIN_LOCKS): defined.

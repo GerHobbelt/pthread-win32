@@ -27,62 +27,6 @@
 #include "implement.h"
 
 
-static int
-ptw32_barrier_check_need_init(pthread_barrier_t *barrier)
-{
-  int result = 0;
-
-  /*
-   * The following guarded test is specifically for statically
-   * initialised barriers (via PTHREAD_BARRIER_INITIALIZER).
-   *
-   * Note that by not providing this synchronisation we risk
-   * introducing race conditions into applications which are
-   * correctly written.
-   *
-   * Approach
-   * --------
-   * We know that static barriers will not be PROCESS_SHARED
-   * so we can serialise access to internal state using
-   * Win32 Critical Sections rather than Win32 Mutexes.
-   *
-   * If using a single global lock slows applications down too much,
-   * multiple global locks could be created and hashed on some random
-   * value associated with each barrier, the pointer perhaps. At a guess,
-   * a good value for the optimal number of global locks might be
-   * the number of processors + 1.
-   *
-   */
-  EnterCriticalSection(&ptw32_barrier_test_init_lock);
-
-  /*
-   * We got here possibly under race
-   * conditions. Check again inside the critical section
-   * and only initialise if the barrier is valid (not been destroyed).
-   * If a static barrier has been destroyed, the application can
-   * re-initialise it only by calling pthread_barrier_init()
-   * explicitly.
-   */
-  if (*barrier == (pthread_barrier_t) PTW32_OBJECT_AUTO_INIT)
-    {
-      result = pthread_barrier_init(barrier, NULL);
-    }
-  else if (*barrier == NULL)
-    {
-      /*
-       * The barrier has been destroyed while we were waiting to
-       * initialise it, so the operation that caused the
-       * auto-initialisation should fail.
-       */
-      result = EINVAL;
-    }
-
-  LeaveCriticalSection(&ptw32_barrier_test_init_lock);
-
-  return(result);
-}
-
-
 int
 pthread_barrier_init(pthread_barrier_t * barrier,
                      const pthread_barrierattr_t * attr,
@@ -147,57 +91,23 @@ pthread_barrier_destroy(pthread_barrier_t *barrier)
       return EINVAL;
     }
 
-  if (*barrier != (pthread_barrier_t) PTW32_OBJECT_AUTO_INIT)
-    {
-      b = *barrier;
+  b = *barrier;
   
-      if (0 == pthread_mutex_trylock(&b->mtxExclusiveAccess))
-        {
-          /*
-           * FIXME!!!
-           * The mutex isn't held by another thread but we could still
-           * be too late invalidating the barrier below since another thread
-           * may alredy have entered barrier_wait and the check for a valid
-           * *barrier != NULL.
-           */
-          *barrier = NULL;
-
-          (void) sem_destroy(&(b->semBarrierBreeched));
-          (void) pthread_mutex_unlock(&(b->mtxExclusiveAccess));
-          (void) pthread_mutex_destroy(&(b->mtxExclusiveAccess));
-          (void) free(b);
-        }
-    }
-  else
+  if (0 == pthread_mutex_trylock(&b->mtxExclusiveAccess))
     {
       /*
-       * See notes in ptw32_barrier_check_need_init() above also.
+       * FIXME!!!
+       * The mutex isn't held by another thread but we could still
+       * be too late invalidating the barrier below since another thread
+       * may alredy have entered barrier_wait and the check for a valid
+       * *barrier != NULL.
        */
-      EnterCriticalSection(&ptw32_barrier_test_init_lock);
+      *barrier = NULL;
 
-      /*
-       * Check again.
-       */
-      if (*barrier == (pthread_barrier_t) PTW32_OBJECT_AUTO_INIT)
-        {
-          /*
-           * This is all we need to do to destroy a statically
-           * initialised barrier that has not yet been used (initialised).
-           * If we get to here, another thread
-           * waiting to initialise this barrier will get an EINVAL.
-           */
-          *barrier = NULL;
-        }
-      else
-        {
-          /*
-           * The barrier has been initialised while we were waiting
-           * so assume it's in use.
-           */
-          result = EBUSY;
-        }
-
-      LeaveCriticalSection(&ptw32_barrier_test_init_lock);
+      (void) sem_destroy(&(b->semBarrierBreeched));
+      (void) pthread_mutex_unlock(&(b->mtxExclusiveAccess));
+      (void) pthread_mutex_destroy(&(b->mtxExclusiveAccess));
+      (void) free(b);
     }
 
   return(result);
@@ -215,17 +125,10 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
       return EINVAL;
     }
 
-  if (*barrier == (pthread_barrier_t) PTHREAD_OBJECT_AUTO_INIT)
-    {
-      if ((result = ptw32_barrier_check_need_init(barrier)) != 0)
-        {
-          return(result);
-        }
-    }
-
   b = *barrier;
 
   result = pthread_mutex_lock(b->mtxExclusiveAccess);
+
   if (0 == result)
     {
       if (0 == --(b->nCurrentBarrierHeight))
@@ -514,4 +417,3 @@ pthread_barrierattr_setpshared (pthread_barrierattr_t * attr,
   return (result);
  
 }                               /* pthread_barrierattr_setpshared */
-

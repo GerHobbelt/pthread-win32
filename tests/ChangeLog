@@ -1,3 +1,16 @@
+2001-07-05  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* spin1.c: New; testing spinlocks.
+	* spin2.c: New; testing spinlocks.
+	* spin3.c: New; testing spinlocks.
+	* spin4.c: New; testing spinlocks.
+	* barrier1.c: New; testing barriers.
+	* barrier2.c: New; testing barriers.
+	* barrier3.c: New; testing barriers.
+	* barrier4.c: New; testing barriers.
+	* GNUmakefile: Add new tests.
+	* Makefile: Add new tests.
+
 2001-07-01  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* benchtest3.c: New; timing mutexes.
