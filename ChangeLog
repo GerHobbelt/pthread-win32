@@ -1,4 +1,4 @@
-2002-12-17  Ross Johnson  <rpj@digit.ise.canberra.edu.au>
+2002-12-17  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* pthread_mutex_lock.c (ptw32_semwait): New static routine to provide
 	a non-cancelable sem_wait() function. This is consistent with the
