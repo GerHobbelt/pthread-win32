@@ -1,8 +1,6 @@
-/*
- * pthread_mutex_unlock.c
+/* 
+ * mutex3e.c
  *
- * Description:
- * This translation unit implements mutual exclusion (mutex) primitives.
  *
  * --------------------------------------------------------------------------
  *
@@ -32,62 +30,46 @@
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *
+ * --------------------------------------------------------------------------
+ *
+ * Declare a static mutex object, lock it, trylock it, 
+ * and then unlock it again.
+ *
+ * Depends on API functions: 
+ *	pthread_mutex_lock()
+ *	pthread_mutex_trylock()
+ *	pthread_mutex_unlock()
  */
 
-#include "pthread.h"
-#include "implement.h"
+#include "test.h"
+ 
+pthread_mutex_t mutex1 = PTHREAD_ERRORCHECK_MUTEX_INITIALIZER;
 
+static int washere = 0;
 
-int
-pthread_mutex_unlock (pthread_mutex_t * mutex)
+void * func(void * arg)
 {
-  int result = 0;
-  pthread_mutex_t mx;
+  assert(pthread_mutex_trylock(&mutex1) == EBUSY);
 
-  if (mutex == NULL || *mutex == NULL)
-    {
-      return EINVAL;
-    }
+  washere = 1;
 
-  mx = *mutex;
+  return 0; 
+}
+ 
+int
+main()
+{
+  pthread_t t;
 
-  /*
-   * If the thread calling us holds the mutex then there is no
-   * race condition. If another thread holds the
-   * lock then we shouldn't be in here.
-   */
-  if (mx < PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
-    {
-      if (mx->ownerThread == (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS
-	  || pthread_equal (mx->ownerThread, pthread_self ()))
-	{
-	  if (mx->kind != PTHREAD_MUTEX_RECURSIVE_NP
-	      || 0 == --mx->recursive_count)
-	    {
-	      mx->ownerThread = NULL;
-	      EnterCriticalSection (&mx->wait_cs);
+  assert(pthread_mutex_lock(&mutex1) == 0);
 
-	      if (InterlockedDecrement (&mx->lock_idx) >= 0)
-		{
-		  /* Someone is waiting on that mutex */
-		  if (sem_post (&mx->wait_sema) != 0)
-		    {
-		      result = errno;
-		    }
-		}
+  assert(pthread_create(&t, NULL, func, NULL) == 0);
+  assert(pthread_join(t, NULL) == 0);
 
-	      LeaveCriticalSection (&mx->wait_cs);
-	    }
-	}
-      else
-	{
-	  result = EPERM;
-	}
-    }
-  else
-    {
-      result = EINVAL;
-    }
+  assert(pthread_mutex_unlock(&mutex1) == 0);
 
-  return (result);
+  assert(washere == 1);
+
+  return 0;
 }

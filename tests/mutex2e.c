@@ -1,8 +1,6 @@
-/*
- * pthread_mutex_unlock.c
+/* 
+ * mutex2e.c
  *
- * Description:
- * This translation unit implements mutual exclusion (mutex) primitives.
  *
  * --------------------------------------------------------------------------
  *
@@ -32,62 +30,37 @@
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *
+ * --------------------------------------------------------------------------
+ *
+ * Declare a static mutex object, lock it, 
+ * and then unlock it again.
+ *
+ * Depends on API functions: 
+ *	pthread_mutex_lock()
+ *	pthread_mutex_unlock()
  */
 
-#include "pthread.h"
-#include "implement.h"
-
+#include "test.h"
+ 
+pthread_mutex_t mutex = PTHREAD_ERRORCHECK_MUTEX_INITIALIZER;
 
 int
-pthread_mutex_unlock (pthread_mutex_t * mutex)
+main()
 {
-  int result = 0;
-  pthread_mutex_t mx;
+  assert(mutex == PTHREAD_ERRORCHECK_MUTEX_INITIALIZER);
 
-  if (mutex == NULL || *mutex == NULL)
-    {
-      return EINVAL;
-    }
+  assert(pthread_mutex_lock(&mutex) == 0);
 
-  mx = *mutex;
+  assert(mutex != PTHREAD_ERRORCHECK_MUTEX_INITIALIZER);
 
-  /*
-   * If the thread calling us holds the mutex then there is no
-   * race condition. If another thread holds the
-   * lock then we shouldn't be in here.
-   */
-  if (mx < PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
-    {
-      if (mx->ownerThread == (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS
-	  || pthread_equal (mx->ownerThread, pthread_self ()))
-	{
-	  if (mx->kind != PTHREAD_MUTEX_RECURSIVE_NP
-	      || 0 == --mx->recursive_count)
-	    {
-	      mx->ownerThread = NULL;
-	      EnterCriticalSection (&mx->wait_cs);
+  assert(mutex != NULL);
 
-	      if (InterlockedDecrement (&mx->lock_idx) >= 0)
-		{
-		  /* Someone is waiting on that mutex */
-		  if (sem_post (&mx->wait_sema) != 0)
-		    {
-		      result = errno;
-		    }
-		}
+  assert(pthread_mutex_unlock(&mutex) == 0);
 
-	      LeaveCriticalSection (&mx->wait_cs);
-	    }
-	}
-      else
-	{
-	  result = EPERM;
-	}
-    }
-  else
-    {
-      result = EINVAL;
-    }
+  assert(pthread_mutex_destroy(&mutex) == 0);
 
-  return (result);
+  assert(mutex == NULL);
+
+  return 0;
 }

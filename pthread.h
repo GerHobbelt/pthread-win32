@@ -620,6 +620,14 @@ struct pthread_once_t_
  * ====================
  */
 #define PTHREAD_MUTEX_INITIALIZER ((pthread_mutex_t) -1)
+#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER ((pthread_mutex_t) -2)
+#define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER ((pthread_mutex_t) -3)
+
+/*
+ * Compatibility with LinuxThreads
+ */
+#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP PTHREAD_RECURSIVE_MUTEX_INITIALIZER
+#define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP PTHREAD_ERRORCHECK_MUTEX_INITIALIZER
 
 #define PTHREAD_COND_INITIALIZER ((pthread_cond_t) -1)
 

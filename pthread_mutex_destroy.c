@@ -52,7 +52,7 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
   /*
    * Check to see if we have something to delete.
    */
-  if (*mutex != PTHREAD_MUTEX_INITIALIZER)
+  if (*mutex < PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
       mx = *mutex;
 
@@ -115,7 +115,7 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
       /*
        * Check again.
        */
-      if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+      if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
 	{
 	  /*
 	   * This is all we need to do to destroy a statically

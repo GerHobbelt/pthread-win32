@@ -24,7 +24,9 @@ mutex1::	mutex1.c
 mutex1e::	mutex1e.c
 mutex1n::	mutex1n.c
 mutex1r::	mutex1r.c
-mutex2::	mutex1.2
+mutex2::	mutex2.c
+mutex2r::	mutex2r.c
+mutex2e::	mutex2e.c
 exit1::	exit1.c
 condvar1::	condvar1.c
 condvar1_1::	condvar1_1.c
@@ -40,6 +42,8 @@ create2.::	create2.c
 cancel1::	cancel1.c
 cancel2::	cancel2.c
 mutex3::	mutex3.c
+mutex3r::	mutex3r.c
+mutex3e::	mutex3e.c
 mutex4::	mutex4.c
 mutex5::	mutex5.c
 mutex6::	mutex6.c
@@ -47,6 +51,9 @@ mutex6e::	mutex6e.c
 mutex6n::	mutex6n.c
 mutex6r::	mutex6r.c
 mutex7::	mutex7.c
+mutex6s::	mutex6s.c
+mutex6rs::	mutex6rs.c
+mutex6es::	mutex6es.c
 mutex7e::	mutex7e.c
 mutex7n::	mutex7n.c
 mutex7r::	mutex7r.c
@@ -136,6 +143,8 @@ semaphore2	:test:	loadfree
 mutex5		:test:	loadfree
 mutex1		:test:	loadfree
 mutex2		:test:	loadfree
+mutex2r		:test:	loadfree
+mutex2e		:test:	loadfree
 exit1		:test:	loadfree
 condvar1	:test:	loadfree
 kill1		:test:	loadfree
@@ -151,11 +160,16 @@ reuse2 		:test:	reuse1
 cancel1		:test:	create1
 cancel2		:test:	cancel1
 mutex3		:test:	create1
+mutex3r		:test:	create1
+mutex3e		:test:	create1
 mutex4		:test:	mutex3
 mutex6		:test:	mutex4
 mutex6n		:test:	mutex4
 mutex6e		:test:	mutex4
 mutex6r		:test:	mutex4
+mutex6s		:test:	mutex6
+mutex6rs	:test:	mutex6r
+mutex6es	:test:	mutex6e
 mutex7		:test:	mutex6
 mutex7n		:test:	mutex6n
 mutex7e		:test:	mutex6e
