@@ -3,6 +3,8 @@
 	* Attempted acquisition of recursive mutex was causing waiting
 	threads to not be woken when the mutex is released.
 
+	* GNUmakefile (GCE): Generate correct version resource comments.
+
 2005-01-01  Konstantin Voronkov  <beowinkle at yahoo.com>
 
 	* pthread_mutex_lock.c (pthread_mutex_lock): The new atomic exchange
