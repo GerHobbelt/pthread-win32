@@ -36,6 +36,10 @@ pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
   if (set != NULL)
     {
       int i;
+	
+      /* FIXME: this code assumes that sigmask is an even multiple of
+	 the size of a long integer. */ 
+         
       unsigned long *src = set;
       unsigned long *dest = this->attr->sigmask;
 
