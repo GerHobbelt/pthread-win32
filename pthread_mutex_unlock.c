@@ -61,7 +61,7 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 	{
 	  LONG idx;
 
-	  idx = (LONG) ptw32_interlocked_compare_exchange ((PTW32_INTERLOCKED_LPLONG)
+	  idx = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE ((PTW32_INTERLOCKED_LPLONG)
 	  					           &mx->lock_idx,
 						           (PTW32_INTERLOCKED_LONG) -1,
 						           (PTW32_INTERLOCKED_LONG) 0);
@@ -70,18 +70,12 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 	    {
 	      if (idx > 0)
 		{
-		  EnterCriticalSection (&mx->wait_cs);
-
-		  if (InterlockedDecrement (&mx->lock_idx) >= 0)
+		  mx->lock_idx = -1;
+		  /* Someone may be waiting on that mutex */
+		  if (sem_post (&mx->wait_sema) != 0)
 		    {
-		      /* Someone is waiting on that mutex */
-		        if (sem_post (&mx->wait_sema) != 0)
-			{
-			  result = errno;
-	 		}
+		      result = errno;
 		    }
-
-		  LeaveCriticalSection (&mx->wait_cs);
 	        }
 	      else
 		{
@@ -100,18 +94,16 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 		  || 0 == --mx->recursive_count)
 		{
 		  mx->ownerThread = NULL;
-		  EnterCriticalSection (&mx->wait_cs);
 
 		  if (InterlockedDecrement (&mx->lock_idx) >= 0)
 		    {
-		      /* Someone is waiting on that mutex */
+		      /* Someone may be waiting on that mutex */
+		      mx->lock_idx = -1;
 		      if (sem_post (&mx->wait_sema) != 0)
 			{
 			  result = errno;
 			}
 		    }
-
-		  LeaveCriticalSection (&mx->wait_cs);
 		}
 	    }
 	  else

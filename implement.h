@@ -192,8 +192,6 @@ struct pthread_mutex_t_
   pthread_t ownerThread;
   sem_t wait_sema;		/* Mutex release notification to waiting
 				   threads. */
-  CRITICAL_SECTION wait_cs;	/* Serialise lock_idx decrement after mutex
-				   timeout. */
 };
 
 struct pthread_mutexattr_t_
@@ -573,6 +571,15 @@ extern "C"
 #else
 #   include <process.h>
 #endif
+
+
+/*
+ * When not building the inlined version of the dll.
+ */
+#ifndef PTW32_INTERLOCKED_COMPARE_EXCHANGE
+#define PTW32_INTERLOCKED_COMPARE_EXCHANGE ptw32_interlocked_compare_exchange
+#endif
+
 
 /*
  * Check for old and new versions of cygwin. See the FAQ file:

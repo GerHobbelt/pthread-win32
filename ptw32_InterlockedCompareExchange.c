@@ -51,7 +51,7 @@
  * we can call it through a pointer.
  */
 
-PTW32_INTERLOCKED_LONG WINAPI
+INLINE PTW32_INTERLOCKED_LONG WINAPI
 ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 				  PTW32_INTERLOCKED_LONG value,
 				  PTW32_INTERLOCKED_LONG comparand)
@@ -69,6 +69,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 #if defined(_M_IX86) || defined(_X86_)
 
 #if defined(_MSC_VER) || defined(__WATCOMC__)
+#define HAVE_INLINABLE_INTERLOCKED_CMPXCHG
 
   _asm {
     PUSH         ecx
@@ -86,6 +87,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
   }
 
 #elif defined(__BORLANDC__)
+#define HAVE_INLINABLE_INTERLOCKED_CMPXCHG
 
   _asm {
     PUSH	 ecx
@@ -103,6 +105,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
   }
 
 #elif defined(__GNUC__)
+#define HAVE_INLINABLE_INTERLOCKED_CMPXCHG
 
   __asm__
     (
@@ -139,3 +142,10 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 #endif
 
 }
+
+#if 0
+#if defined(PTW32_BUILD_INLINED) && defined(HAVE_INLINABLE_INTERLOCKED_CMPXCHG)
+#undef PTW32_INTERLOCKED_COMPARE_EXCHANGE
+#define PTW32_INTERLOCKED_COMPARE_EXCHANGE ptw32_InterlockedCompareExchange
+#endif
+#endif

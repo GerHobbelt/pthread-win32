@@ -92,10 +92,6 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
 	  free (mx);
 	  mx = NULL;
 	}
-      else
-	{
-	  InitializeCriticalSection (&mx->wait_cs);
-	}
     }
 
   *mutex = mx;

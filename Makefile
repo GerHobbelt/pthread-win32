@@ -375,13 +375,13 @@ VC:
 # inlining optimisation turned on.
 #
 VCE-inlined:
-	@ nmake /nologo EHFLAGS="/O2 /Ob1 $(VCEFLAGS)" pthreadVCE.stamp
+	@ nmake /nologo EHFLAGS="/O2 /Ob1 $(VCEFLAGS) /DPTW32_BUILD_INLINED" pthreadVCE.stamp
 
 VSE-inlined:
-	@ nmake /nologo EHFLAGS="/O2 /Ob1 $(VSEFLAGS)" pthreadVSE.stamp
+	@ nmake /nologo EHFLAGS="/O2 /Ob1 $(VSEFLAGS) /DPTW32_BUILD_INLINED" pthreadVSE.stamp
 
 VC-inlined:
-	@ nmake /nologo EHFLAGS="/O2 /Ob1 $(VCFLAGS)" pthreadVC.stamp
+	@ nmake /nologo EHFLAGS="/O2 /Ob1 $(VCFLAGS) /DPTW32_BUILD_INLINED" pthreadVC.stamp
 
 realclean: clean
 	if exist *.dll del *.dll

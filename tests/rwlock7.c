@@ -151,7 +151,7 @@ main (int argc, char *argv[])
     {
       assert(pthread_join (threads[count].thread_id, NULL) == 0);
       thread_updates += threads[count].updates;
-      printf ("%02d: interval %d, updates %d, reads %d\n",
+      printf ("\n%02d: interval %d, updates %d, reads %d\n",
               count, threads[count].interval,
               threads[count].updates, threads[count].reads);
     }

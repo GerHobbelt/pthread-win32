@@ -44,6 +44,7 @@ int
 pthread_mutex_lock (pthread_mutex_t * mutex)
 {
   int result = 0;
+  LONG c;
   pthread_mutex_t mx;
 
   /*
@@ -68,29 +69,48 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
 
   if (mx->kind == PTHREAD_MUTEX_NORMAL)
     {
-      if (0 != InterlockedIncrement (&mx->lock_idx))
+      if ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+		        (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+		        (PTW32_INTERLOCKED_LONG) 0,
+		        (PTW32_INTERLOCKED_LONG) -1)) != -1)
 	{
-	  if (ptw32_semwait (&mx->wait_sema) != 0)
+	  do
 	    {
-	      result = errno;
+	      if (c == 1 ||
+		  (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+		           (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+		           (PTW32_INTERLOCKED_LONG) 1,
+		           (PTW32_INTERLOCKED_LONG) 0) != -1)
+		{
+		  if (ptw32_semwait (&mx->wait_sema) != 0)
+		    {
+		      result = errno;
+		      break;
+		    }
+		}
 	    }
+	  while ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                               (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+		               (PTW32_INTERLOCKED_LONG) 1,
+		               (PTW32_INTERLOCKED_LONG) -1)) != -1);
 	}
     }
   else
     {
-      if (0 == InterlockedIncrement (&mx->lock_idx))
+      pthread_t self = pthread_self();
+
+      if ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                        (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+		        (PTW32_INTERLOCKED_LONG) 0,
+		        (PTW32_INTERLOCKED_LONG) -1)) == -1)
 	{
 	  mx->recursive_count = 1;
-	  mx->ownerThread = pthread_self ();
+	  mx->ownerThread = self;
 	}
       else
 	{
-	  pthread_t self = pthread_self();
-
 	  if (pthread_equal (mx->ownerThread, self))
 	    {
-	      (void) InterlockedDecrement (&mx->lock_idx);
-	      
 	      if (mx->kind == PTHREAD_MUTEX_RECURSIVE)
 		{
 		  mx->recursive_count++;
@@ -102,15 +122,30 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
 	    }
 	  else
 	    {
-	      if (ptw32_semwait (&mx->wait_sema) == 0)
+	      do
 		{
-		  mx->recursive_count = 1;
-		  mx->ownerThread = self;
-		}
-	      else
-		{
-		  result = errno;
-		}
+		  if (c == 1 ||
+		      (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                               (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+		               (PTW32_INTERLOCKED_LONG) 1,
+		               (PTW32_INTERLOCKED_LONG) 0) != -1)
+	            {
+		      if (ptw32_semwait (&mx->wait_sema) == 0)
+		        {
+		          mx->recursive_count = 1;
+		          mx->ownerThread = self;
+		        }
+		      else
+		        {
+		          result = errno;
+		          break;
+		        }
+		    }
+	        }
+	      while ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                                   (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+		                   (PTW32_INTERLOCKED_LONG) 1,
+		                   (PTW32_INTERLOCKED_LONG) -1)) != -1);
 	    }
 	}
     }

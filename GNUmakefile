@@ -49,6 +49,7 @@ AR	= ar
 #OPT	= -g
 #OPT	= -O3 -DTEST_ICE
 OPT	= -O3 -finline-functions
+XOPT	=
 
 LFLAGS		= -lwsock32
 
@@ -57,7 +58,7 @@ GCE_CFLAGS	= -D__CLEANUP_CXX -mthreads
 
 ## Mingw32
 MAKE		= make
-CFLAGS	= $(OPT) -I. -DHAVE_CONFIG_H -Wall
+CFLAGS	= $(OPT) $(XOPT) -I. -DHAVE_CONFIG_H -Wall
 
 DLL_INLINED_OBJS	= \
 		pthread.o
@@ -414,10 +415,10 @@ GCE:
 		$(MAKE) CC=g++ CLEANUP_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_DLL)
 
 GC-inlined:
-		$(MAKE) CC=gcc CLEANUP_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_INLINED_STAMP)
+		$(MAKE) CC=gcc XOPT="-DPTW32_BUILD_INLINED" CLEANUP_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_INLINED_STAMP)
 
 GCE-inlined:
-		$(MAKE) CC=g++ CLEANUP_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
+		$(MAKE) CC=g++ XOPT="-DPTW32_BUILD_INLINED" CLEANUP_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
 
 tests:
 	@ cd tests
@@ -445,13 +446,13 @@ $(GCE_DLL): $(DLL_OBJS)
 	dlltool -k --dllname $@ --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
 
 $(GC_INLINED_STAMP): $(DLL_INLINED_OBJS)
-	$(CC) $(OPT) -shared -o $(GC_DLL) $(DLL_INLINED_OBJS) $(LFLAGS)
+	$(CC) $(OPT) $(XOPT) -shared -o $(GC_DLL) $(DLL_INLINED_OBJS) $(LFLAGS)
 	dlltool -z pthread.def $(DLL_INLINED_OBJS)
 	dlltool -k --dllname $(GC_DLL) --output-lib $(GC_LIB) --def $(PTHREAD_DEF)
 	echo touched > $(GC_INLINED_STAMP)
 
 $(GCE_INLINED_STAMP): $(DLL_INLINED_OBJS)
-	$(CC) $(OPT) -mthreads -shared -o $(GCE_DLL) $(DLL_INLINED_OBJS)  $(LFLAGS)
+	$(CC) $(OPT) $(XOPT) -mthreads -shared -o $(GCE_DLL) $(DLL_INLINED_OBJS)  $(LFLAGS)
 	dlltool -z pthread.def $(DLL_INLINED_OBJS)
 	dlltool -k --dllname $(GCE_DLL) --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
 	echo touched > $(GCE_INLINED_STAMP)
