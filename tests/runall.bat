@@ -1,33 +1,55 @@
 @echo off
 
-if x%1==x-f echo y | erase *.pass > nul:
+if NOT x%1==x-f goto noforce
+if EXIST *.pass echo y | erase *.pass > nul:
+if EXIST *.fail echo y | erase *.fail > nul:
+if EXIST *.notrun echo y | erase *.notrun > nul:
 
-call runtest cl mutex1
-call runtest cl mutex2
-call runtest cl exit1
-call runtest cl condvar1
-call runtest cl self1
-call runtest cl condvar2
-call runtest cl create1
-call runtest cl mutex3
-call runtest cl equal1
-call runtest cl exit2
-call runtest cl exit3
-call runtest cl join1
-call runtest cl join2
-call runtest cl count1
-call runtest cl once1
-call runtest cl tsd1
-call runtest cl self2
-call runtest cl eyal1
-call runtest cl condvar3
-call runtest cl condvar4
-call runtest cl condvar5
-call runtest cl condvar6
-call runtest cl errno1
-call runtest cl rwlock1
-call runtest cl rwlock2
-call runtest cl rwlock3
-call runtest cl rwlock4
-call runtest cl rwlock5
-call runtest cl rwlock6
+:noforce
+call runtest cl mutex1 _
+call runtest cl mutex2 _
+call runtest cl exit1 _
+call runtest cl condvar1 _
+call runtest cl self1 _
+call runtest cl condvar2 condvar1
+call runtest cl create1 mutex2
+call runtest cl mutex3 create1
+call runtest cl equal1 create1
+call runtest cl exit2 create1
+call runtest cl exit3 create1
+call runtest cl join1 create1
+call runtest cl join2 create1
+call runtest cl count1 join1
+call runtest cl once1 create1
+call runtest cl tsd1 join1
+call runtest cl self2 create1
+call runtest cl eyal1 tsd1
+call runtest cl condvar3 create1
+call runtest cl condvar4 create1
+call runtest cl condvar5 condvar4
+call runtest cl condvar6 condvar5
+call runtest cl condvar7 condvar6
+call runtest cl condvar8 condvar7
+call runtest cl condvar9 condvar8
+call runtest cl errno1 mutex3
+call runtest cl rwlock1 condvar6
+call runtest cl rwlock2 rwlock1
+call runtest cl rwlock3 rwlock2
+call runtest cl rwlock4 rwlock3
+call runtest cl rwlock5 rwlock4
+call runtest cl rwlock6 rwlock5
+
+if NOT EXIST *.notrun goto skip1
+echo The following tests did not run (because prerequisite didn't pass?):
+for %%f in (*.notrun) do echo %%f
+goto skip2
+:skip1
+echo All tests ran.
+:skip2
+if NOT EXIST *.fail goto skip3
+echo The following tests failed:
+for %%f in (*.fail) do echo %%f
+goto skip4
+:skip3
+echo No tests failed.
+:skip4

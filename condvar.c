@@ -522,6 +522,68 @@ pthread_cond_destroy (pthread_cond_t * cond)
   return (result);
 }
 
+/*
+ * Arguments for cond_wait_cleanup, since we can only pass a
+ * single void * to it.
+ */
+typedef struct {
+  pthread_mutex_t * mutexPtr;
+  pthread_cond_t cv;
+  int * resultPtr;
+} cond_wait_cleanup_args_t;
+
+static void
+cond_wait_cleanup(void * args)
+{
+  cond_wait_cleanup_args_t * cleanup_args = (cond_wait_cleanup_args_t *) args;
+  pthread_mutex_t * mutexPtr = cleanup_args->mutexPtr;
+  pthread_cond_t cv = cleanup_args->cv;
+  int * resultPtr = cleanup_args->resultPtr;
+  int lock_result;
+  int lastWaiter;
+
+  if ((lock_result = pthread_mutex_lock (&(cv->waitersLock))) == 0)
+    {
+      /*
+       * The waiter is responsible for decrementing
+       * its count, protected by an internal mutex.
+       */
+
+      cv->waiters--;
+
+      lastWaiter = cv->wasBroadcast && (cv->waiters == 0);
+
+      if (lastWaiter)
+        {
+          cv->wasBroadcast = FALSE;
+        }
+
+      lock_result = pthread_mutex_unlock (&(cv->waitersLock));
+    }
+
+  if ((*resultPtr == 0 || *resultPtr == ETIMEDOUT) && lock_result == 0)
+    {
+      if (lastWaiter)
+        {
+          /*
+           * If we are the last waiter on this broadcast
+           * let the thread doing the broadcast proceed
+           */
+          if (!SetEvent (cv->waitersDone))
+            {
+              *resultPtr = EINVAL;
+            }
+        }
+    }
+
+  /*
+   * We must always regain the external mutex, even when
+   * errors occur, because that's the guarantee that we give
+   * to our callers
+   */
+  (void) pthread_mutex_lock (mutexPtr);
+}
+
 static int
 cond_timedwait (pthread_cond_t * cond, 
 		pthread_mutex_t * mutex,
@@ -531,6 +593,7 @@ cond_timedwait (pthread_cond_t * cond,
   int internal_result = 0;
   int lastWaiter = FALSE;
   pthread_cond_t cv;
+  cond_wait_cleanup_args_t cleanup_args;
 
   if (cond == NULL || *cond == NULL)
     {
@@ -579,6 +642,12 @@ cond_timedwait (pthread_cond_t * cond,
    * call to sem_wait since that will deadlock other calls
    * to pthread_cond_signal
    */
+  cleanup_args.mutexPtr = mutex;
+  cleanup_args.cv = cv;
+  cleanup_args.resultPtr = &result;
+
+  pthread_cleanup_push (cond_wait_cleanup, (void *) &cleanup_args);
+
   if ((result = pthread_mutex_unlock (mutex)) == 0)
     {
       /*
@@ -588,59 +657,26 @@ cond_timedwait (pthread_cond_t * cond,
        *              timeout
        *
        * Note: 
-       *      _pthread_sem_timedwait is a cancellation point,
+       *      _pthread_sem_timedwait is a cancelation point,
        *      hence providing the
-       *      mechanism for making pthread_cond_wait a cancellation
+       *      mechanism for making pthread_cond_wait a cancelation
        *      point. We use the cleanup mechanism to ensure we
-       *      re-lock the mutex if we are cancelled.
+       *      re-lock the mutex and decrement the waiters count
+       *      if we are canceled.
        */
-      pthread_cleanup_push (pthread_mutex_lock, mutex);
-
       if (_pthread_sem_timedwait (&(cv->sema), abstime) == -1)
 	{
 	  result = errno;
 	}
-
-      pthread_cleanup_pop (0);
     }
 
-  if ((internal_result = pthread_mutex_lock (&(cv->waitersLock))) == 0)
-    {
-      /*
-       * The waiter is responsible for decrementing
-       * its count, protected by an internal mutex.
-       */
-
-      cv->waiters--;
-
-      lastWaiter = cv->wasBroadcast && (cv->waiters == 0);
-
-      internal_result = pthread_mutex_unlock (&(cv->waitersLock));
-    }
-
-  if ((result == 0 || result == ETIMEDOUT) && internal_result == 0)
-    {
-      if (lastWaiter)
-        {
-          /*
-           * If we are the last waiter on this broadcast
-           * let the thread doing the broadcast proceed
-           */
-          if (!SetEvent (cv->waitersDone))
-            {
-              result = EINVAL;
-            }
-        }
-    }
+  pthread_cleanup_pop (1);
 
   /*
-   * We must always regain the external mutex, even when
-   * errors occur, because that's the guarantee that we give
-   * to our callers
+   * "result" can be modified by the cleanup handler.
+   * Specifically, if we are the last waiting thread and failed
+   * to notify the broadcast thread to proceed.
    */
-  (void) pthread_mutex_lock (mutex);
-
-
   return (result);
 
 }                               /* cond_timedwait */
@@ -905,12 +941,15 @@ pthread_cond_broadcast (pthread_cond_t * cond)
   cv->wasBroadcast = TRUE;
   wereWaiters = (cv->waiters > 0);
 
-  /*
-   * Wake up all waiters
-   */
-  result = (ReleaseSemaphore( cv->sema, cv->waiters, NULL )
-	    ? 0
-	    : EINVAL);
+  if (wereWaiters)
+    {
+      /*
+       * Wake up all waiters
+       */
+      result = (ReleaseSemaphore( cv->sema, cv->waiters, NULL )
+	        ? 0
+	        : EINVAL );
+    }
 
   (void) pthread_mutex_unlock(&(cv->waitersLock));
 

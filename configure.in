@@ -4,7 +4,11 @@ AC_INIT(pthread.h)
 AC_CANONICAL_HOST
 AC_CONFIG_HEADER(config.h)
 AC_PROG_CC
-AC_CHECK_HEADERS([signal.h],signal_h=yes,)
+
+dnl Abort here if there is no windows.h
+AC_CHECK_HEADER([windows.h],,AC_MSG_ERROR([Target system must be Win32]))
+
+AC_CHECK_HEADER([signal.h],signal_h=yes,)
 if test x$signal_h = xyes
 then
   AC_CACHE_CHECK([for sigset_t], p32_cv_sigset_t,
@@ -16,5 +20,4 @@ then
   fi
 fi
 
-AC_CHECK_HEADERS(windows.h,,AC_MSG_WARN([Target system must be Win32]))
 AC_OUTPUT(Makefile)

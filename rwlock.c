@@ -182,7 +182,7 @@ pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
           }
         else
           {
-            rw->rw_magic = NULL;
+            rw->rw_magic = (int) NULL;
             (void) pthread_mutex_unlock(&(rw->rw_lock));
             (void) pthread_cond_destroy(&(rw->rw_condreaders));
             (void) pthread_cond_destroy(&(rw->rw_condwriters));

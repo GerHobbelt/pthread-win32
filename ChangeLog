@@ -1,3 +1,24 @@
+1999-10-17  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* rwlock.c (pthread_rwlock_destroy): Add cast to remove compile
+	warning.
+
+	* condvar.c (pthread_cond_broadcast): Only release semaphores
+	if there are waiting threads.
+
+1999-10-15  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* condvar.c (cond_wait_cleanup): New static cleanup handler for
+	cond_timedwait;
+	(cond_timedwait): pthread_cleanup_push args changed;
+	canceling a thread while it's in pthread_cond_wait
+	will now decrement the waiters count and cleanup if it's the
+	last waiter.
+	- Lorin Hochstein <lmh@xiphos.ca> and 
+	  Peter Slacik <Peter.Slacik@tatramed.sk>;
+	the last waiter will now reset the CV's wasBroadcast flag
+	- Graham Dumpleton <Graham.Dumpleton@ra.pad.otc.telstra.com.au>.
+
 Thu Sep 16 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* rwlock.c (pthread_rwlock_destroy): Add serialisation.
