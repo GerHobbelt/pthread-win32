@@ -102,7 +102,11 @@ _pthread_pop_cleanup (int execute)
 
         }
 
+#if !defined(_WIN32) && !defined(_cplusplus)
+
       pthread_setspecific (_pthread_cleanupKey, cleanup->prev);
+
+#endif
     }
 
   return (cleanup);
@@ -156,7 +160,12 @@ _pthread_push_cleanup (_pthread_cleanup_t * cleanup,
 {
   cleanup->routine = routine;
   cleanup->arg = arg;
+
+#if !defined(_WIN32) && !defined(_cplusplus)
+
   cleanup->prev = pthread_getspecific (_pthread_cleanupKey);
+
+#endif
 
   pthread_setspecific (_pthread_cleanupKey, (void *) cleanup);
 

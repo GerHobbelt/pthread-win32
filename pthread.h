@@ -174,7 +174,7 @@
 #if !defined( PTHREAD_H )
 #define PTHREAD_H
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 /*
  * Disable following warnings when including Windows headers
  *
@@ -229,6 +229,12 @@ struct timespec {
 #include <errno.h>
 
 #ifdef _WIN32
+#ifndef ETIMEDOUT
+#define ETIMEDOUT 19981220     /* Let's hope this is unique */
+#endif
+#endif /* _WIN32 */
+
+#ifdef _MSC_VER
 /*
  * Re-enable all but 4127, 4514
  */
@@ -644,28 +650,10 @@ struct pthread_once_t_ {
     {
       void (*routine) (void *);
       void *arg;
-#if !defined(__cplusplus)
+#if !defined(_WIN32) && !defined(__cplusplus)
       _pthread_cleanup_t *prev;
 #endif
     };
-
-#ifndef __cplusplus
-
-/*
- * C implementation of PThreads cancel cleanup
- */
-
-#define pthread_cleanup_push( _rout, _arg ) \
-	{ \
-	    _pthread_cleanup_t	_cleanup; \
-            \
-	    _pthread_push_cleanup( &_cleanup, (_rout), (_arg) ); \
-
-#define pthread_cleanup_pop( _execute ) \
-	    (void) _pthread_pop_cleanup( _execute ); \
-	}
-
-#else /* !__cplusplus */
 
 #ifdef _WIN32
 	/*
@@ -693,6 +681,24 @@ struct pthread_once_t_ {
 	}
 
 #else /* _WIN32 */
+
+#ifndef __cplusplus
+
+	/*
+	 * C implementation of PThreads cancel cleanup
+	 */
+
+#define pthread_cleanup_push( _rout, _arg ) \
+	{ \
+	    _pthread_cleanup_t	_cleanup; \
+            \
+	    _pthread_push_cleanup( &_cleanup, (_rout), (_arg) ); \
+
+#define pthread_cleanup_pop( _execute ) \
+	    (void) _pthread_pop_cleanup( _execute ); \
+	}
+
+#else /* !__cplusplus */
 
 	/*
 	 * C++ (ie. Cygwin32 or Mingw32) version of cancel cleanup.
@@ -783,13 +789,15 @@ pthread_t pthread_self (void);
 
 int pthread_cancel (pthread_t thread);
 
-#ifndef __cplusplus
+#if !defined(__cplusplus) && !defined(_WIN32)
+
 _pthread_cleanup_t *_pthread_pop_cleanup (int execute);
 
 void _pthread_push_cleanup (_pthread_cleanup_t * cleanup,
 			   void (*routine) (void *),
 			   void *arg);
-#endif /* !__cplusplus */
+
+#endif /* !__cplusplus && ! _WIN32 */
 
 int pthread_setcancelstate (int state,
 			    int *oldstate);

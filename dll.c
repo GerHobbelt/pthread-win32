@@ -16,7 +16,7 @@ BOOL (WINAPI *_pthread_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
 /* Handle to kernel32.dll */
 static HINSTANCE _pthread_h_kernel32;
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 /* 
  * lpvReserved yields an unreferenced formal parameter;
  * ignore it

@@ -234,11 +234,11 @@ sem_post (sem_t * sem)
       *
       * DESCRIPTION
       *      This function posts a wakeup to a semaphore. If there
-      *      are waiting threads (or processes), on is awakened;
+      *      are waiting threads (or processes), one is awakened;
       *      otherwise, the semaphore value is incremented by one.
       *
       * RESULTS
-      *              0                       successfully destroyed semaphore,
+      *              0               successfully destroyed semaphore,
       *              EINVAL          'sem' is not a valid semaphore,
       *              ENOSYS          semaphores are not supported,
       *
@@ -252,3 +252,5 @@ sem_post (sem_t * sem)
 	     : EINVAL));
 
 }				/* sem_post */
+
+
