@@ -126,6 +126,8 @@ pthread_cond_destroy (pthread_cond_t * cond)
       return EINVAL;
     }
 
+  EnterCriticalSection(&ptw32_cond_list_lock);
+
   if (*cond != PTHREAD_COND_INITIALIZER)
     {
       cv = *cond;
@@ -168,8 +170,6 @@ pthread_cond_destroy (pthread_cond_t * cond)
           /*
            * Now it is safe to destroy
            */
-          EnterCriticalSection(&ptw32_cond_list_lock);
-
           *cond = NULL;
 
           if (sem_destroy(&(cv->semBlockLock)) != 0)
@@ -205,8 +205,6 @@ pthread_cond_destroy (pthread_cond_t * cond)
               cv->next->prev = cv->prev;
             }
 
-          LeaveCriticalSection(&ptw32_cond_list_lock);
-
           (void) free(cv);
         }
     }
@@ -241,6 +239,8 @@ pthread_cond_destroy (pthread_cond_t * cond)
 
       LeaveCriticalSection(&ptw32_cond_test_init_lock);
     }
+
+  LeaveCriticalSection(&ptw32_cond_list_lock);
 
   return ((result != 0) ? result : ((result1 != 0) ? result1 : result2));
 }

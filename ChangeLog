@@ -1,3 +1,20 @@
+2002-02-23  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* Testsuite passed (except known MSVC++ problems)
+
+	* pthread_cond_destroy.c: Expand the time change
+	critical section to solve deadlock problem.
+
+	* pthread.c: Add all remaining C modules.
+	* pthread.h: Use dllexport/dllimport attributes on functions
+	to avoid using pthread.def.
+	* sched.h: Likewise.
+	* semaphore.h: Likewise.
+	* GNUmakefile: Add new targets for single translation
+	unit build to maximise inlining potential; generate
+	pthread.def automatically.
+	* Makefile: Likewise, but no longer uses pthread.def.
+
 2002-02-20  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* pthread_cond_destroy.c (pthread_cond_destroy):

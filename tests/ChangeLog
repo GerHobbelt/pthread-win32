@@ -1,3 +1,11 @@
+2002-02-23  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* condvar1_2.c: Loop over the test many times in the hope
+	of detecting any intermittent deadlocks. This is to
+	test a fixed problem in pthread_cond_destroy.c.
+
+	* spin4.c: Remove unused variable.
+
 2002-02-17  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* condvar1_1.c: New test.

@@ -49,9 +49,8 @@ MAKE	= make
 GLANG	= c++
 CC	= gcc
 XXCFLAGS	= 
-#CFLAGS = -g -O0 -mthreads -UNDEBUG -Wall -x $(GLANG)
-#CFLAGS = -O3 -mthreads -UNDEBUG -Wall -x $(GLANG)
-CFLAGS	= -g -O0 -UNDEBUG -Wall $(XXCFLAGS)
+CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
+#CFLAGS	= -g -O0 -UNDEBUG -Wall $(XXCFLAGS)
 BUILD_DIR	= ..
 INCLUDES	= -I.
 

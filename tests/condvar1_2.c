@@ -81,7 +81,8 @@
 #include "test.h"
 
 enum {
-  NUM_CV = 100
+  NUM_CV = 100,
+  NUM_LOOPS = 100
 };
 
 static pthread_cond_t cv[NUM_CV];
@@ -89,34 +90,37 @@ static pthread_cond_t cv[NUM_CV];
 int
 main()
 {
-  int i, j;
+  int i, j, k;
   int result = -1;
   pthread_t t;
 
-  for (i = 0; i < NUM_CV; i++)
+  for (k = 0; k < NUM_LOOPS; k++)
     {
-      assert(pthread_cond_init(&cv[i], NULL) == 0);
-    }
-
-  j = NUM_CV;
-  (void) srand((unsigned)time(NULL));
-
-  /* Traverse the list asynchronously. */
-  assert(pthread_create(&t, NULL, pthread_timechange_handler_np, NULL) == 0);
-
-  do
-    {
-      i = (NUM_CV - 1) * rand() / RAND_MAX;
-      if (cv[i] != NULL)
+      for (i = 0; i < NUM_CV; i++)
         {
-          j--;
-          assert(pthread_cond_destroy(&cv[i]) == 0);
+          assert(pthread_cond_init(&cv[i], NULL) == 0);
         }
-    }
-  while (j > 0);
 
-  assert(pthread_join(t, (void **) &result) == 0);
-  assert (result == 0);
+      j = NUM_CV;
+      (void) srand((unsigned)time(NULL));
+
+      /* Traverse the list asynchronously. */
+      assert(pthread_create(&t, NULL, pthread_timechange_handler_np, NULL) == 0);
+
+      do
+        {
+          i = (NUM_CV - 1) * rand() / RAND_MAX;
+          if (cv[i] != NULL)
+            {
+              j--;
+              assert(pthread_cond_destroy(&cv[i]) == 0);
+            }
+        }
+      while (j > 0);
+
+      assert(pthread_join(t, (void **) &result) == 0);
+      assert (result == 0);
+    }
 
   return 0;
 }

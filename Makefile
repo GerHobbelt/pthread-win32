@@ -11,18 +11,22 @@ DLLDEST=$(DEVROOT)\DLL
 LIBDEST=$(DEVROOT)\DLL
 
 DLLS	= pthreadVCE.dll pthreadVSE.dll pthreadVC.dll
+INLINED_STAMPS	= pthreadVCE.stamp pthreadVSE.stamp pthreadVC.stamp
 
 OPTIM	= /O2
 
-# C++ Exceptions
-VCEFLAGS	= /GX /TP /D__CLEANUP_CXX
-#Structured Exceptions
-VSEFLAGS	= /D__CLEANUP_SEH
-#C cleanup code
-VCFLAGS	= /D__CLEANUP_C
+#CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H /DTEST_ICE
+CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
 
-#CFLAGS	= $(OPTIM) /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H /DTEST_ICE
-CFLAGS	= $(OPTIM) /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
+# C++ Exceptions
+VCEFLAGS	= /GX /TP /D__CLEANUP_CXX $(CFLAGS)
+#Structured Exceptions
+VSEFLAGS	= /D__CLEANUP_SEH $(CFLAGS)
+#C cleanup code
+VCFLAGS	= /D__CLEANUP_C $(CFLAGS)
+
+DLL_INLINED_OBJS = \
+		pthread.obj
 
 # Agregate modules for inlinability
 DLL_OBJS	= \
@@ -270,6 +274,7 @@ PRIVATE_SRCS	= \
 
 RWLOCK_SRCS	= \
 		ptw32_rwlock_check_need_init.c \
+		ptw32_rwlock_cancelwrwait.c \
 		pthread_rwlock_init.c \
 		pthread_rwlock_destroy.c \
 		pthread_rwlockattr_init.c \
@@ -277,7 +282,9 @@ RWLOCK_SRCS	= \
 		pthread_rwlockattr_getpshared.c \
 		pthread_rwlockattr_setpshared.c \
 		pthread_rwlock_rdlock.c \
+		pthread_rwlock_timedrdlock.c \
 		pthread_rwlock_wrlock.c \
+		pthread_rwlock_timedwrlock.c \
 		pthread_rwlock_unlock.c \
 		pthread_rwlock_tryrdlock.c \
 		pthread_rwlock_trywrlock.c
@@ -336,6 +343,9 @@ all:
 	@ echo nmake clean VCE   (to build the MSVC dll with C++ exception handling)
 	@ echo nmake clean VSE   (to build the MSVC dll with structured exception handling)
 	@ echo nmake clean VC    (to build the MSVC dll with C cleanup code)
+	@ echo nmake clean VCE-inlined   (to build the MSVC inlined dll with C++ exception handling)
+	@ echo nmake clean VSE-inlined   (to build the MSVC inlined dll with structured exception handling)
+	@ echo nmake clean VC-inlined    (to build the MSVC inlined dll with C cleanup code)
 
 auto:
 	@ nmake clean VCE
@@ -343,17 +353,31 @@ auto:
 	@ nmake clean VC
 
 VCE:
-	@ nmake /nologo EHFLAGS="$(VCEFLAGS)" pthreadVCE.dll
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCEFLAGS)" pthreadVCE.dll
 
 VSE:
-	@ nmake /nologo EHFLAGS="$(VSEFLAGS)" pthreadVSE.dll
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VSEFLAGS)" pthreadVSE.dll
 
 VC:
-	@ nmake /nologo EHFLAGS="$(VCFLAGS)" pthreadVC.dll
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS)" pthreadVC.dll
+
+#
+# The so-called inlined DLL is just a single translation unit with
+# inlining optimisation turned on.
+#
+VCE-inlined:
+	@ nmake /nologo EHFLAGS="/O2 /Ob1 $(VCEFLAGS)" pthreadVCE.stamp
+
+VSE-inlined:
+	@ nmake /nologo EHFLAGS="/O2 /Ob1 $(VSEFLAGS)" pthreadVSE.stamp
+
+VC-inlined:
+	@ nmake /nologo EHFLAGS="/O2 /Ob1 $(VCFLAGS)" pthreadVC.stamp
 
 realclean: clean
 	if exist *.dll del *.dll
 	if exist *.lib del *.lib
+	if exist *.stamp del *.stamp
 
 clean:
 	if exist *.obj del *.obj
@@ -367,13 +391,18 @@ install: $(DLLS)
 	copy pthread*.dll $(DLLDEST)
 	copy pthread*.lib $(LIBDEST)
 
-$(DLLS): $(DLL_OBJS) pthread.def
+$(DLLS): $(DLL_OBJS)
 	cl /LD /Zi /nologo $(DLL_OBJS) \
 		/link /nodefaultlib:libcmt /implib:$*.lib \
-		msvcrt.lib wsock32.lib /def:pthread.def /out:$@
+		msvcrt.lib wsock32.lib /out:$@
+
+$(INLINED_STAMPS): $(DLL_INLINED_OBJS)
+	cl /LD /Zi /nologo $(DLL_INLINED_OBJS) \
+		/link /nodefaultlib:libcmt /implib:$*.lib \
+		msvcrt.lib wsock32.lib /out:$*.dll
 
 .c.obj:
-	cl $(EHFLAGS) $(CFLAGS) -c $<
+	cl $(EHFLAGS) -c $<
 
 attr.obj:	attr.c $(ATTR_SRCS) $(INCL)
 barrier.obj:	barrier.c $(BARRIER_SRCS) $(INCL)

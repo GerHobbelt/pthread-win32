@@ -65,6 +65,24 @@
 /* Include everything */
 #endif
 
+
+#if __GNUC__ && ! defined (__declspec)
+# error Please upgrade your GNU compiler to one that supports __declspec.
+#endif
+
+/*
+ * When building the DLL code, you should define PTW32_BUILD so that
+ * the variables/functions are exported correctly. When using the DLL,
+ * do NOT define PTW32_BUILD, and then the variables/functions will
+ * be imported correctly.
+ */
+#ifdef PTW32_BUILD
+# define PTW32_DLLPORT __declspec (dllexport)
+#else
+# define PTW32_DLLPORT __declspec (dllimport)
+#endif
+
+
 #if defined(__MINGW32__) || defined(_UWIN)
 #if PTW32_LEVEL >= PTW32_LEVEL_MAX
 /* For pid_t */
@@ -95,15 +113,15 @@ extern "C"
 {
 #endif                          /* __cplusplus */
 
-int sched_yield (void);
+PTW32_DLLPORT int sched_yield (void);
 
-int sched_get_priority_min (int policy);
+PTW32_DLLPORT int sched_get_priority_min (int policy);
 
-int sched_get_priority_max (int policy);
+PTW32_DLLPORT int sched_get_priority_max (int policy);
 
-int sched_setscheduler (pid_t pid, int policy);
+PTW32_DLLPORT int sched_setscheduler (pid_t pid, int policy);
 
-int sched_getscheduler (pid_t pid);
+PTW32_DLLPORT int sched_getscheduler (pid_t pid);
 
 /*
  * Note that this macro returns ENOTSUP rather than

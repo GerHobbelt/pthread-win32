@@ -6,32 +6,32 @@
  *
  * --------------------------------------------------------------------------
  *
- *      Pthreads-win32 - POSIX Threads Library for Win32
- *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2002 Pthreads-win32 contributors
+ *	Pthreads-win32 - POSIX Threads Library for Win32
+ *	Copyright(C) 1998 John E. Bossom
+ *	Copyright(C) 1999,2002 Pthreads-win32 contributors
  * 
- *      Contact Email: rpj@ise.canberra.edu.au
+ *	Contact Email: rpj@ise.canberra.edu.au
  * 
- *      The current list of contributors is contained
- *      in the file CONTRIBUTORS included with the source
- *      code distribution. The list can also be seen at the
- *      following World Wide Web location:
- *      http://sources.redhat.com/pthreads-win32/contributors.html
+ *	The current list of contributors is contained
+ *	in the file CONTRIBUTORS included with the source
+ *	code distribution. The list can also be seen at the
+ *	following World Wide Web location:
+ *	http://sources.redhat.com/pthreads-win32/contributors.html
  * 
- *      This library is free software; you can redistribute it and/or
- *      modify it under the terms of the GNU Lesser General Public
- *      License as published by the Free Software Foundation; either
- *      version 2 of the License, or (at your option) any later version.
+ *	This library is free software; you can redistribute it and/or
+ *	modify it under the terms of the GNU Lesser General Public
+ *	License as published by the Free Software Foundation; either
+ *	version 2 of the License, or (at your option) any later version.
  * 
- *      This library is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *      Lesser General Public License for more details.
+ *	This library is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *	Lesser General Public License for more details.
  * 
- *      You should have received a copy of the GNU Lesser General Public
- *      License along with this library in the file COPYING.LIB;
- *      if not, write to the Free Software Foundation, Inc.,
- *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *	You should have received a copy of the GNU Lesser General Public
+ *	License along with this library in the file COPYING.LIB;
+ *	if not, write to the Free Software Foundation, Inc.,
+ *	59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  *
  * --------------------------------------------------------------------------
  *
@@ -47,7 +47,7 @@ struct _timeb currSysTimeStart;
 struct _timeb currSysTimeStop;
 
 #define GetDurationMilliSecs(_TStart, _TStop) ((_TStop.time*1000+_TStop.millitm) \
-                                               - (_TStart.time*1000+_TStart.millitm))
+					       - (_TStart.time*1000+_TStart.millitm))
 
 static int washere = 0;
 
@@ -66,7 +66,6 @@ int
 main()
 {
   long result = 0;
-  int i;
   pthread_t t;
   int CPUs;
   struct _timeb sysTime;
