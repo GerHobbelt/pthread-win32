@@ -1,3 +1,34 @@
+2001-06-18  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* Made organisational-only changes to UWIN additions.
+	* dll.c (dllMain): Moved UWIN process attach code
+	to pthread_win32_process_attach_np(); moved
+	instance of pthread_count to global.c.
+	* global.c (pthread_count): Moved from dll.c.
+	* nonportable.c (pthread_win32_process_attach_np):
+	Moved _UWIN code to here from dll.c.
+	* implement.h (pthread_count): Define extern int.
+	* create.c (pthread_count): Remove extern int.
+	* private.c (pthread_count): Likewise.
+	* exit.c (pthread_count): Likewise.
+
+2001-06-18  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	Contributed by -  David Korn <dgk@research.att.com>
+
+	* dll.c: Added changes necessary to work with UWIN.
+	* create.c: Likewise.
+	* pthread.h: Likewise.
+	* misc.c: Likewise.
+	* exit.c: Likewise.
+	* private.c: Likewise.
+	* implement.h: Likewise.
+	There is some room at the start of struct pthread_t_
+	to implement the signal semantics in UWIN's posix.dll
+	although this is not yet complete.
+	* Nmakefile: Compatible with UWIN's Nmake utility.
+	* Nmakefile.tests: Likewise - for running the tests.
+
 2001-06-08  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* semaphore.h (sem_t): Fixed for compile and test.

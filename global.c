@@ -51,3 +51,10 @@ CRITICAL_SECTION ptw32_cond_test_init_lock;
  * created read/write locks.
  */
 CRITICAL_SECTION ptw32_rwlock_test_init_lock;
+
+#ifdef _UWIN
+/*
+ * Keep a count of the number of threads.
+ */
+int pthread_count = 0;
+#endif

@@ -24,7 +24,9 @@
  * MA 02111-1307, USA
  */
 
-#include <process.h>
+#ifndef _UWIN
+#   include <process.h>
+#endif
 #ifndef NEED_FTIME
 #include <sys/timeb.h>
 #endif
@@ -278,6 +280,11 @@ ptw32_threadStart (void * vthreadParms)
      * Run the caller's routine;
      */
     status = self->exitStatus = (*start) (arg);
+#ifdef _UWIN
+	if (--pthread_count <= 0)
+		exit(0);
+#endif
+
   }
   __except (ExceptionFilter(GetExceptionInformation(), ei))
   {
@@ -285,6 +292,10 @@ ptw32_threadStart (void * vthreadParms)
        {
         case PTW32_EPS_CANCEL:
           status = PTHREAD_CANCELED;
+#ifdef _UWIN
+		if (--pthread_count <= 0)
+			exit(0);
+#endif
           break;
         case PTW32_EPS_EXIT:
           status = self->exitStatus;

@@ -101,7 +101,6 @@ pthread_getw32threadhandle_np(pthread_t thread)
  *  tsWait.tv_nsec = 500000000L;
  *  intRC = pthread_delay_np(&tsWait);
  */
-
 int
 pthread_delay_np (struct timespec * interval)
 {
@@ -141,6 +140,9 @@ pthread_win32_process_attach_np ()
   BOOL result = TRUE;
 
   result = ptw32_processInitialize ();
+#ifdef _UWIN
+  pthread_count++;
+#endif
 
   return result;
 }

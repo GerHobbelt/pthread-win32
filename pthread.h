@@ -22,6 +22,13 @@
 #if !defined( PTHREAD_H )
 #define PTHREAD_H
 
+#ifdef _UWIN
+#   define HAVE_STRUCT_TIMESPEC 1
+#   define HAVE_SIGNAL_H        1
+#   undef HAVE_CONFIG_H
+#   pragma comment(lib, "pthread")
+#endif
+
 /*
  * -------------------------------------------------------------
  *
@@ -304,6 +311,9 @@ extern "C"
 #define PTHREAD_THREADS_MAX				2019
 
 
+#ifdef _UWIN
+#   include	<sys/types.h>
+#else
 typedef struct pthread_t_ *pthread_t;
 typedef struct pthread_attr_t_ *pthread_attr_t;
 typedef struct pthread_once_t_ pthread_once_t;
@@ -312,6 +322,7 @@ typedef struct pthread_mutex_t_ *pthread_mutex_t;
 typedef struct pthread_mutexattr_t_ *pthread_mutexattr_t;
 typedef struct pthread_cond_t_ *pthread_cond_t;
 typedef struct pthread_condattr_t_ *pthread_condattr_t;
+#endif
 typedef struct pthread_rwlock_t_ *pthread_rwlock_t;
 typedef struct pthread_rwlockattr_t_ *pthread_rwlockattr_t;
 
@@ -853,6 +864,7 @@ int pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
 /*
  * Thread-Safe C Runtime Library Mappings.
  */
+#ifndef _UWIN
 #if 1
 #if (! defined(HAVE_ERRNO)) && (! defined(_REENTRANT)) && (! defined(_MT))
 int * _errno( void );
@@ -863,6 +875,7 @@ int * _errno( void );
 __declspec( dllexport ) int * _errno( void );
 #else
 int * _errno( void );
+#endif
 #endif
 #endif
 #endif

@@ -26,7 +26,9 @@
 
 #include "pthread.h"
 #include "implement.h"
+#ifndef _UWIN
 #include <process.h>
+#endif
 
 int
 pthread_create (pthread_t * tid,
@@ -213,6 +215,10 @@ FAIL0:
     }
   *tid = thread;
 
+#ifdef _UWIN
+	if (result == 0)
+		pthread_count++;
+#endif
   return (result);
 
 }				/* pthread_create */

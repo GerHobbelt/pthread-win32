@@ -144,6 +144,11 @@ pthread_self (void)
 {
   pthread_t self;
 
+#ifdef _UWIN
+	if(!ptw32_selfThreadKey)
+		return(NULL);
+#endif
+
   self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
 
   if (self == NULL)
