@@ -1,3 +1,7 @@
+Mon Oct  5 14:25:08 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.def: New file for building the DLL.
+
 1998-10-05  Ben Elliston  <bje@cygnus.com>
 
 	* misc.c (pthread_equal): Correct inverted logic bug.
