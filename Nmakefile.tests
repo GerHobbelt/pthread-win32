@@ -1,0 +1,131 @@
+/* for running tests */
+CCFLAGS = -g 
+_MT	== 1
+_timeb	== timeb
+_ftime	== ftime 
+
+.SOURCE:	tests
+/*
+:PACKAGE:	pthread
+*/
+
+set keepgoing
+
+":test:" : .MAKE .OPERATOR
+	local I
+	$(<:D:B:S=.pass) : .IMPLICIT $(>:D:B:S=.pass)
+	for I $(<) $(>)
+		$(I:D:B:S=.pass) : .VIRTUAL .FORCE $(I)
+			$(>)
+	end
+loadfree::	loadfree.c
+mutex1::	mutex1.c
+mutex1e::	mutex1e.c
+mutex1n::	mutex1n.c
+mutex1r::	mutex1r.c
+mutex2::	mutex1.2
+exit1::		exit1.c
+condvar1::	condvar1.c
+self1::		self1.c
+condvar2::	condvar2.c
+condvar2_1::	condvar2_1.c
+condvar3_1::	condvar3_1.c
+condvar3_2::	condvar3_2.c
+create1.::	create1.c
+cancel1::	cancel1.c
+cancel2::	cancel2.c
+mutex3::	mutex3.c
+mutex4::	mutex4.c
+mutex5::	mutex5.c
+mutex6::	mutex6.c
+mutex6e::	mutex6e.c
+mutex6n::	mutex6n.c
+mutex6r::	mutex6r.c
+equal1::	equal1.c
+exit2::		exit2.c
+exit3::		exit3.c
+join0::		join0.c
+join1::		join1.c
+join2::		join2.c
+count1::	count1.c
+once1::		once1.c
+tsd1::		tsd1.c
+self2::		self2.c
+eyal1::		eyal1.c
+condvar3::	condvar3.c
+condvar4::	condvar4.c
+condvar5::	condvar5.c
+condvar6::	condvar6.c
+condvar7::	condvar7.c
+condvar8::	condvar8.c
+condvar9::	condvar9.c
+errno1::	errno1.c
+rwlock1::	rwlock1.c
+rwlock2::	rwlock2.c
+rwlock3::	rwlock3.c
+rwlock4::	rwlock4.c
+rwlock5::	rwlock5.c
+rwlock6::	rwlock6.c
+rwlock7::	rwlock7.c
+context1::	context1.c
+cancel3::	cancel3.c
+cancel4::	cancel4.c
+cancel5::	cancel5.c
+cleanup0::	cleanup0.c
+cleanup1::	cleanup1.c
+cleanup2::	cleanup2.c
+cleanup3::	cleanup3.c
+exception1::	exception1.c
+exception2::	exception2.c
+exception3::	exception3.c
+
+loadfree:	:test:
+mutex1		:test: loadfree
+mutex2		:test: loadfree
+exit1		:test: loadfree
+condvar1	:test: loadfree
+self1		:test: loadfree
+condvar2	:test:	condvar1
+create1.	:test:	mutex2
+cancel1		:test:	create1
+cancel2		:test:	cancel1
+mutex3		:test:	create1
+mutex4		:test:	mutex3
+equal1		:test:	create1
+exit2		:test:	create1
+exit3		:test:	create1
+join0		:test:	create1
+join1		:test:	create1
+join2		:test:	create1
+count1		:test:	join1
+once1		:test:	create1
+tsd1		:test:	join1
+self2		:test:	create1
+eyal1		:test:	tsd1
+condvar3	:test:	create1
+condvar4	:test:	create1
+condvar5	:test:	condvar4
+condvar6	:test:	condvar5
+condvar7	:test:	condvar6	cleanup1
+condvar8	:test:	condvar7
+condvar9	:test:	condvar8
+errno1		:test:	mutex3
+rwlock1		:test:	condvar6
+rwlock2		:test:	rwlock1
+rwlock3		:test:	rwlock2
+rwlock4		:test:	rwlock3
+rwlock5		:test:	rwlock4
+rwlock6		:test:	rwlock5
+context1	:test:	cancel2
+cancel3		:test:	context1
+cancel4		:test:	cancel3
+cancel5		:test:	cancel3
+cleanup0	:test:	cancel5
+cleanup1	:test:	cleanup0
+cleanup2	:test:	cleanup1
+cleanup3	:test:	cleanup2
+exception1	:test:	cancel4
+exception2	:test:	exception1
+exception3	:test:	exception2
+tryentercs	:test:
+tryentercs2	:test:

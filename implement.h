@@ -71,6 +71,9 @@ typedef enum {
 PThreadDemise;
 
 struct pthread_t_ {
+#ifdef _UWIN
+  DWORD dummy[5];
+#endif
   DWORD thread;
   HANDLE threadH;
   PThreadState state;
@@ -331,6 +334,9 @@ extern CRITICAL_SECTION ptw32_mutex_test_init_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
 extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
 
+#ifdef _UWIN
+extern int pthread_count;
+#endif
 
 /* Declared in misc.c */
 #ifdef NEED_CALLOC
@@ -390,6 +396,25 @@ BOOL ptw32_increase_semaphore(sem_t * sem,
 }
 #endif /* __cplusplus */
 
+
+#ifdef _UWIN_
+#   ifdef	_MT
+#	ifdef __cplusplus
+	extern "C" {
+#	endif
+	_CRTIMP unsigned long  __cdecl _beginthread (void (__cdecl *) (void *),
+		unsigned, void *);
+	_CRTIMP void __cdecl _endthread(void);
+	_CRTIMP unsigned long __cdecl _beginthreadex(void *, unsigned,
+		unsigned (__stdcall *) (void *), void *, unsigned, unsigned *);
+	_CRTIMP void __cdecl _endthreadex(unsigned);
+#	ifdef __cplusplus
+	}
+#	endif
+#   endif
+#else
+#   include <process.h>
+#endif
 
 /*
  * Check for old and new versions of cygwin. See the FAQ file:
