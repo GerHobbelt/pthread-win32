@@ -44,6 +44,10 @@ Sun Mar  7 12:31:14 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 	(pthread_cond_t): no longer a pointer to pthread_cond_t_.
 	(pthread_cond_t_): add 'staticinit' and 'valid' elements.
 
+Sat Mar 6 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Undate comments.
+
 Sun Feb 21 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* pthread.h (PTHREAD_MUTEX_INITIALIZER): missing braces around

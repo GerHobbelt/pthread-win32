@@ -208,7 +208,7 @@ int _pthread_sem_post (_pthread_sem_t * sem);
 /*
  * Check for old and new versions of cygwin. See the FAQ file:
  *
- * Question 1 - How do I get pthreads-win32 to link under Cygwin32 or Mingw32?
+ * Question 1 - How do I get pthreads-win32 to link under Cygwin or Mingw32?
  *
  * Patch by Anders Norlander <anorland@hem2.passagen.se>
  */

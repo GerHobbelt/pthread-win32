@@ -5,14 +5,14 @@
 INDEX
 -----
 
-Q 1	How do I get pthreads-win32 to link under Cygwin32 or Mingw32?
+Q 1	How do I get pthreads-win32 to link under Cygwin or Mingw32?
 
 Q 2	Now that pthreads-win32 builds under Mingw32, why do I get
 	memory access violations?
 
 =============================================================================
 
-Q 1	How do I get pthreads-win32 to link under Cygwin32 or Mingw32?
+Q 1	How do I get pthreads-win32 to link under Cygwin or Mingw32?
 ---
 
 A 1

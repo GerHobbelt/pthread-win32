@@ -44,18 +44,18 @@
 /*
  * Create NUMTHREADS threads in addition to the Main thread.
  */
-static enum {
+enum {
   NUMTHREADS = 2
 };
 
 typedef struct bag_t_ bag_t;
 struct bag_t_ {
   int threadnum;
-  int washere;
-  /* Add more pre-thread state variables here */
+  int started;
+  /* Add more per-thread state variables here */
 };
 
-static bag_t threadbag[NUMTHREADS];
+static bag_t threadbag[NUMTHREADS + 1];
 
 void *
 mythread(void * arg)
@@ -63,8 +63,8 @@ mythread(void * arg)
   bag_t * bag = (bag_t *) arg;
 
   assert(bag == &threadbag[bag->threadnum]);
-  assert(bag->washere == 0);
-  bag->washere = 1;
+  assert(bag->started == 0);
+  bag->started = 1;
 
   /* ... */
 
@@ -80,11 +80,16 @@ main()
   assert((t[0] = pthread_self()) != NULL);
 
   for (i = 1; i <= NUMTHREADS; i++)
-    { 
-      threadbag[i].washere = 0;
+    {
+      threadbag[i].started = 0;
       threadbag[i].threadnum = i;
       assert(pthread_create(&t[i], NULL, mythread, (void *) &threadbag[i]) == 0);
     }
+
+  /*
+   * Code to control or munipulate child threads should probably go here.
+   */
+
 
   /*
    * Give threads time to run.
@@ -96,24 +101,25 @@ main()
    */
   for (i = 1; i <= NUMTHREADS; i++)
     { 
-      if (threadbag[i].washere != 1)
+      failed = !threadbag[i].started;
+
+      if (failed)
 	{
-	  failed = 1;
-	  fprintf(stderr, "Thread %d: washere %d\n", i, threadbag[i].washere);
+	  fprintf(stderr, "Thread %d: started %d\n", i, threadbag[i].started);
 	}
     }
 
-  assert(failed == 0);
+  assert(!failed);
 
   /*
-   * Check any results here. Only print ouput and set "failed" on failure.
+   * Check any results here. Set "failed" and only print ouput on failure.
    */
   for (i = 1; i <= NUMTHREADS; i++)
     { 
       /* ... */
     }
 
-  assert(failed == 0);
+  assert(!failed);
 
   /*
    * Success.
