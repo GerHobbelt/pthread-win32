@@ -1,3 +1,9 @@
+1998-07-10  Ben Elliston  <bje@cygnus.com>
+
+	* exit.c (pthread_exit): Implement.
+
+	* pthread.h (pthread_exit): Add function prototype.
+
 1998-07-09  Ben Elliston  <bje@cygnus.com>
 
 	* create.c (pthread_create): A dummy stub right now.
