@@ -34,175 +34,60 @@
  *
  *              POSIX 1003.1c-1995      (POSIX.1c)
  *
+ *	Parts of the implementation also comply with the
+ *	Open Group Unix 98 specification in order to enhance
+ *	code portability between Windows, various commercial
+ *	Unix implementations, and Linux.
+ *
  * Authors:
- *      Contributors are listed in the file "MAINTAINERS".
+ *	There have been many contributors to this library.
+ *	The initial implementation was contributed by
+ *	John Bossom, and several others have provided major
+ *	sections or revisions of parts of the implementation.
+ *	Often significant effort has been contributed to
+ *	find and fix important bugs and other problems to
+ *	improve the reliability of the library, which sometimes
+ *	is not reflected in the amount of code which changed as
+ *	result.
+ *	As much as possible, the contributors are acknowledged
+ *	in the ChangeLog file in the source code distribution
+ *	where their changes are noted in detail.
  *
- * The following functions are implemented:
- *      ---------------------------
- *      PThreads
- *      ---------------------------
- *      pthread_attr_init
- *      pthread_attr_destroy
- *      pthread_attr_getdetachstate
- *      pthread_attr_getstackaddr
- *      pthread_attr_getstacksize
- *      pthread_attr_setdetachstate     
- *      pthread_attr_setstackaddr
- *      pthread_attr_setstacksize
+ *      Contributors are listed in the MAINTAINERS file.
  *
- *      pthread_create
- *      pthread_detach
- *      pthread_equal
- *      pthread_exit
- *      pthread_join
- *      pthread_self
- *      sched_yield
+ *	As usual, all bouquets go to the contributors, and all
+ *	brickbats go to the project maintainer.
  *
- *      pthread_cancel
- *      pthread_cleanup_pop
- *      pthread_cleanup_push
- *      pthread_setcancelstate
- *      pthread_setcanceltype
- *      pthread_testcancel
+ * Maintainer:
+ *	The code base for this project is coordinated and
+ *	eventually pre-tested, packaged, and made available by
  *
- *      ---------------------------
- *      Thread Specific Data
- *      ---------------------------
- *      pthread_key_create
- *      pthread_key_delete
- *      pthread_setspecific
- *      pthread_getspecific
+ *		Ross Johnson <rpj@ise.canberra.edu.au>
  *
- *      ---------------------------
- *      Mutexes
- *      ---------------------------
- *      pthread_mutexattr_init
- *      pthread_mutexattr_destroy
- *      pthread_mutexattr_getpshared
- *      pthread_mutexattr_setpshared
+ * QA Testers:
+ *	Ultimately, the library is tested in the real world by
+ *	a host of competent and demanding scientists and
+ *	engineers who report bugs and/or provide solutions
+ *	which are then fixed or incorporated into subsequent
+ *	versions of the library. Each time a bug is fixed, a
+ *	test case is written to prove the fix and ensure
+ *	that later changes to the code don't reintroduce the
+ *	same error. The number of test cases is slowly growing
+ *	and therefore so is the code reliability.
  *
- *      pthread_mutex_init
- *      pthread_mutex_destroy
- *      pthread_mutex_lock
- *      pthread_mutex_trylock
- *      pthread_mutex_unlock
+ * Compliance:
+ *	See the file ANNOUNCE for the list of implemented
+ *	and not-implemented routines and defined options.
+ *	Of course, these are all defined is this file as well.
  *
- *      ---------------------------
- *      Condition Variables
- *      ---------------------------
- *      pthread_condattr_init
- *      pthread_condattr_destroy
- *      pthread_condattr_getpshared
- *      pthread_condattr_setpshared
+ * Web site:
+ *	The source code and other information about this library
+ *	are available from
  *
- *      pthread_cond_init
- *      pthread_cond_destroy
- *      pthread_cond_wait
- *      pthread_cond_timedwait
- *      pthread_cond_signal
- *      pthread_cond_broadcast
- *
- *      ---------------------------
- *      Protected Methods
- *      ---------------------------
- *      pthreadCancelableWait
- *
- *      ---------------------------
- *      RealTime Scheduling:
- *      ---------------------------
- *      pthread_attr_getschedparam
- *      pthread_attr_setschedparam
- *      pthread_getschedparam
- *      pthread_setschedparam
- *      sched_get_priority_max
- *      sched_get_priority_min
- *
- *      ---------------------------
- *      Signals:
- *      ---------------------------
- *      pthread_sigmask
- *
- *      ---------------------------
- *      Read/Write Locks:
- *      ---------------------------
- *      pthread_rwlock_init
- *      pthread_rwlock_destroy
- *      pthread_rwlock_tryrdlock
- *      pthread_rwlock_trywrlock
- *      pthread_rwlock_rdlock
- *      pthread_rwlock_rwlock
- *      pthread_rwlock_unlock
- *
- * Limitations
- * ===========
- *      The following functions are not implemented:
- *
- *      ---------------------------
- *      RealTime Scheduling:
- *      ---------------------------
- *      pthread_attr_getinheritsched
- *      pthread_attr_getschedpolicy
- *      pthread_attr_getscope
- *      pthread_attr_setinheritsched
- *      pthread_attr_setschedpolicy
- *      pthread_attr_setscope
- *      pthread_mutex_getprioceiling
- *      pthread_mutex_setprioceiling
- *      pthread_mutex_attr_getprioceiling
- *      pthread_mutex_attr_getprotocol
- *      pthread_mutex_attr_setprioceiling
- *      pthread_mutex_attr_setprotocol
- *
- *      ---------------------------
- *      Fork Handlers:
- *      ---------------------------
- *      pthread_atfork
- *
- *      ---------------------------
- *      Stdio:
- *      ---------------------------
- *      flockfile
- *      ftrylockfile
- *      funlockfile
- *      getc_unlocked
- *      getchar_unlocked
- *      putc_unlocked
- *      putchar_unlocked
- *
- *      ---------------------------
- *      Thread-Safe C Runtime Library:
- *      ---------------------------
- *      readdir_r
- *      getgrgid_r
- *      getgrnam_r
- *      getpwuid_r
- *      getpwnam_r
- *
- *      ---------------------------
- *      Signals:
- *      ---------------------------
- *      pthread_kill
- *      sigtimedwait
- *      sigwait
- *      sigwaitinfo
- *
+ *		http://sources.redhat.com/pthreads-win32/
  *
  * -------------------------------------------------------------
  */
-
-#ifdef _MSC_VER
-/*
- * Disable following warnings when including Windows headers
- *
- * warning C4115: named type definition in parentheses
- * warning C4116: unnamed type definition in parentheses
- * warning C4127: conditional expression is constant
- * warning C4201: nonstandard extension used : nameless struct/union
- * warning C4214: nonstandard extension used : bit field types other than int
- * warning C4514: unreferenced inline function has been removed
- */
-#pragma warning( disable : 4115 4116 4127 4201 4214 4514)
-#endif
 
 /*
  * -----------------
@@ -226,7 +111,7 @@
 #include <signal.h>
 #endif /* HAVE_SIGNAL_H */
 
-#include <malloc.h>
+#include <setjmp.h>
 
 #ifndef HAVE_STRUCT_TIMESPEC
 struct timespec {
@@ -247,8 +132,6 @@ struct timespec {
 #define SIG_SETMASK 2
 #endif /* SIG_SETMASK */
 
-#include <process.h>
-
 /*
  * note: ETIMEDOUT is correctly defined in winsock.h
  */
@@ -266,28 +149,6 @@ struct timespec {
 #ifndef ETIMEDOUT
 #define ETIMEDOUT 10060     /* This is the value in winsock.h. */
 #endif
-
-#ifdef __MINGW32__
-#define PT_STDCALL
-#else
-#ifdef __cplusplus
-#define PT_STDCALL __stdcall
-#else
-#define PT_STDCALL __stdcall
-#endif
-#endif
-
-#ifdef _MSC_VER
-/*
- * Re-enable all but 4127, 4514
- */
-#pragma warning( default : 4115 4116 4201 4214)
-#endif
-
-#if !defined( TRUE )
-#define TRUE	!FALSE
-#define FALSE	0
-#endif /* !TRUE */
 
 #ifdef __cplusplus
 extern "C"
@@ -495,12 +356,6 @@ typedef struct pthread_rwlockattr_t_ *pthread_rwlockattr_t;
 #define PTHREAD_PROCESS_SHARED		1
 
 /*
- * pthread_mutexattr_setforcecs_np
- */
-#define PTHREAD_MUTEX_AUTO_CS_NP        0
-#define PTHREAD_MUTEX_FORCE_CS_NP       1
-
-/*
  * ====================
  * ====================
  * Cancelation
@@ -532,6 +387,17 @@ struct pthread_once_t_
 #define PTHREAD_COND_INITIALIZER ((pthread_cond_t) -1)
 
 #define PTHREAD_RWLOCK_INITIALIZER ((pthread_rwlock_t) -1)
+
+enum
+{
+  PTHREAD_MUTEX_FAST_NP,
+  PTHREAD_MUTEX_RECURSIVE_NP,
+  PTHREAD_MUTEX_ERRORCHECK_NP,
+  PTHREAD_MUTEX_NORMAL = PTHREAD_MUTEX_FAST_NP,
+  PTHREAD_MUTEX_RECURSIVE = PTHREAD_MUTEX_RECURSIVE_NP,
+  PTHREAD_MUTEX_ERRORCHECK = PTHREAD_MUTEX_ERRORCHECK_NP,
+  PTHREAD_MUTEX_DEFAULT = PTHREAD_MUTEX_NORMAL
+};
 
 
 /*
@@ -581,18 +447,36 @@ struct sched_param {
  * C++ and C built versions will not.
  */
 
+/* 
+ * define defaults for cleanup code
+ */
+#if !defined( __CLEANUP_SEH ) && !defined( __CLEANUP_CXX ) && !defined( __CLEANUP_C )
+
+#if defined(_MSC_VER)
+#define __CLEANUP_SEH
+#elif defined(__cplusplus)
+#define __CLEANUP_CXX
+#else
+#define __CLEANUP_C
+#endif
+
+#endif
+
+#if defined( __CLEANUP_SEH ) && defined(__GNUC__)
+#error ERROR [__FILE__, line __LINE__]: GNUC does not support SEH.
+#endif
+
 typedef struct ptw32_cleanup_t ptw32_cleanup_t;
+typedef void (__cdecl *ptw32_cleanup_callback_t)(void *);
 
 struct ptw32_cleanup_t
 {
-  void (*routine) (void *);
+  ptw32_cleanup_callback_t routine;
   void *arg;
-#if !defined(_MSC_VER) && !defined(__cplusplus)
-  ptw32_leanup_t *prev;
-#endif /* !_MSC_VER && ! __cplusplus */
+  struct ptw32_cleanup_t *prev;
 };
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
+#ifdef __CLEANUP_SEH
 	/*
 	 * WIN32 SEH version of cancel cleanup.
 	 */
@@ -601,7 +485,7 @@ struct ptw32_cleanup_t
 	{ \
 	    ptw32_cleanup_t	_cleanup; \
 	    \
-            _cleanup.routine	= (_rout); \
+        _cleanup.routine	= (ptw32_cleanup_callback_t)(_rout); \
 	    _cleanup.arg	= (_arg); \
 	    __try \
 	      { \
@@ -617,9 +501,9 @@ struct ptw32_cleanup_t
 		} \
 	}
 
-#else /* _MSC_VER && ! __cplusplus */
+#else /* __CLEANUP_SEH */
 
-#ifndef __cplusplus
+#ifdef __CLEANUP_C
 
 	/*
 	 * C implementation of PThreads cancel cleanup
@@ -629,13 +513,15 @@ struct ptw32_cleanup_t
 	{ \
 	    ptw32_cleanup_t	_cleanup; \
             \
-	    pthread_push_cleanup( &_cleanup, (_rout), (_arg) ); \
+	    ptw32_push_cleanup( &_cleanup, (ptw32_cleanup_callback_t) (_rout), (_arg) ); \
 
 #define pthread_cleanup_pop( _execute ) \
-	    (void) pthread_pop_cleanup( _execute ); \
+	    (void) ptw32_pop_cleanup( _execute ); \
 	}
 
-#else /* !__cplusplus */
+#else /* __CLEANUP_C */
+
+#ifdef __CLEANUP_CXX
 
 	/*
 	 * C++ version of cancel cleanup.
@@ -655,7 +541,7 @@ struct ptw32_cleanup_t
 	   *      of how the code exits the scope
 	   *      (i.e. such as by an exception)
 	   */
-	  void            (PT_STDCALL *cleanUpRout)( void * );
+      ptw32_cleanup_callback_t cleanUpRout;
 	  void    *       obj;
 	  int             executeIt;
 
@@ -671,7 +557,7 @@ struct ptw32_cleanup_t
 	    }
 
 	  PThreadCleanup(
-			 void            (PT_STDCALL *routine)( void * ),
+             ptw32_cleanup_callback_t routine,
 			 void    *       arg ) :
 	    cleanUpRout( routine ),
 	    obj( arg ),
@@ -704,16 +590,22 @@ struct ptw32_cleanup_t
 	 */
 #define pthread_cleanup_push( _rout, _arg ) \
         { \
-	    PThreadCleanup  cleanup((void (PT_STDCALL *)(void *))(_rout), \
+	    PThreadCleanup  cleanup((ptw32_cleanup_callback_t)(_rout), \
 				    (void *) (_arg) );
 
 #define pthread_cleanup_pop( _execute ) \
 	    cleanup.execute( _execute ); \
 	}
 
-#endif /* !__cplusplus) */
+#else
 
-#endif /* _MSC_VER && ! __cplusplus */
+#error ERROR [__FILE__, line __LINE__]: Cleanup type undefined.
+
+#endif /* __CLEANUP_CXX */
+
+#endif /* __CLEANUP_C */
+
+#endif /* __CLEANUP_SEH */
 
 /*
  * ===============
@@ -748,6 +640,18 @@ int pthread_attr_setstackaddr (pthread_attr_t * attr,
 int pthread_attr_setstacksize (pthread_attr_t * attr,
 			       size_t stacksize);
 
+int pthread_attr_getschedparam (const pthread_attr_t *attr,
+                                struct sched_param *param);
+ 
+int pthread_attr_setschedparam (pthread_attr_t *attr,
+                                const struct sched_param *param);
+
+int pthread_attr_setscope (pthread_attr_t *,
+                           int);
+ 
+int pthread_attr_getscope (const pthread_attr_t *,
+                           int *);
+
 /*
  * PThread Functions
  */
@@ -781,9 +685,9 @@ void pthread_testcancel (void);
 int pthread_once (pthread_once_t * once_control,
 		  void (*init_routine) (void));
 
-ptw32_cleanup_t *pthread_pop_cleanup (int execute);
+ptw32_cleanup_t *ptw32_pop_cleanup (int execute);
 
-void pthread_push_cleanup (ptw32_cleanup_t * cleanup,
+void ptw32_push_cleanup (ptw32_cleanup_t * cleanup,
 			   void (*routine) (void *),
 			   void *arg);
 
@@ -814,6 +718,9 @@ int pthread_mutexattr_getpshared (const pthread_mutexattr_t
 
 int pthread_mutexattr_setpshared (pthread_mutexattr_t * attr,
 				  int pshared);
+
+int pthread_mutexattr_settype (pthread_mutexattr_t * attr, int kind);
+int pthread_mutexattr_gettype (pthread_mutexattr_t * attr, int *kind);
 
 /*
  * Mutex Functions
@@ -872,11 +779,9 @@ int pthread_getschedparam (pthread_t thread,
 			   int *policy,
 			   struct sched_param *param);
 
-int pthread_attr_getschedparam (const pthread_attr_t *attr,
-				struct sched_param *param);
-
-int pthread_attr_setschedparam (pthread_attr_t *attr,
-				const struct sched_param *param);
+int pthread_setconcurrency (int);
+ 
+int pthread_getconcurrency (void);
 
 /*
  * Read-Write Lock Functions
@@ -901,12 +806,19 @@ int pthread_rwlock_unlock(pthread_rwlock_t *lock);
  * Non-portable functions
  */
 
-/* Possibly supported by other POSIX threads implimentations */
-int pthread_delay_np (struct timespec * interval);
+int pthread_mutexattr_setkind_np(pthread_mutexattr_t * attr, int kind);
+int pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr, int *kind);
 
-/* Pthread Win32 specific */
-int pthread_mutexattr_setforcecs_np(pthread_mutexattr_t *attr,
-				    int forcecs);
+/*
+ * Remaps the default mutex kind to any of the
+ * other possible types. Returns the previous type.
+ */
+int pthread_mutex_setdefaultkind_np(int kind);
+int pthread_mutex_getdefaultkind_np(int *kind);
+
+
+/* Possibly supported by other POSIX threads implementations */
+int pthread_delay_np (struct timespec * interval);
 
 HANDLE pthread_getw32threadhandle_np(pthread_t thread);
 
@@ -942,7 +854,7 @@ int pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
  * Thread-Safe C Runtime Library Mappings.
  */
 #if 1
-#if (! defined(NEED_ERRNO)) || (! defined( _REENTRANT ) && (! defined( _MT ) || ! defined( _MD )))
+#if (! defined(HAVE_ERRNO)) && (! defined(_REENTRANT)) && (! defined(_MT))
 int * _errno( void );
 #endif
 #else
@@ -986,7 +898,7 @@ int * _errno( void );
 	  (_result) )
 
 #define rand_r( _seed ) \
-	rand()
+	( _seed == _seed? rand() : rand() )
 
 
 #ifdef __cplusplus
@@ -1008,7 +920,7 @@ DWORD ptw32_get_exception_services_code(void);
 
 #ifndef PTW32_BUILD
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
+#ifdef __CLEANUP_SEH
 
 /*
  * Redefine the SEH __except keyword to ensure that applications
@@ -1018,7 +930,7 @@ DWORD ptw32_get_exception_services_code(void);
         __except( ( GetExceptionCode() == ptw32_get_exception_services_code() ) \
 		 ? EXCEPTION_CONTINUE_SEARCH : ( E ) )
 
-#endif /* _MSC_VER && ! __cplusplus */
+#endif /* __CLEANUP_SEH */
 
 #ifdef __cplusplus
 

@@ -23,7 +23,6 @@
  * MA 02111-1307, USA
  */
 
-#include <malloc.h>
 #include "pthread.h"
 #include "implement.h"
 
@@ -44,13 +43,6 @@
  * Dear c++: Please don't mangle this name. -thanks
  */
 extern "C"
-{
-#endif /* __cplusplus */
-
-  BOOL WINAPI DllMain( HINSTANCE, DWORD, LPVOID);
-
-#ifdef __cplusplus
-}
 #endif /* __cplusplus */
 
 BOOL WINAPI

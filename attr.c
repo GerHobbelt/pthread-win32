@@ -23,7 +23,10 @@
  * MA 02111-1307, USA
  */
 
-#include <memory.h>
+/* ignore warning "unreferenced formal parameter" */
+#ifdef _MSC_VER
+#pragma warning( disable : 4100 )
+#endif
 
 #include "pthread.h"
 #include "implement.h"
@@ -494,3 +497,31 @@ pthread_attr_setdetachstate(pthread_attr_t *attr,
   (*attr)->detachstate = detachstate;
   return 0;
 }
+
+int
+pthread_attr_setscope(pthread_attr_t *attr, int contentionscope)
+{
+#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
+  if (contentionscope != PTHREAD_SCOPE_SYSTEM)
+    {
+      return ENOTSUP;
+    }
+ 
+  return 0;
+#else
+  return ENOSYS;
+#endif
+}
+ 
+ 
+int
+pthread_attr_getscope(const pthread_attr_t *attr, int *contentionscope)
+{
+#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
+  *contentionscope = PTHREAD_SCOPE_SYSTEM;
+  return 0;
+#else
+  return ENOSYS;
+#endif
+}
+

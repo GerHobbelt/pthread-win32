@@ -27,6 +27,27 @@
 #include "implement.h"
 
 
+#if defined(_M_IX86) || defined(_X86_)
+#define PROGCTR(Context)  ((Context).Eip)
+#endif
+ 
+#if defined(_MIPS_)
+#define PROGCTR(Context)  ((Context).Fir)
+#endif
+ 
+#if defined(_ALPHA_)
+#define PROGCTR(Context)  ((Context).Fir)
+#endif
+ 
+#if defined(_PPC_)
+#define PROGCTR(Context)  ((Context).Iar)
+#endif
+ 
+#if !defined(PROGCTR)
+#error Module contains CPU-specific code; modify and recompile.
+#endif                                                                          
+
+
 static void 
 ptw32_cancel_self(void)
 {
@@ -50,13 +71,11 @@ ptw32_cancel_thread(pthread_t thread)
 
   if (WaitForSingleObject(threadH, 0) == WAIT_TIMEOUT)
     {
-#if defined(_M_IX86) || defined(_X86_)
       CONTEXT context;
       context.ContextFlags = CONTEXT_CONTROL;
       GetThreadContext(threadH, &context);
-      context.Eip = (DWORD) ptw32_cancel_self;
+      PROGCTR(context) = (DWORD) ptw32_cancel_self;
       SetThreadContext(threadH, &context);
-#endif
       ResumeThread(threadH);
     }
 

@@ -219,6 +219,8 @@ main()
 
 #else /* defined(_MSC_VER) || defined(__cplusplus) */
 
+#include <stdio.h>
+
 int
 main()
 {

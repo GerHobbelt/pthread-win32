@@ -26,6 +26,7 @@
 
 #include "pthread.h"
 #include "implement.h"
+#include <process.h>
 
 int
 pthread_create (pthread_t * tid,
@@ -141,7 +142,7 @@ pthread_create (pthread_t * tid,
     _beginthreadex (
 		     (void *) NULL,	/* No security info             */
 		     (unsigned) stackSize,	/* default stack size   */
-		     (unsigned (PT_STDCALL *) (void *)) ptw32_threadStart,
+		     ptw32_threadStart,
 		     parms,
 		     (unsigned) CREATE_SUSPENDED,
 		     (unsigned *) &(thread->thread));
@@ -161,7 +162,7 @@ pthread_create (pthread_t * tid,
 
   thread->threadH = threadH = (HANDLE)
     _beginthread (
-		   (void (PT_STDCALL *) (void *)) ptw32_hreadStart,
+		   ptw32_threadStart,
 		   (unsigned) stackSize,	/* default stack size   */
 		   parms);
 

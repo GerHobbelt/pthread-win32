@@ -40,13 +40,17 @@
  */
 
 
+#if defined(_MSC_VER) || defined(__cplusplus)
+
 #if defined(_MSC_VER) && defined(__cplusplus)
 #include <eh.h>
 #else
 #include <new.h>
 #endif
 
-#if defined(_MSC_VER) || defined(__cplusplus)
+#ifdef __GNUC__
+#include <stdlib.h>
+#endif
 
 #include "test.h"
 
@@ -109,6 +113,8 @@ main(int argc, char argv[])
 }
 
 #else /* defined(_MSC_VER) || defined(__cplusplus) */
+
+#include <stdio.h>
 
 int
 main()

@@ -42,10 +42,10 @@
  * MA 02111-1307, USA
  */
 
-#include <windows.h>
-//#include <process.h>
-//#include <sys/timeb.h>
-#include <string.h>
+/* ignore warning "unreferenced formal parameter" */
+#ifdef _MSC_VER
+#pragma warning( disable : 4100 )
+#endif
 
 #include "pthread.h"
 #include "semaphore.h"

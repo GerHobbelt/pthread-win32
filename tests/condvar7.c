@@ -134,7 +134,7 @@ main()
   abstime.tv_sec = currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
-  abstime.tv_sec += 5;
+  abstime.tv_sec += 10;
 
   assert((t[0] = pthread_self()) != NULL);
 
@@ -156,7 +156,7 @@ main()
   /*
    * Give threads time to start.
    */
-  Sleep(2000);
+  Sleep(1000);
 
   assert(pthread_mutex_lock(&cvthing.lock) == 0);
 
@@ -218,5 +218,3 @@ main()
    */
   return 0;
 }
-
-

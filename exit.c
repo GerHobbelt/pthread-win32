@@ -26,6 +26,7 @@
 
 #include "pthread.h"
 #include "implement.h"
+#include <process.h>
 
 void
 pthread_exit (void *value_ptr)

@@ -1,3 +1,38 @@
+2001-05-30  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* mutex1n.c: New test.
+	* mutex1e.c: New test.
+	* mutex1r.c: New test.
+	* mutex4.c: Now locks and unlocks a mutex.
+	* mutex5.c: New test.
+	* mutex6.c: New test.
+	* mutex6n.c: New test.
+	* mutex6e.c: New test.
+	* mutex6r.c: New test.
+	* Makefile: Added new tests; reorganised.
+	* GNUmakefile: Likewise.
+	* rwlock6.c: Fix to properly prove read-while-write locking
+	and single writer locking.
+
+2001-05-29  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* Makefile: Reorganisation.
+	* GNUmakefile: Likewise.
+	- Thomas Pfaff <tpfaff@gmx.net>
+
+	* exception1.c: Add stdio.h include to define fprintf and stderr
+	in non-exception C version of main().
+	* exception2.c: Likewise.
+	* exception3.c: Likewise.
+
+	* Makefile (rwlock7): Add new test.
+	* GNUmakefile (rwlock7): Add new test.
+	* rwlock7.c: New test.
+	* rwlock6.c: Changed to test that writer has priority.
+
+	* eyal1.c (main): Unlock each mutex_start lock before destroying
+	it.
+
 2000-12-29  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* GNUmakefile: Add mutex4 test; ensure libpthreadw32.a is

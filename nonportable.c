@@ -27,27 +27,85 @@
 #include "implement.h"
 
 /*
- * pthread_mutexattr_setforcecs_np()
+ * pthread_mutexattr_setkind_np()
+ */
+int pthread_mutexattr_setkind_np(pthread_mutexattr_t * attr, int kind)
+{
+  return pthread_mutexattr_settype( attr, kind );
+}
+
+/*
+ * pthread_mutexattr_getkind_np()
+ */
+int pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr, int *kind)
+{
+  return pthread_mutexattr_gettype( attr, kind );
+}
+
+
+/*
+ * pthread_mutex_setdefaultkind_np --
  *
- * Allows an application to force the library to use
- * critical sections rather than win32 mutexes as
- * the basis for any mutexes that use "attr".
+ * Sets the default type to be given to all
+ * POSIX mutexes initialised after the function
+ * is called. Any of the following type values
+ * can be made the default type:
  *
- * Values for "forcecs" are defined in pthread.h
+ *   PTHREAD_MUTEX_NORMAL
+ *   PTHREAD_MUTEX_ERRORCHECK
+ *   PTHREAD_MUTEX_RECURSIVE
+ *   PTHREAD_MUTEX_DEFAULT
+ *
+ * Any mutex initialised with kind PTHREAD_MUTEX_DEFAULT
+ * will be set to the mapped type instead. Previously
+ * initialised mutexes are not changed.
+ *
+ * When set to PTHREAD_MUTEX_DEFAULT (the initial
+ * value), mutexes will behave as for the
+ * PTHREAD_MUTEX_RECURSIVE kind.
+ *
  */
 int
-pthread_mutexattr_setforcecs_np(pthread_mutexattr_t *attr,
-				int forcecs)
+pthread_mutex_setdefaultkind_np (int kind )
 {
-  if (attr == NULL || *attr == NULL)
+  int result = 0;
+
+  switch (kind)
     {
-      /* This is disallowed. */
-      return EINVAL;
+	case PTHREAD_MUTEX_FAST_NP:
+	case PTHREAD_MUTEX_RECURSIVE_NP:
+	case PTHREAD_MUTEX_ERRORCHECK_NP:
+      ptw32_mutex_default_kind = kind;
+      break;
+    default:
+      result = EINVAL;
     }
 
-  (*attr)->forcecs = forcecs;
+  return result;
+}
 
-  return 0;
+/*
+ * pthread_mutex_getdefaultkind_np --
+ *
+ * Return the default kind for all mutexes
+ *
+ */
+int
+pthread_mutex_getdefaultkind_np (int *kind)
+{
+  int result = 0;
+
+  if (kind != NULL)
+    {
+      *kind = ptw32_mutex_default_kind;
+    }
+
+  else
+    {
+      result = EINVAL;
+    }
+
+  return result;
 }
 
 /*
@@ -141,74 +199,12 @@ pthread_delay_np (struct timespec * interval)
 }
 
 
-/*
- * Handle to kernel32.dll 
- */
-static HINSTANCE ptw32_h_kernel32;
-
-
 BOOL
 pthread_win32_process_attach_np ()
 {
   BOOL result = TRUE;
 
-  /*
-   * We use this to double-check that TryEnterCriticalSection works.
-   */
-  CRITICAL_SECTION cs;
-
   result = ptw32_processInitialize ();
-
-  /*
-   * Load KERNEL32 and try to get address of TryEnterCriticalSection
-   */
-  ptw32_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
-  ptw32_try_enter_critical_section = (BOOL (PT_STDCALL *)(LPCRITICAL_SECTION))
-
-#if defined(NEED_UNICODE_CONSTS)
-  GetProcAddress(ptw32_h_kernel32,
-                 (const TCHAR *)TEXT("TryEnterCriticalSection"));
-#else
-  GetProcAddress(ptw32_h_kernel32,
-                 (LPCSTR) "TryEnterCriticalSection");
-#endif
-
-  if (ptw32_try_enter_critical_section != NULL)
-    {
-      InitializeCriticalSection(&cs);
-      if ((*ptw32_try_enter_critical_section)(&cs))
-        {
-          LeaveCriticalSection(&cs);
-        }
-      else
-        {
-          /*
-           * Not really supported (Win98?).
-           */
-          ptw32_try_enter_critical_section = NULL;
-        }
-      DeleteCriticalSection(&cs);
-    }
-
-  if (ptw32_try_enter_critical_section == NULL)
-    {
-      /*
-       * If TryEnterCriticalSection is not being used, then free
-       * the kernel32.dll handle now, rather than leaving it until
-       * DLL_PROCESS_DETACH.
-       *
-       * Note: this is not a pedantic exercise in freeing unused
-       * resources!  It is a work-around for a bug in Windows 95
-       * (see microsoft knowledge base article, Q187684) which
-       * does Bad Things when FreeLibrary is called within
-       * the DLL_PROCESS_DETACH code, in certain situations.
-       * Since w95 just happens to be a platform which does not
-       * provide TryEnterCriticalSection, the bug will be
-       * effortlessly avoided.
-       */
-      (void) FreeLibrary(ptw32_h_kernel32);
-      ptw32_h_kernel32 = 0;
-    }
 
   return result;
 }
@@ -235,11 +231,6 @@ pthread_win32_process_detach_np ()
        * The DLL is being unmapped into the process's address space
        */
       ptw32_processTerminate ();
-
-      if (ptw32_h_kernel32)
-        {
-           (void) FreeLibrary(ptw32_h_kernel32);
-        }
     }
 
   return TRUE;

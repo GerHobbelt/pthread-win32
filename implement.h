@@ -27,14 +27,8 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
-#ifdef __MINGW32__
-#define PT_STDCALL
-#else
-#ifdef __cplusplus
-#define PT_STDCALL __stdcall
-#else
-#define PT_STDCALL __stdcall
-#endif
+#if defined(__MINGW32__)
+#include <malloc.h>
 #endif
 
 /* changed include from <semaphore.h> to use local file during development */
@@ -85,6 +79,9 @@ struct pthread_t_ {
   int cancelState;
   int cancelType;
   HANDLE cancelEvent;
+#ifdef __CLEANUP_C
+  jmp_buf start_mark;
+#endif /* __CLEANUP_C */
 #if HAVE_SIGSET_T
   sigset_t sigmask;
 #endif /* HAVE_SIGSET_T */
@@ -122,16 +119,18 @@ struct pthread_attr_t_ {
 #define PTW32_OBJECT_INVALID   NULL
 
 struct pthread_mutex_t_ {
-  HANDLE mutex;
-  CRITICAL_SECTION cs;
-  int lockCount;
+  LONG lock_idx;
+  int recursive_count;
+  int kind;
   pthread_t ownerThread;
+  HANDLE wait_sema;
+  CRITICAL_SECTION try_lock_cs;
 };
 
 
 struct pthread_mutexattr_t_ {
   int pshared;
-  int forcecs;
+  int kind;
 };
 
 
@@ -173,22 +172,22 @@ struct pthread_condattr_t_ {
   int pshared;
 };
 
-#define RW_MAGIC    0x19283746
+#define PTW32_RWLOCK_MAGIC 0xfacade2
 
 struct pthread_rwlock_t_ {
-    pthread_mutex_t rw_lock;         /* basic lock on this struct */
-    pthread_cond_t  rw_condreaders;  /* for reader threads waiting */
-    pthread_cond_t  rw_condwriters;  /* for writer threads waiting */
-    int             rw_magic;        /* for error checking */
-    int             rw_nwaitreaders; /* the number waiting */
-    int             rw_nwaitwriters; /* the number waiting */
-    int             rw_refcount;     /* -1 if writer has the lock,
-                                        else # readers holding the lock */
+  pthread_mutex_t   mtxExclusiveAccess;
+  pthread_mutex_t   mtxSharedAccessCompleted;
+  pthread_cond_t    cndSharedAccessCompleted;
+  int               nSharedAccessCount;
+  int               nExclusiveAccessCount;
+  int               nCompletedSharedAccessCount;
+  int               nMagic;
 };
 
 struct pthread_rwlockattr_t_ {
-  int pshared;
+  int               pshared;
 };
+
 
 struct ThreadKeyAssoc {
   /*
@@ -249,7 +248,7 @@ struct ThreadKeyAssoc {
 };
 
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
+#ifdef __CLEANUP_SEH
 /*
  * --------------------------------------------------------------
  * MAKE_SOFTWARE_EXCEPTION
@@ -292,25 +291,31 @@ struct ThreadKeyAssoc {
 #define PTW32_SERVICES_FACILITY		0xBAD
 #define PTW32_SERVICES_ERROR	       	0xDEED
 
-#endif /* _MSC_VER */
+#endif /* __CLEANUP_SEH */
 
 /*
  * Services available through EXCEPTION_PTW32_SERVICES
  * and also used [as parameters to ptw32_throw()] as
  * generic exception selectors.
  */
-#define PTW32_EPS_CANCEL       0
-#define PTW32_EPS_EXIT         1
 
+#define PTW32_EPS_EXIT        		(1)
+#define PTW32_EPS_CANCEL       		(2)
+
+#define PTW32_MUTEX_LOCK_IDX_INIT	(-1)
 
 /* Declared in global.c */
 extern int ptw32_processInitialized;
 extern pthread_key_t ptw32_selfThreadKey;
 extern pthread_key_t ptw32_cleanupKey;
+
+extern int ptw32_mutex_default_kind;
+
+extern int ptw32_concurrency;
+
 extern CRITICAL_SECTION ptw32_mutex_test_init_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
 extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
-extern BOOL (WINAPI *ptw32_try_enter_critical_section)(LPCRITICAL_SECTION);
 
 
 /* Declared in misc.c */
@@ -339,16 +344,16 @@ void ptw32_processTerminate (void);
 
 void ptw32_threadDestroy (pthread_t tid);
 
-void ptw32_cleanupStack (void);
+void ptw32_pop_cleanup_all (int execute);
 
 pthread_t ptw32_new (void);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
-unsigned PT_STDCALL
+unsigned __stdcall
 #else
 void
 #endif
-ptw32_threadStart (ThreadParms * threadParms);
+ptw32_threadStart (void * vthreadParms);
 
 void ptw32_callUserDestroyRoutines (pthread_t thread);
 

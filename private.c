@@ -24,12 +24,7 @@
  * MA 02111-1307, USA
  */
 
-#if !defined(_MSC_VER) && !defined(__cplusplus) && defined(__GNUC__)
-
-#warning Compile __FILE__ as C++ or thread cancellation will not work properly.
-
-#endif /* !_MSC_VER && !__cplusplus && __GNUC__ */
-
+#include <process.h>
 #ifndef NEED_FTIME
 #include <sys/timeb.h>
 #endif
@@ -154,7 +149,7 @@ ptw32_processTerminate (void)
 
 }				/* processTerminate */
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
+#ifdef __CLEANUP_SEH
 
 static DWORD
 ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
@@ -194,7 +189,7 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
     }
 }
 
-#elif defined(__cplusplus)
+#elif defined(__CLEANUP_CXX)
 
 #if defined(_MSC_VER)
 #include <eh.h>
@@ -230,18 +225,23 @@ ptw32_terminate ()
 #endif /* _MSC_VER */
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
-unsigned PT_STDCALL
+unsigned __stdcall
 #else
 void
 #endif
-ptw32_threadStart (ThreadParms * threadParms)
+ptw32_threadStart (void * vthreadParms)
 {
+  ThreadParms *threadParms = (ThreadParms *) vthreadParms;
   pthread_t self;
   void *(*start) (void *);
   void *arg;
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
+#ifdef __CLEANUP_SEH
   DWORD ei[] = {0,0,0};
+#endif
+
+#ifdef __CLEANUP_C
+  int setjmp_rc;
 #endif
 
   void * status = (void *) 0;
@@ -270,7 +270,7 @@ ptw32_threadStart (ThreadParms * threadParms)
 
   pthread_setspecific (ptw32_selfThreadKey, self);
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
+#ifdef __CLEANUP_SEH
 
   __try
   {
@@ -295,9 +295,39 @@ ptw32_threadStart (ThreadParms * threadParms)
        }
   }
 
-#else /* _MSC_VER && !__cplusplus */
+#else /* __CLEANUP_SEH */
 
-#ifdef __cplusplus
+#ifdef __CLEANUP_C
+
+  setjmp_rc = setjmp( self->start_mark );
+
+  if( 0 == setjmp_rc ) {
+
+	  /*
+	   * Run the caller's routine;
+	   */
+	  status = self->exitStatus = (*start) (arg);
+  }
+
+  else {
+
+     switch (setjmp_rc)
+       {
+        case PTW32_EPS_CANCEL:
+          status = PTHREAD_CANCELED;
+          break;
+        case PTW32_EPS_EXIT:
+          status = self->exitStatus;
+          break;
+        default:
+          status = PTHREAD_CANCELED;
+          break;
+       }
+  }
+
+#else /* __CLEANUP_C */
+
+#ifdef __CLEANUP_CXX
 
   ptw32_oldTerminate = set_terminate(&ptw32_terminate);
 
@@ -328,7 +358,30 @@ ptw32_threadStart (ThreadParms * threadParms)
         * 
         * ptw32_terminate() will be called if there is no user supplied function.
         */
-       (void) terminate();
+
+       //Original invocation:
+       //(void) terminate();
+
+
+       //New invocation:
+       //  a) get pointer to the termination function
+#if defined(_MSC_VER)
+       terminate_function term_func = set_terminate(0);
+#else
+       terminate_handler term_func = set_terminate(0);
+#endif
+
+       set_terminate(term_func);
+
+       //  b) call the termination function (if any)
+       if (term_func != 0) {
+           term_func();
+       }
+
+       //  c) if there was no termination function or the termination function did
+       //     not exit thread/process, (we got this far), propagate the exception on!
+       //     (should be caught by the second level try/catch block below)
+       throw;
      }
   }
   catch (ptw32_exception_cancel &)
@@ -365,17 +418,14 @@ ptw32_threadStart (ThreadParms * threadParms)
 
   (void) set_terminate(ptw32_oldTerminate);
 
-#else /* __cplusplus */
+#else
 
-  /*
-   * Run the caller's routine; no cancelation or other exceptions will
-   * be honoured.
-   */
-  status = self->exitStatus = (*start) (arg);
+#error ERROR [__FILE__, line __LINE__]: Cleanup type undefined.
 
-#endif /* __cplusplus */
+#endif /* __CLEANUP_CXX */
+#endif /* __CLEANUP_C */
+#endif /* __CLEANUP_SEH */
 
-#endif /* _MSC_VER */
 
   (void) pthread_mutex_destroy(&self->cancelLock);
 
@@ -637,19 +687,6 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 		  if (value != NULL && k->destructor != NULL)
 		    {
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
-
-			/*
-			 * Run the caller's cleanup routine.
-			 *
-			 * If an exception occurs we let the system handle it
-			 * as an unhandled exception. Since we are leaving the
-			 * thread we should not get any internal pthreads
-			 * exceptions.
-			 */
-			(*(k->destructor)) (value);
-
-#else  /* _MSC_VER && !__cplusplus */
 #ifdef __cplusplus
 
 		      try
@@ -681,7 +718,6 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 			(*(k->destructor)) (value);
 
 #endif /* __cplusplus */
-#endif /* _MSC_VER */
 		    }
 		}
 
@@ -895,7 +931,7 @@ ptw32_sem_timedwait (sem_t * sem, const struct timespec * abstime)
 DWORD
 ptw32_get_exception_services_code(void)
 {
-#if defined(_MSC_VER) && !defined(__cplusplus)
+#ifdef __CLEANUP_SEH
 
   return EXCEPTION_PTW32_SERVICES;
 
@@ -910,10 +946,13 @@ ptw32_get_exception_services_code(void)
 void
 ptw32_throw(DWORD exception)
 {
-#if defined(_MSC_VER) && !defined(__cplusplus)
+#ifdef __CLEANUP_C
+  pthread_t self = pthread_self();
+#endif
 
+
+#ifdef __CLEANUP_SEH
   DWORD exceptionInformation[3];
-
 #endif
 
   if (exception != PTW32_EPS_CANCEL &&
@@ -923,7 +962,8 @@ ptw32_throw(DWORD exception)
       exit(1);
     }
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
+#ifdef __CLEANUP_SEH
+
 
   exceptionInformation[0] = (DWORD) (exception);
   exceptionInformation[1] = (DWORD) (0);
@@ -935,9 +975,17 @@ ptw32_throw(DWORD exception)
 		  3,
 		  exceptionInformation);
 
-#else /* _MSC_VER && ! __cplusplus */
+#else /* __CLEANUP_SEH */
 
-# ifdef __cplusplus
+#ifdef __CLEANUP_C
+
+  ptw32_pop_cleanup_all( 1 );
+
+  longjmp( self->start_mark, exception );
+
+#else /* __CLEANUP_C */
+
+#ifdef __CLEANUP_CXX
 
   switch (exception)
     {
@@ -949,9 +997,22 @@ ptw32_throw(DWORD exception)
       break;
     }
 
-# endif /* __cplusplus */
+#else
 
-#endif /* _MSC_VER && ! __cplusplus */
+#error ERROR [__FILE__, line __LINE__]: Cleanup type undefined.
+
+#endif /* __CLEANUP_CXX */
+
+#endif /* __CLEANUP_C */
+
+#endif /* __CLEANUP_SEH */
 
   /* Never reached */
+}
+
+void
+ptw32_pop_cleanup_all(int execute)
+{
+	while( NULL != ptw32_pop_cleanup(execute) ) {
+	}
 }

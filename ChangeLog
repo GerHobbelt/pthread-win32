@@ -1,3 +1,86 @@
+2001-05-30  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* pthread.h (rand_r): Fake using _seed argument to quell
+	compiler warning (compiler should optimise this away later).
+
+	* GNUmakefile (OPT): Leave symbolic information out of the library
+	and increase optimisation level - for smaller faster prebuilt
+	dlls.
+	
+2001-05-29  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	Contributed by  - Milan Gardian <Milan.Gardian@LEIBINGER.com>
+
+	* Makefile: fix typo.
+	* pthreads.h: Fix problems with stdcall/cdecl conventions, in particular
+	remove the need for PT_STDCALL everywhere; remove warning supression.
+	* (errno): Fix the longstanding "inconsistent dll linkage" problem
+	with errno; now also works with /MD debugging libs - 
+	warnings emerged when compiling pthreads library with /MD (or /MDd)
+	compiler switch, instead of /MT (or /MTd) (i.e. when compiling pthreads
+	using Multithreaded DLL CRT instead of Multithreaded statically linked
+	CRT).
+	* create.c (pthread_create): Likewise; fix typo.
+	* private.c (ptw32_threadStart): Eliminate use of terminate() which doesn't
+	throw exceptions.
+	* Remove unnecessary #includes from a number of modules -
+	[I had to #include malloc.h in implement.h for gcc - rpj].
+
+2001-05-29  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	Contributed by 	- Thomas Pfaff <tpfaff@gmx.net>
+
+	* pthread.h (PTHREAD_MUTEX_DEFAULT): New; equivalent to
+	PTHREAD_MUTEX_DEFAULT_NP.
+	* (PTHREAD_MUTEX_NORMAL): Similarly.
+	* (PTHREAD_MUTEX_ERRORCHECK): Similarly.
+	* (PTHREAD_MUTEX_RECURSIVE): Similarly.
+	* (pthread_mutex_setdefaultkind_np): New; Linux compatibility stub
+	for pthread_mutexattr_settype.
+	* (pthread_mutexattr_getkind_np): New; Linux compatibility stub
+	for pthread_mutexattr_gettype.
+	* mutex.c (pthread_mutexattr_settype): New; allow
+	the following types of mutex:
+	  PTHREAD_MUTEX_DEFAULT_NP
+	  PTHREAD_MUTEX_NORMAL_NP
+	  PTHREAD_MUTEX_ERRORCHECK_NP
+	  PTHREAD_MUTEX_RECURSIVE_NP
+	* Note that PTHREAD_MUTEX_DEFAULT is equivalent to
+	PTHREAD_MUTEX_NORMAL - ie. mutexes should no longer
+	be recursive by default, and a thread will deadlock if it
+	tries to relock a mutex it already owns. This is inline with
+	other pthreads implementations.
+	* (pthread_mutex_lock): Process the lock request
+	according to the mutex type.
+	* (pthread_mutex_init): Eliminate use of Win32 mutexes as the
+	basis of POSIX mutexes - instead, a combination of one critical section
+	and one semaphore are used in conjunction with Win32 Interlocked* routines.
+	* (pthread_mutex_destroy): Likewise.
+	* (pthread_mutex_lock): Likewise.
+	* (pthread_mutex_trylock): Likewise.
+	* (pthread_mutex_unlock): Likewise.
+	* Use longjmp/setjmp to implement cancelation when building the library
+	using a C compiler which doesn't support exceptions, e.g. gcc -x c (note
+	that gcc -x c++ uses exceptions).
+	* Also fixed some of the same typos and eliminated PT_STDCALL as
+	Milan Gardian's patches above.
+
+2001-02-07  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	Contributed by  - Alexander Terekhov <TEREKHOV@de.ibm.com>
+	
+	* rwlock.c: Revamped.
+	* implement.h (pthread_rwlock_t_): Redefined.
+	This implementation does not have reader/writer starvation problem.
+	Rwlock attempts to behave more like a normal mutex with
+	races and scheduling policy determining who is more important;
+	It also supports recursive locking,
+	has less synchronization overhead (no broadcasts at all,
+	readers are not blocked on any condition variable) and seem to
+	be faster than the current implementation [W98 appears to be
+	approximately 15 percent faster at least - on top of speed increase
+	from Thomas Pfaff's changes to mutex.c - rpj].
+
 2000-12-29  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* Makefile: Back-out "for" loops which don't work.

@@ -11,12 +11,14 @@ DEVROOT=c:\pthreads\dll
 DLLDEST=$(DEVROOT)
 LIBDEST=$(DEVROOT)
 
-DLLS	= pthreadVCE.dll pthreadVSE.dll
+DLLS	= pthreadVCE.dll pthreadVSE.dll pthreadVC.dll
 
 # C++ Exceptions
-VCEFLAGS	= /GX /TP /DPtW32NoCatchWarn
+VCEFLAGS	= /GX /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
 #Structured Exceptions
-VSEFLAGS	= 
+VSEFLAGS	= /D__CLEANUP_SEH
+#C cleanup code
+VCFLAGS	= /D__CLEANUP_C
 
 CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DPTW32_BUILD
 
@@ -43,8 +45,14 @@ OBJ=attr.obj \
 
 all:
 	@ echo Run one of the following command lines:
-	@ echo nmake clean VCE   (to build the dll with C++ exception handling)
-	@ echo nmake clean VSE   (to build the dll with structured exception handling)
+	@ echo nmake clean VCE   (to build the MSVC dll with C++ exception handling)
+	@ echo nmake clean VSE   (to build the MSVC dll with structured exception handling)
+	@ echo nmake clean VC    (to build the MSVC dll with C cleanup code)
+
+auto:
+	@ nmake clean VCE
+	@ nmake clean VSE
+	@ nmake clean VC
 
 VCE:
 	@ nmake /nologo EHFLAGS="$(VCEFLAGS)" pthreadVCE.dll
@@ -52,9 +60,12 @@ VCE:
 VSE:
 	@ nmake /nologo EHFLAGS="$(VSEFLAGS)" pthreadVSE.dll
 
+VC:
+	@ nmake /nologo EHFLAGS="$(VCFLAGS)" pthreadVC.dll
+
 realclean: clean
 	if exist *.dll del *.dll
-	if exit *.lib del *.lib
+	if exist *.lib del *.lib
 
 clean:
 	if exist *.obj del *.obj
