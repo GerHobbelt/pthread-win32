@@ -6,14 +6,14 @@
 # The variables $DLLDEST and $LIBDEST hold the destination directories for the
 # dll and the lib, respectively. Probably all that needs to change is $DEVROOT.
 
-DEVROOT=e:
+DEVROOT=c:\pthreads\dll
 
-DLLDEST=$(DEVROOT)\dll
-LIBDEST=$(DEVROOT)\lib
+DLLDEST=$(DEVROOT)
+LIBDEST=$(DEVROOT)
 
 #CLIB	= /MD
 CLIB	= /MT
-CFLAGS	= #/EHsc /TP
+CCFLAGS	= #/EHsc /TP /D_cplusplus
 
 OBJ=attr.obj \
 	cancel.obj \
@@ -38,9 +38,12 @@ OBJ=attr.obj \
 all: pthread.dll
 
 clean:
-	del pthread.dll \
-		pthread.lib \
-		*.obj
+	del pthread.dll
+	del pthread.lib
+	del *.obj
+	del *.ilk
+	del *.pdb
+	del *.o
 
 
 install: all

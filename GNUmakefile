@@ -49,6 +49,10 @@ LIB	= libpthread32.a
 
 all:	$(LIB)
 
+pthread.a:
+	dlltool --def $(DLL:.dll=.def) --output-lib $@ --dllname $(DLL)
+	rename pthread.a $(LIB)
+
 $(LIB): $(DLL)
 	dlltool --def $(DLL:.dll=.def) --output-lib $@ --dllname $(DLL)
 

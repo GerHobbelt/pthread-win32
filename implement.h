@@ -293,7 +293,6 @@ struct ThreadKeyAssoc {
  */
 #ifdef __except
 #undef __except
-#define _pthread__except __except
 #endif
 
 #else
@@ -304,7 +303,6 @@ struct ThreadKeyAssoc {
  */
 #ifdef catch
 #undef catch
-#define _pthread_catch catch
 #endif
 
 #else /* __cplusplus */

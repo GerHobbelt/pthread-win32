@@ -1,8 +1,8 @@
 
-                 PTHREADS-WIN32 SNAPSHOT 2000-??-??
+                 PTHREADS-WIN32 SNAPSHOT 2000-08-10
                  ----------------------------------
-       Web Site: http://sourceware.cygnus.com/pthreads-win32/
-      FTP Site: ftp://sourceware.cygnus.com/pub/pthreads-win32
+       Web Site: http://sources.redhat.com/pthreads-win32/
+      FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
         Coordinator: Ross Johnson <rpj@ise.canberra.edu.au>
 
 
@@ -10,7 +10,8 @@ We are pleased to announce the availability of a new snapshot of
 Pthreads-win32, an Open Source Software (OSS) implementation of the
 Threads component of the POSIX 1003.1c 1995 Standard for Microsoft's
 Win32 environment. Some functions from POSIX 1003.1b are also
-supported including semaphores.
+supported including semaphores. Other related functions include
+the set of read-write lock functions.
 
 Pthreads-win32 is free software, distributed under the GNU Library
 General Public License (LGPL).
@@ -25,16 +26,58 @@ Change Summary (since the last snapshot)
 (See the ChangeLog file for details.)
 
 New:
--	asynchronous cancelation (Jason Nye)
+-	asynchronous cancelation on X86 (Jason Nye)
 -	Makefile compatible with MS nmake to replace
 	buildlib.bat
+-	GNUmakefile for Mingw32
+-	tests/Makefile for MS nmake replaces runall.bat
+-	tests/GNUmakefile for Mingw32
 
 Bugs fixed:
--	kernel32 load/free problem,
+-	kernel32 load/free problem
 -	attempt to hide internel exceptions from application
 	exception handlers (__try/__except and try/catch blocks)
+-	Win32 thread handle leakage bug
+	(David Baggett/Paul Redondo/Eyal Lebedinsky)
 
 Some new tests have been added.
+
+
+Known bugs in this snapshot
+---------------------------
+
+1. Running the test "join1.c" with the library built with Mingw32
+and the GNUmakefile included, the test fails with a segmentation (invalid
+page access) exception. The fault appears to be in the assembler code
+emmitted by the compiler [to handle exception contexts] at the
+end of the try block in _pthread_threadStart().
+
+2. There are problems with using the libpthread32.a file with the
+VC++ SEH version of pthread.dll. The cleanup1.c test fails and the
+eyal1.c test gives suspect results.
+
+3. I have not been able to build with VC++ using C++ EH. This is a
+maintainer problem who doesn't think he's doing it right. Consequently
+there may also be basic parser errors and warnings to be cleaned
+up in the code.
+
+4. Due to what is believed to be a C++ compliance error in VC++,
+if your application contains catch(...) blocks in your POSIX threads
+then you will need to replace the "catch(...)" with the macro
+"PtW32Catch", eg.
+
+	#ifdef PtW32Catch
+		PtW32Catch {
+			...
+		}
+	#else
+		catch(...) {
+			...
+		}
+	#endif
+
+Otherwise neither pthreads cancelation nor pthread_exit() will work
+reliably.
 
 
 Level of standards conformance
@@ -252,15 +295,15 @@ complete source code.
 
 The source code can be found at:
 
-	ftp://sourceware.cygnus.com/pub/pthreads-win32
+	ftp://sourcs.redhat.com/pub/pthreads-win32
 
 and as individual source code files at
 
-	ftp://sourceware.cygnus.com/pub/pthreads-win32/source
+	ftp://sources.redhat.com/pub/pthreads-win32/source
 
 The pre-built DLL, export libraries and include files can be found at:
 
-	ftp://sourceware.cygnus.com/pub/pthreads-win32/dll-latest
+	ftp://sources.redhat.com/pub/pthreads-win32/dll-latest
 
 
       
@@ -277,13 +320,14 @@ Application Development Environments
 ------------------------------------
       
 MSVC:
-MSVC works.
+MSVC using SEH works.
+MSVC using C++ EH not tested.
 
 Mingw32: (ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/egcs-1.1.1/)
 Mingw32 must use the thread-safe MSVCRT library (see the FAQ). You can link
 against the export library libpthread32.a built under Mingw32
 but you must run your application with the version of pthread.dll built
-with MSVC.
+with MSVC. See the "Known bugs" section above.
       
 Cygwin: (http://sourceware.cygnus.com/cygwin/)
 Cygwin aims to provide a complete POSIX environment on top of Win32, including
@@ -308,18 +352,6 @@ These are the only files you need in order to build POSIX threads
 applications for Win32 using either MSVC or Mingw32.
       
 See the FAQ file in the source tree for additional information.
-
-
-Why you can't build the DLL itself with Mingw32 (yet)
------------------------------------------------------
-
-The library makes use of exception handling internally (Win32 SEH if
-compiled with MSVC and C++ EH otherwise). Unfortunately, current
-versions of egcs (g++) do not have thread-safe exception handling
-and therefore the DLL pthread.dll cannot be built.
-
-However, it is possible to build applications which make use of
-pthreads-win32, using Mingw32's gcc or g++.
 
 
 Building the library with MSVC
@@ -364,7 +396,7 @@ of Douglas Schmidt et al
 There is also a separate CONTRIBUTORS file. This file and others are
 on the web site:
 
-        http://sourceware.cygnus.com/pthreads-win32
+        http://sources.redhat.com/pthreads-win32
 
 Enjoy!
 

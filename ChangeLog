@@ -1,3 +1,37 @@
+2000-08-10  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* cleanup.c (pthread_pop_cleanup): Remove _pthread
+	prefix from __except and catch keywords; implement.h
+	now simply undefines _pthread__except and
+	_pthread_catch if defined; VC++ was not textually
+	substituting _pthread_catch etc back to catch as
+	it was redefined; the reason for using the prefixed
+	version was to make it clear that it was not using
+	the pthread.h redefined catch keyword.
+
+	* private.c (_pthread_threadStart): Ditto.
+	(_pthread_callUserDestroyRoutines): Ditto.
+
+	* implement.h (_pthread__except): Remove #define.
+	(_pthread_catch): Remove #define.
+
+	* GNUmakefile (pthread.a): New target to build
+	libpthread32.a from pthread.dll using dlltool.
+
+	* buildlib.bat: Duplicate cl commands with args to
+	build C++ EH version of pthread.dll; use of .bat
+	files is redundant now that nmake compatible
+	Makefile is included; used as a kludge only now.
+
+	* Makefile: Localise some macros and fix up the clean:
+	target to extend it and work properly.
+
+	* CONTRIBUTORS: Add contributors.
+
+	* ANNOUNCE: Updated.
+
+	* README: Updated.
+
 2000-08-06  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* pthread.h: Remove #warning - VC++ doesn't accept it.

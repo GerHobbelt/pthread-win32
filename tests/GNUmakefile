@@ -31,7 +31,7 @@ TESTS	= loadfree \
 	  mutex1 condvar1 condvar2 exit1 create1 equal1 \
 	  exit2 exit3 \
 	  join0 join1 join2 mutex2 mutex3 \
-	  count1 once1 tsd1 self1 self2 cancel1 eyal1 \
+	  count1 once1 tsd1 self1 self2 cancel1 cancel2 eyal1 \
 	  condvar3 condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 \
@@ -51,6 +51,8 @@ condvar1.pass:
 self1.pass:
 condvar2.pass: condvar1.pass
 create1.pass: mutex2.pass
+cancel1.pass: create1.pass
+cancel2.pass: cancel1.pass
 mutex3.pass: create1.pass
 equal1.pass: create1.pass
 exit2.pass: create1.pass

@@ -1,3 +1,23 @@
+2000-08-10  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* eyal1.c (main): Change implicit cast to explicit
+	cast when passing "print_server" function pointer;
+	G++ no longer allows implicit func parameter casts.
+
+	* cleanup1.c: Remove unused "waitLock".
+	(main): Fix implicit parameter cast.
+
+	* cancel2.c (main): Fix implicit parameter cast.
+
+	* cancel4.c (main): Fix implicit parameter cast.
+
+	* cancel3.c (main): Fix implicit parameter cast.
+
+	* GNUmakefile: Renamed from Makefile; Add missing
+	cancel1 and cancel2 test targets.
+
+	* Makefile: Converted for use with MS nmake.
+
 2000-08-06  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* ccl.bat: Add /nologo to remove extraneous output.

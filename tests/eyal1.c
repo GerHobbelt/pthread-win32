@@ -244,14 +244,14 @@ main (int argc, char *argv[])
       assert(pthread_mutex_init (&tcs[i].mutex_end, NULL) == 0);
       assert(pthread_mutex_init (&tcs[i].mutex_ended, NULL) == 0);
 
-      tcs[i].work = 0;
+      tcs[i].work = 0;  
 
       assert(pthread_mutex_lock (&tcs[i].mutex_start) == 0);
       assert((tcs[i].stat = 
 	      pthread_create (&tcs[i].thread,
 			      NULL,
-			      (void*)&print_server,
-				(void *)&tcs[i])
+                  (void *(*)(void *))&print_server,
+                (void *) &tcs[i])
 	      ) == 0);
 
       /* 
