@@ -14,6 +14,12 @@ int _pthread_processInitialized = FALSE;
 pthread_key_t _pthread_selfThreadKey = NULL;
 pthread_key_t _pthread_cleanupKey = NULL;
 
+#if !defined(_MSC_VER) && defined(__cplusplus)
+
+Pthread_exception pthread_exception;
+
+#endif
+
 /*
  * Global lock for testing internal state of PTHREAD_MUTEX_INITIALIZER
  * created mutexes.

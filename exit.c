@@ -37,7 +37,7 @@ pthread_exit (void *value_ptr)
       * ------------------------------------------------------
       */
 {
-  _pthread_callUserDestroyRoutines(pthread_getspecific(_pthread_selfThreadKey));
+  _pthread_callUserDestroyRoutines((pthread_t) pthread_getspecific(_pthread_selfThreadKey));
 
   _endthreadex ((unsigned) value_ptr);
 

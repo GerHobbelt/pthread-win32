@@ -71,7 +71,8 @@ pthread_self (void)
    * need to ensure there always is a self
    */
 
-  if ((self = pthread_getspecific (_pthread_selfThreadKey)) == NULL)
+  if ((self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey)) 
+      == NULL)
     {
       /*
        * Need to create an implicit 'self' for the currently
@@ -153,7 +154,8 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
 
   handles[0] = waitHandle;
 
-  if ((self = pthread_getspecific (_pthread_selfThreadKey)) != NULL)
+  if ((self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey)) 
+      != NULL)
     {
       /*
        * Get cancelEvent handle
@@ -219,6 +221,9 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
               /*
                * Thread started with pthread_create
                */
+
+#ifdef _MSC_VER
+
               DWORD exceptionInformation[3];
 
               exceptionInformation[0] = (DWORD) (0);
@@ -229,10 +234,20 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
                                0,
                                3,
                                exceptionInformation);
+
+#else /* _MSC_VER */
+
+#ifdef __cplusplus
+
+	      throw pthread_exception;
+
+#endif /* __cplusplus */
+
+#endif /* _MSC_VER */
             }
 
-
-          ((void *) -1);
+	  /* Should never get to here. */
+	  result = EINVAL;
           break;
 
         default:

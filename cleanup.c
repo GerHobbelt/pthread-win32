@@ -44,14 +44,14 @@ _pthread_pop_cleanup (int execute)
 {
   _pthread_cleanup_t *cleanup;
   
-  cleanup = pthread_getspecific (_pthread_cleanupKey);
+  cleanup = (_pthread_cleanup_t *) pthread_getspecific (_pthread_cleanupKey);
 
   if (cleanup != NULL)
     {
       if (execute && (cleanup->routine != NULL))
         {
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 
           __try
 	    {
@@ -69,7 +69,7 @@ _pthread_pop_cleanup (int execute)
 	       */
 	    }
       
-#else /* _WIN32 */
+#else /* _MSC_VER */
 
 #ifdef __cplusplus
 
@@ -91,7 +91,7 @@ _pthread_pop_cleanup (int execute)
 
 #else /* __cplusplus */
       
-#if defined(__CYGWIN__) || defined(__CYGWIN32__)
+#if defined(__GNUC__)
 #warning Compile __FILE__ as C++ or thread cancellation will not work properly.
 #endif
 
@@ -102,15 +102,16 @@ _pthread_pop_cleanup (int execute)
 
 #endif /* __cplusplus */
 
-#endif /* _WIN32 */
+#endif /* _MSC_VER */
 
         }
 
-#if !defined(_WIN32) && !defined(__cplusplus)
+#if !defined(_MSC_VER) && !defined(__cplusplus)
 
-      pthread_setspecific (_pthread_cleanupKey, cleanup->prev);
+      pthread_setspecific (_pthread_cleanupKey, (void *) cleanup->prev);
 
 #endif
+
     }
 
   return (cleanup);
@@ -165,9 +166,9 @@ _pthread_push_cleanup (_pthread_cleanup_t * cleanup,
   cleanup->routine = routine;
   cleanup->arg = arg;
 
-#if !defined(_WIN32) && !defined(__cplusplus)
+#if !defined(_MSC_VER) && !defined(__cplusplus)
 
-  cleanup->prev = pthread_getspecific (_pthread_cleanupKey);
+  cleanup->prev = (_pthread_cleanup_t *) pthread_getspecific (_pthread_cleanupKey);
 
 #endif
 
@@ -176,5 +177,4 @@ _pthread_push_cleanup (_pthread_cleanup_t * cleanup,
 }                               /* _pthread_push_cleanup */
 
 /* </JEB> */
-
 

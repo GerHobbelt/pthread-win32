@@ -84,6 +84,7 @@ struct ThreadKeyAssoc {
 };
 
 
+#ifdef _MSC_VER
 /*
  * --------------------------------------------------------------
  * MAKE_SOFTWARE_EXCEPTION
@@ -127,6 +128,21 @@ struct ThreadKeyAssoc {
 #define PTHREAD_SERVICES_FACILITY		0xBAD
 #define PTHREAD_SERVICES_ERROR			0xDEED
 
+#else
+
+#ifdef __cplusplus
+
+class Pthread_exception {};
+
+extern Pthread_exception pthread_exception;
+
+#else /* __cplusplus */
+
+#warning File __FILE__, Line __LINE__: Cancellation not supported under C.
+
+#endif /* __cplusplus */
+
+#endif /* _MSC_VER */
 
 /* Function pointer to TryEnterCriticalSection if it exists; otherwise NULL */
 extern BOOL (WINAPI *_pthread_try_enter_critical_section)(LPCRITICAL_SECTION);

@@ -223,7 +223,7 @@ pthread_mutexattr_init (pthread_mutexattr_t * attr)
   pthread_mutexattr_t attr_result;
   int result = 0;
 
-  attr_result = calloc (1, sizeof (*attr_result));
+  attr_result = (pthread_mutexattr_t) calloc (1, sizeof (*attr_result));
 
   result = (attr_result == NULL)
     ? ENOMEM

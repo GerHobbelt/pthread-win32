@@ -1,5 +1,5 @@
 ; pthread.def
-; Last updated: $Date: 1999/01/12 14:48:59 $
+; Last updated: $Date: 1999/01/23 06:59:02 $
 
 ; Currently unimplemented functions are commented out.
 
@@ -49,11 +49,11 @@ pthread_key_delete
 pthread_mutexattr_destroy
 ;pthread_mutexattr_getprioceiling
 ;pthread_mutexattr_getprotocol
-;phtread_mutexattr_getpshared
+pthread_mutexattr_getpshared
 pthread_mutexattr_init
 ;pthread_mutexattr_setprioceiling
 ;pthread_mutexattr_setprotocol
-;pthread_mutexattr_setpshared
+pthread_mutexattr_setpshared
 pthread_mutexattr_destroy
 pthread_mutex_init
 pthread_mutex_destroy
@@ -68,3 +68,14 @@ pthread_setschedparam
 pthread_setspecific
 ;pthread_sigmask
 pthread_testcancel
+;
+; Non-portable but useful
+;
+pthread_mutexattr_setforcecs_np
+pthreadCancelableWait
+pthreadCancelableTimedWait
+;
+; Needed if !defined(_MSC_VER) && !defined(__cplusplus)
+;
+_pthread_push_cleanup
+_pthread_pop_cleanup

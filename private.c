@@ -6,10 +6,10 @@
  * the implementation and may be used throughout it.
  */
 
+#include <sys/timeb.h>
+
 #include "pthread.h"
 #include "implement.h"
-
-#include <sys/timeb.h>
 
 /*
  * Code contributed by John E. Bossom <JEB>.
@@ -133,7 +133,7 @@ _pthread_threadStart (ThreadParms * threadParms)
 
   pthread_setspecific (_pthread_selfThreadKey, tid);
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 
   __try
   {
@@ -152,7 +152,7 @@ _pthread_threadStart (ThreadParms * threadParms)
     status = -1;
   }
 
-#else /* _WIN32 */
+#else /* _MSC_VER */
 
 #ifdef __cplusplus
 
@@ -164,19 +164,26 @@ _pthread_threadStart (ThreadParms * threadParms)
     (*start) (arg);
     status = 0;
   }
+  catch (Pthread_exception)
+    {
+      /*
+       * Thread was cancelled.
+       */
+      status = -1;
+    }
   catch (...)
-  {
-    /*
-     * A system unexpected exception had occurred running the user's
-     * routine. We get control back within this block.
-     */
-    status = -1;
-  }
+    {
+      /*
+       * A system unexpected exception had occurred running the user's
+       * routine. We get control back within this block.
+       */
+      status = -1;
+    }
 
 #else /* __cplusplus */
 
 #if defined(__CYGWIN__) || defined(__CYGWIN32__)
-#warning Compile __FILE__ as C++ or thread cancellation will not work properly.
+#warning File __FILE__, Line __LINE__: Cancelation not supported under C.
 #endif
 
   /*
@@ -407,6 +414,8 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 		  if (value != NULL && k->destructor != NULL)
 		    {
 
+#ifdef _MSC_VER
+
 		      __try
 		      {
 			/*
@@ -422,6 +431,35 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 			 * We get control back within this block.
 			 */
 		      }
+
+#else  /* _MSC_VER */
+#ifdef __cplusplus
+
+		      try
+		      {
+			/*
+			 * Run the caller's cleanup routine.
+			 */
+			(*(k->destructor)) (value);
+		      }
+		      catch (...)
+		      {
+			/*
+			 * A system unexpected exception had occurred
+			 * running the user's destructor.
+			 * We get control back within this block.
+			 */
+		      }
+
+#else  /* __cplusplus */
+
+			/*
+			 * Run the caller's cleanup routine.
+			 */
+			(*(k->destructor)) (value);
+
+#endif /* __cplusplus */
+#endif /* _MSC_VER */
 		    }
 		}
 

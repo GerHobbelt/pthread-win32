@@ -48,7 +48,7 @@ pthread_condattr_init (pthread_condattr_t * attr)
   pthread_condattr_t attr_result;
   int result = 0;
 
-  attr_result = calloc (1, sizeof (*attr_result));
+  attr_result = (pthread_condattr_t) calloc (1, sizeof (*attr_result));
 
   if (attr_result == NULL)
     {

@@ -292,7 +292,6 @@ pthread_attr_init(pthread_attr_t *attr)
       */
 {
   pthread_attr_t attr_result;
-  int result = 0;
 
   if (attr == NULL)
     {
@@ -300,7 +299,7 @@ pthread_attr_init(pthread_attr_t *attr)
       return EINVAL;
     }
 
-  attr_result = malloc (sizeof (*attr_result));
+  attr_result = (pthread_attr_t) malloc (sizeof (*attr_result));
 
   if (attr_result == NULL)
     {

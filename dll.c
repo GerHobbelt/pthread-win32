@@ -50,8 +50,8 @@ DllMain (
       /* Load KERNEL32 and try to get address of TryEnterCriticalSection */
       _pthread_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
       _pthread_try_enter_critical_section =
-	(void *) GetProcAddress(_pthread_h_kernel32,
-				"TryEnterCriticalSection");
+	GetProcAddress(_pthread_h_kernel32,
+		       (LPCSTR) "TryEnterCriticalSection");
       break;
 
     case DLL_THREAD_ATTACH:
