@@ -1,7 +1,17 @@
 1998-07-24  Ben Elliston  <bje@cygnus.com>
 
+	* pthread.h (PTHREAD_CREATE_JOINABLE): Define.
+	(PTHREAD_CREATE_DETACHED): Likewise.
+	(pthread_attr_t): Add new structure member `detached'.
+	(pthread_attr_getdetachstate): Add function prototype.
+	(pthread_attr_setdetachstate): Likewise.
+
+	* sync.c (pthread_join): Return if the target thread is detached.
+
 	* attr.c (pthread_attr_init): Initialise cancelability and
 	canceltype structure members.
+	(pthread_attr_getdetachstate): Implement.
+	(pthread_attr_setdetachstate): Likewise.
 
 	* implement.h (_PTHREAD_CANCEL_DEFAULTS): Remove.  Bit fields
 	proved to be too cumbersome.  Set the defaults in attr.c using the
