@@ -16,6 +16,9 @@ Bugs fixed
 * Fix integer overrun error in sem_timedwait().
 Kevin Lussier
 
+* Fix preprocessor directives for static linking.
+Dimitar Panayotov
+
 
 RELEASE 1.5.0
 -------------
