@@ -1,3 +1,22 @@
+2002-01-07  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	Contributed by - Thomas Pfaff <tpfaff@gmx.net>
+	                 Alexander Terekhov <TEREKHOV@de.ibm.com>
+
+	* mutex.c (pthread_mutex_init): Remove critical
+	section calls.
+	(pthread_mutex_destroy): Likewise.
+	(pthread_mutex_unlock): Likewise.
+	(pthread_mutex_trylock): Likewise; recursive mutexes
+	now increment the lock count rather than return EBUSY;
+	errorcheck mutexes return EDEADLCK rather than
+	EBUSY. This behaviour is consistent with the Solaris
+	pthreads implementation.
+
+	* implement.h (pthread_mutex_t_): Remove critical
+	section element - no longer needed.
+	
+
 2002-01-04  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* attr.c (pthread_attr_setscope): Add more error

@@ -31,7 +31,7 @@ platform dependence
 -------------------
 As Win9x doesn't provide one, the library now contains
 it's own InterlockedCompareExchange() routine. It is used to
-implement spinlocks and barriers, and soon may be used in mutexes.
+implement spinlocks and barriers, and also in mutexes.
 This routine relies on the CMPXCHG machine instruction which
 is only available in i486 or above CPUs. This library
 (from snapshot 20010712 onwards) therefore no longer runs on
@@ -52,6 +52,15 @@ pthread_barrierattr_getpshared, and pthread_condattr_getpshared.
 Removed potential race condition in pthread_mutex_trylock and
 pthread_mutex_lock;
 - Alexander Terekhov <TEREKHOV@de.ibm.com>
+
+The behaviour of pthread_mutex_trylock in relation to
+recursive mutexes was inconsistent with commercial implementations.
+Trylock would return EBUSY if the lock was owned already
+regardless of mutex type. Trylock now increments the recursion
+count and returns 0 for RECURSIVE mutexes, and will now return
+EDEADLCK instead of EBUSY for ERRORCHECK mutexes. This is
+consistent with Solaris.
+- Thomas Pfaff <tpfaff@gmx.net>
 
 ---------------------------
 Known bugs in this snapshot
