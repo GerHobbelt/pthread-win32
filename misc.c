@@ -8,39 +8,102 @@
 #include "pthread.h"
 #include "implement.h"
 
-int
-pthread_once(pthread_once_t *once_control,
-	     void (*init_routine)(void))
-{
-  /* A flag, allocated per invocation, that indicates if the atomic
-     test-and-set occured. */
-  unsigned short flag = 0;
-
-  if (once_control == NULL || init_routine == NULL)
-    {
-      return EINVAL;
-    }
-
-  /* An atomic test-and-set of the "once" flag. */
-  pthread_mutex_lock(&once_control->lock);
-  if (once_control->flag == 0)
-    {
-      flag = once_control->flag = 1;
-    }
-  pthread_mutex_unlock(&once_control->lock);
-
-  if (flag)
-    {
-      /* Run the init routine. */
-      init_routine();
-    }
-  
-  return 0;
-}
-
 /*
  * Code contributed by John E. Bossom <JEB>.
  */
+
+int
+pthread_once (
+               pthread_once_t * once_control,
+               void (*init_routine) (void)
+)
+        /*
+         * ------------------------------------------------------
+         * DOCPUBLIC
+         *      If any thread in a process  with  a  once_control  parameter
+         *      makes  a  call to pthread_once(), the first call will summon
+         *      the init_routine(), but  subsequent  calls  will  not. The
+         *      once_control  parameter  determines  whether  the associated
+         *      initialization routine has been called.  The  init_routine()
+         *      is complete upon return of pthread_once().
+         *      This function guarantees that one and only one thread
+         *      executes the initialization routine, init_routine when
+         *      access is controlled by the pthread_once_t control
+         *      key.
+         *
+         * PARAMETERS
+         *      once_control
+         *              pointer to an instance of pthread_once_t
+         *
+         *      init_routine
+         *              pointer to an initialization routine
+         *
+         *
+         * DESCRIPTION
+         *      See above.
+         *
+         * RESULTS
+         *              0               success,
+         *              EINVAL          once_control or init_routine is NULL
+         *
+         * ------------------------------------------------------
+         */
+{
+  int result;
+
+  if (once_control == NULL || init_routine == NULL)
+    {
+
+      result = EINVAL;
+      goto FAIL0;
+
+    }
+  else
+    {
+      result = 0;
+    }
+
+  if (!once_control->done)
+    {
+      if (InterlockedIncrement (&(once_control->started)) == 0)
+        {
+          /*
+           * First thread to increment the started variable
+           */
+          (*init_routine) ();
+          once_control->done = TRUE;
+
+        }
+      else
+        {
+          /*
+           * Block until other thread finishes executing the onceRoutine
+           */
+          while (!(once_control->done))
+            {
+              /*
+               * The following gives up CPU cycles without pausing
+               * unnecessarily
+               */
+              Sleep (0);
+            }
+        }
+    }
+
+  /*
+   * Fall through Intentionally
+   */
+
+  /*
+   * ------------
+   * Failure Code
+   * ------------
+   */
+FAIL0:
+  return (result);
+
+}                               /* pthread_once */
+
 
 pthread_t
 pthread_self (void)

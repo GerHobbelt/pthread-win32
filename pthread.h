@@ -491,8 +491,14 @@ extern "C"
  * ====================
  * ====================
  */
-#define PTHREAD_ONCE_INIT	 { 0, PTHREAD_MUTEX_INITIALIZER }
+#define PTHREAD_ONCE_INIT       { FALSE, -1 }
 
+struct pthread_once_t_
+{
+  int done;                 /* indicates if user function executed  */
+  long started;             /* First thread to increment this value */
+                            /* to zero executes the user function   */
+};
 
 /*
  * ====================
