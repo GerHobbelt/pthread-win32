@@ -1,3 +1,19 @@
+1998-07-19  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.h (pthread_key_t): Define this type.
+	(pthread_key_create): Add function prototype.
+	(pthread_setspecific): Likewise.
+	(pthread_getspecific): Likwise.
+	(pthread_key_delete): Likewise.
+
+	* tsd.c (pthread_key_create): Implement.
+	(pthread_setspecific): Likewise.
+	(pthread_getspecific): Likewise.
+	(pthread_key_delete): Likewise.
+
+	* mutex.c (pthread_mutex_trylock): Return ENOSYS if this function
+	is called on a Win32 platform which is not Windows NT.
+
 1998-07-18  Ben Elliston  <bje@cygnus.com>
 
 	* condvar.c (pthread_condattr_init): Do not attempt to malloc any
