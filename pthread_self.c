@@ -115,6 +115,12 @@ pthread_self (void)
 	      return (NULL);
 	    }
 #endif
+
+          /*
+           * No need to explicitly serialise access to sched_priority
+           * because the new handle is not yet public.
+           */
+          self->sched_priority = GetThreadPriority(self->threadH);
 	}
 
       pthread_setspecific (ptw32_selfThreadKey, self);

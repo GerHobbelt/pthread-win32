@@ -97,21 +97,22 @@ void *
 getValidPriorities(void * arg)
 {
   int prioSet;
-  pthread_t threadID = pthread_self();
-  HANDLE threadH = pthread_getw32threadhandle_np(threadID);
+  pthread_t thread = pthread_self();
+  HANDLE threadH = pthread_getw32threadhandle_np(thread);
+  struct sched_param param;
 
   for (prioSet = minPrio;
        prioSet <= maxPrio;
        prioSet++)
     {
-	/*
+        /*
        * If prioSet is invalid then the threads priority is unchanged
        * from the previous value. Make the previous value a known
        * one so that we can check later.
        */
-	SetThreadPriority(threadH, PTW32TEST_THREAD_INIT_PRIO);
-	SetThreadPriority(threadH, prioSet);
-	validPriorities[prioSet+(PTW32TEST_MAXPRIORITIES/2)] = GetThreadPriority(threadH);
+        param.sched_priority = prioSet;
+        assert(pthread_setschedparam(thread, SCHED_OTHER, &param) == 0);
+        validPriorities[prioSet+(PTW32TEST_MAXPRIORITIES/2)] = GetThreadPriority(threadH);
     }
 
   return (void *) 0;
@@ -155,7 +156,9 @@ main()
       assert(pthread_setschedparam(mainThread, SCHED_OTHER, &mainParam) == 0);
       assert(pthread_getschedparam(mainThread, &policy, &mainParam) == 0);
       assert(policy == SCHED_OTHER);
-      assert(mainParam.sched_priority ==
+      /* Priority returned below should be the level set by pthread_setschedparam(). */
+      assert(mainParam.sched_priority == prio);
+      assert(GetThreadPriority(threadH) ==
                validPriorities[prio+(PTW32TEST_MAXPRIORITIES/2)]);
 
       for (param.sched_priority = prio;

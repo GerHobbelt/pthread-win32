@@ -1,3 +1,42 @@
+2003-09-14  Ross Johnson  <ross@callisto.canberra.edu.au>
+
+	* pthread_setschedparam.c (pthread_setschedparam): Attempt to map
+	all priority levels between max and min (as returned by
+	sched_get_priority_min/max) to reasonable Win32 priority levels - i.e.
+	levels between THREAD_PRIORITY_LOWEST/IDLE to THREAD_PRIORITY_LOWEST and
+	between THREAD_PRIORITY_HIGHEST/TIME_CRITICAL to THREAD_PRIORITY_HIGHEST
+	while others remain unchanged; record specified thread priority level
+	for return by pthread_getschedparam.
+
+	Note that, previously, specified levels not matching Win32 priority levels
+	would silently leave the current thread priority unaltered.
+
+	* pthread_getschedparam.c (pthread_getschedparam): Return the priority
+	level specified by the latest pthread_setschedparam or pthread_create rather
+	than the actual running thread priority as returned by GetThreadPriority - as
+	required by POSIX. I.e. temporary or adjusted actual priority levels are not
+	returned by this routine.
+
+	* pthread_create.c (pthread_create): For priority levels specified via
+	pthread attributes, attempt to map all priority levels between max and
+	min (as returned by sched_get_priority_min/max) to reasonable Win32
+	priority levels; record priority level given via attributes, or
+	inherited from parent thread, for later return by pthread_getschedparam.
+
+	* ptw32_new.c (ptw32_new): Initialise pthread_t_ sched_priority element.
+
+	* pthread_self.c (pthread_self): Set newly created implicit POSIX thread
+	sched_priority to Win32 thread's current actual priority. Temporarily
+	altered priorities can't be avoided in this case.
+
+	* implement.h (struct pthread_t_): Add new sched_priority element.
+
+2003-09-12  Ross Johnson  <ross@callisto.canberra.edu.au>
+
+	* sched_get_priority_min.c (sched_get_priority_min): On error should return -1
+	with errno set.
+	* sched_get_priority_max.c (sched_get_priority_max): Likewise.
+
 2003-09-03  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* w32_cancelableWait.c (ptw32_cancelable_wait): Allow cancelation

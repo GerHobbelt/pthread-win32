@@ -56,6 +56,8 @@ struct _timeb currSysTimeStart;
 struct _timeb currSysTimeStop;
 long durationMilliSecs;
 long overHeadMilliSecs = 0;
+int one = 1;
+int zero = 0;
 
 #define GetDurationMilliSecs(_TStart, _TStop) ((_TStop.time*1000+_TStop.millitm) \
                                                - (_TStart.time*1000+_TStart.millitm))
@@ -100,7 +102,7 @@ main (int argc, char *argv[])
    */
 
   TESTSTART
-  assert(1 == 1);
+  assert(1 == one);
   TESTSTOP
 
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
@@ -112,7 +114,7 @@ main (int argc, char *argv[])
    */
   assert(sem_init(&sema, 0, 0) == 0);
   TESTSTART
-  assert(sem_post(&sema) == 0);
+  assert(sem_post(&sema) == zero);
   TESTSTOP
   assert(sem_destroy(&sema) == 0);
 
@@ -121,7 +123,7 @@ main (int argc, char *argv[])
 
   assert(sem_init(&sema, 0, ITERATIONS) == 0);
   TESTSTART
-  assert(sem_wait(&sema) == 0);
+  assert(sem_wait(&sema) == zero);
   TESTSTOP
   assert(sem_destroy(&sema) == 0);
 
@@ -133,8 +135,8 @@ main (int argc, char *argv[])
    */
 
   TESTSTART
-  assert(1 == 1);
-  assert(1 == 1);
+  assert(1 == one);
+  assert(1 == one);
   TESTSTOP
 
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
@@ -146,8 +148,8 @@ main (int argc, char *argv[])
    */
   assert(sem_init(&sema, 0, 0) == 0);
   TESTSTART
-  assert(sem_post(&sema) == 0);
-  assert(sem_wait(&sema) == 0);
+  assert(sem_post(&sema) == zero);
+  assert(sem_wait(&sema) == zero);
   TESTSTOP
   assert(sem_destroy(&sema) == 0);
 
@@ -156,8 +158,8 @@ main (int argc, char *argv[])
 
   assert(sem_init(&sema, 0, 1) == 0);
   TESTSTART
-  assert(sem_wait(&sema) == 0);
-  assert(sem_post(&sema) == 0);
+  assert(sem_wait(&sema) == zero);
+  assert(sem_post(&sema) == zero);
   TESTSTOP
   assert(sem_destroy(&sema) == 0);
 

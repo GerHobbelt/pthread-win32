@@ -1,3 +1,22 @@
+2003-09-18  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* benchtest.h: Move old mutex code into benchlib.c.
+	* benchlib.c: New statically linked module to ensure that
+	bench apps don't inline the code and therefore have an unfair
+	advantage over the pthreads lib routines. Made little or no
+	difference.
+	* benchtest1.c: Minor change to avoid compiler warnings.
+	* benchtest5.c: Likewise.
+	* benchtest2.c: Fix misinformation in output report.
+	* README.BENCH: Add comments on results.
+
+2003-09-14  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* priority1.c: Reworked to comply with modified priority
+	management and provide additional output.
+	* priority2.c: Likewise.
+	* inherit1.c: Likewise.
+
 2003-09-03  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* exit4.c: New test.

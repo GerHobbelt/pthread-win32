@@ -42,7 +42,6 @@ int
 pthread_setschedparam(pthread_t thread, int policy,
 			  const struct sched_param *param)
 {
-  int prio;
   int result;
 
   /* Validate the thread id. */
@@ -64,7 +63,17 @@ pthread_setschedparam(pthread_t thread, int policy,
       return ENOTSUP;
     }
 
-  prio = param->sched_priority;
+  return (ptw32_setthreadpriority(thread, policy, param->sched_priority));
+}
+
+
+int
+ptw32_setthreadpriority(pthread_t thread, int policy, int priority)
+{
+  int prio;
+  int result;
+
+  prio = priority;
 
   /* Validate priority level. */
   if (prio < sched_get_priority_min(policy) ||
@@ -73,8 +82,44 @@ pthread_setschedparam(pthread_t thread, int policy,
       return EINVAL;
     }
 
-  /* This is practically guaranteed to return TRUE. */
-  (void) SetThreadPriority(thread->threadH, prio);
+#if (THREAD_PRIORITY_LOWEST > THREAD_PRIORITY_NORMAL)
+/* WinCE */
+#else
+/* Everything else */
 
-  return 0;
+  if (THREAD_PRIORITY_IDLE < prio
+      && THREAD_PRIORITY_LOWEST > prio)
+    {
+      prio = THREAD_PRIORITY_LOWEST;
+    }
+  else if (THREAD_PRIORITY_TIME_CRITICAL > prio
+           && THREAD_PRIORITY_HIGHEST < prio)
+    {
+      prio = THREAD_PRIORITY_HIGHEST;
+    }
+
+#endif
+
+  result = pthread_mutex_lock(&thread->threadLock);
+
+  if (0 == result)
+    {
+      /* If this fails, the current priority is unchanged. */
+      if (0 == SetThreadPriority(thread->threadH, prio))
+        {
+          result = EINVAL;
+        }
+      else
+        {
+          /*
+           * Must record the thread's sched_priority as given,
+           * not as finally adjusted.
+           */
+          thread->sched_priority = priority;
+      }
+
+      (void) pthread_mutex_unlock(&thread->threadLock);
+    }
+
+  return result;
 }
