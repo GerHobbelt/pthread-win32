@@ -7,6 +7,9 @@
 Sat Sep 12 20:09:24 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* windows.h: Remove error number definitions. These are in <errno.h>
+	
+	* tsd.c: Add comment explaining rationale for not building
+	POSIX TSD on top of Win32 TLS.
 
 1998-09-12  Ben Elliston  <bje@cygnus.com>
 

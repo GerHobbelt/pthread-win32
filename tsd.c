@@ -4,6 +4,23 @@
  * Description:
  * POSIX thread functions which implement thread-specific data (TSD).
  */
+ 
+/*
+ * Why we can't use Win32 TLS
+ * --------------------------
+ *
+ * In a word: Destructors
+ *
+ * POSIX 1003.1 1996, Section 17 allows for optional destructor functions
+ * to be associated with each key value. The destructors are called from
+ * the creating thread, which means that the calling thread must have access
+ * to the TSD keys of all active threads.
+ *
+ * If we use Win32 TLS then this is not possible since Tls*Value()
+ * functions don't allow us to access other than our own [thread's] key.
+ *
+ * As a result, these routines need to be redesigned.
+ */
 
 #include <errno.h>
 
