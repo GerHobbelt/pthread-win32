@@ -1,5 +1,5 @@
 
-                 PTHREADS-WIN32 SNAPSHOT 1999-09-17
+                 PTHREADS-WIN32 SNAPSHOT 1999-10-17
                  ----------------------------------
        Web Site: http://sourceware.cygnus.com/pthreads-win32/
       FTP Site: ftp://sourceware.cygnus.com/pub/pthreads-win32
@@ -24,17 +24,9 @@ Change Summary (since the last snapshot)
 
 (See the ChangeLog file for details.)
 
-Fixed a few bugs:
-	- threads return status properly (Milan Gardian)
-	- fix memory leak in mutexes (Milan Gardian)
+Bug fix - Cancelation of threads waiting on condition variables
+now works properly (Lorin Hochstein and Peter Slacik)
 
-New routines to add POSIX read/write locks (Aurelio Medina)
-	These routines have not been fully tested yet.
-
-Changes to allow building with Mingw32 (Mumit Khan)
-	Please note that the current public release
-	of Mingw32/gcc-2.95 will not build the library.
-	The next release should though.
 
 Level of standards conformance
 ------------------------------
