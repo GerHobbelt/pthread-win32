@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define _PTHREADS_H
 
 typedef HANDLE pthread_t;
+typedef void pthread_mutexattr_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,6 +41,22 @@ pthread_t pthread_self(void);
 int pthread_equal(pthread_t t1, pthread_t t2);
 
 int pthread_join(pthread_t thread, void ** valueptr);
+
+/* These functions cannot be implemented in terms of the Win32 API.
+   Fortunately they are optional.  Their implementation just returns
+   the correct error number. */
+
+int pthread_mutexattr_setprotocol(pthread_mutexattr_t *attr,
+				  int protocol);
+
+int pthread_mutexattr_getprotocol(const pthread_mutexattr_t *attr,
+				  int *protocol);
+
+int pthread_mutexattr_setprioceiling(pthread_mutexattr_t *attr,
+				      int prioceiling);
+
+int pthread_mutexattr_getprioceiling(const pthread_mutexattr_t *attr,
+				     int *ceiling);
 
 #ifdef __cplusplus
 }
