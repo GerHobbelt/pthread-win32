@@ -63,8 +63,12 @@ pthread_cond_init(pthread_cond_t *cv, const pthread_condattr_t *attr)
   return 0;
 }
 
-int 
-pthread_cond_wait(pthread_cond_t *cv, pthread_mutex_t *mutex)
+/* This is an internal routine that allows the functions `pthread_cond_wait' and
+   `pthread_cond_timedwait' to share implementations.  The `abstime'
+   parameter to this function is in millisecond units (or INFINITE). */
+
+static int
+cond_wait(pthread_cond_t *cv, pthread_mutex_t *mutex, DWORD abstime)
 {
   int result, last_waiter;
 
@@ -89,7 +93,7 @@ pthread_cond_wait(pthread_cond_t *cv, pthread_mutex_t *mutex)
      pthread_cond_signal() being called or pthread_cond_broadcast()
      being called. */
  
-  result = WaitForMultipleObjects (2, ev->events, FALSE, INFINITE);
+  result = WaitForMultipleObjects (2, ev->events, FALSE, abstime);
 
   EnterCriticalSection (&cv->waiters_count_lock);
   cv->waiters_count--;
@@ -111,16 +115,29 @@ pthread_cond_wait(pthread_cond_t *cv, pthread_mutex_t *mutex)
 }
 
 int
+pthread_cond_wait(pthread_cond_t *cv,
+		  pthread_mutex_t *mutex)
+{
+  return cond_wait(cv, mutex, INFINITE);
+}
+
+/* Assume that our configure script will test for the existence of
+   `struct timespec' and define it according to POSIX if it isn't
+   found.  This will enable people to use this implementation
+   without necessarily needing Cygwin32. */
+
+int
 pthread_cond_timedwait(pthread_cond_t *cv, 
 		       pthread_mutex_t *mutex,
 		       const struct timespec *abstime)
 {
-  /* Yet to be implemented.  This will be identical to cond_wait(),
-     but we will need to get the timeout parameter in the call to
-     WaitForMultipleObject() as close to the time specified in
-     `abstime' as possible. */
+  DWORD msecs;
+  
+  /* Calculate the number of milliseconds in abstime. */
+  msecs = abstime->tv_sec * 1000;
+  msecs += abstime->tv_nsec / 1000000;
 
-  return 0;
+  return cond_wait(cv, mutex, msecs);
 }
 
 int 
