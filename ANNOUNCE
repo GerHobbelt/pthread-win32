@@ -1,8 +1,8 @@
-                 PTHREADS-WIN32 SNAPSHOT 2002-??-??
-                 ----------------------------------
-       Web Site: http://sources.redhat.com/pthreads-win32/
-      FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
-        Coordinator: Ross Johnson <rpj@ise.canberra.edu.au>
+		 PTHREADS-WIN32 SNAPSHOT 2002-03-02
+		 ----------------------------------
+	 Web Site: http://sources.redhat.com/pthreads-win32/
+	FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
+	 Maintainer: Ross Johnson <rpj@ise.canberra.edu.au>
 
 
 We are pleased to announce the availability of a new snapshot of
@@ -23,366 +23,43 @@ Please see the 'Acknowledgements' section at the end of this
 announcement for the list of contributors.
 
 
--------------------------------
+Acknowledgements
+----------------
+This library is based substantially on a Win32 pthreads
+implementation contributed by John Bossom <John.Bossom@cognos.com>.
+
+The implementation of Condition Variables uses algorithms developed
+by Alexander Terekhov and Louis Thomas.
+
+The implementation of POSIX mutexes has been improved by Thomas Pfaff.
+
+The implementation of Spinlocks and Barriers was contributed
+by Ross Johnson.
+
+The implementation of read/write locks was contributed by
+Aurelio Medina and improved by Alexander Terekhov.
+
+Many others have contributed significant time and effort to solve crutial
+problems in order to make the library workable, robust and reliable.
+
+There is also a separate CONTRIBUTORS file. This file and others are
+on the web site:
+
+	http://sources.redhat.com/pthreads-win32
+
+As much as possible, the ChangeLog file acknowledges contributions to the
+code base in more detail.
+
+
 Changes since the last snapshot
 -------------------------------
+These are now documented in the NEWS file.
+See the ChangeLog file also.
 
-Cleanup code default style. (IMPORTANT)
-----------------------------------------------------------------------
-Previously, if not defined, the cleanup style was determined automatically
-from the compiler/language, and one of the following was defined accordingly:
 
-	__CLEANUP_SEH	MSVC only
-	__CLEANUP_CXX	C++, including MSVC++, GNU G++
-	__CLEANUP_C		C, including GNU GCC, not MSVC
-
-These defines determine the style of cleanup (see pthread.h) and,
-most importantly, the way that cancelation and thread exit (via
-pthread_exit) is performed (see the routine ptw32_throw() in private.c).
-
-In short, the exceptions versions of the library throw an exception
-when a thread is canceled or exits (via pthread_exit()), which is
-caught by a handler in the thread startup routine, so that the
-the correct stack unwinding occurs regardless of where the thread
-is when it's canceled or exits via pthread_exit().
-
-In this and future snapshots, unless the build explicitly defines (e.g.
-via a compiler option) __CLEANUP_SEH, __CLEANUP_CXX, or __CLEANUP_C, then
-the build NOW always defaults to __CLEANUP_C style cleanup. This style
-uses setjmp/longjmp in the cancelation and pthread_exit implementations,
-and therefore won't do stack unwinding even when linked to applications
-that have it (e.g. C++ apps). This is for consistency with most
-current commercial Unix POSIX threads implementations. Compaq's TRU64
-may be an exception (no pun intended) and possible future trend.
-
-Although it was not clearly documented before, it is still necessary to
-build your application using the same __CLEANUP_* define as was
-used for the version of the library that you link with, so that the
-correct parts of pthread.h are included. That is, the possible
-defines require the following library versions:
-
-	__CLEANUP_SEH	pthreadVSE.dll
-	__CLEANUP_CXX	pthreadVCE.dll or pthreadGCE.dll
-	__CLEANUP_C	pthreadVC.dll or pthreadGC.dll
-
-E.g. regardless of whether your app is C or C++, if you link with
-pthreadVC.lib or libpthreadGC.a, then you must define __CLEANUP_C.
-
-
-THE POINT OF ALL THIS IS: if you have not been defining one of these
-explicitly, then the defaults as described at the top of this
-section were being used.
-
-THIS NOW CHANGES, as has been explained above, but to try to make this
-clearer here's an example:
-
-If you were building your application with MSVC++ i.e. using C++
-exceptions and not explicitly defining one of __CLEANUP_*, then
-__CLEANUP_C++ was automatically defined for you in pthread.h.
-You should have been linking with pthreadVCE.dll, which does
-stack unwinding.
-
-If you now build your application as you had before, pthread.h will now
-automatically set __CLEANUP_C as the default style, and you will need to
-link with pthreadVC.dll. Stack unwinding will now NOT occur when a thread
-is canceled, or the thread calls pthread_exit().
-
-Your application will now most likely behave differently to previous
-versions, and in non-obvious ways. Most likely is that locally
-instantiated objects may not be destroyed or cleaned up after a thread
-is canceled.
-
-If you want the same behaviour as before, then you must now define
-__CLEANUP_C++ explicitly using a compiler option and link with
-pthreadVCE.dll as you did before.
-
-
-WHY ARE WE MAKING THE DEFAULT STYLE LESS EXCEPTION-FRIENDLY?
-Because no commercial Unix POSIX threads implementation allows you to
-choose to have stack unwinding. Therefore, providing it in pthread-win32
-as a default is dangerous. We still provide the choice but unless
-you consciously choose to do otherwise, your pthreads applications will
-now run or crash in similar ways irrespective of the threads platform
-you use. Or at least this is the hope.
-
-
-WHY NOT REMOVE THE EXCEPTIONS VERSIONS OF THE LIBRARY ALTOGETHER?
-There are a few reasons:
-- because there are well respected POSIX threads people who believe
-  that POSIX threads implementations should be exceptions aware and
-  do the expected thing in that context. (There are equally respected
-  people who believe it should not be easily accessible, if it's there
-  at all, for unconditional conformity to other implementations.)
-- because pthreads-win32 is one of the few implementations that has
-  the choice, perhaps the only freely available one, and so offers
-  a laboratory to people who may want to explore the effects;
-- although the code will always be around somewhere for anyone who
-  wants it, once it's removed from the current version it will not be
-  nearly as visible to people who may have a use for it.
-
-
-Source module splitting
------------------------
-In order to enable smaller image sizes to be generated
-for applications that link statically with the library,
-most routines have been separated out into individual
-source code files.
-
-This is being done in such a way as to be backward compatible.
-The old source files are reused to congregate the individual
-routine files into larger translation units (via a bunch of
-# includes) so that the compiler can still optimise wherever
-possible, e.g. through inlining, which can only be done
-within the same translation unit.
-
-It is also possible to build the entire library by compiling
-the single file named "pthread.c", which just #includes all
-the secondary congregation source files. The compiler
-may be able to use this to do more inlining of routines.
-
-Although the GNU compiler is able to produce libraries with
-the necessary separation (the -ffunction-segments switch),
-AFAIK, the MSVC and other compilers don't have this feature.
-
-Finally, since I use makefiles and command-line compilation,
-I don't know what havoc this reorganisation may wreak amongst
-IDE project file users. You should be able to continue
-using your existing project files without modification.
-
-
-New non-portable function
--------------------------
-pthread_num_processors_np(): Returns the number of processors
-in the system that are available to the process, as determined
-from the processor affinity mask.
-
-
-Platform dependence
--------------------
-As Win95 doesn't provide one, the library now contains
-it's own InterlockedCompareExchange() routine, which is used
-whenever Windows doesn't provide it. InterlockedCompareExchange()
-is used to implement spinlocks and barriers, and also in mutexes.
-This routine relies on the CMPXCHG machine instruction which
-is not available on i386 CPUs. This library (from snapshot
-20010712 onwards) is therefore no longer supported on i386
-processor platforms.
-
-
-New standard routines
----------------------
-For source code portability only - rwlocks cannot be process shared yet.
-
-        pthread_rwlockattr_init()
-        pthread_rwlockattr_destroy()
-        pthread_rwlockattr_setpshared()
-        pthread_rwlockattr_getpshared()
-
-As defined in the new POSIX standard, and the Single Unix Spec version 3:
-
-        sem_timedwait()
-        pthread_mutex_timedlock()    - Alexander Terekhov and Thomas Pfaff
-        pthread_rwlock_timedrdlock() - adapted from pthread_rwlock_rdlock()
-        pthread_rwlock_timedwrlock() - adapted from pthread_rwlock_wrlock()
-
-
-New non-portable routine
-------------------------
-To improve tolerance against operator or time service initiated
-system clock changes, the following routine is provided:
-
-        pthread_timechange_handler_np()
-
-This routine can be called by an application when it
-receives a WM_TIMECHANGE message from the system. At present
-it broadcasts all condition variables so that waiting threads
-can wake up and re-evaluate their conditions and restart
-their timed waits if required.
-- Suggested by Alexander Terekhov
-
-
-pthread.h no longer includes windows.h
---------------------------------------
-[Not yet for G++]
-
-This was done to prevent conflicts.
-
-HANDLE, DWORD, and NULL are temporarily defined within pthread.h if
-they are not already.
-
-
-pthread.h, sched.h and semaphore.h now use dllexport/dllimport
---------------------------------------------------------------
-Not only to avoid the need for the pthread.def file, but to
-improve performance. Apparently, declaring functions with dllimport
-generates a direct call to the function and avoids the overhead
-of a stub function call.
-
-Bug fixes
----------
-* Fixed potential NULL pointer dereferences in pthread_mutexattr_init,
-pthread_mutexattr_getpshared, pthread_barrierattr_init,
-pthread_barrierattr_getpshared, and pthread_condattr_getpshared.
-- Scott McCaskill <scott@magruder.org>
-
-* Removed potential race condition in pthread_mutex_trylock and
-pthread_mutex_lock;
-- Alexander Terekhov <TEREKHOV@de.ibm.com>
-
-* The behaviour of pthread_mutex_trylock in relation to
-recursive mutexes was inconsistent with commercial implementations.
-Trylock would return EBUSY if the lock was owned already by the
-calling thread regardless of mutex type. Trylock now increments the
-recursion count and returns 0 for RECURSIVE mutexes, and will
-return EDEADLK rather than EBUSY for ERRORCHECK mutexes. This is
-consistent with Solaris.
-- Thomas Pfaff <tpfaff@gmx.net>
-
-* Found a fix for the library and workaround for applications for
-the known bug #2, i.e. where __CLEANUP_CXX or __CLEANUP_SEH is defined.
-See the "Known Bugs in this snapshot" section below.
-
-This could be made transparent to applications by replacing the macros that
-define the current C++ and SEH versions of pthread_cleanup_push/pop
-with the C version, but AFAIK cleanup handlers would not then run in the
-correct sequence with destructors and exception cleanup handlers when
-an exception occurs.
-
-* Cancelation once started in a thread cannot now be inadvertantly
-double canceled. That is, once a thread begins it's cancelation run,
-cancelation is disabled and a subsequent cancel request will
-return an error (ESRCH).
-
-
----------------------------
-Known bugs in this snapshot
----------------------------
-
-1. Under MS VC++ (only tested with version 6.0), a term_func
-   set via the standard C++ set_terminate() function is not called.
-
-   Notes from the MSVC++ manual:
-         1) A term_func() should call exit(), otherwise
-            abort() will be called on return to the caller.
-            A call to abort() raises SIGABRT and the default signal handler
-            for all signals terminates the calling program with
-            exit code 3.
-         2) A term_func() must not throw an exception. Therefore
-            term_func() should not call pthread_exit(), which
-            works by throwing an exception (pthreadVCE or pthreadVSE)
-            or by calling longjmp (pthreadVC).
-
-   Workaround: avoid using pthread_exit() in C++ applications. Exit
-   threads by dropping through the end of the thread routine.
-
-2. Cancellation problems in optimised code
-   - Milan Gardian
-
-   Workaround [rpj - 2 Feb 2002]
-   -----------------------------
-   The problem disappears when /Ob0 is used, i.e. /O2 /Ob0 works OK,
-   but if you want to use inlining optimisation you can be much more
-   specific about where it's switched off and on by using a pragma.
-
-   So the inlining optimisation is interfering with the way that cleanup
-   handlers are run. It appears to relate to auto-inlining of class methods
-   since this is the only auto inlining that is performed at /O1 optimisation
-   (functions with the "inline" qualifier are also inlined, but the problem
-   doesn't appear to involve any such functions in the library or testsuite).
-
-   In order to confirm the inlining culprit, the following use of pragmas
-   eliminate the problem but I don't know how to make it transparent, putting
-   it in, say, pthread.h where pthread_cleanup_push defined as a macro.
-
-   #pragma inline_depth(0)
-     pthread_cleanup_push(handlerFunc, (void *) &arg);
-
-        /* ... */
-
-     pthread_cleanup_pop(0);
-   #pragma inline_depth()
-
-   Note the empty () pragma value after the pop macro. This resets depth to the
-   default. Or you can specify a non-zero depth here.
-
-   The pragma is also needed (and now used) within the library itself wherever
-   cleanup handlers are used (condvar.c and rwlock.c).
-
-   Use of these pragmas allows compiler optimisations /O1 and /O2 to be
-   used for either or both the library and applications.
-
-   Experimenting further, I found that wrapping the actual cleanup handler
-   function with #pragma auto_inline(off|on) does NOT work.
-
-   MSVC6.0 doesn't appear to support the C99 standard's _Pragma directive,
-   however, later versions may. This form is embeddable inside #define
-   macros, which would be ideal because it would mean that it could be added
-   to the push/pop macro definitions in pthread.h and hidden from the
-   application programmer.
-
-   [/rpj]
-
-   Original problem description
-   ----------------------------
-
-   The cancellation (actually, cleanup-after-cancel) tests fail when using VC
-   (professional) optimisation switches (/O1 or /O2) in pthreads library. I
-   have not investigated which concrete optimisation technique causes this
-   problem (/Og, /Oi, /Ot, /Oy, /Ob1, /Gs, /Gf, /Gy, etc.), but here is a
-   summary of builds and corresponding failures:
-
-     * pthreads VSE (optimised tests): OK
-     * pthreads VCE (optimised tests): Failed "cleanup1" test (runtime)
-   
-     * pthreads VSE (DLL in CRT, optimised tests): OK
-     * pthreads VCE (DLL in CRT, optimised tests): Failed "cleanup1" test
-   (runtime)
-
-   Please note that while in VSE version of the pthreads library the
-   optimisation does not really have any impact on the tests (they pass OK), in
-   VCE version addition of optimisation (/O2 in this case) causes the tests to
-   fail uniformly - either in "cleanup0" or "cleanup1" test cases.
-   
-   Please note that all the tests above use default pthreads DLL (no
-   optimisations, linked with either static or DLL CRT, based on test type).
-   Therefore the problem lies not within the pthreads DLL but within the
-   compiled client code (the application using pthreads -> involvement of
-   "pthread.h").
-
-   I think the message of this section is that usage of VCE version of pthreads
-   in applications relying on cancellation/cleanup AND using optimisations for
-   creation of production code is highly unreliable for the current version of
-   the pthreads library.
-
-3. errno
-
-   Under MSVC, errno isn't working.
-
-
-Special notes
--------------
-
-1. [See also the discussion in the FAQ file - Q2, Q4, and Q5]
-
-Due to what is believed to be a C++ compliance error in VC++ whereby
-you may not have multiple handlers for the same exception in the same
-try/catch block, if your application contains catch(...) blocks in your POSIX
-threads then you will need to replace the "catch(...)" with the macro
-"PtW32Catch", eg.
-
-	#ifdef PtW32Catch
-		PtW32Catch {
-			...
-		}
-	#else
-		catch(...) {
-			...
-		}
-	#endif
-
-Otherwise neither pthreads cancelation nor pthread_exit() will work
-reliably when using versions of the library that use C++ exceptions
-for cancelation and thread exit.
+Known Bugs
+----------
+These are now documented in the BUGS file.
 
 
 Level of standards conformance
@@ -436,7 +113,7 @@ The following functions are implemented:
       pthread_setcancelstate
       pthread_setcanceltype
       pthread_testcancel
-          
+	  
       ---------------------------
       Thread Specific Data   
       ---------------------------
@@ -444,7 +121,7 @@ The following functions are implemented:
       pthread_key_delete
       pthread_setspecific
       pthread_getspecific
-                
+		
       ---------------------------
       Mutexes
       ---------------------------
@@ -454,9 +131,9 @@ The following functions are implemented:
       pthread_mutexattr_setpshared
       pthread_mutexattr_gettype
       pthread_mutexattr_settype (types: PTHREAD_MUTEX_DEFAULT
-                                        PTHREAD_MUTEX_NORMAL
-                                        PTHREAD_MUTEX_ERRORCHECK
-                                        PTHREAD_MUTEX_RECURSIVE  )
+					PTHREAD_MUTEX_NORMAL
+					PTHREAD_MUTEX_ERRORCHECK
+					PTHREAD_MUTEX_RECURSIVE  )
       pthread_mutex_init
       pthread_mutex_destroy
       pthread_mutex_lock
@@ -525,10 +202,10 @@ The following functions are implemented:
       sem_wait
       sem_trywait
       sem_timedwait
-      sem_open               (returns an error ENOSYS)
-      sem_close              (returns an error ENOSYS)
-      sem_unlink             (returns an error ENOSYS)
-      sem_getvalue           (returns an error ENOSYS)
+      sem_open		     (returns an error ENOSYS)
+      sem_close 	     (returns an error ENOSYS)
+      sem_unlink	     (returns an error ENOSYS)
+      sem_getvalue	     (returns an error ENOSYS)
 
       ---------------------------
       RealTime Scheduling
@@ -564,16 +241,16 @@ The following functions are implemented:
       pthread_timechange_handler_np
       pthread_delay_np
       pthread_mutexattr_getkind_np
-      pthread_mutexattr_setkind_np      (types: PTHREAD_MUTEX_FAST_NP,
-                                                PTHREAD_MUTEX_ERRORCHECK_NP,
-                                                PTHREAD_MUTEX_RECURSIVE_NP,
-                                                PTHREAD_MUTEX_ADAPTIVE_NP,
-                                                PTHREAD_MUTEX_TIMED_NP)
+      pthread_mutexattr_setkind_np	(types: PTHREAD_MUTEX_FAST_NP,
+						PTHREAD_MUTEX_ERRORCHECK_NP,
+						PTHREAD_MUTEX_RECURSIVE_NP,
+						PTHREAD_MUTEX_ADAPTIVE_NP,
+						PTHREAD_MUTEX_TIMED_NP)
       pthread_num_processors_np
-      pthread_win32_process_attach_np   (Required when statically linking the library)
-      pthread_win32_process_detach_np   (Required when statically linking the library)
-      pthread_win32_thread_attach_np    (Required when statically linking the library)
-      pthread_win32_thread_detach_np    (Required when statically linking the library)
+      pthread_win32_process_attach_np	(Required when statically linking the library)
+      pthread_win32_process_detach_np	(Required when statically linking the library)
+      pthread_win32_thread_attach_np	(Required when statically linking the library)
+      pthread_win32_thread_detach_np	(Required when statically linking the library)
 
       ---------------------------
       Static Initializers
@@ -606,7 +283,7 @@ The following functions are not implemented:
       pthread_mutex_attr_getprotocol
       pthread_mutex_attr_setprioceiling
       pthread_mutex_attr_setprotocol
-      
+
       ---------------------------
       Fork Handlers
       ---------------------------
@@ -619,7 +296,7 @@ The following functions are not implemented:
       ftrylockfile
       funlockfile
       getc_unlocked
-      getchar_unlocked  
+      getchar_unlocked	
       putc_unlocked
       putchar_unlocked
 
@@ -675,7 +352,7 @@ Mailing List
 There is a mailing list for discussing pthreads on Win32. To join,
 send email to:
 
-        pthreads-win32-subscribe@sourceware.cygnus.com
+	pthreads-win32-subscribe@sourceware.cygnus.com
       
 
 Application Development Environments
@@ -690,7 +367,7 @@ MSVC using C setjmp/longjmp works. Distribute pthreadVC.dll with your applicatio
 
 
 Mingw32:
-See FAQ Questions 6 and 10.
+See the FAQ, Questions 6 and 10.
 
 Mingw using C++ EH works. Distribute pthreadGCE.dll with your application.
 Mingw using C setjmp/longjmp works. Distribute pthreadGC.dll with your application.
@@ -712,7 +389,7 @@ For convenience, the following pre-built files are available on the FTP site
 
 	pthread.h	- for POSIX 1c threads
 	semaphore.h	- for POSIX 1b semaphores
-	sched.h		- for POSIX 1b scheduling
+	sched.h 	- for POSIX 1b scheduling
 	pthreadVCE.dll	- built with MSVC++ compiler using C++ EH
 	pthreadVCE.lib
 	pthreadVC.dll	- built with MSVC compiler using C setjmp/longjmp
@@ -721,62 +398,45 @@ For convenience, the following pre-built files are available on the FTP site
 	pthreadVSE.lib
 	pthreadGCE.dll	- built with Mingw32 G++ 2.95.2-1
 	pthreadGC.dll	- built with Mingw32 GCC 2.95.2-1 using setjmp/longjmp
-	libpthreadGCE.a	- derived from pthreadGCE.dll
+	libpthreadGCE.a - derived from pthreadGCE.dll
 	libpthreadGC.a	- derived from pthreadGC.dll
-        gcc.dll         - needed if distributing applications that use pthreadGCE.dll
+	gcc.dll 	- needed if distributing applications that use
+			  pthreadGCE.dll (but see the FAQ Q 10 for the latest
+			  related information)
 
 These are the only files you need in order to build POSIX threads
 applications for Win32 using either MSVC or Mingw32.
-      
+
 See the FAQ file in the source tree for additional information.
 
 
 Documentation
 -------------
 
-Currently, there is no documentation included in the package apart
-from the copious comments in the source code.
+For the authoritative reference, see the online POSIX
+standard reference:
+
+       http://www.UNIX-systems.org/version3/ieee_std.html
 
 For POSIX Thread API programming, several reference books are
-available:  
+available:
 
-        Programming with POSIX Threads
-        David R. Butenhof
-        Addison-Wesley (pub)
+       Programming with POSIX Threads
+       David R. Butenhof
+       Addison-Wesley (pub)
 
-        Pthreads Programming
-        By Bradford Nichols, Dick Buttlar & Jacqueline Proulx Farrell
-        O'Reilly (pub)
+       Pthreads Programming
+       By Bradford Nichols, Dick Buttlar & Jacqueline Proulx Farrell
+       O'Reilly (pub)
 
 On the web: see the links at the bottom of the pthreads-win32 site:
 
-        http://sources.redhat.com/pthreads-win32/
+       http://sources.redhat.com/pthreads-win32/
+
+       Currently, there is no documentation included in the package apart
+       from the copious comments in the source code.
 
 
-Acknowledgements
-----------------
-      
-This library is based substantially on a Win32 pthreads
-implementation contributed by John Bossom <John.Bossom@cognos.com>.
-      
-The implementation of Condition Variables uses algorithms developed
-by Alexander Terekhov and Louis Thomas.
-
-The implementation of POSIX mutexes has been improved by Thomas Pfaff.
-
-The implementation of read/write locks was contributed by
-Aurelio Medina and improved by Alexander Terekhov.
-
-Many others have contributed significant time and effort to solve critical
-problems in order to make the library workable, robust and reliable.
-
-There is also a separate CONTRIBUTORS file. This file and others are
-on the web site:
-
-        http://sources.redhat.com/pthreads-win32
-
-As much as possible, the ChangeLog file acknowledges contributions to the
-code base in more detail.
 
 Enjoy!
 

@@ -57,7 +57,7 @@ VCDLL	= pthreadVC.dll
 # C++ Exceptions in application - using VC version of pthreads dll
 VCXFLAGS	= /GX /TP /D__CLEANUP_C
 
-CFLAGS= $(OPTIM) /W3 /WX /MT /nologo /Yd /Zi -D_WIN32_WINNT=0x400
+CFLAGS= $(OPTIM) /W3 /WX /MD /nologo /Yd /Zi -D_WIN32_WINNT=0x400
 LFLAGS= /INCREMENTAL:NO
 INCLUDES=-I.
 BUILD_DIR=..
@@ -96,8 +96,7 @@ PASSES= loadfree.pass \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  \
-	  exception1.pass  exception2.pass  exception3.pass  \
-	  exit4
+	  exception1.pass  exception2.pass  exception3.pass
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
@@ -243,7 +242,6 @@ exception3.pass: exception2.pass
 exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass
-exit4.pass: exit3.pass
 eyal1.pass: tsd1.pass
 inherit1.pass: join1.pass
 join0.pass: create1.pass
