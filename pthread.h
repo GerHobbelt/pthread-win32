@@ -22,11 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef _PTHREADS_H
 #define _PTHREADS_H
 
-#define PTHREAD_PROCESS_PRIVATE 0
-#define PTHREAD_PROCESS_SHARED  1
-
 typedef HANDLE pthread_t;
-typedef HANDLE pthread_mutex_t;
+typedef CRITICAL_SECTION pthread_mutex_t;
 
 typedef struct { void * ptr; } pthread_condattr_t;
 typedef struct { void * ptr; } pthread_mutexattr_t;
