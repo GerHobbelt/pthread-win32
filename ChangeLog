@@ -1,3 +1,11 @@
+1998-07-26  Ben Elliston  <bje@cygnus.com>
+
+	* mutex.c (pthread_mutexattr_setpshared): Not supported; remove.
+	(pthread_mutexattr_getpshared): Likewise.
+
+	* pthread.h (pthread_mutexattr_setpshared): Remove prototype.
+	(pthread_mutexattr_getpshared): Likewise.
+
 Sun Jul 26 00:09:59 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* sync.c: Rename all instances of _pthread_count_mutex to

@@ -208,12 +208,6 @@ int pthread_mutexattr_init(pthread_mutexattr_t *attr);
 
 int pthread_mutexattr_destroy(pthread_mutexattr_t *attr);
 
-int pthread_mutexattr_setpshared(pthread_mutexattr_t *attr,
-				 int pshared);
-
-int pthread_mutexattr_getpshared(pthread_mutexattr_t *attr,
-				 int *pshared);
-
 /* Primitives for condition variables. */
 
 int pthread_cond_init(pthread_cond_t *cv,
