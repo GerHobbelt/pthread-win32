@@ -101,9 +101,9 @@ mythread(void * arg)
 
   cvthing.shared++;
 
-  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
-
   assert(pthread_cond_broadcast(&cvthing.notbusy) == 0);
+
+  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
   return (void *) 0;
 }

@@ -45,6 +45,17 @@
 #include "semaphore.h"
 #include "implement.h"
 
+static void
+ptw32_sem_wait_cleanup(void * sem)
+{
+  sem_t s = (sem_t) sem;
+
+  if (pthread_mutex_lock (&s->lock) == 0)
+    {
+      s->value++;
+      (void) pthread_mutex_unlock (&s->lock);
+    }
+}
 
 int
 sem_wait (sem_t * sem)
@@ -78,8 +89,9 @@ sem_wait (sem_t * sem)
       */
 {
   int result = 0;
+  sem_t s = *sem;
 
-  if (sem == NULL || *sem == NULL)
+  if (s == NULL)
     {
       result = EINVAL;
     }
@@ -88,16 +100,23 @@ sem_wait (sem_t * sem)
 
 #ifdef NEED_SEM
 
-      result = pthreadCancelableWait ((*sem)->event);
+      result = pthreadCancelableWait (s->event);
 
 #else /* NEED_SEM */
 
-      sem_t s = *sem;
-
-      if (InterlockedDecrement((LPLONG) &s->value) < 0)
+      if ((result = pthread_mutex_lock (&s->lock)) == 0)
 	{
-	  /* Must wait */
-	  result = pthreadCancelableWait (s->sem);
+	  int v = --s->value;
+
+	  (void) pthread_mutex_unlock (&s->lock);
+
+	  if (v < 0)
+	    {
+	      /* Must wait */
+	      pthread_cleanup_push(ptw32_sem_wait_cleanup, s);
+	      result = pthreadCancelableWait (s->sem);
+	      pthread_cleanup_pop(0);
+	    }
 	}
      
 #endif /* NEED_SEM */

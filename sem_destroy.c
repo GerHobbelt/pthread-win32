@@ -98,11 +98,44 @@ sem_destroy (sem_t * sem)
 
 #else /* NEED_SEM */
 
-      if (!CloseHandle (s->sem))
-	{
-	  *sem = s;
-	  result = EINVAL;
-	}
+      if ((result = pthread_mutex_trylock (&s->lock)) == 0)
+        {
+          if (s->value >= 0)
+            {
+              (void) pthread_mutex_unlock (&s->lock);
+
+              if (!CloseHandle (s->sem))
+	        {
+	          *sem = s;
+	          result = EINVAL;
+	        }
+              else if ((result = pthread_mutex_destroy (&s->lock)) != 0)
+                {
+                  s->sem = CreateSemaphore (NULL,      /* Always NULL */
+                                            (long) 0,  /* Force threads to wait */
+                                            (long) _POSIX_SEM_VALUE_MAX,       /* Maximum value */
+                                            NULL);     /* Name */
+                  if (s->sem == 0)
+                    {
+                      /* We just have to pretend that we've destroyed the semaphore
+                       * even though we're leaving a mutex around.
+                       */
+                      result = 0;
+                    }
+                  else
+                    {
+                      *sem = s;
+                      if (result != EBUSY)
+                        result = EINVAL;
+                    }
+                }
+            }
+          else
+            {
+              (void) pthread_mutex_unlock (&s->lock);
+              result = EBUSY;
+            }
+        }
 
 #endif /* NEED_SEM */
 

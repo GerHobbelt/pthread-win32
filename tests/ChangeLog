@@ -1,3 +1,20 @@
+2004-10-23  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* condvar3.c: Fixed mutex operations that were incorrectly
+	placed in relation to their condition variable operations.
+	The error became evident after sem_destroy() was rewritten
+	and conditions for destroing the semaphore were tightened.
+	As a result, pthread_cond_destroy() was not able to
+	destroy the cv queueing sempahore.
+	* condvar3_1.c: Likewise.
+	* condvar3_2.c: Likewise.
+	* condvar4.c: Likewise.
+	* condvar5.c: Likewise.
+	* condvar6.c: Likewise.
+	* condvar7.c: Likewise.
+	* condvar8.c: Likewise.
+	* condvar9.c: Likewise.
+
 2004-10-19  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* semaphore3.c: New test.

@@ -83,6 +83,7 @@
 static pthread_cond_t cv;
 static pthread_cond_t cv1;
 static pthread_mutex_t mutex;
+static pthread_mutex_t mutex1;
 static struct timespec abstime = { 0, 0 };
 static int timedout = 0;
 static int signaled = 0;
@@ -98,11 +99,12 @@ mythread(void * arg)
 {
   int result;
 
+  assert(pthread_mutex_lock(&mutex1) == 0);
+  ++waiting;
+  assert(pthread_cond_signal(&cv1) == 0);
+  assert(pthread_mutex_unlock(&mutex1) == 0);
+
   assert(pthread_mutex_lock(&mutex) == 0);
-
-  if ( ++waiting == NUMTHREADS)
-    assert(pthread_cond_signal(&cv1) == 0);
-
   result = pthread_cond_timedwait(&cv, &mutex, &abstime);
   if (result == ETIMEDOUT)
     {
@@ -112,7 +114,6 @@ mythread(void * arg)
     {
       awoken++;
     }
-
   assert(pthread_mutex_unlock(&mutex) == 0);
 
   return arg;
@@ -133,6 +134,7 @@ main()
   assert(pthread_cond_init(&cv1, NULL) == 0);
 
   assert(pthread_mutex_init(&mutex, NULL) == 0);
+  assert(pthread_mutex_init(&mutex1, NULL) == 0);
 
   /* get current system time */
   _ftime(&currSysTime);
@@ -142,7 +144,7 @@ main()
 
   abstime.tv_sec += 5;
 
-  assert(pthread_mutex_lock(&mutex) == 0);
+  assert(pthread_mutex_lock(&mutex1) == 0);
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
@@ -150,18 +152,19 @@ main()
     }
 
   do {
-    assert(pthread_cond_wait(&cv1,&mutex) == 0);
-  } while ( NUMTHREADS != waiting );
+    assert(pthread_cond_wait(&cv1,&mutex1) == 0);
+  } while ( NUMTHREADS > waiting );
 
-  assert(pthread_mutex_unlock(&mutex) == 0);
+  assert(pthread_mutex_unlock(&mutex1) == 0);
 
   for (i = NUMTHREADS/3; i <= 2*NUMTHREADS/3; i++)
     {
+      assert(pthread_mutex_lock(&mutex) == 0);
       assert(pthread_cond_signal(&cv) == 0);
+      assert(pthread_mutex_unlock(&mutex) == 0);
+
       signaled++;
     }
-
-  assert(pthread_cond_destroy(&cv1) == 0);
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
@@ -176,6 +179,8 @@ main()
   assert(signaled == awoken);
   assert(timedout == NUMTHREADS - signaled);
 
+  assert(pthread_cond_destroy(&cv1) == 0);
+
   {
   int result = pthread_cond_destroy(&cv);
   if (result != 0)
@@ -188,6 +193,9 @@ main()
     }
   assert(result == 0);
   }
+
+  assert(pthread_mutex_destroy(&mutex1) == 0);
+  assert(pthread_mutex_destroy(&mutex) == 0);
 
   return 0;
 }

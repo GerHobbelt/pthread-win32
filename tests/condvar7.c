@@ -200,8 +200,6 @@ main()
 
   cvthing.shared++;
 
-  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
-
   /*
    * Cancel one of the threads.
    */
@@ -212,6 +210,8 @@ main()
    * Signal all remaining waiting threads.
    */
   assert(pthread_cond_broadcast(&cvthing.notbusy) == 0);
+
+  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
   /*
    * Give threads time to complete.

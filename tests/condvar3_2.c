@@ -160,10 +160,16 @@ main()
        * and while some are still waking up after timeout.
        * Also tests that redundant broadcasts don't return errors.
        */
+
+      assert(pthread_mutex_lock(&mutex) == 0);
+
       if (awoken > NUMTHREADS/3)
         {
           assert(pthread_cond_broadcast(&cv) == 0);
         }
+
+      assert(pthread_mutex_unlock(&mutex) == 0);
+
     }
 
   assert(awoken == NUMTHREADS - timedout);
@@ -180,6 +186,8 @@ main()
     }
   assert(result == 0);
   }
+
+  assert(pthread_mutex_destroy(&mutex) == 0);
 
   return 0;
 }
