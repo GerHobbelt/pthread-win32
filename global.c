@@ -39,7 +39,7 @@
 #include "implement.h"
 
 
-int ptw32_processInitialized = FALSE;
+int ptw32_processInitialized = PTW32_FALSE;
 pthread_t ptw32_threadReuseTop = PTW32_THREAD_REUSE_BOTTOM;
 pthread_key_t ptw32_selfThreadKey = NULL;
 pthread_key_t ptw32_cleanupKey = NULL;

@@ -201,6 +201,14 @@
 #include <limits.h>
 
 /*
+ * Boolean values to make us independent of system includes.
+ */
+enum {
+  PTW32_FALSE = 0,
+  PTW32_TRUE = (! PTW32_FALSE)
+};
+
+/*
  * This is a duplicate of what is in the autoconf config.h,
  * which is only used when building the pthread-win32 libraries.
  */
@@ -576,7 +584,7 @@ enum {
  * ====================
  * ====================
  */
-#define PTHREAD_ONCE_INIT	{ FALSE, -1 }
+#define PTHREAD_ONCE_INIT	{ PTW32_FALSE, -1 }
 
 struct pthread_once_t_
 {

@@ -61,8 +61,8 @@ ptw32_new (void)
       t->cancelLock  = PTHREAD_MUTEX_INITIALIZER;
       t->cancelEvent = CreateEvent (
 				    0,
-				    (int) TRUE,    /* manualReset  */
-				    (int) FALSE,   /* setSignaled  */
+				    (int) PTW32_TRUE,    /* manualReset  */
+				    (int) PTW32_FALSE,   /* setSignaled  */
 				    NULL);
 
       if (t->cancelEvent == NULL)

@@ -348,8 +348,8 @@ pthread_cond_broadcast (pthread_cond_t * cond)
       */
 {
   /*
-   * The '1'(TRUE) unblockAll arg means unblock ALL waiters.
+   * The TRUE unblockAll arg means unblock ALL waiters.
    */
-  return (ptw32_cond_unblock(cond, 1));
+  return (ptw32_cond_unblock(cond, PTW32_TRUE));
 
 }                               /* pthread_cond_broadcast */

@@ -144,6 +144,10 @@ pthread_win32_thread_detach_np ()
 {
   if (ptw32_processInitialized)
     {
+      /*
+       * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
+       * unnecessarily.
+       */
        pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
 
        /*

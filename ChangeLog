@@ -1,3 +1,22 @@
+2003-09-02  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* pthread_win32_attach_detach_np.c (pthread_win32_thread_detach_np):
+	Add comment.
+
+	* pthread_exit.c (pthread_exit): Fix to recycle the POSIX thread handle in
+	addition to calling user TSD destructors. Move the implicit POSIX thread exit
+	handling to ptw32_throw to centralise the logic.
+
+	* ptw32_throw.c (ptw32_throw): Implicit POSIX threads have no point
+	to jump or throw to, so cleanup and exit the thread here in this case. For
+	processes using the C runtime, the exit code will be set to the POSIX
+	reason for the throw (i.e. PTHREAD_CANCEL or the value given to pthread_exit).
+	Note that pthread_exit() already had similar logic, which has been moved to
+	here.
+
+	* ptw32_threadDestroy.c (ptw32_threadDestroy): Don't close the Win32 handle
+	of implicit POSIX threads - expect this to be done by Win32?
+
 2003-09-01  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* pthread_self.c (pthread_self): The newly aquired pthread_t must be

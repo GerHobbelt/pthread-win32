@@ -110,7 +110,7 @@ ptw32_processTerminate (void)
       DeleteCriticalSection(&ptw32_mutex_test_init_lock);
       DeleteCriticalSection(&ptw32_thread_reuse_lock);
 
-      ptw32_processInitialized = FALSE;
+      ptw32_processInitialized = PTW32_FALSE;
     }
 
 }				/* processTerminate */

@@ -63,7 +63,7 @@ DllMain (
 	  LPVOID lpvReserved
 )
 {
-  BOOL result = TRUE;
+  BOOL result = PTW32_TRUE;
 
   switch (fdwReason)
     {

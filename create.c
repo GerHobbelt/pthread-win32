@@ -84,7 +84,7 @@ pthread_create (pthread_t * tid,
   pthread_t thread;
   HANDLE threadH = 0;
   int result = EAGAIN;
-  int run = TRUE;
+  int run = PTW32_TRUE;
   ThreadParms *parms = NULL;
   long stackSize;
 

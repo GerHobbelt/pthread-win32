@@ -65,16 +65,16 @@ ptw32_processInitialize (void)
 {
 	if (ptw32_processInitialized) {
 		/* 
-		 * ignore if already initialized. this is useful for 
+		 * Ignore if already initialized. this is useful for 
 		 * programs that uses a non-dll pthread
-		 * library. such programs must call ptw32_processInitialize() explicitely,
+		 * library. Such programs must call ptw32_processInitialize() explicitly,
 		 * since this initialization routine is automatically called only when
 		 * the dll is loaded.
 		 */
-		return TRUE;
+		return PTW32_TRUE;
 	}
 
-  ptw32_processInitialized = TRUE;
+  ptw32_processInitialized = PTW32_TRUE;
 
   /*
    * Initialize Keys

@@ -84,7 +84,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
   status = WaitForMultipleObjects (
 				    nHandles,
 				    handles,
-				    FALSE,
+				    PTW32_FALSE,
 				    timeout);
 
 

@@ -97,7 +97,7 @@ pthread_once (
 	   * First thread to increment the started variable
 	   */
 	  (*init_routine) ();
-	  once_control->done = TRUE;
+	  once_control->done = PTW32_TRUE;
 
 	}
       else

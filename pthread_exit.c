@@ -67,29 +67,33 @@ pthread_exit (void *value_ptr)
 {
   pthread_t self;
 
-  /* If the current thread is implicit it was not started through
-     pthread_create(), therefore we cleanup and end the thread
-     here. Otherwise we raise an exception to unwind the exception
-     stack. The exception will be caught by ptw32_threadStart(),
-     which will cleanup and end the thread for us.
+  /*
+   * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
+   * unnecessarily.
    */
-
   self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
+
 #ifdef _UWIN
 	 if(--pthread_count <= 0)
 		exit((int)value_ptr);
 #endif
 
-  if (self == NULL || self->implicit)
+  if (NULL == self)
     {
-      ptw32_callUserDestroyRoutines(self);
+      /*
+       * A POSIX thread handle was never created. I.e. this is a
+       * Win32 thread that has never called a pthreads-win32 routine that
+       * required a POSIX handle.
+       *
+       * Implicit POSIX handles are cleaned up in ptw32_throw() now.
+       */
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
       _endthreadex ((unsigned) value_ptr);
 #else
       _endthread ();
 #endif
-      
+
       /* Never reached */
     }
 

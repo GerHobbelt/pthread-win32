@@ -76,7 +76,7 @@ PASSES= loadfree.pass \
 	  condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
 	  exit1.pass  create1.pass  create2.pass  reuse1.pass  reuse2.pass  equal1.pass  \
 	  kill1.pass  valid1.pass  valid2.pass  \
-	  exit2.pass  exit3.pass  \
+	  exit2.pass  exit3.pass  exit4  exit5  \
 	  join0.pass  join1.pass  join2.pass  \
 	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
 	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
@@ -93,6 +93,7 @@ PASSES= loadfree.pass \
 	  rwlock2_t.pass  rwlock3_t.pass  rwlock4_t.pass  rwlock5_t.pass  rwlock6_t.pass  rwlock6_t2.pass  \
 	  context1.pass  \
 	  cancel3.pass  cancel4.pass  cancel5.pass  cancel6a.pass  cancel6d.pass  \
+	  cancel7  \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
@@ -211,6 +212,7 @@ cancel4.pass: cancel3.pass
 cancel5.pass: cancel3.pass
 cancel6a.pass: cancel3.pass
 cancel6d.pass: cancel3.pass
+cancel7.pass: kill1.pass
 cleanup0.pass: cancel5.pass
 cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
@@ -244,6 +246,8 @@ exception3.pass: exception2.pass
 exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass
+exit4.pass:
+exit5.pass: kill1.pass
 eyal1.pass: tsd1.pass
 inherit1.pass: join1.pass
 join0.pass: create1.pass

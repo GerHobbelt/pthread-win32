@@ -1,3 +1,45 @@
+SNAPSHOT 2003-09-03
+-------------------
+
+Bug fixes
+---------
+* pthread_self() would free the newly created implicit POSIX thread handle if
+DuplicateHandle failed instead of recycle it (very unlikely).
+
+* pthread_exit() was neither freeing nor recycling the POSIX thread struct
+for implicit POSIX threads.
+
+New feature - Cancelation of/by Win32 (non-POSIX) threads
+---------------------------------------------------------
+Since John Bossom's original implementation, the library has allowed non-POSIX
+initialised threads (Win32 threads) to call pthreads-win32 routines and
+therefore interact with POSIX threads. This is done by creating an on-the-fly
+POSIX thread ID for the Win32 thread that, once created, allows fully
+reciprical interaction. This did not extend to thread cancelation (async or
+deferred). Now it does.
+
+Any thread can be canceled by any other thread (Win32 or POSIX) if the former
+thread's POSIX pthread_t value is known. It's TSD destructors and POSIX
+cleanup handlers will be run before the thread exits with an exit code of
+PTHREAD_CANCELED (retrieved with GetExitCodeThread()).
+
+This allows a Win32 thread to, for example, call POSIX CV routines in the same way
+that POSIX threads would/should, with pthread_cond_wait() cancelability and
+cleanup handlers (pthread_cond_wait() is a POSIX cancelation point).
+
+By adding cancelation, Win32 threads should now be able to call all POSIX
+threads routines that make sense including semaphores, mutexes, condition
+variables, read/write locks, barriers, spinlocks, tsd, cleanup push/pop,
+cancelation, pthread_exit, scheduling, etc.
+
+Note that these on-the-fly 'implicit' POSIX thread IDs are initialised as detached
+(not joinable) with deferred cancelation type. The POSIX thread ID will be created
+automatically by any POSIX routines that need a POSIX handle (unless the routine
+needs a pthread_t as a parameter of course). A Win32 thread can discover it's own
+POSIX thread ID by calling pthread_self(), which will create the handle if
+necessary and return the pthread_t value.
+
+
 SNAPSHOT 2003-08-19
 -------------------
 
