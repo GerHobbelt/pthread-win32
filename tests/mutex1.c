@@ -9,9 +9,12 @@
 
 pthread_mutex_t mutex1;
 
+int
 main()
 {
   pthread_mutex_init(&mutex1, NULL);
   pthread_mutex_lock(&mutex1);
   pthread_mutex_unlock(&mutex1);
+
+  return 0;
 }
