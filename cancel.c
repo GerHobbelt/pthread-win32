@@ -12,7 +12,7 @@ int
 pthread_setcancelstate(int state,
 		       int *oldstate)
 {
-  _pthread_threads_thread_t * this = *_PTHREAD_THIS;
+  _pthread_threads_thread_t * us = _PTHREAD_THIS;
 
   /* Validate the new cancellation state. */
   if (state != PTHREAD_CANCEL_ENABLE 
@@ -23,10 +23,10 @@ pthread_setcancelstate(int state,
 
   if (oldstate != NULL)
     {
-      *oldstate = this->cancelstate;
+      *oldstate = us->cancelstate;
     }
 
-  this->cancelstate = state;
+  us->cancelstate = state;
   return 0;
 }
 
