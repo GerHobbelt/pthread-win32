@@ -155,7 +155,7 @@ _pthread_threadDestroy (pthread_t thread)
   if (thread != NULL)
     {
 
-      callUserDestroyRoutines (thread);
+      _pthread_callUserDestroyRoutines (thread);
 
       if (thread->cancelEvent != NULL)
 	{

@@ -6,7 +6,7 @@
 LIBRARY pthread
 
 EXPORTS
-pthread_atfork
+;pthread_atfork
 pthread_attr_destroy
 pthread_attr_getdetachstate
 ;pthread_attr_getinheritsched

@@ -8,6 +8,7 @@
 #include <errno.h>
 
 #include "pthread.h"
+#include "implement.h"
 
 int
 pthread_once(pthread_once_t *once_control,

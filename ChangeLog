@@ -1,3 +1,72 @@
+Tue Dec 29 13:11:16 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Move the following struct definitions to pthread.h:
+	pthread_t_, pthread_attr_t_, pthread_mutex_t_, pthread_mutex_t_,
+	pthread_mutexattr_t_, pthread_key_t_, pthread_cond_t_,
+	pthread_condattr_t_, pthread_once_t_.
+
+	* pthread.h: Add "_" prefix to pthread_push_cleanup and 
+	pthread_pop_cleanup internal routines, and associated struct and
+	typedefs.
+
+	* buildlib.bat: Add compile command for semaphore.c
+
+	* pthread.def: Comment out pthread_atfork routine name. 
+	Now unimplemented.
+
+	* tsd.c (pthread_setspecific): Rename tkAssocCreate to
+	_pthread_tkAssocCreate.
+	(pthread_key_delete): Rename tkAssocDestroy to
+	_pthread_tkAssocDestroy.
+
+	* sync.c (pthread_join): Rename threadDestroy to _pthread_threadDestroy
+
+	* sched.c (is_attr): attr is now **attr (was *attr), so add extra
+	NULL pointer test.
+	(pthread_attr_setschedparam): Increase redirection for attr which is
+	now a **.
+	(pthread_attr_getschedparam): Ditto.
+	(pthread_setschedparam): Change thread validation and rename "thread"
+ 	Win32 thread Handle element name to match John Bossom's version.
+	(pthread_getschedparam): Ditto.
+
+	* private.c (_pthread_threadDestroy): Rename call to
+	callUserDestroyRoutines() as _pthread_callUserDestroyRoutines()
+
+	* misc.c: Add #include "implement.h".
+
+	* dll.c: Remove defined(KLUDGE) wrapped code.
+
+	* fork.c: Remove redefinition of ENOMEM.
+
+	* create.c (pthread_create): Rename threadStart and threadDestroy calls
+	to _pthread_threadStart and _pthread_threadDestroy.
+
+	* implement.h: Rename "detachedstate" to "detachstate".
+
+	* attr.c: Rename "detachedstate" to "detachstate".
+
+Mon Dec 28 09:54:39 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h (pthread_attr_t_): Change to *pthread_attr_t.
+
+	* attr.c (pthread_attr_setstacksize): Merge with John Bossom's version.
+	(pthread_attr_getstacksize): Merge with John Bossom's version.
+	(pthread_attr_setstackaddr): Merge with John Bossom's version.
+	(pthread_attr_getstackaddr): Merge with John Bossom's version.
+	(pthread_attr_init): Merge with John Bossom's version.
+	(pthread_attr_destroy): Merge with John Bossom's version.
+	(pthread_attr_getdetachstate): Merge with John Bossom's version.
+	(pthread_attr_setdetachstate): Merge with John Bossom's version.
+	(is_attr): attr is now **attr (was *attr), so add extra NULL pointer
+	test.
+
+	* implement.h (pthread_attr_t_): Add and rename elements in JEB's
+	version to correspond to original, so that it can be used with
+	original attr routines.
+
+	* pthread.h: Add #endif at end which was truncated in merging.
+
 Sun Dec 20 14:51:58 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* misc.c (pthreadCancelableWait): New function by John Bossom. Non-standard

@@ -189,7 +189,7 @@ pthread_key_delete (pthread_key_t key)
 
                   pthread_mutex_unlock (&(assoc->lock));
 
-                  tkAssocDestroy (assoc);
+                  _pthread_tkAssocDestroy (assoc);
 
                   assoc = next;
                 }
@@ -304,7 +304,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
            * create an association if not found
            */
           result = (assoc == NULL)
-            ? tkAssocCreate (&assoc, self, key)
+            ? _pthread_tkAssocCreate (&assoc, self, key)
             : 0;
         }
       else

@@ -90,7 +90,6 @@ pthread_create (pthread_t * tid,
     {
       stackSize = (*attr)->stacksize;
       thread->detachState = (*attr)->detachstate;
-
     }
   else
     {
@@ -109,7 +108,7 @@ pthread_create (pthread_t * tid,
     _beginthreadex (
 		     (void *) NULL,	/* No security info             */
 		     (unsigned) stackSize,	/* default stack size   */
-		     (unsigned (__stdcall *) (void *)) threadStart,
+		     (unsigned (__stdcall *) (void *)) _pthread_threadStart,
 		     parms,
 		     (unsigned) run ? 0 : CREATE_SUSPENDED,
 		     (unsigned *) &(thread->thread));
@@ -130,7 +129,7 @@ FAIL0:
   if (result != 0)
     {
 
-      threadDestroy (thread);
+      _pthread_threadDestroy (thread);
       thread = NULL;
 
       if (parms != NULL)
@@ -235,7 +234,7 @@ pthread_create(pthread_t *thread,
 	      attr_copy->stacksize = PTHREAD_STACK_MIN;
 	    }
 
-	  attr_copy->detachedstate = attr->detachedstate;
+	  attr_copy->detachstate = attr->detachstate;
 	  attr_copy->priority = attr->priority;
 
 #if HAVE_SIGSET_T

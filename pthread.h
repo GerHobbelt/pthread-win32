@@ -234,7 +234,7 @@ struct timespec {
 
 
 #include <semaphore.h>
-#include <sched.h>
+/* #include <sched.h> /**/
 
 
 #ifdef __cplusplus
@@ -397,7 +397,7 @@ extern "C"
 
 
   typedef struct pthread_t_ *pthread_t;
-  typedef struct pthread_attr_t_ pthread_attr_t;
+  typedef struct pthread_attr_t_ *pthread_attr_t;
   typedef struct pthread_once_t_ pthread_once_t;
   typedef struct pthread_key_t_ *pthread_key_t;
   typedef struct pthread_mutex_t_ pthread_mutex_t;
@@ -483,6 +483,126 @@ extern "C"
 /*
  * ====================
  * ====================
+ * Opaque Structure Definitions
+ * ====================
+ * ====================
+ */
+
+typedef enum {
+  /*
+   * This enumeration represents the state of the thread;
+   * The thread is still "alive" if the numeric value of the
+   * state is greater or equal "PThreadStateRunning".
+   */
+  PThreadStateInitial = 0,	/* Thread not running                   */
+  PThreadStateRunning,	        /* Thread alive & kicking               */
+  PThreadStateSuspended,	/* Thread alive but suspended           */
+  PThreadStateCanceling,	/* Thread alive but and is              */
+                                /* in the process of terminating        */
+                                /* due to a cancellation request        */
+  PThreadStateException,	/* Thread alive but exiting             */
+                                /* due to an exception                  */
+  PThreadStateLast
+}
+PThreadState;
+
+
+typedef enum {
+  /*
+   * This enumeration represents the reason why a thread has
+   * terminated/is terminating.
+   */
+  PThreadDemisePeaceful = 0,	/* Death due natural causes     */
+  PThreadDemiseCancelled,	/* Death due to user cancel     */
+  PThreadDemiseException,	/* Death due to unhandled       */
+                                /* exception                    */
+  PThreadDemiseNotDead	/* I'm not dead!                */
+}
+PThreadDemise;
+
+
+struct pthread_t_ {
+  DWORD thread;
+  HANDLE threadH;
+  PThreadState state;
+  PThreadDemise demise;
+  void *exitStatus;
+  void *parms;
+  int detachState;
+  int cancelState;
+  int cancelType;
+  HANDLE cancelEvent;
+  int implicit:1;
+  void *keys;
+};
+
+
+/* 
+ * Special value to mark attribute objects as valid.
+ */
+#define _PTHREAD_ATTR_VALID 0xC4C0FFEE
+
+struct pthread_attr_t_ {
+  long valid;
+  void *stackaddr;
+  size_t stacksize;
+  int detachstate;
+  int priority;
+#if HAVE_SIGSET_T
+  sigset_t sigmask;
+#endif /* HAVE_SIGSET_T */
+};
+
+
+struct pthread_mutex_t_ {
+	int valid;
+	CRITICAL_SECTION cs;
+  };
+
+
+struct pthread_mutexattr_t_ {
+  int pshared;
+};
+
+
+struct pthread_key_t_ {
+  DWORD key;
+  void (*destructor) (void *);
+  pthread_mutex_t threadsLock;
+  void *threads;
+};
+
+
+struct pthread_cond_t_ {
+  long waiters;                       /* # waiting threads             */
+  pthread_mutex_t waitersLock;        /* Mutex that guards access to 
+					 waiter count                  */
+  sem_t sema;                         /* Queue up threads waiting for the 
+					 condition to become signaled  */
+  HANDLE waitersDone;                 /* An auto reset event used by the 
+					 broadcast/signal thread to wait 
+					 for the waiting thread(s) to wake
+					 up and get a chance at the  
+					 semaphore                     */
+  int wasBroadcast;                   /* keeps track if we are signaling 
+					 or broadcasting               */
+};
+
+
+struct pthread_condattr_t_ {
+  int pshared;
+};
+
+
+struct pthread_once_t_ {
+  unsigned short flag;
+  pthread_mutex_t lock;
+};
+
+
+/*
+ * ====================
+ * ====================
  * Scheduling
  * ====================
  * ====================
@@ -510,28 +630,31 @@ extern "C"
  *   WIN32 SEH or C++
  */
 
+  typedef struct _pthread_cleanup_t _pthread_cleanup_t;
+
+  struct _pthread_cleanup_t
+    {
+      void (*routine) (void *);
+      void *arg;
+#if !defined(__cplusplus)
+      _pthread_cleanup_t *prev;
+#endif
+    };
+
 #ifndef __cplusplus
 
 /*
  * C implementation of PThreads cancel cleanup
  */
-  typedef struct pthread_cleanup_t pthread_cleanup_t;
-
-  struct pthread_cleanup_t
-    {
-      void (*routine) (void *);
-      void *arg;
-      pthread_cleanup_t *prev;
-    };
 
 #define pthread_cleanup_push( _rout, _arg ) \
 	{ \
-	    pthread_cleanup_t	cleanup; \
+	    _pthread_cleanup_t	_cleanup; \
             \
-	    pthread_push_cleanup( &cleanup, (_rout), (_arg) ); \
+	    _pthread_push_cleanup( &_cleanup, (_rout), (_arg) ); \
 
 #define pthread_cleanup_pop( _execute ) \
-	    (void) pthread_pop_cleanup( _execute ); \
+	    (void) _pthread_pop_cleanup( _execute ); \
 	}
 
 #else /* !__cplusplus */
@@ -543,7 +666,7 @@ extern "C"
 
 #define pthread_cleanup_push( _rout, _arg ) \
 	{ \
-	    pthread_cleanup_t	_cleanup; \
+	    _pthread_cleanup_t	_cleanup; \
 	    \
             _cleanup.routine	= (_rout); \
 	    _cleanup.arg	= (_arg); \
@@ -571,7 +694,7 @@ extern "C"
 
 #define pthread_cleanup_push( _rout, _arg ) \
 	{ \
-	    pthread_cleanup_t	_cleanup; \
+	    _pthread_cleanup_t	_cleanup; \
 	    \
             _cleanup.routine	= (_rout); \
 	    _cleanup.arg	= (_arg); \
@@ -652,11 +775,13 @@ pthread_t pthread_self (void);
 
 int pthread_cancel (pthread_t thread);
 
-pthread_cleanup_t *pthread_pop_cleanup (int execute);
+#ifndef __cplusplus
+_pthread_cleanup_t *_pthread_pop_cleanup (int execute);
 
-void pthread_push_cleanup (pthread_cleanup_t * cleanup,
+void _pthread_push_cleanup (_pthread_cleanup_t * cleanup,
 			   void (*routine) (void *),
 			   void *arg);
+#endif /* !__cplusplus */
 
 int pthread_setcancelstate (int state,
 			    int *oldstate);
@@ -817,3 +942,4 @@ int pthreadCancelableWait (HANDLE waitHandle);
 }				/* End of extern "C" */
 #endif				/* __cplusplus */
 
+#endif /* PTHREAD_H */

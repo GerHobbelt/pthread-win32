@@ -69,10 +69,6 @@ DllMain (
 
 	if (_pthread_processInitialized)
 	  {
-#if defined( KLUDGE )
-	    _pthread_cleanupStack ();
-#endif /* KLUDGE */
-
 	    self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
 
 	    /*

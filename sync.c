@@ -10,6 +10,9 @@
  * Code contributed by John E. Bossom <JEB>.
  */
 
+#include "pthread.h"
+#include "implement.h"
+
 int
 pthread_detach (pthread_t tid)
      /*
@@ -112,7 +115,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 	}
       else
 	{
-	  threadDestroy (thread);
+	  _pthread_threadDestroy (thread);
 	}
     }
 

@@ -15,7 +15,9 @@
 static int
 is_attr(const pthread_attr_t *attr)
 {
-  return (attr == NULL || attr->valid != _PTHREAD_ATTR_VALID) ? 1 : 0;
+  return (attr == NULL || 
+	  *attr == NULL || 
+	  (*attr)->valid != _PTHREAD_ATTR_VALID) ? 1 : 0;
 }
 
 int
@@ -27,11 +29,12 @@ pthread_attr_setschedparam(pthread_attr_t *attr,
       return EINVAL;
     }
 
-  attr->priority = param->sched_priority;
+  (*attr)->priority = param->sched_priority;
   return 0;
 }
 
-int pthread_attr_getschedparam(const pthread_attr_t *attr,
+int 
+pthread_attr_getschedparam(const pthread_attr_t *attr,
 			       struct sched_param *param)
 {
   if (is_attr(attr) != 0 || param == NULL)
@@ -39,7 +42,7 @@ int pthread_attr_getschedparam(const pthread_attr_t *attr,
       return EINVAL;
     }
   
-  param->sched_priority = attr->priority;
+  param->sched_priority = (*attr)->priority;
   return 0;
 }
 
@@ -47,7 +50,7 @@ int pthread_setschedparam(pthread_t thread, int policy,
 			  const struct sched_param *param)
 {
   /* Validate the thread id. */
-  if (_PTHREAD_VALID(thread) < 0)
+  if (thread == NULL || thread->threadH == 0)
     {
       return EINVAL;
     }
@@ -72,7 +75,8 @@ int pthread_setschedparam(pthread_t thread, int policy,
     }
 
   /* This is practically guaranteed to return TRUE. */
-  (void) SetThreadPriority(thread->win32handle, param->sched_priority);
+  (void) SetThreadPriority(thread->threadH, param->sched_priority);
+
   return 0;
 }
 
@@ -82,7 +86,7 @@ int pthread_getschedparam(pthread_t thread, int *policy,
   int prio;
 
   /* Validate the thread id. */
-  if (_PTHREAD_VALID(thread) != 0)
+  if (thread == NULL || thread->threadH == 0)
     {
       return EINVAL;
     }
@@ -97,7 +101,7 @@ int pthread_getschedparam(pthread_t thread, int *policy,
   *policy = SCHED_OTHER;
 
   /* Fill out the sched_param structure. */
-  prio = GetThreadPriority(thread->win32handle);
+  prio = GetThreadPriority(thread->threadH);
   if (prio == THREAD_PRIORITY_ERROR_RETURN)
     {
       return EINVAL;
