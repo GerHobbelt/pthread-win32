@@ -11,8 +11,9 @@ ECHO	= @echo
 #
 # Mingw32
 #
+GLANG	= c
 CC	= gcc
-CFLAGS	= -g -O2 -UNDEBUG -Wall -o $@ $^
+CFLAGS	= -g -O2 -UNDEBUG -Wall -x $(GLANG) -o $@ $^
 BUILD_DIR	= ..
 INCLUDES	= -I.
 LIBS	= ./libpthread32.a

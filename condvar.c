@@ -459,14 +459,21 @@ pthread_cond_destroy (pthread_cond_t * cond)
 
   if (cv != (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
+      if (pthread_mutex_lock(&(cv->waitersLock)) != 0)
+	{
+	  return EINVAL;
+	}
+
       if (cv->waiters > 0)
 	{
+	  (void) pthread_mutex_unlock(&(cv->waitersLock));
 	  return EBUSY;
 	}
 
       (void) sem_destroy (&(cv->sema));
-      (void) pthread_mutex_destroy (&(cv->waitersLock));
       (void) CloseHandle (cv->waitersDone);
+      (void) pthread_mutex_unlock(&(cv->waitersLock));
+      (void) pthread_mutex_destroy (&(cv->waitersLock));
 
       free(cv);
     }
@@ -510,9 +517,21 @@ cond_timedwait (pthread_cond_t * cond,
   cv = *cond;
 
   /*
-   * OK to increment  cond->waiters because the caller locked 'mutex'
+   * It's not OK to increment cond->waiters while the caller locked 'mutex',
+   * there may be other threads just waking up (with 'mutex' unlocked)
+   * and cv->... data is not protected.
    */
+  if (pthread_mutex_lock(&(cv->waitersLock)) != 0)
+    {
+      return EINVAL;
+    }
+
   cv->waiters++;
+
+  if (pthread_mutex_unlock(&(cv->waitersLock)) != 0)
+    {
+      return EINVAL;
+    }
 
   /*
    * We keep the lock held just long enough to increment the count of
@@ -527,6 +546,7 @@ cond_timedwait (pthread_cond_t * cond,
        * Wait to be awakened by
        *              pthread_cond_signal, or
        *              pthread_cond_broadcast
+       *              timeout
        *
        * Note: 
        *      _pthread_sem_timedwait is a cancellation point,
@@ -548,10 +568,10 @@ cond_timedwait (pthread_cond_t * cond,
   if ((internal_result = pthread_mutex_lock (&(cv->waitersLock))) == 0)
     {
       /*
-       * By making the waiter responsible for decrementing
-       * its count we don't have to worry about having an internal
-       * mutex.
+       * The waiter is responsible for decrementing
+       * its count, protected by an internal mutex.
        */
+
       cv->waiters--;
 
       lastWaiter = cv->wasBroadcast && (cv->waiters == 0);
@@ -559,7 +579,7 @@ cond_timedwait (pthread_cond_t * cond,
       internal_result = pthread_mutex_unlock (&(cv->waitersLock));
     }
 
-  if (result == 0 && internal_result == 0)
+  if ((result == 0 || result == ETIMEDOUT) && internal_result == 0)
     {
       if (lastWaiter)
         {
@@ -576,7 +596,7 @@ cond_timedwait (pthread_cond_t * cond,
 
   /*
    * We must always regain the external mutex, even when
-   * errors occur because that's the guarantee that we give
+   * errors occur, because that's the guarantee that we give
    * to our callers
    */
   (void) pthread_mutex_lock (mutex);
@@ -760,6 +780,7 @@ pthread_cond_signal (pthread_cond_t * cond)
 
   /*
    * No-op if the CV is static and hasn't been initialised yet.
+   * Assuming that race conditions are harmless.
    */
   if (cv == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
@@ -768,6 +789,7 @@ pthread_cond_signal (pthread_cond_t * cond)
 
   /*
    * If there aren't any waiters, then this is a no-op.
+   * Assuming that race conditions are harmless.
    */
   if (cv->waiters > 0)
     {
@@ -817,6 +839,7 @@ pthread_cond_broadcast (pthread_cond_t * cond)
       */
 {
   int result = 0;
+  int wereWaiters = FALSE;
   pthread_cond_t cv;
 
   if (cond == NULL || *cond == NULL)
@@ -828,13 +851,20 @@ pthread_cond_broadcast (pthread_cond_t * cond)
 
   /*
    * No-op if the CV is static and hasn't been initialised yet.
+   * Assuming that any race condition is harmless.
    */
   if (cv == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
       return 0;
     }
 
+  if (pthread_mutex_lock(&(cv->waitersLock)) == EINVAL)
+    {
+      return EINVAL;
+    }
+
   cv->wasBroadcast = TRUE;
+  wereWaiters = (cv->waiters > 0);
 
   /*
    * Wake up all waiters
@@ -843,14 +873,16 @@ pthread_cond_broadcast (pthread_cond_t * cond)
 	    ? 0
 	    : EINVAL);
 
-  if (cv->waiters > 0 && result == 0)
+  (void) pthread_mutex_unlock(&(cv->waitersLock));
+
+  if (wereWaiters && result == 0)
     {
       /*
        * Wait for all the awakened threads to acquire their part of
        * the counting semaphore
        */
-      if (WaitForSingleObject (cv->waitersDone, INFINITE) ==
-          WAIT_OBJECT_0)
+      if (WaitForSingleObject (cv->waitersDone, INFINITE)
+          == WAIT_OBJECT_0)
         {
           result = 0;
         }

@@ -1,3 +1,43 @@
+1999-08-12  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* exit.c (pthread_exit): Check for implicitly created threads
+	to avoid raising an unhandled exception.
+	
+1999-07-12  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* condvar.c (pthread_cond_destroy): Add critical section.
+	(cond_timedwait): Add critical section; check for timeout
+	waiting on semaphore.
+	(pthread_cond_broadcast): Add critical section.
+	- Peter Slacik <Peter.Slacik@tatramed.sk>
+
+1999-07-09  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	The following changes fix a bug identified by
+	Lorin Hochstein <lmh@xiphos.ca> and solved by
+	John Bossom <John.Bossom@Cognos.COM>.
+
+	The problem was that cleanup handlers were not executed when
+	pthread_exit() was called.
+
+	* implement.h (pthread_t_): Add exceptionInformation element for
+	C++ per-thread exception information.
+	(general): Define and rename exceptions.
+
+
+	* misc.c (CancelableWait):  _PTHREAD_EPS_CANCEL (SEH) and
+	Pthread_exception_cancel (C++) used to identify the exception.
+
+	* cancel.c (pthread_testcancel): _PTHREAD_EPS_CANCEL (SEH) and
+	Pthread_exception_cancel (C++) used to identify the exception.
+
+	* exit.c (pthread_exit): throw/raise an exception to return to
+	_pthread_threadStart() to exit the thread. _PTHREAD_EPS_EXIT (SEH)
+	and Pthread_exception_exit (C++) used to identify the exception.
+
+	* private.c (_pthread_threadStart): Add pthread_exit exception trap;
+	clean up and exit the thread directly rather than via pthread_exit().
+
 Sun May 30 00:25:02 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* semaphore.h (mode_t): Conditionally typedef it.

@@ -9,8 +9,8 @@
 We are pleased to announce the availability of a new snapshot of
 Pthreads-win32, an Open Source Software (OSS) implementation of the
 Threads component of the POSIX 1003.1c 1995 Standard for Microsoft's
-Win32 environment. Some functions from POSIX 1003.1b are supported
-including semaphores.
+Win32 environment. Some functions from POSIX 1003.1b are also
+supported including semaphores.
 
 Pthreads-win32 is free software, distributed under the GNU Library
 General Public License (LGPL).
@@ -27,7 +27,7 @@ Change Summary (since the last snapshot)
 
 Some minor bugs have been fixed. See the ChangeLog file for details.
 
-Some more POSIX 1b functions are now included but ony return an
+Some more POSIX 1b functions are now included but only return an
 error (ENOSYS) if called. They are:
 
 	sem_open
@@ -267,7 +267,7 @@ MSVC:
 MSVC works.
       
 Mingw32: (ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/egcs-1.1.1/)
-Mingw32 must use the thread-safe MSVCRT library. You can link
+Mingw32 must use the thread-safe MSVCRT library (see the FAQ). You can link
 against the export library libpthread32.a built under Mingw32
 but you must run your application with the version of pthread.dll built
 with MSVC.
@@ -281,41 +281,46 @@ pthreads-win32 against Cygwin.
 
 Generally:
 For convenience, the following pre-built files are available on the FTP site
-(see above):
+(see Availability above):
 
         pthread.h       - for POSIX 1c threads
         semaphore.h     - for POSIX 1b semaphores
         sched.h         - for POSIX 1b scheduling
-        pthread.dll     - built with MSVC cl compiler
-        pthread.lib     - built with MSVC cl compiler
-        libpthread32.a  - built with Mingw32 (use with MSVC pthread.dll)
-      
+        pthread.dll     - built with MSVC cl compiler on NT4.0
+        pthread.lib     - built with MSVC cl compiler on NT4.0
+        libpthread32.a  - built with Mingw32 on Win98 (use with
+                          MSVC pthread.dll for runtime)
+
 These are the only files you need in order to build POSIX threads
 applications for Win32 using either MSVC or Mingw32.
       
 See the FAQ file in the source tree for additional information.
 
-      
-Building the library with MSVC
--------------------------------  
-      
-There is currently no Makefile for building the library under MSVC.
-There is a batch file "buildlib.bat" which will build the library.
-      
 
-Why you can't build the library with Cygwin or Mingw32 (yet)
-------------------------------------------------------------
-      
+Why you can't build the DLL itself with Mingw32 (yet)
+-----------------------------------------------------
+
 The library makes use of exception handling internally (Win32 SEH if
 compiled with MSVC and C++ EH otherwise). Unfortunately, current
 versions of egcs (g++) do not have thread-safe exception handling
-and therefore the DLL pthread.dll cannot be built under either
-Mingw32 or Cygwin.
-      
-      
+and therefore the DLL pthread.dll cannot be built.
+
+However, it is possible to build applications which make use of
+pthreads-win32, using Mingw32's gcc or g++.
+
+
+Building the library with MSVC
+------------------------------
+
+There is currently no Makefile for building the library under MSVC.
+This is partly because my access to MSVC is via telnet to a remote NT
+machine. There is a batch file "buildlib.bat" which will build the
+library.
+
+
 Documentation
 -------------
-      
+
 Currently, there is no documentation included in the package apart
 from the copious comments in the source code.
 

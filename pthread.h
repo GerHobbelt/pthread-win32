@@ -540,6 +540,14 @@ struct sched_param {
  *   WIN32 SEH
  *   C
  *   C++
+ *
+ * Please note that exiting a push/pop block via
+ * "return", "exit", "break", or "continue" will
+ * lead to different behaviour amongst applications
+ * depending upon whether the library was built
+ * using SEH, C++, or C. For example, a library built
+ * with SEH will call the cleanup routine, while both
+ * C++ and C built versions will not.
  */
 
 typedef struct _pthread_cleanup_t _pthread_cleanup_t;
@@ -550,7 +558,7 @@ struct _pthread_cleanup_t
   void *arg;
 #if !defined(_MSC_VER) && !defined(__cplusplus)
   _pthread_cleanup_t *prev;
-#endif
+#endif /* !_MSC_VER && ! __cplusplus */
 };
 
 #ifdef _MSC_VER

@@ -139,22 +139,43 @@ _pthread_processTerminate (void)
 
 }				/* processTerminate */
 
+#ifdef _MSC_VER
+
+static DWORD
+ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
+{
+  DWORD param;
+  DWORD numParams = ep->ExceptionRecord->NumberParameters;
+  
+  numParams = (numParams > 3) ? 3 : numParams;
+
+  for (param = 0; param < numParams; param++)
+    {
+      ei[param] = ep->ExceptionRecord->ExceptionInformation[param];
+    }
+
+  return EXCEPTION_EXECUTE_HANDLER;
+}
+
+#endif /* _MSC_VER */
+
 void *
 _pthread_threadStart (ThreadParms * threadParms)
 {
-  pthread_t tid;
+  pthread_t self;
   void *(*start) (void *);
   void *arg;
+  DWORD ei[3];
 
   void * status;
 
-  tid = threadParms->tid;
+  self = threadParms->tid;
   start = threadParms->start;
   arg = threadParms->arg;
 
   free (threadParms);
 
-  pthread_setspecific (_pthread_selfThreadKey, tid);
+  pthread_setspecific (_pthread_selfThreadKey, self);
 
 #ifdef _MSC_VER
 
@@ -166,13 +187,32 @@ _pthread_threadStart (ThreadParms * threadParms)
     (*start) (arg);
     status = (void *) 0;
   }
-  __except (EXCEPTION_EXECUTE_HANDLER)
+  __except (ExceptionFilter(GetExceptionInformation(), ei))
   {
-    /*
-     * A system unexpected exception had occurred running the user's
-     * routine. We get control back within this block.
-     */
-    status = PTHREAD_CANCELED;
+    DWORD ec = GetExceptionCode();
+
+    if (ec == EXCEPTION_PTHREAD_SERVICES)
+      {
+	switch (ei[0])
+	  {
+	  case _PTHREAD_EPS_CANCEL:
+	    status = PTHREAD_CANCELED;
+	    break;
+	  case _PTHREAD_EPS_EXIT:
+	    status = (void *) ei[1];
+	    break;
+	  default:
+	    status = PTHREAD_CANCELED;
+	  }
+      }
+    else
+      {
+	/*
+	 * A system unexpected exception had occurred running the user's
+	 * routine. We get control back within this block.
+	 */
+	status = PTHREAD_CANCELED;
+      }
   }
 
 #else /* _MSC_VER */
@@ -187,12 +227,19 @@ _pthread_threadStart (ThreadParms * threadParms)
     (*start) (arg);
     status = (void *) 0;
   }
-  catch (Pthread_exception)
+  catch (Pthread_exception_cancel)
     {
       /*
        * Thread was cancelled.
        */
       status = PTHREAD_CANCELED;
+    }
+  catch (Pthread_exception_exit)
+    {
+      /*
+       * Thread was exited via pthread_exit().
+       */
+      status = self->exceptionInformation;
     }
   catch (...)
     {
@@ -214,9 +261,11 @@ _pthread_threadStart (ThreadParms * threadParms)
 
 #endif /* __cplusplus */
 
-#endif /* _WIN32 */
+#endif /* _MSC_VER */
 
-  pthread_exit (status);
+  _pthread_callUserDestroyRoutines(self);
+
+  _endthreadex ((unsigned) status);
 
   /*
    * Never reached.
