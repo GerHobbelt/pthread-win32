@@ -32,7 +32,7 @@ _pthread_start_call(void * us_arg)
      that our records reflect true reality. */
   if (SetThreadPriority((HANDLE) us->win32handle, us->attr.priority) == FALSE)
     {
-      us->attr.priority = GetThreadPriority((HANDLE) us->win32handle;
+      us->attr.priority = GetThreadPriority((HANDLE) us->win32handle);
     }
 
   func = us->call.routine;
@@ -40,7 +40,7 @@ _pthread_start_call(void * us_arg)
 
   ret = (*func)(arg);
 
-  _pthread_exit(NULL, ret);
+  _pthread_exit(us, NULL, ret);
 
   /* Never Reached */
 }
@@ -56,14 +56,14 @@ pthread_create(pthread_t *thread,
   void *   security = NULL;
   DWORD  threadID;
   pthread_attr_t * attr_copy;
-  pthread_t * usptr;
+  pthread_t us;
   /* Success unless otherwise set. */
   int ret;
 
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_table_mutex);
 
-  ret = _pthread_new_thread_entry((pthread_t) handle, usptr);
+  ret = _pthread_new_thread(&us);
 
   pthread_mutex_lock(&_pthread_table_mutex);
   /* END CRITICAL SECTION */
@@ -111,7 +111,9 @@ pthread_create(pthread_t *thread,
   if (ret == 0)
     {
       /* Let the caller know the thread handle. */
-      *thread = (pthread_t) handle;
+      us->win32handle = handle;
+      us->ptstatus = _PTHREAD_INUSE;
+      *thread = (pthread_t) us;
     }
   else
     {
@@ -119,7 +121,7 @@ pthread_create(pthread_t *thread,
       pthread_mutex_lock(&_pthread_table_mutex);
 
       /* Remove the failed thread entry. */
-      _pthread_delete_thread_entry(us);
+      _pthread_delete_thread(us);
 
       pthread_mutex_lock(&_pthread_table_mutex);
       /* END CRITICAL SECTION */
