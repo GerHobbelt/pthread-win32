@@ -107,20 +107,6 @@ typedef enum
 PThreadState;
 
 
-typedef enum
-{
-  /*
-   * This enumeration represents the reason why a thread has
-   * terminated/is terminating.
-   */
-  PThreadDemisePeaceful = 0,	/* Death due natural causes     */
-  PThreadDemiseCancelled,	/* Death due to user cancel     */
-  PThreadDemiseException,	/* Death due to unhandled       */
-  /* exception                    */
-  PThreadDemiseNotDead		/* I'm not dead!                */
-}
-PThreadDemise;
-
 struct pthread_t_
 {
 #ifdef _UWIN
@@ -130,7 +116,6 @@ struct pthread_t_
   HANDLE threadH;		/* POSIX thread is invalid if threadH == 0 */
   pthread_t prevReuse;		/* Links threads on reuse stack */
   PThreadState state;
-  PThreadDemise demise;
   void *exitStatus;
   void *parms;
   int ptErrno;

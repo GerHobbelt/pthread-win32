@@ -519,20 +519,20 @@ extern "C"
 #if defined(_UWIN) && PTW32_LEVEL >= PTW32_LEVEL_MAX
 #   include     <sys/types.h>
 #else
-typedef struct pthread_t_ *pthread_t;
-typedef struct pthread_attr_t_ *pthread_attr_t;
+typedef struct pthread_t_ * volatile pthread_t;
+typedef struct pthread_attr_t_ * volatile pthread_attr_t;
 typedef struct pthread_once_t_ pthread_once_t;
-typedef struct pthread_key_t_ *pthread_key_t;
-typedef struct pthread_mutex_t_ *pthread_mutex_t;
-typedef struct pthread_mutexattr_t_ *pthread_mutexattr_t;
-typedef struct pthread_cond_t_ *pthread_cond_t;
-typedef struct pthread_condattr_t_ *pthread_condattr_t;
+typedef struct pthread_key_t_ * volatile pthread_key_t;
+typedef struct pthread_mutex_t_ * volatile pthread_mutex_t;
+typedef struct pthread_mutexattr_t_ * volatile pthread_mutexattr_t;
+typedef struct pthread_cond_t_ * volatile pthread_cond_t;
+typedef struct pthread_condattr_t_ * volatile pthread_condattr_t;
 #endif
-typedef struct pthread_rwlock_t_ *pthread_rwlock_t;
-typedef struct pthread_rwlockattr_t_ *pthread_rwlockattr_t;
-typedef struct pthread_spinlock_t_ *pthread_spinlock_t;
-typedef struct pthread_barrier_t_ *pthread_barrier_t;
-typedef struct pthread_barrierattr_t_ *pthread_barrierattr_t;
+typedef struct pthread_rwlock_t_ * volatile pthread_rwlock_t;
+typedef struct pthread_rwlockattr_t_ * volatile pthread_rwlockattr_t;
+typedef struct pthread_spinlock_t_ * volatile pthread_spinlock_t;
+typedef struct pthread_barrier_t_ * volatile pthread_barrier_t;
+typedef struct pthread_barrierattr_t_ * volatile pthread_barrierattr_t;
 
 /*
  * ====================
@@ -607,7 +607,7 @@ enum {
 
 struct pthread_once_t_
 {
-  int done;                 /* indicates if user function executed  */
+  volatile int done;        /* indicates if user function executed  */
   long started;             /* First thread to increment this value */
                             /* to zero executes the user function   */
 };

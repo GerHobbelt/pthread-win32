@@ -110,7 +110,7 @@ PASSES= sizes.pass  loadfree.pass \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  \
 	  exception1.pass  exception2.pass  exception3.pass  \
-	  cancel9
+	  cancel9 create3
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
@@ -264,6 +264,7 @@ context1.pass: cancel2.pass
 count1.pass: join1.pass
 create1.pass: mutex2.pass
 create2.pass: create1.pass
+create3.pass:
 delay1.pass:
 delay2.pass: delay1.pass
 equal1.pass: create1.pass
