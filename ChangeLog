@@ -1,3 +1,7 @@
+2003-05-14  Viv  <vcotirlea@hotmail.com>
+
+	* pthread.dsp: Change /MT compile flag to /MD.
+
 2003-03-04  Alexander Terekhov  <TEREKHOV@de.ibm.com>
 
 	* pthread_mutex_timedlock.c (pthread_mutex_timedlock): Fix failure to
