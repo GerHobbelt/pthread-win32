@@ -147,7 +147,7 @@ _pthread_threadStart (ThreadParms * threadParms)
   void *(*start) (void *);
   void *arg;
 
-  int status;
+  void * status;
 
   tid = threadParms->tid;
   start = threadParms->start;
@@ -165,7 +165,7 @@ _pthread_threadStart (ThreadParms * threadParms)
      * Run the caller's routine;
      */
     (*start) (arg);
-    status = 0;
+    status = (void *) 0;
   }
   __except (EXCEPTION_EXECUTE_HANDLER)
   {
@@ -173,7 +173,7 @@ _pthread_threadStart (ThreadParms * threadParms)
      * A system unexpected exception had occurred running the user's
      * routine. We get control back within this block.
      */
-    status = -1;
+    status = PTHREAD_CANCELED;
   }
 
 #else /* _MSC_VER */
@@ -186,14 +186,14 @@ _pthread_threadStart (ThreadParms * threadParms)
      * Run the caller's routine;
      */
     (*start) (arg);
-    status = 0;
+    status = (void *) 0;
   }
   catch (Pthread_exception)
     {
       /*
        * Thread was cancelled.
        */
-      status = -1;
+      status = PTHREAD_CANCELED;
     }
   catch (...)
     {
@@ -201,24 +201,28 @@ _pthread_threadStart (ThreadParms * threadParms)
        * A system unexpected exception had occurred running the user's
        * routine. We get control back within this block.
        */
-      status = -1;
+      status = PTHREAD_CANCELED;
     }
 
 #else /* __cplusplus */
 
   /*
-   * Run the caller's routine;
+   * Run the caller's routine; no cancelation or other exceptions will
+   * be honoured.
    */
   (*start) (arg);
-  status = 0;
+  status = (void *) 0;
 
 #endif /* __cplusplus */
 
 #endif /* _WIN32 */
 
-  pthread_exit ((void *) status);
+  pthread_exit (status);
 
-  return ((void *) status);
+  /*
+   * Never reached.
+   */
+  return (status);
 
 }				/* threadStart */
 

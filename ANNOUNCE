@@ -130,7 +130,7 @@ The following functions are implemented:
       Static Initializers (macros)
       ---------------------------
       PTHREAD_ONCE_INIT
-      PTHREAD_MUTEXINITIALIZER
+      PTHREAD_MUTEX_INITIALIZER
       PTHREAD_COND_INITIALIZER   
       
       ---------------------------
