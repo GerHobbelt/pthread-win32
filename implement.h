@@ -219,7 +219,6 @@ struct ThreadParms {
 struct pthread_cond_t_ {
   long            nWaitersBlocked;   /* Number of threads blocked            */
   long            nWaitersGone;      /* Number of threads timed out          */
-  long            nWaitersUnblocked; /* Number of threads unblocked          */
   long            nWaitersToUnblock; /* Number of threads to unblock         */
   sem_t           semBlockQueue;     /* Queue up threads waiting for the     */
                                      /*   condition to become signalled      */
