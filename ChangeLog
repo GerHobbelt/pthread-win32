@@ -10,10 +10,9 @@
 
 	* create.c: #include <string.h> to get a prototype for memcpy().
 	(pthread_create): New threads inherit their creator's signal
-	mask.  Copy the signal mask to the new thread structure.
-
+	mask.  Copy the signal mask to the new thread structure if we know
+	about signals.
 	
-
 Fri Jul 24 16:33:17 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* fork.c (pthread_atfork): Add all the necessary push calls.
