@@ -48,9 +48,9 @@
  * The original pthread_t struct plus all copies of it contain the address of
  * the thread state struct ptw32_thread_t_ (p), plus a reuse counter (x). Each
  * ptw32_thread_t contains the original copy of it's pthread_t.
- * Once malloced, a ptw2_thread_t_ struct is never freed.
+ * Once malloced, a ptw32_thread_t_ struct is not freed until the process exits.
  * 
- * The thread reuse stack is a simple LIFO stack managed through a singly
+ * The thread reuse stack is a simple LILO stack managed through a singly
  * linked list element in the ptw32_thread_t.
  *
  * Each time a thread is destroyed, the ptw32_thread_t address is pushed onto the
@@ -58,7 +58,7 @@
  * 
  * The following can now be said from this:
  * - two pthread_t's are identical if their ptw32_thread_t reference pointers
- * are equal and their reuse couters are equal. That is,
+ * are equal and their reuse counters are equal. That is,
  *
  *   equal = (a.p == b.p && a.x == b.x)
  *
