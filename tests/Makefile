@@ -89,7 +89,7 @@ PASSES= sizes.pass  loadfree.pass \
 	  condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
 	  exit1.pass  create1.pass  create2.pass  reuse1.pass  reuse2.pass  equal1.pass  \
 	  kill1.pass  valid1.pass  valid2.pass  \
-	  exit2.pass  exit3.pass  exit4  exit5  \
+	  exit2.pass  exit3.pass  exit4.pass  exit5.pass  \
 	  join0.pass  join1.pass  join2.pass join3.pass  \
 	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
 	  mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
@@ -109,13 +109,13 @@ PASSES= sizes.pass  loadfree.pass \
 	  rwlock2_t.pass  rwlock3_t.pass  rwlock4_t.pass  rwlock5_t.pass  rwlock6_t.pass  rwlock6_t2.pass  \
 	  context1.pass  \
 	  cancel3.pass  cancel4.pass  cancel5.pass  cancel6a.pass  cancel6d.pass  \
-	  cancel7  cancel8  \
+	  cancel7.pass  cancel8.pass  \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  \
 	  exception1.pass  exception2.pass  exception3.pass  \
-	  cancel9 create3
+	  cancel9.pass create3.pass
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
