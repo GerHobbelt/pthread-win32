@@ -1,13 +1,12 @@
-Last updated: $Date: 1998/07/24 05:01:02 $
+Last updated: $Date: 1998/07/24 12:05:37 $
 
-Completion:	57 out of 61 functions	[ 93%]
+Completion:	58 out of 61 functions	[ 95%]
 
-P = preliminary implementation
 U = unimplemented
 * = practically completed
 
 no.	name					status
-1	pthread_atfork				P
+1	pthread_atfork				*
 2	pthread_attr_destroy			*
 3	pthread_attr_getdetachstate		*
 4	pthread_attr_getinheritsched		U
@@ -66,5 +65,5 @@ no.	name					status
 57	pthread_setcanceltype			*	
 58	pthread_setschedparam			*
 59	pthread_setspecific			*
-60	pthread_sigmask				
+60	pthread_sigmask				*	
 61	pthread_testcancel
