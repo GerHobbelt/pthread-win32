@@ -73,7 +73,7 @@ BEGIN
             VALUE "InternalName", PTW32_VERSIONINFO_NAME
             VALUE "OriginalFilename", PTW32_VERSIONINFO_NAME
             VALUE "CompanyName", "Open Source Software community project\0"
-            VALUE "LegalCopyright", "Copyright (C) Project contributors 1998-2004\0"
+            VALUE "LegalCopyright", "Copyright (C) Project contributors 1998-2005\0"
             VALUE "Licence", "LGPL\0"
             VALUE "Info", "http://sources.redhat.com/pthreads-win32/\0"
 	    VALUE "Comment", PTW32_VERSIONINFO_COMMENT

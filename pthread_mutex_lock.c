@@ -114,16 +114,17 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
                               (LPLONG) &mx->lock_idx,
 			      (LONG) -1) != 0)
 		{
-	          if (WAIT_OBJECT_0 == WaitForSingleObject (mx->event, INFINITE))
-	            {
-		      mx->recursive_count = 1;
-		      mx->ownerThread = self;
-	            }
-		  else
+	          if (WAIT_OBJECT_0 != WaitForSingleObject (mx->event, INFINITE))
 		    {
 	              result = EINVAL;
 		      break;
 		    }
+		}
+
+	      if (0 == result)
+		{
+		  mx->recursive_count = 1;
+		  mx->ownerThread = self;
 		}
 	    }
 	}
