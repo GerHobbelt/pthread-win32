@@ -38,13 +38,15 @@
 #include "implement.h"
 
 
-/*
- * NOTE: For speed, these routines don't check if "lock" is valid.
- */
 int
 pthread_spin_lock(pthread_spinlock_t *lock)
 {
   register pthread_spinlock_t s;
+
+  if (NULL == lock || NULL == *lock)
+    {
+      return(EINVAL);
+    }
 
   if (*lock == PTHREAD_SPINLOCK_INITIALIZER)
     {

@@ -1,3 +1,17 @@
+2003-07-19  Ross Johnson  <ross@ise.canberra.edu.au>
+
+	* eyal1.c (waste_time): Make threads do more work to ensure that
+	all threads get to do some work.
+	* semaphore1.c: Make it clear that certain errors are expected.
+	* exception2.c (non_MSVC code sections): Change to include
+	C++ standard include file, i.e. change <new.h> to <exception>.
+	* exception3.c (non_MSVC code sections): Likewise; qualify std::
+	namespace entities where necessary.
+	* GNUmakefile: modified to work in the MsysDTK (newer MinGW)
+	environment; define CC as gcc or g++ as appropriate because
+	using gcc -x c++ doesn't link with required c++ libs by default,
+	but g++ does.
+
 2002-12-11  Ross Johnson  <ross@special.ise.canberra.edu.au>
 
 	* mutex7e.c: Assert EBUSY return instead of EDEADLK.

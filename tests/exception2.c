@@ -79,7 +79,7 @@
 #if defined(_MSC_VER) && defined(__cplusplus)
 #include <eh.h>
 #else
-#include <new.h>
+#include <exception>
 #endif
 
 #ifdef __GNUC__

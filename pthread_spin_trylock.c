@@ -38,15 +38,17 @@
 #include "implement.h"
 
 
-/*
- * NOTE: For speed, these routines don't check if "lock" is valid.
- */
 int
 pthread_spin_trylock(pthread_spinlock_t *lock)
 {
-  pthread_spinlock_t s = *lock;
+  register pthread_spinlock_t s;
 
-  if (s == PTHREAD_SPINLOCK_INITIALIZER)
+  if (NULL == lock || NULL == *lock)
+    {
+      return(EINVAL);
+    }
+
+  if (*lock == PTHREAD_SPINLOCK_INITIALIZER)
     {
       int result;
 
@@ -55,6 +57,8 @@ pthread_spin_trylock(pthread_spinlock_t *lock)
           return(result);
         }
     }
+
+  s = *lock;
 
   switch ((long) ptw32_interlocked_compare_exchange((PTW32_INTERLOCKED_LPLONG) &(s->interlock),
                                                     (PTW32_INTERLOCKED_LONG) PTW32_SPIN_LOCKED,

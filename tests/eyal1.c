@@ -124,15 +124,21 @@ static double
 waste_time (int n)
 {
   int		i;
-  double		f;
+  double	f, g, h, s;
 
-  f = rand ();
+  s = 0;
 
+  /*
+   * Useless work.
+   */
   for (i = n*100; i > 0; --i)
     {
-      f = 2 * f * f / (f * f);
+      f = rand ();
+      g = rand ();
+      h = rand ();
+      s += 2 * f * g / (h != 0 ? (h * h) : 1);
     }
-  return f;
+  return s;
 }
 
 static int

@@ -85,7 +85,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
       */
 {
   int result = 0;
-  sem_t s;
+  sem_t s = NULL;
 
   if (pshared != 0)
     {

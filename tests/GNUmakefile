@@ -32,12 +32,12 @@
 #
 
 
-#CP	= cp
-#MV	= mv
-#RM	= rm
-CP	= copy
-MV	= rename
-RM	= erase
+CP	= cp -f
+MV	= mv -f
+RM	= rm -f
+#CP	= copy
+#MV	= rename
+#RM	= erase
 MKDIR	= mkdir
 TOUCH	= echo Passed >
 ECHO	= @echo
@@ -46,8 +46,6 @@ MAKE	= make
 #
 # Mingw32
 #
-GLANG	= c++
-CC	= gcc
 XXCFLAGS	= 
 CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
 #CFLAGS	= -g -O0 -UNDEBUG -Wall $(XXCFLAGS)
@@ -92,12 +90,12 @@ PASSES		= $(TESTS:%=%.pass)
 BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
 
 help:
-	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) nmake clean GC    (to test using GC dll with C (no EH) applications)
-	@ $(ECHO) nmake clean GCX   (to test using GC dll with C++ (EH) applications)
-	@ $(ECHO) nmake clean GCE   (to test using GCE dll with C++ (EH) applications)
-	@ $(ECHO) nmake clean GC-bench	  (to benchtest using GNU C dll with C cleanup code)
-	@ $(ECHO) nmake clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)
+	@ $(ECHO) "Run one of the following command lines:"
+	@ $(ECHO) "make clean GC    (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "make clean GCX   (to test using GC dll with C++ (EH) applications)"
+	@ $(ECHO) "make clean GCE   (to test using GCE dll with C++ (EH) applications)"
+	@ $(ECHO) "make clean GC-bench	  (to benchtest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "make clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)"
 
 all:
 	@ $(MAKE) clean GC
@@ -105,19 +103,19 @@ all:
 	@ $(MAKE) clean GCE
 
 GC:
-	$(MAKE) GCX=GC XXCFLAGS="-x c -D__CLEANUP_C" all-pass
+	$(MAKE) GCX=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" all-pass
 
 GCE:
-	$(MAKE) GCX=GCE XXCFLAGS="-mthreads -x c++ -D__CLEANUP_CXX" all-pass
+	$(MAKE) GCX=GCE CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-pass
 
 GCX:
-	$(MAKE) GCX=GC XXCFLAGS="-mthreads -x c++ -D__CLEANUP_C" all-pass
+	$(MAKE) GCX=GC CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
 
 GC-bench:
-	$(MAKE) GCX=GC XXCFLAGS="-x c -D__CLEANUP_C" all-bench
+	$(MAKE) GCX=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" all-bench
 
 GCE-bench:
-	$(MAKE) GCX=GCE XXCFLAGS="-mthreads -x c++ -D__CLEANUP_CXX" all-bench
+	$(MAKE) GCX=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-bench
 
 all-pass: $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
@@ -244,7 +242,7 @@ tsd1.pass: join1.pass
 %.exe: %.c
 	@ $(ECHO) Compiling $@
 	@ $(ECHO) $(CC) $(CFLAGS) -o $@ $^ $(INCLUDES) -L. -lpthread$(GCX)
-	@ $(CC) $(CFLAGS) -o $@ $^ $(INCLUDES) -L. -lpthread$(GCX)
+	@ $(CC) $(CFLAGS) -o $@ $^ $(INCLUDES) -L. -lpthread$(GCX) -lsupc++
 
 %.pre: %.c
 	@ $(CC) -E $(CFLAGS) -o $@ $^ $(INCLUDES)
@@ -254,7 +252,7 @@ tsd1.pass: join1.pass
 
 $(COPYFILES):
 	@ $(ECHO) Copying $@
-	@ $(CP) $(BUILD_DIR)\$@ .
+	@ $(CP) $(BUILD_DIR)/$@ .
 
 pthread.dll:
 	@ $(CP) $(DLL) $@

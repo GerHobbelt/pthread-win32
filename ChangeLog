@@ -4,6 +4,21 @@
 	parameter was returning an incorrect error value.
 	* pthread_setschedparam.c (pthread_setschedparam): Likewise.
 
+2003-07-19  Ross Johnson  <rpj@ise.canberra.edu.au>
+
+	* GNUmakefile: modified to work under MsysDTK environment.
+	* pthread_spin_lock.c (pthread_spin_lock): Check for NULL arg.
+	* pthread_spin_unlock.c (pthread_spin_unlock): Likewise.
+	* pthread_spin_trylock.c (pthread_spin_trylock): Likewise;
+	fix incorrect pointer value if lock is dynamically initialised by
+	this function.
+	* sem_init.c (sem_init): Initialise sem_t value to quell compiler warning.
+	* sem_destroy.c (sem_destroy): Likewise.
+	* ptw32_threadStart.c (non-MSVC code sections): Include <exception> rather
+	than old-style <new.h>; fix all std:: namespace entities such as
+	std::terminate_handler instances and associated methods.
+	* ptw32_callUserDestroyRoutines.c (non-MSVC code sections): Likewise.
+
 2003-06-24  Piet van Bruggen  <pietvb@newbridges.nl>
 
 	* pthread_spin_destroy.c (pthread_spin_destroy): Was not freeing the
