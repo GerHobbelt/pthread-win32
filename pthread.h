@@ -52,7 +52,7 @@ int pthread_join(pthread_t thread, void ** valueptr);
 
 int pthread_condattr_init(pthread_condattr_t *attr);
 
-int pthread_condatr_setpshared(pthread_condattr_t *attr,
+int pthread_condattr_setpshared(pthread_condattr_t *attr,
 			       int pshared);
 
 int pthread_condattr_getpshared(pthread_condattr_t *attr,
