@@ -1068,6 +1068,12 @@ PTW32_DLLPORT int pthread_rwlockattr_setpshared (pthread_rwlockattr_t * attr,
 #if PTW32_LEVEL >= PTW32_LEVEL_MAX - 1
 
 /*
+ * Signal Functions. Should be defined in <signal.h> but MSVC and MinGW32
+ * already have signal.h that don't define these.
+ */
+PTW32_DLLPORT int pthread_kill(pthread_t thread, int sig);
+
+/*
  * Non-portable functions
  */
 

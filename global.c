@@ -40,6 +40,7 @@
 
 
 int ptw32_processInitialized = FALSE;
+pthread_t ptw32_threadReuseTop = PTW32_THREAD_REUSE_BOTTOM;
 pthread_key_t ptw32_selfThreadKey = NULL;
 pthread_key_t ptw32_cleanupKey = NULL;
 pthread_cond_t ptw32_cond_list_head = NULL;
@@ -54,6 +55,11 @@ PTW32_INTERLOCKED_LONG
 (WINAPI *ptw32_interlocked_compare_exchange)(PTW32_INTERLOCKED_LPLONG,
                                              PTW32_INTERLOCKED_LONG,
                                              PTW32_INTERLOCKED_LONG) = NULL;
+
+/*
+ * Global lock for managing pthread_t struct reuse.
+ */
+CRITICAL_SECTION ptw32_thread_reuse_lock;
 
 /*
  * Global lock for testing internal state of PTHREAD_MUTEX_INITIALIZER

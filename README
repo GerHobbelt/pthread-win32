@@ -29,7 +29,10 @@ or,
 What are all these pthread*.dll and pthread*.lib files?
 -------------------------------------------------------
 
-Simply, you only use one of them, but you need to choose carefully.
+Simple, use either pthreadGC.* if you use GCC, or pthreadVC.* if you
+use MSVC.
+
+Otherwise, you need to choose carefully and know WHY.
 
 The most important choice you need to make is whether to use a
 version that uses exceptions internally, or not (there are versions
@@ -53,9 +56,9 @@ since this appears to be the assumption commercial pthreads
 implementations make. Therefore, if you use an EH version
 of pthreads-win32 then you may be under the illusion that
 your application will be portable, when in fact it is likely to
-behave very differently linked with other pthreads libraries.
+behave differently when linked with other pthreads libraries.
 
-Now you may be asking: why have you kept the EH versions of
+Now you may be asking: then why have you kept the EH versions of
 the library?
 
 There are a couple of reasons:
@@ -338,6 +341,10 @@ from the FTP site (see under "Availability" below):
 	pthreadGCE.a	- derived from pthreadGCE.dll
 	pthreadGC.dll	- built with Mingw32 GCC
 	pthreadGC.a	- derived from pthreadGC.dll
+
+As of August 2003 pthreads-win32 is built and tested using the MinGW + MsysDTK
+environment current as of that date or later. The following file MAY be needed
+for older MinGW environments.
 	gcc.dll 	- needed to build and run applications that use
 			  pthreadGCE.dll.
 

@@ -64,7 +64,9 @@ COPYFILES	= $(HDR) $(LIB) $(DLL)
 
 TESTS	= loadfree \
 	  semaphore1 semaphore2 self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
-	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 create1 equal1 \
+	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
+	  create1 create2 reuse1 reuse2 equal1 \
+	  kill1 valid1 valid2 \
 	  exit2 exit3 \
 	  join0 join1 join2 \
 	  mutex2 mutex3 mutex4 mutex6 mutex6n mutex6e mutex6r \
@@ -164,6 +166,7 @@ condvar9.pass: condvar8.pass
 context1.pass: cancel2.pass
 count1.pass: join1.pass
 create1.pass: mutex2.pass
+create2.pass: create1.pass
 delay1.pass: cancel2.pass
 delay2.pass: delay1.pass
 equal1.pass: create1.pass
@@ -179,6 +182,7 @@ inherit1.pass: join1.pass
 join0.pass: create1.pass
 join1.pass: create1.pass
 join2.pass: create1.pass
+kill1.pass:
 loadfree.pass: pthread.dll
 mutex1.pass: self1.pass
 mutex1n.pass: mutex1.pass
@@ -203,6 +207,8 @@ mutex8r.pass: mutex7r.pass
 once1.pass: create1.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass
+reuse1.pass: create2.pass
+reuse2.pass: reuse1.pass
 rwlock1.pass: condvar6.pass
 rwlock2.pass: rwlock1.pass
 rwlock3.pass: rwlock2.pass
@@ -225,6 +231,8 @@ spin2.pass: spin1.pass
 spin3.pass: spin2.pass
 spin4.pass: spin3.pass
 tsd1.pass: join1.pass
+valid1.pass: join1.pass
+valid2.pass: valid1.pass
 
 #%.pass: %.exe $(HDR)
 %.pass: %.exe $(LIB) $(DLL) $(HDR)

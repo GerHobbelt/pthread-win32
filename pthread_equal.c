@@ -43,13 +43,13 @@ pthread_equal (pthread_t t1, pthread_t t2)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
-      *      This function returns zero if t1 and t2 are equal, else
+      *      This function returns nonzero if t1 and t2 are equal, else
       *      returns nonzero
       *
       * PARAMETERS
       *      t1,
       *      t2
-      * 	     references to an instances of thread_t
+      * 	     thread IDs
       *
       *
       * DESCRIPTION

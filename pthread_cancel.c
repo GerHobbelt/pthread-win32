@@ -94,12 +94,13 @@ pthread_cancel (pthread_t thread)
   int cancel_self;
   pthread_t self;
 
-  if (thread == NULL )
+  /* This is the proper way to test thread validity. */
+  result = pthread_kill(thread, 0);
+  if (0 != result)
     {
-      return ESRCH;
+      return result;
     }
 
-  result = 0;
   if ((self = pthread_self()) == NULL)
     {
       return ENOMEM;

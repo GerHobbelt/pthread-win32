@@ -38,9 +38,15 @@
 #include "pthread.h"
 #include "implement.h"
 
+/*
+ * Not needed yet, but defining it should indicate clashes with build target
+ * environment that should be fixed.
+ */
+#include <signal.h>
+
 
 int
-pthread_detach (pthread_t tid)
+pthread_detach (pthread_t thread)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -70,17 +76,21 @@ pthread_detach (pthread_t tid)
 {
   int result;
 
-  if (tid == NULL ||
-      tid->detachState == PTHREAD_CREATE_DETACHED)
+  /* This is the proper way to test for a valid thread. */
+  result = pthread_kill(thread, 0);
+  if (0 != result)
     {
+      return result;
+    }
 
+  if (thread->detachState == PTHREAD_CREATE_DETACHED)
+    {
       result = EINVAL;
-
     }
   else
     {
       result = 0;
-      tid->detachState = PTHREAD_CREATE_DETACHED;
+      thread->detachState = PTHREAD_CREATE_DETACHED;
     }
 
   return (result);

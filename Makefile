@@ -148,6 +148,7 @@ SMALL_STATIC_OBJS	= \
 		ptw32_getprocessors.obj \
 		ptw32_calloc.obj \
 		ptw32_new.obj \
+		ptw32_reuse.obj \
 		ptw32_rwlock_check_need_init.obj \
 		ptw32_cond_check_need_init.obj \
 		ptw32_mutex_check_need_init.obj \
@@ -170,6 +171,7 @@ SMALL_STATIC_OBJS	= \
 		ptw32_increase_semaphore.obj \
 		ptw32_decrease_semaphore.obj \
 		signal.obj \
+		pthread_kill.obj \
 		ptw32_spinlock_check_need_init.obj \
 		pthread_spin_init.obj \
 		pthread_spin_destroy.obj \
@@ -230,11 +232,13 @@ EXIT_SRCS	= \
 MISC_SRCS	= \
 		pthread_equal.c \
 		pthread_getconcurrency.c \
+		pthread_kill.c \
 		pthread_once.c \
 		pthread_self.c \
 		pthread_setconcurrency.c \
 		ptw32_calloc.c \
 		ptw32_new.c \
+		ptw32_reuse.c \
 		w32_CancelableWait.c
 
 MUTEX_SRCS	= \

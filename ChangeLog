@@ -1,8 +1,47 @@
-2003-08-12  Ross Johnson  <rpj@ise.canberra.edu.au>
+2003-08-13  Ross Johnson  <rpj@ise.canberra.edu.au>
 
 	* pthread_getschedparam.c (pthread_getschedparam): An invalid thread ID
-	parameter was returning an incorrect error value.
+	parameter was returning an incorrect error value; now uses a more exhaustive
+	check for validity.
+
 	* pthread_setschedparam.c (pthread_setschedparam): Likewise.
+
+	* pthread_join.c (pthread_join): Now uses a more exhaustive
+	check for validity.
+
+	* pthread_detach.c (pthread_detach): Likewise.
+
+	* pthread_cancel.c (pthread_cancel): Likewise.
+
+	* ptw32_threadDestroy.c (ptw32_threadDestroy): pthread_t structs are
+	never freed - push them onto a stack for reuse.
+
+	* ptw32_new.c (ptw32_new): Check for reusable pthread_t before dynamically
+	allocating new memory for the struct.
+
+	* pthread_kill.c (pthread_kill): New file; new routine; takes only a zero
+	signal arg so that applications can check the thread arg for validity; checks
+	that the underlying Win32 thread HANDLE is valid.
+
+	* pthread.h (pthread_kill): Add prototype.
+
+	* ptw32_reuse.c (ptw32_threadReusePop): New file; new routine; pop a
+	pthread_t off the reuse stack. pthread_t_ structs that have been destroyed, i.e.
+	have exited detached or have been joined, are cleaned up and put onto a reuse
+	stack. Consequently, thread IDs are no longer freed once calloced. The library
+	will attempt to get a struct off this stack before asking the system to alloc
+	new memory when creating threads. The stack is guarded by a global mutex.
+	(ptw32_threadReusePush): New routine; push a pthread_t onto the reuse stack.
+
+	* implement.h (ptw32_threadReusePush): Add new prototype.
+	(ptw32_threadReusePop): Likewise.
+	(pthread_t): Add new element.
+
+	* ptw32_processTerminate.c (ptw32_processTerminate): Delete the thread
+	reuse lock; free all thread ID structs on the thread reuse stack.
+
+	* ptw32_processInitialize.c (ptw32_processInitialize): Initialise the
+	thread reuse lock.
 
 2003-07-19  Ross Johnson  <rpj@ise.canberra.edu.au>
 

@@ -76,16 +76,13 @@
 #include "test.h"
 
 enum {
-	NUMTHREADS = 10000;
+  NUMTHREADS = 10000
 };
 
 static int washere = 0;
 
 void * func(void * arg)
 {
-  HANDLE w32ThreadH = (pthread_self())->threadH;
-
-  assert(w32ThreadH != 0);
   washere = 1;
   return (void *) 0; 
 }
@@ -96,6 +93,7 @@ main()
   pthread_t t;
   pthread_attr_t attr;
   void * result = NULL;
+  int i;
 
   pthread_attr_init(&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);

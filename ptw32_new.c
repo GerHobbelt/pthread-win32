@@ -43,7 +43,15 @@ ptw32_new (void)
 {
   pthread_t t;
 
-  t = (pthread_t) calloc (1, sizeof (*t));
+  /*
+   * If there's a reusable pthread_t then use it.
+   */
+  t = ptw32_threadReusePop();
+
+  if (NULL == t)
+    {
+      t = (pthread_t) calloc (1, sizeof (*t));
+    }
 
   if (t != NULL)
     {
@@ -59,7 +67,10 @@ ptw32_new (void)
 
       if (t->cancelEvent == NULL)
 	{
-	  free (t);
+	  /*
+	   * Thread ID structs are never freed.
+	   */
+	  ptw32_threadReusePush(t);
 	  t = NULL;
 	}
     }
