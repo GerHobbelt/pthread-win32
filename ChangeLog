@@ -1,3 +1,11 @@
+2000-09-02  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* rwlock.c (_rwlock_check*): Renamed to
+	ptw32_rwlock_check*.
+	* mutex.c (_mutex_check*): Renamed to ptw32_mutex_check*.
+	* condvar.c (cond_timed*): Renamed to ptw32_cond_timed*.
+	(_cond_check*): Renamed to ptw32_cond_check*.
+
 2000-08-22  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* private.c (ptw32_throw): Fix exception test;

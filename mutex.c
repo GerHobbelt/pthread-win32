@@ -31,7 +31,7 @@
 
 
 static int
-_mutex_check_need_init(pthread_mutex_t *mutex)
+ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
 {
   int result = 0;
 
@@ -250,7 +250,7 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
   else
     {
       /*
-       * See notes in _mutex_check_need_init() above also.
+       * See notes in ptw32_mutex_check_need_init() above also.
        */
       EnterCriticalSection(&ptw32_mutex_test_init_lock);
 
@@ -530,12 +530,12 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static mutex. We check
-   * again inside the guarded section of _mutex_check_need_init()
+   * again inside the guarded section of ptw32_mutex_check_need_init()
    * to avoid race conditions.
    */
   if (*mutex == (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
     {
-      result = _mutex_check_need_init(mutex);
+      result = ptw32_mutex_check_need_init(mutex);
     }
 
   mx = *mutex;
@@ -609,12 +609,12 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static mutex. We check
-   * again inside the guarded section of _mutex_check_need_init()
+   * again inside the guarded section of ptw32_mutex_check_need_init()
    * to avoid race conditions.
    */
   if (*mutex == (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
     {
-      result = _mutex_check_need_init(mutex);
+      result = ptw32_mutex_check_need_init(mutex);
     }
 
   mx = *mutex;

@@ -27,7 +27,7 @@
 #include "implement.h"
 
 static int
-_cond_check_need_init(pthread_cond_t *cond)
+ptw32_cond_check_need_init(pthread_cond_t *cond)
 {
   int result = 0;
 
@@ -490,7 +490,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
   else
     {
       /*
-       * See notes in _cond_check_need_init() above also.
+       * See notes in ptw32_cond_check_need_init() above also.
        */
       EnterCriticalSection(&ptw32_cond_test_init_lock);
 
@@ -585,7 +585,7 @@ cond_wait_cleanup(void * args)
 }
 
 static int
-cond_timedwait (pthread_cond_t * cond, 
+ptw32_cond_timedwait (pthread_cond_t * cond, 
 		pthread_mutex_t * mutex,
 		const struct timespec *abstime)
 {
@@ -601,12 +601,12 @@ cond_timedwait (pthread_cond_t * cond,
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static condition variable. We check
-   * again inside the guarded section of _cond_check_need_init()
+   * again inside the guarded section of ptw32_cond_check_need_init()
    * to avoid race conditions.
    */
   if (*cond == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
     {
-      result = _cond_check_need_init(cond);
+      result = ptw32_cond_check_need_init(cond);
     }
 
   if (result != 0 && result != EBUSY)
@@ -677,7 +677,7 @@ cond_timedwait (pthread_cond_t * cond,
    */
   return (result);
 
-}                               /* cond_timedwait */
+}                               /* ptw32_cond_timedwait */
 
 
 int
@@ -731,7 +731,7 @@ pthread_cond_wait (pthread_cond_t * cond,
       */
 {
   /* The NULL abstime arg means INFINITE waiting. */
-  return(cond_timedwait(cond, mutex, NULL));
+  return(ptw32_cond_timedwait(cond, mutex, NULL));
 }                               /* pthread_cond_wait */
 
 
@@ -792,7 +792,7 @@ pthread_cond_timedwait (pthread_cond_t * cond,
     }
   else
     {
-      result = cond_timedwait(cond, mutex, abstime);
+      result = ptw32_cond_timedwait(cond, mutex, abstime);
     }
 
   return(result);
