@@ -40,7 +40,7 @@ TESTS	= mutex1 condvar1 condvar2 exit1 create1 equal1 \
 	  exit2 exit3 \
 	  join1 join2 mutex2 mutex3 \
 	  count1 once1 tsd1 self1 self2 eyal1 \
-	  condvar3 condvar4 condvar5 condvar6 \
+	  condvar3 condvar4 condvar5 condvar6 condvar7 condvar8 \
 	  errno1 \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6
 
@@ -71,6 +71,8 @@ condvar3.pass: create1.pass
 condvar4.pass: create1.pass
 condvar5.pass: condvar4.pass
 condvar6.pass: condvar5.pass
+condvar7.pass: condvar6.pass
+condvar8.pass: condvar6.pass
 errno1.pass: mutex3.pass
 rwlock1.pass: condvar6.pass
 rwlock2.pass: rwlock1.pass

@@ -1,3 +1,10 @@
+Oct 14 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* condvar7.c: New. Test broadcast after waiting thread is canceled.
+	* condvar8.c: New. Test multiple broadcasts.
+	* condvar9.c: New. Test multiple broadcasts with thread
+	cancelation.
+	
 Sep 16 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* rwlock6.c: New test.

@@ -1,7 +1,11 @@
 @echo off
 
-REM Usage: runtest cl|gcc testname testarg ...
+REM Usage: runtest cl|gcc testname prerequisit testarg ...
 
+if %3==_ goto noprereq
+if NOT EXIST %3.pass goto needprereq
+
+:noprereq
 if EXIST %2.pass goto bypass
 
 REM Make sure we start with only those files we expect to need
@@ -30,11 +34,15 @@ REM erase ..\%2.%1log
 echo TEST: %2 [%1]
 
 REM Run the test case
-aout.exe %3 %4 %5 %6 %7 %8 %9
+if EXIST %2.pass erase %2.pass
+if EXIST %2.fail erase %2.fail
+if EXIST %2.notrun erase %2.notrun
+aout.exe %4 %5 %6 %7 %8 %9
 
 set RESULT=%ERRORLEVEL%
 
-if %RESULT% EQU 0 echo Passed [%RESULT%] > ..\%2.pass
+if %RESULT% NEQ 0 echo Failed [%RESULT%] > ..\%2.fail
+if %RESULT% EQU 0 echo Passed > ..\%2.pass
 
 :cleanup
 
@@ -43,6 +51,15 @@ cd ..
 REM Clean up
 if exist tmp\*.* echo y | erase tmp\*.* > nul:
 
+if EXIST %2.fail echo Failed [%RESULT%]
 if EXIST %2.pass echo Passed [%RESULT%]
 
 :bypass
+goto end
+
+:needprereq
+echo Test %2 requires %3 to pass before it can run.
+echo No Prereq > ..\%2.notrun
+goto end
+
+:end
