@@ -38,6 +38,8 @@
 #include "pthread.h"
 #include "implement.h"
 
+/* Must be first to define HAVE_INLINABLE_INTERLOCKED_CMPXCHG */
+#include "ptw32_InterlockedCompareExchange.c"
 
 #include "ptw32_is_attr.c"
 #include "ptw32_processInitialize.c"
@@ -50,5 +52,4 @@
 #include "ptw32_semwait.c"
 #include "ptw32_timespec.c"
 #include "ptw32_throw.c"
-#include "ptw32_InterlockedCompareExchange.c"
 #include "ptw32_getprocessors.c"

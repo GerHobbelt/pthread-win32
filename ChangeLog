@@ -1,3 +1,30 @@
+2004-10-08  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* pthread_mutex_destroy.c (pthread_mutex_destroy): Critical Section
+	element is no longer required.
+	* pthread_mutex_init.c (pthread_mutex_init): Likewise.
+	* pthread_mutex_lock.c (pthread_mutex_lock): New algorithm following Drepper's
+	paper at http://people.redhat.com/drepper/futex.pdf, but using the existing
+	semaphore in place of the futex described in the paper. Idea suggested by
+	Alexander Terekhov - see:
+	http://sources.redhat.com/ml/pthreads-win32/2003/msg00108.html
+	* pthread_mutex_timedlock.c pthread_mutex_timedlock(): Similarly.
+	* pthread_mutex_trylock.c (pthread_mutex_trylock): Similarly.
+	* pthread_mutex_unlock.c (pthread_mutex_unlock): Similarly.
+	* pthread_barrier_wait.c (pthread_barrier_wait): Use inlined version of
+	InterlockedCompareExchange() if possible - determined at build-time.
+	* pthread_spin_destroy.c pthread_spin_destroy(): Likewise.
+	* pthread_spin_lock.c pthread_spin_lock():Likewise.
+	* pthread_spin_trylock.c (pthread_spin_trylock):Likewise.
+	* pthread_spin_unlock.c (pthread_spin_unlock):Likewise.
+	* ptw32_InterlockedCompareExchange.c: Sets up macro for inlined use.
+	* implement.h (pthread_mutex_t_): Remove Critical Section element.
+	(PTW32_INTERLOCKED_COMPARE_EXCHANGE): Set to default non-inlined version of
+	InterlockedCompareExchange().
+	* private.c: Include ptw32_InterlockedCompareExchange.c first for inlining.
+	* GNUmakefile: Add commandline option to use inlined InterlockedCompareExchange().
+	* Makefile: Likewise.
+
 2004-09-27  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* pthread_mutex_lock.c (pthread_mutex_lock): Separate PTHREAD_MUTEX_NORMAL

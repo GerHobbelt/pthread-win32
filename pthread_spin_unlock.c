@@ -56,7 +56,7 @@ pthread_spin_unlock (pthread_spinlock_t * lock)
     }
 
   switch ((long)
-	  ptw32_interlocked_compare_exchange ((PTW32_INTERLOCKED_LPLONG) &
+	  PTW32_INTERLOCKED_COMPARE_EXCHANGE ((PTW32_INTERLOCKED_LPLONG) &
 					      (s->interlock),
 					      (PTW32_INTERLOCKED_LONG)
 					      PTW32_SPIN_UNLOCKED,

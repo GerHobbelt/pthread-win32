@@ -83,7 +83,6 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
 	      if (result == 0)
 		{
 		  (void) sem_destroy (&mx->wait_sema);
-		  DeleteCriticalSection (&mx->wait_cs);
 		  free (mx);
 		}
 	      else

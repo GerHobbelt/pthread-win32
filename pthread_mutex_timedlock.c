@@ -206,7 +206,7 @@ int
 pthread_mutex_timedlock (pthread_mutex_t * mutex,
 			 const struct timespec *abstime)
 {
-  int result = 0;
+  LONG c;
   pthread_mutex_t mx;
 
 #ifdef NEED_SEM
@@ -226,6 +226,8 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
    */
   if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
+      int result;
+
       if ((result = ptw32_mutex_check_need_init (mutex)) != 0)
 	{
 	  return (result);
@@ -236,63 +238,51 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 
   if (mx->kind == PTHREAD_MUTEX_NORMAL)
     {
-      if (0 != InterlockedIncrement (&mx->lock_idx))
+      if ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+		        (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+		        (PTW32_INTERLOCKED_LONG) 0,
+		        (PTW32_INTERLOCKED_LONG) -1)) != -1)
 	{
-	  switch (ptw32_timed_semwait (&mx->wait_sema, abstime))
-	    {
-	      case 0:	/* We got the mutex. */
-		{
-		  break;
-		}
-	      case 1:	/* Timed out. */
-	      case 2:	/* abstime passed before we started to wait. */
-		{
-		  /*
-		   * If we timeout, it is up to us to adjust lock_idx to say
-		   * we're no longer waiting.
-		   *
-		   * The owner thread may still have posted wait_sema thinking
-		   * we were waiting. We must check but then NOT do any
-		   * programmed work if we have acquired the mutex because
-		   * we don't know how long ago abstime was. We MUST just release it
-		   * immediately.
-		   */
-		  EnterCriticalSection (&mx->wait_cs);
-
-		  result = ETIMEDOUT;
-
-		  if (-1 == sem_trywait (&mx->wait_sema))
+          do
+            {
+              if (c == 1 ||
+                  (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                           (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+                           (PTW32_INTERLOCKED_LONG) 1,
+                           (PTW32_INTERLOCKED_LONG) 0) != -1)
+                {
+		  switch (ptw32_timed_semwait (&mx->wait_sema, abstime))
 		    {
-		      (void) InterlockedDecrement (&mx->lock_idx);
-		    }
-		  else
-		    {
-		      if (InterlockedDecrement (&mx->lock_idx) >= 0)
-			{
-			  /* Someone else is waiting on that mutex */
-			  if (sem_post (&mx->wait_sema) != 0)
-			    {
-			      result = errno;
-			    }
-			}
-		    }
-
-		  LeaveCriticalSection (&mx->wait_cs);
-		  break;
+		    case 0:	/* We got woken up so try get the lock again. */
+		      {
+		        break;
+		      }
+		    case 1:	/* Timed out. */
+		    case 2:	/* abstime passed before we started to wait. */
+		      {
+		        return ETIMEDOUT;
+		      }
+		    default:
+		      {
+		        return errno;
+		      }
+		  }
 		}
-	      default:
-		{
-		  result = errno;
-		  break;
-		}
-	    }
+            }
+          while ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                               (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+                               (PTW32_INTERLOCKED_LONG) 1,
+                               (PTW32_INTERLOCKED_LONG) -1)) != -1);
 	}
     }
   else
     {
       pthread_t self = pthread_self();
 
-      if (0 == InterlockedIncrement (&mx->lock_idx))
+      if ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                        (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+		        (PTW32_INTERLOCKED_LONG) 0,
+		        (PTW32_INTERLOCKED_LONG) -1)) == -1)
 	{
 	  mx->recursive_count = 1;
 	  mx->ownerThread = self;
@@ -301,72 +291,53 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 	{
 	  if (pthread_equal (mx->ownerThread, self))
 	    {
-	      (void) InterlockedDecrement (&mx->lock_idx);
-
 	      if (mx->kind == PTHREAD_MUTEX_RECURSIVE)
 		{
 		  mx->recursive_count++;
 		}
 	      else
 		{
-		  result = EDEADLK;
+		  return EDEADLK;
 		}
 	    }
 	  else
 	    {
-	      switch (ptw32_timed_semwait (&mx->wait_sema, abstime))
-		{
-		  case 0:	/* We got the mutex. */
-		    {
-		      mx->recursive_count = 1;
-		      mx->ownerThread = self;
-		      break;
+              do
+                {
+                  if (c == 1 ||
+                      (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                               (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+                               (PTW32_INTERLOCKED_LONG) 1,
+                               (PTW32_INTERLOCKED_LONG) 0) != -1)
+                    {
+		      switch (ptw32_timed_semwait (&mx->wait_sema, abstime))
+		        {
+		        case 0:	/* We got woken up so try get the lock again. */
+		          {
+		            break;
+		          }
+		        case 1:	/* Timed out. */
+		        case 2:	/* abstime passed before we started to wait. */
+		          {
+		            return ETIMEDOUT;
+		          }
+		        default:
+		          {
+		            return errno;
+		          }
+		      }
 		    }
-		  case 1:	/* Timedout. */
-		  case 2:	/* abstime passed before we started to wait. */
-		    {
-		      /*
-		       * If we timeout, it is up to us to adjust lock_idx to say
-		       * we're no longer waiting.
-		       *
-		       * The owner thread may still have posted wait_sema thinking
-		       * we were waiting. We must check but then NOT do any
-		       * programmed work if we have acquired the mutex because
-		       * we don't know how long ago abstime was. We MUST just release it
-		       * immediately.
-		       */
-		      EnterCriticalSection (&mx->wait_cs);
+                }
+              while ((c = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                                   (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+                                   (PTW32_INTERLOCKED_LONG) 1,
+                                   (PTW32_INTERLOCKED_LONG) -1)) != -1);
 
-		      result = ETIMEDOUT;
-
-		      if (-1 == sem_trywait (&mx->wait_sema))
-			{
-			  (void) InterlockedDecrement (&mx->lock_idx);
-			}
-		     else
-			{
-			  if (InterlockedDecrement (&mx->lock_idx) >= 0)
-			    {
-			      /* Someone else is waiting on that mutex */
-			      if (sem_post (&mx->wait_sema) != 0)
-				{
-				  result = errno;
-				}
-			    }
-			}
-
-		      LeaveCriticalSection (&mx->wait_cs);
-		      break;
-		    }
-		  default:
-		    {
-		      result = errno;
-		      break;
-		    }
-		}
+	      mx->recursive_count = 1;
+	      mx->ownerThread = self;
 	    }
 	}
     }
 
-  return (result);
+  return 0;
 }
