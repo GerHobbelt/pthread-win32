@@ -115,12 +115,12 @@ pthread_win32_process_detach_np ()
       if (self != NULL &&
           self->detachState == PTHREAD_CREATE_DETACHED)
         {
-          pthread_setspecific (ptw32_selfThreadKey, NULL);
           ptw32_threadDestroy (self);
+	  TlsSetValue (ptw32_selfThreadKey->key, NULL);
         }
 
       /*
-       * The DLL is being unmapped into the process's address space
+       * The DLL is being unmapped from the process's address space
        */
       ptw32_processTerminate ();
 
@@ -153,8 +153,8 @@ pthread_win32_thread_detach_np ()
        if (self != NULL &&
            self->detachState == PTHREAD_CREATE_DETACHED)
          {
-           pthread_setspecific (ptw32_selfThreadKey, NULL);
            ptw32_threadDestroy (self);
+	   TlsSetValue (ptw32_selfThreadKey->key, NULL);
          }
     }
 

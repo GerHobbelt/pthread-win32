@@ -84,7 +84,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
   else
     {
       /*
-       * Resolve catch-22 of registering thread with threadSelf
+       * Resolve catch-22 of registering thread with selfThread
        * key
        */
       self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);

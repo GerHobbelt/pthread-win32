@@ -1,3 +1,12 @@
+2003-05-15  Steven Reddie  <Steven.Reddie@ca.com>
+
+	* pthread_win32_attach_detach_np.c (pthread_win32_process_detach_np):
+	NULLify ptw32_selfThreadKey after the thread is destroyed, otherwise
+	destructors calling pthreads routines might resurrect it again, creating
+	memory leaks. Call the underlying Win32 Tls routine directly rather than
+	pthread_setspecific().
+	(pthread_win32_thread_detach_np): Likewise.
+
 2003-05-14  Viv  <vcotirlea@hotmail.com>
 
 	* pthread.dsp: Change /MT compile flag to /MD.
