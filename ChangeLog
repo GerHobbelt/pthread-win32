@@ -1,3 +1,14 @@
+1999-08-22  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* exit.c (pthread_exit): Fix reference to potentially
+	uninitialised pointer.
+
+1999-08-21  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* private.c (_pthread_threadStart): Apply fix of 1999-08-19
+	this time to C++ and non-trapped C versions. Ommitted to
+	do this the first time through.
+
 1999-08-19  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* private.c (_pthread_threadStart): Return exit status from

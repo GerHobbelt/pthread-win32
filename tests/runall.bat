@@ -14,6 +14,7 @@ call runtest cl equal1
 call runtest cl exit2
 call runtest cl exit3
 call runtest cl join1
+call runtest cl join2
 call runtest cl count1
 call runtest cl once1
 call runtest cl tsd1
