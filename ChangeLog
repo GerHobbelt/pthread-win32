@@ -1,3 +1,9 @@
+2003-06-22  Nicolas Barry  <boozai@yahoo.com>
+
+	* pthread_mutex_destroy.c (pthread_mutex_destroy): When called
+	with a recursive mutex that was locked by the current thread, the
+	function was failing with a success return code.
+
 2003-05-15  Steven Reddie  <Steven.Reddie@ca.com>
 
 	* pthread_win32_attach_detach_np.c (pthread_win32_process_detach_np):
