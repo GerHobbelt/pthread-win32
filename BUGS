@@ -101,38 +101,3 @@ Known bugs
    creation of production code is highly unreliable for the current version of
    the pthreads library.
 
-
-3. sem_getvalue sometimes returns lower value than expected
-
-   The following comments from the code explain the problem:
-
-      /*
-       * There appears to be NO atomic means of determining the
-       * value of the semaphore. Using only ReleaseSemaphore()
-       * with either a zero or oversized count parameter has been
-       * suggested but this trick doesn't produce consistent results
-       * across Windows versions (the technique uses values that are
-       * knowingly illegal but hopes to extract the current value
-       * anyway - the zero parameter appears to work for Win9x but
-       * neither work reliably for WinNT).
-       *
-       * The intrusive method below will give false results
-       * at times but it at least errs on the side of
-       * caution. Competing threads might occasionally believe
-       * the semaphore has a count of one less than it actually
-       * would have and possibly block momentarily unecessarily,
-       * but they will never see a higher semaphore value than
-       * there should be.
-       *
-       *
-       * Multiple threads calling sem_getvalue() at the same time
-       * may not all return the same value (assuming no calls to
-       * other semaphore routines). They will always return the
-       * correct value or a lesser value. This problem could be fixed
-       * with a global or a per-semaphore critical section here.
-       *
-       * An equally approximate but IMO slightly riskier approach
-       * would be to keep a separate per-semaphore counter and
-       * decrement/increment it inside of sem_wait() and sem_post()
-       * etc using the Interlocked* functions.
-       */
