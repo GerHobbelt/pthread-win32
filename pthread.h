@@ -27,6 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 typedef HANDLE pthread_t;
 typedef HANDLE pthread_mutex_t;
+
+typedef struct { void * ptr; } pthread_condattr_t;
 typedef struct { void * ptr; } pthread_mutexattr_t;
 
 #ifdef __cplusplus
@@ -45,6 +47,18 @@ pthread_t pthread_self(void);
 int pthread_equal(pthread_t t1, pthread_t t2);
 
 int pthread_join(pthread_t thread, void ** valueptr);
+
+/* Functions for manipulating cond. var. attribute objects. */
+
+int pthread_condattr_init(pthread_condattr_t *attr);
+
+int pthread_condatr_setpshared(pthread_condattr_t *attr,
+			       int pshared);
+
+int pthread_condattr_getpshared(pthread_condattr_t *attr,
+				int *pshared);
+
+int pthread_condattr_destroy(pthread_condattr_t *attr);
 
 /* Functions for manipulating mutex attribute objects. */
 
