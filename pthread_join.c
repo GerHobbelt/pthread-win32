@@ -118,7 +118,7 @@ pthread_join (pthread_t thread, void **value_ptr)
       if (result == 0)
 	{
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
 
 	  if (value_ptr != NULL
 	      && !GetExitCodeThread (thread->threadH, (LPDWORD) value_ptr))

@@ -1,3 +1,14 @@
+2004-07-01  Anuj Goyal  <anuj.goyal at gmail.com>
+
+	* builddmc.bat: New; Windows bat file to build the library.
+	* config.h (__DMC__): Support for Digital Mars compiler.
+	* create.c (__DMC__): Likewise.
+	* pthread_exit.c (__DMC__): Likewise.
+	* pthread_join.c (__DMC__): Likewise.
+	* ptw32_threadDestroy.c (__DMC__): Likewise.
+	* ptw32_threadStart.c (__DMC__): Likewise.
+	* ptw32_throw.c (__DMC__): Likewise.
+
 2004-06-29  Anuj Goyal  <anuj.goyal at gmail.com>
 
 	* pthread.h (__DMC__): Initial support for Digital Mars compiler.
