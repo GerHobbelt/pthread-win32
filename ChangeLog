@@ -1,6 +1,8 @@
 1998-10-05  Ben Elliston  <bje@cygnus.com>
 
 	* misc.c (pthread_equal): Correct inverted logic bug.
+	(pthread_once): Use the POSIX mutex primitives, not Win32. Remove
+	irrelevant FIXME comment.
 
 	* global.c (PTHREAD_MUTEX_INITIALIZER): Move to pthread.h.
 
@@ -10,6 +12,7 @@
 	we call pthread_mutex_create() to initialise the object. This
 	fixes the problem of how to handle statically initialised objects
 	that can't call InitializeCriticalSection() due to their context.
+	(PTHREAD_ONCE_INIT): Define.
 
 	* mutex.c (pthread_mutex_init): Set valid flag.
 	(pthread_mutex_destroy): Clear valid flag.
@@ -25,6 +28,8 @@
 	* tests/equal.c: Poor test; remove.
 	
 	* tests/equal1.c New file; test pthread_equal(). Passes.
+
+	* tests/once1.c: New file; test for pthread_once(). Passes.
 	
 1998-10-04  Ben Elliston  <bje@cygnus.com>
 
