@@ -62,14 +62,26 @@ pthread_key_create(pthread_key_t *key, void (*destructor)(void *))
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_tsd_mutex);
 
-  if (_pthread_key_virgin_next >= PTHREAD_KEYS_MAX)
-    ret = EAGAIN;
+  if (_pthread_key_reuse_top >= 0)
+    {
+      k = _pthread_key_reuse[_pthread_key_reuse_top--];
+    }
+  else
+    {
+      if (_pthread_key_virgin_next < PTHREAD_KEYS_MAX)
+	{
+	  k = _pthread_key_virgins[_pthread_key_virgin_next++];
+	}
+      else
+	{
+	  return EAGAIN;
+	}
+    }
 
   /* FIXME: This needs to be implemented as a list plus a re-use stack as for
      thread IDs. _pthread_destructor_run_all() then needs to be changed
      to push keys onto the re-use stack.
    */
-  k = _pthread_key_virgin_next++;
 
   _pthread_tsd_key_table[k].in_use = 0;
   _pthread_tsd_key_table[k].status = _PTHREAD_TSD_KEY_INUSE;

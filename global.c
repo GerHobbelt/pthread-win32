@@ -74,7 +74,7 @@ int _pthread_tsd_key_next = 0;
 pthread_key_t _pthread_key_virgins[_PTHREAD_MAX_KEYS];
 
 /* Index to the next available previously unused pthread_key_t */
-int _pthread_key_virgin_next;
+int _pthread_key_virgin_next = 0;
 
 /* An array of pthread_key_t */
 pthread_key_t _pthread_key_reuse[_PTHREAD_MAX_KEYS];

@@ -1,5 +1,15 @@
 Sun Dec  6 21:54:35 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* buildlib.bat: Fix args to CL when building the .DLL
+
+	* cleanup.c (_pthread_destructor_run_all): Fix TSD key management.
+	This is a tidy-up before TSD and Thread management is completely
+	replaced by John Bossom's much more elegant code.
+
+	* tsd.c (pthread_key_create): Fix TSD key management.
+
+	* global.c (_pthread_key_virgin_next): Initialise.
+
 	* build.bat: New DOS script to compile and link a pthreads app
 	using Microsoft's CL compiler linker.
 	* buildlib.bat: New DOS script to compile all the object files
