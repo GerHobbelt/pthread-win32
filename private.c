@@ -134,7 +134,7 @@ _pthread_new_thread(pthread_t * thread)
 	}
     }
 
-  new_thread->win32handle = NULL;
+  new_thread->win32handle = (HANDLE) NULL;
   new_thread->ptstatus = _PTHREAD_NEW;
   pthread_attr_init(&(new_thread->attr));
   new_thread->joinvalueptr = NULL;
@@ -164,7 +164,7 @@ _pthread_delete_thread(_pthread_t * thread)
       && thread->ptstatus == _PTHREAD_EXITED)
     {
       pthread_attr_destroy(&(thread->attr));
-      thread->win32handle = NULL;
+      thread->win32handle = (HANDLE) NULL;
       thread->ptstatus = _PTHREAD_REUSE;
 
       _pthread_reuse[++_pthread_reuse_top] = thread;
