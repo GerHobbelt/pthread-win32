@@ -1,3 +1,30 @@
+SNAPSHOT 2002-11-04
+-------------------
+
+Bug fixes
+---------
+
+* sem_getvalue() now returns the correct value under Win NT and WinCE.
+- Rob Fanner  <rfanner@stonethree.com>
+
+* sem_timedwait() now uses tighter checks for unreasonable
+abstime values - that would result in unexpected timeout values.
+
+* ptw32_cond_wait_cleanup() no longer mysteriously consumes
+CV signals but may produce more spurious wakeups. It is believed
+that the sem_timedwait() call is consuming a CV signal that it
+shouldn't.
+- Alexander Terekhov  <TEREKHOV@de.ibm.com>
+
+* Fixed a memory leak in ptw32_threadDestroy() for implicit threads.
+
+* Fixed potential for deadlock in pthread_cond_destroy().
+A deadlock could occur for statically declared CVs (PTHREAD_COND_INITIALIZER),
+when one thread is attempting to destroy the condition variable while another
+is attempting to dynamically initialize it.
+- Michael Johnson  <michaelj@maine.rr.com>
+
+
 SNAPSHOT 2002-03-02
 -------------------
 

@@ -1,4 +1,4 @@
-		 PTHREADS-WIN32 SNAPSHOT 2002-03-02
+		 PTHREADS-WIN32 SNAPSHOT 2002-11-04
 		 ----------------------------------
 	 Web Site: http://sources.redhat.com/pthreads-win32/
 	FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -67,6 +67,8 @@ The following POSIX 1003.1 2001 options are defined:
       _POSIX_THREADS
       _POSIX_THREAD_SAFE_FUNCTIONS
       _POSIX_THREAD_ATTR_STACKSIZE
+      _POSIX_SEM_VALUE_MAX
+      _POSIX_SEM_NSEMS_MAX
       _POSIX_THREAD_PRIORITY_SCHEDULING
       _POSIX_SEMAPHORES
       _POSIX_READER_WRITER_LOCKS
@@ -110,15 +112,15 @@ The following functions are implemented:
       pthread_setcancelstate
       pthread_setcanceltype
       pthread_testcancel
-	  
+
       ---------------------------
-      Thread Specific Data   
+      Thread Specific Data
       ---------------------------
       pthread_key_create
       pthread_key_delete
       pthread_setspecific
       pthread_getspecific
-		
+
       ---------------------------
       Mutexes
       ---------------------------
@@ -151,7 +153,7 @@ The following functions are implemented:
       pthread_cond_wait
       pthread_cond_timedwait
       pthread_cond_signal
-      pthread_cond_broadcast  
+      pthread_cond_broadcast
 
       ---------------------------
       Read/Write Locks
@@ -207,8 +209,8 @@ The following functions are implemented:
       ---------------------------
       RealTime Scheduling
       ---------------------------
-      pthread_attr_getschedparam  
-      pthread_attr_setschedparam  
+      pthread_attr_getschedparam
+      pthread_attr_setschedparam
       pthread_attr_getinheritsched
       pthread_attr_setinheritsched
       pthread_attr_getschedpolicy (only supports SCHED_OTHER)

@@ -14,13 +14,13 @@ Ross Johnson		rpj@ise.canberra.edu.au
 					bug fixes;
 					documentation;
 					testsuite.
-Robert Colquhoun		rjc@trump.net.au
+Robert Colquhoun	rjc@trump.net.au
 					Early bug fixes.
 John E. Bossom		John.Bossom@cognos.com
 					Contributed substantial original working implementation;
 					bug fixes;
 					ongoing guidance and standards interpretation.
-Anders Norlander		anorland@hem2.passagen.se
+Anders Norlander	anorland@hem2.passagen.se
 					Early enhancements and runtime checking for supported
 					Win32 routines.
 Tor Lillqvist		tml@iki.fi
@@ -30,37 +30,37 @@ Scott Lightner		scott@curriculum.com
 					Bug fix.
 Kevin Ruland		Kevin.Ruland@anheuser-busch.com
 					Various bug fixes.
-Mike Russo			miker@eai.com
+Mike Russo		miker@eai.com
 					Bug fix.
-Mark E. Armstrong		avail@pacbell.net
+Mark E. Armstrong	avail@pacbell.net
 					Bug fixes.
-Lorin Hochstein		lmh@xiphos.ca
+Lorin Hochstein 	lmh@xiphos.ca
 					general bug fixes; bug fixes to condition variables.
 Peter Slacik		Peter.Slacik@tatramed.sk
 					Bug fixes.
-Mumit Khan			khan@xraylith.wisc.edu
+Mumit Khan		khan@xraylith.wisc.edu
 					Fixes to work with Mingw32.
 Milan Gardian		mg@tatramed.sk
 					Bug fixes and reports/analyses of obscure problems.
 Aurelio Medina		aureliom@crt.com
 					First implementation of read-write locks.
-Graham Dumpleton		Graham.Dumpleton@ra.pad.otc.telstra.com.au
+Graham Dumpleton	Graham.Dumpleton@ra.pad.otc.telstra.com.au
 					Bug fix in condition variables.
-Tristan Savatier		tristan@mpegtv.com
+Tristan Savatier	tristan@mpegtv.com
 					WinCE port.
 Erik Hensema		erik@hensema.xs4all.nl
 					Bug fixes.
-Rich Peters			rpeters@micro-magic.com
-Todd Owen			towen@lucidcalm.dropbear.id.au
+Rich Peters		rpeters@micro-magic.com
+Todd Owen		towen@lucidcalm.dropbear.id.au
 					Bug fixes to dll loading.
-Jason Nye			jnye@nbnet.nb.ca
+Jason Nye		jnye@nbnet.nb.ca
 					Implementation of async cancelation.
 Fred Forester		fforest@eticomm.net
 Kevin D. Clark		kclark@cabletron.com
 David Baggett		dmb@itasoftware.com
 					Bug fixes.
 Paul Redondo		paul@matchvision.com
-Scott McCaskill		scott@3dfx.om
+Scott McCaskill 	scott@3dfx.om
 					Bug fixes.
 Jef Gearhart		jgearhart@tpssys.com
 					Bug fix.
@@ -80,23 +80,26 @@ Thomas Pfaff		tpfaff@gmx.net
 					re-implemented mutex routines to avoid Win32 mutexes
 					and TryEnterCriticalSection;
 					procedure to fix Mingw32 thread-safety issues.
-Franco Bez			franco.bez@gmx.de
+Franco Bez		franco.bez@gmx.de
 					procedure to fix Mingw32 thread-safety issues.
 Louis Thomas		lthomas@arbitrade.com
 					(with Alexander Terekhov) re-implemented and improved
 					condition variables.
-David Korn			dgk@research.att.com
+David Korn		dgk@research.att.com
 					Ported to UWIN.
-Phil Frisbie, Jr.		phil@hawksoft.com
+Phil Frisbie, Jr.	phil@hawksoft.com
 					Bug fix.
-Ralf Brese			Ralf.Brese@pdb4.siemens.de
+Ralf Brese		Ralf.Brese@pdb4.siemens.de
 					Bug fix.
-prionx@juno.com		prionx@juno.com
+prionx@juno.com 	prionx@juno.com
 					Bug fixes.
 Max Woodbury		mtew@cds.duke.edu
 					POSIX versioning conditionals;
 					reduced namespace pollution;
 					idea to separate routines to reduce statically
 					linked image sizes.
-Michael Johnson		michaelj@maine.rr.com
+Rob Fanner		rfanner@stonethree.com
 					Bug fix.
+Michael Johnson 	michaelj@maine.rr.com
+					Bug fix.
+
