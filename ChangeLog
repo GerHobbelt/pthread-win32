@@ -1,5 +1,10 @@
 Sun Jul 26 00:09:59 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* signal.c (pthread_sigmask): Rename "this" to "us" and fix some
+	minor syntax errors. Declare "us" and initialise it.
+
+	* sync.c (pthread_detach): Rename "this" to "target".
+
 	* pthread.h: Converting PTHREAD_* defines to alias the (const int)
 	values in global.c.
 

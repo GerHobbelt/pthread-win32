@@ -35,13 +35,14 @@ pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
 
   if (set != NULL)
     {
+      _pthread_threads_thread_t * us = _PTHREAD_THIS;
       int i;
 	
       /* FIXME: this code assumes that sigmask is an even multiple of
 	 the size of a long integer. */ 
          
       unsigned long *src = set;
-      unsigned long *dest = this->attr->sigmask;
+      unsigned long *dest = us->attr.sigmask;
 
       switch (how)
 	{
@@ -60,7 +61,7 @@ pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
 	    }
 	case SIG_SET:
 	  /* Replace the whole sigmask. */
-	  memcpy(this->attr.sigmask, set, sizeof(sigset_t));
+	  memcpy(us->attr.sigmask, set, sizeof(sigset_t));
 	  break;
 	}
     }
