@@ -1,3 +1,12 @@
+2000-09-13  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* mutex.c (pthread_mutex_init): Call
+	TryEnterCriticalSection through the pointer
+	rather than directly so that the dll can load
+	on Windows versions that can't resolve the
+	function, eg. Windows 95
+	- "Jef Gearhart" <jgearhart@tpssys.com>
+
 2000-09-08  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* GNUmakefile(_WIN32_WINNT=0x400): Define in CFLAGS;
