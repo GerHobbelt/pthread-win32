@@ -946,9 +946,21 @@ pthread_cond_broadcast (pthread_cond_t * cond)
       /*
        * Wake up all waiters
        */
+
+#ifdef NEED_SEM
+
+      result = (_pthread_increase_semaphore( &cv->sema, cv->waiters )
+		? 0
+		: EINVAL);
+
+#else /* NEED_SEM */
+
       result = (ReleaseSemaphore( cv->sema, cv->waiters, NULL )
-	        ? 0
-	        : EINVAL );
+		? 0
+		: EINVAL);
+
+#endif /* NEED_SEM */
+
     }
 
   (void) pthread_mutex_unlock(&(cv->waitersLock));

@@ -1,3 +1,10 @@
+1999-11-05  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* general: Patched for portability to WinCE. The details are
+	described in the file WinCE-PORT. Follow the instructions
+	in README.WinCE to make the appropriate changes in config.h.
+	- Tristan Savatier <tristan@mpegtv.com>
+
 1999-10-30  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* create.c (pthread_create): Explicitly initialise thread state to

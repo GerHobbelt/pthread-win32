@@ -27,7 +27,8 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
-#define PT_STDCALL __stdcall
+/* changed include from <semaphore.h> to use local file during development */
+#include "semaphore.h"
 
 #include <semaphore.h>
 
@@ -315,6 +316,12 @@ extern CRITICAL_SECTION _pthread_mutex_test_init_lock;
 extern CRITICAL_SECTION _pthread_cond_test_init_lock;
 extern CRITICAL_SECTION _pthread_rwlock_test_init_lock;
 
+/* Declared in misc.c */
+#ifdef NEED_CALLOC
+#define calloc(n, s) _pthread_calloc(n, s)
+void *_pthread_calloc(size_t n, size_t s);
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -353,6 +360,12 @@ void _pthread_tkAssocDestroy (ThreadKeyAssoc * assoc);
 int _pthread_sem_timedwait (sem_t * sem,
 			    const struct timespec * abstime);
 
+#ifdef NEED_SEM
+void _pthread_decrease_semaphore(sem_t * sem);
+BOOL _pthread_increase_semaphore(sem_t * sem,
+                                 unsigned int n);
+#endif /* NEED_SEM */
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
@@ -365,7 +378,7 @@ int _pthread_sem_timedwait (sem_t * sem,
  *
  * Patch by Anders Norlander <anorland@hem2.passagen.se>
  */
-#if defined(__CYGWIN32__) || defined(__CYGWIN__)
+#if defined(__CYGWIN32__) || defined(__CYGWIN__) || defined(NEED_CREATETHREAD)
 
 /* 
  * Macro uses args so we can cast start_proc to LPTHREAD_START_ROUTINE
@@ -387,7 +400,7 @@ int _pthread_sem_timedwait (sem_t * sem,
 
 #define _endthreadex ExitThread
 
-#endif /* __CYGWIN32__ || __CYGWIN__ */
+#endif /* __CYGWIN32__ || __CYGWIN__ || NEED_CREATETHREAD*/
 
 
 #endif /* _IMPLEMENT_H */

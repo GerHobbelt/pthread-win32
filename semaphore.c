@@ -43,13 +43,12 @@
  */
 
 #include <windows.h>
-#include <process.h>
-#include <sys/timeb.h>
+//#include <process.h>
+//#include <sys/timeb.h>
 #include <string.h>
 
 #include "pthread.h"
 #include "semaphore.h"
-
 
 int
 sem_init (sem_t * sem, int pshared, unsigned int value)
@@ -90,6 +89,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 {
   int result = 0;
 
+
   if (pshared != 0)
     {
       /*
@@ -101,6 +101,22 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
     }
   else
     {
+
+#ifdef NEED_SEM
+
+      sem->value = value;
+      pthread_mutex_init(&sem->mutex, NULL);
+      sem->event = CreateEvent (NULL,
+				FALSE,	/* manual reset */
+				FALSE,	/* initial state */
+				NULL);
+      if (value != 0)
+        {
+	  SetEvent(sem->event);
+        }
+
+#else /* NEED_SEM */
+
       /*
        * NOTE: Taking advantage of the fact that
        *               sem_t is a simple structure with one entry;
@@ -116,6 +132,9 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 	{
 	  result = ENOSPC;
 	}
+
+#endif /* NEED_SEM */
+
     }
 
   if (result != 0)
@@ -161,10 +180,26 @@ sem_destroy (sem_t * sem)
     {
       result = EINVAL;
     }
+
+#ifdef NEED_SEM
+
+  else
+    {
+      pthread_mutex_destroy(&sem->mutex);
+      if (!CloseHandle(sem->event))
+        {
+          result = EINVAL;
+        }
+    }
+
+#else /* NEED_SEM */
+
   else if (! CloseHandle (*sem))
     {
       result = EINVAL;
     }
+
+#endif /* NEED_SEM */
 
   if (result != 0)
     {
@@ -213,10 +248,21 @@ sem_trywait (sem_t * sem)
     {
       result = EINVAL;
     }
+
+#ifdef NEED_SEM
+
+  /* not yet implemented! */
+  result = EINVAL;
+  return -1;
+
+#else /* NEED_SEM */
+
   else if (WaitForSingleObject (*sem, 0) == WAIT_TIMEOUT)
     {
       result = EAGAIN;
     }
+
+#endif /* NEED_SEM */
 
   if (result != 0)
     {
@@ -228,6 +274,53 @@ sem_trywait (sem_t * sem)
 
 }				/* sem_trywait */
 
+
+#ifdef NEED_SEM
+
+void 
+_pthread_decrease_semaphore(sem_t * sem)
+{
+  pthread_mutex_lock(&sem->mutex);
+
+  if (sem->value != 0)
+    {
+      sem->value--;
+      if (sem->value != 0)
+        {
+          SetEvent(sem->event);
+        }
+    }
+  else
+    {
+      /* this case should not happen! */
+    }
+
+  pthread_mutex_unlock(&sem->mutex);
+}
+
+BOOL 
+_pthread_increase_semaphore(sem_t * sem, unsigned int n)
+{
+  BOOL result;
+
+  pthread_mutex_lock(&sem->mutex);
+
+  if (sem->value + n > sem->value)
+    {
+       sem->value += n;
+       SetEvent(sem->event);
+       result = TRUE;
+    }
+  else
+    {
+       result = FALSE;
+    }
+
+  pthread_mutex_unlock(&sem->mutex);
+  return result;
+}
+
+#endif /* NEED_SEM */
 
 int
 sem_wait (sem_t * sem)
@@ -268,7 +361,17 @@ sem_wait (sem_t * sem)
     }
   else
     {
+
+#ifdef NEED_SEM
+
+	result = pthreadCancelableWait (sem->event);
+
+#else /* NEED_SEM */
+
 	result = pthreadCancelableWait (*sem);
+
+#endif /* NEED_SEM */
+
     }
 
   if (result != 0)
@@ -276,6 +379,12 @@ sem_wait (sem_t * sem)
       errno = result;
       return -1;
     }
+
+#ifdef NEED_SEM
+
+  _decrease_semaphore(sem);
+
+#endif /* NEED_SEM */
 
   return 0;
 
@@ -314,11 +423,20 @@ sem_post (sem_t * sem)
     {
 	result = EINVAL;
     }
+
+#ifdef NEED_SEM
+
+  else if (! _increase_semaphore (sem, 1))
+
+#else /* NEED_SEM */
+
   else if (! ReleaseSemaphore (*sem, 1, 0))
+
+#endif /* NEED_SEM */
+
     {
 	result = EINVAL;
     }
-
 
   if (result != 0)
     {

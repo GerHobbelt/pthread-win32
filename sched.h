@@ -43,8 +43,8 @@
 #endif
 
 #include <windows.h>
-#include <process.h>
-#include <errno.h>
+//#include <process.h>
+//#include <errno.h>
 
 #ifdef _MSC_VER
 /*
