@@ -27,10 +27,9 @@ A 1
 ---
 Important: see Q2 also.
 
-I short, use Mingw32 with the MSVCRT library to build applications that use
-the DLL. You cannot build the library itself with either yet because the
-library uses C++ EH which is not thread-safe in egcs yet. Use MSVC or grab
-the pre-build DLL etc.
+In short, use Mingw32 with the MSVCRT library to build applications that use
+the DLL. Cygwin's own internal support for POSIX threads is growing. Consult
+that project's documentation for more information.
 
 Date: Mon, 07 Dec 1998 15:11:37 +0100
 From: Anders Norlander <anorland@hem2.passagen.se>
@@ -89,11 +88,14 @@ Q 2	Now that pthreads-win32 builds under Mingw32, why do I get
 
 A 2
 ---
+Note:
+The latest Mingw32 package now has thread-safe exception handling.
+
 The following email exchange describes the problem. Until this issue
 is resolved people without the Microsoft compiler can obtain the current
 MSVC prebuilt DLL (pthread.{dll,lib,h}) at:
 
-ftp://sourceware.cygnus.com/pub/pthreads-win32/dll-latest 
+ftp://sources.redhat.com/pub/pthreads-win32/dll-latest 
 
 Date: Wed, 10 Feb 1999 13:21:01 -0000
 From: "Ruland, Kevin" <Kevin.Ruland@anheuser-busch.com>
@@ -133,15 +135,7 @@ For Mingw crtdll/msvc, someone needs to write the thread-wrapper for win32
 threads. Anyone who knows win32 threads should be able to do this without
 much trouble at all. It's low on my priority list, so unless someone else
 volunteers, it'll have to wait.
-
-Are you willing to take a look? If so, I can provide details.
 <\Quote>
-
-And there you have it!  To summarize, it's nice that pthreads compile but they
-aren't much use just yet.
-
-I'll respond to Mumit with 'Okay, what do I need to look at', but may not be
-able to tackle it myself.
 
 Kevin
 
@@ -191,7 +185,6 @@ Q 4	Cancelation doesn't work for me, why?
 
 A 4
 ---
-
 > I'm investigating a problem regarding thread cancelation. The thread I want
 > to cancel has PTHREAD_CANCEL_ASYNCHRONOUS, however, this piece of code
 > blocks on the join():
@@ -214,6 +207,9 @@ A 4
 > win32 programming, so I don't really understand how the *Event() family of
 > calls work.
 
+Async cancelation should be in post-snapshot-1999-11-02 versions
+of pthreads-win32 (currently only for x86 architectures).
+
 The answer to your first question is, normal POSIX behaviour would  
 be to asynchronously cancel the thread. However, even that doesn't
 guarantee cancelation as the standard only says it should be
@@ -221,9 +217,9 @@ cancelled as soon as possible.
 
 However ...
 
-Pthreads-win32 only partially supports asynchronous cancellation. If the
-thread you're trying to cancel is blocked (for instance, it could be waiting
-for data from the network), it will only get cancelled when it unblocks
+Snapshot 99-11-02 or earlier only partially supports asynchronous cancellation.
+If the thread you're trying to cancel is blocked (for instance, it could be
+waiting for data from the network), it will only get cancelled when it unblocks
 (when the data arrives). Unfortunately, there is no way to do so from
 outside the thread.
 
@@ -264,7 +260,6 @@ Q 5	Thread won't block after two calls to mutex_lock
  
 A 5
 ---
-
 > i was testing this pthread for win32 in my prog.
 > when i checked if it was blocking mutex_lock calls, i was surprised when it
 > didnt lock
@@ -304,7 +299,6 @@ Q 6	How do I generate libpthread.a for use with Mingw32?
  
 A 6
 ---
-
 > I'm lacking the libpthread.a that
 > used to come with the pre-compiled package. The last time this
 > library appeared was in 1999-08-12. Without this library I cannot
@@ -320,4 +314,3 @@ Where DLLTOOL is i686-pc-cygwin-dlltool
 and AS i686-pc-cygwin-as.
 
 Thomas Sailer <sailer@ife.ee.ethz.ch>
-

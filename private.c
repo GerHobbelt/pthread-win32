@@ -184,11 +184,8 @@ _pthread_threadStart (ThreadParms * threadParms)
   pthread_t self;
   void *(*start) (void *);
   void *arg;
-
 #ifdef _MSC_VER
-
   DWORD ei[] = {0,0,0};
-
 #endif
 
   void * status;
@@ -249,7 +246,8 @@ _pthread_threadStart (ThreadParms * threadParms)
       {
 	/*
 	 * A system unexpected exception had occurred running the user's
-	 * routine. We get control back within this block.
+	 * routine. We get control back within this block because
+         * we can't allow the exception out of thread scope.
 	 */
 	status = PTHREAD_CANCELED;
       }
@@ -271,7 +269,7 @@ _pthread_threadStart (ThreadParms * threadParms)
       /*
        * Thread was cancelled.
        */
-      status = PTHREAD_CANCELED;
+      status = self->exitStatus = PTHREAD_CANCELED;
     }
   _pthread_catch (Pthread_exception_exit)
     {
@@ -284,9 +282,10 @@ _pthread_threadStart (ThreadParms * threadParms)
     {
       /*
        * A system unexpected exception had occurred running the user's
-       * routine. We get control back within this block.
+       * routine. We get control back within this block because
+       * we can't allow the exception out of thread scope.
        */
-      status = PTHREAD_CANCELED;
+      status = self->exitStatus = PTHREAD_CANCELED;
     }
 
 #else /* __cplusplus */

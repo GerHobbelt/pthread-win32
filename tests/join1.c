@@ -37,7 +37,7 @@ main(int argc, char * argv[])
 
 	for (i = 0; i < 4; i++)
 	  {
-	    assert(pthread_join(id[i], (void *) &result) == 0);
+	    assert(pthread_join(id[i], (void **) &result) == 0);
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
 	    assert(result == i);
 #else

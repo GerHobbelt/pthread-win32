@@ -56,7 +56,7 @@ exceptionedThread(void * arg)
   int result = ((int)PTHREAD_CANCELED + 1);
   int one = 1;
   int zero = 0;
-  int dummy;
+  int dummy = 0;
 
   /* Set to async cancelable */
 
@@ -66,22 +66,32 @@ exceptionedThread(void * arg)
 
   Sleep(100);
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__cplusplus)
   __try
   {
-    dummy = one/zero;
+    /* Avoid being optimised out */
+    if (dummy == one/zero)
+	Sleep(0);
   }
   __except (EXCEPTION_EXECUTE_HANDLER)
   {
+    /* Should get into here. */
     result = ((int)PTHREAD_CANCELED + 2);
   }
 #elif defined(__cplusplus)
   try
   {
-    dummy = one/zero;
+    /* Avoid being optimised out */
+    if (dummy == one/zero)
+	Sleep(0);
   }
+#if defined(PtW32CatchAll)
+  PtW32CatchAll
+#else
   catch (...)
+#endif
   {
+    /* Should get into here. */
     result = ((int)PTHREAD_CANCELED + 2);
   }
 #endif
@@ -93,7 +103,6 @@ void *
 canceledThread(void * arg)
 {
   int result = ((int)PTHREAD_CANCELED + 1);
-  int dummy;
   int count;
 
   /* Set to async cancelable */
@@ -102,7 +111,7 @@ canceledThread(void * arg)
 
   assert(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL) == 0);
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__cplusplus)
   __try
   {
     /*
@@ -114,6 +123,7 @@ canceledThread(void * arg)
   }
   __except (EXCEPTION_EXECUTE_HANDLER)
   {
+    /* Should NOT get into here. */
     result = ((int)PTHREAD_CANCELED + 2);
   }
 #elif defined(__cplusplus)
@@ -126,8 +136,13 @@ canceledThread(void * arg)
     for (count = 0; count < 100; count++)
       Sleep(100);
   }
+#if defined(_MSC_VER)
+  AltCatchAll
+#else
   catch (...)
+#endif
   {
+    /* Should NOT get into here. */
     result = ((int)PTHREAD_CANCELED + 2);
   }
 #endif

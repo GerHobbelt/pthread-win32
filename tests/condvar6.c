@@ -102,7 +102,7 @@ mythread(void * arg)
 
   assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
-  return 0;
+  return (void *) 0;
 }
 
 int

@@ -88,7 +88,7 @@ mythread(void * arg)
       break;
     }
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
   __try
 #else
   try
@@ -104,10 +104,14 @@ mythread(void * arg)
 	  pthread_testcancel();
 	}
     }
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
   __except(EXCEPTION_EXECUTE_HANDLER)
 #else
+#if defined(PtW32CatchAll)
+  PtW32CatchAll
+#else
   catch(...)
+#endif
 #endif
     {
       /*

@@ -1,3 +1,63 @@
+2000-08-06  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* ccl.bat: Add /nologo to remove extraneous output.
+
+	* exception1.c (exceptionedThread): Init 'dummy';
+	put expression into if condition to prevent optimising away;
+	remove unused variable.
+
+	* cancel4.c (mythread): Cast return value to avoid warnings.
+
+	* cancel2.c (mythread): Missing #endif.
+
+	* condvar9.c (mythread): Cast return value to avoid warnings.
+
+	* condvar8.c (mythread): Cast return value to avoid warnings.
+
+	* condvar7.c (mythread): Cast return value to avoid warnings.
+
+	* cleanup3.c (mythread): Cast return value to avoid warnings.
+
+	* cleanup2.c (mythread): Cast return value to avoid warnings.
+
+	* cleanup1.c (mythread): Cast return value to avoid warnings.
+
+	* condvar5.c (mythread): Cast return value to avoid warnings.
+
+	* condvar3.c (mythread): Cast return value to avoid warnings.
+
+	* condvar6.c (mythread): Cast return value to avoid warnings.
+
+	* condvar4.c (mythread): Cast return value to avoid warnings.
+
+2000-08-05  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* cancel2.c: Use PtW32CatchAll macro if defined.
+
+	* exception1.c: Use PtW32CatchAll macro if defined.
+
+2000-08-02  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* tsd1.c: Fix typecasts of &result [g++ is now very fussy].
+	
+	* test.h (assert): Return 0's explicitly to allay
+	g++ errors.
+	
+	* join2.c: Add explicit typecasts.
+	
+	* join1.c: Add explicit typecasts.
+	
+	* join0.c: Add explicit typecasts.
+	
+	* eyal1.c: Add explicit typecasts.
+	
+	* count1.c (main): Add type cast to remove g++ parse warning
+	[gcc-2.95.2 seems to have tightened up on this].
+
+	* Makefile (GLANG): Use c++ explicitly.
+	Remove MSVC sections (was commented out).
+	Add target to generate cpp output.
+
 2000-07-25  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* runtest.bat: modified to work under W98.

@@ -53,7 +53,7 @@ main()
   /* 
    * Check the number of threads created.
    */
-  assert(numThreads == maxThreads);
+  assert((int) numThreads == maxThreads);
   
   /*
    * Success.

@@ -1,3 +1,28 @@
+2000-08-06  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* pthread.h: Remove #warning - VC++ doesn't accept it.
+
+2000-08-05  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* pthread.h (PtW32CatchAll): Add macro. When compiling
+	applications using VC++ with C++ EH rather than SEH
+	'PtW32CatchAll' must be used in place of any 'catch( ... )'
+	if the application wants pthread cancelation or
+	pthread_exit() to work.
+
+2000-08-03  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* pthread.h: Add a base class Pthread_exception for
+	library internal exceptions and change the "catch"
+	re-define macro to use it.
+
+2000-08-02  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* GNUmakefile (CFLAGS): Add -mthreads.
+	Add new targets to generate cpp and asm output.
+
+	* sync.c (pthread_join): Remove dead code.
+
 2000-07-25  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* sched.c (sched_get_priority_max): Handle different WinCE and
