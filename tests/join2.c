@@ -29,7 +29,11 @@ main(int argc, char * argv[])
 	for (i = 0; i < 4; i++)
 	  {
 	    assert(pthread_join(id[i], (void *) &result) == 0);
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+	    /* CRTDLL _beginthread doesn't support return value, so
+	       the assertion is guaranteed to fail. */
 	    assert(result == i);
+#endif
 	  }
 
 	/* Success. */

@@ -109,4 +109,8 @@ pthreadCancelableTimedWait
 ;
 pthread_push_cleanup
 pthread_pop_cleanup
-
+;
+; Not for use directly. Needed by macros in pthread.h
+; to return internal SEH code.
+;
+_pthread_get_exception_services_code

@@ -49,6 +49,3 @@ CRITICAL_SECTION _pthread_cond_test_init_lock;
  * created read/write locks.
  */
 CRITICAL_SECTION _pthread_rwlock_test_init_lock;
-
-
-

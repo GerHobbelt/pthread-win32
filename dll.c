@@ -107,6 +107,26 @@ DllMain (
             }
           DeleteCriticalSection(&cs);
         }
+
+      if (_pthread_try_enter_critical_section == NULL)
+        {
+          /*
+           * If TryEnterCriticalSection is not being used, then free
+           * the kernel32.dll handle now, rather than leaving it until
+           * DLL_PROCESS_DETACH.
+           *
+           * Note: this is not a pedantic exercise in freeing unused
+           * resources!  It is a work-around for a bug in Windows 95
+           * (see microsoft knowledge base article, Q187684) which
+           * does Bad Things when FreeLibrary is called within
+           * the DLL_PROCESS_DETACH code, in certain situations.
+           * Since w95 just happens to be a platform which does not
+           * provide TryEnterCriticalSection, the bug will be
+           * effortlessly avoided.
+           */
+          (void) FreeLibrary(_pthread_h_kernel32);
+          _pthread_h_kernel32 = 0;
+        }
       break;
 
     case DLL_THREAD_ATTACH:
@@ -150,7 +170,10 @@ DllMain (
 		 */
 		_pthread_processTerminate ();
 
-		(void) FreeLibrary(_pthread_h_kernel32);
+                 if (_pthread_h_kernel32)
+                   {
+                     (void) FreeLibrary(_pthread_h_kernel32);
+                   }
 	      }
 	  }
 

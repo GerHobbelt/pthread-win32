@@ -1,3 +1,100 @@
+2000-01-04  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* private.c (_pthread_get_exception_services_code): New; returns
+	value of EXCEPTION_PTHREAD_SERVICES.
+	(_pthread_processInitialize): Remove initialisation of
+	_pthread_exception_services which is no longer needed.
+
+	* pthread.h (_pthread_exception_services): Remove extern.
+	(_pthread_get_exception_services_code): Add function prototype;
+	use this to return EXCEPTION_PTHREAD_SERVICES value instead of
+	using the _pthread_exception_services variable which I had
+	trouble exporting through pthread.def.
+
+	* global.c (_pthread_exception_services): Remove declaration.
+
+1999-11-22  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* implement.h: Forward declare _pthread_new();
+
+	* misc.c (_pthread_new): New; alloc and initialise a new pthread_t.
+	(pthread_self): New thread struct is generated 	by new routine
+	_pthread_new().
+
+	* create.c (pthread_create): New thread struct is generated
+	by new routine_pthread_new().
+
+1999-11-21  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* global.c (_pthread_exception_services): Declare new variable. 
+
+	* private.c (_pthread_threadStart): Destroy thread's
+	cancelLock mutex; make 'catch' and '__except' usageimmune to
+	redfinitions in pthread.h.
+	(_pthread_processInitialize): Init new constant _pthread_exception_services.
+
+	* create.c (pthread_create): Initialise thread's cancelLock
+	mutex.
+
+	* cleanup.c (pthread_pop_cleanup): Make 'catch' and '__except'
+	usage immune to redfinition s in pthread.h.
+
+	* private.c: Ditto.
+
+	* pthread.h (catch): Redefine 'catch' so that C++ applications
+	won't catch our internal exceptions.
+	(__except): ditto for __except.
+
+	* implement.h (_pthread_catch): Define internal version
+	of 'catch' because 'catch' is redefined by pthread.h.
+	(__except): ditto for __except.
+	(struct pthread_t_): Add cancelLock mutex for async cancel
+	safety.
+
+	* cancel.c (_pthread_cancel_self): New; part of the async
+	cancellation implementation.
+	(_pthread_cancel_thread): Ditto; this function is X86
+	processor specific.
+	(pthread_setcancelstate): Add check for pending async
+	cancel request and cancel the calling thread if
+	required; add async-cancel safety lock.
+	(pthread_setcanceltype): Ditto.
+	- Jason Nye <jnye@nbnet.nb.ca>
+	- Erik Hensema <erik.hensema@group2000.nl>
+
+1999-11-13  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* configure.in (AC_OUTPUT): Put generated output into GNUmakefile
+	rather than Makefile. Makefile will become the MSC nmake compatible
+	version
+	- Erik Hensema <erik.hensema@group2000.nl>
+
+	* misc.c (pthread_self): Add a note about GetCurrentThread
+	returning a pseudo-handle
+	- John Bossom (John.Bossom@cognos.com>
+
+1999-11-10  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* dll.c (dllMain): Free kernel32 ASAP.
+	If TryEnterCriticalSection is not being used, then free
+	the kernel32.dll handle now, rather than leaving it until
+	DLL_PROCESS_DETACH.
+
+	Note: this is not a pedantic exercise in freeing unused
+	resources!  It is a work-around for a bug in Windows 95
+	(see microsoft knowledge base article, Q187684) which
+	does Bad Things when FreeLibrary is called within
+	the DLL_PROCESS_DETACH code, in certain situations.
+	Since w95 just happens to be a platform which does not
+	provide TryEnterCriticalSection, the bug will be
+	effortlessly avoided.
+	- Todd Owen <towen@lucidcalm.dropbear.id.au>
+
+	* sync.c (pthread_join): Make it a deferred cancelation point.
+
+	* misc.c (pthread_self): Explicitly initialise implicitly
+	created thread state to default values.
+
 1999-11-05  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* pthread.h (winsock.h): Include unconditionally.

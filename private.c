@@ -215,7 +215,7 @@ _pthread_threadStart (ThreadParms * threadParms)
      */
     status = (*start) (arg);
   }
-  __except (ExceptionFilter(GetExceptionInformation(), ei))
+  _pthread__except (ExceptionFilter(GetExceptionInformation(), ei))
   {
     DWORD ec = GetExceptionCode();
 
@@ -254,21 +254,21 @@ _pthread_threadStart (ThreadParms * threadParms)
      */
     status = self->exitStatus = (*start) (arg);
   }
-  catch (Pthread_exception_cancel)
+  _pthread_catch (Pthread_exception_cancel)
     {
       /*
        * Thread was cancelled.
        */
       status = PTHREAD_CANCELED;
     }
-  catch (Pthread_exception_exit)
+  _pthread_catch (Pthread_exception_exit)
     {
       /*
        * Thread was exited via pthread_exit().
        */
       status = self->exitStatus;
     }
-  catch (...)
+  _pthread_catch (...)
     {
       /*
        * A system unexpected exception had occurred running the user's
@@ -289,6 +289,7 @@ _pthread_threadStart (ThreadParms * threadParms)
 
 #endif /* _MSC_VER */
 
+  (void) pthread_mutex_destroy(&self->cancelLock);
   _pthread_callUserDestroyRoutines(self);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
@@ -536,7 +537,7 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 			 */
 			(*(k->destructor)) (value);
 		      }
-		      __except (EXCEPTION_EXECUTE_HANDLER)
+		      _pthread__except (EXCEPTION_EXECUTE_HANDLER)
 		      {
 			/*
 			 * A system unexpected exception had occurred
@@ -555,7 +556,7 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 			 */
 			(*(k->destructor)) (value);
 		      }
-		      catch (...)
+		      _pthread_catch (...)
 		      {
 			/*
 			 * A system unexpected exception had occurred
@@ -686,15 +687,9 @@ _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
   struct timespec currSysTime;
 
 #else /* NEED_FTIME */
-#if defined(__MINGW32__)
-
-  struct timeb currSysTime;
-
-#else /* __MINGW32__ */
 
   struct _timeb currSysTime;
 
-#endif /* __MINGW32__ */
 #endif /* NEED_FTIME */
 
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
@@ -787,3 +782,18 @@ _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
   return 0;
 
 }				/* _pthread_sem_timedwait */
+
+
+DWORD
+_pthread_get_exception_services_code(void)
+{
+#ifdef _MSC_VER
+
+  return EXCEPTION_PTHREAD_SERVICES;
+
+#else
+
+  return NULL;
+
+#endif
+}

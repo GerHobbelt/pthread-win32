@@ -73,6 +73,7 @@ struct pthread_t_ {
   void *parms;
   int ptErrno;
   int detachState;
+  pthread_mutex_t cancelLock;  /* Used for async-cancel safety */
   int cancelState;
   int cancelType;
   HANDLE cancelEvent;
@@ -287,19 +288,28 @@ struct ThreadKeyAssoc {
 #define _PTHREAD_EPS_CANCEL       0
 #define _PTHREAD_EPS_EXIT         1
 
+/*
+ * '__except' was redefined in pthread.h. We use the real one internally.
+ */
+#ifdef __except
+#undef __except
+#define _pthread__except __except
+#endif
+
 #else
 
 #ifdef __cplusplus
-
 /*
- * Exceptions similar to the SEH exceptions above.
+ * 'catch' was redefined in pthread.h. We use the real one internally.
  */
-class Pthread_exception_cancel {};
-class Pthread_exception_exit {};
+#ifdef catch
+#undef catch
+#define _pthread_catch catch
+#endif
 
 #else /* __cplusplus */
 
-#warning File __FILE__, Line __LINE__: Cancellation not supported under C.
+#warning File __FILE__, Line __LINE__: Cancellation not supported if library compiled as C.
 
 #endif /* __cplusplus */
 
@@ -341,6 +351,8 @@ void _pthread_processTerminate (void);
 void _pthread_threadDestroy (pthread_t tid);
 
 void _pthread_cleanupStack (void);
+
+pthread_t _pthread_new (void);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
 unsigned PT_STDCALL

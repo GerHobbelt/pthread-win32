@@ -73,18 +73,10 @@ pthread_create (pthread_t * tid,
   ThreadParms *parms = NULL;
   long stackSize;
 
-  if ((thread = (pthread_t) calloc (1, sizeof (*thread))) ==
-      NULL)
+  if ((thread = _pthread_new()) == NULL)
     {
       goto FAIL0;
     }
-
-  /*
-   * Setup standard default state.
-   */
-  thread->detachState = PTHREAD_CREATE_JOINABLE;
-  thread->cancelState = PTHREAD_CANCEL_ENABLE;
-  thread->cancelType  = PTHREAD_CANCEL_DEFERRED;
 
   thread->cancelEvent =
     CreateEvent (

@@ -7,7 +7,9 @@
 #ifndef _PTHREAD_TEST_H_
 #define _PTHREAD_TEST_H_
 
-#include <pthread.h>
+#include "pthread.h"
+#include "sched.h"
+#include "semaphore.h"
 #include <stdio.h>
 
 char * error_string[] = {
@@ -61,28 +63,31 @@ char * error_string[] = {
  * which pops up a dialog. We want to run in batch mode so
  * we define our own assert macro.
  */
-#ifdef NDEBUG
-
-#define assert(e) ((void)0)
-
-#else /* NDEBUG */
-
 #ifdef assert
 # undef assert
 #endif
 
+#ifdef NDEBUG
+
+# define assert(e) ((void)0)
+
+#else /* NDEBUG */
+
 #ifndef ASSERT_TRACE
-#define ASSERT_TRACE 0
+# define ASSERT_TRACE 0
+#else
+# undef ASSERT_TRACE
+# define ASSERT_TRACE 1
 #endif
 
-#define assert(e) \
-  ((e) ? ((ASSERT_TRACE) ? fprintf(stderr, \
-                                   "Assertion succeeded: (%s), file %s, line %d\n", \
-			           #e, __FILE__, (int) __LINE__), \
-	                           fflush(stderr) : \
-                            (void) 0) : \
-         (fprintf(stderr, "Assertion failed: (%s), file %s, line %d\n", \
-                  #e, __FILE__, (int) __LINE__), exit(1)))
+# define assert(e) \
+   ((e) ? ((ASSERT_TRACE) ? fprintf(stderr, \
+                                    "Assertion succeeded: (%s), file %s, line %d\n", \
+			            #e, __FILE__, (int) __LINE__), \
+	                            fflush(stderr) : \
+                             (void) 0) : \
+          (fprintf(stderr, "Assertion failed: (%s), file %s, line %d\n", \
+                   #e, __FILE__, (int) __LINE__), exit(1)))
 
 #endif /* NDEBUG */
 

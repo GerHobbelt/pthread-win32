@@ -20,11 +20,18 @@ Acknowledgements
 Pthreads-win32 is based substantially on a Win32 Pthreads implementation
 contributed by John E. Bossom <jebossom@cognos.com>.
 
-See the 'MAINTAINERS' file for the list of contributors.
+See the 'CONTRIBUTORS' file for the list of contributors.
 
 
-Why you cannot build the library with Cygwin or Mingw32 yet
------------------------------------------------------------
+Building under Mingw32
+----------------------
+
+pthread.dll can be build with the current development version of mingw32.
+Use the GNUmakefile with GNU make should do the right thing.
+
+
+Why you cannot build the library with Cygwin yet
+------------------------------------------------
 
 The DLL pthread.dll still cannot be built using g++ due to non thread-safe
 exception handling in g++.  Thanks to Kevin Ruland for researching this

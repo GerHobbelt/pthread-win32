@@ -1,3 +1,22 @@
+2000-01-04  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* cancel4.c: New; Test cancelation does not occur in deferred
+	cancelation threads with no cancelation points.
+
+	* cancel3.c: New; Test asynchronous cancelation.
+
+	* context1.c: New; Test context switching method for async
+	cancelation.
+
+1999-11-23  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* test.h: Add header includes; include local header versions rather
+	than system versions; rearrange the assert macro defines.
+
+1999-11-07  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* loadfree.c: New. Test loading and freeing the library (DLL).
+
 1999-10-30  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* cancel1.c: New. Test pthread_setcancelstate and

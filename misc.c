@@ -154,17 +154,30 @@ pthread_self (void)
        * Need to create an implicit 'self' for the currently
        * executing thread.
        */
-      self = (pthread_t) calloc (1, sizeof (*self));
+      self = _pthread_new();
 
       if (self != NULL)
 	{
+	  /*
+	   * This is a non-POSIX thread which has chosen to call
+	   * a POSIX threads function for some reason. We assume that
+	   * it isn't joinable, but we do assume that it's
+	   * (deferred) cancelable.
+	   */
 	  self->implicit = 1;
 	  self->detachState = PTHREAD_CREATE_DETACHED;
-
 	  self->thread = GetCurrentThreadId ();
 
 #ifdef NEED_DUPLICATEHANDLE
-	  /* DuplicateHandle does not exist on WinCE */
+	  /* 
+	   * DuplicateHandle does not exist on WinCE.
+	   *
+	   * NOTE:
+	   * GetCurrentThread only returns a pseudo-handle
+	   * which is only valid in the current thread context.
+	   * Therefore, you should not use pass the handle to
+	   * other threads for whatever purpose.
+	   */
 	  self->threadH = GetCurrentThread();
 #else
 	  if( !DuplicateHandle(
@@ -366,9 +379,30 @@ pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout)
   return (CancelableWait(waitHandle, timeout));
 }
 
+
+pthread_t
+_pthread_new (void)
+{
+  pthread_t new;
+
+  new = (pthread_t) calloc (1, sizeof (*new));
+
+  if (new != NULL)
+    {
+      new->detachState = PTHREAD_CREATE_JOINABLE;
+      new->cancelState = PTHREAD_CANCEL_ENABLE;
+      new->cancelType  = PTHREAD_CANCEL_DEFERRED;
+      new->cancelLock  = PTHREAD_MUTEX_INITIALIZER;
+    }
+
+  return new;
+
+}
+
+
 #ifdef NEED_CALLOC
-void 
-*_pthread_calloc(size_t n, size_t s) {
+void *
+_pthread_calloc(size_t n, size_t s) {
 	unsigned int m = n*s;
 	void *p;
 	
