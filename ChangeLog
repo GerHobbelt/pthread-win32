@@ -1,3 +1,7 @@
+2004-02-13  Gustav Hallberg  <gustav@virtutech.com>
+
+	* pthread_equal.c: Remove redundant equality logic.
+
 2003-12-10  Philippe Di Cristo  <philipped@voicebox.com>
 
 	* sem_timedwait.c (sem_timedwait): Fix timeout calculations.
