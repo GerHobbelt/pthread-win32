@@ -842,7 +842,7 @@ int pthread_detach (pthread_t tid);
 int pthread_equal (pthread_t t1,
 		   pthread_t t2);
 
-int pthread_exit (void *value_ptr);
+void pthread_exit (void *value_ptr);
 
 int pthread_join (pthread_t thread,
 		  void **value_ptr);
