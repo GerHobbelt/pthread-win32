@@ -44,5 +44,11 @@ CRITICAL_SECTION _pthread_mutex_test_init_lock;
  */
 CRITICAL_SECTION _pthread_cond_test_init_lock;
 
+/*
+ * Global lock for testing internal state of PTHREAD_RWLOCK_INITIALIZER
+ * created read/write locks.
+ */
+CRITICAL_SECTION _pthread_rwlock_test_init_lock;
+
 
 

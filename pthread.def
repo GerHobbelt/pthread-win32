@@ -1,5 +1,5 @@
 ; pthread.def
-; Last updated: $Date: 1999/05/29 06:44:34 $
+; Last updated: $Date: 1999/09/15 00:56:22 $
 
 ; Currently unimplemented functions are commented out.
 
@@ -87,6 +87,16 @@ sem_open
 sem_close
 sem_unlink
 sem_getvalue
+;
+; Read/Write Locks
+;
+pthread_rwlock_init
+pthread_rwlock_destroy
+pthread_rwlock_tryrdlock
+pthread_rwlock_trywrlock
+pthread_rwlock_rdlock
+pthread_rwlock_wrlock
+pthread_rwlock_unlock
 ;
 ; Non-portable but useful
 ;

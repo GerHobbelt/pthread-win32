@@ -24,14 +24,15 @@ Change Summary (since the last snapshot)
 
 (See the ChangeLog file for details.)
 
-Fixed exception stack cleanup if calling pthread_exit()
-- (Lorin Hochstein and John Bossom).
+Fixed a few bugs:
+	- threads return status properly (Milan Gardian)
+	- fix memory leak in mutexes (Milan Gardian)
 
-Fixed bugs in condition variables - (Peter Slacik):
-	- additional contention checks
-	- properly adjust number of waiting threads after timed
-	  condvar timeout.
+Added new POSIX read/write locks (Aurelio Medina)
+These routines have not been fully tested yet.
 
+Changes to allow building with mingw32/MSCVRT (Mumit Khan)
+This still needs a little work.
 
 Level of standards conformance
 ------------------------------
@@ -151,11 +152,23 @@ The following functions are implemented:
       pthread_sigmask
 
       ---------------------------
+      Read/Write Locks:
+      ---------------------------
+      pthread_rwlock_init
+      pthread_rwlock_destroy
+      pthread_rwlock_tryrdlock
+      pthread_rwlock_trywrlock
+      pthread_rwlock_rdlock
+      pthread_rwlock_rwlock
+      pthread_rwlock_unlock
+
+      ---------------------------
       Static Initializers (macros)
       ---------------------------
       PTHREAD_ONCE_INIT
       PTHREAD_MUTEX_INITIALIZER
-      PTHREAD_COND_INITIALIZER   
+      PTHREAD_COND_INITIALIZER
+      PTHREAD_RWLOCK_INITIALIZER
       
       ---------------------------
       Thread-Safe C Runtime Library (macros)

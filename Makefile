@@ -24,7 +24,7 @@ CC	= g++
 
 AR	= ar
 
-LD	= gcc -mdll -e _DllMain@12
+LD	= gcc -mdll
 
 OPT	= -g -O2
 
@@ -34,11 +34,11 @@ CFLAGS	= $(OPT) -I. -DHAVE_CONFIG_H -Wall
 ## Cygwin G++
 #CFLAGS	= $(OPT) -fhandle-exceptions -I. -DHAVE_CONFIG_H -Wall
 
-OBJS	= attr.o cancel.o cleanup.o condvar.o create.o dll.o \
-	  exit.o fork.o global.o misc.o mutex.o private.o sched.o \
-	  semaphore.o signal.o sync.o tsd.o
+OBJS	= attr.o cancel.o cleanup.o condvar.o create.o dll.o errno.o \
+	  exit.o fork.o global.o misc.o mutex.o private.o rwlock.o \
+	  sched.o semaphore.o signal.o sync.o tsd.o
 
-INCL	= implement.h pthread.h windows.h
+INCL	= implement.h semaphore.h pthread.h windows.h
 
 DLL     = pthread.dll
 

@@ -1,5 +1,18 @@
 Sat Sep 10 12:56:13 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	The following code for POSIX read/write locks was contributed
+	by Aurelio Medina.
+
+	* implement.h (pthread_rwlock_t_): Add.
+	* pthread.h (pthread_rwlock_t): Add.
+	(PTHREAD_RWLOCK_INITIALIZER): Add.
+	Add rwlock function prototypes.
+	* rwlock.c: New module.
+	* pthread.def: Add new rwlock functions.
+	* private.c (_pthread_processInitialize): initialise
+	_pthread_rwlock_test_init_lock critical section.
+	* global.c (_pthread_rwlock_test_init_lock): Add.
+
 	* mutex.c (pthread_mutex_destroy): Don't free mutex memory
 	if mutex is PTHREAD_MUTEX_INITIALIZER and has not been
 	initialised yet.

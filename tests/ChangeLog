@@ -1,3 +1,10 @@
+Sep 15 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* rwlock1.c: New test.
+	* rwlock2.c: New test.
+	* rwlock3.c: New test.
+	* rwlock4.c: New test.
+
 Aug 22 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* runall.bat (join2): Add test.

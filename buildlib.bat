@@ -17,6 +17,7 @@ cl /W3 /MT /nologo /Yd /Zi -I. -D_WIN32_WINNT=0x400 -DSTDCALL=_stdcall -c signal
 cl /W3 /MT /nologo /Yd /Zi -I. -D_WIN32_WINNT=0x400 -DSTDCALL=_stdcall -c sync.c
 cl /W3 /MT /nologo /Yd /Zi -I. -D_WIN32_WINNT=0x400 -DSTDCALL=_stdcall -c tsd.c
 cl /W3 /MT /nologo /Yd /Zi -I. -D_WIN32_WINNT=0x400 -DSTDCALL=_stdcall -c semaphore.c
+cl /W3 /MT /nologo /Yd /Zi -I. -D_WIN32_WINNT=0x400 -DSTDCALL=_stdcall -c rwlock.c
 
 cl /LD /Zi *.obj /Fepthread.dll /link /nodefaultlib:libcmt /implib:pthread.lib msvcrt.lib /def:pthread.def
 

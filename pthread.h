@@ -122,6 +122,17 @@
  *      ---------------------------
  *      pthread_sigmask
  *
+ *      ---------------------------
+ *      Read/Write Locks:
+ *      ---------------------------
+ *      pthread_rwlock_init
+ *      pthread_rwlock_destroy
+ *      pthread_rwlock_tryrdlock
+ *      pthread_rwlock_trywrlock
+ *      pthread_rwlock_rdlock
+ *      pthread_rwlock_rwlock
+ *      pthread_rwlock_unlock
+ *
  * Limitations
  * ===========
  *      The following functions are not implemented:
@@ -418,6 +429,8 @@ typedef struct pthread_mutex_t_ *pthread_mutex_t;
 typedef struct pthread_mutexattr_t_ *pthread_mutexattr_t;
 typedef struct pthread_cond_t_ *pthread_cond_t;
 typedef struct pthread_condattr_t_ *pthread_condattr_t;
+typedef struct pthread_rwlock_t_ *pthread_rwlock_t;
+typedef struct pthread_rwlockattr_t_ *pthread_rwlockattr_t;
 
 
 /*
@@ -495,6 +508,8 @@ struct pthread_once_t_
 #define PTHREAD_MUTEX_INITIALIZER ((pthread_mutex_t) -1)
 
 #define PTHREAD_COND_INITIALIZER ((pthread_cond_t) -1)
+
+#define PTHREAD_RWLOCK_INITIALIZER ((pthread_rwlock_t) -1)
 
 
 /*
@@ -844,6 +859,25 @@ int pthread_attr_getschedparam (const pthread_attr_t *attr,
 
 int pthread_attr_setschedparam (pthread_attr_t *attr,
 				const struct sched_param *param);
+
+/*
+ * Read-Write Lock Functions
+ */
+
+int pthread_rwlock_init(pthread_rwlock_t *lock,
+                               const pthread_rwlockattr_t *attr);
+
+int pthread_rwlock_destroy(pthread_rwlock_t *lock);
+
+int pthread_rwlock_tryrdlock(pthread_rwlock_t *);
+
+int pthread_rwlock_trywrlock(pthread_rwlock_t *);
+
+int pthread_rwlock_rdlock(pthread_rwlock_t *lock);
+
+int pthread_rwlock_wrlock(pthread_rwlock_t *lock);
+
+int pthread_rwlock_unlock(pthread_rwlock_t *lock);
 
 /*
  * Protected Methods
