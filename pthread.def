@@ -1,5 +1,5 @@
 ; pthread.def
-; Last updated: $Date: 2002/01/31 06:56:04 $
+; Last updated: $Date: 2002/01/31 21:52:58 $
 
 ; Currently unimplemented functions are commented out.
 
@@ -66,6 +66,7 @@ pthread_mutex_init
 pthread_mutex_destroy
 pthread_mutex_lock
 pthread_mutex_trylock
+pthread_mutex_timedlock
 pthread_mutex_unlock
 pthread_once
 pthread_self
@@ -77,17 +78,21 @@ pthread_setspecific
 ;pthread_sigmask
 pthread_testcancel
 ;
-; POSIX 1.b
+; Scheduling
 ;
 sched_get_priority_min
 sched_get_priority_max
 sched_getscheduler
 sched_setscheduler
 sched_yield
+;
+; Semaphores
+;
 sem_init
 sem_destroy
 sem_trywait
 sem_wait
+sem_timedwait
 sem_post
 sem_open
 sem_close
