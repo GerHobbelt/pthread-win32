@@ -153,7 +153,7 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 	   * Check that it works ok - since InitializeCriticalSection doesn't
 	   * return success or failure.
 	   */
-	  if (TryEnterCriticalSection(&mx->cs))
+	  if ((*ptw32_try_enter_critical_section)(&mx->cs))
 	    {
 	      LeaveCriticalSection(&mx->cs);
 	    }
