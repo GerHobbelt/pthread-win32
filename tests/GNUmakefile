@@ -48,6 +48,8 @@ TESTS	= loadfree \
 	  context1 cancel3 cancel4 cancel5 \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
+	  spin1 spin2 spin3 spin4 \
+	  barrier1 barrier2 barrier3 barrier4 \
 	  exception1 exception2 exception3
 
 BENCHTESTS = \
@@ -89,6 +91,11 @@ benchtest1.bench:
 benchtest2.bench:
 benchtest3.bench:
 benchtest4.bench:
+
+barrier1.pass:
+barrier2.pass: barrier1.pass
+barrier3.pass: barrier2.pass
+barrier4.pass: barrier3.pass
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
 cancel2_1.pass: cancel2.pass
@@ -149,6 +156,10 @@ rwlock6.pass: rwlock5.pass
 rwlock7.pass: rwlock6.pass
 self1.pass:
 self2.pass: create1.pass
+spin1.pass:
+spin2.pass: spin1.pass
+spin3.pass: spin2.pass
+spin4.pass: spin3.pass
 tsd1.pass: join1.pass
 
 #%.pass: %.exe $(HDR)

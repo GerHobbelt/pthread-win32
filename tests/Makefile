@@ -57,6 +57,8 @@ PASSES= loadfree.pass \
 	  cancel3.pass  cancel4.pass  cancel5.pass  \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  priority1.pass priority2.pass inherit1.pass  \
+	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
+	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  \
 	  exception1.pass  exception2.pass  exception3.pass
 
 BENCHRESULTS = \
@@ -145,6 +147,10 @@ benchtest1.bench:
 benchtest2.bench:
 benchtest3.bench:
 benchtest4.bench:
+barrier1.pass:
+barrier2.pass: barrier1.pass
+barrier3.pass: barrier2.pass
+barrier4.pass: barrier3.pass
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
 cancel3.pass: context1.pass
@@ -204,4 +210,8 @@ rwlock6.pass: rwlock5.pass
 rwlock7.pass: rwlock6.pass
 self1.pass:
 self2.pass: create1.pass
+spin1.pass:
+spin2.pass: spin1.pass
+spin3.pass: spin2.pass
+spin4.pass: spin3.pass
 tsd1.pass: join1.pass

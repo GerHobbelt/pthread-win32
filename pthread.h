@@ -458,7 +458,6 @@ struct pthread_once_t_
 
 #define PTHREAD_SPINLOCK_INITIALIZER {1}
 
-#define PTHREAD_BARRIER_INITIALIZER ((pthread_barrier_t) -1)
 
 enum
 {
@@ -477,10 +476,6 @@ enum
  * compilation units and also internally for the library.
  * The code here and within the library aims to work
  * for all reasonable combinations of environments.
- * For example, although the library itself can't be
- * built (yet) in C, an application written in C can
- * be linked and run against a library built using
- * either WIN32 SEH or C++ EH.
  *
  * The three implementations are:
  *
