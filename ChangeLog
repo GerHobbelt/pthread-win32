@@ -7,6 +7,31 @@
 	because STACK_MIN is 0 and stacksize is of type
 	size_t (or unsigned int).
 
+2001-10-17  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* barrier.c: Move _LONG and _LPLONG defines into
+	implement.h; rename to PTW32_INTERLOCKED_LONG and
+	PTW32_INTERLOCKED_LPLONG respectively.
+	* spin.c: Likewise; ptw32_interlocked_compare_exchange used
+	in place of InterlockedCompareExchange directly.
+	* global.c (ptw32_interlocked_compare_exchange): Add
+	prototype for this new routine pointer to be used when
+	InterlockedCompareExchange isn't supported by Windows.
+	* nonportable.c (pthread_win32_process_attach_np): Check for
+	support of InterlockedCompareExchange in kernel32 and assign its
+	address to ptw32_interlocked_compare_exchange if it exists, or
+	our own ix86 specific implementation ptw32_InterlockedCompareExchange.
+	*private.c (ptw32_InterlockedCompareExchange): An
+	implementation of InterlockedCompareExchange() which is
+	specific to ix86; written directly in assembler for either
+	MSVC or GNU C; needed because Windows 95 doesn't support
+	InterlockedCompareExchange().
+
+	* sched.c (sched_get_priority_min): Extend to return
+	THREAD_PRIORITY_IDLE.
+	(sched_get_priority_max): Extend to return
+	THREAD_PRIORITY_CRITICAL.
+
 2001-10-15  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* spin.c (pthread_spin_lock): PTHREAD_SPINLOCK_INITIALIZER

@@ -1020,3 +1020,71 @@ ptw32_pop_cleanup_all(int execute)
 	while( NULL != ptw32_pop_cleanup(execute) ) {
 	}
 }
+
+
+/*
+ * ptw32_InterlockedCompareExchange --
+ *
+ * Needed because W95 doesn't support InterlockedCompareExchange.
+ * It is only used when running the dll on W95. Other versions of
+ * Windows use the Win32 supported version, which may be running on
+ * different processor types.
+ *
+ * This can't be inlined because we need to know it's address so that
+ * we can call it through a pointer.
+ */
+PTW32_INTERLOCKED_LONG
+ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG ptr,
+                                 PTW32_INTERLOCKED_LONG   value,
+                                 PTW32_INTERLOCKED_LONG   comparand)
+{
+  PTW32_INTERLOCKED_LONG result;
+
+#if defined(_M_IX86) || defined(_X86_)
+
+#if defined(__MSVCRT__)
+
+  _asm {
+    PUSH         ecx
+    PUSH         edx
+    MOV          ecx,dword ptr [ptr]        ; Load ECX with plTarget
+    MOV          edx,dword ptr [value]      ; Load EDX with lValue
+    MOV          eax,dword ptr [comparand]
+    LOCK CMPXCHG dword ptr [ecx],edx        ; if (EAX == [ECX]), 
+                                            ;   [ECX] = EDX
+                                            ; else
+                                            ;   EAX = [ECX]
+    MOV          dword ptr [result], eax
+    POP          edx
+    POP          ecx
+  }
+
+#elif defined(__GNUC__)
+
+  __asm__
+    (
+     "lock\n\t"
+     "cmpxchgl       %3,(%0)"    /* if (EAX == [ptr]), */
+                                 /*   [ptr] = value    */
+                                 /* else               */
+                                 /*   EAX = [ptr]      */
+     :"=r" (ptr), "=a" (result)
+     :"0"  (ptr), "q" (value), "a" (comparand)
+     : "memory" );
+
+#endif
+
+#else
+
+  /*
+   * If we get to here then we should be running on a Win95 system but either
+   * running on something other than an X86 processor, or a compiler other
+   * than MSVC or GCC. Pthreads-win32 doesn't support that platform (yet).
+   */
+
+  result = 0;
+
+#endif
+
+  return result;
+}

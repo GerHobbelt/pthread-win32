@@ -45,6 +45,14 @@
 #define INLINE
 #endif
 
+#ifdef __MINGW32__
+#define PTW32_INTERLOCKED_LONG long
+#define PTW32_INTERLOCKED_LPLONG long*
+#else
+#define PTW32_INTERLOCKED_LONG PVOID
+#define PTW32_INTERLOCKED_LPLONG PVOID*
+#endif
+
 typedef enum {
   /*
    * This enumeration represents the state of the thread;
@@ -410,6 +418,16 @@ extern "C" {
  * =====================
  * =====================
  */
+PTW32_INTERLOCKED_LONG
+(WINAPI *ptw32_interlocked_compare_exchange)(PTW32_INTERLOCKED_LPLONG,
+                                             PTW32_INTERLOCKED_LONG,
+                                             PTW32_INTERLOCKED_LONG);
+
+PTW32_INTERLOCKED_LONG
+ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG ptr,
+                                 PTW32_INTERLOCKED_LONG   value,
+                                 PTW32_INTERLOCKED_LONG   comparand);
+
 int ptw32_processInitialize (void);
 
 void ptw32_processTerminate (void);

@@ -179,6 +179,11 @@ pthread_getprocessors_np(int * count)
 }
 
 
+/*
+ * Handle to kernel32.dll 
+ */
+static HINSTANCE ptw32_h_kernel32;
+
 BOOL
 pthread_win32_process_attach_np ()
 {
@@ -188,6 +193,43 @@ pthread_win32_process_attach_np ()
 #ifdef _UWIN
   pthread_count++;
 #endif
+
+  /*
+   * Load KERNEL32 and try to get address of InterlockedCompareExchange
+   */
+  ptw32_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
+
+  ptw32_interlocked_compare_exchange =
+    (PTW32_INTERLOCKED_LONG (PT_STDCALL *)(PTW32_INTERLOCKED_LPLONG, PTW32_INTERLOCKED_LONG, PTW32_INTERLOCKED_LONG))
+#if defined(NEED_UNICODE_CONSTS)
+    GetProcAddress(ptw32_h_kernel32,
+                   (const TCHAR *)TEXT("InterlockedCompareExchange"));
+#else
+    GetProcAddress(ptw32_h_kernel32,
+                   (LPCSTR) "InterlockedCompareExchange");
+#endif
+
+  if (ptw32_interlocked_compare_exchange == NULL)
+    {
+      ptw32_interlocked_compare_exchange = &ptw32_InterlockedCompareExchange;
+
+      /*
+       * If InterlockedCompareExchange is not being used, then free
+       * the kernel32.dll handle now, rather than leaving it until
+       * DLL_PROCESS_DETACH.
+       *
+       * Note: this is not a pedantic exercise in freeing unused
+       * resources!  It is a work-around for a bug in Windows 95
+       * (see microsoft knowledge base article, Q187684) which
+       * does Bad Things when FreeLibrary is called within
+       * the DLL_PROCESS_DETACH code, in certain situations.
+       * Since w95 just happens to be a platform which does not
+       * provide InterlockedCompareExchange, the bug will be
+       * effortlessly avoided.
+       */
+      (void) FreeLibrary(ptw32_h_kernel32);
+      ptw32_h_kernel32 = 0;
+    }
 
   return result;
 }
@@ -214,6 +256,11 @@ pthread_win32_process_detach_np ()
        * The DLL is being unmapped into the process's address space
        */
       ptw32_processTerminate ();
+
+      if (ptw32_h_kernel32)
+        {
+           (void) FreeLibrary(ptw32_h_kernel32);
+        }
     }
 
   return TRUE;

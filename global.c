@@ -34,6 +34,14 @@ pthread_key_t ptw32_cleanupKey = NULL;
 
 int ptw32_concurrency = 0;
 
+/* 
+ * Function pointer to InterlockedCompareExchange if it exists; otherwise NULL 
+ */
+PTW32_INTERLOCKED_LONG
+(WINAPI *ptw32_interlocked_compare_exchange)(PTW32_INTERLOCKED_LPLONG,
+                                             PTW32_INTERLOCKED_LONG,
+                                             PTW32_INTERLOCKED_LONG) = NULL;
+
 /*
  * Global lock for testing internal state of PTHREAD_MUTEX_INITIALIZER
  * created mutexes.

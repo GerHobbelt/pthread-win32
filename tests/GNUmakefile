@@ -53,7 +53,7 @@ TESTS	= loadfree \
 	  exception1 exception2 exception3
 
 BENCHTESTS = \
-	benchtest1 benchtest2 benchtest3 benchtest4
+	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
 
 PASSES		= $(TESTS:%=%.pass)
 BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
@@ -91,6 +91,7 @@ benchtest1.bench:
 benchtest2.bench:
 benchtest3.bench:
 benchtest4.bench:
+benchtest5.bench:
 
 barrier1.pass:
 barrier2.pass: barrier1.pass
