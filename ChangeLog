@@ -1,3 +1,11 @@
+2005-01-01  Konstantin Voronkov  <beowinkle at yahoo.com>
+
+	* pthread_mutex_lock.c (pthread_mutex_lock): The new atomic exchange
+	mutex algorithm is known to allow a thread to steal the lock off
+	FIFO waiting threads. The next waiting FIFO thread gets a spurious
+	wake-up and must attempt to re-acquire the lock. The woken thread
+	was setting itself as the the mutex's owner before the re-acquisition.
+
 2004-11-22  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* pthread_cond_wait.c (ptw32_cond_wait_cleanup): Undo change
