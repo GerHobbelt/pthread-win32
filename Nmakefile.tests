@@ -62,6 +62,7 @@ exit5::		exit5.c
 join0::		join0.c
 join1::		join1.c
 join2::		join2.c
+join3::		join3.c
 kill1::		kill1.c
 count1::	count1.c
 once1::		once1.c
@@ -171,6 +172,7 @@ exit5		:test:	exit4
 join0		:test:	create1
 join1		:test:	create1
 join2		:test:	create1
+join3		:test:	join2
 count1		:test:	join1
 once1		:test:	create1
 tsd1		:test:	join1
