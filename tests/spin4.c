@@ -1,19 +1,14 @@
 /* 
  * spin4.c
  *
- * Declare a spinlock object, lock it, spin on it, 
+ * Declare a static spinlock object, lock it, spin on it, 
  * and then unlock it again.
- *
- * For this to work on a single processor machine we have
- * to static initialise the spinlock. This bypasses the
- * check of the number of processors done by pthread_spin_init.
- * This is a non-portable side-effect of this implementation.
  */
 
 #include "test.h"
 #include <sys/timeb.h>
  
-pthread_spinlock_t lock = PTHREADS_SPINLOCK_INITIALIZER;
+pthread_spinlock_t lock = PTHREAD_SPINLOCK_INITIALIZER;
 struct _timeb currSysTimeStart;
 struct _timeb currSysTimeStop;
 
@@ -37,7 +32,16 @@ int
 main()
 {
   long result = 0;
+  int i;
   pthread_t t;
+  int CPUs;
+
+  if (pthread_getprocessors_np(&CPUs) != 0 || CPUs == 1)
+    {
+      printf("This test is not applicable to this system.\n");
+      printf("Either there is only 1 CPU or the no. could not be determined.\n");
+	exit(0);
+    }
 
   assert(pthread_spin_lock(&lock) == 0);
 
@@ -47,6 +51,7 @@ main()
    * This should relinqish the CPU to the func thread enough times
    * to waste approximately 2000 millisecs only if the lock really
    * is spinning in the func thread (assuming 10 millisec CPU quantum).
+   */
   for (i = 0; i < 200; i++)
     {
       sched_yield();

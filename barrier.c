@@ -148,21 +148,21 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
         }
       else
         {
+          pthread_t self;
+          int oldCancelState;
+
+          (void) pthread_mutex_unlock(&(b->mtxExclusiveAccess));
+
+          self = pthread_self();
+
           /*
            * pthread_barrier_wait() is not a cancelation point
            * so temporarily prevent sem_wait() from being one.
            */
-          pthread_t self = pthread_self();
-          int oldCancelState;
-
           if (self->cancelType == PTHREAD_CANCEL_DEFERRED)
             {
               pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldCancelState);
             }
-
-          /* Could still be PTHREAD_CANCEL_ASYNCHRONOUS. */
-          pthread_cleanup_push(pthread_mutex_unlock,
-                               (void *) &(b->mtxExclusiveAccess));
 
           if (0 != sem_wait(&(b->semBarrierBreeched)))
             {
@@ -173,8 +173,6 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
             {
               pthread_setcancelstate(oldCancelState, NULL);
             }
-
-          pthread_cleanup_pop(1);
         }
     }
 

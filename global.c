@@ -52,6 +52,12 @@ CRITICAL_SECTION ptw32_cond_test_init_lock;
  */
 CRITICAL_SECTION ptw32_rwlock_test_init_lock;
 
+/*
+ * Global lock for testing internal state of PTHREAD_SPINLOCK_INITIALIZER
+ * created spin locks.
+ */
+CRITICAL_SECTION ptw32_spinlock_test_init_lock;
+
 #ifdef _UWIN
 /*
  * Keep a count of the number of threads.

@@ -22,7 +22,8 @@ VCFLAGS	= /D__CLEANUP_C
 
 CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DPTW32_BUILD
 
-OBJ=attr.obj \
+OBJ=  attr.obj \
+	barrier.obj \
 	cancel.obj \
 	cleanup.obj \
 	condvar.obj \
@@ -40,6 +41,7 @@ OBJ=attr.obj \
 	sched.obj \
 	semaphore.obj \
 	signal.obj \
+	spin.obj \
 	sync.obj \
 	tsd.obj
 

@@ -1,3 +1,16 @@
+2001-07-07  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* spin.c: Revamped and working; included static initialiser.
+	Now beta level.
+	* barrier.c: Likewise.
+	* condvar.c: Macro constant change; inline auto init routine.
+	* mutex.c: Likewise.
+	* rwlock.c: Likewise.
+	* private.c: Add support for spinlock initialiser.
+	* global.c: Likewise.
+	* implement.h: Likewise.
+	* pthread.h (PTHREAD_SPINLOCK_INITIALIZER): Fix typo.
+
 2001-07-05  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* barrier.c: Remove static initialisation - irrelevent

@@ -152,7 +152,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-static int
+static INLINE int
 ptw32_cond_check_need_init (pthread_cond_t *cond)
 {
   int result = 0;
@@ -187,7 +187,7 @@ ptw32_cond_check_need_init (pthread_cond_t *cond)
    * re-initialise it only by calling pthread_cond_init()
    * explicitly.
    */
-  if (*cond == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
+  if (*cond == PTHREAD_COND_INITIALIZER)
     {
       result = pthread_cond_init(cond, NULL);
     }
@@ -584,7 +584,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
       return EINVAL;
     }
 
-  if (*cond != (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
+  if (*cond != PTHREAD_COND_INITIALIZER)
     {
       cv = *cond;
 
@@ -649,7 +649,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
       /*
        * Check again.
        */
-      if (*cond == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
+      if (*cond == PTHREAD_COND_INITIALIZER)
         {
           /*
            * This is all we need to do to destroy a statically
@@ -827,7 +827,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
    * again inside the guarded section of ptw32_cond_check_need_init()
    * to avoid race conditions.
    */
-  if (*cond == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
+  if (*cond == PTHREAD_COND_INITIALIZER)
     {
       result = ptw32_cond_check_need_init(cond);
     }
@@ -950,7 +950,7 @@ ptw32_cond_unblock (pthread_cond_t * cond,
    * No-op if the CV is static and hasn't been initialised yet.
    * Assuming that any race condition is harmless.
    */
-  if (cv == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
+  if (cv == PTHREAD_COND_INITIALIZER)
     {
       return 0;
     }

@@ -26,7 +26,6 @@ int
 main()
 {
   pthread_t t;
-  pthread_spinattr_t ma;
 
   wasHere = 0;
   assert(pthread_spin_init(&spin, PTHREAD_PROCESS_PRIVATE) == 0);
@@ -34,6 +33,7 @@ main()
   assert(pthread_create(&t, NULL, unlocker, (void *) 0) == 0);
   assert(pthread_join(t, NULL) == 0);
   assert(pthread_spin_unlock(&spin) == EPERM);
+  assert(pthread_spin_destroy(&spin) == 0);
   assert(wasHere == 2);
 
   return 0;

@@ -1,4 +1,4 @@
-/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+/* config.h.in  Generated automatically from configure.in by autoheader.  */
 
 #ifndef PTW32_CONFIG_H
 #define PTW32_CONFIG_H
@@ -30,6 +30,9 @@
 /* Define if you need to convert string parameters to unicode. (eg. WinCE)  */
 #undef NEED_UNICODE_CONSTS
 
+/* Define if your C (not C++) compiler supports "inline" functions. */
+#undef HAVE_C_INLINE
+
 /* Do we know about type mode_t? */
 #undef HAVE_MODE_T
 
@@ -52,6 +55,10 @@
 #ifdef _UWIN
 #define HAVE_MODE_T
 #define HAVE_STRUCT_TIMESPEC
+#endif
+
+#ifdef __GNUC__
+#define HAVE_C_INLINE
 #endif
 
 #ifdef __MINGW32__

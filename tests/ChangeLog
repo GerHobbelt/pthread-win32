@@ -1,3 +1,10 @@
+2001-07-07  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* spin3.c: Changed test and fixed.
+	* spin4.c: Fixed.
+	* barrier3.c: Fixed.
+	* barrier4.c: Fixed.
+
 2001-07-05  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* spin1.c: New; testing spinlocks.
