@@ -100,8 +100,41 @@ pthread_attr_init(pthread_attr_t *attr)
 
   attr->cancelability = PTHREAD_CANCEL_ENABLE;
   attr->canceltype = PTHREAD_CANCEL_DEFERRED;
+  attr->detached = PTHREAD_CREATE_JOINABLE;
   attr->valid = 0;
 
+  return 0;
+}
+
+int
+pthread_attr_getdetachstate(const pthread_attr_t *attr,
+			    int *detachstate)
+{
+  if (is_attr(attr) != 0 || detachstate == NULL)
+    {
+      return EINVAL;
+    }
+
+  *detachstate = attr->detached;
+  return 0;
+}
+
+int
+pthread_attr_setdetachstate(pthread_attr_t *attr,
+			    int detachstate)
+{
+  if (is_attr(attr) != 0)
+    {
+      return EINVAL;
+    }
+
+  if (detachstate != PTHREAD_CREATE_JOINABLE ||
+      detachstate != PTHREAD_CREATE_DETACHED)
+    {
+      return EINVAL;
+    }
+  
+  attr->detached = detachstate;
   return 0;
 }
 
