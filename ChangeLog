@@ -1,3 +1,21 @@
+Thu Jan 14 14:27:13 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* cleanup.c: Correct _cplusplus to __cplusplus wherever used.
+
+	* Makefile.in: Add CC=g++ and add -fhandle-exceptions to CFLAGS.
+	The derived Makefile will compile all units of the package as C++
+	so that those which include try/catch exception handling should work
+	properly. The package should compile ok if CC=gcc, however, exception
+	handling will not be included and thus thread cancellation, for
+ 	example, will not work.
+
+	* cleanup.c (_pthread_pop_cleanup): Add #warning to compile this
+ 	file as C++ if using a cygwin32 environment. Perhaps the whole package
+	should be compiled using g++ under cygwin.
+
+	* private.c (_pthread_threadStart): Change #error directive
+	into #warning and bracket for __CYGWIN__ and derivative compilers.
+
 Wed Jan 13 09:34:52 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* build.bat: Delete old binaries before compiling/linking.
