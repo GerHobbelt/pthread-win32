@@ -1,5 +1,10 @@
 Thu Aug  6 15:19:22 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* condvar.c (pthread_cond_init): Add address-of operator & to
+	arg 1 of pthread_mutex_init() call.
+	(pthread_cond_destroy): Add address-of operator & to
+	arg 1 of pthread_mutex_destroy() call. 
+
 	* cleanup.c (_pthread_destructor_pop_all): Add (int) cast to 
 	pthread_getspecific() arg.
 	(_pthread_destructor_pop): Add (void *) cast to "if" conditional.
