@@ -42,6 +42,7 @@ int
 pthread_spin_destroy(pthread_spinlock_t *lock)
 {
   register pthread_spinlock_t s;
+  int result = 0;
 
   if (lock == NULL || *lock == NULL)
     {
@@ -52,34 +53,28 @@ pthread_spin_destroy(pthread_spinlock_t *lock)
     {
       if (s->interlock == PTW32_SPIN_USE_MUTEX)
         {
-          return pthread_mutex_destroy(&(s->u.mutex));
+          result = pthread_mutex_destroy(&(s->u.mutex));
+        }
+      else if ( (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED !=
+		ptw32_interlocked_compare_exchange((PTW32_INTERLOCKED_LPLONG) &(s->interlock),
+						   (PTW32_INTERLOCKED_LONG) PTW32_OBJECT_INVALID,
+						   (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED))
+        {
+          result = EINVAL;
         }
 
-      if ( (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED ==
-           ptw32_interlocked_compare_exchange((PTW32_INTERLOCKED_LPLONG) &(s->interlock),
-                                              (PTW32_INTERLOCKED_LONG) PTW32_OBJECT_INVALID,
-                                              (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED))
-        {
+      if (0 == result)
+	{
 	  /*
-	   * The spinlock isn't held by another thread so other threads that have
-	   * just entered another spin_* routine will get PTW32_OBJECT_INVALID
-	   * and so return EINVAL. This will not be so if the memory freed below is
-	   * re-allocated and initialised before that happens.
-	   *
-	   * We are relying on the application to be responsible for ensuring that
-	   * all other threads have finished with the spinlock before destroying it.
+	   * We are relying on the application to ensure that all other threads
+	   * have finished with the spinlock before destroying it.
 	   */
 	  *lock = NULL;
 	  (void) free(s);
-          return 0;
-        }
-
-      return EINVAL;
+	}
     }
   else
     {
-      int result = 0;
-
       /*
        * See notes in ptw32_spinlock_check_need_init() above also.
        */
@@ -108,6 +103,7 @@ pthread_spin_destroy(pthread_spinlock_t *lock)
         }
 
       LeaveCriticalSection(&ptw32_spinlock_test_init_lock);
-      return(result);
     }
+
+  return(result);
 }
