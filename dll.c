@@ -22,6 +22,10 @@
 /* Global index for TLS data. */
 DWORD _pthread_threadID_TlsIndex;
 
+/* Global index for thread TSD key array. */
+DWORD _pthread_TSD_keys_TlsIndex;
+
+
 BOOL WINAPI PthreadsEntryPoint(HINSTANCE dllHandle,
 			  DWORD reason,
 			  LPVOID situation)
@@ -42,9 +46,18 @@ BOOL WINAPI PthreadsEntryPoint(HINSTANCE dllHandle,
 	{
 	  return FALSE;
 	}
+
+      /* Set up per thread TSD key array pointer. */
+      _pthread_TSD_keys_TlsIndex = TlsAlloc();
+
+      if (_pthread_TSD_keys_TlsIndex == 0xFFFFFFFF)
+	{
+	  return FALSE;
+	}
       break;
 
     case DLL_PROCESS_DETACH:
+      (void) TlsFree(_pthread_TSD_keys_TlsIndex);
       (void) TlsFree(_pthread_threadID_TlsIndex);
       break;
 

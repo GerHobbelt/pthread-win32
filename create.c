@@ -22,13 +22,17 @@ STDCALL _pthread_start_call(void * us_arg)
      this thread's private stack so we're safe to leave data in them
      until we leave. */
   pthread_t us;
+  void * keys[PTHREAD_KEYS_MAX];
   unsigned (*func)(void *);
   void * arg;
   unsigned ret;
 
   us = (pthread_t) us_arg;
 
+  memset(keys, 0, sizeof(keys));
+
   (void) TlsSetValue(_pthread_threadID_TlsIndex, (LPVOID) us);
+  (void) TlsSetValue(_pthread_TSD_keys_TlsIndex, (LPVOID) keys);
 
   /* FIXME: For now, if priority setting fails then at least ensure
      that our records reflect true reality. */
