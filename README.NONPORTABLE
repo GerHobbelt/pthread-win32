@@ -3,6 +3,33 @@ This file documents non-portable functions and other issues.
 Non-portable functions included in pthreads-win32
 -------------------------------------------------
 
+BOOL
+pthread_win32_test_features_np(int mask)
+
+	This routine allows an application to check which
+	run-time auto-detected features are available within
+	the library.
+
+	The possible features are:
+
+		PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE
+			Return TRUE if the native version of
+			InterlockedCompareExchange() is being used.
+		PTW32_ALERTABLE_ASYNC_CANCEL
+			Return TRUE is the QueueUserAPCEx package
+			QUSEREX.DLL is available and the AlertDrv.sys
+			driver is loaded into Windows, providing
+			alertable (pre-emptive) asyncronous threads
+			cancelation. If this feature returns FALSE
+			then the default async cancel scheme is in
+			use, which cannot cancel blocked threads.
+
+	Features may be Or'ed into the mask parameter, in which case
+	the routine returns TRUE if any of the Or'ed features would
+	return TRUE. At this stage it doesn't make sense to Or features
+	but it may some day.
+
+
 void *
 pthread_timechange_handler_np(void *)
 
@@ -17,7 +44,7 @@ pthread_timechange_handler_np(void *)
 
         It has the same return type and argument type as a
         thread routine so that it may be called directly
-        through pthread_create() for asynchronicity.
+        through pthread_create(), i.e. as a separate thread.
 
         Parameters
 
@@ -31,7 +58,7 @@ pthread_timechange_handler_np(void *)
         Otherwise, 0 is returned.
 
         If run as a thread, the return value is returned
-        through pthread_join(), otherwise directly.
+        through pthread_join().
 
         The return value should be cast to an integer.
 

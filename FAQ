@@ -58,7 +58,7 @@ Simply, you only use one of them, but you need to choose carefully.
 The most important choice you need to make is whether to use a
 version that uses exceptions internally, or not (there are versions
 of the library that use exceptions as part of the thread
-cancelation and exit implementation, and one that uses
+cancelation and cleanup implementation, and one that uses
 setjmp/longjmp instead).
 
 There is some contension amongst POSIX threads experts as
@@ -221,8 +221,9 @@ Q 5	Why is the default library version now less exception-friendly?
 Because most commercial Unix POSIX threads implementations don't allow you to
 choose to have stack unwinding. (Compaq's TRU64 Unix is possibly an exception.)
 
-Therefore, providing it in pthread-win32 as a default could be dangerous. We
-still provide the choice but you must now consciously make it.
+Therefore, providing it in pthread-win32 as a default could be dangerous
+and non-portable. We still provide the choice but you must now consciously
+make it.
 
 WHY NOT REMOVE THE EXCEPTIONS VERSIONS OF THE LIBRARY ALTOGETHER?
 There are a few reasons:
@@ -326,15 +327,10 @@ Q 9	Cancelation doesn't work for me, why?
 > win32 programming, so I don't really understand how the *Event() family of
 > calls work.
 
-Async cancelation should be in versions post snapshot-1999-11-02
-of pthreads-win32 (currently only for x86 architectures).
-
 The answer to your first question is, normal POSIX behaviour would  
 be to asynchronously cancel the thread. However, even that doesn't
 guarantee cancelation as the standard only says it should be
 cancelled as soon as possible.
-
-However ...
 
 Snapshot 99-11-02 or earlier only partially supports asynchronous cancellation.
 Snapshots since then simulate async cancelation by poking the address of
@@ -357,19 +353,33 @@ functions that are defined as deferred cancelation points, there is
 no hookup between those which are provided by Windows and the
 pthreads-win32 library.
 
-Incidently, it's worth noting for code portability that the POSIX
-threads standard list doesn't include "select" because (as I read in
-Butenhof) it isn't part of POSIX.
+Incidently, it's worth noting for code portability that the older POSIX
+threads standards cancelation point lists didn't include "select" because
+(as I read in Butenhof) it wasn't part of POSIX. However, it does appear in
+the SUSV3.
 
-Effectively, the only cancelation points that pthreads-win32 can
-recognise are those the library implements itself, ie.
+Effectively, the only mandatory cancelation points that pthreads-win32
+recognises are those the library implements itself, ie.
 	
 	pthread_testcancel
 	pthread_cond_wait
 	pthread_cond_timedwait
 	pthread_join
 	sem_wait
+	sem_timedwait
 	pthread_delay_np
+
+The following routines from the non-mandatory list in SUSV3 are
+cancelation points in pthreads-win32:
+
+	pthread_rwlock_wrlock
+	pthread_rwlock_timedwrlock
+
+The following routines from the non-mandatory list in SUSV3 are not
+cancelation points in pthreads-win32:
+
+	pthread_rwlock_rdlock
+	pthread_rwlock_timedrdlock
 
 Pthreads-win32 also provides two functions that allow you to create
 cancelation points within your application, but only for cases where
@@ -378,9 +388,6 @@ a thread is going to block on a Win32 handle. These are:
 	pthreadCancelableWait(HANDLE waitHandle) /* Infinite wait */
  
 	pthreadCancelableTimedWait(HANDLE waitHandle, DWORD timeout)
-
-Regards.
-Ross
 
 ------------------------------------------------------------------------------
  
