@@ -12,7 +12,7 @@
 
 #if HAVE_SIGSET_T
 int
-pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
+pthread_sigmask(int how, sigset_t const *set, sigset_t *oset)
 {
   pthread_t thread = pthread_self();
 
@@ -36,18 +36,18 @@ pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
   /* Copy the old mask before modifying it. */
   if (oset != NULL)
     {
-      memcpy(oset, &(thread->attr.sigmask), sizeof(sigset_t));
+      memcpy(oset, &(thread->sigmask), sizeof(sigset_t));
     }
 
   if (set != NULL)
     {
-      int i;
+      unsigned int i;
 	
       /* FIXME: this code assumes that sigmask is an even multiple of
 	 the size of a long integer. */ 
          
-      unsigned long *src = (long *) set;
-      unsigned long *dest = &(thread->attr.sigmask);
+      unsigned long *src = (unsigned long const *) set;
+      unsigned long *dest = (unsigned long *) &(thread->sigmask);
 
       switch (how)
 	{
@@ -55,18 +55,18 @@ pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
 	  for (i = 0; i < (sizeof(sigset_t) / sizeof(unsigned long)); i++)
 	    {
 	      /* OR the bit field longword-wise. */
-	      *src++ |= *dest++;
+	      *dest++ |= *src++;
 	    }
 	  break;
 	case SIG_UNBLOCK:
 	  for (i = 0; i < (sizeof(sigset_t) / sizeof(unsigned long)); i++)
 	    {
 	      /* XOR the bitfield longword-wise. */
-	      *src++ ^= *dest++;
+	      *dest++ ^= *src++;
 	    }
 	case SIG_SETMASK:
 	  /* Replace the whole sigmask. */
-	  memcpy(&(thread->attr.sigmask), set, sizeof(sigset_t));
+	  memcpy(&(thread->sigmask), set, sizeof(sigset_t));
 	  break;
 	}
     }

@@ -9,8 +9,6 @@
  * Code contributed by John E. Bossom <JEB>.
  */
 
-#include <string.h>
-
 #include "pthread.h"
 #include "implement.h"
 
@@ -308,7 +306,7 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
   cv->waiters = 0;
   cv->wasBroadcast = FALSE;
 
-  if (sem_init (&(cv->sema), 0, 1) != 0)
+  if (_pthread_sem_init (&(cv->sema), 0, 1) != 0)
     {
       goto FAIL0;
     }
@@ -341,7 +339,7 @@ FAIL2:
   (void) pthread_mutex_destroy (&(cv->waitersLock));
 
 FAIL1:
-  (void) sem_destroy (&(cv->sema));
+  (void) _pthread_sem_destroy (&(cv->sema));
   free (cv);
   cv = NULL;
 
@@ -388,7 +386,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
     {
       cv = *cond;
 
-      (void) sem_destroy (&(cv->sema));
+      (void) _pthread_sem_destroy (&(cv->sema));
       (void) pthread_mutex_destroy (&(cv->waitersLock));
       (void) CloseHandle (cv->waitersDone);
 
@@ -420,7 +418,7 @@ cond_timedwait (pthread_cond_t * cond,
    * We keep the lock held just long enough to increment the count of
    * waiters by one (above).
    * Note that we can't keep it held across the
-   * call to sem_wait since that will deadlock other calls
+   * call to _pthread_sem_wait since that will deadlock other calls
    * to pthread_cond_signal
    */
   if ((result = pthread_mutex_unlock (mutex)) == 0)
@@ -656,7 +654,7 @@ pthread_cond_signal (pthread_cond_t * cond)
   if (cv->waiters > 0)
     {
 
-      result = sem_post (&(cv->sema));
+      result = _pthread_sem_post (&(cv->sema));
     }
 
   return (result);
@@ -713,7 +711,7 @@ pthread_cond_broadcast (pthread_cond_t * cond)
   for (i = cv->waiters; i > 0 && result == 0; i--)
     {
 
-      result = sem_post (&(cv->sema));
+      result = _pthread_sem_post (&(cv->sema));
     }
 
   if (cv->waiters > 0 && result == 0)

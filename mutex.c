@@ -42,20 +42,20 @@ _mutex_check_need_init(pthread_mutex_t *mutex)
    * the number of processors + 1.
    *
    * We need to maintain the following per-mutex state independently:
-   *   - mutex staticinit (true iff static mutex and still
+   *   - mutex staticinit (true iff mutex is static and still
    *                        needs to be initialised)
    *   - mutex valid (false iff mutex has been destroyed)
    *
-   * For example, a mutex initialised by PTHREAD_MUTEX_INITIALIZER
-   * in this implementation will be valid but uninitialised until the thread
-   * attempts to lock it. It can also be destroyed (made invalid) before
-   * ever being locked.
+   * For example, in this implementation a mutex initialised by
+   * PTHREAD_MUTEX_INITIALIZER will be 'valid' but uninitialised until
+   * the thread attempts to lock it. It can also be destroyed (made invalid)
+   * before ever being locked.
    */
   EnterCriticalSection(&_pthread_mutex_test_init_lock);
 
   /*
-   * We got here because staticinit tested true.
-   * Check staticinit again inside the critical section
+   * We got here because staticinit tested true, possibly under race
+   * conditions. Check staticinit again inside the critical section
    * and only initialise if the mutex is valid (not been destroyed).
    * If a static mutex has been destroyed, the application can
    * re-initialise it only by calling pthread_mutex_init()

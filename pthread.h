@@ -15,6 +15,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#if !defined( PTHREAD_H )
+#define PTHREAD_H
+
 /*
  * -------------------------------------------------------------
  *
@@ -171,8 +174,6 @@
  *
  * -------------------------------------------------------------
  */
-#if !defined( PTHREAD_H )
-#define PTHREAD_H
 
 #ifdef _MSC_VER
 /*
@@ -249,7 +250,6 @@ struct timespec {
 #endif /* !TRUE */
 
 
-#include <semaphore.h>
 /* #include <sched.h> */
 
 #ifdef __MINGW32__
@@ -277,16 +277,6 @@ extern "C"
  *
  * POSIX 1003.1c-1995 Options
  * ===========================
- *
- * _POSIX_SEMAPHORES
- *                      Semaphores come from POSIX.1b (POSIX 1003.1b-1993)
- *                      rather than from PThreads. This macro indicates
- *                      that POSIX Semaphores are supported:
- *                              sem_destroy
- *                              sem_init
- *                              sem_wait
- *                              sem_trywait
- *                              sem_post
  *
  * _POSIX_THREADS (set)
  *                      If set, you can use threads
@@ -381,7 +371,6 @@ extern "C"
  * POSIX Options
  */
 #define _POSIX_THREADS
-#define _POSIX_SEMAPHORES
 #define _POSIX_THREAD_SAFE_FUNCTIONS
 
 #define _POSIX_THREAD_ATTR_STACKSIZE
@@ -567,6 +556,9 @@ struct pthread_t_ {
   int cancelState;
   int cancelType;
   HANDLE cancelEvent;
+#if HAVE_SIGSET_T
+  sigset_t sigmask;
+#endif /* HAVE_SIGSET_T */
   int implicit:1;
   void *keys;
 };
@@ -575,7 +567,7 @@ struct pthread_t_ {
 /* 
  * Special value to mark attribute objects as valid.
  */
-#define _PTHREAD_ATTR_VALID 0xC4C0FFEE
+#define _PTHREAD_ATTR_VALID ((unsigned long) 0xC4C0FFEE)
 
 struct pthread_attr_t_ {
   unsigned long valid;
@@ -611,11 +603,13 @@ struct pthread_key_t_ {
 };
 
 
+typedef HANDLE _pthread_sem_t;
+
 struct pthread_cond_t_ {
   long waiters;                       /* # waiting threads             */
   pthread_mutex_t waitersLock;        /* Mutex that guards access to 
 					 waiter count                  */
-  sem_t sema;                         /* Queue up threads waiting for the 
+  _pthread_sem_t sema;                /* Queue up threads waiting for the 
 					 condition to become signaled  */
   HANDLE waitersDone;                 /* An auto reset event used by the 
 					 broadcast/signal thread to wait 
@@ -668,18 +662,21 @@ struct pthread_once_t_ {
  *   C++
  */
 
+typedef struct _pthread_cleanup_t _pthread_cleanup_t;
+
+struct _pthread_cleanup_t
+{
+  void (*routine) (void *);
+  void *arg;
+#if !defined(_MSC_VER) && !defined(__cplusplus)
+  _pthread_cleanup_t *prev;
+#endif
+};
+
 #ifdef _MSC_VER
 	/*
 	 * WIN32 SEH version of cancel cleanup.
 	 */
-
-  typedef struct _pthread_cleanup_t _pthread_cleanup_t;
-
-  struct _pthread_cleanup_t
-  {
-    void (*routine) (void *);
-    void *arg;
-  };
 
 #define pthread_cleanup_push( _rout, _arg ) \
 	{ \
@@ -709,15 +706,6 @@ struct pthread_once_t_ {
 	 * C implementation of PThreads cancel cleanup
 	 */
 
-  typedef struct _pthread_cleanup_t _pthread_cleanup_t;
-
-  struct _pthread_cleanup_t
-  {
-    void (*routine) (void *);
-    void *arg;
-    _pthread_cleanup_t *prev;
-  };
-
 #define pthread_cleanup_push( _rout, _arg ) \
 	{ \
 	    _pthread_cleanup_t	_cleanup; \
@@ -733,8 +721,6 @@ struct pthread_once_t_ {
 	/*
 	 * C++ version of cancel cleanup.
 	 * - John E. Bossom.
-	 *
-	 * Emulate try-finally behaviour.
 	 */
 
 	class PThreadCleanup {
@@ -1013,8 +999,10 @@ int pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
  * Only provide function mappings for functions that
  * actually exist on WIN32.
  */
+#if !defined(__MINGW32__)
 #define strtok_r( _s, _sep, _lasts ) \
 	( *(_lasts) = strtok( (_s), (_sep) ) )
+#endif /* !__MINGW32__ */
 
 #define asctime_r( _tm, _buf ) \
 	( strcpy( (_buf), asctime( (_tm) ) ), \
