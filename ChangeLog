@@ -1,3 +1,45 @@
+2000-12-28  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* private.c (ptw32_threadStart): Unhandled exceptions are
+	now passed through to the system to deal with. This is consistent
+	with normal Windows behaviour. C++ applications may use
+	set_terminate() to override the default behaviour which is
+	to call ptw32_terminate(). Ptw32_terminate() cleans up some
+	POSIX thread stuff before calling the system default function
+	which calls abort(). The users termination function should conform
+	to standard C++ semantics which is to not return. It should
+	exit the thread (call pthread_exit()) or exit the application.
+	* private.c (ptw32_terminate): Added as the default set_terminate()
+	function. It calls the system default function after cleaning up
+	some POSIX thread stuff.
+
+	* implement.h (ptw32_try_enter_critical_section): Move
+	declaration.
+	* global.c (ptw32_try_enter_critical_section): Moved
+	from dll.c.
+	* dll.c: Move process and thread attach/detach code into
+	functions in nonportable.c.
+	* nonportable.c (pthread_win32_process_attach_np): Process
+	attach code from dll.c is now available to static linked
+	applications.
+	* nonportable.c (pthread_win32_process_detach_np): Likewise.
+	* nonportable.c (pthread_win32_thread_attach_np): Likewise.
+	* nonportable.c (pthread_win32_thread_detach_np): Likewise.
+
+	* pthread.h: Add new non-portable prototypes for static
+	linked applications.
+
+	* GNUmakefile (OPT): Increase optimisation flag and remove
+	debug info flag.
+
+	* pthread.def: Add new non-portable exports for static
+	linked applications.
+
+2000-12-11  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* FAQ: Update Answer 6 re getting a fully working
+	Mingw32 built library.
+
 2000-09-13  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* mutex.c (pthread_mutex_init): Call
@@ -6,6 +48,10 @@
 	on Windows versions that can't resolve the
 	function, eg. Windows 95
 	- "Jef Gearhart" <jgearhart@tpssys.com>
+
+2000-09-09  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* pthread.h (ctime_r): Fix arg.
 
 2000-09-08  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 

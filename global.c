@@ -32,6 +32,11 @@ int ptw32_processInitialized = FALSE;
 pthread_key_t ptw32_selfThreadKey = NULL;
 pthread_key_t ptw32_cleanupKey = NULL;
 
+/* 
+ * Function pointer to TryEnterCriticalSection if it exists; otherwise NULL 
+ */
+BOOL (WINAPI *ptw32_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
+
 /*
  * Global lock for testing internal state of PTHREAD_MUTEX_INITIALIZER
  * created mutexes.

@@ -53,11 +53,8 @@ enum {
 void *
 exceptionedThread(void * arg)
 {
-  int result = ((int)PTHREAD_CANCELED + 1);
-  int one = 1;
-  int zero = 0;
   int dummy = 0;
-
+  int result = ((int)PTHREAD_CANCELED + 1);
   /* Set to async cancelable */
 
   assert(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == 0);
@@ -69,9 +66,14 @@ exceptionedThread(void * arg)
 #if defined(_MSC_VER) && !defined(__cplusplus)
   __try
   {
-    /* Avoid being optimised out */
+    int zero = 0;
+    int one = 1;
+    /*
+     * The deliberate exception condition (zero devide) is
+     * in an "if" to avoid being optimised out.
+     */
     if (dummy == one/zero)
-	Sleep(0);
+      Sleep(0);
   }
   __except (EXCEPTION_EXECUTE_HANDLER)
   {
@@ -81,9 +83,12 @@ exceptionedThread(void * arg)
 #elif defined(__cplusplus)
   try
   {
-    /* Avoid being optimised out */
-    if (dummy == one/zero)
-	Sleep(0);
+    /*
+     * I had a zero divide exception here but it
+     * wasn't being caught by the catch(...)
+     * below under Mingw32. That could be a problem.
+     */
+    throw dummy;
   }
 #if defined(PtW32CatchAll)
   PtW32CatchAll
@@ -170,7 +175,7 @@ main()
   /*
    * Code to control or munipulate child threads should probably go here.
    */
-  Sleep(500);
+  Sleep(1000);
 
   for (i = 0; i < NUMTHREADS; i++)
     {
@@ -180,7 +185,7 @@ main()
   /*
    * Give threads time to run.
    */
-  Sleep(NUMTHREADS * 100);
+  Sleep(NUMTHREADS * 1000);
 
   /*
    * Check any results here. Set "failed" and only print output on failure.
@@ -193,13 +198,13 @@ main()
 
 	/* Canceled thread */
       assert(pthread_join(ct[i], (void **) &result) == 0);
-      fail = (result != (int) PTHREAD_CANCELED);
+      assert(!(fail = (result != (int) PTHREAD_CANCELED)));
 
       failed = (failed || fail);
 
-      /* Exception thread */
+      /* Exceptioned thread */
       assert(pthread_join(et[i], (void **) &result) == 0);
-      fail = (result != ((int) PTHREAD_CANCELED + 2));
+      assert(!(fail = (result != ((int) PTHREAD_CANCELED + 2))));
 
       failed = (failed || fail);
     }

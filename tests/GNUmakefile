@@ -3,6 +3,7 @@
 
 
 CP	= copy
+MV	= rename
 RM	= erase
 MKDIR	= mkdir
 TOUCH	= echo Passed >
@@ -13,7 +14,8 @@ ECHO	= @echo
 #
 GLANG   = c++
 CC	= gcc
-CFLAGS	= -g -O0 -mthreads -UNDEBUG -Wall -x $(GLANG)
+#CFLAGS	= -g -O0 -mthreads -UNDEBUG -Wall -x $(GLANG)
+CFLAGS	= -O3 -mthreads -UNDEBUG -Wall -x $(GLANG)
 BUILD_DIR	= ..
 INCLUDES	= -I.
 LIBS	= -L. -lpthreadw32
@@ -37,7 +39,7 @@ TESTS	= loadfree \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 \
 	  context1 cancel3 cancel4 cancel5 \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
-	  exception1
+	  exception1 exception2 exception3
 
 PASSES	= $(TESTS:%=%.pass)
 
@@ -89,7 +91,10 @@ cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
 cleanup3.pass: cleanup2.pass
 exception1.pass: cancel4.pass
+exception2.pass: exception1.pass
+exception3.pass: exception2.pass
 
+#%.pass: %.exe $(HDR)
 %.pass: %.exe $(LIB) $(DLL) $(HDR)
 	$*
 	@ $(ECHO) Passed

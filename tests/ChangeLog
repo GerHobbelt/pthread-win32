@@ -1,3 +1,22 @@
+2000-12-28  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* eyal1.c: Increase thread work loads.
+	* exception2.c: New test.
+	* exception3.c: New test.
+	* Makefile: Add new tests exception2.c and exception3.c.
+	* GNUmakefile: Likewise.
+
+2000-12-11  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* cleanup3.c: Remove unused variable.
+	* cleanup2.c: Likewise.
+	* exception1.c: Throw an exception rather than use
+	a deliberate zero divide so that catch(...) will
+	handle it under Mingw32. Mingw32 now builds the
+	library correctly to pass all tests - see Thomas
+	Pfaff's detailed instructions re needed changes
+	to Mingw32 in the Pthreads-Win32 FAQ.
+
 2000-09-08  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* cancel5.c: New; tests calling pthread_cancel()

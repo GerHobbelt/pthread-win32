@@ -16,7 +16,7 @@ Q 4	Cancelation doesn't work for me, why?
 
 Q 5	Thread won't block after two calls to mutex_lock
 
-Q 6	How do I generate libpthread.a for use with Mingw32?
+Q 6	How do I generate pthreadGCE.dll and libpthreadw32.a for use with Mingw32?
 
 =============================================================================
 
@@ -89,7 +89,8 @@ Q 2	Now that pthreads-win32 builds under Mingw32, why do I get
 A 2
 ---
 Note:
-The latest Mingw32 package now has thread-safe exception handling.
+The latest Mingw32 package has thread-safe exception handling.
+Make sure you also read A 6 below to get a fully working build.
 
 The following email exchange describes the problem. Until this issue
 is resolved people without the Microsoft compiler can obtain the current
@@ -207,7 +208,7 @@ A 4
 > win32 programming, so I don't really understand how the *Event() family of
 > calls work.
 
-Async cancelation should be in post-snapshot-1999-11-02 versions
+Async cancelation should be in versions post snapshot-1999-11-02
 of pthreads-win32 (currently only for x86 architectures).
 
 The answer to your first question is, normal POSIX behaviour would  
@@ -241,6 +242,7 @@ recognise are those the library implements itself, ie.
         pthread_cond_timedwait
 	pthread_join
         sem_wait
+        pthread_delay_np
 
 Pthreads-win32 also provides two functions that allow you to create
 cancelation points within your application, but only for cases where
@@ -294,23 +296,88 @@ Ross
 
 ------------------------------------------------------------------------------
  
-Q 6	How do I generate libpthread.a for use with Mingw32?
+Q 6	How do I generate pthreadGCE.dll and libpthreadw32.a for use with Mingw32?
 ---
  
 A 6
 ---
-> I'm lacking the libpthread.a that
-> used to come with the pre-compiled package. The last time this
-> library appeared was in 1999-08-12. Without this library I cannot
-> use the pre-compiled dll.
+Once you've followed Thomas Pfaff's instructions below to fix
+Mingw32, then you can simply run "make" to build the library and dll.
 
-You can create libpthread.a from the .def file, should work along these
-lines:
 
-$(DLLTOOL) --as $(AS) -k --dllname libpthread.dll --output-lib
-libpthread.a --def $(srcdir)/libpthread.def
+From - Sat Dec  9 22:56:10 2000
+From: "Thomas Pfaff" <tpfaff@gmx.net>
+To: <mingw-users@lists.sourceforge.net>, <pthreads-win32@sources.redhat.com>
+Subject: mingw32 DLLs, threads and exceptions HOWTO
+Date: Thu, 7 Dec 2000 11:12:43 +0100
 
-Where DLLTOOL is i686-pc-cygwin-dlltool
-and AS i686-pc-cygwin-as.
+Dear all,
 
-Thomas Sailer <sailer@ife.ee.ethz.ch>
+this is a summary that should help users to have thread safe exception
+handling over DLL exported functions.
+If you don't care about c++ exceptions you can stop reading here.
+
+The first time i struggled with c++ exceptions was when i tried to throw an
+exception in a dll exported function where the exception handler resides in
+the program module.
+Instead of catching the exception the program stopped with an abnormal
+termination.
+The reason was that the exception code is in libgcc.a. Since this is a
+static library the code and some static variables are both in the dll and in
+the program module, each module runs in its own context.
+It was Franco Bez that pointed me in the right direction, that is convert
+libgcc.a into a dll.
+
+That done i tried to build the pthreads-win32 library, but some tests failed
+with an access violation. Due to the fact that the dll was not build
+was -mthreads support, eh_context_static instead of eh_context_specific (the
+mthreads version) was used for exception handling.
+I did a rebuild of the gcc dll with -mthreads, now all tests are passed
+(except a nonportable exception test that relies on a MSVC feature).
+
+To build the gcc dll i did the following steps.
+
+1. create a temporary directory libgcc
+2. copy libgcc.a from gcc-2.95.2\lib\gcc-lib\i386-mingw32\gcc-2.95.2 to that
+directory
+3. ar -x libgcc.a
+4. create a directory tmp and move __main.o, _exit.o and __dummy.o in that
+directory
+5. build the dll
+gcc -shared -mthreads -o gcc.dll *.o
+strip gcc.dll
+Move this dll into your gcc\bin directory
+6. Move _chkstk.o and frame.o to the tmp directory, otherwise you break the
+builtin alloca.
+7. Build the import library libgcc.a
+dllwrap --export-all --dllname=gcc.dll --output-def=libgcc.def --output-lib=
+libgcc.a *.o
+ar -q libgcc.a tmp/*.o
+strip --strip-debug libgcc.a
+ranlib libgcc.a
+8. save your old libgcc.a, copy the new libgcc.a into
+gcc-2.95.2\lib\gcc-lib\i386-mingw32\gcc-2.95.2
+
+I am using gcc-2.95.2-1 with Mumits patched binutils-19990818-1and msvcrt
+runtime-2000-03-27.
+I don't know if this is still required with the current binutils and gcc
+since i have seen no sources until now.
+
+I believe that these steps are at least necessary if you are trying to use
+the pthreads-win32 library (which is required if you want to use gtk+ on
+win32).
+They will make mingw32 a real replacement for MSVC (at least for me).
+
+What is left:
+
+1. Include the mingwm10.dll function into the gcc.dll to have only one dll
+left.
+2. make -mthreads and -fnative-struct default compiler options.
+3. convert libstdc++ to a dll by adding the declspec dllexport and dllimport
+to every class definition.
+
+Regards,
+    Thomas
+
+------------------------------------------------------------------------------
+ 
