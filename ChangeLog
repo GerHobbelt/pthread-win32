@@ -1,3 +1,14 @@
+2001-10-15  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* spin.c (pthread_spin_lock): PTHREAD_SPINLOCK_INITIALIZER
+	was causing a program fault.
+	(pthread_spin_init): Could have alloced memory
+	without freeing under some error conditions.
+
+	* mutex.c (pthread_mutex_init): Move memory
+	allocation of mutex struct after checking for
+	PROCESS_SHARED.
+
 2001-10-12  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* spin.c (pthread_spin_unlock): Was not returning
