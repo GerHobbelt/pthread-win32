@@ -1,4 +1,6 @@
 1998-07-09  Ben Elliston  <bje@cygnus.com>
 
+	* create.c (pthread_create): A dummy stub right now.
+
 	* pthread.h (pthread_create): Add function prototype.
 
