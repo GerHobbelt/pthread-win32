@@ -38,9 +38,7 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
-#ifndef _WIN32_WINNT
-#  define _WIN32_WINNT 0x400
-#endif
+#define _WIN32_WINNT 0x400
 
 #include <windows.h>
 /*
