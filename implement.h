@@ -107,6 +107,8 @@ void _pthread_handler_pop_all(int stack,
 int _pthread_destructor_push(void (*routine)(void *),
 			     pthread_key_t key);
 
+void _pthread_destructor_pop(pthread_key_t key);
+
 void _pthread_destructor_pop_all();
 
 /* Primitives to manage threads table entries. */

@@ -1,5 +1,9 @@
 Thu Aug  6 15:19:22 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* implement.h (_pthread_destructor_pop): Add prototype.
+
+	* tsd.c (implement.h): Add include.
+
 	* sync.c (pthread_join): Remove target_thread_mutex and it's
 	initialisation. Rename getdetachedstate to getdetachstate.
 	Remove unused variable "exitcode".
