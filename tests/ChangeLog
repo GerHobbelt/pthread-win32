@@ -1,3 +1,7 @@
+1999-01-17  Ross Johnson  <rpj@ise.canberra.edu.au>
+
+	* runtest: New script to build and run a test in the tests directory.
+
 Wed Dec 30 11:22:44 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* tsd1.c: Re-written. See comments at start of file.
