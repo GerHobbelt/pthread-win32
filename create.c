@@ -40,7 +40,8 @@ _pthread_start_call(void * us_arg)
 
   ret = (*func)(arg);
 
-  pthread_exit(NULL);
+  _pthread_exit(NULL, ret);
+
   /* Never Reached */
 }
 

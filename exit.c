@@ -46,7 +46,7 @@ _pthread_vacuum(void)
 }
 
 void
-pthread_exit(void * value)
+_pthread_exit(void * value, int return_code)
 {
   _pthread_threads_thread_t * us = _PTHREAD_THIS;
 
@@ -62,5 +62,11 @@ pthread_exit(void * value)
 
   _pthread_vacuum();
 
-  _endthreadex(0);
+  _endthreadex(return_code);
+}
+
+void
+pthread_exit(void * value)
+{
+  _pthread_exit(value, 0);
 }
