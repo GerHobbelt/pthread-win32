@@ -78,6 +78,9 @@ cond_wait(pthread_cond_t *cv, pthread_mutex_t *mutex, DWORD abstime)
       return EINVAL;
     }
 
+  /* CANCELATION POINT */
+  pthread_testcancel();
+
   /* Avoid race conditions. */
   EnterCriticalSection (&cv->waiters_count_lock);
   cv->waiters_count_++;

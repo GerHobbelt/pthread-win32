@@ -33,17 +33,15 @@ _pthread_vacuum(void)
 void
 pthread_exit(void * value)
 {
-  _pthread_threads_thread_t * this;
-
-  this = _PTHREAD_THIS;
+  _pthread_threads_thread_t * us = _PTHREAD_THIS;
 
   /* Copy value into the thread entry so it can be given
      to any joining threads. */
-  if (this->joinvalueptr != NULL)
+  if (us->joinvalueptr != NULL)
     {
-      this->joinvalueptr = value;
+      us->joinvalueptr = value;
     }
 
   /* Teleport back to _pthread_start_call() to cleanup and exit. */
-  longjmp(this->call.env, 1);
+  longjmp(us->call.env, 1);
 }
