@@ -104,15 +104,15 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 			case 1:
 				/*
 				 * Got cancel request.
-				 * In the event that both handles are signalled, the cancel will
+				 * In the event that both handles are signaled, the cancel will
 				 * be ignored (see case 0 comment).
 				 */
 				ResetEvent (handles[1]);
 
-				if (self != NULL && !self->implicit)
+				if (self != NULL)
 					{
 						/*
-						 * Thread started with pthread_create.
+						 * Should handle POSIX and implicit POSIX threads..
 						 * Make sure we haven't been async-canceled in the meantime.
 						 */
 						(void) pthread_mutex_lock(&self->cancelLock);

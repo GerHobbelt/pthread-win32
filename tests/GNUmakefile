@@ -79,7 +79,7 @@ TESTS	= loadfree \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 rwlock7 \
 	  rwlock2_t rwlock3_t rwlock4_t rwlock5_t rwlock6_t rwlock6_t2 \
 	  context1 cancel3 cancel4 cancel5 cancel6a cancel6d \
-	  cancel7 \
+	  cancel7 cancel8 \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
@@ -146,6 +146,7 @@ cancel5.pass: cancel3.pass
 cancel6a.pass: cancel3.pass
 cancel6d.pass: cancel3.pass
 cancel7.pass: kill1.pass
+cancel8.pass: cancel7.pass
 cleanup0.pass: cancel5.pass
 cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
