@@ -96,8 +96,6 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
       return EINVAL;
     }
 
-  mx = *mutex;
-
   mx = (pthread_mutex_t) calloc(1, sizeof(*mx));
 
   if (mx == NULL)
@@ -213,20 +211,40 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
     {
       mx = *mutex;
 
-      if (mx->mutex == 0)
-	{
-	  DeleteCriticalSection(&mx->cs);
-	}
-      else
-	{
-	  result = (CloseHandle (mx->mutex) ? 0 : EINVAL);
-	}
-
-      if (result == 0)
+      if ((result = pthread_mutex_trylock(&mx)) == 0)
         {
-          mx->mutex = 0;
-          free(mx);
+          /*
+           * FIXME!!!
+           * The mutex isn't held by another thread but we could still
+           * be too late invalidating the mutex below. Yet we can't do it
+           * earlier in case another thread needs to unlock the mutex
+           * that it's holding.
+           */
           *mutex = NULL;
+
+          pthread_mutex_unlock(&mx);
+
+          if (mx->mutex == 0)
+            {
+              DeleteCriticalSection(&mx->cs);
+            }
+          else
+            {
+              result = (CloseHandle (mx->mutex) ? 0 : EINVAL);
+            }
+
+          if (result == 0)
+            {
+              mx->mutex = 0;
+              free(mx);
+            }
+          else
+            {
+              /*
+               * Restore the mutex before we return the error.
+               */
+              *mutex = mx;
+            }
         }
     }
   else
@@ -291,16 +309,17 @@ pthread_mutexattr_init (pthread_mutexattr_t * attr)
       * ------------------------------------------------------
       */
 {
-  pthread_mutexattr_t attr_result;
+  pthread_mutexattr_t ma;
   int result = 0;
 
-  attr_result = (pthread_mutexattr_t) calloc (1, sizeof (*attr_result));
+  ma = (pthread_mutexattr_t) calloc (1, sizeof (*ma));
 
-  result = (attr_result == NULL)
-    ? ENOMEM
-    : 0;
+  if (ma == NULL)
+    {
+      result = ENOMEM;
+    }
 
-  *attr = attr_result;
+  *attr = ma;
 
   return (result);
 
@@ -343,9 +362,11 @@ pthread_mutexattr_destroy (pthread_mutexattr_t * attr)
     }
   else
     {
-      free (*attr);
+      pthread_mutexattr_t ma = *attr;
 
       *attr = NULL;
+      free (ma);
+
       result = 0;
     }
 

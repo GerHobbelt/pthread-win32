@@ -94,8 +94,6 @@ pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
         return EINVAL;
       }
 
-    rw = *rwlock;
-
     rw = (pthread_rwlock_t) calloc(1, sizeof(*rw));
 
     if (rw == NULL)
@@ -182,14 +180,19 @@ pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
           }
         else
           {
+            /*
+             * Need to NULL this before we start freeing up
+             * and destroying it's components.
+             */
+            *rwlock = NULL;
             rw->rw_magic = 0;
+
             (void) pthread_mutex_unlock(&(rw->rw_lock));
+
             (void) pthread_cond_destroy(&(rw->rw_condreaders));
             (void) pthread_cond_destroy(&(rw->rw_condwriters));
             (void) pthread_mutex_destroy(&(rw->rw_lock));
- 
             free(rw);
-            *rwlock = NULL;
            }
       }
     else
