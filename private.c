@@ -165,7 +165,12 @@ _pthread_threadStart (ThreadParms * threadParms)
   pthread_t self;
   void *(*start) (void *);
   void *arg;
+
+#ifdef _MSC_VER
+
   DWORD ei[3];
+
+#endif
 
   void * status;
 
