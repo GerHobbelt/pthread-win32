@@ -60,8 +60,6 @@ struct bag_t_ {
 
 static bag_t threadbag[NUMTHREADS + 1];
 
-static pthread_mutex_t waitLock = PTHREAD_MUTEX_INITIALIZER;
-
 void *
 mythread(void * arg)
 {

@@ -1,9 +1,9 @@
 ; pthread.def
-; Last updated: $Date: 2000/01/04 10:19:28 $
+; Last updated: $Date: 2000/08/14 03:43:09 $
 
 ; Currently unimplemented functions are commented out.
 
-LIBRARY pthread
+;LIBRARY pthread
 
 EXPORTS
 _pthread_processInitialize

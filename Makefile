@@ -11,9 +11,14 @@ DEVROOT=c:\pthreads\dll
 DLLDEST=$(DEVROOT)
 LIBDEST=$(DEVROOT)
 
-#CLIB	= /MD
-CLIB	= /MT
-CCFLAGS	= #/EHsc /TP /D_cplusplus
+DLLS	= pthreadVCE.dll pthreadVSE.dll
+
+# C++ Exceptions
+VCEFLAGS	= /GX /TP /DPtW32NoCatchWarn
+#Structured Exceptions
+VSEFLAGS	= 
+
+CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400
 
 OBJ=attr.obj \
 	cancel.obj \
@@ -35,33 +40,37 @@ OBJ=attr.obj \
 	sync.obj \
 	tsd.obj
 
-all: pthread.dll
+all:
+	@ echo Run one of the following command lines:
+	@ echo nmake clean VCE   (to build the dll with C++ exception handling)
+	@ echo nmake clean VSE   (to build the dll with structured exception handling)
+
+VCE:
+	@ nmake /nologo EHFLAGS="$(VCEFLAGS)" pthreadVCE.dll
+
+VSE:
+	@ nmake /nologo EHFLAGS="$(VSEFLAGS)" pthreadVSE.dll
+
+realclean: clean
+	del *.dll
+	del *.lib
 
 clean:
-	del pthread.dll
-	del pthread.lib
 	del *.obj
 	del *.ilk
 	del *.pdb
+	del *.exp
 	del *.o
 
 
-install: all
-	copy pthread.dll $(DLLDEST)
-	copy pthread.lib $(LIBDEST)
+install: $(DLLS)
+	copy pthread*.dll $(DLLDEST)
+	copy pthread*.lib $(LIBDEST)
 
-pthread.dll: $(OBJ) pthread.def
-	cl /LD /Zi $(CFLAGS) $(OBJ) /Fepthread.dll /link \
-	    /nodefaultlib:libcmt \
-		/implib:pthread.lib \
-		msvcrt.lib \
-		/def:pthread.def
+$(DLLS): $(OBJ) pthread.def
+	cl /LD /Zi /nologo $(OBJ) \
+		/link /nodefaultlib:libcmt /implib:$*.lib \
+		msvcrt.lib /def:pthread.def /out:$@
 
-.c.obj::
-	cl /W3 $(CLIB) $(CFLAGS) /nologo /Yd /Zi /I. \
-		/D_WIN32_WINNT=0x400 \
-		/DSTDCALL=_stdcall \
-		-c $<
-
-$(OBJ):
-
+.c.obj:
+	cl $(EHFLAGS) $(CFLAGS) -c $<

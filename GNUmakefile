@@ -21,6 +21,8 @@
 GLANG	= c++
 
 RM	= erase
+MV	= rename
+CP	= copy
 
 CC	= gcc
 
@@ -28,7 +30,7 @@ AR	= ar
 
 LD	= gcc -mdll
 
-OPT	= -g -O2 -x $(GLANG)
+OPT	= -g -O0 -x $(GLANG)
 
 ## Mingw32
 CFLAGS	= $(OPT) -I. -mthreads -DHAVE_CONFIG_H -Wall
@@ -42,19 +44,21 @@ OBJS	= attr.o cancel.o cleanup.o condvar.o create.o dll.o errno.o \
 
 INCL	= implement.h semaphore.h pthread.h windows.h
 
-DLL     = pthread.dll
+DLL     = pthreadGCE.dll
 
-LIB	= libpthread32.a
+LIBS	= libpthreadw32.a
 
 
-all:	$(LIB)
+all:	$(LIBS)
 
-pthread.a:
-	dlltool --def $(DLL:.dll=.def) --output-lib $@ --dllname $(DLL)
-	rename pthread.a $(LIB)
+fake.a:
+	@ $(CP) pthreadVCE.dll $(DLL)
+	dlltool --def pthread.def --output-lib $@ --dllname $(DLL)
+	@-$(RM) $(LIBS)
+	$(MV) fake.a $(LIBS)
 
-$(LIB): $(DLL)
-	dlltool --def $(DLL:.dll=.def) --output-lib $@ --dllname $(DLL)
+$(LIBS): $(DLL)
+	dlltool --def pthread.def --output-lib $@ --dllname $(DLL)
 
 %.pre: %.c
 	$(CC) -E -o $@ $(CFLAGS) $^
@@ -66,16 +70,17 @@ $(LIB): $(DLL)
 
 $(DLL): $(OBJS)
 	$(LD) -o $@ $^ -Wl,--base-file,$*.base
-	dlltool --base-file=$*.base --def $*.def --output-exp $*.exp --dllname $@
+	dlltool --base-file=$*.base --def pthread.def --output-exp $*.exp --dllname $@
 	$(LD) -o $@ $^ -Wl,--base-file,$*.base,$*.exp
-	dlltool --base-file=$*.base --def $*.def --output-exp $*.exp --dllname $@
+	dlltool --base-file=$*.base --def pthread.def --output-exp $*.exp --dllname $@
 	$(LD) -o $@ $^ -Wl,$*.exp
 
 clean:
 	-$(RM) *~
-	-$(RM) $(LIB)
+	-$(RM) $(LIBS)
 	-$(RM) *.o 
 	-$(RM) *.exe
 	-$(RM) $(DLL) 
 	-$(RM) $(DLL:.dll=.base)
 	-$(RM) $(DLL:.dll=.exp)
+	-$(RM) fake.a

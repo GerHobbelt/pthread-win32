@@ -27,6 +27,16 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
+#ifdef __MINGW32__
+#define PT_STDCALL
+#else
+#ifdef __cplusplus
+#define PT_STDCALL __stdcall
+#else
+#define PT_STDCALL __stdcall
+#endif
+#endif
+
 /* changed include from <semaphore.h> to use local file during development */
 #include "semaphore.h"
 

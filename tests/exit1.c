@@ -14,4 +14,5 @@ main(int argc, char * argv[])
 
 	/* Not reached */
 	assert(0);
+	return 0;
 }

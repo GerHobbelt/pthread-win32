@@ -159,10 +159,9 @@ main()
 
       if (fail)
 	{
-	  fprintf(stderr, "Thread %d: started %d: count %d: result %d\n",
+	  fprintf(stderr, "Thread %d: started %d: result %d\n",
 		  i,
 		  threadbag[i].started,
-		  threadbag[i].count,
 		  result);
 	}
       failed = (failed || fail);

@@ -1,13 +1,31 @@
 Running test cases in this directory
 ------------------------------------
 
-runtest.bat is included for compiling and running tests.
+These make scripts expect to be able to copy the dll, libarary
+and header files from this directory's parent directory,
+which should be the pthreads-win32 source directory.
 
-Usage:	runtest cl|gcc testname
+MS VC++ nmake
+-------------
 
-	"cl" 		calls the VC++ cl compiler/linker
-	"gcc"		calls the GNU gcc compiler/linker
-	"testname"	is the name of the C source file without the .c
+Run the target corresponding to the DLL version being tested:
+ 
+nmake clean VCE
+ 
+or:
+ 
+nmake clean VSE
+
+
+GNU G++ make
+------------
+
+Run "make clean" and then "make". See the "Known bugs" section
+in ..\README.
+
+
+Writing Test Cases
+------------------
 
 Tests written in this test suite should behave in the following manner:
 
