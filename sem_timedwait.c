@@ -42,7 +42,7 @@
  */
 
 #ifndef _UWIN
-#include <process.h>
+//#include <process.h>
 #endif
 #ifndef NEED_FTIME
 #include <sys/timeb.h>
@@ -54,7 +54,7 @@
 
 
 int
-sem_timedwait (sem_t * sem, const struct timespec * abstime)
+sem_timedwait (sem_t * sem, const struct timespec *abstime)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -63,10 +63,10 @@ sem_timedwait (sem_t * sem, const struct timespec * abstime)
       *
       * PARAMETERS
       *      sem
-      * 	     pointer to an instance of sem_t
+      *              pointer to an instance of sem_t
       *
       *      abstime
-      * 	     pointer to an instance of struct timespec
+      *              pointer to an instance of struct timespec
       *
       * DESCRIPTION
       *      This function waits on a semaphore. If the
@@ -81,14 +81,14 @@ sem_timedwait (sem_t * sem, const struct timespec * abstime)
       *      until interrupted by a signal.
       *
       * RESULTS
-      * 	     0		     successfully decreased semaphore,
-      * 	     -1 	     failed, error in errno
+      *              0               successfully decreased semaphore,
+      *              -1              failed, error in errno
       * ERRNO
-      * 	     EINVAL	     'sem' is not a valid semaphore,
-      * 	     ENOSYS	     semaphores are not supported,
-      * 	     EINTR	     the function was interrupted by a signal,
-      * 	     EDEADLK	     a deadlock condition was detected.
-      * 	     ETIMEDOUT	     abstime elapsed before success.
+      *              EINVAL          'sem' is not a valid semaphore,
+      *              ENOSYS          semaphores are not supported,
+      *              EINTR           the function was interrupted by a signal,
+      *              EDEADLK         a deadlock condition was detected.
+      *              ETIMEDOUT       abstime elapsed before success.
       *
       * ------------------------------------------------------
       */
@@ -184,11 +184,11 @@ sem_timedwait (sem_t * sem, const struct timespec * abstime)
 	}
 
 #ifdef NEED_SEM
-			
+
       result = (pthreadCancelableTimedWait ((*sem)->event, milliseconds));
-			
+
 #else /* NEED_SEM */
-			
+
       result = (pthreadCancelableTimedWait ((*sem)->sem, milliseconds));
 
 #endif
@@ -205,7 +205,7 @@ sem_timedwait (sem_t * sem, const struct timespec * abstime)
 
 #ifdef NEED_SEM
 
-  ptw32_decrease_semaphore(sem);
+  ptw32_decrease_semaphore (sem);
 
 #endif /* NEED_SEM */
 
