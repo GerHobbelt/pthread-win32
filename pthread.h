@@ -60,16 +60,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define SCHED_MIN   SCHED_OTHER
 #define SCHED_MAX   SCHED_RR
 
-#define PTHREAD_CREATE_JOINABLE     0
-#define PTHREAD_CREATE_DETACHED     1
-
-/* Cancelability attributes */
-#define PTHREAD_CANCEL_ENABLE       0
-#define PTHREAD_CANCEL_DISABLE      1
-
-#define PTHREAD_CANCEL_ASYNCHRONOUS 0
-#define PTHREAD_CANCEL_DEFERRED     1
-
 /* Cancelation return value.
    This value must be neither NULL nor the value of any
    pointer to an object in memory. */
@@ -281,6 +271,26 @@ int pthread_cancel(pthread_t thread);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+extern const int _pthread_create_joinable;
+extern const int _pthread_create_detached;
+
+/* Cancelability attributes */
+extern const int _pthread_cancel_enable;
+extern const int _pthread_cancel_disable;
+
+extern const int _pthread_cancel_asynchronous;
+extern const int _pthread_cancel_deferred;
+
+#define PTHREAD_CREATE_JOINABLE     _pthread_create_joinable
+#define PTHREAD_CREATE_DETACHED     _pthread_create_detached
+
+/* Cancelability attributes */
+#define PTHREAD_CANCEL_ENABLE       _pthread_cancel_enable
+#define PTHREAD_CANCEL_DISABLE      _pthread_cancel_disable
+
+#define PTHREAD_CANCEL_ASYNCHRONOUS _pthread_cancel_asynchronous
+#define PTHREAD_CANCEL_DEFERRED     _pthread_cancel_deferred
 
 
 /* The following #defines implement POSIX cleanup handlers.

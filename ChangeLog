@@ -1,5 +1,12 @@
 Sun Jul 26 00:09:59 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* pthread.h: Converting PTHREAD_* defines to alias the (const int)
+	values in global.c.
+
+	* global.c: Started converting PTHREAD_* defines to (const int) as
+ 	a part of making the eventual pthreads DLL binary compatible
+ 	through version changes.
+
 	* condvar.c (cond_wait): Add cancelation point. This applies the
 	point to both pthread_cond_wait() and pthread_cond_timedwait().
 
