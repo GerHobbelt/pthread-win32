@@ -27,10 +27,20 @@ announcement for the list of contributors.
 Changes since the last snapshot
 -------------------------------
 
+platform dependence
+-------------------
+As Win9x doesn't provide one, the library now contains
+it's own InterlockedCompareExchange() routine. It is used to
+implement spinlocks and barriers, and soon may be used in mutexes.
+This routine relies on the CMPXCHG machine instruction which
+is only available in i486 or above CPUs. This library
+(from snapshot 20010712 onwards) therefore no longer runs on
+i386 platforms.
+
 rwlocks
 -------
 Restored pthread_rwlock_wrlock() as a cancelation point as permitted
-by POSIX 1003.1j. (Was prematurely disabled in the the last snapshot.)
+by POSIX 1003.1j. (Was prematurely disabled in the last snapshot.)
 
 Bug fixes
 ---------
@@ -39,6 +49,9 @@ pthread_mutexattr_getpshared, pthread_barrierattr_init,
 pthread_barrierattr_getpshared, and pthread_condattr_getpshared.
 - Scott McCaskill <scott@magruder.org>
 
+Removed potential race condition in pthread_mutex_trylock and
+pthread_mutex_lock;
+- Alexander Terekhov <TEREKHOV@de.ibm.com>
 
 ---------------------------
 Known bugs in this snapshot
@@ -256,8 +269,8 @@ The following functions are implemented:
       pthread_setschedparam
       pthread_getconcurrency
       pthread_setconcurrency
-      pthread_attr_getscope  (returns an error ENOSYS)
-      pthread_attr_setscope  (returns an error ENOSYS)
+      pthread_attr_getscope
+      pthread_attr_setscope  (only supports PTHREAD_SCOPE_SYSTEM)
       sched_get_priority_max (POSIX 1b)
       sched_get_priority_min (POSIX 1b)
       sched_rr_get_interval  (POSIX 1b  - returns an error ENOTSUP)
