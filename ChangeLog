@@ -1,3 +1,8 @@
+Thu Oct 15 14:05:01 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* tsd.c (pthread_setspecific): Fix type declaration and cast.
+	(pthread_getspecific): Ditto.
+
 Thu Oct 15 11:53:21 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* global.c (_pthread_tsd_key_table): Fix declaration.
