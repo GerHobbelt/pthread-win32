@@ -23,8 +23,8 @@ contributed by John E. Bossom <jebossom@cognos.com>.
 See the 'MAINTAINERS' file for the list of contributors.
 
 
-Why you cannot build the library with Cygwin or Mingw32
--------------------------------------------------------
+Why you cannot build the library with Cygwin or Mingw32 yet
+-----------------------------------------------------------
 
 The DLL pthread.dll still cannot be built using g++ due to non thread-safe
 exception handling in g++.  Thanks to Kevin Ruland for researching this
