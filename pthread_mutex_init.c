@@ -80,7 +80,7 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
     }
   else
     {
-      mx->lock_idx = PTW32_MUTEX_LOCK_IDX_INIT;
+      mx->lock_idx = -1;
       mx->recursive_count = 0;
       mx->kind = (attr == NULL || *attr == NULL
 		  ? PTHREAD_MUTEX_DEFAULT : (*attr)->kind);

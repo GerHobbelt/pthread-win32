@@ -46,11 +46,9 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
   int result = 0;
   pthread_mutex_t mx;
 
-
-  if (mutex == NULL || *mutex == NULL)
-    {
-      return EINVAL;
-    }
+  /*
+   * Let the system deal with invalid pointers.
+   */
 
   /*
    * We do a quick check to see if we need to do more work
@@ -68,41 +66,51 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
 
   mx = *mutex;
 
-  if (0 == InterlockedIncrement (&mx->lock_idx))
+  if (mx->kind == PTHREAD_MUTEX_NORMAL)
     {
-      mx->recursive_count = 1;
-      mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-			 ? pthread_self ()
-			 : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
+      if (0 != InterlockedIncrement (&mx->lock_idx))
+	{
+	  if (ptw32_semwait (&mx->wait_sema) != 0)
+	    {
+	      result = errno;
+	    }
+	}
     }
   else
     {
-      if (mx->kind != PTHREAD_MUTEX_FAST_NP &&
-	  pthread_equal (mx->ownerThread, pthread_self ()))
+      if (0 == InterlockedIncrement (&mx->lock_idx))
 	{
-	  (void) InterlockedDecrement (&mx->lock_idx);
-
-	  if (mx->kind == PTHREAD_MUTEX_RECURSIVE_NP)
-	    {
-	      mx->recursive_count++;
-	    }
-	  else
-	    {
-	      result = EDEADLK;
-	    }
+	  mx->recursive_count = 1;
+	  mx->ownerThread = pthread_self ();
 	}
       else
 	{
-	  if (ptw32_semwait (&mx->wait_sema) == 0)
+	  pthread_t self = pthread_self();
+
+	  if (pthread_equal (mx->ownerThread, self))
 	    {
-	      mx->recursive_count = 1;
-	      mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-				 ? pthread_self ()
-				 : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
+	      (void) InterlockedDecrement (&mx->lock_idx);
+	      
+	      if (mx->kind == PTHREAD_MUTEX_RECURSIVE)
+		{
+		  mx->recursive_count++;
+		}
+	      else
+		{
+		  result = EDEADLK;
+		}
 	    }
 	  else
 	    {
-	      result = errno;
+	      if (ptw32_semwait (&mx->wait_sema) == 0)
+		{
+		  mx->recursive_count = 1;
+		  mx->ownerThread = self;
+		}
+	      else
+		{
+		  result = errno;
+		}
 	    }
 	}
     }

@@ -101,6 +101,7 @@ runTest (char * testNameString, int mType)
 int
 main (int argc, char *argv[])
 {
+  int i = 0;
   CRITICAL_SECTION cs;
   old_mutex_t ox;
   pthread_mutexattr_init(&ma);
@@ -127,6 +128,45 @@ main (int argc, char *argv[])
   overHeadMilliSecs = durationMilliSecs;
 
 
+  TESTSTART
+  assert((dummy_call(&i), 1) == one);
+  assert((dummy_call(&i), 1) == one);
+  TESTSTOP
+
+  durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
+
+  printf( "%-45s %15ld %15.3f\n",
+	    "Dummy call x 2",
+          durationMilliSecs,
+          (float) durationMilliSecs * 1E3 / ITERATIONS);
+
+
+  TESTSTART
+  assert((interlocked_inc_with_conditionals(&i), 1) == one);
+  assert((interlocked_dec_with_conditionals(&i), 1) == one);
+  TESTSTOP
+
+  durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
+
+  printf( "%-45s %15ld %15.3f\n",
+	    "Dummy call -> Interlocked with cond x 2",
+          durationMilliSecs,
+          (float) durationMilliSecs * 1E3 / ITERATIONS);
+
+
+  TESTSTART
+  assert((InterlockedIncrement(&i), 1) == one);
+  assert((InterlockedDecrement(&i), 1) == one);
+  TESTSTOP
+
+  durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
+
+  printf( "%-45s %15ld %15.3f\n",
+	    "InterlockedOp x 2",
+          durationMilliSecs,
+          (float) durationMilliSecs * 1E3 / ITERATIONS);
+
+
   InitializeCriticalSection(&cs);
 
   TESTSTART
@@ -139,7 +179,7 @@ main (int argc, char *argv[])
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
 
   printf( "%-45s %15ld %15.3f\n",
-	    "Simple Critical Section",
+	    "Simple Critical Section x 2",
           durationMilliSecs,
           (float) durationMilliSecs * 1E3 / ITERATIONS);
 
