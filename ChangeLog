@@ -1,3 +1,7 @@
+2001-05-31  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* condvar.c (pthread_cond_init): free memory when init fails.
+
 2001-05-30  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* pthread.h (rand_r): Fake using _seed argument to quell
