@@ -2,7 +2,7 @@
  * signal.c
  *
  * Description:
- * POSIX thread-aware signal functions.
+ * Thread-aware signal functions.
  */
 
 #include <errno.h>
