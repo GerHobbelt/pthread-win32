@@ -56,21 +56,21 @@ pthread_create(pthread_t *thread,
   void *   security = NULL;
   DWORD  threadID;
   pthread_attr_t * attr_copy;
-  pthread_t new;
+  pthread_t new_thread;
   /* Success unless otherwise set. */
   int ret;
 
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_table_mutex);
 
-  ret = _pthread_new_thread(&new);
+  ret = _pthread_new_thread(&new_thread);
 
   pthread_mutex_lock(&_pthread_table_mutex);
   /* END CRITICAL SECTION */
 
   if (ret == 0)
     {
-      attr_copy = &(new->attr);
+      attr_copy = &(new_thread->attr);
 
       /* Map given attributes otherwise just use default values. */
       if (attr != NULL) 
@@ -89,8 +89,8 @@ pthread_create(pthread_t *thread,
 	}
 
       /* We call a generic wrapper which then calls the start routine. */
-      new->call.routine = start_routine;
-      new->call.arg = arg;
+      new_thread->call.routine = start_routine;
+      new_thread->call.arg = arg;
 
       /* Start running, not suspended. */
       flags = 0;
@@ -98,7 +98,7 @@ pthread_create(pthread_t *thread,
       handle = (HANDLE) _beginthreadex(security,
 				       attr_copy->stacksize,
 				       _pthread_start_call,
-				       (void *) new,
+				       (void *) new_thread,
 				       flags,
 				       &threadID);
 
@@ -115,9 +115,9 @@ pthread_create(pthread_t *thread,
   if (ret == 0)
     {
       /* Let the caller know the thread handle. */
-      new->win32handle = handle;
-      new->ptstatus = _PTHREAD_INUSE;
-      *thread = new;
+      new_thread->win32handle = handle;
+      new_thread->ptstatus = _PTHREAD_INUSE;
+      *thread = new_thread;
     }
   else
     {
@@ -125,7 +125,7 @@ pthread_create(pthread_t *thread,
       pthread_mutex_lock(&_pthread_table_mutex);
 
       /* Remove the failed thread entry. */
-      _pthread_delete_thread(new);
+      _pthread_delete_thread(new_thread);
 
       pthread_mutex_lock(&_pthread_table_mutex);
       /* END CRITICAL SECTION */

@@ -17,36 +17,37 @@ _pthread_handler_push(int stack,
 {
   /* Place the new handler into the list so that handlers are
      popped off in the order given by poporder. */
-  _pthread_handler_node_t * new;
+  _pthread_handler_node_t * new_thread;
   _pthread_handler_node_t * next;
   _pthread_handler_node_t ** stacktop;
 
   stacktop = _PTHREAD_STACK(stack);
 
-  new = (_pthread_handler_node_t *) malloc(sizeof(_pthread_handler_node_t));
+  new_thread = 
+    (_pthread_handler_node_t *) malloc(sizeof(_pthread_handler_node_t));
 
-  if (new == NULL)
+  if (new_thread == NULL)
     {
       return ENOMEM;
     }
 
-  new->routine = routine;
-  new->arg = arg;
+  new_thread->routine = routine;
+  new_thread->arg = arg;
 
   if (poporder == _PTHREAD_HANDLER_POP_LIFO)
     {
       /* Add the new node to the start of the list. */
-      new->next = *stacktop;
+      new_thread->next = *stacktop;
       *stacktop = next;
     }
   else
     {
       /* Add the new node to the end of the list. */
-      new->next = NULL;
+      new_thread->next = NULL;
 
       if (*stacktop == NULL)
 	{
-	  *stacktop = new;
+	  *stacktop = new_thread;
 	}
       else
 	{
@@ -57,7 +58,7 @@ _pthread_handler_push(int stack,
 	      next = next->next;
 	    }
 
-	  next = new;
+	  next = new_thread;
 	}
     }
   return 0;

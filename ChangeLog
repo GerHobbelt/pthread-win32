@@ -1,3 +1,12 @@
+Wed Jul 29 11:39:03 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* cleanup.c (_pthread_handler_push): Same as below.
+
+	* create.c (pthread_create): Same as below.
+
+	* private.c (_pthread_new_thread): Rename "new" to "new_thread".
+	Since when has a C programmer been required to know C++?
+
 Tue Jul 28 14:04:29 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* implement.h: Add _PTHREAD_VALID macro.

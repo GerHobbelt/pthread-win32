@@ -99,7 +99,7 @@
 int
 _pthread_new_thread(pthread_t * thread)
 {
-  pthread_t new;
+  pthread_t new_thread;
 
   if (_pthread_reuse_top == -1)
     {
@@ -109,28 +109,28 @@ _pthread_new_thread(pthread_t * thread)
 	}
       else
 	{
-	  new = _pthread_virgin[_pthread_virgin_next++];
+	  new_thread = _pthread_virgin[_pthread_virgin_next++];
 	}
     }
   else
     {
-      new = _pthread_reuse[_pthread_reuse_top--];
+      new_thread = _pthread_reuse[_pthread_reuse_top--];
     }
 
-  new->win32handle = NULL;
-  new->ptstatus = _PTHREAD_NEW;
-  pthread_attr_init(&(new->attr));
-  new->joinvalueptr = NULL;
-  new->cancelstate = PTHREAD_CANCEL_ENABLE;
-  new->canceltype = PTHREAD_CANCEL_DEFERRED;
-  new->cancel_pending = FALSE;
-  new->cleanupstack = NULL;
-  new->destructorstack = NULL;
-  new->forkpreparestack = NULL;
-  new->forkparentstack = NULL;
-  new->forkchildstack = NULL;
+  new_thread->win32handle = NULL;
+  new_thread->ptstatus = _PTHREAD_NEW;
+  pthread_attr_init(&(new_thread->attr));
+  new_thread->joinvalueptr = NULL;
+  new_thread->cancelstate = PTHREAD_CANCEL_ENABLE;
+  new_thread->canceltype = PTHREAD_CANCEL_DEFERRED;
+  new_thread->cancel_pending = FALSE;
+  new_thread->cleanupstack = NULL;
+  new_thread->destructorstack = NULL;
+  new_thread->forkpreparestack = NULL;
+  new_thread->forkparentstack = NULL;
+  new_thread->forkchildstack = NULL;
 
-  *thread = new;
+  *thread = new_thread;
 
   return 0;
 }
