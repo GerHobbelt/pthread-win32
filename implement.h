@@ -66,15 +66,15 @@ extern "C" {
 
 /* Generic handler push and pop routines. */
 
-void _pthread_handler_push(_pthread_handler_node_t ** stacktop,
-			   int poporder,
-			   void (*routine)(void *),
-			   void *arg);
+int _pthread_handler_push(int stack,
+			  int poporder,
+			  void (*routine)(void *),
+			  void *arg);
 
-void _pthread_handler_pop(_pthread_handler_node_t ** stacktop,
+void _pthread_handler_pop(int stack,
 			  int execute);
 
-void _pthread_handler_pop_all(_pthread_handler_node_t ** stacktop,
+void _pthread_handler_pop_all(int stack,
 			      int execute);
 
 /* Primitives to manage threads table entries. */

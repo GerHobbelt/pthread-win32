@@ -1,5 +1,22 @@
 Fri Jul 24 16:33:17 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* fork.c (pthread_atfork): Add all the necessary push calls.
+	Local implementation semantics:
+	If we get an ENOMEM at any time then ALL handlers
+	(including those from previous pthread_atfork() calls) will be
+	popped off each of the three atfork stacks before we return.
+	(fork): Add all the necessary pop calls. Add the thread cancellation
+	and join calls to the child fork.
+	Add #includes.
+
+	* implement.h: (_pthread_handler_push): Fix return type and stack arg
+	type in prototype.
+	(_pthread_handler_pop): Fix stack arg type in prototype.
+	(_pthread_handler_pop_all): Fix stack arg type in prototype.
+
+	* cleanup.c (_pthread_handler_push): Change return type to int and
+	return ENOMEM if malloc() fails.
+
 	* sync.c (pthread_detach): Use equality test, not assignment.
 
 	* create.c (_pthread_start_call): Add call to Win32 CloseHandle()
