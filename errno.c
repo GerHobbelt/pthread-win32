@@ -24,7 +24,7 @@
  * MA 02111-1307, USA
  */
 
-#if defined( _REENTRANT ) || defined( _MT )
+#if ! defined( _REENTRANT ) && ! defined( _MT )
 
 #include "pthread.h"
 #include "implement.h"
@@ -45,8 +45,7 @@ static int reallyBad    = ENOMEM;
  * it on thread termination. We get all that for free
  * by simply storing the errno on the pthread_t structure.
  *
- * Relies on the following being defined in errno.h:
- * (true for MSVC and Mingw32 I think)
+ * MSVC and Mingw32 already have there own thread-safe errno.
  *
  * #if defined( _REENTRANT ) || defined( _MT )
  * #define errno *_errno()
@@ -54,7 +53,7 @@ static int reallyBad    = ENOMEM;
  * int *_errno( void );
  * #else
  * extern int errno;
- * #endif /* _REENTRANT */
+ * #endif
  *
  */
 
@@ -80,8 +79,4 @@ int * _errno( void )
 
 } /* _errno */
 
-#else
-
-#error "errno: Not thread-safe."
-
-#endif /* _REENTRANT || _MT */
+#endif /* !_REENTRANT && !_MT */

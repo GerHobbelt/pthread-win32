@@ -1,11 +1,11 @@
 /*
- * File: 
+ * File: errn1.c
  *
- * Test Synopsis:
+ * Test Synopsis: Test thread-safety of errno
  * - 
  *
  * Test Method (Validation or Falsification):
- * - 
+ * - Validation
  *
  * Requirements Tested:
  * - 
@@ -45,7 +45,7 @@
  * Create NUMTHREADS threads in addition to the Main thread.
  */
 enum {
-  NUMTHREADS = 2
+  NUMTHREADS = 3
 };
 
 typedef struct bag_t_ bag_t;
@@ -57,6 +57,8 @@ struct bag_t_ {
 
 static bag_t threadbag[NUMTHREADS + 1];
 
+pthread_mutex_t stop_here = PTHREAD_MUTEX_INITIALIZER;
+
 void *
 mythread(void * arg)
 {
@@ -66,7 +68,17 @@ mythread(void * arg)
   assert(bag->started == 0);
   bag->started = 1;
 
-  /* ... */
+  errno = bag->threadnum;
+
+  Sleep(1000);
+
+  pthread_mutex_lock(&stop_here);
+
+  assert(errno == bag->threadnum);
+
+  pthread_mutex_unlock(&stop_here);
+
+  Sleep(1000);
 
   return 0;
 }
@@ -77,6 +89,9 @@ main()
   int failed = 0;
   int i;
   pthread_t t[NUMTHREADS + 1];
+
+  pthread_mutex_lock(&stop_here);
+  errno = 0;
 
   assert((t[0] = pthread_self()) != NULL);
 
@@ -90,7 +105,8 @@ main()
   /*
    * Code to control or munipulate child threads should probably go here.
    */
-
+  Sleep(2000);
+  pthread_mutex_unlock(&stop_here);
 
   /*
    * Give threads time to run.

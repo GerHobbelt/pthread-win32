@@ -862,7 +862,13 @@ int pthreadCancelableWait (HANDLE waitHandle);
 int pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
 
 /*
- * Thread-Safe C Runtime Library Mappings
+ * Thread-Safe C Runtime Library Mappings.
+ */
+#if ! defined( _REENTRANT ) && ! defined( _MT )
+int * _errno( void );
+#endif
+
+/*
  * WIN32 C runtime library had been made thread-safe
  * without affecting the user interface. Provide
  * mappings from the UNIX thread-safe versions to
@@ -870,6 +876,7 @@ int pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
  * Only provide function mappings for functions that
  * actually exist on WIN32.
  */
+
 #if !defined(__MINGW32__)
 #define strtok_r( _s, _sep, _lasts ) \
 	( *(_lasts) = strtok( (_s), (_sep) ) )
