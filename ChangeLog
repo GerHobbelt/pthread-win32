@@ -1,3 +1,10 @@
+1998-10-05  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.def: Update. Some functions aren't available yet, others
+	are macros in <pthread.h>.
+
+	* tests/join.c: Remove; useless.
+
 Mon Oct  5 14:25:08 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* pthread.def: New file for building the DLL.
