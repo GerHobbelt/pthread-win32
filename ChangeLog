@@ -1,3 +1,15 @@
+2001-07-01  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	Contributed by  - Alexander Terekhov.
+
+	* condvar.c: Fixed lost signal bug reported by Timur Aydin
+	(taydin@snet.net).
+	[RPJ (me) didn't translate the original algorithm
+	correctly.]
+	* semaphore.c: Added sem_post_multiple; this is a useful
+	routine, but it doesn't appear to be standard. For now it's
+	not an exported function.
+	
 2001-06-25  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* create.c (pthread_create): Add priority inheritance

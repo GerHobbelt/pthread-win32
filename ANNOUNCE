@@ -23,10 +23,8 @@ Please see the 'Acknowledgements' section at the end of this
 announcement for the list of contributors.
 
 
-Change Summary (since the last snapshot)
-----------------------------------------
-
-(See the ChangeLog file for details.)
+Changes since the last snapshot
+-------------------------------
 
 -----------------------
 Additions to Scheduling
@@ -113,11 +111,13 @@ values.
 ------------------
 Changes to Mutexes
 ------------------
+Background:
 Snapshot-2001-06-06 included Thomas Pfaff's enhancements
 to the mutex routines to improve speed. The improvements
-are most apparent on Win9x class systems where pthreads-win32
+are very large on Win9x class systems where pthreads-win32
 previously used Win32 mutexes rather than critical
-sections as the underlying mechanism. The enhancements
+sections as the underlying mechanism. On WNT systems speed
+appears to have decreased a little. On Win9x the enhancements
 also resulted in speed improvements in other primitives
 which use mutexes internally, such as condition variables
 and read-write locks. Thomas also added mutex
@@ -126,6 +126,11 @@ Specification documentation, and as provided with
 the majority of major Unix and Linux Pthreads
 implementations.
 
+Overall, the library provides far more consistent performance
+across the different Windows variants with greater compatibility.
+Future work will continue to improve on this.
+
+New changes:
 Changes have been made to further improve the speed of the
 default PTHREAD_MUTEX_NORMAL type (and therefore also
 PTHREAD_MUTEX_DEFAULT which is equivalent in pthreads-win32).
@@ -160,13 +165,61 @@ These mutex changes appear to be consistent with both
 the behaviour exhibited by other implementations and their
 documentation, including the Open Group documentation.
 
+------------
+Benchmarking
+------------
+There is a new but growing set a benchmarking programs in the
+"tests" directory. These should be runnable using the
+following command-lines corresponding to each of the possible
+library builds:
 
--------
-Bug fix
--------
+MSVC:
+nmake clean VC-bench
+nmake clean VCE-bench
+nmake clean VSE-bench
+
+Mingw32:
+make clean GC-bench
+make clean GCE-bench
+
+UWIN:
+The benchtests are run as part of the testsuite.
+
+Currently these only provide timing for various
+synchronisation senarios for the different mutex types.
+Each test does timings for each of the implemented
+mutex types and, for reference, also repeats the same
+tests using the following:
+
+Simple Critical Section
+POSIX mutex implemented using a Critical Section
+POSIX mutex implemented using a Win32 Mutex
+
+The later two represent the old implementation under
+WNT and W9x respectively.
+
+The mutex types tested are:
+PTHREAD_MUTEX_DEFAULT
+PTHREAD_MUTEX_NORMAL
+PTHREAD_MUTEX_ERRORCHECK
+PTHREAD_MUTEX_RECURSIVE
+
+These tests indicate that is may be worthwhile re-introducing
+runtime adaptation of the underlying Win32 synchronisation
+mechanism for WinNT.
+
+
+---------
+Bug fixes
+---------
 Pthread_create now sets the priority of the new thread
 from the value set in the thread attribute. 
 - from Ralf.Brese@pdb4.siemens.de.
+
+A "lost signal" bug in condition variables that I introduced
+in the last snapshot has been fixed.
+- fixed by Alexander Terekhov
+- reported by Timur Aydin taydin@snet.net
 
 
 ---------------------------
