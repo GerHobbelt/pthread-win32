@@ -24,7 +24,7 @@ mutex1e::	mutex1e.c
 mutex1n::	mutex1n.c
 mutex1r::	mutex1r.c
 mutex2::	mutex1.2
-exit1::		exit1.c
+exit1::	exit1.c
 condvar1::	condvar1.c
 condvar1_1::	condvar1_1.c
 condvar1_2::	condvar1_2.c
@@ -85,6 +85,7 @@ rwlock4_t::	rwlock4_t.c
 rwlock5_t::	rwlock5_t.c
 rwlock6_t::	rwlock6_t.c
 rwlock6_t2::	rwlock6_t2.c
+semaphore1::	semaphore1.c
 context1::	context1.c
 cancel3::	cancel3.c
 cancel4::	cancel4.c
@@ -117,6 +118,7 @@ benchtest4::    benchtest4.c
 benchtest5::    benchtest5.c
 
 loadfree:	:test:
+semaphore1	:test:	loadfree
 mutex5		:test:	loadfree
 mutex1		:test:	loadfree
 mutex2		:test:	loadfree
