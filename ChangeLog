@@ -1,4 +1,11 @@
-Sat Feb 18 16:2s1703:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+Fri Feb 19 16:2s1703:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* sync.c (pthread_join): Fix pthread_equal() test.
+
+	* mutex.c (pthread_mutex_trylock): Check mutex != NULL before
+	using it.
+
+Thu Feb 18 16:2s1703:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* misc.c (pthread_equal): Fix inverted result.
 
