@@ -7,6 +7,40 @@
 
 #include "pthread.h"
 
+int
+pthread_once(pthread_once_t *once_control,
+	     void (*init_routine)(void))
+{
+  /* A flag, allocated per invocation, that indicates if the amotic
+     test-and-set occured. */
+  unsigned short flag = 0;
+
+  if (once_control == NULL || init_routine == NULL)
+    {
+      return EINVAL;
+    }
+
+  /* FIXME: we are assuming that the `cs' object is initialised at DLL
+     load time.  Likewise, the object should be destroyed when (if)
+     the DLL is unloaded. */
+
+  /* An atomic test-and-set of the "once" flag. */
+  EnterCriticalSection(&_pthread_once_lock);
+  if (_pthread_once_flag == 0)
+    {
+      flag = _pthread_once_flag = 1;
+    }
+  LeaveCriticalSection(&_pthread_once_lock);
+
+  if (flag)
+    {
+      /* Run the init routine. */
+      init_routine();
+    }
+  
+  return 0;
+}
+
 pthread_t
 pthread_self(void)
 {
