@@ -1978,7 +1978,7 @@ Tue Feb  2 18:07:43 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 	* implement.h: Add #include <pthread.h>.
 	Change sem_t to ptw32_sem_t.
 
-	Various patches by Kevin Ruland <Kevin.Ruland@anheuser-busch.com>
+Tue Feb  2 18:07:43 1999  Kevin Ruland <Kevin.Ruland@anheuser-busch.com>
 
 	* signal.c (pthread_sigmask): Add and modify casts.
 	Reverse LHS/RHS bitwise assignments.

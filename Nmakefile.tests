@@ -79,6 +79,12 @@ rwlock4::	rwlock4.c
 rwlock5::	rwlock5.c
 rwlock6::	rwlock6.c
 rwlock7::	rwlock7.c
+rwlock2_t::	rwlock2_t.c
+rwlock3_t::	rwlock3_t.c
+rwlock4_t::	rwlock4_t.c
+rwlock5_t::	rwlock5_t.c
+rwlock6_t::	rwlock6_t.c
+rwlock6_t2::	rwlock6_t2.c
 context1::	context1.c
 cancel3::	cancel3.c
 cancel4::	cancel4.c
@@ -166,6 +172,12 @@ rwlock3		:test:	rwlock2
 rwlock4		:test:	rwlock3
 rwlock5		:test:	rwlock4
 rwlock6		:test:	rwlock5
+rwlock2_t	:test:	rwlock2
+rwlock3_t	:test:	rwlock2_t
+rwlock4_t	:test:	rwlock3_t
+rwlock5_t	:test:	rwlock4_t
+rwlock6_t	:test:	rwlock5_t
+rwlock6_t2	:test:	rwlock6_t
 context1	:test:	cancel2
 cancel3		:test:	context1
 cancel4		:test:	cancel3

@@ -87,16 +87,16 @@
  * Create NUMTHREADS threads in addition to the Main thread.
  */
 enum {
-  NUMTHREADS = 20
+  NUMTHREADS = 1
 };
 
 int caught = 0;
-pthread_mutex_t caughtLock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t caughtLock;
 
 void
 terminateFunction ()
 {
-  pthread_mutex_lock(&caughtLock);
+  assert(pthread_mutex_lock(&caughtLock) == 0);
   caught++;
 #if 1
   {
@@ -105,8 +105,34 @@ terminateFunction ()
      fclose(fp);
   }
 #endif
-  pthread_mutex_unlock(&caughtLock);
-  pthread_exit((void *) 0);
+  assert(pthread_mutex_unlock(&caughtLock) == 0);
+
+#if defined(__MINGW32__)
+  /*
+   * Seems to work. That is, threads exit and the process
+   * continues. Note: need to check correct POSIX behaviour.
+   * My guess is: this is because of the
+   * eh incompatibility between g++ and MSVC++. That is,
+   * an exception thrown in g++ code doesn't propogate
+   * through or to MSVC++ code, and vice versa.
+   * Applications should probably not depend on this.
+   */
+  pthread_exit((void *) 0));
+#else
+  /*
+   * Notes from the MSVC++ manual:
+   *       1) A term_func() should call exit(), otherwise
+   *          abort() will be called on return to the caller.
+   *          abort() raises SIGABRT. The default signal handler
+   *          for all signals terminates the calling program with
+   *          exit code 3.
+   *       2) A term_func() must not throw an exception. Therefore
+   *          term_func() should not call pthread_exit() if an
+   *          an exception-using version of pthreads-win32 library
+   *          is being used (i.e. either pthreadVCE or pthreadVSE).
+   */
+  exit(0);
+#endif
 }
 
 void *
@@ -115,6 +141,7 @@ exceptionedThread(void * arg)
   int dummy = 0x1;
 
   (void) set_terminate(&terminateFunction);
+
   throw dummy;
 
   return (void *) 0;
@@ -126,8 +153,16 @@ main()
   int i;
   pthread_t mt;
   pthread_t et[NUMTHREADS];
+  pthread_mutexattr_t ma;
 
   assert((mt = pthread_self()) != NULL);
+
+  printf("See the notes inside of exception3.c re term_funcs.\n");
+
+  assert(pthread_mutexattr_init(&ma) == 0);
+  assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_ERRORCHECK) == 0);
+  assert(pthread_mutex_init(&caughtLock, &ma) == 0);
+  assert(pthread_mutexattr_destroy(&ma) == 0);
 
   for (i = 0; i < NUMTHREADS; i++)
     {

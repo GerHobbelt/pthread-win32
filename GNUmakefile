@@ -132,7 +132,7 @@ SMALL_STATIC_OBJS	= \
 		create.o \
 		dll.o \
 		errno.o \
-		exit.o \
+		pthread_exit.o \
 		fork.o \
 		global.o \
 		pthread_mutex_init.o \
@@ -266,6 +266,9 @@ CONDVAR_SRCS	= \
 		pthread_cond_init.c \
 		pthread_cond_signal.c \
 		pthread_cond_wait.c
+
+EXIT_SRCS	= \
+		pthread_exit.c
 
 MISC_SRCS	= \
 		pthread_equal.c \
@@ -467,6 +470,7 @@ attr.o:		attr.c $(ATTR_SRCS) $(INCL)
 barrier.o:	barrier.c $(BARRIER_SRCS) $(INCL)
 cancel.o:	cancel.c $(CANCEL_SRCS) $(INCL)
 condvar.o:	condvar.c $(CONDVAR_SRCS) $(INCL)
+exit.o:		exit.c $(EXIT_SRCS) $(INCL)
 misc.o:		misc.c $(MISC_SRCS) $(INCL)
 mutex.o:	mutex.c $(MUTEX_SRCS) $(INCL)
 nonportable.o:	nonportable.c $(NONPORTABLE_SRCS) $(INCL)
