@@ -1,5 +1,11 @@
 1998-07-17  Ben Elliston  <bje@cygnus.com>
 
+	* pthread.h (PTHREADS_PROCESS_PRIVATE): Remove.
+	(PTHREAD_PROCESS_SHARED): Likewise.  No support for mutexes shared
+	across processes for now.
+	(pthread_mutex_t): Use a Win32 CRITICAL_SECTION type for better
+	performance.
+	
 	* implement.h (_pthread_mutexattr_t): Remove shared attribute.
 	
 	* mutex.c (pthread_mutexattr_setpshared): This optional function
@@ -8,6 +14,15 @@
 	primitives.  Critical section objects in Win32 cannot be shared
 	between processes.
 	(pthread_mutexattr_getpshared): Likewise.
+	(pthread_mutexattr_init): No need to malloc any storage; the
+	attributes structure is now empty.
+	(pthread_mutexattr_destroy): This is now a nop.
+	(pthread_mutex_init): Use InitializeCriticalSection().
+	(pthread_mutex_destroy): Use DeleteCriticalSection().
+	(pthread_mutex_lock): Use EnterCriticalSection().
+	(pthread_mutex_trylock): Use TryEnterCriticalSection().  This is
+	not supported by Windows 9x, but trylock is a hack anyway, IMHO.
+	(pthread_mutex_unlock): Use LeaveCriticalSection().
 
 1998-07-14  Ben Elliston  <bje@cygnus.com>
 
