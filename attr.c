@@ -12,9 +12,9 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2002 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2003 Pthreads-win32 contributors
  * 
- *      Contact Email: rpj@ise.canberra.edu.au
+ *      Contact Email: rpj@callisto.canberra.edu.au
  * 
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
