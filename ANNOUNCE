@@ -120,13 +120,41 @@ There are a few reasons:
   wants it, once it's removed from the current version it will not be
   nearly as visible to people who may have a use for it.
 
+Source module splitting
+-----------------------
+In order to enable smaller image sizes to be generated
+for applications that link statically with the library,
+most routines have been separated out into individual
+source code files.
+
+This is being done in such a way as to be backward compatible.
+The old source files are reused to congregate the individual
+routine files into larger translation units (via a bunch of
+# includes) so that the compiler can still optimise wherever
+possible, e.g. through inlining, which can only be done
+within the same translation unit.
+
+It is also possible to build the entire library by compiling
+the single file named "pthread.c", which just #includes all
+the secondary congregation source files. The compiler
+may be able to use this to do more inlining of routines.
+
+Although the GNU compiler is able to produce libraries with
+the necessary separation (the -ffunction-segments switch),
+AFAIK, the MSVC and other compilers don't have this feature.
+
+Finally, since I use makefiles and command-line compilation,
+I don't know what havoc this reorganisation may wreak amongst
+IDE project file users. You should be able to continue
+using your existing project files without modification.
+
 New non-portable function
 -------------------------
 pthread_num_processors_np(): Returns the number of processors
 in the system that are available to the process, as determined
 from the processor affinity mask.
 
-platform dependence
+Platform dependence
 -------------------
 As Win95 doesn't provide one, the library now contains
 it's own InterlockedCompareExchange() routine, which is used
@@ -139,7 +167,7 @@ processor platforms.
 
 New routines
 ------------
-For source code portability only, rwlocks cannot be process shared yet.
+For source code portability only - rwlocks cannot be process shared yet.
         pthread_rwlockattr_init()
         pthread_rwlockattr_destroy()
         pthread_rwlockattr_setpshared()
