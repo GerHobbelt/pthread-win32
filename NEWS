@@ -1,7 +1,7 @@
-RELEASE 2.0.0^M
--------------^M
+RELEASE 2.0.0
+-------------
 (2005-03-16)
-^M
+
 General
 -------
 
@@ -25,7 +25,7 @@ cancel. See the README file (Prerequisites section) for info
 on adding alertable async cancelation.
 
 New features
-------------^M
+------------
 
 * pthread_once() now supports init_routine cancellability.
 

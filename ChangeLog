@@ -1,5 +1,9 @@
 2005-03-16  Ross Johnson  <ross at callisto.canberra.edu.au>^M
 
+        * pthread_setcancelstate.c: Undo the last change.
+
+2005-03-16  Ross Johnson  <ross at callisto.canberra.edu.au>^M
+
         * pthread_setcancelstate.c: Don't check for an async cancel event
         if the library is using alertable async cancel..
 
