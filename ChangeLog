@@ -1,3 +1,19 @@
+Mon Jul 27 17:46:37 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* create.c (pthread_create): Start of rewrite. Not completed yet.
+
+	* private.c (_pthread_new_thread_entry): Start of rewrite. Not
+	complete.
+
+	* implement.h (_pthread_threads_thread): Rename, remove thread
+	member, add win32handle and ptstatus members.
+	(_pthread_t): Add.
+
+	* pthread.h: pthread_t is no longer mapped directly to a Win32
+	HANDLE type. This is so we can let the Win32 thread terminate and
+	reuse the HANDLE while pthreads holds it's own thread ID until
+	the last waiting join exits.
+
 Mon Jul 27 00:20:37 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* private.c (_pthread_delete_thread_entry): Destroy the thread

@@ -19,20 +19,20 @@ _pthread_start_call(void * us_arg)
   /* We're now in a running thread. Any local variables here are on
      this threads private stack so we're safe to leave data in them
      until we leave. */
-  _pthread_threads_thread__t * us;
+  pthread_t us;
   _pthread_call_t * call;
   unsigned (*func)(void *);
   void * arg;
   unsigned ret;
   int from;
 
-  us = (_pthread_threads_thread__t *) us_arg;
+  us = (pthread_t) us_arg;
 
   /* FIXME: For now, if priority setting fails then at least ensure
      that our records reflect true reality. */
-  if (SetThreadPriority((HANDLE) us->thread, us->attr.priority) == FALSE)
+  if (SetThreadPriority((HANDLE) us->win32handle, us->attr.priority) == FALSE)
     {
-      us->attr.priority = GetThreadPriority((HANDLE) us->thread);
+      us->attr.priority = GetThreadPriority((HANDLE) us->win32handle;
     }
 
   func = us->call.routine;
@@ -56,14 +56,14 @@ pthread_create(pthread_t *thread,
   void *   security = NULL;
   DWORD  threadID;
   pthread_attr_t * attr_copy;
-  _pthread_threads_thread_t * us;
+  pthread_t * usptr;
   /* Success unless otherwise set. */
   int ret;
 
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_table_mutex);
 
-  ret = _pthread_new_thread_entry((pthread_t) handle, us);
+  ret = _pthread_new_thread_entry((pthread_t) handle, usptr);
 
   pthread_mutex_lock(&_pthread_table_mutex);
   /* END CRITICAL SECTION */

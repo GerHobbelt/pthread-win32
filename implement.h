@@ -55,10 +55,16 @@ typedef struct {
    (&_pthread_threads_mutex_table[_PTHREAD_THREADS_TABLE_INDEX(this)])
 
 /* An element in the thread table. */
-typedef struct _pthread_threads_thread _pthread_threads_thread_t;
+typedef struct _pthread _pthread_t;
 
-struct _pthread_threads_thread {
-  pthread_t                   thread;
+/* Keep the old typedef until we've updated all source files. */
+typedef struct _pthread _pthread_threads_thread_t;
+
+/*                                                 Related constants */
+struct _pthread {
+  HANDLE                      win32handle;
+  int                         ptstatus;        /* _PTHREAD_EXITED
+						   _PTHREAD_REUSABLE */
   pthread_attr_t              attr;
   _pthread_call_t             call;
   int                         cancel_pending;
