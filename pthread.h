@@ -40,12 +40,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define SCHED_MIN   SCHED_OTHER
 #define SCHED_MAX   SCHED_RR
 
-/* Cancelability attributes */
-#define PTHREAD_CANCEL_ENABLE       0x00
-#define PTHREAD_CANCEL_DISABLE      0x01
+#define PTHREAD_CREATE_JOINABLE     0
+#define PTHREAD_CREATE_DETACHED     1
 
-#define PTHREAD_CANCEL_ASYNCHRONOUS 0x00
-#define PTHREAD_CANCEL_DEFERRED     0x01
+/* Cancelability attributes */
+#define PTHREAD_CANCEL_ENABLE       0
+#define PTHREAD_CANCEL_DISABLE      1
+
+#define PTHREAD_CANCEL_ASYNCHRONOUS 0
+#define PTHREAD_CANCEL_DEFERRED     1
 
 typedef HANDLE pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
@@ -63,6 +66,9 @@ typedef struct {
 
   int canceltype;                    /* PTHREAD_CANCEL_ASYNCHRONOUS
 					PTHREAD_CANCEL_DEFERRED */
+
+  int detached;                      /* PTHREAD_CREATE_JOINABLE
+                                        PTHREAD_CREATE_DETACHED */
 
   int priority;
 } pthread_attr_t;
@@ -142,6 +148,12 @@ int pthread_attr_getschedparam(const pthread_attr_t *attr,
 int pthread_attr_setschedparam(pthread_attr_t *attr,
 			       const struct sched_param *param);
 
+int pthread_attr_getdetachstate(const pthread_attr_t *attr,
+				int *detachstate);
+
+int pthread_attr_setdetachstate(pthread_attr_t *attr,
+				int detachstate);
+  
 int pthread_setschedparam(pthread_t thread,
 			  int policy,
 			  const struct sched_param *param);
