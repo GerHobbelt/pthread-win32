@@ -93,14 +93,6 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
       return EINVAL;
     }
 
-  mx = (pthread_mutex_t) calloc(1, sizeof(*mx));
-
-  if (mx == NULL)
-    {
-      result = ENOMEM;
-      goto FAIL0;
-    }
-
   if (attr != NULL
       && *attr != NULL
       && (*attr)->pshared == PTHREAD_PROCESS_SHARED
@@ -118,14 +110,20 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 
 #error ERROR [__FILE__, line __LINE__]: Process shared mutexes are not supported yet.
 
-
 #else
 
-      result = ENOSYS;
-      goto FAIL0;
+      return ENOSYS;
 
 #endif /* _POSIX_THREAD_PROCESS_SHARED */
 
+    }
+
+  mx = (pthread_mutex_t) calloc(1, sizeof(*mx));
+
+  if (mx == NULL)
+    {
+      result = ENOMEM;
+      goto FAIL0;
     }
 
   mx->lock_idx = PTW32_MUTEX_LOCK_IDX_INIT;

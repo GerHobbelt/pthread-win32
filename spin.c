@@ -81,6 +81,7 @@ int
 pthread_spin_init(pthread_spinlock_t *lock, int pshared)
 {
   pthread_spinlock_t s;
+  int cpus = 0;
   int result = 0;
 
   if (lock == NULL)
@@ -88,19 +89,12 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
       return EINVAL;
     }
 
-  s = (pthread_spinlock_t) calloc(1, sizeof(*s));
-
-  if (s == NULL)
+  if (0 != pthread_getprocessors_np(&cpus))
     {
-      return ENOMEM;
+      cpus = 1;
     }
 
-  if (0 != pthread_getprocessors_np(&(s->u.cpus)))
-    {
-      s->u.cpus = 1;
-    }
-
-  if (s->u.cpus > 1)
+  if (cpus > 1)
     {
       if (pshared == PTHREAD_PROCESS_SHARED)
         {
@@ -116,16 +110,24 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
 
 #error ERROR [__FILE__, line __LINE__]: Process shared spin locks are not supported yet.
 
-
 #else
 
-          result = ENOSYS;
-          goto FAIL0;
+          return ENOSYS;
 
 #endif /* _POSIX_THREAD_PROCESS_SHARED */
 
         }
 
+  s = (pthread_spinlock_t) calloc(1, sizeof(*s));
+
+  if (s == NULL)
+    {
+      return ENOMEM;
+    }
+
+  if (cpus > 1)
+    {
+      s->u.cpus = cpus;
       s->interlock = PTW32_SPIN_UNLOCKED;
     }
   else
@@ -142,10 +144,19 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
               s->interlock = PTW32_SPIN_USE_MUTEX;
             }
         }
+      (void) pthread_mutexattr_destroy(&ma);
     }
 
-FAIL0:
-  *lock = (0 == result ? s : NULL);
+  if (0 == result)
+    {
+      *lock = s;
+    }
+  else
+    {
+      (void) free(s);
+      *lock = NULL;
+    }
+
   return(result);
 }
 
@@ -218,9 +229,9 @@ pthread_spin_destroy(pthread_spinlock_t *lock)
 int
 pthread_spin_lock(pthread_spinlock_t *lock)
 {
-  register pthread_spinlock_t s = *lock;
+  register pthread_spinlock_t s;
 
-  if (s == PTHREAD_SPINLOCK_INITIALIZER)
+  if (*lock == PTHREAD_SPINLOCK_INITIALIZER)
     {
       int result;
 
@@ -229,6 +240,8 @@ pthread_spin_lock(pthread_spinlock_t *lock)
           return(result);
         }
     }
+
+  s = *lock;
 
   while ( (_LONG) PTW32_SPIN_LOCKED ==
           InterlockedCompareExchange((_LPLONG) &(s->interlock),
