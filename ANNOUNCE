@@ -1,5 +1,5 @@
 
-                 PTHREADS-WIN32 SNAPSHOT 1999-08-12
+                 PTHREADS-WIN32 SNAPSHOT 1999-09-17
                  ----------------------------------
        Web Site: http://sourceware.cygnus.com/pthreads-win32/
       FTP Site: ftp://sourceware.cygnus.com/pub/pthreads-win32
@@ -28,11 +28,13 @@ Fixed a few bugs:
 	- threads return status properly (Milan Gardian)
 	- fix memory leak in mutexes (Milan Gardian)
 
-Added new POSIX read/write locks (Aurelio Medina)
-These routines have not been fully tested yet.
+New routines to add POSIX read/write locks (Aurelio Medina)
+	These routines have not been fully tested yet.
 
-Changes to allow building with mingw32/MSCVRT (Mumit Khan)
-This still needs a little work.
+Changes to allow building with Mingw32 (Mumit Khan)
+	Please note that the current public release
+	of Mingw32/gcc-2.95 will not build the library.
+	The next release should though.
 
 Level of standards conformance
 ------------------------------
@@ -123,6 +125,17 @@ The following functions are implemented:
       pthread_cond_broadcast  
 
       ---------------------------
+      Read/Write Locks:
+      ---------------------------
+      pthread_rwlock_init
+      pthread_rwlock_destroy
+      pthread_rwlock_tryrdlock
+      pthread_rwlock_trywrlock
+      pthread_rwlock_rdlock
+      pthread_rwlock_rwlock
+      pthread_rwlock_unlock
+
+      ---------------------------
       Semaphores
       ---------------------------
       sem_init               (POSIX 1b)
@@ -150,17 +163,6 @@ The following functions are implemented:
       Signals
       ---------------------------
       pthread_sigmask
-
-      ---------------------------
-      Read/Write Locks:
-      ---------------------------
-      pthread_rwlock_init
-      pthread_rwlock_destroy
-      pthread_rwlock_tryrdlock
-      pthread_rwlock_trywrlock
-      pthread_rwlock_rdlock
-      pthread_rwlock_rwlock
-      pthread_rwlock_unlock
 
       ---------------------------
       Static Initializers (macros)
@@ -275,7 +277,7 @@ Application Development Environments
       
 MSVC:
 MSVC works.
-      
+
 Mingw32: (ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/egcs-1.1.1/)
 Mingw32 must use the thread-safe MSVCRT library (see the FAQ). You can link
 against the export library libpthread32.a built under Mingw32
@@ -369,6 +371,9 @@ Mike Russo		miker@eai.com
 Mark E. Armstrong	avail@pacbell.net
 Lorin Hochstein		lmh@xiphos.ca
 Peter Slacik		Peter.Slacik@tatramed.sk
+Mumit Khan              khan@xraylith.wisc.edu
+Aurelio Medina          aureliom@crt.com
+Milan Gardian           mg@tatramed.sk
 
 If you aren't on the list and believe you should be let me know.
 
