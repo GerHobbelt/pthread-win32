@@ -122,6 +122,29 @@ pthread_getspecific(pthread_key_t key)
   return keys[key];
 }
 
+/*
+  pthread_key_delete:
+
+  ANSI/IEEE Std 1003.1, 1996 Edition
+
+  Section 17.1.3.2
+
+  This function deletes a thread-specific data key previously returned by
+  pthread_key_create(). The thread specific data values associated with
+  "key" need not be NULL at the time pthread_key_delete() is called. It is
+  the responsibility of the application to free any application storage
+  or perform any cleanup actions for data structures related to the deleted
+  key or associated thread-specific data in any threads; this cleanup
+  can be done either before or after pthread_key_delete() is called. Any
+  attempt to use "key" following the call to pthread_key_delete()
+  results in undefined behaviour.
+
+  The pthread_key_delete() function shall be callable from within
+  destructor functions. No destructor functions shall be invoked by
+  pthread_key_delete(). Any destructor function that may have been associated
+  with "key" shall no longer be called upon thread exit.
+ */
+
 int
 pthread_key_delete(pthread_key_t key)
 {
@@ -145,3 +168,4 @@ pthread_key_delete(pthread_key_t key)
 
   return ret;
 }
+
