@@ -229,7 +229,11 @@ pthread_equal (pthread_t t1, pthread_t t2)
 {
   int result;
 
-  result = ((t1 == t2) && (t1->thread == t2->thread));
+  /*
+   * We also accept NULL == NULL - treating NULL as a thread
+   * for this special case, because there is no error that we can return.
+   */
+  result = ( ( t1 == t2 ) && ( t1 == NULL || ( t1->thread == t2->thread ) ) );
 
   return (result);
 
@@ -260,8 +264,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 
   handles[0] = waitHandle;
 
-  if ((self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey)) 
-      != NULL)
+  if ((self = pthread_self()) != NULL)
     {
       /*
        * Get cancelEvent handle

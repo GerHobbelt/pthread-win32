@@ -399,22 +399,10 @@ ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
       goto FAIL0;
     }
 
-#if 0
-
-  if ((result = pthread_mutex_init (&(assoc->lock), NULL)) != 0)
-    {
-      goto FAIL1;
-    }
-
-#else
-
   /*
    * Initialise only when used for the first time.
    */
   assoc->lock = PTHREAD_MUTEX_INITIALIZER;
-
-#endif
-
   assoc->thread = thread;
   assoc->key = key;
 
@@ -451,8 +439,6 @@ ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
    */
 FAIL2:
   pthread_mutex_destroy (&(assoc->lock));
-
-FAIL1:
   free (assoc);
 
 FAIL0:

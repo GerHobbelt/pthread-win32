@@ -62,8 +62,8 @@ struct thread_control {
 typedef struct thread_control	TC;
 
 static TC		*tcs = NULL;
-static int		nthreads = 7;
-static int		nwork = 50;
+static int		nthreads = 14;
+static int		nwork = 100;
 static int		quiet = 0;
 
 static int		todo = -1;

@@ -1,3 +1,29 @@
+2000-09-08  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* cancel.c (pthread_cancel): Must get "self" through
+	calling pthread_self() which will ensure a POSIX thread
+	struct is built for non-POSIX threads; return an error
+	if this fails
+	- Ollie Leahy <ollie@mpt.ie>
+	(pthread_setcancelstate): Likewise.
+	(pthread_setcanceltype): Likewise.
+	* misc.c (ptw32_cancelable_wait): Likewise.
+
+	* private.c (ptw32_tkAssocCreate): Remove unused #if 0
+	wrapped code.
+
+	* pthread.h (ptw32_get_exception_services_code):
+	Needed to be forward declared unconditionally.
+
+2000-09-06  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* cancel.c (pthread_cancel): If called from the main
+	thread "self" would be NULL; get "self" via pthread_self()
+	instead of directly from TLS so that an implicit
+	pthread object is created.
+
+	* misc.c (pthread_equal): Strengthen test for NULLs.
+
 2000-09-02  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* condvar.c (ptw32_cond_wait_cleanup): Ensure that all
