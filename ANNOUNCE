@@ -27,10 +27,9 @@ Changes since the last snapshot
 -------------------------------
 
 ----------------------------------
-New: Spin locks (alpha level code)
+New: Spin locks (beta level code)
 ----------------------------------
-These are part of POSIX 1003.1j. They are
-useful only on multiprocessor machines.
+These are part of POSIX 1003.1j.
 
         #define _POSIX_SPIN_LOCKS
         pthread_spin_init()
@@ -38,12 +37,16 @@ useful only on multiprocessor machines.
         pthread_spin_lock()
         pthread_spin_unlock()
         pthread_spin_trylock()
+        #define PTHREAD_SPINLOCK_INITIALIZER
+
+Spin_lock spins (busy-waits) if more than one processor is available
+to the process, othewise it is equivalent to a POSIX_MUTEX_DEFAULT.
+The spinlock routines do minimal error checking.
 
 --------------------------------
-New: Barriers (alpha level code)
+New: Barriers (beta level code)
 --------------------------------
-These are part of POSIX 1003.1j. They are generally
-useful.
+These are part of POSIX 1003.1j.
 
         #define _POSIX_BARRIERS
         pthread_barrier_init()
@@ -62,6 +65,7 @@ auto-initialiser initialisation fails.
 
 _POSIX_READER_WRITER_LOCKS is now defined.
 
+pthread_rwlock_wrlock() was inadvertantly a cancelation point.
 
 ---------------------------
 Known bugs in this snapshot
