@@ -1,3 +1,12 @@
+2001-10-26  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	Reported by -  prionx@juno.com
+
+	* semaphore.c (sem_init): Fix typo and missing bracket
+	in conditionally compiled code. Only older versions of
+	WinCE require this code, hence it doesn't normally get
+	tested.
+
 2001-10-25  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* GNUmakefile (libwsock32): Add to linker flags for

@@ -105,7 +105,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
                                   FALSE,	/* manual reset */
                                   FALSE,	/* initial state */
                                   NULL);
-          if (0 == s->Event)
+          if (0 == s->event)
             {
               result = ENOSPC;
             }
@@ -118,6 +118,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 
               InitializeCriticalSection(&s->sem_lock_cs);
             }
+        }
 
 #else /* NEED_SEM */
 
