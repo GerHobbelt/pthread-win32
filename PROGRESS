@@ -1,6 +1,6 @@
 Last updated: $Date$
 
-Completion:	54 out of 61 functions	[ 88%]
+Completion:	57 out of 61 functions	[ 93%]
 
 P = preliminary implementation
 U = unimplemented
@@ -10,7 +10,7 @@ no.	name					status
 1	pthread_atfork				P
 2	pthread_attr_destroy			*
 3	pthread_attr_getdetachstate		*
-4	pthread_attr_getinheritsched
+4	pthread_attr_getinheritsched		U
 5	pthread_attr_getschedparam		*
 6	pthread_attr_getschedpolicy		U
 7	pthread_attr_getscope			U
@@ -18,7 +18,7 @@ no.	name					status
 9	pthread_attr_getstacksize		*
 10	pthread_attr_init			*
 11	pthread_attr_setdetachstate		*
-12	pthread_attr_setinheritsched
+12	pthread_attr_setinheritsched		U
 13	pthread_attr_setschedparam		*
 14	pthread_attr_setschedpolicy		U
 15	pthread_attr_setscope			U
