@@ -46,13 +46,13 @@
  * - 
  *
  * Cases Tested:
- * - 
+ * -
  *
  * Description:
- * - 
+ * -
  *
  * Environment:
- * - 
+ * -
  *
  * Input:
  * - None.
@@ -62,7 +62,7 @@
  * - No output on success.
  *
  * Assumptions:
- * - 
+ * -
  *
  * Pass Criteria:
  * - Process returns zero exit status.
@@ -73,30 +73,33 @@
 
 #include "test.h"
 
-#define BIG_NUM 10000
+#define MAX_COUNT 100000
 
 int
 main()
 {
   sem_t s;
 	int value = 0;
-  int result;
+	int i;
 
-  assert(sem_init(&s, PTHREAD_PROCESS_PRIVATE, BIG_NUM) == 0);
-	assert((result = sem_getvalue(&s, &value)) == 0);
-	assert(value == BIG_NUM);
+  assert(sem_init(&s, PTHREAD_PROCESS_PRIVATE, MAX_COUNT) == 0);
+	assert(sem_getvalue(&s, &value) == 0);
+	assert(value == MAX_COUNT);
+//	  printf("Value = %ld\n", value);
 
-	for (i = BIG_NUM - 1; i >= 0; i--)
+	for (i = MAX_COUNT - 1; i >= 0; i--)
 		{
 			assert(sem_wait(&s) == 0);
-			assert((result = sem_getvalue(&s, &value)) == 0);
+			assert(sem_getvalue(&s, &value) == 0);
+//			  printf("Value = %ld\n", value);
 			assert(value == i);
 		}
 
-	for (i = 1; i <= BIG_NUM; i--)
+	for (i = 1; i <= MAX_COUNT; i++)
 		{
 			assert(sem_post(&s) == 0);
-			assert((result = sem_getvalue(&s, &value)) == 0);
+			assert(sem_getvalue(&s, &value) == 0);
+//			  printf("Value = %ld\n", value);
 			assert(value == i);
 		}
 
