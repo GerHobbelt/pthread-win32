@@ -290,7 +290,6 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
   if (status == WAIT_FAILED)
     {
       result = EINVAL;
-
     }
   else if (status == WAIT_TIMEOUT)
     {
@@ -330,8 +329,8 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
 	      ptw32_throw(PTW32_EPS_CANCEL);
             }
 
-         /* Should never get to here. */
-         result = EINVAL;
+          /* Should never get to here. */
+          result = EINVAL;
           break;
 
         default:
@@ -342,7 +341,7 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
 
   return (result);
 
-}                               /* pthreadCancelableWait */
+}                               /* CancelableWait */
 
 int
 pthreadCancelableWait (HANDLE waitHandle)
