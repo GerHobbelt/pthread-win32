@@ -66,7 +66,7 @@ VCXFLAGS	= /GX /TP /D__CLEANUP_C
 CPLIB	= pthreadVC.lib
 CPDLL	= pthreadVC.dll
 
-CFLAGS= $(OPTIM) /W3 /WX /MD /nologo /Yd /Zi -D_WIN32_WINNT=0x400
+CFLAGS= $(OPTIM) /W3 /WX /MD /nologo /Yd /Zi
 LFLAGS= /INCREMENTAL:NO
 INCLUDES=-I.
 BUILD_DIR=..

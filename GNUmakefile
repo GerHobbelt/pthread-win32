@@ -57,10 +57,7 @@ GCE_CFLAGS	= -D__CLEANUP_CXX -mthreads
 
 ## Mingw32
 MAKE		= make
-CFLAGS	= $(OPT) -I. -D_WIN32_WINNT=0x400 -DHAVE_CONFIG_H -Wall
-
-## Cygwin G++
-#CFLAGS	= $(OPT) -x $(GLANG) -fhandle-exceptions -D_WIN32_WINNT=0x400 -I. -DHAVE_CONFIG_H -Wall
+CFLAGS	= $(OPT) -I. -DHAVE_CONFIG_H -Wall
 
 DLL_INLINED_OBJS	= \
 		pthread.o

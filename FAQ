@@ -345,8 +345,11 @@ been able to get to it.
 
 If the thread you're trying to cancel is blocked (for instance, it could be
 waiting for data from the network), it will only get cancelled when it unblocks
-(when the data arrives). Unfortunately, there is no way to do so from
-outside the thread.
+(when the data arrives). For true pre-emptive cancelation in these cases,
+pthreads-win32 from snapshot 2004-05-16 can automatically recognise and use the
+QueueUserAPCEx package by Panagiotis E. Hadjidoukas. This package is available
+from the pthreads-win32 ftp site and is included in the pthreads-win32
+self-unpacking zip from 2004-05-16 onwards.
 
 Using deferred cancelation would normally be the way to go, however,
 even though the POSIX threads standard lists a number of C library
@@ -385,10 +388,9 @@ Ross
 Q 10	How do I create thread-safe applications using
 ----	pthreadGCE.dll, libpthreadw32.a and Mingw32?
 
-See Thomas Pfaff's email at:
+This should not be a problem with recent versions of MinGW32.
+
+For early versions, see Thomas Pfaff's email at:
 http://sources.redhat.com/ml/pthreads-win32/2002/msg00000.html
-
-Later versions should thread-safe.
-
 ------------------------------------------------------------------------------
  
