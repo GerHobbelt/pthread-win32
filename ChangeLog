@@ -2,10 +2,158 @@
 
 	* README: Update info about subscribing to the mailing list.
 
+Mon Jan  4 11:23:40 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* all: No code changes, just cleanup.
+	- remove #if 0 /* Pre Bossom */ enclosed code.
+	- Remove some redundant #includes.
+	* pthread.h: Update implemented/unimplemented routines list.
+	* Tag the bossom merge branch getting ready to merge back to main
+	trunk.
+
+Tue Dec 29 13:11:16 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Move the following struct definitions to pthread.h:
+	pthread_t_, pthread_attr_t_, pthread_mutex_t_, pthread_mutex_t_,
+	pthread_mutexattr_t_, pthread_key_t_, pthread_cond_t_,
+	pthread_condattr_t_, pthread_once_t_.
+
+	* pthread.h: Add "_" prefix to pthread_push_cleanup and 
+	pthread_pop_cleanup internal routines, and associated struct and
+	typedefs.
+
+	* buildlib.bat: Add compile command for semaphore.c
+
+	* pthread.def: Comment out pthread_atfork routine name. 
+	Now unimplemented.
+
+	* tsd.c (pthread_setspecific): Rename tkAssocCreate to
+	_pthread_tkAssocCreate.
+	(pthread_key_delete): Rename tkAssocDestroy to
+	_pthread_tkAssocDestroy.
+
+	* sync.c (pthread_join): Rename threadDestroy to _pthread_threadDestroy
+
+	* sched.c (is_attr): attr is now **attr (was *attr), so add extra
+	NULL pointer test.
+	(pthread_attr_setschedparam): Increase redirection for attr which is
+	now a **.
+	(pthread_attr_getschedparam): Ditto.
+	(pthread_setschedparam): Change thread validation and rename "thread"
+ 	Win32 thread Handle element name to match John Bossom's version.
+	(pthread_getschedparam): Ditto.
+
+	* private.c (_pthread_threadDestroy): Rename call to
+	callUserDestroyRoutines() as _pthread_callUserDestroyRoutines()
+
+	* misc.c: Add #include "implement.h".
+
+	* dll.c: Remove defined(KLUDGE) wrapped code.
+
+	* fork.c: Remove redefinition of ENOMEM.
+	Remove pthread_atfork() and fork() with #if 0/#endif.
+
+	* create.c (pthread_create): Rename threadStart and threadDestroy calls
+	to _pthread_threadStart and _pthread_threadDestroy.
+
+	* implement.h: Rename "detachedstate" to "detachstate".
+
+	* attr.c: Rename "detachedstate" to "detachstate".
+
+Mon Dec 28 09:54:39 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* semaphore.c: Initial version. From John Bossom's implementation.
+	* semaphore.h: Initial version. From John Bossom's implementation.
+
+Mon Dec 28 09:54:39 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h (pthread_attr_t_): Change to *pthread_attr_t.
+
+	* attr.c (pthread_attr_setstacksize): Merge with John Bossom's version.
+	(pthread_attr_getstacksize): Merge with John Bossom's version.
+	(pthread_attr_setstackaddr): Merge with John Bossom's version.
+	(pthread_attr_getstackaddr): Merge with John Bossom's version.
+	(pthread_attr_init): Merge with John Bossom's version.
+	(pthread_attr_destroy): Merge with John Bossom's version.
+	(pthread_attr_getdetachstate): Merge with John Bossom's version.
+	(pthread_attr_setdetachstate): Merge with John Bossom's version.
+	(is_attr): attr is now **attr (was *attr), so add extra NULL pointer
+	test.
+
+	* implement.h (pthread_attr_t_): Add and rename elements in JEB's
+	version to correspond to original, so that it can be used with
+	original attr routines.
+
+	* pthread.h: Add #endif at end which was truncated in merging.
+
+Sun Dec 20 14:51:58 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* misc.c (pthreadCancelableWait): New function by John Bossom. Non-standard
+	but provides a hook that can be used to implement cancellation points in
+	applications that use this library.
+
+	* pthread.h (pthread_cleanup_pop): C++ (non-WIN32) version uses
+	try/catch to emulate John Bossom's WIN32 __try/__finally behaviour.
+	In the WIN32 version __finally block, add a test for AbnormalTermination otherwise
+	cleanup is only run if the cleanup_pop execute arg is non-zero. Cancellation
+	should cause the cleanup to run irrespective of the execute arg.
+
+	* condvar.c (pthread_condattr_init): Replaced by John Bossom's version.
+	(pthread_condattr_destroy): Replaced by John Bossom's version.
+	(pthread_condattr_getpshared): Replaced by John Bossom's version.
+	(pthread_condattr_setpshared): Replaced by John Bossom's version.
+	(pthread_cond_init): Replaced by John Bossom's version.
+	Fix comment (refered to mutex rather than condition variable).
+	(pthread_cond_destroy): Replaced by John Bossom's version.
+	(pthread_cond_wait): Replaced by John Bossom's version.
+	(pthread_cond_timedwait): Replaced by John Bossom's version.
+	(pthread_cond_signal): Replaced by John Bossom's version.
+	(pthread_cond_broadcast): Replaced by John Bossom's version.
+
+Thu Dec 17 19:10:46 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* tsd.c (pthread_key_create): Replaced by John Bossom's version.
+	(pthread_key_delete): Replaced by John Bossom's version.
+	(pthread_setspecific): Replaced by John Bossom's version.
+	(pthread_getspecific): Replaced by John Bossom's version.
+
 Mon Dec  7 09:44:40 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* cancel.c (pthread_setcancelstate): Replaced by John Bossom's version.
+	(pthread_setcanceltype): Replaced by John Bossom's version.
+	(pthread_testcancel): Replaced by John Bossom's version.
+	(pthread_cancel): Replaced by John Bossom's version.
+	
+	* exit.c (pthread_exit): Replaced by John Bossom's version.
+
+	* misc.c (pthread_self): Replaced by John Bossom's version.
+	(pthread_equal): Replaced by John Bossom's version.
+
+	* sync.c (pthread_detach): Replaced by John Bossom's version.
+	(pthread_join): Replaced by John Bossom's version.
+
+	* create.c (pthread_create): Replaced by John Bossom's version.
+
+	* private.c (_pthread_processInitialize): New by John Bossom.
+	(_pthread_processTerminate): Non-public function by John Bossom.
+	(_pthread_threadStart): Non-public function by John Bossom.
+ 	(_pthread_threadDestroy): Non-public function by John Bossom.
+	(_pthread_cleanupStack): Non-public function by John Bossom.
+	(_pthread_tkAssocCreate): Non-public function by John Bossom.
+	(_pthread_tkAssocDestroy): Non-public function by John Bossom.
+	(_pthread_callUserDestroyRoutines): Non-public function by John Bossom.
+
+	* implement.h: Added John Bossom's non-API structures and
+	declarations.
 
 	* dll.c (PthreadsEntryPoint): Cast return value of GetProcAddress
 	to resolve compile warning from MSVC.
+
+	* dll.c (DLLmain): Replaced by John Bossom's version.
+	* dll.c (PthreadsEntryPoint):
+	Re-applied Anders Norlander's patch:-
+	Initialize _pthread_try_enter_critical_section at startup
+	and release kernel32 handle when DLL is being unloaded.
 
 Sun Dec  6 21:54:35 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
@@ -13,7 +161,7 @@ Sun Dec  6 21:54:35 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* cleanup.c (_pthread_destructor_run_all): Fix TSD key management.
 	This is a tidy-up before TSD and Thread management is completely
-	replaced by John Bossom's much more elegant code.
+	replaced by John Bossom's code.
 
 	* tsd.c (pthread_key_create): Fix TSD key management.
 

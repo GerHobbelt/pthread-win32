@@ -5,11 +5,11 @@
  * Implementation of fork() for POSIX threads.
  */
 
-/* FIXME! */
-#define ENOMEM 0
 
 #include "pthread.h"
 #include "implement.h"
+
+#if 0 /* Pre Bossom */
 
 int
 pthread_atfork(void (*prepare)(void),
@@ -139,3 +139,5 @@ fork()
 }
 
 #endif /* HAVE_PID_T && HAVE_FORK */
+
+#endif /* Pre Bossom */

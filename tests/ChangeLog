@@ -1,3 +1,9 @@
+Wed Dec 30 11:22:44 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* tsd1.c: Re-written. See comments at start of file.
+	* Template.c: New. Contains skeleton code and comment template
+	intended to fully document the test.
+
 Fri Oct 16 17:59:49 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* tsd1.c (destroy_key): Add function. Change diagnostics.
