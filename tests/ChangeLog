@@ -1,3 +1,8 @@
+1998-09-12  Ben Elliston  <bje@cygnus.com>
+
+	* exit2.c (func): Return a value.
+	(main): Call the right thread entry function.
+
 1998-07-22  Ben Elliston  <bje@cygnus.com>
 
 	* exit2.c (main): Fix size of pthread_t array.
