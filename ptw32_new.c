@@ -1,5 +1,5 @@
 /*
- * misc.c
+ * ptw32_new.c
  *
  * Description:
  * This translation unit implements miscellaneous thread functions.
@@ -38,12 +38,32 @@
 #include "implement.h"
 
 
-#include "pthread_once.c"
-#include "pthread_self.c"
-#include "pthread_equal.c"
-#include "pthread_setconcurrency.c"
-#include "pthread_getconcurrency.c"
-#include "w32_CancelableWait.c"
-#include "ptw32_new.c"
-#include "ptw32_calloc.c"
+pthread_t
+ptw32_new (void)
+{
+  pthread_t t;
 
+  t = (pthread_t) calloc (1, sizeof (*t));
+
+  if (t != NULL)
+    {
+      t->detachState = PTHREAD_CREATE_JOINABLE;
+      t->cancelState = PTHREAD_CANCEL_ENABLE;
+      t->cancelType  = PTHREAD_CANCEL_DEFERRED;
+      t->cancelLock  = PTHREAD_MUTEX_INITIALIZER;
+      t->cancelEvent = CreateEvent (
+				    0,
+				    (int) TRUE,    /* manualReset  */
+				    (int) FALSE,   /* setSignaled  */
+				    NULL);
+
+      if (t->cancelEvent == NULL)
+	{
+	  free (t);
+	  t = NULL;
+	}
+    }
+
+  return t;
+
+}

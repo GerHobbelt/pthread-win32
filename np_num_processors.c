@@ -1,5 +1,5 @@
 /*
- * nonportable.c
+ * np_num_processors.c
  *
  * Description:
  * This translation unit implements non-portable thread functions.
@@ -37,9 +37,20 @@
 #include "pthread.h"
 #include "implement.h"
 
-#include "np_mutexattr_setkind.c"
-#include "np_mutexattr_getkind.c"
-#include "np_getw32threadhandle.c"
-#include "np_delay.c"
-#include "np_num_processors.c"
-#include "np_win32_attach.c"
+/*
+ * pthread_num_processors_np()
+ *
+ * Get the number of CPUs available to the process.
+ */
+int
+pthread_num_processors_np(void)
+{
+  int count;
+
+  if ( ptw32_getprocessors(& count) != 0 )
+    {
+      count = 1;
+    }
+
+  return (count);
+}

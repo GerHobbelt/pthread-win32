@@ -1,5 +1,5 @@
 /*
- * misc.c
+ * pthread_setconcurrency.c
  *
  * Description:
  * This translation unit implements miscellaneous thread functions.
@@ -38,12 +38,16 @@
 #include "implement.h"
 
 
-#include "pthread_once.c"
-#include "pthread_self.c"
-#include "pthread_equal.c"
-#include "pthread_setconcurrency.c"
-#include "pthread_getconcurrency.c"
-#include "w32_CancelableWait.c"
-#include "ptw32_new.c"
-#include "ptw32_calloc.c"
-
+int
+pthread_setconcurrency(int level)
+{
+  if (level < 0)
+    {
+      return EINVAL;
+    }
+  else
+    {
+      ptw32_concurrency = level;
+      return 0;
+    }
+}

@@ -1,5 +1,5 @@
 /*
- * misc.c
+ * pthread_equal.c
  *
  * Description:
  * This translation unit implements miscellaneous thread functions.
@@ -38,12 +38,39 @@
 #include "implement.h"
 
 
-#include "pthread_once.c"
-#include "pthread_self.c"
-#include "pthread_equal.c"
-#include "pthread_setconcurrency.c"
-#include "pthread_getconcurrency.c"
-#include "w32_CancelableWait.c"
-#include "ptw32_new.c"
-#include "ptw32_calloc.c"
+int
+pthread_equal (pthread_t t1, pthread_t t2)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      This function returns zero if t1 and t2 are equal, else
+      *      returns nonzero
+      *
+      * PARAMETERS
+      *      t1,
+      *      t2
+      * 	     references to an instances of thread_t
+      *
+      *
+      * DESCRIPTION
+      *      This function returns nonzero if t1 and t2 are equal, else
+      *      returns zero.
+      *
+      * RESULTS
+      * 	     non-zero	     if t1 and t2 refer to the same thread,
+      * 	     0		     t1 and t2 do not refer to the same thread
+      *
+      * ------------------------------------------------------
+      */
+{
+  int result;
 
+  /*
+   * We also accept NULL == NULL - treating NULL as a thread
+   * for this special case, because there is no error that we can return.
+   */
+  result = ( ( t1 == t2 ) && ( t1 == NULL || ( t1->thread == t2->thread ) ) );
+
+  return (result);
+
+}				/* pthread_equal */

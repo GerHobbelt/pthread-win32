@@ -36,13 +36,6 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-/*
- * This file is intended to form a single translation unit
- * consisting of the entire pthreads-win32 library.
- * The reason for doing this is to maximise inline optimisation
- * wherever possible.
- */
-
 #include "pthread.h"
 #include "implement.h"
 
