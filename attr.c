@@ -480,7 +480,7 @@ pthread_attr_setdetachstate(pthread_attr_t *attr,
       return EINVAL;
     }
 
-  if (detachstate != PTHREAD_CREATE_JOINABLE ||
+  if (detachstate != PTHREAD_CREATE_JOINABLE &&
       detachstate != PTHREAD_CREATE_DETACHED)
     {
       return EINVAL;
