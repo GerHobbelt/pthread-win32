@@ -69,7 +69,7 @@ There are a couple of reasons:
 
 Finally, for a proper version of the library with no internal
 exceptions to be usable with C++ applications, the C version
-should compiled as C++ so that it knows about and can propagate
+should be compiled as C++ so that it knows about and can propagate
 exceptions even if it doesn't use C++ features.
 
 
@@ -79,9 +79,7 @@ Notes:
 
 1. [See also the discussion in the FAQ file - Q2, Q4, and Q5]
 
-Due to what is believed to be a C++ compliance error in VC++ whereby
-you may not have multiple handlers for the same exception in the same
-try/catch block, if your application contains catch(...) blocks in your POSIX
+If your application contains catch(...) blocks in your POSIX
 threads then you will need to replace the "catch(...)" with the macro
 "PtW32Catch", eg.
 
@@ -98,6 +96,10 @@ threads then you will need to replace the "catch(...)" with the macro
 Otherwise neither pthreads cancelation nor pthread_exit() will work
 reliably when using versions of the library that use C++ exceptions
 for cancelation and thread exit.
+
+This is due to what is believed to be a C++ compliance error in VC++
+whereby you may not have multiple handlers for the same exception in
+the same try/catch block. GNU G++ doesn't have this restriction.
 
 
 Library naming
@@ -167,15 +169,15 @@ included a call to _pthread_processInitialize. You will
 now have to change that to ptw32_processInitialize.
 
 
-A note on Cleanup code default style
-------------------------------------
+Cleanup code default style
+--------------------------
 
 Previously, if not defined, the cleanup style was determined automatically
 from the compiler used, and one of the following was defined accordingly:
 
 	__CLEANUP_SEH	MSVC only
 	__CLEANUP_CXX	C++, including MSVC++, GNU G++
-	__CLEANUP_C		C, including GNU GCC, not MSVC
+	__CLEANUP_C	C, including GNU GCC, not MSVC
 
 These defines determine the style of cleanup (see pthread.h) and,
 most importantly, the way that cancelation and thread exit (via
@@ -203,7 +205,7 @@ defines require the following library versions:
 
 	__CLEANUP_SEH	pthreadVSE.dll
 	__CLEANUP_CXX	pthreadVCE.dll or pthreadGCE.dll
-	__CLEANUP_C		pthreadVC.dll or pthreadGC.dll
+	__CLEANUP_C	pthreadVC.dll or pthreadGC.dll
 
 THE POINT OF ALL THIS IS: if you have not been defining one of these
 explicitly, then the defaults as described at the top of this
