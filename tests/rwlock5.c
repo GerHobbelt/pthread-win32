@@ -1,12 +1,12 @@
 /* 
- * rwlock3.c
+ * rwlock5.c
  *
- * Declare a static rwlock object, wrlock it, trywrlock it, 
+ * Declare a static rwlock object, rdlock it, tryrdlock it, 
  * and then unlock it again.
  *
  * Depends on API functions: 
- *	pthread_rwlock_wrlock()
- *	pthread_rwlock_trywrlock()
+ *	pthread_rwlock_rdlock()
+ *	pthread_rwlock_tryrdlock()
  *	pthread_rwlock_unlock()
  */
 
@@ -18,7 +18,9 @@ static int washere = 0;
 
 void * func(void * arg)
 {
-  assert(pthread_rwlock_trywrlock(&rwlock1) == EBUSY);
+  assert(pthread_rwlock_tryrdlock(&rwlock1) == 0);
+
+  assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
   washere = 1;
 
@@ -30,7 +32,7 @@ main()
 {
   pthread_t t;
 
-  assert(pthread_rwlock_wrlock(&rwlock1) == 0);
+  assert(pthread_rwlock_rdlock(&rwlock1) == 0);
 
   assert(pthread_create(&t, NULL, func, NULL) == 0);
 
