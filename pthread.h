@@ -25,6 +25,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 typedef HANDLE pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
 
+typedef struct {
+  enum { SIGNAL, BROADCAST, NUM_EVENTS };
+
+  /* Signal and broadcast event HANDLEs. */
+  HANDLE events[NUM_EVENTS];
+
+  /* Count of the number of waiters. */
+  u_int waiters_count;
+  
+  /* Serialize access to waiters_count_. */
+  CRITICAL_SECTION waiters_count_lock;
+} pthread_cond_t;
+
 typedef struct { void * ptr; } pthread_condattr_t;
 typedef struct { void * ptr; } pthread_mutexattr_t;
 
@@ -86,6 +99,24 @@ int pthread_mutexattr_setpshared(pthread_mutexattr_t *attr,
 
 int pthread_mutexattr_getpshared(pthread_mutexattr_t *attr,
 				 int *pshared);
+
+/* Primitives for condition variables. */
+
+int pthread_cond_init(pthread_cond_t *cv,
+		      const pthread_condattr_t *attr);
+
+int pthread_cond_broadcast(pthread_cond_t *cv);
+
+int pthread_cond_signal(pthread_cond_t *cv);
+
+int pthread_cond_timedwait(pthread_cond_t *cv,
+			   pthread_mutex_t *mutex,
+			   const struct timespec *abstime);
+
+int pthread_cond_wait(pthread_cond_t *cv,
+		      pthread_mutex_t *mutex);
+
+int pthread_cond_destroy(pthread_cond_t *cv);
 
 /* Primitives for mutexes. */
 
