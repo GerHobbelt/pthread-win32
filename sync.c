@@ -12,12 +12,26 @@ int
 pthread_join(pthread_t thread, void ** valueptr)
 {
   LPDWORD exitcode;
+  _pthread_threads_thread_t * target;
+
   pthread_t us = pthread_self();
 
   /* First check if we are trying to join to ourselves. */
   if (pthread_equal(thread, us) == 0)
     {
       return EDEADLK;
+    }
+
+  /* If the thread is detached, then join will return immediately. */
+
+  target = _pthread_find_thread_entry(thread);
+  if (target < 0)
+    {
+      return EINVAL;
+    }
+  else if (target->detached == PTHREAD_CREATE_DETACHED)
+    {
+      return ESRCH;
     }
 
   /* Wait on the kernel thread object. */
