@@ -64,7 +64,7 @@ pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
       */
 {
   int result = 0;
-  pthread_key_t *newkey;
+  pthread_key_t newkey;
 
   if ((newkey = (pthread_key_t) calloc (1, sizeof (*newkey))) == NULL)
     {

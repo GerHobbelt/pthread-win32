@@ -824,7 +824,13 @@ ptw32_get_exception_services_code(void)
 void
 ptw32_throw(DWORD exception)
 {
-  if (exception != PTW32_EPS_CANCEL ||
+#if defined(_MSC_VER) && !defined(__cplusplus)
+
+  DWORD exceptionInformation[3];
+
+#endif
+
+  if (exception != PTW32_EPS_CANCEL &&
       exception != PTW32_EPS_EXIT)
     {
       /* Should never enter here */
@@ -832,8 +838,6 @@ ptw32_throw(DWORD exception)
     }
 
 #if defined(_MSC_VER) && !defined(__cplusplus)
-
-  DWORD exceptionInformation[3];
 
   exceptionInformation[0] = (DWORD) (exception);
   exceptionInformation[1] = (DWORD) (0);
