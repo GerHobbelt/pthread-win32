@@ -10,7 +10,7 @@ and place the fllowing text in the message body:
 	subscribe pthreads-win32
 
 
-Building the library with Cygwin32 or Mingw32
+Building the library with Cygwin or Mingw32
 ---------------------------------------------
 Feb 18, 1999
 
@@ -25,7 +25,7 @@ exception handling in g++.  Thanks to Kevin Ruland for researching this
 one. See the FAQ Question 2 for more information.
 
 However, you can use the export library libpthread32.a built under
-Mingw32 (not tested under Cygwin32) together with the pthread.dll built
+Mingw32 (not tested under Cygwin) together with the pthread.dll built
 with MSVC. Thanks to Anders Norlander for pointing this out.
 
 For convenience, the following pre-built files can be downloaded from
