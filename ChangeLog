@@ -1,3 +1,12 @@
+1998-07-11  Ben Elliston  <bje@cygnus.com>
+
+	* sync.c (pthread_join): Implement.
+
+	* misc.c (pthread_equal): Likewise.
+	
+	* pthread.h (pthread_join): Add function prototype.
+	(pthread_equal): Likewise.
+	
 1998-07-10  Ben Elliston  <bje@cygnus.com>
 
 	* misc.c (pthread_self): Implement.
