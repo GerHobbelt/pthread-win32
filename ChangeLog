@@ -1,5 +1,8 @@
 2000-09-08  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
+	* GNUmakefile(_WIN32_WINNT=0x400): Define in CFLAGS;
+	doesn't seem to be needed though.
+
 	* cancel.c (pthread_cancel): Must get "self" through
 	calling pthread_self() which will ensure a POSIX thread
 	struct is built for non-POSIX threads; return an error
