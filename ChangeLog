@@ -1,3 +1,8 @@
+Mon Dec  7 09:44:40 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* dll.c (PthreadsEntryPoint): Cast return value of GetProcAddress
+	to resolve compile warning from MSVC.
+
 Sun Dec  6 21:54:35 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* buildlib.bat: Fix args to CL when building the .DLL

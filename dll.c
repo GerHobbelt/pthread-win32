@@ -63,7 +63,7 @@ BOOL WINAPI PthreadsEntryPoint(HINSTANCE dllHandle,
 
       /* Load KERNEL32 and try to get address of TryEnterCriticalSection */
       _pthread_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
-      _pthread_try_enter_critical_section = GetProcAddress(_pthread_h_kernel32, "TryEnterCriticalSection");
+      _pthread_try_enter_critical_section = (void *) GetProcAddress(_pthread_h_kernel32, "TryEnterCriticalSection");
       break;
 
     case DLL_PROCESS_DETACH:
