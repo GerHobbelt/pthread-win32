@@ -160,7 +160,7 @@ pthread_key_delete (pthread_key_t key)
 
                   pthread_mutex_unlock (&(assoc->lock));
 
-                  _pthread_tkAssocDestroy (assoc);
+                  ptw32_tkAssocDestroy (assoc);
 
                   assoc = next;
                 }
@@ -214,7 +214,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
   pthread_t self;
   int result = 0;
 
-  if (key != _pthread_selfThreadKey)
+  if (key != ptw32_selfThreadKey)
     {
       /*
        * Using pthread_self will implicitly create
@@ -233,7 +233,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
        * Resolve catch-22 of registering thread with threadSelf
        * key
        */
-      self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
+      self = (pthread_t) pthread_getspecific (ptw32_elfThreadKey);
       if (self == NULL)
         {
           self = (pthread_t) value;
@@ -280,7 +280,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
            */
 	  if (assoc == NULL)
 	    {
-	      result = _pthread_tkAssocCreate (&assoc, self, key);
+	      result = ptw32_tkAssocCreate (&assoc, self, key);
 	    }
         }
 

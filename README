@@ -56,7 +56,7 @@ Known bugs in this snapshot
 and the GNUmakefile included, the test fails with a segmentation (invalid
 page access) exception. The fault appears to be in the assembler code
 emmitted by the compiler [to handle exception contexts] at the
-end of the try block in _pthread_threadStart().
+end of the try block in ptw32_threadStart().
 
 2. There are problems using the libpthreadw32.a stub archive derived
 from either of pthreadVSE.dll or pthreadVCE.dll. The cleanup1.c test

@@ -118,7 +118,7 @@ the Known Problem listed below.
 > main thread, so the bug appears with 2 or more worker threads.
 > 
 > Kevin Ruland has traced the exception to the try/catch blocks in
-> _pthread_threadStart().
+> ptw32_threadStart().
 > 
 
 The official word is:

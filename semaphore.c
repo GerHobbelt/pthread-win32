@@ -278,7 +278,7 @@ sem_trywait (sem_t * sem)
 #ifdef NEED_SEM
 
 void 
-_pthread_decrease_semaphore(sem_t * sem)
+ptw32_decrease_semaphore(sem_t * sem)
 {
   pthread_mutex_lock(&sem->mutex);
 
@@ -299,7 +299,7 @@ _pthread_decrease_semaphore(sem_t * sem)
 }
 
 BOOL 
-_pthread_increase_semaphore(sem_t * sem, unsigned int n)
+ptw32_increase_semaphore(sem_t * sem, unsigned int n)
 {
   BOOL result;
 

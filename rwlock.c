@@ -54,7 +54,7 @@ _rwlock_check_need_init(pthread_rwlock_t *rwlock)
    * the number of processors + 1.
    *
    */
-  EnterCriticalSection(&_pthread_rwlock_test_init_lock);
+  EnterCriticalSection(&ptw32_rwlock_test_init_lock);
 
   /*
    * We got here possibly under race
@@ -78,7 +78,7 @@ _rwlock_check_need_init(pthread_rwlock_t *rwlock)
       result = EINVAL;
     }
 
-  LeaveCriticalSection(&_pthread_rwlock_test_init_lock);
+  LeaveCriticalSection(&ptw32_rwlock_test_init_lock);
 
   return(result);
 }
@@ -197,7 +197,7 @@ pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
         /*
          * See notes in _rwlock_check_need_init() above also.
          */
-        EnterCriticalSection(&_pthread_rwlock_test_init_lock);
+        EnterCriticalSection(&ptw32_wlock_test_init_lock);
 
         /*
          * Check again.
@@ -221,7 +221,7 @@ pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
             result = EBUSY;
           }
 
-        LeaveCriticalSection(&_pthread_rwlock_test_init_lock);
+        LeaveCriticalSection(&ptw32_rwlock_test_init_lock);
       }
 
     return(result);

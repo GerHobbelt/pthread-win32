@@ -52,7 +52,7 @@ _cond_check_need_init(pthread_cond_t *cond)
    * the number of processors + 1.
    *
    */
-  EnterCriticalSection(&_pthread_cond_test_init_lock);
+  EnterCriticalSection(&ptw32_cond_test_init_lock);
 
   /*
    * We got here possibly under race
@@ -75,7 +75,7 @@ _cond_check_need_init(pthread_cond_t *cond)
       result = EINVAL;
     }
 
-  LeaveCriticalSection(&_pthread_cond_test_init_lock);
+  LeaveCriticalSection(&ptw32_cond_test_init_lock);
 
   return(result);
 }
@@ -492,7 +492,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
       /*
        * See notes in _cond_check_need_init() above also.
        */
-      EnterCriticalSection(&_pthread_cond_test_init_lock);
+      EnterCriticalSection(&ptw32_ond_test_init_lock);
 
       /*
        * Check again.
@@ -516,7 +516,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
           result = EBUSY;
         }
 
-      LeaveCriticalSection(&_pthread_cond_test_init_lock);
+      LeaveCriticalSection(&ptw32_cond_test_init_lock);
     }
 
   return (result);
@@ -655,14 +655,14 @@ cond_timedwait (pthread_cond_t * cond,
        *              timeout
        *
        * Note: 
-       *      _pthread_sem_timedwait is a cancelation point,
+       *      ptw32_sem_timedwait is a cancelation point,
        *      hence providing the
        *      mechanism for making pthread_cond_wait a cancelation
        *      point. We use the cleanup mechanism to ensure we
        *      re-lock the mutex and decrement the waiters count
        *      if we are canceled.
        */
-      if (_pthread_sem_timedwait (&(cv->sema), abstime) == -1)
+      if (ptw32_sem_timedwait (&(cv->sema), abstime) == -1)
 	{
 	  result = errno;
 	}
@@ -947,7 +947,7 @@ pthread_cond_broadcast (pthread_cond_t * cond)
 
 #ifdef NEED_SEM
 
-      result = (_pthread_increase_semaphore( &cv->sema, cv->waiters )
+      result = (ptw32_increase_semaphore( &cv->sema, cv->waiters )
 		? 0
 		: EINVAL);
 

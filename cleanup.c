@@ -40,7 +40,7 @@
  * SEH or C++ destructor support. 
  */
 
-_pthread_cleanup_t *
+ptw32_cleanup_t *
 pthread_pop_cleanup (int execute)
      /*
       * ------------------------------------------------------
@@ -67,9 +67,9 @@ pthread_pop_cleanup (int execute)
       * ------------------------------------------------------
       */
 {
-  _pthread_cleanup_t *cleanup = NULL;
+  ptw32_cleanup_t *cleanup = NULL;
   
-  cleanup = (_pthread_cleanup_t *) pthread_getspecific (_pthread_cleanupKey);
+  cleanup = (ptw32_leanup_t *) pthread_getspecific (ptw32_leanupKey);
 
   if (cleanup != NULL)
     {
@@ -129,7 +129,7 @@ pthread_pop_cleanup (int execute)
 
 #if !defined(_MSC_VER) && !defined(__cplusplus)
 
-      pthread_setspecific (_pthread_cleanupKey, (void *) cleanup->prev);
+      pthread_setspecific (ptw32_cleanupKey, (void *) cleanup->prev);
 
 #endif /* !_MSC_VER && !__cplusplus */
 
@@ -137,11 +137,11 @@ pthread_pop_cleanup (int execute)
 
   return (cleanup);
 
-}                               /* _pthread_pop_cleanup */
+}                               /* ptw32_pop_cleanup */
 
 
 void
-pthread_push_cleanup (_pthread_cleanup_t * cleanup,
+pthread_push_cleanup (ptw32_cleanup_t * cleanup,
 		      void (*routine) (void *),
 		      void *arg)
      /*
@@ -189,12 +189,12 @@ pthread_push_cleanup (_pthread_cleanup_t * cleanup,
 
 #if !defined(_MSC_VER) && !defined(__cplusplus)
 
-  cleanup->prev = (_pthread_cleanup_t *) pthread_getspecific (_pthread_cleanupKey);
+  cleanup->prev = (ptw32_cleanup_t *) pthread_getspecific (ptw32_cleanupKey);
 
 #endif /* !_MSC_VER && !__cplusplus */
 
-  pthread_setspecific (_pthread_cleanupKey, (void *) cleanup);
+  pthread_setspecific (ptw32_cleanupKey, (void *) cleanup);
 
-}                               /* _pthread_push_cleanup */
+}                               /* ptw32_push_cleanup */
 
 

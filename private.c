@@ -39,7 +39,7 @@
 
 
 int
-_pthread_processInitialize (void)
+ptw32_processInitialize (void)
      /*
       * ------------------------------------------------------
       * DOCPRIVATE
@@ -53,7 +53,7 @@ _pthread_processInitialize (void)
       *      This function performs process wide initialization for
       *      the pthread library.
       *      If successful, this routine sets the global variable
-      *      _pthread_processInitialized to TRUE.
+      *      ptw32_processInitialized to TRUE.
       *
       * RESULTS
       *              TRUE    if successful,
@@ -62,42 +62,42 @@ _pthread_processInitialize (void)
       * ------------------------------------------------------
       */
 {
-	if (_pthread_processInitialized) {
+	if (ptw32_rocessInitialized) {
 		/* 
 		 * ignore if already initialized. this is useful for 
 		 * programs that uses a non-dll pthread
-		 * library. such programs must call _pthread_processInitialize() explicitely,
+		 * library. such programs must call ptw32_processInitialize() explicitely,
 		 * since this initialization routine is automatically called only when
 		 * the dll is loaded.
 		 */
 		return TRUE;
 	}
 
-  _pthread_processInitialized = TRUE;
+  ptw32_processInitialized = TRUE;
 
   /*
    * Initialize Keys
    */
-  if ((pthread_key_create (&_pthread_selfThreadKey, NULL) != 0) ||
-      (pthread_key_create (&_pthread_cleanupKey, NULL) != 0))
+  if ((pthread_key_create (&ptw32_selfThreadKey, NULL) != 0) ||
+      (pthread_key_create (&ptw32_cleanupKey, NULL) != 0))
     {
 
-      _pthread_processTerminate ();
+      ptw32_processTerminate ();
     }
 
   /* 
    * Set up the global test and init check locks.
    */
-  InitializeCriticalSection(&_pthread_mutex_test_init_lock);
-  InitializeCriticalSection(&_pthread_cond_test_init_lock);
-  InitializeCriticalSection(&_pthread_rwlock_test_init_lock);
+  InitializeCriticalSection(&ptw32_mutex_test_init_lock);
+  InitializeCriticalSection(&ptw32_cond_test_init_lock);
+  InitializeCriticalSection(&ptw32_rwlock_test_init_lock);
 
-  return (_pthread_processInitialized);
+  return (ptw32_processInitialized);
 
 }				/* processInitialize */
 
 void
-_pthread_processTerminate (void)
+ptw32_processTerminate (void)
      /*
       * ------------------------------------------------------
       * DOCPRIVATE
@@ -111,7 +111,7 @@ _pthread_processTerminate (void)
       *      This function performs process wide termination for
       *      the pthread library.
       *      This routine sets the global variable
-      *      _pthread_processInitialized to FALSE
+      *      ptw32_processInitialized to FALSE
       *
       * RESULTS
       *              N/A
@@ -119,37 +119,37 @@ _pthread_processTerminate (void)
       * ------------------------------------------------------
       */
 {
-  if (_pthread_processInitialized)
+  if (ptw32_processInitialized)
     {
 
-      if (_pthread_selfThreadKey != NULL)
+      if (ptw32_selfThreadKey != NULL)
 	{
 	  /*
-	   * Release _pthread_selfThreadKey
+	   * Release ptw32_selfThreadKey
 	   */
-	  pthread_key_delete (_pthread_selfThreadKey);
+	  pthread_key_delete (ptw32_selfThreadKey);
 
-	  _pthread_selfThreadKey = NULL;
+	  ptw32_selfThreadKey = NULL;
 	}
 
-      if (_pthread_cleanupKey != NULL)
+      if (ptw32_cleanupKey != NULL)
 	{
 	  /*
-	   * Release _pthread_cleanupKey
+	   * Release ptw32_cleanupKey
 	   */
-	  pthread_key_delete (_pthread_cleanupKey);
+	  pthread_key_delete (ptw32_cleanupKey);
 
-	  _pthread_cleanupKey = NULL;
+	  ptw32_cleanupKey = NULL;
 	}
 
       /* 
        * Destroy the global test and init check locks.
        */
-      DeleteCriticalSection(&_pthread_rwlock_test_init_lock);
-      DeleteCriticalSection(&_pthread_cond_test_init_lock);
-      DeleteCriticalSection(&_pthread_mutex_test_init_lock);
+      DeleteCriticalSection(&ptw32_rwlock_test_init_lock);
+      DeleteCriticalSection(&ptw32_cond_test_init_lock);
+      DeleteCriticalSection(&ptw32_mutex_test_init_lock);
 
-      _pthread_processInitialized = FALSE;
+      ptw32_processInitialized = FALSE;
     }
 
 }				/* processTerminate */
@@ -179,7 +179,7 @@ unsigned PT_STDCALL
 #else
 void
 #endif
-_pthread_threadStart (ThreadParms * threadParms)
+ptw32_threadStart (ThreadParms * threadParms)
 {
   pthread_t self;
   void *(*start) (void *);
@@ -212,7 +212,7 @@ _pthread_threadStart (ThreadParms * threadParms)
     }
 #endif
 
-  pthread_setspecific (_pthread_selfThreadKey, self);
+  pthread_setspecific (ptw32_selfThreadKey, self);
 
 #if defined(_MSC_VER) && !defined(__cplusplus)
 
@@ -301,7 +301,7 @@ _pthread_threadStart (ThreadParms * threadParms)
 #endif /* _MSC_VER */
 
   (void) pthread_mutex_destroy(&self->cancelLock);
-  _pthread_callUserDestroyRoutines(self);
+  ptw32_callUserDestroyRoutines(self);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
   _endthreadex ((unsigned) status);
@@ -317,14 +317,14 @@ _pthread_threadStart (ThreadParms * threadParms)
   return (unsigned) status;
 #endif
 
-}				/* _pthread_threadStart */
+}				/* ptw32_threadStart */
 
 void
-_pthread_threadDestroy (pthread_t thread)
+ptw32_threadDestroy (pthread_t thread)
 {
   if (thread != NULL)
     {
-      _pthread_callUserDestroyRoutines (thread);
+      ptw32_callUserDestroyRoutines (thread);
 
       if (thread->cancelEvent != NULL)
 	{
@@ -342,10 +342,10 @@ _pthread_threadDestroy (pthread_t thread)
       free (thread);
     }
 
-}				/* _pthread_threadDestroy */
+}				/* ptw32_threadDestroy */
 
 int
-_pthread_tkAssocCreate (ThreadKeyAssoc ** assocP,
+ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
 			pthread_t thread,
 			pthread_key_t key)
      /*
@@ -361,7 +361,7 @@ _pthread_tkAssocCreate (ThreadKeyAssoc ** assocP,
       *
       * Notes:
       *      1)      New associations are pushed to the beginning of the
-      *              chain so that the internal _pthread_selfThreadKey association
+      *              chain so that the internal ptw32_selfThreadKey association
       *              is always last, thus allowing selfThreadExit to
       *              be implicitly called by pthread_exit last.
       *
@@ -448,11 +448,11 @@ FAIL0:
 
   return (result);
 
-}				/* _pthread_tkAssocCreate */
+}				/* ptw32_tkAssocCreate */
 
 
 void
-_pthread_tkAssocDestroy (ThreadKeyAssoc * assoc)
+ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
      /*
       * -------------------------------------------------------------------
       * This routine releases all resources for the given ThreadKeyAssoc
@@ -477,11 +477,11 @@ _pthread_tkAssocDestroy (ThreadKeyAssoc * assoc)
       free (assoc);
     }
 
-}				/* _pthread_tkAssocDestroy */
+}				/* ptw32_tkAssocDestroy */
 
 
 void
-_pthread_callUserDestroyRoutines (pthread_t thread)
+ptw32_callUserDestroyRoutines (pthread_t thread)
      /*
       * -------------------------------------------------------------------
       * DOCPRIVATE
@@ -601,14 +601,14 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 
 	      pthread_mutex_unlock (&(assoc->lock));
 
-	      _pthread_tkAssocDestroy (assoc);
+	      ptw32_tkAssocDestroy (assoc);
 
 	      assoc = *nextP;
 	    }
 	}
     }
 
-}				/* _pthread_callUserDestroyRoutines */
+}				/* ptw32_callUserDestroyRoutines */
 
 
 
@@ -652,7 +652,7 @@ filetime_to_timespec(const FILETIME *ft, struct timespec *ts)
 #endif /* NEED_FTIME */
 
 int
-_pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
+ptw32_sem_timedwait (sem_t * sem, const struct timespec * abstime)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -786,17 +786,17 @@ _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
 
 #ifdef NEED_SEM
 
-  _pthread_decrease_semaphore(sem);
+  ptw32_decrease_semaphore(sem);
 
 #endif /* NEED_SEM */
 
   return 0;
 
-}				/* _pthread_sem_timedwait */
+}				/* ptw32_sem_timedwait */
 
 
 DWORD
-_pthread_get_exception_services_code(void)
+ptw32_get_exception_services_code(void)
 {
 #if defined(_MSC_VER) && !defined(__cplusplus)
 
