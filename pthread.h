@@ -278,6 +278,12 @@ int pthread_sigmask(int how,
 		    const sigset_t *set,
 		    sigset_t *oset);
 
+/* Thread cancelation functions. */
+
+void pthread_testcancel(void);
+
+int pthread_cancel(pthread_t thread);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
