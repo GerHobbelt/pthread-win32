@@ -46,12 +46,9 @@ typedef struct {
   void * arg;
 } _pthread_call_t;
 
-/* Macro to return the address of the thread entry of the calling thread. */
-#define _PTHREAD_THIS (_pthread_find_thread_entry(pthread_this()))
-
 /* Macro to compute the address of a given handler stack. */
 #define _PTHREAD_STACK(stack) \
-  ((_pthread_handler_node_t *) &(_PTHREAD_THIS)->cleanupstack + stack);
+  ((_pthread_handler_node_t *) &(pthread_self())->cleanupstack + stack);
 
 /* Macro to compute the table index of a thread entry from it's entry
    address. */
