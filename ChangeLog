@@ -1,3 +1,18 @@
+Wed Mar 24 11:32:07 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* misc.c (CancelableWait): Initialise exceptionInformation[2].
+	(pthread_self): Get a real Win32 thread handle for implicit threads.
+
+	* cancel.c (pthread_testcancel): Initialise exceptionInformation[2].
+
+	* implement.h (SE_INFORMATION): Fix values.
+
+	* private.c (_pthread_threadDestroy): Close the thread handle.
+
+Fri Mar 19 12:57:27 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* cancel.c (comments): Update and cleanup.
+
 Fri Mar 19 09:12:59 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* private.c (_pthread_threadStart): status returns PTHREAD_CANCELED.

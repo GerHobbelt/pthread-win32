@@ -26,9 +26,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-/*
- * Code contributed by John E. Bossom <JEB>.
- */
 
 int
 pthread_once (
@@ -158,14 +155,26 @@ pthread_self (void)
        * executing thread.
        */
       self = (pthread_t) calloc (1, sizeof (*self));
+
       if (self != NULL)
 	{
-
 	  self->implicit = 1;
 	  self->detachState = PTHREAD_CREATE_DETACHED;
 
 	  self->thread = GetCurrentThreadId ();
-	  self->threadH = GetCurrentThread ();
+
+	  if( !DuplicateHandle(
+			       GetCurrentProcess(),
+			       GetCurrentThread(),
+			       GetCurrentProcess(),
+			       &self->threadH,
+			       0,
+			       FALSE,
+			       DUPLICATE_SAME_ACCESS ) )
+	    {
+	      free( self );
+	      return (NULL);
+	    }
 	}
 
       pthread_setspecific (_pthread_selfThreadKey, self);
@@ -307,6 +316,7 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
 
               exceptionInformation[0] = (DWORD) (0);
               exceptionInformation[1] = (DWORD) (0);
+              exceptionInformation[2] = (DWORD) (0);
 
               RaiseException (
                                EXCEPTION_PTHREAD_SERVICES,
@@ -351,5 +361,4 @@ pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout)
   return (CancelableWait(waitHandle, timeout));
 }
 
-/* </JEB> */
 

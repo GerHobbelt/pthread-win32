@@ -26,10 +26,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-/*
- * Code contributed by John E. Bossom <JEB>.
- */
-
 int
 pthread_setcancelstate (int state, int *oldstate)
      /*
@@ -106,7 +102,7 @@ pthread_setcanceltype (int type, int *oldtype)
       *              PTHREAD_CANCEL_DEFERRED
       *                      only deferred cancelation is allowed,
       *
-      *              PTHRAD_CANCEL_ASYNCHRONOUS
+      *              PTHREAD_CANCEL_ASYNCHRONOUS
       *                      Asynchronous cancellation is allowed
       *
       *
@@ -201,6 +197,7 @@ pthread_testcancel (void)
 
 	      exceptionInformation[0] = (DWORD) (0);
 	      exceptionInformation[1] = (DWORD) (0);
+	      exceptionInformation[2] = (DWORD) (0);
 
 	      RaiseException (
 			       EXCEPTION_PTHREAD_SERVICES,
@@ -242,7 +239,7 @@ pthread_cancel (pthread_t thread)
       *                wait for termination of 'thread' if necessary.
       *
       * RESULTS
-      *              0               successfully created semaphore,
+      *              0               successfully requested cancellation,
       *              ESRCH           no thread found corresponding to 'thread',
       *
       * ------------------------------------------------------
@@ -252,7 +249,9 @@ pthread_cancel (pthread_t thread)
 
   if (thread != NULL)
     {
-
+      /*
+       * Set for deferred cancellation.
+       */
       if (!SetEvent (thread->cancelEvent))
 	{
 	  result = ESRCH;
@@ -270,6 +269,4 @@ pthread_cancel (pthread_t thread)
 
   return (result);
 }
-
-/* </JEB> */
 
