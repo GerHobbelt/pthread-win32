@@ -20,7 +20,6 @@ _pthread_start_call(void * us_arg)
      this threads private stack so we're safe to leave data in them
      until we leave. */
   _pthread_threads_thread__t * us;
-  pthread_mutex_t * us_thread_mutex;
   _pthread_call_t * call;
   unsigned (*func)(void *);
   void * arg;
@@ -39,8 +38,6 @@ _pthread_start_call(void * us_arg)
   func = us->call.routine;
   arg = us->call.arg;
 
-  us_thread_mutex = _PTHREAD_THREAD_MUTEX(us);
-
   /* FIXME: Should we be using sigsetjmp() here instead. */
   from = setjmp(us->call.env);
 
@@ -55,7 +52,7 @@ _pthread_start_call(void * us_arg)
 	 was called and there are no waiting joins. */
 
       /* CRITICAL SECTION */
-      pthread_mutex_lock(us_thread_mutex);
+      pthread_mutex_lock(&_pthread_count_mutex);
 
       if (us->detach == TRUE
 	  && us->join_count == 0)
@@ -63,7 +60,7 @@ _pthread_start_call(void * us_arg)
 	  _pthread_delete_thread_entry(us);
 	}
 
-      pthread_mutex_lock(us_thread_mutex);
+      pthread_mutex_lock(&_pthread_count_mutex);
       /* END CRITICAL SECTION */
     }
   else
@@ -76,7 +73,7 @@ _pthread_start_call(void * us_arg)
 	 was called and there are no waiting joins. */
 
       /* CRITICAL SECTION */
-      pthread_mutex_lock(us_thread_mutex);
+      pthread_mutex_lock(&_pthread_count_mutex);
 
       if (us->detach == TRUE
 	  && us->join_count == 0)
@@ -84,7 +81,7 @@ _pthread_start_call(void * us_arg)
 	  _pthread_delete_thread_entry(us);
 	}
 
-      pthread_mutex_lock(us_thread_mutex);
+      pthread_mutex_lock(&_pthread_count_mutex);
       /* END CRITICAL SECTION */
 
       ret = 0;
@@ -130,9 +127,9 @@ pthread_create(pthread_t *thread,
 #if HAVE_SIGSET_T
 	  memcpy(&(attr_copy->sigmask), &(attr->sigmask), sizeof(sigset_t)); 
 #endif /* HAVE_SIGSET_T */
-
-	  this->detach = (attr->detachedstate == PTHREAD_CREATE_DETACHED);
 	}
+
+      this->detach = (attr->detachedstate == PTHREAD_CREATE_DETACHED);
 
       /* Start running, not suspended. */
       flags = 0;

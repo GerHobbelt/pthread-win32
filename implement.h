@@ -62,7 +62,12 @@ struct _pthread_threads_thread {
   pthread_t                   thread;
   pthread_attr_t              attr;
   _pthread_call_t             call;
-  int                         cancelthread;
+  int                         cancel_pending;
+  int                         cancelstate;      /* PTHREAD_CANCEL_DISABLE
+						   PTHREAD_CANCEL_ENABLE */
+
+  int                         canceltype;       /* PTHREAD_CANCEL_ASYNCHRONOUS
+						   PTHREAD_CANCEL_DEFERRED */
   void **                     joinvalueptr;
   int                         join_count;
   _pthread_handler_node_t *   cleanupstack;

@@ -6,8 +6,6 @@
  * the implementation and may be used throughout it.
  */
 
-#include <windows.h>
-#include <process.h>
 #include "pthread.h"
 #include "implement.h"
 
@@ -27,51 +25,48 @@
 int
 _pthread_new_thread_entry(pthread_t thread, _pthread_threads_thread_t * entry)
 {
-  _pthread_threads_thread_t * this;
-
-  /* CRITICAL SECTION */
-  pthread_mutex_lock(&_pthread_count_mutex);
+  _pthread_threads_thread_t * new;
 
   if (_pthread_threads_count >= PTHREAD_THREADS_MAX)
     {
       return EAGAIN;
     }
 
-  this = &_pthread_threads_table[_PTHREAD_HASH_INDEX(thread)];
+  new = &_pthread_threads_table[_PTHREAD_HASH_INDEX(thread)];
 
-  while (this->thread != NULL)
+  while (new->thread != NULL)
     {
-      this++;
+      new++;
 
-      if (this == &_pthread_threads_table[PTHREAD_THREADS_MAX])
+      if (new == &_pthread_threads_table[PTHREAD_THREADS_MAX])
 	{
 	  /* Wrap to the top of the table. */
-	  this == _pthread_threads_table;
+	  new == _pthread_threads_table;
 	}
     }
 
-  if (this->thread != NULL)
+  if (new->thread != NULL)
     {
       /* INTERNAL ERROR: There should be at least one slot left. */
       return ESRCH;
     }
   else
     {
-      this->thread = thread;
-      pthread_attr_init(&(this->attr));
-      this->joinvalueptr = NULL;
-      this->cleanupstack = NULL;
-      this->destructorstack = NULL;
-      this->forkpreparestack = NULL;
-      this->forkparentstack = NULL;
-      this->forkchildstack = NULL;
+      new->thread = thread;
+      pthread_attr_init(&(new->attr));
+      new->joinvalueptr = NULL;
+      new->cancelstate = PTHREAD_CANCEL_ENABLE;
+      new->canceltype = PTHREAD_CANCEL_DEFERRED;
+      new->cancel_pending = FALSE;
+      new->cleanupstack = NULL;
+      new->destructorstack = NULL;
+      new->forkpreparestack = NULL;
+      new->forkparentstack = NULL;
+      new->forkchildstack = NULL;
     }
 
   _pthread_threads_count++;
-  entry = this;
-
-  pthread_mutex_unlock(&_pthread_count_mutex);
-  /* END CRITICAL SECTION */
+  entry = new;
 
   return 0;
 }
@@ -79,45 +74,42 @@ _pthread_new_thread_entry(pthread_t thread, _pthread_threads_thread_t * entry)
 _pthread_threads_thread *
 _pthread_find_thread_entry(pthread_t thread)
 {
-  _pthread_threads_thread_t * this;
+  _pthread_threads_thread_t * entry;
   _pthread_threads_thread_t * start;
 
-  start = this = &_pthread_threads_table[_PTHREAD_HASH_INDEX(thread)];
+  start = entry = &_pthread_threads_table[_PTHREAD_HASH_INDEX(thread)];
 
-  while (this->thread != thread)
+  while (entry->thread != thread)
     {
-      this++;
+      entry++;
 
-      if (this == &_pthread_threads_table[PTHREAD_THREADS_MAX])
+      if (entry == &_pthread_threads_table[PTHREAD_THREADS_MAX])
 	{
 	  /* Wrap to top of table. */
-	  this = _pthread_threads_table;
+	  entry = _pthread_threads_table;
 	}
     }
 
-  if (this->thread == NULL || this == start)
+  if (entry->thread == NULL || entry == start)
     {
       /* Failed to find the thread. */
       return NULL;
     }
 
-  return this;
+  return entry;
 }
 
 void
-_pthread_delete_thread_entry(_pthread_threads_thread_t * thread_entry)
+_pthread_delete_thread_entry(_pthread_threads_thread_t * entry)
 {
   /* We don't check that the thread has been properly cleaned up, so
      it had better be done already. */
 
-  /* CRITICAL SECTION */
-  pthread_mutex_lock(&_pthread_count_mutex);
-
   /* Remove the thread entry if necessary. */
 
-  if (thread_entry->thread != NULL)
+  if (entry->thread != NULL)
     {
-      thread_entry->thread = NULL;
+      entry->thread = NULL;
       
       if (_pthread_threads_count > 0)
 	{
@@ -132,7 +124,4 @@ _pthread_delete_thread_entry(_pthread_threads_thread_t * thread_entry)
     {
       /* FIXME: INTERNAL ERROR: This should not happen. */
     }
-
-  pthread_mutex_unlock(&_pthread_count_mutex);
-  /* END CRITICAL SECTION */
 }

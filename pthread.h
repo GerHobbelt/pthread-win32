@@ -88,14 +88,8 @@ typedef struct {
   size_t stacksize;                  /* PTHREAD_STACK_MIN */
 #endif
 
-  int cancelstate;                   /* PTHREAD_CANCEL_DISABLE
-					PTHREAD_CANCEL_ENABLE */
-
   int detachedstate;                 /* PTHREAD_CREATE_DETACHED
 					PTHREAD_CREATE_JOINABLE */
-
-  int canceltype;                    /* PTHREAD_CANCEL_ASYNCHRONOUS
-					PTHREAD_CANCEL_DEFERRED */
 
 #ifdef HAVE_SIGSET_T
   sigset_t sigmask;
