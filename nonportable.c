@@ -34,6 +34,7 @@ int pthread_mutexattr_setkind_np(pthread_mutexattr_t * attr, int kind)
   return pthread_mutexattr_settype( attr, kind );
 }
 
+
 /*
  * pthread_mutexattr_getkind_np()
  */
@@ -42,71 +43,6 @@ int pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr, int *kind)
   return pthread_mutexattr_gettype( attr, kind );
 }
 
-
-/*
- * pthread_mutex_setdefaultkind_np --
- *
- * Sets the default type to be given to all
- * POSIX mutexes initialised after the function
- * is called. Any of the following type values
- * can be made the default type:
- *
- *   PTHREAD_MUTEX_NORMAL
- *   PTHREAD_MUTEX_ERRORCHECK
- *   PTHREAD_MUTEX_RECURSIVE
- *   PTHREAD_MUTEX_DEFAULT
- *
- * Any mutex initialised with kind PTHREAD_MUTEX_DEFAULT
- * will be set to the mapped type instead. Previously
- * initialised mutexes are not changed.
- *
- * When set to PTHREAD_MUTEX_DEFAULT (the initial
- * value), mutexes will behave as for the
- * PTHREAD_MUTEX_RECURSIVE kind.
- *
- */
-int
-pthread_mutex_setdefaultkind_np (int kind )
-{
-  int result = 0;
-
-  switch (kind)
-    {
-	case PTHREAD_MUTEX_FAST_NP:
-	case PTHREAD_MUTEX_RECURSIVE_NP:
-	case PTHREAD_MUTEX_ERRORCHECK_NP:
-      ptw32_mutex_default_kind = kind;
-      break;
-    default:
-      result = EINVAL;
-    }
-
-  return result;
-}
-
-/*
- * pthread_mutex_getdefaultkind_np --
- *
- * Return the default kind for all mutexes
- *
- */
-int
-pthread_mutex_getdefaultkind_np (int *kind)
-{
-  int result = 0;
-
-  if (kind != NULL)
-    {
-      *kind = ptw32_mutex_default_kind;
-    }
-
-  else
-    {
-      result = EINVAL;
-    }
-
-  return result;
-}
 
 /*
  * pthread_getw32threadhandle_np()

@@ -1,0 +1,109 @@
+Non-portable functions included in pthreads-win32
+-------------------------------------------------
+
+HANDLE
+pthread_getw32threadhandle_np(pthread_t thread);
+
+	Returns the win32 thread handle that the POSIX
+	thread "thread" is running as.
+
+	Applications can use the win32 handle to set
+	win32 specific attributes of the thread.
+
+
+int
+pthread_mutexattr_setkind_np(pthread_mutexattr_t * attr, int kind)
+
+int
+pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr, int *kind)
+
+        These two routines are included for Linux compatibility
+        and are direct equivalents to the standard routines
+                pthread_mutexattr_settype
+                pthread_mutexattr_gettype
+
+        pthread_mutexattr_setkind_np accepts the following
+        mutex kinds:
+                PTHREAD_MUTEX_FAST_NP
+                PTHREAD_MUTEX_ERRORCHECK_NP
+                PTHREAD_MUTEX_RECURSIVE_NP
+
+        These are really just equivalent to (respectively):
+                PTHREAD_MUTEX_NORMAL
+                PTHREAD_MUTEX_ERRORCHECK
+                PTHREAD_MUTEX_RECURSIVE
+
+int
+pthread_delay_np (const struct timespec *interval);
+
+        This routine causes a thread to delay execution for a specific period of time.
+        This period ends at the current time plus the specified interval. The routine
+        will not return before the end of the period is reached, but may return an
+        arbitrary amount of time after the period has gone by. This can be due to
+        system load, thread priorities, and system timer granularity.
+
+        Specifying an interval of zero (0) seconds and zero (0) nanoseconds is
+        allowed and can be used to force the thread to give up the processor or to
+        deliver a pending cancelation request.
+
+        This routine is a cancelation point.
+
+        The timespec structure contains the following two fields:
+
+                tv_sec is an integer number of seconds.
+                tv_nsec is an integer number of nanoseconds. 
+
+        Return Values
+
+        If an error condition occurs, this routine returns an integer value
+        indicating the type of error. Possible return values are as follows:
+
+        0          Successful completion. 
+        [EINVAL]   The value specified by interval is invalid. 
+
+
+BOOL
+pthread_win32_process_attach_np (void);
+
+BOOL
+pthread_win32_process_detach_np (void);
+
+BOOL
+pthread_win32_thread_attach_np (void);
+
+BOOL
+pthread_win32_thread_detach_np (void);
+
+	These functions contain the code normally run via dllMain
+	when the library is used as a dll but which need to be
+	called explicitly by an application when the library
+	is statically linked.
+
+	You will need to call pthread_win32_process_attach_np() before
+	you can call any pthread routines when statically linking.
+	You should call pthread_win32_process_detach_np() before
+	exiting your application to clean up.
+
+	pthread_win32_thread_attach_np() is currently a no-op, but
+	pthread_win32_thread_detach_np() is needed to clean up
+	after Win32 threads that have called pthreads routines
+	have exited.
+
+	These functions invariably return TRUE except for
+	pthread_win32_process_attach_np() which will return FALSE
+	if pthreads-win32 initialisation fails.
+
+
+int
+pthreadCancelableWait (HANDLE waitHandle);
+
+int
+pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
+
+	These two functions provide hooks into the pthread_cancel
+	mechanism that will allow you to wait on a Windows handle
+	and make it a cancellation point. Both functions block
+	until either the given w32 handle is signaled, or
+	pthread_cancel has been called. It is implemented using
+	WaitForMultipleObjects on 'waitHandle' and a manually
+	reset w32 event used to implement pthread_cancel.

@@ -32,8 +32,6 @@ int ptw32_processInitialized = FALSE;
 pthread_key_t ptw32_selfThreadKey = NULL;
 pthread_key_t ptw32_cleanupKey = NULL;
 
-int ptw32_mutex_default_kind = PTHREAD_MUTEX_DEFAULT;
-
 int ptw32_concurrency = 0;
 
 /*

@@ -1,3 +1,26 @@
+2001-06-05  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* nonportable.c (pthread_mutex_setdefaultkind_np):
+	Remove - should not have been included in the first place.
+	(pthread_mutex_getdefaultkind_np): Likewise.
+	* global.c (ptw32_mutex_default_kind): Likewise.
+	* mutex.c (pthread_mutex_init): Remove use of
+	ptw32_mutex_default_kind.
+	* pthread.h (pthread_mutex_setdefaultkind_np): Likewise.
+	(pthread_mutex_getdefaultkind_np): Likewise.
+	* pthread.def (pthread_mutexattr_setkind_np): Added.
+	(pthread_mutexattr_getkind_np): Likewise.
+
+	* README: Many changes that should have gone in before
+	the last snapshot.
+	* README.NONPORTABLE: New - referred to by ANNOUNCE
+	but never created; documents the non-portable routines
+	included in the library - moved from README with new
+	routines added.
+	* ANNOUNCE (pthread_mutexattr_setkind_np): Added to
+	compliance list.
+	(pthread_mutexattr_getkind_np): Likewise.
+
 2001-06-04  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* condvar.c: Add original description of the algorithm as
