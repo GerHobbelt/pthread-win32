@@ -1,3 +1,22 @@
+RELEASE 1.6.0
+-------------
+(2005-04-04)
+
+General
+-------
+
+* Added makefile targets to build static link versions of the library.
+Both MinGW and MSVC. Please note that this does not imply any change
+to the LGPL licensing, which still imposes specific conditions on
+distributing software that has been statically linked with this library.
+
+Bugs fixed
+----------
+
+* Fix integer overrun error in sem_timedwait().
+Kevin Lussier
+
+
 RELEASE 1.5.0
 -------------
 (2005-03-16)
