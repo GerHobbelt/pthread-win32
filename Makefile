@@ -8,7 +8,7 @@
 
 # DLL_VER:
 # See pthread.h and README - This number is computed as 'current - age'
-DLL_VER	= 1
+DLL_VER	= 2
 
 DEVROOT	= c:\pthreads
 

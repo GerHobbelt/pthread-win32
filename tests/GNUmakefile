@@ -31,7 +31,7 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
-DLL_VER	= 1
+DLL_VER	= 2
 
 CP	= cp -f
 MV	= mv -f
@@ -74,6 +74,7 @@ COPYFILES	= $(HDR) $(LIB) $(DLL) $(QAPC)
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
+XTESTS	= once3 
 TESTS	= sizes loadfree \
 	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  semaphore1 semaphore2 semaphore3 \
@@ -86,7 +87,7 @@ TESTS	= sizes loadfree \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
-	  count1 once1 once2 tsd1 self2 \
+	  count1 once1 once2 once3 tsd1 self2 \
 	  cancel1 cancel2 \
 	  semaphore4 semaphore4t \
 	  delay1 delay2 eyal1 \
@@ -238,6 +239,7 @@ mutex8e.pass: mutex7e.pass
 mutex8r.pass: mutex7r.pass
 once1.pass: create1.pass
 once2.pass: once1.pass
+once3.pass: once2.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass barrier3.pass
 reuse1.pass: create2.pass

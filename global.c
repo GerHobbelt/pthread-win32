@@ -108,15 +108,9 @@ CRITICAL_SECTION ptw32_spinlock_test_init_lock;
 CRITICAL_SECTION ptw32_cond_list_lock;
 
 /*
- * Global condition variable and mutex for once_control management.
- * The mutex must be an ERRORCHECK type because we need to
- * guarantee ownership when unlocking.
+ * Global lock to serialise once_control event management.
  */
-ptw32_once_control_t ptw32_once_control =
-  {
-    PTHREAD_COND_INITIALIZER,
-    PTHREAD_ERRORCHECK_MUTEX_INITIALIZER
-  };
+CRITICAL_SECTION ptw32_once_event_lock;
 
 #ifdef _UWIN
 /*

@@ -38,6 +38,23 @@
 #include "implement.h"
 
 
+void ptw32_once_init_routine_cleanup(void * arg)
+{
+  pthread_once_t * once_control = (pthread_once_t *) arg;
+
+  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_CANCELLED);
+
+  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->started, (LONG)PTW32_FALSE);
+
+  // There are waiters, wake some up
+  // We're deliberately not using PulseEvent. It's iffy, and deprecated.
+  EnterCriticalSection(&ptw32_once_event_lock);
+  if (once_control->event)
+    SetEvent(once_control->event);
+  LeaveCriticalSection(&ptw32_once_event_lock);
+}
+
+
 int
 pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	/*
@@ -53,6 +70,11 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	 *      executes the initialization routine, init_routine when
 	 *      access is controlled by the pthread_once_t control
 	 *      key.
+	 *
+	 *      pthread_once() is not a cancelation point, but the init_routine
+	 *      can be. If it's cancelled then the effect on the once_control is
+	 *      as if pthread_once had never been entered.
+	 *
 	 *
 	 * PARAMETERS
 	 *      once_control
@@ -86,65 +108,99 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
       result = 0;
     }
 
-  /*
-   * Use a single global cond+mutex to manage access to all once_control objects.
-   * Unlike a global mutex on it's own, the global cond+mutex allows faster
-   * once_controls to overtake slower ones. Spurious wakeups may occur, but
-   * can be tolerated.
-   *
-   * To maintain a separate mutex for each once_control object requires either
-   * cleaning up the mutex (difficult to synchronise reliably), or leaving it
-   * around forever. Since we can't make assumptions about how an application might
-   * employ pthread_once objects, the later is considered to be unacceptable.
-   *
-   * Since this is being introduced as a bug fix, the global cond+mtx also avoids
-   * a change in the ABI, maintaining backwards compatibility.
-   *
-   * The mutex should be an ERRORCHECK type to be sure we will never, in the event
-   * we're cancelled before we get the lock, unlock the mutex when it's held by
-   * another thread (possible with NORMAL/DEFAULT mutexes because they don't check
-   * ownership).
-   */
-
-  if (!once_control->done)
+  while (!(InterlockedExchangeAdd((LPLONG)&once_control->state, 0L) & (LONG)PTW32_ONCE_DONE))  // Atomic Read
     {
-      if (InterlockedExchange((LPLONG) &once_control->started, (LONG) 0) == -1)
+      if (!PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->started, (LONG)PTW32_TRUE))
 	{
-	  (*init_routine) ();
+	  // Clear residual state from a cancelled init_routine
+	  // (and DONE still hasn't been set of course).
+	  if (PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_CLEAR)
+	      & PTW32_ONCE_CANCELLED)
+	    {
+	      // The previous initter was cancelled.
+	      // We now have a new initter (us) and we need to make the rest wait again.
+	      EnterCriticalSection(&ptw32_once_event_lock);
+	      if (once_control->event)
+		ResetEvent(once_control->event);
+	      LeaveCriticalSection(&ptw32_once_event_lock);
 
-#ifdef _MSC_VER
-#pragma inline_depth(0)
-#endif
-	  /*
-	   * Holding the mutex during the broadcast prevents threads being left
-	   * behind waiting.
-	   */
-	  pthread_cleanup_push(pthread_mutex_unlock, (void *) &ptw32_once_control.mtx);
-	  (void) pthread_mutex_lock(&ptw32_once_control.mtx);
-	  once_control->done = PTW32_TRUE;
-	  (void) pthread_cond_broadcast(&ptw32_once_control.cond);
-	  pthread_cleanup_pop(1);
-#ifdef _MSC_VER
-#pragma inline_depth()
-#endif
+	      /*
+	       * Any threads entering the wait section and getting out again before
+	       * the CANCELLED state can be cleared and the event is reset will, at worst, just go
+	       * around again or, if they suspend and we (the initter) completes before they resume,
+	       * they will see state == DONE and leave immediately.
+	       */
+	    }
+
+	  pthread_cleanup_push(ptw32_once_init_routine_cleanup, (void *) once_control);
+
+	  (*init_routine)();
+
+	  pthread_cleanup_pop(0);
+
+	  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_DONE);
+
+	  // we didn't create the event.
+	  // it is only there if there is someone waiting
+	  EnterCriticalSection(&ptw32_once_event_lock);
+	  if (once_control->event)
+	    SetEvent(once_control->event);
+	  LeaveCriticalSection(&ptw32_once_event_lock);
 	}
       else
 	{
-#ifdef _MSC_VER
-#pragma inline_depth(0)
-#endif
-	  pthread_cleanup_push(pthread_mutex_unlock, (void *) &ptw32_once_control.mtx);
-	  (void) pthread_mutex_lock(&ptw32_once_control.mtx);
-	  while (!once_control->done)
+	  // wait for init.
+	  // while waiting, create an event to wait on
+
+	  EnterCriticalSection(&ptw32_once_event_lock);
+	  (void) InterlockedIncrement((LPLONG)&once_control->eventUsers);
+
+	  /*
+	   * If we are the first thread after the initter thread, and the init_routine is cancelled
+	   * while we're suspended at this point in the code:-
+	   * - state will not get set to PTW32_ONCE_DONE;
+	   * - cleanup will not see an event and cannot set it;
+	   * - therefore, we will eventually resume, create an event and wait on it;
+	   * Remedy: cleanup must set state == CANCELLED before checking for an event, so that
+	   * we will see it and avoid waiting (as for state == DONE). We will go around again and
+	   * we may become the initter.
+	   * If we are still the only other thread when we get to the end of this block, we will
+	   * have closed the event (good). If another thread beats us to be initter, then we will
+	   * re-enter here (good). If, when we reach lights out, other threads have reached this
+	   * point, we will not close the event. The eventUsers counter will still correctly reflect
+	   * the real number of waiters, the old event will remain in use. It will be reset
+	   * by the new initter after clearing the CANCELLED state, causing any threads that are
+	   * cycling around the loop to wait again.
+	   */
+
+	  if (!InterlockedExchangeAdd((LPLONG)&once_control->event, 0L)) // Atomic Read
 	    {
-	      (void) pthread_cond_wait(&ptw32_once_control.cond, &ptw32_once_control.mtx);
+	      once_control->event = CreateEvent(NULL, PTW32_TRUE, PTW32_FALSE, NULL);
 	    }
-	  pthread_cleanup_pop(1);
-#ifdef _MSC_VER
-#pragma inline_depth()
-#endif
+	  LeaveCriticalSection(&ptw32_once_event_lock);
+
+	  // check 'state' again in case the initting thread has finished or cancelled
+	  // and left before seeing that there was an event to trigger.
+	  // (Now that the event IS created, if init gets finished AFTER this,
+	  //  then the event handle is guaranteed to be seen and triggered).
+
+	  if (!InterlockedExchangeAdd((LPLONG)&once_control->state, 0L)) // Atomic Reads
+	    {
+	      // Neither DONE nor CANCELLED
+	      (void) WaitForSingleObject(once_control->event, INFINITE);
+	    }
+
+	  // last one out shut off the lights:
+	  EnterCriticalSection(&ptw32_once_event_lock);
+	  if (InterlockedDecrement((LPLONG)&once_control->eventUsers) == 0) // we were last
+	    {
+	      CloseHandle(once_control->event);
+	      once_control->event = 0;
+	    }
+	  LeaveCriticalSection(&ptw32_once_event_lock);
 	}
     }
+
 
   /*
    * Fall through Intentionally
