@@ -13,7 +13,7 @@ pthread_attr_getdetachstate
 pthread_attr_getschedparam
 ;pthread_attr_getschedpolicy
 ;pthread_attr_getscope
-;pthread_attr_getstackaddr
+pthread_attr_getstackaddr
 pthread_attr_getstacksize
 pthread_attr_init
 pthread_attr_setdetachstate
@@ -21,11 +21,15 @@ pthread_attr_setdetachstate
 pthread_attr_setschedparam
 ;pthread_attr_setschedpolicy
 ;pthread_attr_setscope
-;pthread_attr_setstackaddr
+pthread_attr_setstackaddr
 pthread_attr_setstacksize
 pthread_cancel
+;
+; These are implemented as macros
+;
 ;pthread_cleanup_pop
 ;pthread_cleanup_push
+;
 pthread_condattr_destroy
 pthread_condattr_getpshared
 pthread_condattr_init

@@ -1,3 +1,8 @@
+Wed Feb 10 12:49:11 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.def (pthread_attr_getstackaddr): uncomment
+	(pthread_attr_setstackaddr): uncomment
+
 Fri Feb  5 13:42:30 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* semaphore.c: Comment format changes.
