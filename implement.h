@@ -187,10 +187,12 @@ struct pthread_spinlock_t_ {
 };
 
 struct pthread_barrier_t_ {
-  LONG nCurrentBarrierHeight;
-  LONG nInitialBarrierHeight;
+  unsigned int nCurrentBarrierHeight;
+  unsigned int nInitialBarrierHeight;
+  unsigned int nSerial;
+  int iStep;
   pthread_mutex_t mtxExclusiveAccess;
-  HANDLE eventBarrierBreeched;
+  sem_t semBarrierBreeched[2];
 };
 
 struct pthread_barrierattr_t_ {

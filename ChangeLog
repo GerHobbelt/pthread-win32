@@ -1,3 +1,11 @@
+2001-07-10  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* barrier.c: Revamped to fix the race condition. Two alternating
+	semaphores are used instead of the PulseEvent. Also improved
+	overall throughput by returning PTHREAD_BARRIER_SERIAL_THREAD
+	to the first waking thread.
+	* implement.h (pthread_barrier_t_): Revamped.
+
 2001-07-09  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* barrier.c: Fix several bugs in all routines. Now passes

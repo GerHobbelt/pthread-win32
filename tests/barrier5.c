@@ -10,13 +10,13 @@
 
 enum {
   NUMTHREADS = 16,
-  ITERATIONS = 10000
+  BARRIERS = 10000
 };
  
 pthread_barrier_t barrier = NULL;
 pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;
 
-int barrierReleases[ITERATIONS + 1];
+int barrierReleases[BARRIERS + 1];
 
 void *
 func(void * barrierHeight)
@@ -24,7 +24,7 @@ func(void * barrierHeight)
   int i;
   int result;
 
-  for (i = 1; i < ITERATIONS; i++)
+  for (i = 1; i < BARRIERS; i++)
     {
       result = pthread_barrier_wait(&barrier);
 
@@ -38,12 +38,8 @@ func(void * barrierHeight)
        */
       if (result == PTHREAD_BARRIER_SERIAL_THREAD)
         {
-          assert(pthread_mutex_lock(&mx) == 0);
-//printf("Releases bucket %d = %d\n", i - 1, barrierReleases[i - 1]);
-//fflush(stdout);
           assert(barrierReleases[i - 1] == (int) barrierHeight);
           barrierReleases[i + 1] = 0;
-          assert(pthread_mutex_unlock(&mx) == 0);
         }
       else if (result != 0)
         {
@@ -81,8 +77,8 @@ main()
           assert(pthread_join(t[i], NULL) == 0);
         }
 
-      assert(barrierReleases[ITERATIONS - 1] == j);
-      assert(barrierReleases[ITERATIONS] == 0);
+      assert(barrierReleases[BARRIERS - 1] == j);
+      assert(barrierReleases[BARRIERS] == 0);
 
       assert(pthread_barrier_destroy(&barrier) == 0);
     }
