@@ -1,7 +1,7 @@
 /*
  * Test for pthread_join().
  *
- * Depends on API functions: pthread_create(), pthread_exit().
+ * Depends on API functions: pthread_create(), pthread_join(), pthread_exit().
  */
 
 #include "test.h"

@@ -1,3 +1,9 @@
+2000-08-17  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* tsd.c (pthread_create_key): Initialise temporary
+	key before returning it's address to avoid race
+	conditions.
+
 2000-08-13  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* errno.c: Add _MD precompile condition; thus far
