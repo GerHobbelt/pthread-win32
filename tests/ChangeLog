@@ -1,4 +1,4 @@
-2005-04-01  Ross Johnson  <ross@desk.home>
+2005-04-01  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* GNUmakefile: Add target to test linking static link library.
 	* Makefile: Likewise.
