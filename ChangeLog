@@ -1,3 +1,8 @@
+Sun Feb 21 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h (PTHREAD_MUTEX_INITIALIZER): missing braces around
+	cs element initialiser.
+
 1999-02-21  Ben Elliston  <bje@cygnus.com>
 
 	* pthread.h (pthread_exit): The return type of this function is

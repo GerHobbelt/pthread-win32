@@ -1,6 +1,4 @@
 #include <pthread.h>
-/* Hack. Peer into implementation details. */
-#include <implement.h>
 #include <assert.h>
 #include <stdio.h>
 
@@ -13,7 +11,7 @@ entry(void * arg)
      ordinarily bad, m'kay? */
 
   pthread_t t = pthread_self();
-  printf("thread no. %d has id %lx\n", (int) arg, t->win32handle); 
+  printf("thread no. %d has id %lx\n", (int) arg, t->threadH); 
   return 0; 
 }
 
@@ -23,15 +21,11 @@ main()
   int rc;
   pthread_t t[2];
 
-  if (pthread_create(&t[0], NULL, entry, (void *) 1) != 0)
-    {
-      return 1;
-    }
+  rc = pthread_create(&t[0], NULL, entry, (void *) 1);
+  assert(rc == 0);
 
-  if (pthread_create(&t[1], NULL, entry, (void *) 2) != 0)
-    {
-      return 1;
-    }
+  rc = pthread_create(&t[1], NULL, entry, (void *) 2);
+  assert(rc == 0);
 
   Sleep(2000);
   return 0;

@@ -1,6 +1,4 @@
 #include <pthread.h>
-/* Hack. Peer into implementation details. */
-#include <implement.h>
 #include <assert.h>
 #include <stdio.h>
 
@@ -13,7 +11,7 @@ entry(void * arg)
      ordinarily bad, m'kay? */
 
   pthread_t t = pthread_self();
-  printf("my thread is %lx\n", t->win32handle); 
+  printf("my thread is %lx\n", t->threadH); 
   return arg;
 }
 
