@@ -11,6 +11,7 @@ Ross Johnson		rpj at callisto dot canberra dot edu dot au
 					early prototype routines;
 					ongoing project coordination/maintenance;
 					implementation of spin locks and barriers;
+					various enhancements;
 					bug fixes;
 					documentation;
 					testsuite.
@@ -117,3 +118,6 @@ Will Bryant		will dot bryant at ecosm dot com
 					Borland compiler patch and makefile.
 Anuj Goyal		anuj dot goyal at gmail dot com
 					Port to Digital Mars compiler.
+Gottlob Frege		gottlobfrege at  gmail dot com
+					re-implemented pthread_once (version 2)
+					(pthread_once cancellation added by rpj).
