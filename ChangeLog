@@ -1,7 +1,11 @@
 1998-10-03  Ben Elliston  <bje@cygnus.com>
 
+	* attr.c (pthread_attr_init): Only zero out the `sigmask' member
+	if we have the sigset_t type.
+
 	* pthread.h: No need to include <unistd.h>.  It doesn't even exist
 	on Win32! Again, an artifact of cross-compilation.	
+	(pthread_sigmask): Only provide if we have the sigset_t type.
 
 	* process.h: Remove. This was a stand-in before we started doing
 	native compilation under Win32.

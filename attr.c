@@ -102,7 +102,9 @@ pthread_attr_init(pthread_attr_t *attr)
 #endif
 
   attr->detachedstate = PTHREAD_CREATE_JOINABLE;
+#ifdef HAVE_SIGSET_T
   memset(&(attr->sigmask), 0, sizeof(sigset_t));
+#endif /* HAVE_SIGSET_T */
 
   /* Priority uses Win32 priority values. */
   attr->priority = THREAD_PRIORITY_NORMAL;

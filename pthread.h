@@ -261,9 +261,11 @@ int pthread_key_delete(pthread_key_t key);
 
 /* Signal handling. */
 
+#if HAVE_SIGSET_T
 int pthread_sigmask(int how,
 		    const sigset_t *set,
 		    sigset_t *oset);
+#endif /* HAVE_SIGSET_T */
 
 /* Thread cancelation functions. */
 
