@@ -1,3 +1,33 @@
+1999-02-21  Ben Elliston  <bje@cygnus.com>
+
+	* README: Update.
+
+	* Makefile: New file. Run all tests automatically. Primitive tests
+	are run first; more complex tests are run last.
+
+	* count1.c: New test. Validate the thread count.
+
+	* exit2.c: Perform a simpler test.
+	
+	* exit3.c: New test. Replaces exit2.c, since exit2.c needs to
+	perform simpler checking first.
+
+	* create1.c: Update to use the new testsuite exiting convention.
+	
+	* equal1.c: Likewise.
+
+	* mutex1.c: Likewise.
+
+	* mutex2.c: Likewise.
+
+	* once1.c: Likewise.
+
+	* self2.c: Likewise.
+
+	* self3.c: Likewise.
+
+	* tsd1.c: Likewise.
+
 1999-02-20  Ross Johnson  <rpj@ise.canberra.edu.au>
 
 	* mutex2.c: Test static mutex initialisation.
