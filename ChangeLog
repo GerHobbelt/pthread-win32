@@ -1,3 +1,10 @@
+1999-10-21  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h (_POSIX_THREADS): Only define it if it isn't
+	already defined. Projects may need to define this on
+	the CC command line under Win32 as it doesn't have unistd.h
+	- Aurelio Medina <aureliom@crt.com>
+
 1999-10-17  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* rwlock.c (pthread_rwlock_destroy): Add cast to remove compile
