@@ -28,14 +28,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #undef _POSIX_THREAD_ATTR_STACKADDR
 #endif
 
-#ifdef HAVE_CONFIG_H
+#if HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
 #include <windows.h>
 #include <time.h>
 
-#ifdef HAVE_SIGNAL_H
+#if HAVE_SIGNAL_H
 #include <signal.h>
 #endif /* HAVE_SIGNAL_H */
 
@@ -90,7 +90,7 @@ typedef struct {
   int detachedstate;                 /* PTHREAD_CREATE_DETACHED
 					PTHREAD_CREATE_JOINABLE */
 
-#ifdef HAVE_SIGSET_T
+#if HAVE_SIGSET_T
   sigset_t sigmask;
 #endif /* HAVE_SIGSET_T */
 
