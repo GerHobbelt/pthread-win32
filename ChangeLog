@@ -1,3 +1,16 @@
+1998-08-02  Ben Elliston  <bje@cygnus.com>
+
+	* windows.h: Remove duplicate TlsSetValue() prototype.  Add 
+	TlsGetValue() prototype.
+	(FALSE): Define.
+	(TRUE): Likewise.
+	Add forgotten errno values.  Guard against multiple #includes.
+
+	* windows.c: New file.  Implement stubs for Win32 functions.
+
+	* Makefile (SRCS): Remove.  Not explicitly needed.
+	(CFLAGS): Add -Wall for all warnings with GCC.
+
 Sun Aug  2 19:03:42 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* config.h: Create. This is a temporary stand-in for autoconf yet
