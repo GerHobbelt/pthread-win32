@@ -10,3 +10,8 @@
 #define PTHREAD_THREADS_MAX 256;
 
 extern DWORD pthreads_thread_count;
+
+typedef struct {
+  int proc_shared;
+} _pthread_mutexattr_t;
+
