@@ -88,8 +88,14 @@ DllMain (
       _pthread_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
       _pthread_try_enter_critical_section =
 	(BOOL (PT_STDCALL *)(LPCRITICAL_SECTION))
+
+#if defined(NEED_UNICODE_CONSTS)
+	GetProcAddress(_pthread_h_kernel32,
+		       (const TCHAR *)TEXT("TryEnterCriticalSection"));
+#else
 	GetProcAddress(_pthread_h_kernel32,
 		       (LPCSTR) "TryEnterCriticalSection");
+#endif
 
       if (_pthread_try_enter_critical_section != NULL)
         {

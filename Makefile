@@ -11,7 +11,9 @@ DEVROOT=e:
 DLLDEST=$(DEVROOT)\dll
 LIBDEST=$(DEVROOT)\lib
 
-CLIB=/MD
+#CLIB	= /MD
+CLIB	= /MT
+CFLAGS	= #/EHsc /TP
 
 OBJ=attr.obj \
 	cancel.obj \
@@ -46,10 +48,14 @@ install: all
 	copy pthread.lib $(LIBDEST)
 
 pthread.dll: $(OBJ) pthread.def
-	cl /LDd /Zi $(CLIB) $(OBJ) /Fepthread.dll pthread.def 
+	cl /LD /Zi $(CFLAGS) $(OBJ) /Fepthread.dll /link \
+	    /nodefaultlib:libcmt \
+		/implib:pthread.lib \
+		msvcrt.lib \
+		/def:pthread.def
 
 .c.obj::
-	cl /W3 $(CLIB) /nologo /Yd /Zi /I. \
+	cl /W3 $(CLIB) $(CFLAGS) /nologo /Yd /Zi /I. \
 		/D_WIN32_WINNT=0x400 \
 		/DSTDCALL=_stdcall \
 		-c $<

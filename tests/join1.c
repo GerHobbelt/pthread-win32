@@ -9,12 +9,14 @@
 void *
 func(void * arg)
 {
-	Sleep(1000);
+    int i = (int) arg;
 
-	pthread_exit(arg);
+    Sleep(i * 500);
 
-	/* Never reached. */
-	exit(1);
+    pthread_exit(arg);
+
+    /* Never reached. */
+    exit(1);
 }
 
 int
@@ -29,6 +31,9 @@ main(int argc, char * argv[])
 	  {
 	    assert(pthread_create(&id[i], NULL, func, (void *) i) == 0);
 	  }
+
+	/* Some threads will finish before they are joined, some after. */
+	Sleep(1000);
 
 	for (i = 0; i < 4; i++)
 	  {

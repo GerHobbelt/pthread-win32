@@ -2,8 +2,9 @@
  * cleanup.c
  *
  * Description:
- * This translation unit implements routines associated cleaning up
- * threads.
+ * This translation unit implements routines associated
+ * with cleaning up threads.
+ *
  *
  * Pthreads-win32 - POSIX Threads Library for Win32
  * Copyright (C) 1998
@@ -33,6 +34,12 @@
 #include "pthread.h"
 #include "implement.h"
 
+/*
+ * The functions pthread_pop_cleanup and pthread_push_cleanup
+ * are implemented here for applications written in C with no
+ * SEH or C++ destructor support. 
+ */
+
 _pthread_cleanup_t *
 pthread_pop_cleanup (int execute)
      /*
@@ -60,7 +67,7 @@ pthread_pop_cleanup (int execute)
       * ------------------------------------------------------
       */
 {
-  _pthread_cleanup_t *cleanup;
+  _pthread_cleanup_t *cleanup = NULL;
   
   cleanup = (_pthread_cleanup_t *) pthread_getspecific (_pthread_cleanupKey);
 
@@ -69,7 +76,7 @@ pthread_pop_cleanup (int execute)
       if (execute && (cleanup->routine != NULL))
         {
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 
           __try
 	    {
@@ -87,7 +94,7 @@ pthread_pop_cleanup (int execute)
 	       */
 	    }
       
-#else /* _MSC_VER */
+#else /* _MSC_VER && ! __cplusplus */
 
 #ifdef __cplusplus
 
@@ -114,7 +121,7 @@ pthread_pop_cleanup (int execute)
 	   */
 	  (*cleanup->routine) (cleanup->arg);
 
-#endif /* __cplusplus */
+#endif /* __cplusplus && ! __cplusplus */
 
 #endif /* _MSC_VER */
 

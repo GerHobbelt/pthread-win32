@@ -1,6 +1,7 @@
 @echo off
 
-REM Usage: runtest cl|gcc testname prerequisit testarg ...
+REM Usage: runtest cl  testname prerequisit testarg ...
+REM    or: runtest gcc testname prerequisit testarg ...
 
 if %3==_ goto noprereq
 if NOT EXIST %3.pass goto needprereq
@@ -13,9 +14,11 @@ if EXIST %2.pass goto bypass
 if EXIST %2.fail erase %2.fail
 
 REM Make sure we start with only those files we expect to need
-if exist tmp\*.* echo y | erase tmp\*.* > nul:
+if not exist tmp\*.* goto skip1
+echo y | erase tmp\*.* > nul:
 rmdir tmp
 mkdir tmp
+:skip1
 
 copy ..\pthread.dll tmp > nul:
 copy ..\pthread.h tmp > nul:
@@ -23,7 +26,7 @@ copy ..\semaphore.h tmp > nul:
 copy ..\sched.h tmp > nul:
 copy test.h tmp > nul:
 copy ..\pthread.lib tmp > nul:
-copy ..\libpthread32.a tmp > nul:
+REM copy ..\libpthread32.a tmp > nul:
 
 cd tmp
 
@@ -43,17 +46,26 @@ if EXIST %2.fail erase %2.fail
 if EXIST %2.notrun erase %2.notrun
 aout.exe %4 %5 %6 %7 %8 %9
 
-set RESULT=%ERRORLEVEL%
+set RESULT=1
+if ERRORLEVEL 0 set RESULT=0
 
-if %RESULT% NEQ 0 echo Failed [%RESULT%] > ..\%2.fail
-if %RESULT% EQU 0 echo Passed > ..\%2.pass
+REM set RESULT=%ERRORLEVEL%
+
+if %RESULT%==0 goto passed
+echo Failed [%RESULT%] > ..\%2.fail
+goto cleanup
+
+:passed
+echo Passed > ..\%2.pass
 
 :cleanup
 
 cd ..
 
 REM Clean up
-if exist tmp\*.* echo y | erase tmp\*.* > nul:
+if not exist tmp\*.* goto skip2
+echo y | erase tmp\*.* > nul:
+:skip2
 
 if EXIST %2.fail echo Failed [%RESULT%]
 if EXIST %2.pass echo Passed [%RESULT%]

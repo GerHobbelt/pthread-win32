@@ -1,3 +1,20 @@
-- Check behaviour of calling pthread_exit from main().
-  The main thread should wait for other threads to exit
-  before calling exit.
+====
+Automate the build/test cycle so that I can
+expand to test both library and applications in different
+environments and cross-environments.
+
+Eg.
+           Applications | SEH | C++ | G++ |  C  | GCC |
+        Library         |     |     |     |     |     |
+        ----------------+-----+-----+-----+-----+-----+
+        SEH             |  X  |  X  |  X  |  X  |  X  |
+        ----------------+-----+-----+-----+-----+-----+
+        C++ (MSC)       |  X  |  X  |  X  |  X  |  X  |
+        ----------------+-----+-----+-----+-----+-----+
+        G++ (GNU)       |  ?  |  ?  |  X  |  ?  |  X  |
+        ----------------+-----+-----+-----+-----+-----+
+
+'?' indicates combinations that may not be doable.
+
+====
+

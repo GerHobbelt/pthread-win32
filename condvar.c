@@ -540,7 +540,7 @@ cond_wait_cleanup(void * args)
   pthread_cond_t cv = cleanup_args->cv;
   int * resultPtr = cleanup_args->resultPtr;
   int lock_result;
-  int lastWaiter;
+  int lastWaiter = FALSE;
 
   if ((lock_result = pthread_mutex_lock (&(cv->waitersLock))) == 0)
     {
@@ -590,8 +590,6 @@ cond_timedwait (pthread_cond_t * cond,
 		const struct timespec *abstime)
 {
   int result = 0;
-  int internal_result = 0;
-  int lastWaiter = FALSE;
   pthread_cond_t cv;
   cond_wait_cleanup_args_t cleanup_args;
 

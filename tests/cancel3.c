@@ -65,7 +65,7 @@ static pthread_mutex_t waitLock = PTHREAD_MUTEX_INITIALIZER;
 void *
 mythread(void * arg)
 {
-  int result = 0;
+  int result = ((int)PTHREAD_CANCELED + 1);
   bag_t * bag = (bag_t *) arg;
 
   assert(bag == &threadbag[bag->threadnum]);
@@ -85,7 +85,7 @@ mythread(void * arg)
   for (bag->count = 0; bag->count < 100; bag->count++)
     Sleep(100);
 
-  return result;
+  return (void *) result;
 }
 
 int

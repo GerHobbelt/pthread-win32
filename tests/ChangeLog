@@ -1,3 +1,17 @@
+2000-07-25  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* runtest.bat: modified to work under W98.
+	
+	* runall.bat: Add new tests; modified to work under W98.
+	It was ok under NT.
+
+	* Makefile: Add new tests.
+
+	* exception1.c: New; Test passing exceptions back to the
+	application and retaining library internal exceptions.
+
+	* join0.c: New; Test a single join.
+
 2000-01-06  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* cleanup1.c: New; Test cleanup handler executes (when thread is

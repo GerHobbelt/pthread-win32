@@ -18,15 +18,17 @@
 # MA 02111-1307, USA
 #
 
+GLANG	= c++
+
 RM	= erase
 
-CC	= g++
+CC	= gcc
 
 AR	= ar
 
 LD	= gcc -mdll
 
-OPT	= -g -O2
+OPT	= -g -O2 -x $(GLANG)
 
 ## Mingw32
 CFLAGS	= $(OPT) -I. -DHAVE_CONFIG_H -Wall

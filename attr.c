@@ -84,7 +84,7 @@ pthread_attr_setstacksize(pthread_attr_t *attr,
 {
 #ifdef _POSIX_THREAD_ATTR_STACKSIZE
 
-  /* Verify that the stack size is within range. */
+  /*  Verify that the stack size is within range. */
   if (stacksize < PTHREAD_STACK_MIN)
     {
       return EINVAL;
@@ -324,7 +324,12 @@ pthread_attr_init(pthread_attr_t *attr)
     }
 
 #ifdef _POSIX_THREAD_ATTR_STACKSIZE
-  attr_result->stacksize = PTHREAD_STACK_MIN;
+  /*
+   * Default to zero size. Unless changed explicitly this
+   * will allow Win32 to set the size to that of the
+   * main thread.
+   */
+  attr_result->stacksize = 0;
 #endif
 
 #ifdef _POSIX_THREAD_ATTR_STACKADDR

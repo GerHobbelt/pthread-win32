@@ -187,7 +187,7 @@ _pthread_threadStart (ThreadParms * threadParms)
 
 #ifdef _MSC_VER
 
-  DWORD ei[3];
+  DWORD ei[] = {0,0,0};
 
 #endif
 
@@ -197,12 +197,23 @@ _pthread_threadStart (ThreadParms * threadParms)
   start = threadParms->start;
   arg = threadParms->arg;
 
-#if defined (__MINGW32__) && ! defined (__MSVCRT__)
-  /* beginthread does not return the thread id, and so we do it here. */
-  self->thread = GetCurrentThreadId ();
-#endif
-
   free (threadParms);
+
+#if defined (__MINGW32__) && ! defined (__MSVCRT__)
+  /*
+   * beginthread does not return the thread id and is running
+   * before it returns us the thread handle, and so we do it here.
+   */
+  self->thread = GetCurrentThreadId ();
+  if (pthread_mutex_lock(&self->cancelLock) == 0)
+    {
+      /* 
+       * We got the lock which means that our creator has
+       * our thread handle. Unlock and continue on.
+       */
+      (void) pthread_mutex_unlock(&self->cancelLock);
+    }
+#endif
 
   pthread_setspecific (_pthread_selfThreadKey, self);
 
@@ -231,6 +242,7 @@ _pthread_threadStart (ThreadParms * threadParms)
 	    break;
 	  default:
 	    status = PTHREAD_CANCELED;
+          break;
 	  }
       }
     else
@@ -366,7 +378,9 @@ _pthread_tkAssocCreate (ThreadKeyAssoc ** assocP,
       *                      key on which to create an association.
       * Returns:
       *       0              - if successful,
-      *      -1              - general error
+      *       ENOMEM         - not enough memory to create assoc or other object
+      *       EINVAL	     - an internal error occurred
+      *       ENOSYS	     - an internal error occurred
       * -------------------------------------------------------------------
       */
 {
@@ -382,12 +396,11 @@ _pthread_tkAssocCreate (ThreadKeyAssoc ** assocP,
 
   if (assoc == NULL)
     {
-      result = -1;
+      result = ENOMEM;
       goto FAIL0;
     }
 
-  if ((result = pthread_mutex_init (&(assoc->lock), NULL)) !=
-      0)
+  if ((result = pthread_mutex_init (&(assoc->lock), NULL)) != 0)
     {
       goto FAIL1;
     }
@@ -398,8 +411,7 @@ _pthread_tkAssocCreate (ThreadKeyAssoc ** assocP,
   /*
    * Register assoc with key
    */
-  if ((result = pthread_mutex_lock (&(key->threadsLock))) !=
-      0)
+  if ((result = pthread_mutex_lock (&(key->threadsLock))) != 0)
     {
       goto FAIL2;
     }
@@ -793,7 +805,7 @@ _pthread_get_exception_services_code(void)
 
 #else
 
-  return NULL;
+  return (DWORD) NULL;
 
 #endif
 }

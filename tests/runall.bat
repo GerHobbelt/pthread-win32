@@ -18,6 +18,7 @@ call runtest cl mutex3 create1
 call runtest cl equal1 create1
 call runtest cl exit2 create1
 call runtest cl exit3 create1
+call runtest cl join0 create1
 call runtest cl join1 create1
 call runtest cl join2 create1
 call runtest cl count1 join1
@@ -47,6 +48,7 @@ call runtest cl cleanup3 cleanup2
 call runtest cl condvar7 cleanup1
 call runtest cl condvar8 condvar7
 call runtest cl condvar9 condvar8
+call runtest cl exception1 cancel4
 
 if NOT EXIST *.notrun goto skip1
 echo The following tests did not run (because prerequisite didn't pass?):
