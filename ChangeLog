@@ -1,5 +1,16 @@
 2001-07-10  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
+	* barrier.c: Still more revamping. The exclusive access
+	mutex isn't really needed so it has been removed and replaced
+	by an InterlockedDecrement(). nSerial has been removed.
+	iStep is now dual-purpose. The process shared attribute
+	is now stored in the barrier struct.
+	* implement.h (pthread_barrier_t_): Lost some/gained one
+	elements.
+	* private.c (ptw32_threadStart): Removed some comments.
+
+2001-07-10  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
 	* barrier.c: Revamped to fix the race condition. Two alternating
 	semaphores are used instead of the PulseEvent. Also improved
 	overall throughput by returning PTHREAD_BARRIER_SERIAL_THREAD

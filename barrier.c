@@ -2,7 +2,7 @@
  * barrier.c
  *
  * Description:
- * This translation unit implements spin locks primitives.
+ * This translation unit implements barrier primitives.
  *
  * Pthreads-win32 - POSIX Threads Library for Win32
  * Copyright (C) 1998
@@ -40,9 +40,7 @@ pthread_barrier_init(pthread_barrier_t * barrier,
                      const pthread_barrierattr_t * attr,
                      unsigned int count)
 {
-  int pshared = PTHREAD_PROCESS_PRIVATE;
   pthread_barrier_t b;
-  pthread_mutexattr_t ma;
 
   if (barrier == NULL || count == 0)
     {
@@ -51,33 +49,29 @@ pthread_barrier_init(pthread_barrier_t * barrier,
 
   if (NULL != (b = (pthread_barrier_t) calloc(1, sizeof(*b))))
     {
-      if (attr != NULL && *attr != NULL)
-        {
-          pshared = (*attr)->pshared;
-        }
+      b->pshared = (attr != NULL && *attr != NULL
+                    ? (*attr)->pshared
+                    : PTHREAD_PROCESS_PRIVATE);
 
       b->nCurrentBarrierHeight = b->nInitialBarrierHeight = count;
       b->iStep = 0;
-	b->nSerial = 0;
 
-      if (0 == pthread_mutexattr_init(&ma) &&
-          0 == pthread_mutexattr_setpshared(&ma, pshared))
+      /*
+       * Two semaphores are used in the same way as two stepping
+       * stones might be used in crossing a stream. Once all
+       * threads are safely on one stone, the other stone can
+       * be moved ahead, and the threads can start moving to it.
+       * If some threads decide to eat their lunch before moving
+       * then the other threads have to wait.
+       */
+      if (0 == sem_init(&(b->semBarrierBreeched[0]), b->pshared, 0))
         {
-          if (0 == pthread_mutex_init(&(b->mtxExclusiveAccess), &ma))
+          if (0 == sem_init(&(b->semBarrierBreeched[1]), b->pshared, 0))
             {
-              pthread_mutexattr_destroy(&ma);
-              if (0 == sem_init(&(b->semBarrierBreeched[0]), pshared, 0))
-                {
-                  if (0 == sem_init(&(b->semBarrierBreeched[1]), pshared, 0))
-                    {
-                      *barrier = b;
-                      return 0;
-                    }
-                  (void) sem_destroy(&(b->semBarrierBreeched[0]));
-                }
-              (void) pthread_mutex_destroy(&(b->mtxExclusiveAccess));
+              *barrier = b;
+              return 0;
             }
-          pthread_mutexattr_destroy(&ma);
+          (void) sem_destroy(&(b->semBarrierBreeched[0]));
         }
       (void) free(b);
     }
@@ -97,34 +91,30 @@ pthread_barrier_destroy(pthread_barrier_t *barrier)
     }
 
   b = *barrier;
-  
-  result = pthread_mutex_trylock(&(b->mtxExclusiveAccess));
+  *barrier = NULL;
 
-  if (0 == result)
+  if (0 == (result = sem_destroy(&(b->semBarrierBreeched[0]))))
     {
-      /*
-       * FIXME!!!
-       * The mutex isn't held by another thread but we could still
-       * be too late invalidating the barrier below since another thread
-       * may alredy have entered barrier_wait and the check for a valid
-       * *barrier != NULL.
-       */
-      *barrier = NULL;
-      (void) pthread_mutex_unlock(&(b->mtxExclusiveAccess));
-
-      (void) sem_destroy(&(b->semBarrierBreeched[1]));
-      (void) sem_destroy(&(b->semBarrierBreeched[0]));
-      (void) pthread_mutex_destroy(&(b->mtxExclusiveAccess));
-      (void) free(b);
+      if (0 == (result = sem_destroy(&(b->semBarrierBreeched[1]))))
+        {
+          (void) free(b);
+          return 0;
+        }
+      (void) sem_init(&(b->semBarrierBreeched[0]),
+                        b->pshared,
+                        0);
     }
 
+  *barrier = b;
   return(result);
 }
+
 
 int
 pthread_barrier_wait(pthread_barrier_t *barrier)
 {
   int result;
+  int step;
   pthread_barrier_t b;
 
   if (barrier == NULL || *barrier == (pthread_barrier_t) PTW32_OBJECT_INVALID)
@@ -133,69 +123,61 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
     }
 
   b = *barrier;
+  step = b->iStep;
 
-  result = pthread_mutex_lock(&(b->mtxExclusiveAccess));
-
-  if (0 == result)
+  if (0 == InterlockedDecrement((_LPLONG) &(b->nCurrentBarrierHeight)))
     {
-      int step = b->iStep;
-      unsigned int serial = b->nSerial;
-
-      if (0 == --(b->nCurrentBarrierHeight))
-        {
-          (void) pthread_mutex_unlock(&(b->mtxExclusiveAccess));
-          /*
-           * All other threads in this barrier set have at least passed
-           * through the decrement and test above, so its safe to
-           * raise the barrier to its full height.
-           */
-          b->iStep = 1 - step;
-          b->nCurrentBarrierHeight = b->nInitialBarrierHeight;
-          (void) sem_post_multiple(&(b->semBarrierBreeched[step]), b->nInitialBarrierHeight - 1);
-        }
-      else
-        {
-          pthread_t self;
-          int oldCancelState;
-
-          (void) pthread_mutex_unlock(&(b->mtxExclusiveAccess));
-
-          self = pthread_self();
- 
-          /*
-           * pthread_barrier_wait() is not a cancelation point
-           * so temporarily prevent pthreadCancelableWait() from being one.
-           */
-          if (self->cancelType == PTHREAD_CANCEL_DEFERRED)
-            {
-              pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldCancelState);
-            }
-
-          /*
-           * There is no race condition between the semaphore wait and post
-           * because we are using two alternating semas and all threads have
-           * entered barrier_wait and checked nCurrentBarrierHeight before this
-           * barrier's sema can be posted. Any threads that have not quite
-           * entered sem_wait below when the multiple_post above is called
-           * will nevertheless continue through the sema (and the barrier).
-           * We have fulfilled our synchronisation function.
-           */
-          result = sem_wait(&(b->semBarrierBreeched[step]));
-
-          if (self->cancelType == PTHREAD_CANCEL_DEFERRED)
-            {
-              pthread_setcancelstate(oldCancelState, NULL);
-            }
-        }
+      /* Must be done before posting the semaphore. */
+      b->nCurrentBarrierHeight = b->nInitialBarrierHeight;
 
       /*
-       * The first thread to return from the wait will be the
-       * PTHREAD_BARRIER_SERIAL_THREAD.
+       * There is no race condition between the semaphore wait and post
+       * because we are using two alternating semas and all threads have
+       * entered barrier_wait and checked nCurrentBarrierHeight before this
+       * barrier's sema can be posted. Any threads that have not quite
+       * entered sem_wait below when the multiple_post has completed
+       * will nevertheless continue through the sema (barrier)
+       * and will not be left stranded.
        */
-      result = ((_LONG) serial == InterlockedCompareExchange((_LPLONG) &(b->nSerial),
-                                                             (_LONG) ((serial + 1)
-                                                                      & 0x7FFFFFFF),
-                                                             (_LONG) serial)
+      if (b->nInitialBarrierHeight > 1)
+        {
+          result = sem_post_multiple(&(b->semBarrierBreeched[step]),
+                                     b->nInitialBarrierHeight - 1);
+        }
+    }
+  else
+    {
+      BOOL switchCancelState;
+      int oldCancelState;
+      pthread_t self = pthread_self();
+
+      /*
+       * This routine is not a cancelation point, so temporarily
+       * prevent sem_wait() from being one.
+       * PTHREAD_CANCEL_ASYNCHRONOUS threads can still be canceled.
+       */
+      switchCancelState = (self->cancelType == PTHREAD_CANCEL_DEFERRED &&
+                           0 == pthread_setcancelstate(PTHREAD_CANCEL_DISABLE,
+                                                       &oldCancelState));
+
+      result = sem_wait(&(b->semBarrierBreeched[step]));
+
+      if (switchCancelState)
+        {
+          (void) pthread_setcancelstate(oldCancelState, NULL);
+        }
+    }
+
+  /*
+   * The first thread across will be the PTHREAD_BARRIER_SERIAL_THREAD.
+   * It also sets up the alternate semaphore as the next barrier.
+   */
+  if (0 == result)
+    {
+      result = ((_LONG) step ==
+                InterlockedCompareExchange((_LPLONG) &(b->iStep),
+                                           (_LONG) (1L - step),
+                                           (_LONG) step)
                 ? PTHREAD_BARRIER_SERIAL_THREAD
                 : 0);
     }

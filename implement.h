@@ -189,9 +189,8 @@ struct pthread_spinlock_t_ {
 struct pthread_barrier_t_ {
   unsigned int nCurrentBarrierHeight;
   unsigned int nInitialBarrierHeight;
-  unsigned int nSerial;
   int iStep;
-  pthread_mutex_t mtxExclusiveAccess;
+  int pshared;
   sem_t semBarrierBreeched[2];
 };
 

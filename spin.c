@@ -2,7 +2,7 @@
  * spin.c
  *
  * Description:
- * This translation unit implements spin locks primitives.
+ * This translation unit implements spin lock primitives.
  *
  * Pthreads-win32 - POSIX Threads Library for Win32
  * Copyright (C) 1998
