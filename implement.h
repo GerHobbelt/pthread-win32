@@ -127,6 +127,7 @@ struct pthread_attr_t_ {
   int detachstate;
   struct sched_param param;
   int inheritsched;
+  int contentionscope;
 #if HAVE_SIGSET_T
   sigset_t sigmask;
 #endif /* HAVE_SIGSET_T */

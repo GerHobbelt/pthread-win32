@@ -360,6 +360,7 @@ pthread_attr_init(pthread_attr_t *attr)
    */
   attr_result->param.sched_priority = THREAD_PRIORITY_NORMAL;
   attr_result->inheritsched = PTHREAD_EXPLICIT_SCHED;
+  attr_result->contentionscope = PTHREAD_SCOPE_SYSTEM;
 
   attr_result->valid = PTW32_ATTR_VALID;
 
@@ -515,12 +516,15 @@ int
 pthread_attr_setscope(pthread_attr_t *attr, int contentionscope)
 {
 #ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
-  if (contentionscope != PTHREAD_SCOPE_SYSTEM)
-    {
-      return ENOTSUP;
-    }
- 
-  return 0;
+  switch (contentionscope) {
+  case PTHREAD_SCOPE_SYSTEM:
+    attr->contentionscope = contentionscope;
+    return 0;
+  case PTHREAD_SCOPE_PROCESS:
+    return ENOTSUP;
+  default:
+    return EINVAL;
+  }
 #else
   return ENOSYS;
 #endif
@@ -531,7 +535,7 @@ int
 pthread_attr_getscope(const pthread_attr_t *attr, int *contentionscope)
 {
 #ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
-  *contentionscope = PTHREAD_SCOPE_SYSTEM;
+  *contentionscope = attr->contentionscope;
   return 0;
 #else
   return ENOSYS;

@@ -1,3 +1,13 @@
+2002-01-04  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* attr.c (pthread_attr_setscope): Add more error
+	checking and actually store the scope value even
+	though it's not really necessary.
+	(pthread_attr_getscope): Return stored value.
+	* implement.h (pthread_attr_t_): Add new scope element.
+	* ANNOUNCE: Fix out of date comment next to
+	pthread_attr_setscope in conformance section.
+
 2001-12-21  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	Contributed by - Alexander Terekhov <TEREKHOV@de.ibm.com>
