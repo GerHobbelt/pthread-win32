@@ -100,7 +100,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 
   self = pthread_self ();
 
-  if (pthread_equal (self, thread) == 0)
+  if (pthread_equal (self, thread) != 0)
     {
       result = EDEADLK;
     }

@@ -508,17 +508,17 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
   int result = 0;
 
+  if (mutex == NULL)
+    {
+      return EINVAL;
+    }
+
   if (mutex->mutex == 0 && _pthread_try_enter_critical_section == NULL)
     {
       /* TryEnterCriticalSection does not exist in the OS; return ENOSYS. */
       return ENOSYS;
     }
       
-  if (mutex == NULL)
-    {
-      return EINVAL;
-    }
-
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static mutex. We check 'staticinit'
