@@ -214,10 +214,9 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
   return -1;
 #endif
 
-  if (mutex == NULL || *mutex == NULL)
-    {
-      return EINVAL;
-    }
+  /*
+   * Let the system deal with invalid pointers.
+   */
 
   /*
    * We do a quick check to see if we need to do more work
@@ -235,142 +234,135 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 
   mx = *mutex;
 
-  if (0 == InterlockedIncrement (&mx->lock_idx))
+  if (mx->kind == PTHREAD_MUTEX_NORMAL)
     {
-      mx->recursive_count = 1;
-      mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-			 ? pthread_self ()
-			 : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
+      if (0 != InterlockedIncrement (&mx->lock_idx))
+	{
+	  switch (ptw32_timed_semwait (&mx->wait_sema, abstime))
+	    {
+	      case 0:	/* We got the mutex. */
+		{
+		  break;
+		}
+	      case 1:	/* Timed out. */
+	      case 2:	/* abstime passed before we started to wait. */
+		{
+		  /*
+		   * If we timeout, it is up to us to adjust lock_idx to say
+		   * we're no longer waiting.
+		   *
+		   * The owner thread may still have posted wait_sema thinking
+		   * we were waiting. We must check but then NOT do any
+		   * programmed work if we have acquired the mutex because
+		   * we don't know how long ago abstime was. We MUST just release it
+		   * immediately.
+		   */
+		  EnterCriticalSection (&mx->wait_cs);
+
+		  result = ETIMEDOUT;
+
+		  if (-1 == sem_trywait (&mx->wait_sema))
+		    {
+		      (void) InterlockedDecrement (&mx->lock_idx);
+		    }
+		  else
+		    {
+		      if (InterlockedDecrement (&mx->lock_idx) >= 0)
+			{
+			  /* Someone else is waiting on that mutex */
+			  if (sem_post (&mx->wait_sema) != 0)
+			    {
+			      result = errno;
+			    }
+			}
+		    }
+
+		  LeaveCriticalSection (&mx->wait_cs);
+		  break;
+		}
+	      default:
+		{
+		  result = errno;
+		  break;
+		}
+	    }
+	}
     }
   else
     {
-      if (mx->kind != PTHREAD_MUTEX_FAST_NP &&
-	  pthread_equal (mx->ownerThread, pthread_self ()))
-	{
-	  (void) InterlockedDecrement (&mx->lock_idx);
+      pthread_t self = pthread_self();
 
-	  if (mx->kind == PTHREAD_MUTEX_RECURSIVE_NP)
-	    {
-	      mx->recursive_count++;
-	    }
-	  else
-	    {
-	      result = EDEADLK;
-	    }
+      if (0 == InterlockedIncrement (&mx->lock_idx))
+	{
+	  mx->recursive_count = 1;
+	  mx->ownerThread = self;
 	}
       else
 	{
-	  if (abstime == NULL)
+	  if (pthread_equal (mx->ownerThread, self))
 	    {
-	      result = EINVAL;
+	      (void) InterlockedDecrement (&mx->lock_idx);
+
+	      if (mx->kind == PTHREAD_MUTEX_RECURSIVE)
+		{
+		  mx->recursive_count++;
+		}
+	      else
+		{
+		  result = EDEADLK;
+		}
 	    }
 	  else
 	    {
 	      switch (ptw32_timed_semwait (&mx->wait_sema, abstime))
 		{
-		case 0:	/* We got the mutex. */
-		  {
-		    mx->recursive_count = 1;
-		    mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-				       ? pthread_self ()
-				       : (pthread_t)
-				       PTW32_MUTEX_OWNER_ANONYMOUS);
-		    break;
-		  }
-		case 1:	/* Timedout, try a second grab. */
-		  {
-		    int busy;
+		  case 0:	/* We got the mutex. */
+		    {
+		      mx->recursive_count = 1;
+		      mx->ownerThread = self;
+		      break;
+		    }
+		  case 1:	/* Timedout. */
+		  case 2:	/* abstime passed before we started to wait. */
+		    {
+		      /*
+		       * If we timeout, it is up to us to adjust lock_idx to say
+		       * we're no longer waiting.
+		       *
+		       * The owner thread may still have posted wait_sema thinking
+		       * we were waiting. We must check but then NOT do any
+		       * programmed work if we have acquired the mutex because
+		       * we don't know how long ago abstime was. We MUST just release it
+		       * immediately.
+		       */
+		      EnterCriticalSection (&mx->wait_cs);
 
-		    EnterCriticalSection (&mx->wait_cs);
+		      result = ETIMEDOUT;
 
-		    /*
-		     * If we timeout, it is up to us to adjust lock_idx to say
-		     * we're no longer waiting. If the mutex was also unlocked
-		     * while we were timing out, and we simply return ETIMEDOUT,
-		     * then wait_sema would be left in a state that is not consistent
-		     * with the state of lock_idx.
-		     *
-		     * We must check to see if wait_sema has just been posted
-		     * but we can't just call sem_getvalue - we must compete for
-		     * the semaphore using sem_trywait(), otherwise we would need
-		     * additional critical sections elsewhere, which would make the
-		     * logic too inefficient.
-		     *
-		     * If sem_trywait returns EAGAIN then either wait_sema
-		     * was given directly to another waiting thread or
-		     * another thread has called sem_*wait() before us and
-		     * taken the lock. Then we MUST decrement lock_idx and return
-		     * ETIMEDOUT.
-		     *
-		     * Otherwise we MUST return success (because we have effectively
-		     * acquired the lock that would have been ours had we not
-		     * timed out), and NOT decrement lock_idx.
-		     *
-		     * We can almost guarrantee that EAGAIN is the only
-		     * possible error, so no need to test errno.
-		     */
+		      if (-1 == sem_trywait (&mx->wait_sema))
+			{
+			  (void) InterlockedDecrement (&mx->lock_idx);
+			}
+		     else
+			{
+			  if (InterlockedDecrement (&mx->lock_idx) >= 0)
+			    {
+			      /* Someone else is waiting on that mutex */
+			      if (sem_post (&mx->wait_sema) != 0)
+				{
+				  result = errno;
+				}
+			    }
+			}
 
-		    if (-1 == (busy = sem_trywait (&mx->wait_sema)))
-		      {
-			(void) InterlockedDecrement (&mx->lock_idx);
-			result = ETIMEDOUT;
-		      }
-
-		    LeaveCriticalSection (&mx->wait_cs);
-
-		    if (!busy)
-		      {
-			/*
-			 * We have acquired the lock on second grab - keep it.
-			 */
-			mx->recursive_count = 1;
-			mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-					   ? pthread_self ()
-					   : (pthread_t)
-					   PTW32_MUTEX_OWNER_ANONYMOUS);
-		      }
-		    break;
-		  }
-		case 2:	/* abstime passed before we started to wait. */
-		  {
-		    /*
-		     * If we timeout, it is up to us to adjust lock_idx to say
-		     * we're no longer waiting.
-		     *
-		     * The owner thread may still have posted wait_sema thinking
-		     * we were waiting. I believe we must check but then NOT do any
-		     * programmed work if we have acquired the mutex because
-		     * we don't how long ago abstime was. We MUST just release it
-		     * immediately.
-		     */
-		    EnterCriticalSection (&mx->wait_cs);
-
-		    result = ETIMEDOUT;
-
-		    if (-1 == sem_trywait (&mx->wait_sema))
-		      {
-			(void) InterlockedDecrement (&mx->lock_idx);
-		      }
-		    else
-		      {
-			if (InterlockedDecrement (&mx->lock_idx) >= 0)
-			  {
-			    /* Someone else is waiting on that mutex */
-			    if (sem_post (&mx->wait_sema) != 0)
-			      {
-				result = errno;
-			      }
-			  }
-		      }
-
-		    LeaveCriticalSection (&mx->wait_cs);
-		    break;
-		  }
-		default:
-		  {
-		    result = errno;
-		    break;
-		  }
+		      LeaveCriticalSection (&mx->wait_cs);
+		      break;
+		    }
+		  default:
+		    {
+		      result = errno;
+		      break;
+		    }
 		}
 	    }
 	}

@@ -1,3 +1,19 @@
+2004-09-27  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* pthread_mutex_lock.c (pthread_mutex_lock): Separate PTHREAD_MUTEX_NORMAL
+	logic since we do not need to keep or check some state required by other
+	mutex types; do not check mutex pointer arg for validity - leave this to
+	the system since we are only checking for NULL pointers. This should improve
+	speed of NORMAL mutexes and marginally improve speed of other type.
+	* pthread_mutex_trylock.c (pthread_mutex_trylock): Likewise.
+	* pthread_mutex_unlock.c (pthread_mutex_unlock): Likewise; also avoid
+	entering the critical section for the no-waiters case, with approx. 30%
+	reduction in lock/unlock overhead for this case..
+	* pthread_mutex_timedlock.c (pthread_mutex_timedlock): Likewise; also
+	no longer keeps mutex if post-timeout second attempt succeeds - this will
+	assist applications that wish to impose strict lock deadlines, rather than
+	simply to escape from frozen locks.
+
 2004-09-09  Tristan Savatier  <tristan at mpegtv.com>
 	* pthread.h (struct pthread_once_t_): Qualify the 'done' element
 	as 'volatile'.

@@ -69,6 +69,9 @@ main()
   assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_DEFAULT) == 0);
   assert(pthread_mutex_init(&mutex1, &ma) == 0);
   assert(pthread_mutex_lock(&mutex1) == 0);
+  /*
+   * NORMAL (fast) mutexes don't check ownership.
+   */
   assert(pthread_create(&t, NULL, unlocker, (void *) 0) == 0);
   assert(pthread_join(t, NULL) == 0);
   assert(pthread_mutex_unlock(&mutex1) == EPERM);
@@ -78,6 +81,9 @@ main()
   assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_NORMAL) == 0);
   assert(pthread_mutex_init(&mutex1, &ma) == 0);
   assert(pthread_mutex_lock(&mutex1) == 0);
+  /*
+   * NORMAL (fast) mutexes don't check ownership.
+   */
   assert(pthread_create(&t, NULL, unlocker, (void *) 0) == 0);
   assert(pthread_join(t, NULL) == 0);
   assert(pthread_mutex_unlock(&mutex1) == EPERM);

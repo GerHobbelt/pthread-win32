@@ -423,13 +423,6 @@ struct ThreadKeyAssoc
 #define PTW32_EPS_EXIT                  (1)
 #define PTW32_EPS_CANCEL                (2)
 
-/* Mutex constants */
-enum
-{
-  PTW32_MUTEX_LOCK_IDX_INIT = -1,
-  PTW32_MUTEX_OWNER_ANONYMOUS = 1
-};
-
 
 /* Useful macros */
 #define PTW32_MAX(a,b)  ((a)<(b)?(b):(a))

@@ -44,10 +44,9 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
   int result = 0;
   pthread_mutex_t mx;
 
-  if (mutex == NULL || *mutex == NULL)
-    {
-      return EINVAL;
-    }
+  /*
+   * Let the system deal with invalid pointers.
+   */
 
   /*
    * Check to see if we have something to delete.
@@ -64,7 +63,7 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
        */
       if (result == 0)
 	{
-	  if (1 == mx->recursive_count)
+	  if (mx->kind != PTHREAD_MUTEX_RECURSIVE || 1 == mx->recursive_count)
 	    {
 	      /*
 	       * FIXME!!!

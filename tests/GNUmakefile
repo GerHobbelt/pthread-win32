@@ -273,7 +273,7 @@ sizes.pass: sizes.exe
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
-%.bench: $(XXLIBS) %.exe
+%.bench: $(LIB) $(DLL) $(HDR) $(QAPC) $(XXLIBS) %.exe
 	@ $(ECHO) Running $*
 	$*
 	@ $(ECHO) Done

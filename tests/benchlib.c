@@ -51,6 +51,31 @@ int old_mutex_use = OLD_WIN32CS;
 BOOL (WINAPI *ptw32_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
 HINSTANCE ptw32_h_kernel32;
 
+void
+dummy_call(int * a)
+{
+}
+
+void
+interlocked_inc_with_conditionals(int * a)
+{
+  if (a != NULL)
+    if (InterlockedIncrement((long *) a) == -1)
+      {
+        *a = 0;
+      }
+}
+
+void
+interlocked_dec_with_conditionals(int * a)
+{
+  if (a != NULL)
+    if (InterlockedDecrement((long *) a) == -1)
+      {
+        *a = 0;
+      }
+}
+
 int
 old_mutex_init(old_mutex_t *mutex, const old_mutexattr_t *attr)
 {

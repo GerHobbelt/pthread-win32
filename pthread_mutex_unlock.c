@@ -44,10 +44,9 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
   int result = 0;
   pthread_mutex_t mx;
 
-  if (mutex == NULL || *mutex == NULL)
-    {
-      return EINVAL;
-    }
+  /*
+   * Let the system deal with invalid pointers.
+   */
 
   mx = *mutex;
 
@@ -58,30 +57,67 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
    */
   if (mx < PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
-      if (mx->ownerThread == (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS
-	  || pthread_equal (mx->ownerThread, pthread_self ()))
+      if (mx->kind == PTHREAD_MUTEX_NORMAL)
 	{
-	  if (mx->kind != PTHREAD_MUTEX_RECURSIVE_NP
-	      || 0 == --mx->recursive_count)
+	  LONG idx;
+
+	  idx = (LONG) ptw32_interlocked_compare_exchange ((PTW32_INTERLOCKED_LPLONG)
+	  					           &mx->lock_idx,
+						           (PTW32_INTERLOCKED_LONG) -1,
+						           (PTW32_INTERLOCKED_LONG) 0);
+
+	  if (idx != 0)
 	    {
-	      mx->ownerThread = NULL;
-	      EnterCriticalSection (&mx->wait_cs);
-
-	      if (InterlockedDecrement (&mx->lock_idx) >= 0)
+	      if (idx > 0)
 		{
-		  /* Someone is waiting on that mutex */
-		  if (sem_post (&mx->wait_sema) != 0)
-		    {
-		      result = errno;
-		    }
-		}
+		  EnterCriticalSection (&mx->wait_cs);
 
-	      LeaveCriticalSection (&mx->wait_cs);
+		  if (InterlockedDecrement (&mx->lock_idx) >= 0)
+		    {
+		      /* Someone is waiting on that mutex */
+		        if (sem_post (&mx->wait_sema) != 0)
+			{
+			  result = errno;
+	 		}
+		    }
+
+		  LeaveCriticalSection (&mx->wait_cs);
+	        }
+	      else
+		{
+		  /*
+		   * Was not locked (so can't be owned by us).
+		   */
+		  result = EPERM;
+		}
 	    }
 	}
       else
 	{
-	  result = EPERM;
+	  if (pthread_equal (mx->ownerThread, pthread_self ()))
+	    {
+	      if (mx->kind != PTHREAD_MUTEX_RECURSIVE
+		  || 0 == --mx->recursive_count)
+		{
+		  mx->ownerThread = NULL;
+		  EnterCriticalSection (&mx->wait_cs);
+
+		  if (InterlockedDecrement (&mx->lock_idx) >= 0)
+		    {
+		      /* Someone is waiting on that mutex */
+		      if (sem_post (&mx->wait_sema) != 0)
+			{
+			  result = errno;
+			}
+		    }
+
+		  LeaveCriticalSection (&mx->wait_cs);
+		}
+	    }
+	  else
+	    {
+	      result = EPERM;
+	    }
 	}
     }
   else
