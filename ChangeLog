@@ -1,3 +1,32 @@
+2004-11-22  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* pthread_cond_wait.c (ptw32_cond_wait_cleanup): Undo change
+	from 2004-11-02.
+	* Makefile (DLL_VER): Added for DLL naming suffix - see README.
+	* GNUmakefile (DLL_VER): Likewise.
+	* Wmakefile (DLL_VER): Likewise.
+	* Bmakefile (DLL_VER): Likewise.
+	* pthread.dsw (version.rc): Added to MSVS workspace.
+
+2004-11-20  Boudewijn Dekker  <b.dekker at ellipsis.nl>
+
+	* pthread_getspecific.c (pthread_getspecific): Check for
+	invalid (NULL) key argument.
+
+2004-11-19  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* config.h (PTW32_THREAD_ID_REUSE_INCREMENT): Added to allow
+	building the library for either unique thread IDs like Solaris
+	or non-unique thread IDs like Linux; allows application developers
+	to override the library's default insensitivity to some apps
+	that may not be strictly POSIX compliant.
+	* version.rc: New resource module to encode version information
+	within the DLL.
+	* pthread.h: Added PTW32_VERSION* defines and grouped sections
+	required by resource compiler together; bulk of file is skipped
+	if RC_INVOKED. Defined some error numbers and other names for
+	Borland compiler.
+
 2004-11-02  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* pthread_cond_wait.c (ptw32_cond_wait_cleanup): Lock CV mutex at

@@ -4,7 +4,7 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2003 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2004 Pthreads-win32 contributors
  * 
  *      Contact Email: rpj@callisto.canberra.edu.au
  * 
@@ -32,6 +32,56 @@
 
 #if !defined( PTHREAD_H )
 #define PTHREAD_H
+
+/*
+ * See the README file for an explanation of the pthreads-win32 version
+ * numbering scheme and how the DLL is named etc.
+ */
+#define PTW32_VERSION 1,0,0,0
+#define PTW32_VERSION_STRING "1, 0, 0, 0\0"
+
+/* There are three implementations of cancel cleanup.
+ * Note that pthread.h is included in both application
+ * compilation units and also internally for the library.
+ * The code here and within the library aims to work
+ * for all reasonable combinations of environments.
+ *
+ * The three implementations are:
+ *
+ *   WIN32 SEH
+ *   C
+ *   C++
+ *
+ * Please note that exiting a push/pop block via
+ * "return", "exit", "break", or "continue" will
+ * lead to different behaviour amongst applications
+ * depending upon whether the library was built
+ * using SEH, C++, or C. For example, a library built
+ * with SEH will call the cleanup routine, while both
+ * C++ and C built versions will not.
+ */
+
+/*
+ * Define defaults for cleanup code.
+ * Note: Unless the build explicitly defines one of the following, then
+ * we default to standard C style cleanup. This style uses setjmp/longjmp
+ * in the cancelation and thread exit implementations and therefore won't
+ * do stack unwinding if linked to applications that have it (e.g.
+ * C++ apps). This is currently consistent with most/all commercial Unix
+ * POSIX threads implementations.
+ */
+#if !defined( __CLEANUP_SEH ) && !defined( __CLEANUP_CXX ) && !defined( __CLEANUP_C )
+# define __CLEANUP_C
+#endif
+
+#if defined( __CLEANUP_SEH ) && ( !defined( _MSC_VER ) && !defined(PTW32_RC_MSC))
+#error ERROR [__FILE__, line __LINE__]: SEH is not supported for this compiler.
+#endif
+
+/*
+ * Stop here if we are being included by the resource compiler.
+ */
+#ifndef RC_INVOKED
 
 #undef PTW32_LEVEL
 
@@ -242,15 +292,26 @@ enum {
 #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
 /*
- * Several systems don't define ENOTSUP. If not, we use
- * the same value as Solaris.
+ * Several systems don't define some error numbers.
  */
 #ifndef ENOTSUP
-#  define ENOTSUP 48
+#  define ENOTSUP 48   /* This is the value in Solaris. */
 #endif
 
 #ifndef ETIMEDOUT
 #  define ETIMEDOUT 10060     /* This is the value in winsock.h. */
+#endif
+
+#ifndef ENOSYS
+#  define ENOSYS 140     /* Semi-arbitrary value */
+#endif
+
+#ifndef EDEADLK
+#  ifdef EDEADLOCK
+#    define EDEADLK EDEADLOCK
+#  else
+#    define EDEADLK 36     /* This is the value in MSVC. */
+#  endif
 #endif
 
 #include <sched.h>
@@ -304,48 +365,49 @@ extern "C"
  * POSIX 1003.1-2001 Options
  * =========================
  *
- * _POSIX_THREADS (set)
- *                      If set, you can use threads
+ * Options are normally set in <unistd.h>, which is not provided
+ * with pthreads-win32.
  *
- * _POSIX_THREAD_ATTR_STACKSIZE (set)
- *                      If set, you can control the size of a thread's
+ * For conformance with the Single Unix Specification (version 3), all of the
+ * options below are defined, and have a value of either -1 (not supported)
+ * or 200112L (supported).
+ *
+ * These options can neither be left undefined nor have a value of 0, because
+ * either indicates that sysconf(), which is not implemented, may be used at
+ * runtime to check the status of the option.
+ *
+ * _POSIX_THREADS (== 200112L)
+ *                      If == 200112L, you can use threads
+ *
+ * _POSIX_THREAD_ATTR_STACKSIZE (== 200112L)
+ *                      If == 200112L, you can control the size of a thread's
  *                      stack
  *                              pthread_attr_getstacksize
  *                              pthread_attr_setstacksize
  *
- * _POSIX_THREAD_ATTR_STACKADDR (not set)
- *                      If set, you can allocate and control a thread's
+ * _POSIX_THREAD_ATTR_STACKADDR (== -1)
+ *                      If == 200112L, you can allocate and control a thread's
  *                      stack. If not supported, the following functions
  *                      will return ENOSYS, indicating they are not
  *                      supported:
  *                              pthread_attr_getstackaddr
  *                              pthread_attr_setstackaddr
  *
- * _POSIX_THREAD_PRIORITY_SCHEDULING (set)
- *                      If set, you can use realtime scheduling.
- *                      Indicates the availability of:
- *                              pthread_attr_getinheritsched
- *                              pthread_attr_getschedparam
- *                              pthread_attr_getschedpolicy
- *                              pthread_attr_getscope
- *                              pthread_attr_setinheritsched
- *                              pthread_attr_setschedparam
- *                              pthread_attr_setschedpolicy
- *                              pthread_attr_setscope
- *                              pthread_getschedparam
- *                              pthread_setschedparam
- *                              sched_get_priority_max
- *                              sched_get_priority_min
- *                              sched_rr_set_interval
+ * _POSIX_THREAD_PRIORITY_SCHEDULING (== -1)
+ *                      If == 200112L, you can use realtime scheduling.
+ *                      This option indicates that the behaviour of some
+ *                      implemented functions conforms to the additional TPS
+ *                      requirements in the standard. E.g. rwlocks favour
+ *                      writers over readers when threads have equal priority.
  *
- * _POSIX_THREAD_PRIO_INHERIT (not set)
- *                      If set, you can create priority inheritance
+ * _POSIX_THREAD_PRIO_INHERIT (== -1)
+ *                      If == 200112L, you can create priority inheritance
  *                      mutexes.
  *                              pthread_mutexattr_getprotocol +
  *                              pthread_mutexattr_setprotocol +
  *
- * _POSIX_THREAD_PRIO_PROTECT (not set)
- *                      If set, you can create priority ceiling mutexes
+ * _POSIX_THREAD_PRIO_PROTECT (== -1)
+ *                      If == 200112L, you can create priority ceiling mutexes
  *                      Indicates the availability of:
  *                              pthread_mutex_getprioceiling
  *                              pthread_mutex_setprioceiling
@@ -354,7 +416,7 @@ extern "C"
  *                              pthread_mutexattr_setprioceiling
  *                              pthread_mutexattr_setprotocol     +
  *
- * _POSIX_THREAD_PROCESS_SHARED (not set)
+ * _POSIX_THREAD_PROCESS_SHARED (== -1)
  *                      If set, you can create mutexes and condition
  *                      variables that can be shared with another
  *                      process.If set, indicates the availability
@@ -364,25 +426,73 @@ extern "C"
  *                              pthread_condattr_getpshared
  *                              pthread_condattr_setpshared
  *
- * _POSIX_THREAD_SAFE_FUNCTIONS (set)
- *                      If set you can use the special *_r library
+ * _POSIX_THREAD_SAFE_FUNCTIONS (== 200112L)
+ *                      If == 200112L you can use the special *_r library
  *                      functions that provide thread-safe behaviour
  *
- * _POSIX_READER_WRITER_LOCKS (set)
- *                      If set, you can use read/write locks
+ * _POSIX_READER_WRITER_LOCKS (== 200112L)
+ *                      If == 200112L, you can use read/write locks
  *
- * _POSIX_SPIN_LOCKS (set)
- *                      If set, you can use spin locks
+ * _POSIX_SPIN_LOCKS (== 200112L)
+ *                      If == 200112L, you can use spin locks
  *
- * _POSIX_BARRIERS (set)
- *                      If set, you can use barriers
+ * _POSIX_BARRIERS (== 200112L)
+ *                      If == 200112L, you can use barriers
  *
  *      + These functions provide both 'inherit' and/or
  *        'protect' protocol, based upon these macro
  *        settings.
  *
+ * -------------------------------------------------------------
+ */
+
+/*
+ * POSIX Options
+ */
+#undef _POSIX_THREADS
+#define _POSIX_THREADS 200112L
+
+#undef _POSIX_READER_WRITER_LOCKS
+#define _POSIX_READER_WRITER_LOCKS 200112L
+
+#undef _POSIX_SPIN_LOCKS
+#define _POSIX_SPIN_LOCKS 200112L
+
+#undef _POSIX_BARRIERS
+#define _POSIX_BARRIERS 200112L
+
+#undef _POSIX_THREAD_SAFE_FUNCTIONS
+#define _POSIX_THREAD_SAFE_FUNCTIONS 200112L
+
+#undef _POSIX_THREAD_ATTR_STACKSIZE
+#define _POSIX_THREAD_ATTR_STACKSIZE 200112L
+
+/*
+ * The following options are not supported
+ */
+#undef _POSIX_THREAD_ATTR_STACKADDR
+#define _POSIX_THREAD_ATTR_STACKADDR -1
+
+#undef _POSIX_THREAD_PRIO_INHERIT
+#define _POSIX_THREAD_PRIO_INHERIT -1
+
+#undef _POSIX_THREAD_PRIO_PROTECT
+#define _POSIX_THREAD_PRIO_PROTECT -1
+
+/* TPS is not fully supported.  */
+#undef _POSIX_THREAD_PRIORITY_SCHEDULING
+#define _POSIX_THREAD_PRIORITY_SCHEDULING -1
+
+#undef _POSIX_THREAD_PROCESS_SHARED
+#define _POSIX_THREAD_PROCESS_SHARED -1
+
+
+/*
  * POSIX 1003.1-2001 Limits
  * ===========================
+ *
+ * These limits are normally set in <limits.h>, which is not provided with
+ * pthreads-win32.
  *
  * PTHREAD_DESTRUCTOR_ITERATIONS
  *                      Maximum number of attempts to destroy
@@ -408,83 +518,33 @@ extern "C"
  *      The maximum value a semaphore can have.
  *      (only defined if not already defined)
  *
- * -------------------------------------------------------------
  */
-
-/*
- * POSIX Options
- */
-#ifndef _POSIX_THREADS
-#define _POSIX_THREADS
-#endif
-
-#ifndef _POSIX_READER_WRITER_LOCKS
-#define _POSIX_READER_WRITER_LOCKS
-#endif
-
-#ifndef _POSIX_SPIN_LOCKS
-#define _POSIX_SPIN_LOCKS
-#endif
-
-#ifndef _POSIX_BARRIERS
-#define _POSIX_BARRIERS
-#endif
-
-#define _POSIX_THREAD_SAFE_FUNCTIONS
-#define _POSIX_THREAD_ATTR_STACKSIZE
-#define _POSIX_THREAD_PRIORITY_SCHEDULING
-
-#if defined( KLUDGE )
-/*
- * The following are not supported
- */
-#define _POSIX_THREAD_ATTR_STACKADDR
-#define _POSIX_THREAD_PRIO_INHERIT
-#define _POSIX_THREAD_PRIO_PROTECT
-#define _POSIX_THREAD_PROCESS_SHARED
-
-#endif                          /* KLUDGE */
-
-/*
- * POSIX Limits
- *
- *      PTHREAD_DESTRUCTOR_ITERATIONS
- *              Standard states this must be at least
- *              4.
- *
- *      PTHREAD_KEYS_MAX
- *              WIN32 permits only 64 TLS keys per process.
- *              This limitation could be worked around by
- *              simply simulating keys.
- *
- *      PTHREADS_STACK_MIN
- *              POSIX specifies 0 which is also the value WIN32
- *              interprets as allowing the system to
- *              set the size to that of the main thread. The
- *              maximum stack size in Win32 is 1Meg. WIN32
- *              allocates more stack as required up to the 1Meg
- *              limit.
- *
- *      PTHREAD_THREADS_MAX
- *              Not documented by WIN32. Wrote a test program
- *              that kept creating threads until it failed
- *              revealed this approximate number (Windows NT).
- *              This number is somewhat less for Windows 9x
- *              and is effectively less than 64. Perhaps this
- *              constant should be set at DLL load time.
- *
- */
+#undef PTHREAD_DESTRUCTOR_ITERATIONS
 #define PTHREAD_DESTRUCTOR_ITERATIONS                          4
+
+#undef PTHREAD_KEYS_MAX
 #define PTHREAD_KEYS_MAX                        64
+
+#undef PTHREAD_STACK_MIN
 #define PTHREAD_STACK_MIN                        0
-#define PTHREAD_THREADS_MAX                   2019
-#ifndef _POSIX_SEM_NSEMS_MAX
-/* Not used and only an arbitrary value. */
-#  define _POSIX_SEM_NSEMS_MAX                1024
+
+#if PTW32_LEVEL < 2
+  /* Arbitrary value */
+#  undef PTHREAD_THREADS_MAX
+#  define PTHREAD_THREADS_MAX                   2019
 #endif
-#ifndef _POSIX_SEM_VALUE_MAX
-#  define _POSIX_SEM_VALUE_MAX         (INT_MAX/2)
-#endif
+
+  /* Arbitrary value */
+#undef _POSIX_THREAD_THREADS_MAX
+#define _POSIX_THREAD_THREADS_MAX               2019
+
+  /* Arbitrary value */
+#undef _POSIX_SEM_NSEMS_MAX
+#define _POSIX_SEM_NSEMS_MAX                    1024
+
+#undef _POSIX_SEM_VALUE_MAX
+#define _POSIX_SEM_VALUE_MAX                    (INT_MAX/2)
+
 
 #if __GNUC__ && ! defined (__declspec)
 # error Please upgrade your GNU compiler to one that supports __declspec.
@@ -665,44 +725,6 @@ enum
   PTHREAD_MUTEX_DEFAULT = PTHREAD_MUTEX_NORMAL
 };
 
-
-/* There are three implementations of cancel cleanup.
- * Note that pthread.h is included in both application
- * compilation units and also internally for the library.
- * The code here and within the library aims to work
- * for all reasonable combinations of environments.
- *
- * The three implementations are:
- *
- *   WIN32 SEH
- *   C
- *   C++
- *
- * Please note that exiting a push/pop block via
- * "return", "exit", "break", or "continue" will
- * lead to different behaviour amongst applications
- * depending upon whether the library was built
- * using SEH, C++, or C. For example, a library built
- * with SEH will call the cleanup routine, while both
- * C++ and C built versions will not.
- */
-
-/*
- * Define defaults for cleanup code.
- * Note: Unless the build explicitly defines one of the following, then
- * we default to standard C style cleanup. This style uses setjmp/longjmp
- * in the cancelation and thread exit implementations and therefore won't
- * do stack unwinding if linked to applications that have it (e.g.
- * C++ apps). This is currently consistent with most/all commercial Unix
- * POSIX threads implementations.
- */
-#if !defined( __CLEANUP_SEH ) && !defined( __CLEANUP_CXX ) && !defined( __CLEANUP_C )
-# define __CLEANUP_C
-#endif
-
-#if defined( __CLEANUP_SEH ) && defined(__GNUC__)
-#error ERROR [__FILE__, line __LINE__]: GNUC does not support SEH.
-#endif
 
 typedef struct ptw32_cleanup_t ptw32_cleanup_t;
 
@@ -1255,6 +1277,14 @@ PTW32_DLLPORT int PTW32_CDECL pthreadCancelableTimedWait (HANDLE waitHandle,
         ( _seed == _seed? rand() : rand() )
 
 
+/*
+ * Some compiler environments don't define some things.
+ */
+#if defined(__BORLANDC__)
+#  define _ftime ftime
+#  define _timeb timeb
+#endif
+
 #ifdef __cplusplus
 
 /*
@@ -1352,5 +1382,7 @@ PTW32_DLLPORT DWORD PTW32_CDECL ptw32_get_exception_services_code(void);
 
 #undef PTW32_LEVEL
 #undef PTW32_LEVEL_MAX
+
+#endif /* ! RC_INVOKED */
 
 #endif /* PTHREAD_H */

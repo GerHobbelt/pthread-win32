@@ -1,3 +1,10 @@
+2004-11-19  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* Bmakefile: New makefile for Borland.
+	* Makefile (DLL_VER): Added.
+	* GNUmakefile (DLL_VER): Added.
+	* Wmakefile (DLL_VER): Added.
+
 2004-10-29  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* semaphore4.c: New test.

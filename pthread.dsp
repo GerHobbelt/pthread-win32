@@ -48,7 +48,7 @@ RSC=rc.exe
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
-# ADD RSC /l 0x809 /d "NDEBUG"
+# ADD RSC /l 0x409 /i "." /d "NDEBUG" /d "PTW32_RC_MSC"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -74,7 +74,7 @@ LINK32=link.exe
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "_DEBUG"
-# ADD RSC /l 0x809 /d "_DEBUG"
+# ADD RSC /l 0x409 /i "." /d "_DEBUG" /d "PTW32_RC_MSC"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -120,6 +120,23 @@ SOURCE=.\semaphore.h
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# Begin Source File
+
+SOURCE=.\version.rc
+
+!IF  "$(CFG)" == "pthread - Win32 Release"
+
+# ADD BASE RSC /l 0xc09
+# ADD RSC /l 0x409 /i "." /d "PTW32_RC_MSC"
+
+!ELSEIF  "$(CFG)" == "pthread - Win32 Debug"
+
+# ADD BASE RSC /l 0xc09
+# ADD RSC /l 0x409 /i "." /d "PTW32_RC_MSC"
+
+!ENDIF 
+
+# End Source File
 # End Group
 # End Target
 # End Project

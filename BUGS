@@ -27,6 +27,11 @@ Known bugs
 
    Workaround [rpj - 2 Feb 2002]
    -----------------------------
+   [Please note: this workaround did not solve a similar problem in
+   snapshot-2004-11-03 or later, even though similar symptoms were seen.
+   tests\semaphore4.c fails in that snapshot for the VCE version of the
+   DLL. It suspected to be a compiler bug in VC6.0, and also seen in VC7.0.]
+
    The problem disappears when /Ob0 is used, i.e. /O2 /Ob0 works OK,
    but if you want to use inlining optimisation you can be much more
    specific about where it's switched off and on by using a pragma.

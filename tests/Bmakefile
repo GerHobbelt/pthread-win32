@@ -44,31 +44,27 @@ QAPC	= ..\QueueUserAPCEx\User\quserex.dll
 
 CPHDR	= pthread.h semaphore.h sched.h
 
-OPTIM	= /O2 /Ob0
+OPTIM	= -O2
 
 XXLIBS	= ws2_32.lib
 
 # C++ Exceptions
-VCEFLAGS	= /GX /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
-VCELIB	= pthreadVCE$(DLL_VER).lib
-VCEDLL	= pthreadVCE$(DLL_VER).dll
-# Structured Exceptions
-VSEFLAGS	= /D__CLEANUP_SEH
-VSELIB	= pthreadVSE$(DLL_VER).lib
-VSEDLL	= pthreadVSE$(DLL_VER).dll
+BCEFLAGS	= -P -DPtW32NoCatchWarn -D__CLEANUP_CXX
+BCELIB	= pthreadBCE$(DLL_VER).lib
+BCEDLL	= pthreadBCE$(DLL_VER).dll
 # C cleanup code
-VCFLAGS	= /D__CLEANUP_C
-VCLIB	= pthreadVC$(DLL_VER).lib
-VCDLL	= pthreadVC$(DLL_VER).dll
+BCFLAGS	= -D__CLEANUP_C
+BCLIB	= pthreadBC$(DLL_VER).lib
+BCDLL	= pthreadBC$(DLL_VER).dll
 # C++ Exceptions in application - using VC version of pthreads dll
-VCXFLAGS	= /GX /TP /D__CLEANUP_C
+BCXFLAGS	= -D__CLEANUP_C
 
 # Defaults
-CPLIB	= $(VCLIB)
-CPDLL	= $(VCDLL)
+CPLIB	= $(BCLIB)
+CPDLL	= $(BCDLL)
 
-CFLAGS= $(OPTIM) /W3 /WX /MD /nologo /Yd /Zi
-LFLAGS= /INCREMENTAL:NO
+CFLAGS= -q $(OPTIM) -w -tWC -tWM -w-aus -w-asc -w-par
+LFLAGS= 
 INCLUDES=-I.
 BUILD_DIR=..
 
@@ -80,7 +76,8 @@ EHFLAGS	=
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
-PASSES= sizes.pass  loadfree.pass \
+PASSES=   loadfree.pass \
+	  errno1.pass  \
 	  self1.pass  mutex5.pass  \
 	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
 	  semaphore1.pass  semaphore2.pass  semaphore3.pass  \
@@ -103,7 +100,6 @@ PASSES= sizes.pass  loadfree.pass \
 	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  \
 	  condvar4.pass  condvar5.pass  condvar6.pass  \
 	  condvar7.pass  condvar8.pass  condvar9.pass  \
-	  errno1.pass  \
 	  rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  \
 	  rwlock5.pass  rwlock6.pass  rwlock7.pass  rwlock8.pass  \
 	  rwlock2_t.pass  rwlock3_t.pass  rwlock4_t.pass  rwlock5_t.pass  rwlock6_t.pass  rwlock6_t2.pass  \
@@ -122,82 +118,74 @@ BENCHRESULTS = \
 
 help:
 	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) nmake clean VC    (to test using VC dll with VC (no EH) applications)
-	@ $(ECHO) nmake clean VCX   (to test using VC dll with VC++ (EH) applications)
-	@ $(ECHO) nmake clean VCE   (to test using the VCE dll with VC++ EH applications)
-	@ $(ECHO) nmake clean VSE   (to test using VSE dll with VC (SEH) applications)
-	@ $(ECHO) nmake clean VC-bench    (to benchtest using VC dll with C bench app)
-	@ $(ECHO) nmake clean VCX-bench   (to benchtest using VC dll with C++ bench app)
-	@ $(ECHO) nmake clean VCE-bench   (to benchtest using VCE dll with C++ bench app)
-	@ $(ECHO) nmake clean VSE-bench   (to benchtest using VSE dll with SEH bench app)
+	@ $(ECHO) make clean BC    (to test using BC dll with VC (no EH) applications)
+	@ $(ECHO) make clean BCX   (to test using BC dll with VC++ (EH) applications)
+	@ $(ECHO) make clean BCE   (to test using the BCE dll with VC++ EH applications)
+	@ $(ECHO) make clean BC-bench    (to benchtest using BC dll with C bench app)
+	@ $(ECHO) make clean BCX-bench   (to benchtest using BC dll with C++ bench app)
+	@ $(ECHO) make clean BCE-bench   (to benchtest using BCE dll with C++ bench app)
 
 all:
-	@ nmake clean VC
-	@ nmake clean VCX
-	@ nmake clean VCE
-	@ nmake clean VSE
-	@ nmake clean VC-bench
+	@ make clean BC
+	@ make clean BCX
+	@ make clean BCE
+	@ make clean BC-bench
 
 # This allows an individual test application to be made using the default lib.
-# e.g. nmake clean test cancel3.exe
+# e.g. make clean test cancel3.exe
 test: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC)
 
-tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) $(PASSES)
+tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) sizes.pass $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
-benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(XXLIBS) $(BENCHRESULTS)
+benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(BENCHRESULTS)
 	@ $(ECHO) ALL BENCH TESTS DONE.
 
 sizes.pass: sizes.exe
-	@ $(ECHO) ... Running $(TEST)$(DLL_VER) test: $*.exe
+	@ $(ECHO) ... Running $(TEST) test: $*.exe
 	@ .\$*.exe > SIZES.$(TEST)
 	@ $(CAT) SIZES.$(TEST)
 	@ $(ECHO) ...... Passed
 	@ $(TOUCH) $*.pass
 
-$(PASSES): $*.exe
-	@ $(ECHO) ... Running $(TEST) test: $*.exe
-	@ .\$*.exe
+BCE:
+	@ make -f Bmakefile TEST="$@" CPLIB="$(BCELIB)" CPDLL="$(BCEDLL)" EHFLAGS="$(BCEFLAGS)" tests
+
+BC:
+	@ make -f Bmakefile TEST="$@" CPLIB="$(BCLIB)" CPDLL="$(BCDLL)" EHFLAGS="$(BCFLAGS)" tests
+
+BCX:
+	@ make -f Bmakefile TEST="$@" CPLIB="$(BCLIB)" CPDLL="$(BCDLL)" EHFLAGS="$(BCXFLAGS)" tests
+
+BCE-bench:
+	@ make -f Bmakefile TEST="$@" CPLIB="$(BCELIB)" CPDLL="$(BCEDLL)" EHFLAGS="$(BCEFLAGS)" XXLIBS="benchlib.o" benchtests
+
+BC-bench:
+	@ make -f Bmakefile TEST="$@" CPLIB="$(BCLIB)" CPDLL="$(BCDLL)" EHFLAGS="$(BCFLAGS)" XXLIBS="benchlib.o" benchtests
+
+BCX-bench:
+	@ make -f Bmakefile TEST="$@" CPLIB="$(BCLIB)" CPDLL="$(BCDLL)" EHFLAGS="$(BCXFLAGS)" XXLIBS="benchlib.o" benchtests
+
+.exe.pass:
+	@ $(ECHO) ... Running $(TEST) test: $<
+	@ .\$<
 	@ $(ECHO) ...... Passed
-	@ $(TOUCH) $*.pass
+	@ $(TOUCH) $@
 
-$(BENCHRESULTS): $*.exe
-	@ $(ECHO) ... Running $(TEST) benchtest: $*.exe
-	@ .\$*.exe
+.exe.bench:
+	@ $(ECHO) ... Running $(TEST) benchtest: $<
+	@ .\$<
 	@ $(ECHO) ...... Done
-	@ $(TOUCH) $*.bench
-
-VCE:
-	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
-
-VSE:	
-	@ nmake TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" tests
-
-VC:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
-
-VCX:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
-
-VCE-bench:
-	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" benchtests
-
-VSE-bench:
-	@ nmake TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" benchtests
-
-VC-bench:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" benchtests
-
-VCX-bench:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(TOUCH) $@
 
 .c.exe:
-	@ $(ECHO) $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
-	@ $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
+	@ $(ECHO) $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< -e$@ $(LFLAGS) $(CPLIB) $(XXLIBS)
+	@ $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< -e$@ $(LFLAGS) $(CPLIB) $(XXLIBS)
 
 .c.o:
-	@ $(ECHO) $(CC) $(EHFLAGS) /c $(CFLAGS) $(INCLUDES) $< /Fo$@
-	@ $(CC) $(EHFLAGS) $(CFLAGS) /c $(INCLUDES) $< /Fo$@
+	@ $(ECHO) $(CC) $(EHFLAGS) -c $(CFLAGS) $(INCLUDES) $< -o$@
+	@ $(CC) $(EHFLAGS) $(CFLAGS) -c $(INCLUDES) $< -o$@
+
 
 .c.i:
 	@ $(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<
@@ -219,6 +207,7 @@ clean:
 	- $(RM) *.e
 	- $(RM) *.i
 	- $(RM) *.obj
+	- $(RM) *.tds
 	- $(RM) *.pdb
 	- $(RM) *.o
 	- $(RM) *.asm

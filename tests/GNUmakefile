@@ -5,7 +5,7 @@
 #
 #      Pthreads-win32 - POSIX Threads Library for Win32
 #      Copyright(C) 1998 John E. Bossom
-#      Copyright(C) 1999,2003 Pthreads-win32 contributors
+#      Copyright(C) 1999,2004 Pthreads-win32 contributors
 # 
 #      Contact Email: rpj@callisto.canberra.edu.au
 # 
@@ -31,6 +31,7 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
+DLL_VER	= 1
 
 CP	= cp -f
 MV	= mv -f
@@ -55,8 +56,12 @@ CFLAGS	= -g -UNDEBUG -Wall $(XXCFLAGS)
 BUILD_DIR	= ..
 INCLUDES	= -I.
 
+
+TEST	= GC
+
 # Default lib version
-GCX	= GC
+GCX	= $(TEST)$(DLL_VER)
+
 # Files we need to run the tests
 # - paths are relative to pthreads build dir.
 HDR	= pthread.h semaphore.h sched.h
@@ -119,19 +124,19 @@ all:
 	@ $(MAKE) clean GCE
 
 GC:
-	$(MAKE) GCX=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" all-pass
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" all-pass
 
 GCE:
-	$(MAKE) GCX=GCE CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-pass
+	$(MAKE) TEST=GCE CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-pass
 
 GCX:
-	$(MAKE) GCX=GC CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
+	$(MAKE) TEST=GC CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
 
 GC-bench:
-	$(MAKE) GCX=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
 
 GCE-bench:
-	$(MAKE) GCX=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
+	$(MAKE) TEST=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
 
 all-pass: $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
@@ -269,8 +274,8 @@ cancel9.pass: cancel8.pass
 
 sizes.pass: sizes.exe
 	@ $(ECHO) Running $*
-	$< > SIZES.$(GCX)
-	@ $(CAT) SIZES.$(GCX)
+	$< > SIZES.$(TEST)
+	@ $(CAT) SIZES.$(TEST)
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
@@ -301,13 +306,13 @@ $(COPYFILES):
 	@ $(ECHO) Copying $@
 	@ $(CP) $(BUILD_DIR)/$@ .
 
-pthread.dll:
-	@ $(CP) $(DLL) $@
-
 benchlib.o: benchlib.c
 	@ $(ECHO) Compiling $@
 	@ $(ECHO) $(CC) -c $(CFLAGS) $< $(INCLUDES)
 	@ $(CC) -c $(CFLAGS) $< $(INCLUDES)
+
+pthread.dll: $(DLL)
+	@ $(CP) $(DLL) $@
 
 clean:
 	- $(RM) *.dll

@@ -8,7 +8,7 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2003 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2004 Pthreads-win32 contributors
  * 
  *      Contact Email: rpj@callisto.canberra.edu.au
  * 
@@ -102,12 +102,6 @@ char * error_string[] = {
 # undef assert
 #endif
 
-#ifdef NDEBUG
-
-# define assert(e) ((void)0)
-
-#else /* NDEBUG */
-
 #ifndef ASSERT_TRACE
 # define ASSERT_TRACE 0
 #else
@@ -133,8 +127,5 @@ int assertE;
                              0) : \
           (fprintf(stderr, "Assertion failed: (%s %s %s), file %s, line %d, error %s\n", \
                    #e,#o,#r, __FILE__, (int) __LINE__, error_string[assertE]), exit(1), 0))
-
-#endif /* NDEBUG */
-
 
 #endif
