@@ -98,10 +98,10 @@ BOOL TlsSetValue(DWORD index, LPVOID value)
 	return TRUE;
 }
 
-BOOL TlsGetValue(DWORD index, LPVOID value)
+LPVOID TlsGetValue(DWORD index)
 {
 	DIAG("TlsGetValue");
-	return TRUE;
+	return 0;
 }
 
 BOOL SetThreadPriority(HANDLE threadHandle, int priority)

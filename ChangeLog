@@ -1,3 +1,14 @@
+1998-08-11  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile (LIB): Define.
+	(clean): Define target.
+	(all): Build a library not just the object files.
+
+	* pthread.h: Provide a definition for struct timespec if we don't
+	already have one.
+
+	* windows.c (TlsGetValue): Bug fix.
+	
 Thu Aug  6 15:19:22 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* misc.c (pthread_once): Fix arg 1 of EnterCriticalSection()
