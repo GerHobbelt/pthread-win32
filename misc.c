@@ -13,7 +13,7 @@ int
 pthread_once(pthread_once_t *once_control,
 	     void (*init_routine)(void))
 {
-  /* A flag, allocated per invocation, that indicates if the amotic
+  /* A flag, allocated per invocation, that indicates if the atomic
      test-and-set occured. */
   unsigned short flag = 0;
 

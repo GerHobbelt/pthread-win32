@@ -19,6 +19,11 @@ enum {
   _PTHREAD_REUSE
 };
 
+enum {
+  _PTHREAD_TSD_KEY_DELETED,
+  _PTHREAD_TSD_KEY_INUSE
+};
+
 #define _PTHREAD_VALID(T) \
   ((T) != NULL \
    && ((T)->ptstatus == _PTHREAD_NEW \
@@ -38,6 +43,14 @@ struct _pthread_handler_node {
   _pthread_handler_node_t * next;
   void (* routine)(void *);
   void * arg;
+};
+
+/* TSD key element. */
+typedef struct _pthread_tsd_key _pthread_tsd_key_t;
+
+struct _pthread_tsd_key {
+  int in_use;
+  void (* destructor)(void *);
 };
 
 /* Stores a thread call routine and argument. */
@@ -84,7 +97,6 @@ struct _pthread {
 
   /* These must be kept in this order and together. */
   _pthread_handler_node_t *   cleanupstack;
-  _pthread_handler_node_t *   destructorstack;
   _pthread_handler_node_t *   forkpreparestack;
   _pthread_handler_node_t *   forkparentstack;
   _pthread_handler_node_t *   forkchildstack;
@@ -107,12 +119,7 @@ void _pthread_handler_pop(int stack,
 void _pthread_handler_pop_all(int stack,
 			      int execute);
 
-int _pthread_destructor_push(void (*routine)(void *),
-			     pthread_key_t key);
-
-void _pthread_destructor_pop(pthread_key_t key);
-
-void _pthread_destructor_pop_all();
+void _pthread_destructor_run_all();
 
 /* Primitives to manage threads table entries. */
 
@@ -160,6 +167,9 @@ extern pthread_t _pthread_win32handle_map[];
 
 /* Per thread mutex locks. */
 extern pthread_mutex_t _pthread_threads_mutex_table[];
+
+/* Global TSD key array. */
+extern _pthread_tsd_key_t _pthread_tsd_key_table[];
 
 #endif /* _IMPLEMENT_H */
 

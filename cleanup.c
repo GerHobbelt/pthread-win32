@@ -120,112 +120,36 @@ _pthread_handler_pop_all(int stack, int execute)
     }
 }
 
-
-int
-_pthread_destructor_push(void (* routine)(void *), pthread_key_t key)
-{
-  return _pthread_handler_push(_PTHREAD_DESTRUCTOR_STACK, 
-			       _PTHREAD_HANDLER_POP_LIFO,
-			       routine, 
-			       (void *) key);
-}
-
-
-/* Remove all of the destructors associated with the key. */
-void
-_pthread_destructor_pop(pthread_key_t key)
-{
-  _pthread_handler_node_t ** head;
-  _pthread_handler_node_t * current;
-  _pthread_handler_node_t * next;
-
-  head = _PTHREAD_STACK(_PTHREAD_DESTRUCTOR_STACK);
-  current = *head;
-
-  while (current != NULL)
-    {
-      next = current->next;
-
-      /* The destructors associated key is in current->arg. */
-      if (current->arg == (void *) key)
-	{
-	  if (current == *head)
-	    {
-	      *head = next;
-	    }
-	  free(current);
-	}
-      current = next;
-    }
-}
-
-
-/* Run destructors for all non-NULL key values.
-
-   FIXME: Currently we only run the destructors on the calling
-   thread's key values. The way I interpret POSIX semantics is that,
-   for each key that the calling thread has a destructor for, we need
-   to look at the key values of every thread and run the destructor on
-   it if the key value is non-NULL.
-
-   The question is: how do we access the key associated values which
-   are private to other threads?
-
+/* Run destructors for all non-NULL key values for the calling thread.
  */
 void
-_pthread_destructor_pop_all()
+_pthread_destructor_run_all()
 {
-  _pthread_handler_node_t ** head;
-  _pthread_handler_node_t * current;
-  _pthread_handler_node_t * next;
-  void (* func)(void *);
+  _pthread_tsd_key_t * k;
   void * arg;
   int count;
 
-  head = _PTHREAD_STACK(_PTHREAD_DESTRUCTOR_STACK);
+  k = _pthread_tsd_key_table;
 
   /* Stop destructor execution at a finite time. POSIX allows us
      to ignore this if we like, even at the risk of an infinite loop.
    */
   for (count = 0; count < PTHREAD_DESTRUCTOR_ITERATIONS; count++)
     {
-      /* Loop through all destructors for this thread. */
-      while (current != NULL)
+      /* Loop through all keys. */
+      for (key = 0; key < _POSIX_THREAD_KEYS_MAX; key++)
 	{
-	  func = current->routine;
+	  if (k->in_use != 1)
+	    continue;
 
-	  /* Get the key value using the key which is in current->arg. */
-	  arg = pthread_getspecific((int) current->arg);
+	  arg = pthread_getspecific(key);
 
-	  next = current->next;
-
-	  /* If the key value is non-NULL run the destructor, otherwise
-	     unlink it from the list.
-	   */
-	  if (arg != NULL)
+	  if (arg != NULL && k->destructor != NULL)
 	    {
-	      if (func != NULL)
-		{
-		  (void) func(arg);
-		}
+	      (void) (k->destructor)(arg);
 	    }
-	  else
-	    {
-	      if (current == *head)
-		{
-		  *head = next;
-		}
-	      free(current);
-	    }
-	  current = next;
+
+	  k++;
 	}
-    }
-
-  /* Free the destructor list even if we still have non-NULL key values. */
-  while (*head != NULL)
-    {
-      next = (*head)->next;
-      free(*head);
-      *head = next;
     }
 }

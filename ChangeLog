@@ -1,3 +1,42 @@
+Mon Oct 12 00:00:44 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h (_pthread_tsd_key_table): New.
+
+	* create.c (_pthread_start_call): Initialise per-thread TSD keys
+	to NULL.
+
+	* misc.c (pthread_once): Correct typo in comment.
+
+	* implement.h (_pthread_destructor_push): Remove.
+	(_pthread_destructor_pop): Remove.
+	(_pthread_destructor_run_all): Rename from _pthread_destructor_pop_all.
+	(_PTHREAD_TSD_KEY_DELETED): Add enum.
+	(_PTHREAD_TSD_KEY_INUSE): Add enum.
+
+	* cleanup.c (_pthread_destructor_push): Remove.
+	(_pthread_destructor_pop): Remove.
+	(_pthread_destructor_run_all): Totally revamped TSD.
+
+	* dll.c (_pthread_TSD_keys_TlsIndex): Initialise.
+
+	* tsd.c (pthread_setspecific): Totally revamped TSD.
+	(pthread_getspecific): Ditto.
+	(pthread_create): Ditto.
+	(pthread_delete): Ditto.
+
+Sun Oct 11 22:44:55 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* global.c (_pthread_tsd_key_table): Add new global.
+
+	* implement.h (_pthread_tsd_key_t and struct _pthread_tsd_key):
+	Add.
+	(struct _pthread): Remove destructorstack.
+
+	* cleanup.c (_pthread_destructor_run_all): Rename from
+ 	_pthread_destructor_pop_all. The key destructor stack was made
+ 	global rather than per-thread. No longer removes destructor nodes
+	from the stack. Comments updated.
+
 1998-10-06  Ben Elliston  <bje@cygnus.com>
 
 	* condvar.c (cond_wait): Use POSIX, not Win32 mutex calls.
