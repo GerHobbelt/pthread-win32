@@ -1,5 +1,5 @@
 /* 
- * rwlock3.c
+ * rwlock4.c
  *
  * Declare a static rwlock object, rdlock it, trywrlock it, 
  * and then unlock it again.
