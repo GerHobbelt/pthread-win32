@@ -2,8 +2,11 @@
 Known bugs
 ----------
 
-1. Under MS VC++ (only tested with version 6.0), a term_func
-   set via the standard C++ set_terminate() function is not called.
+1. Not strictly a bug, more of a gotcha.
+
+   Under MS VC++ (only tested with version 6.0), a term_func
+   set via the standard C++ set_terminate() function causes the
+   application to abort.
 
    Notes from the MSVC++ manual:
          1) A term_func() should call exit(), otherwise
