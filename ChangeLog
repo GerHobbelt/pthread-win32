@@ -1,3 +1,17 @@
+1998-07-13  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.h (pthread_mutex_t): Define this type.
+	(pthread_mutex_destroy): Add function prototype.
+	(pthread_lock): Likewise.
+	(pthread_trylock): Likewise.
+	(pthread_unlock): Likewise.
+
+	* mutex.c (pthread_mutex_init): Implement.
+	(pthread_mutex_destroy): Likewise.
+	(pthread_lock): Likewise.
+	(pthread_trylock): Likewise.
+	(pthread_unlock): Likewise.
+
 1998-07-12  Ben Elliston  <bje@cygnus.com>
 
 	* implement.h (_pthread_mutex_attr_t): Define this implementation
