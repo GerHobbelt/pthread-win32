@@ -21,6 +21,8 @@ AC_CACHE_CHECK(for _stdcall keyword, p32_cv_stdcall,
 
 if test x$p32_cv_stdcall = xyes ; then
   AC_DEFINE(STDCALL, _stdcall)
+else
+  AC_DEFINE(STDCALL,)
 fi
 
 AC_CHECK_HEADERS(windows.h,,AC_MSG_WARN([Target system must be Win32]))
