@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define PTHREAD_PROCESS_SHARED  1
 
 typedef HANDLE pthread_t;
+typedef HANDLE pthread_mutex_t;
 typedef struct { void * ptr; } pthread_mutexattr_t;
 
 #ifdef __cplusplus
@@ -56,6 +57,19 @@ int pthread_mutexattr_setpshared(pthread_mutexattr_t *attr,
 
 int pthread_mutexattr_getpshared(pthread_mutexattr_t *attr,
 				 int *pshared);
+
+/* Primitives for mutexes. */
+
+int pthread_mutex_init(pthread_mutex_t *mutex,
+		       pthread_mutex_attr_t *attr);
+
+int pthread_mutex_destroy(pthread_mutex_t *mutex);
+
+int pthread_mutex_lock(pthread_mutex_t *mutex);
+
+int pthread_mutex_trylock(pthread_mutex_t *mutex);
+
+int pthread_mutex_unlock(pthread_mutex_t *mutex);
 
 /* These functions cannot be implemented in terms of the Win32 API.
    Fortunately they are optional.  Their implementation just returns
