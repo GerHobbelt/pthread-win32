@@ -13,14 +13,16 @@ and place the fllowing text in the message body:
 
 Building the library with Cygwin32 or Mingw32
 ---------------------------------------------
-Jan 23, 1999
+Feb 10, 1999
 
-The package cannot be built using cygwin32 or mingw32 yet.
-I'm working on this now. Initially it will be made to compile using g++
-because the implementation uses exception handling for cancellation
-to work. The library is C callable though so if you need to write
-applications in C you'll have to grab the pre-built DLL.
+If you have a suitable environment run the configure script, otherwise you
+can copy Makefile.in to Makefile and edit it as required.
 
+There is an unresolved bug which shows up as a segmentation fault
+(memory access violation) when the library is built using g++. Build
+the test program "eyal1.c" and run with an argument of "2" or greater.
+The argument is the number of threads to run, excluding the main thread,
+so the bug appears with 2 or more worker threads.
 
 The complete source code in tar format and a precompiled DLL and
 matching pthread.h can be found at:
