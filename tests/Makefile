@@ -74,7 +74,8 @@ PASSES= loadfree.pass \
 	  semaphore1.pass  semaphore2.pass  self1.pass  mutex5.pass  \
 	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  mutex2.pass  mutex3.pass  \
 	  condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
-	  exit1.pass  create1.pass  equal1.pass  \
+	  exit1.pass  create1.pass  create2.pass  reuse1.pass  reuse2.pass  equal1.pass  \
+	  kill1.pass  valid1.pass  valid2.pass  \
 	  exit2.pass  exit3.pass  \
 	  join0.pass  join1.pass  join2.pass  \
 	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
@@ -232,6 +233,7 @@ condvar9.pass: condvar8.pass
 context1.pass: cancel2.pass
 count1.pass: join1.pass
 create1.pass: mutex2.pass
+create2.pass: create1.pass
 delay1.pass:
 delay2.pass: delay1.pass
 equal1.pass: create1.pass
@@ -247,6 +249,7 @@ inherit1.pass: join1.pass
 join0.pass: create1.pass
 join1.pass: create1.pass
 join2.pass: create1.pass
+kill1.pass: 
 loadfree.pass: pthread.dll
 mutex1.pass: self1.pass
 mutex1n.pass: mutex1.pass
@@ -271,6 +274,8 @@ mutex8r.pass: mutex7r.pass
 once1.pass: create1.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass
+reuse1.pass: create2.pass
+reuse2.pass: reuse1.pass
 rwlock1.pass: condvar6.pass
 rwlock2.pass: rwlock1.pass
 rwlock3.pass: rwlock2.pass
@@ -293,3 +298,5 @@ spin2.pass: spin1.pass
 spin3.pass: spin2.pass
 spin4.pass: spin3.pass
 tsd1.pass: join1.pass
+valid1.pass: join1.pass
+valid2.pass: valid1.pass

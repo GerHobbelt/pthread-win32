@@ -89,6 +89,7 @@ ptw32_processInitialize (void)
   /* 
    * Set up the global locks.
    */
+  InitializeCriticalSection(&ptw32_thread_reuse_lock);
   InitializeCriticalSection(&ptw32_mutex_test_init_lock);
   InitializeCriticalSection(&ptw32_cond_list_lock);
   InitializeCriticalSection(&ptw32_cond_test_init_lock);

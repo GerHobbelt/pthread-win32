@@ -35,6 +35,7 @@ condvar3_1::	condvar3_1.c
 condvar3_2::	condvar3_2.c
 condvar3_3::	condvar3_3.c
 create1.::	create1.c
+create2.::	create2.c
 cancel1::	cancel1.c
 cancel2::	cancel2.c
 mutex3::	mutex3.c
@@ -59,6 +60,7 @@ exit4::		exit4.c
 join0::		join0.c
 join1::		join1.c
 join2::		join2.c
+kill1::		kill1.c
 count1::	count1.c
 once1::		once1.c
 tsd1::		tsd1.c
@@ -72,6 +74,8 @@ condvar7::	condvar7.c
 condvar8::	condvar8.c
 condvar9::	condvar9.c
 errno1::	errno1.c
+reuse1.::	reuse1.c
+reuse2.::	reuse2.c
 rwlock1::	rwlock1.c
 rwlock2::	rwlock2.c
 rwlock3::	rwlock3.c
@@ -117,6 +121,8 @@ benchtest2::    benchtest2.c
 benchtest3::    benchtest3.c
 benchtest4::    benchtest4.c
 benchtest5::    benchtest5.c
+valid1::	valid1.c
+valid2::	valid2.c
 
 loadfree:	:test:
 semaphore1	:test:	loadfree
@@ -126,12 +132,16 @@ mutex1		:test:	loadfree
 mutex2		:test:	loadfree
 exit1		:test:	loadfree
 condvar1	:test:	loadfree
+kill1		:test:	loadfree
 condvar1_1	:test:	condvar1
 condvar1_2	:test:	join2
 self1		:test:	loadfree
 condvar2	:test:	condvar1
 condvar2_1	:test:	condvar2
 create1 	:test:	mutex2
+create2 	:test:	create1
+reuse1 		:test:	create2
+reuse2 		:test:	reuse1
 cancel1		:test:	create1
 cancel2		:test:	cancel1
 mutex3		:test:	create1
@@ -213,4 +223,6 @@ exception1	:test:	cancel4
 exception2	:test:	exception1
 exception3	:test:	exception2
 exit4		:test:	exit3
+valid1		:test:	join1
+valid2		:test:	valid1
 

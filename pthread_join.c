@@ -38,6 +38,12 @@
 #include "pthread.h"
 #include "implement.h"
 
+/*
+ * Not needed yet, but defining it should indicate clashes with build target
+ * environment that should be fixed.
+ */
+#include <signal.h>
+
 
 int
 pthread_join (pthread_t thread, void **value_ptr)
@@ -74,20 +80,27 @@ pthread_join (pthread_t thread, void **value_ptr)
       * ------------------------------------------------------
       */
 {
-  int result = 0;
+  int result;
   pthread_t self;
 
+  /* This is the proper way to test for a valid thread ID */
+  result = pthread_kill(thread, 0);
+  if (0 != result)
+    {
+      return result;
+    }
+
   self = pthread_self ();
-  if (self == NULL)
+  if (NULL == self)
     {
        return ENOENT;
     }
 
-  if (pthread_equal (self, thread) != 0)
+  if (0 != pthread_equal (self, thread))
     {
       result = EDEADLK;
     }
-  else if (thread->detachState == PTHREAD_CREATE_DETACHED)
+  else if (PTHREAD_CREATE_DETACHED == thread->detachState)
     {
       result = EINVAL;
     }

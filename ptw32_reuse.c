@@ -1,9 +1,8 @@
 /*
- * ptw32_threadDestroy.c
+ * ptw32_threadReuse.c
  *
  * Description:
- * This translation unit implements routines which are private to
- * the implementation and may be used throughout it.
+ * This translation unit implements miscellaneous thread functions.
  *
  * --------------------------------------------------------------------------
  *
@@ -39,47 +38,57 @@
 #include "implement.h"
 
 
-void
-ptw32_threadDestroy (pthread_t thread)
+/*
+ * The thread reuse stack is a simple LIFO stack managed through a singly
+ * linked list element in the pthread_t struct.
+ *
+ * All thread structs on the stack are clean and ready for reuse.
+ *
+ * The pthread_t_ struct's prevReuse element can be tested to check for an invalid
+ * thread ID. A NULL value indicates a valid thread. Applications should use the
+ * pthread_kill() function with a zero signal value to test for a valid thread ID.
+ */
+
+/*
+ * Pop a clean pthread_t struct off the reuse stack.
+ */
+pthread_t
+ptw32_threadReusePop (void)
 {
-  struct pthread_t_ threadCopy;
+  pthread_t t;
 
-  if (thread != NULL)
+  EnterCriticalSection(&ptw32_thread_reuse_lock);
+
+  t = ptw32_threadReuseTop;
+
+  if (PTW32_THREAD_REUSE_BOTTOM != t)
     {
-      (void) pthread_mutex_lock(&thread->cancelLock);
-      thread->state = PThreadStateLast;
-      (void) pthread_mutex_unlock(&thread->cancelLock);
-
-      ptw32_callUserDestroyRoutines (thread);
-
-      /*
-       * Copy thread state so that the thread can be atomically NULLed.
-       */
-      memcpy(&threadCopy, thread, sizeof(threadCopy));
-
-      /*
-       * Thread ID structs are never freed. They're NULLed and reused.
-       * This also sets the thread to PThreadStateInitial (invalid).
-       */
-      ptw32_threadReusePush(thread);
-
-      /* Now work on the copy. */
-      if (threadCopy.cancelEvent != NULL)
-	{
-	  CloseHandle (threadCopy.cancelEvent);
-	}
-
-      (void) pthread_mutex_destroy(&threadCopy.cancelLock);
-
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
-      /* See documentation for endthread vs endthreadex. */
-      if( threadCopy.threadH != 0 )
-	{
-	  CloseHandle( threadCopy.threadH );
-	}
-#endif
-
+      ptw32_threadReuseTop = t->prevReuse;
+      t->prevReuse = NULL;
+    }
+  else
+    {
+      t = NULL;
     }
 
-}				/* ptw32_threadDestroy */
+  LeaveCriticalSection(&ptw32_thread_reuse_lock);
+
+  return t;
+
+}
+
+/*
+ * Push a clean pthread_t struct onto the reuse stack.
+ */
+void
+ptw32_threadReusePush (pthread_t thread)
+{
+  EnterCriticalSection(&ptw32_thread_reuse_lock);
+
+  memset(thread, 0, sizeof (*thread));
+  thread->prevReuse = ptw32_threadReuseTop;
+  ptw32_threadReuseTop = thread;
+
+  LeaveCriticalSection(&ptw32_thread_reuse_lock);
+}
 

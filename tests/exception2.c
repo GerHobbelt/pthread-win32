@@ -78,7 +78,7 @@
 
 #if defined(_MSC_VER) && defined(__cplusplus)
 #include <eh.h>
-#else
+#elif defined(__cplusplus)
 #include <exception>
 #endif
 

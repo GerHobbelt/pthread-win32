@@ -164,11 +164,6 @@ pthread_sigmask(int how, sigset_t const *set, sigset_t *oset)
   return 0;
 }
 
-int pthread_kill(pthread_t thread,
-		 int signo)
-{
-}
-
 int sigwait(const sigset_t *set,
 	    int *sig)
 {

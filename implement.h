@@ -86,7 +86,7 @@ typedef enum {
   PThreadStateInitial = 0,	/* Thread not running			*/
   PThreadStateRunning,		/* Thread alive & kicking		*/
   PThreadStateSuspended,	/* Thread alive but suspended		*/
-  PThreadStateCanceling,	/* Thread alive but and is		*/
+  PThreadStateCanceling,	/* Thread alive but is                  */
 				/* in the process of terminating	*/
 				/* due to a cancellation request	*/
   PThreadStateException,	/* Thread alive but exiting		*/
@@ -114,7 +114,8 @@ struct pthread_t_ {
   DWORD dummy[5];
 #endif
   DWORD thread;
-  HANDLE threadH;
+  HANDLE threadH;             /* POSIX thread is invalid if threadH == 0 */
+  pthread_t prevReuse;        /* Links threads on reuse stack */
   PThreadState state;
   PThreadDemise demise;
   void *exitStatus;
@@ -424,7 +425,11 @@ extern PTW32_INTERLOCKED_LONG (WINAPI *ptw32_interlocked_compare_exchange)(PTW32
 									   PTW32_INTERLOCKED_LONG,
 									   PTW32_INTERLOCKED_LONG);
 
+/* Thread Reuse stack bottom marker. Must not be NULL or any valid pointer to memory. */
+#define PTW32_THREAD_REUSE_BOTTOM ((pthread_t) 1)
+
 extern int ptw32_processInitialized;
+extern pthread_t ptw32_threadReuseTop;
 extern pthread_key_t ptw32_selfThreadKey;
 extern pthread_key_t ptw32_cleanupKey;
 extern pthread_cond_t ptw32_cond_list_head;
@@ -434,6 +439,7 @@ extern int ptw32_mutex_default_kind;
 
 extern int ptw32_concurrency;
 
+extern CRITICAL_SECTION ptw32_thread_reuse_lock;
 extern CRITICAL_SECTION ptw32_mutex_test_init_lock;
 extern CRITICAL_SECTION ptw32_cond_list_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
@@ -486,7 +492,11 @@ void ptw32_pop_cleanup_all (int execute);
 
 pthread_t ptw32_new (void);
 
-int ptw32_getprocessors(int * count);
+pthread_t ptw32_threadReusePop (void);
+
+void ptw32_threadReusePush (pthread_t thread);
+
+int ptw32_getprocessors (int * count);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
 unsigned __stdcall

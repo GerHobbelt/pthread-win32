@@ -232,6 +232,8 @@ The following functions are implemented:
       Signals
       ---------------------------
       pthread_sigmask
+      pthread_kill           (only supports zero sig value,
+                              for thread validity checking)
 
       ---------------------------
       Non-portable routines (see the README.NONPORTABLE file for usage)
@@ -311,7 +313,6 @@ The following functions are not implemented:
       ---------------------------
       Signals
       ---------------------------
-      pthread_kill
       sigtimedwait
       sigwait
       sigwaitinfo

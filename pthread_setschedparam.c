@@ -43,11 +43,13 @@ pthread_setschedparam(pthread_t thread, int policy,
 			  const struct sched_param *param)
 {
   int prio;
+  int result;
 
   /* Validate the thread id. */
-  if (thread == NULL || thread->threadH == 0)
+  result = pthread_kill(thread, 0);
+  if (0 != result)
     {
-      return ESRCH;
+      return result;
     }
 
   /* Validate the scheduling policy. */
