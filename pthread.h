@@ -22,12 +22,17 @@
 #if !defined( PTHREAD_H )
 #define PTHREAD_H
 
+#if !defined( PTW32_HEADER )
+#define PTW32_HEADER
+
 #ifdef _UWIN
 #   define HAVE_STRUCT_TIMESPEC 1
 #   define HAVE_SIGNAL_H        1
 #   undef HAVE_CONFIG_H
 #   pragma comment(lib, "pthread")
 #endif
+
+#endif /* PTW32_HEADER */
 
 /*
  * -------------------------------------------------------------
@@ -120,7 +125,8 @@
 
 #include <setjmp.h>
 
-#ifndef HAVE_STRUCT_TIMESPEC
+#if ! defined(HAVE_STRUCT_TIMESPEC) && ! defined(PTW32_TIMESPEC)
+#define PTW32_TIMESPEC
 struct timespec {
 	long tv_sec;
 	long tv_nsec;
@@ -145,10 +151,12 @@ struct timespec {
 #include <winsock.h>
 
 #ifdef NEED_ERRNO
-#include "need_errno.h"
+#  include "need_errno.h"
 #else
-#include <errno.h>
+#  include <errno.h>
 #endif
+
+#include <sched.h>
 
 /*
  * In case ETIMEDOUT hasn't been defined above somehow.
@@ -156,6 +164,15 @@ struct timespec {
 #ifndef ETIMEDOUT
 #define ETIMEDOUT 10060     /* This is the value in winsock.h. */
 #endif
+
+/*
+ * Several systems don't define ENOTSUP. If not, we use
+ * the same value as Solaris.
+ */
+#ifndef ENOTSUP
+#  define ENOTSUP 48
+#endif
+
 
 #ifdef __cplusplus
 extern "C"
@@ -185,7 +202,7 @@ extern "C"
  *                              pthread_attr_getstackaddr
  *                              pthread_attr_setstackaddr
  *
- * _POSIX_THREAD_PRIORITY_SCHEDULING (not set)
+ * _POSIX_THREAD_PRIORITY_SCHEDULING (set)
  *                      If set, you can use realtime scheduling.
  *                      Indicates the availability of:
  *                              pthread_attr_getinheritsched
@@ -198,8 +215,9 @@ extern "C"
  *                              pthread_attr_setscope
  *                              pthread_getschedparam
  *                              pthread_setschedparam
- *                              pthread_get_priority_max
- *                              pthread_get_priority_min
+ *                              sched_get_priority_max
+ *                              sched_get_priority_min
+ *                              sched_rr_set_interval
  *
  * _POSIX_THREAD_PRIO_INHERIT (not set)
  *                      If set, you can create priority inheritance
@@ -263,16 +281,16 @@ extern "C"
 #ifndef _POSIX_THREADS
 #define _POSIX_THREADS
 #endif
-#define _POSIX_THREAD_SAFE_FUNCTIONS
 
+#define _POSIX_THREAD_SAFE_FUNCTIONS
 #define _POSIX_THREAD_ATTR_STACKSIZE
+#define _POSIX_THREAD_PRIORITY_SCHEDULING
 
 #if defined( KLUDGE )
 /*
  * The following are not supported
  */
 #define _POSIX_THREAD_ATTR_STACKADDR
-#define _POSIX_THREAD_PRIORITY_SCHEDULING
 #define _POSIX_THREAD_PRIO_INHERIT
 #define _POSIX_THREAD_PRIO_PROTECT
 #define _POSIX_THREAD_PROCESS_SHARED
@@ -335,36 +353,44 @@ typedef struct pthread_rwlockattr_t_ *pthread_rwlockattr_t;
  * ====================
  */
 
+enum {
 /*
  * pthread_attr_{get,set}detachstate
  */
-#define PTHREAD_CREATE_JOINABLE		0
-#define PTHREAD_CREATE_DETACHED		1
+  PTHREAD_CREATE_JOINABLE	= 0,  /* Default */
+  PTHREAD_CREATE_DETACHED	= 1,
 
 /*
- * pthread_attr{get,set}inheritsched
+ * pthread_attr_{get,set}inheritsched
  */
-#define PTHREAD_INHERIT_SCHED		0
-#define PTHREAD_EXPLICIT_SCHED		1
+  PTHREAD_INHERIT_SCHED		= 0,
+  PTHREAD_EXPLICIT_SCHED	= 1,  /* Default */
+
+/*
+ * pthread_{get,set}scope
+ */
+  PTHREAD_SCOPE_PROCESS		= 0,
+  PTHREAD_SCOPE_SYSTEM		= 1,  /* Default */
 
 /*
  * pthread_setcancelstate paramters
  */
-#define PTHREAD_CANCEL_ENABLE		0
-#define PTHREAD_CANCEL_DISABLE		1
+  PTHREAD_CANCEL_ENABLE		= 0,  /* Default */
+  PTHREAD_CANCEL_DISABLE	= 1,
 
 /*
  * pthread_setcanceltype parameters
  */
-#define PTHREAD_CANCEL_ASYNCHRONOUS	0
-#define PTHREAD_CANCEL_DEFERRED		1
+  PTHREAD_CANCEL_ASYNCHRONOUS	= 0,
+  PTHREAD_CANCEL_DEFERRED	= 1,  /* Default */
 
 /*
  * pthread_mutexattr_{get,set}pshared
  * pthread_condattr_{get,set}pshared
  */
-#define PTHREAD_PROCESS_PRIVATE		0
-#define PTHREAD_PROCESS_SHARED		1
+  PTHREAD_PROCESS_PRIVATE	= 0,
+  PTHREAD_PROCESS_SHARED	= 1
+};
 
 /*
  * ====================
@@ -408,28 +434,6 @@ enum
   PTHREAD_MUTEX_RECURSIVE = PTHREAD_MUTEX_RECURSIVE_NP,
   PTHREAD_MUTEX_ERRORCHECK = PTHREAD_MUTEX_ERRORCHECK_NP,
   PTHREAD_MUTEX_DEFAULT = PTHREAD_MUTEX_NORMAL
-};
-
-
-/*
- * ====================
- * ====================
- * Scheduling
- * ====================
- * ====================
- */
-
-/* Thread scheduling policies */
-
-#define SCHED_OTHER 0
-#define SCHED_FIFO  1
-#define SCHED_RR    2
-
-#define SCHED_MIN   SCHED_OTHER
-#define SCHED_MAX   SCHED_RR
-
-struct sched_param {
-  int sched_priority;
 };
 
 
@@ -656,6 +660,18 @@ int pthread_attr_getschedparam (const pthread_attr_t *attr,
  
 int pthread_attr_setschedparam (pthread_attr_t *attr,
                                 const struct sched_param *param);
+
+int pthread_attr_setschedpolicy (pthread_attr_t *,
+                                 int);
+
+int pthread_attr_getschedpolicy (pthread_attr_t *,
+                                 int *);
+
+int pthread_attr_setinheritsched(pthread_attr_t * attr,
+                                 int inheritsched);
+
+int pthread_attr_getinheritsched(pthread_attr_t * attr,
+                                 int * inheritsched);
 
 int pthread_attr_setscope (pthread_attr_t *,
                            int);

@@ -35,8 +35,9 @@
 #include <limits.h>
 #endif
 
-/* changed include from <semaphore.h> to use local file during development */
+/* use local include files during development */
 #include "semaphore.h"
+#include "sched.h"
 
 typedef enum {
   /*
@@ -107,7 +108,8 @@ struct pthread_attr_t_ {
   void *stackaddr;
   size_t stacksize;
   int detachstate;
-  int priority;
+  struct sched_param param;
+  int inheritsched;
 #if HAVE_SIGSET_T
   sigset_t sigmask;
 #endif /* HAVE_SIGSET_T */
@@ -319,7 +321,12 @@ struct ThreadKeyAssoc {
 #define PTW32_EPS_EXIT        		(1)
 #define PTW32_EPS_CANCEL       		(2)
 
-#define PTW32_MUTEX_LOCK_IDX_INIT	(-1)
+/* Mutex constants */
+enum {
+  PTW32_MUTEX_LOCK_IDX_INIT	= -1,
+  PTW32_MUTEX_OWNER_ANONYMOUS = 1
+};
+
 
 /* Declared in global.c */
 extern int ptw32_processInitialized;

@@ -23,8 +23,6 @@
  * MA 02111-1307, USA
  */
 
-#define ENOSUP 0
-
 #include "pthread.h"
 #include "implement.h"
 #include "sched.h"
@@ -37,18 +35,77 @@ is_attr(const pthread_attr_t *attr)
 	  (*attr)->valid != PTW32_ATTR_VALID) ? 1 : 0;
 }
 
+
+int
+pthread_attr_setschedpolicy(pthread_attr_t *attr,
+                            int policy)
+{
+  if (is_attr(attr) != 0)
+    {
+      return EINVAL;
+    }
+
+  if (policy != SCHED_OTHER)
+    {
+      return ENOTSUP;
+    }
+
+  return 0;
+}
+
+
+int
+pthread_attr_getschedpolicy(pthread_attr_t *attr,
+                            int * policy)
+{
+  if (is_attr(attr) != 0 || policy == NULL)
+    {
+      return EINVAL;
+    }
+
+  /*
+   * Validate the policy arg.
+   * Check that a policy constant wasn't passed rather than &policy.
+   */
+  if (policy <= (int *) SCHED_MAX)
+    {
+      return EINVAL;
+    }
+
+  *policy = SCHED_OTHER;
+
+  return 0;
+}
+
+
 int
 pthread_attr_setschedparam(pthread_attr_t *attr,
 			   const struct sched_param *param)
 {
+  int priority;
+
   if (is_attr(attr) != 0 || param == NULL)
     {
       return EINVAL;
     }
 
-  (*attr)->priority = param->sched_priority;
+  priority = param->sched_priority;
+
+  /*
+   * Validate priority level. Don't check the
+   * return values of the function calls because
+   * we're sure they will succeed.
+   */
+  if (priority < sched_get_priority_min(SCHED_OTHER) ||
+      priority > sched_get_priority_max(SCHED_OTHER))
+    {
+      return EINVAL;
+    }
+
+  memcpy(&(*attr)->param, param, sizeof(*param));
   return 0;
 }
+
 
 int 
 pthread_attr_getschedparam(const pthread_attr_t *attr,
@@ -59,11 +116,47 @@ pthread_attr_getschedparam(const pthread_attr_t *attr,
       return EINVAL;
     }
   
-  param->sched_priority = (*attr)->priority;
+  memcpy(param, &(*attr)->param, sizeof(*param));
   return 0;
 }
 
-int pthread_setschedparam(pthread_t thread, int policy,
+
+int
+pthread_attr_setinheritsched(pthread_attr_t * attr,
+                             int inheritsched)
+{
+  if (is_attr(attr) != 0)
+    {
+      return EINVAL;
+    }
+
+  if (PTHREAD_INHERIT_SCHED != inheritsched
+      && PTHREAD_EXPLICIT_SCHED != inheritsched)
+    {
+      return EINVAL;
+    }
+
+  (*attr)->inheritsched = inheritsched;
+  return 0;
+}
+
+
+int
+pthread_attr_getinheritsched(pthread_attr_t * attr,
+                             int * inheritsched)
+{
+  if (is_attr(attr) != 0 || inheritsched == NULL)
+    {
+      return EINVAL;
+    }
+
+  *inheritsched = (*attr)->inheritsched;
+  return 0;
+}
+
+
+int
+pthread_setschedparam(pthread_t thread, int policy,
 			  const struct sched_param *param)
 {
   /* Validate the thread id. */
@@ -81,12 +174,16 @@ int pthread_setschedparam(pthread_t thread, int policy,
   /* Ensure the policy is SCHED_OTHER. */
   if (policy != SCHED_OTHER)
     {
-      return ENOSUP;
+      return ENOTSUP;
     }
 
-  /* Validate priority level. */
-  if (param->sched_priority < sched_get_priority_min(policy) ||
-      param->sched_priority > sched_get_priority_max(policy))
+  /*
+   * Validate priority level. Don't check the
+   * return values of the function calls because
+   * we're sure they will succeed.
+   */
+  if (param->sched_priority < sched_get_priority_min(SCHED_OTHER) ||
+      param->sched_priority > sched_get_priority_max(SCHED_OTHER))
     {
       return EINVAL;
     }
@@ -97,7 +194,9 @@ int pthread_setschedparam(pthread_t thread, int policy,
   return 0;
 }
 
-int pthread_getschedparam(pthread_t thread, int *policy,
+
+int
+pthread_getschedparam(pthread_t thread, int *policy,
 			  struct sched_param *param)
 {
   int prio;
@@ -108,8 +207,11 @@ int pthread_getschedparam(pthread_t thread, int *policy,
       return EINVAL;
     }
 
-  /* Validate the param structure. */
-  if (param == NULL)
+  /*
+   * Validate the policy and param args.
+   * Check that a policy constant wasn't passed rather than &policy.
+   */
+  if (policy <= (int *) SCHED_MAX || param == NULL)
     {
       return EINVAL;
     }
@@ -141,14 +243,24 @@ int pthread_getschedparam(pthread_t thread, int *policy,
  * sched_get_priority_max() returns 1
  */
 
+
 #define sched_Max(a,b)  ((a)<(b)?(b):(a))
 #define sched_Min(a,b)  ((a)>(b)?(b):(a))
 
-int sched_get_priority_max(int policy)
+
+int
+sched_get_priority_max(int policy)
 {
   if (policy < SCHED_MIN || policy > SCHED_MAX)
     {
-      return EINVAL;
+      errno = EINVAL;
+      return -1;
+    }
+
+  if (policy != SCHED_OTHER)
+    {
+      errno = ENOTSUP;
+      return -1;
     }
 
 #if (THREAD_PRIORITY_LOWEST > THREAD_PRIORITY_NORMAL)
@@ -160,11 +272,20 @@ int sched_get_priority_max(int policy)
 #endif
 }
 
-int sched_get_priority_min(int policy)
+
+int
+sched_get_priority_min(int policy)
 {
   if (policy < SCHED_MIN || policy > SCHED_MAX)
     {
-      return EINVAL;
+      errno = EINVAL;
+      return -1;
+    }
+
+  if (policy != SCHED_OTHER)
+    {
+      errno = ENOTSUP;
+      return -1;
     }
 
 #if (THREAD_PRIORITY_LOWEST > THREAD_PRIORITY_NORMAL)
@@ -176,7 +297,259 @@ int sched_get_priority_min(int policy)
 #endif
 }
 
-int sched_yield(void)
+
+int
+sched_rr_get_interval(pid_t pid, struct timespec * interval)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      This function updates the timespec structure
+      *      referenced by the interval argument to contain
+      *      the current quantum for the process executing
+      *      under the SCHED_RR policy. If a process, running under
+      *      the round-robin scheduling policy, runs without
+      *      blocking or yielding for more than this amount of
+      *      time, it may be preempted by another runnable
+      *      process (at the same priority).
+      *
+      *      If the PID argument is zero, the current execution
+      *      time limit for the calling process is returned.
+      *
+      * PARAMETERS
+      *      pid    Process identifier.
+      *
+      *
+      * DESCRIPTION
+      *      This function updates the timespec structure
+      *      referenced by the interval argument to contain
+      *      the current quantum for the process executing
+      *      under the SCHED_RR policy. If a process, running under
+      *      the round-robin scheduling policy, runs without
+      *      blocking or yielding for more than this amount of
+      *      time, it may be preempted by another runnable
+      *      process (at the same priority).
+      *
+      *      If the PID argument is zero, the current execution
+      *      time limit for the calling process is returned.
+      *
+      * RESULTS
+      *      We don't support SCHED_RR so this routine always fails.
+      *
+      *      NOTE: Since this is part of POSIX 1003.1b
+      *                (realtime extensions), it is defined as returning
+      *                -1 if an error occurs and sets errno to the actual
+      *                error.
+      *
+      *      errno:  ESRCH           Pid doesn't refer to a valid process.
+      *              EPERM           The process referenced by pid does
+      *                              not allow query access.
+      *              ENOTSUP         SCHED_RR is not supported.
+      *
+      * ------------------------------------------------------
+      */
+{
+  /*
+   * Provide other valid side-effects
+   * such as EPERM and ESRCH errors.
+   */
+  if (0 != pid)
+    {
+      DWORD selfPid = GetCurrentProcessId();
+
+      if (pid != selfPid)
+        {
+          HANDLE h = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+
+          if (NULL == h)
+            {
+              errno = (GetLastError() == (0xFF & ERROR_ACCESS_DENIED)
+                       ? EPERM
+                       : ESRCH );
+
+              return -1;
+            }
+
+          (void) CloseHandle(h);
+        }
+    }
+
+  /*
+   * We can't return ENOSYS and stay strictly compliant with the
+   * standard. We don't support round-robin scheduling so
+   * we return ENOTSUP instead. This is consistent with
+   * routines which return ENOTSUP if SCHED_RR is given
+   * as the policy parameter.
+   */
+  errno = ENOTSUP;
+  return -1;
+}
+
+
+int
+sched_setscheduler(pid_t pid, int policy)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      This function returns sets the scheduling policy and
+      *      scheduling parameters of the process specified by pid
+      *      to policy and the parameters specified in the
+      *      sched_param structure pointed to by param, respectively.
+      *      The value of the sched_priority member in the sched_param
+      *      structure is any integer within the inclusive priority
+      *      range for the scheduling policy specified by policy.
+      *      If the value of pid is negative, the behaviour of the
+      *      sched_setscheduler() function is unspecified.
+      *
+      * PARAMETERS
+      *      pid        Identifier of the process in which the
+      *                 policy will be set.
+      *      policy     The new policy value.
+      *
+      *
+      * DESCRIPTION
+      *      This function returns sets the scheduling policy and
+      *      scheduling parameters of the process specified by pid
+      *      to policy and the parameters specified in the
+      *      sched_param structure pointed to by param, respectively.
+      *      The value of the sched_priority member in the sched_param
+      *      structure is any integer within the inclusive priority
+      *      range for the scheduling policy specified by policy.
+      *      If the value of pid is negative, the behaviour of the
+      *      sched_setscheduler() function is unspecified.
+      *
+      * RESULTS
+      *      SCHED_OTHER            on success this is the only possible
+      *                             value that can be returned.
+      *
+      *      NOTE: Since this is part of POSIX 1003.1b
+      *                (realtime extensions), it is defined as returning
+      *                -1 if an error occurs and sets errno to the actual
+      *                error.
+      *
+      *      errno:  ESRCH           'pid' doesn't refer to an existing
+      *                              process.
+      *              EPERM           The process referenced by pid does
+      *                              not allow set access.
+      *              EINVAL          'policy' is not a valid policy value.
+      *              ENOSYS          the policy specified is not supported.
+      *
+      * ------------------------------------------------------
+      */
+{
+  /*
+   * Win32 only has one policy which we call SCHED_OTHER.
+   * However, we try to provide other valid side-effects
+   * such as EPERM and ESRCH errors.
+   */
+  if (0 != pid)
+    {
+      DWORD selfPid = GetCurrentProcessId();
+
+      if (pid != selfPid)
+        {
+          HANDLE h = OpenProcess(PROCESS_SET_INFORMATION, FALSE, pid);
+
+          if (NULL == h)
+            {
+              errno = (GetLastError() == (0xFF & ERROR_ACCESS_DENIED)
+                       ? EPERM
+                       : ESRCH );
+
+              return -1;
+            }
+
+          (void) CloseHandle(h);
+        }
+    }
+
+  if (policy < SCHED_MIN || policy > SCHED_MAX)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  if (SCHED_OTHER != policy)
+    {
+      errno = ENOSYS;
+      return -1;
+    }
+
+  /*
+   * Don't set anything because there is nothing to set.
+   * Just return the current (the only possible) value.
+   */
+  return SCHED_OTHER;
+}
+
+
+int
+sched_getscheduler(pid_t pid)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      This function returns the scheduling policy of the
+      *      process specified by pid. If the value of pid is
+      *      negative, the behaviour of the sched_getscheduler()
+      *      function is unspecified.
+      *
+      * PARAMETERS
+      *      pid    Process identifier.
+      *
+      *
+      * DESCRIPTION
+      *      This function returns the scheduling policy of the
+      *      process specified by pid. If the value of pid is
+      *      negative, the behaviour of the sched_getscheduler()
+      *      function is unspecified.
+      *
+      * RESULTS
+      *      SCHED_OTHER            on success this is the only possible
+      *                             value that can be returned.
+      *
+      *      NOTE: Since this is part of POSIX 1003.1b
+      *                (realtime extensions), it is defined as returning
+      *                -1 if an error occurs and sets errno to the actual
+      *                error.
+      *
+      *      errno:  ESRCH           Pid doesn't refer to a valid process.
+      *              EPERM           The process referenced by pid does
+      *                              not allow query access.
+      *
+      * ------------------------------------------------------
+      */
+{
+  /*
+   * Win32 only has one policy which we call SCHED_OTHER.
+   * However, we try to provide other valid side-effects
+   * such as EPERM and ESRCH errors.
+   */
+  if (0 != pid)
+    {
+      DWORD selfPid = GetCurrentProcessId();
+
+      if (pid != selfPid)
+        {
+          HANDLE h = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+
+          if (NULL == h)
+            {
+              errno = (GetLastError() == (0xFF & ERROR_ACCESS_DENIED)
+                       ? EPERM
+                       : ESRCH );
+
+              return -1;
+            }
+
+          (void) CloseHandle(h);
+        }
+    }
+
+  return SCHED_OTHER;
+}
+
+
+int
+sched_yield(void)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -196,8 +569,7 @@ int sched_yield(void)
       *                error.
       *
       * RESULTS
-      *              0               successfully created semaphore,
-      *              ENOSYS          sched_yield not supported,
+      *              0               always succeeds
       *
       * ------------------------------------------------------
       */

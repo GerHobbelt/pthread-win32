@@ -46,7 +46,10 @@ TESTS	= loadfree \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 rwlock7 \
 	  context1 cancel3 cancel4 cancel5 \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
-	  exception1 exception2 exception3
+	  priority1 priority2 inherit1 \
+	  exception1 exception2 \
+	  benchtest1 benchtest2 \
+	  exception3
 
 PASSES	= $(TESTS:%=%.pass)
 
@@ -71,6 +74,8 @@ all-GC: $(PASSES)
 all-GCE: $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
+benchtest1.pass: mutex3.pass
+benchtest2.pass: benchtest1.pass
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
 cancel2_1.pass: cancel2.pass
@@ -105,6 +110,7 @@ exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass
 eyal1.pass: tsd1.pass
+inherit1.pass: join1.pass
 join0.pass: create1.pass
 join1.pass: create1.pass
 join2.pass: create1.pass
@@ -118,6 +124,8 @@ mutex3.pass: create1.pass
 mutex4.pass: mutex3.pass
 mutex5.pass:
 once1.pass: create1.pass
+priority1.pass: join1.pass
+priority2.pass: priority1.pass
 rwlock1.pass: condvar6.pass
 rwlock2.pass: rwlock1.pass
 rwlock3.pass: rwlock2.pass

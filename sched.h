@@ -28,6 +28,49 @@
 #ifndef _SCHED_H
 #define _SCHED_H
 
+#if !defined( PTW32_HEADER )
+#define PTW32_HEADER
+
+#ifdef _UWIN
+#   define HAVE_STRUCT_TIMESPEC 1
+#   define HAVE_SIGNAL_H        1
+#   undef HAVE_CONFIG_H
+#   pragma comment(lib, "pthread")
+#endif
+
+#endif /* PTW32_HEADER */
+
+#if defined(__MINGW32__) || defined(_UWIN)
+/* For pid_t */
+#  include <sys/types.h>
+/* Required by Unix 98 - including sched.h makes time.h available */
+#  include <time.h>
+#else
+typedef DWORD pid_t;
+#endif
+
+#if ! defined(HAVE_STRUCT_TIMESPEC) && ! defined(PTW32_TIMESPEC)
+#define PTW32_TIMESPEC
+struct timespec {
+	long tv_sec;
+	long tv_nsec;
+};
+#endif /* HAVE_STRUCT_TIMESPEC */
+
+
+/* Thread scheduling policies */
+enum {
+  SCHED_OTHER = 0,
+  SCHED_FIFO,
+  SCHED_RR,
+  SCHED_MIN   = SCHED_OTHER,
+  SCHED_MAX   = SCHED_RR
+};
+
+struct sched_param {
+  int sched_priority;
+};
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -39,6 +82,11 @@ int sched_get_priority_min (int policy);
 
 int sched_get_priority_max (int policy);
 
+int sched_setscheduler (pid_t pid, int policy);
+
+int sched_getscheduler (pid_t pid);
+
+int sched_rr_get_interval(pid_t pid, struct timespec * interval);
 
 #ifdef __cplusplus
 }                               /* End of extern "C" */
