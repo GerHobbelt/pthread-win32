@@ -1,12 +1,12 @@
 ; pthread.def
-; Last updated: $Date: 1998/10/04 23:01:59 $
+; Last updated: $Date: 1999/01/03 18:48:06 $
 
 ; Currently unimplemented functions are commented out.
 
 LIBRARY pthread
 
 EXPORTS
-pthread_atfork
+;pthread_atfork
 pthread_attr_destroy
 pthread_attr_getdetachstate
 ;pthread_attr_getinheritsched

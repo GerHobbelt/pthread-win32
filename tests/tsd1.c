@@ -1,7 +1,53 @@
+/*
+ * File: tsd1.c
+ *
+ * Test Synopsis:
+ * - Thread Specific Data (TSD) key creation and destruction.
+ *
+ * Description:
+ * - 
+ *
+ * Test Method (validation or falsification):
+ * - validation
+ *
+ * Requirements Tested:
+ * - keys are created for each existing thread including the main thread
+ * - keys are created for newly created threads
+ * - keys are thread specific
+ * - destroy routine is called on each thread exit including the main thread
+ *
+ * Features Tested:
+ * - 
+ *
+ * Cases Tested:
+ * - 
+ *
+ * Environment:
+ * - 
+ *
+ * Input:
+ * - none
+ *
+ * Output:
+ * - text to stdout
+ *
+ * Assumptions:
+ * - already validated:     pthread_create()
+ *                          pthread_once()
+ * - main thread also has a POSIX thread identity
+ *
+ * Pass Criteria:
+ * - stdout matches file reference/tsd1.out
+ *
+ * Fail Criteria:
+ * - fails to match file reference/tsd1.out
+ * - output identifies failed component
+ */
+
 #include <pthread.h>
 #include <stdio.h>
 
-pthread_key_t key;
+pthread_key_t key = NULL;
 pthread_once_t key_once = PTHREAD_ONCE_INIT;
 
 void
@@ -11,9 +57,6 @@ destroy_key(void * arg)
   printf("SUCCESS: %s: destroying key.\n", (char *) arg);
 
   free((char *) arg);
-
-  /* Is it our responsibility to do this? */
-  arg = NULL;
 }
 
 void
@@ -26,44 +69,50 @@ make_key(void)
     }
 }
 
-void *
-mythread(void * arg)
+void
+setkey(void * arg)
 {
   void * ptr;
 
-  (void) pthread_once(&key_once, make_key);
-
   if ((ptr = pthread_getspecific(key)) != NULL)
     {
-      printf("ERROR: Thread %d, Key 0x%x not initialised to NULL\n",
-	     (int) arg,
-	     (int) key);
+      printf("ERROR: Thread %d, Key not initialised to NULL\n",
+	     (int) arg);
       exit(1);
     }
   else
     {
       ptr = (void *) malloc(80);
-      sprintf((char *) ptr, "Thread %d Key 0x%x",
-	      (int) arg,
-	      (int) key);
+      sprintf((char *) ptr, "Thread %d Key",
+	      (int) arg);
       (void) pthread_setspecific(key, ptr);
     }
 
   if ((ptr = pthread_getspecific(key)) == NULL)
     {
-      printf("FAILED: Thread %d Key 0x%x: key value set or get failed.\n",
-	     (int) arg,
-	     (int) key);
+      printf("FAILED: Thread %d Key value set or get failed.\n",
+	     (int) arg);
       exit(1);
     }
   else
     {
-      printf("SUCCESS: Thread %d Key 0x%x: key value set and get succeeded.\n",
-	     (int) arg,
-	     (int) key);
+      printf("SUCCESS: Thread %d Key value set and get succeeded.\n",
+	     (int) arg);
 
       printf("SUCCESS: %s: exiting thread.\n", (char *) ptr);
     }
+}
+
+void *
+mythread(void * arg)
+{
+  while (key == NULL)
+    {
+    }
+
+  printf("Thread %d, Key created\n", (int) arg);
+
+  setkey(arg);
 
   return 0;
 
@@ -74,14 +123,29 @@ int
 main()
 {
   int rc;
-  pthread_t t1, t2;
-  
-  rc = pthread_create(&t1, NULL, mythread, (void *) 1);
-  printf("pthread_create returned %d\n", rc);
+  int t;
+  pthread_t thread[10];
 
-  rc = pthread_create(&t2, NULL, mythread, (void *) 2);
-  printf("pthread_create returned %d\n", rc);
+  for (t = 0; t < 5; t++)
+    {
+      rc = pthread_create(&thread[t], NULL, mythread, (void *) (t + 1));
+      printf("pthread_create returned %d\n", rc);
+    }
+
+  (void) pthread_once(&key_once, make_key);
+
+  /* Test main thread key. */
+  setkey((void *) 0);
+
+  Sleep(500);
+
+  for (t = 5; t < 10; t++)
+    {
+      rc = pthread_create(&thread[t], NULL, mythread, (void *) (t + 1));
+      printf("pthread_create returned %d\n", rc);
+    }
 
   Sleep(2000);
   return 0;
 }
+
