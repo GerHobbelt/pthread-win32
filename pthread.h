@@ -163,4 +163,31 @@ int pthread_key_delete(pthread_key_t key);
 }
 #endif /* __cplusplus */
 
+/* Below here goes all internal definitions required by this implementation
+   of pthreads for Win32.
+ */
+
+/* An element in the thread table. */
+typedef struct _pthread_threads_thread _pthread_threads_thread_t;
+struct _pthread_threads_thread {
+   pthread_t                  thread;
+  _pthread_attr_t            *attr;
+};
+
+/* _PTHREAD_BUILD_DLL must only be defined if we are building the DLL. */
+#ifndef _PTHREADS_BUILD_DLL
+/* Static global data that must be static within the application
+   but not the DLL.
+ */
+pthread_mutex_t _pthread_count_mutex = PTHREAD_MUTEX_INITIALIZER;
+DWORD _pthread_threads_count = 0;
+_pthread_threads_thread_t _pthread_threads_table[PTHREAD_THREADS_MAX];
+#else
+extern pthread_mutex_t _pthread_count_mutex;
+extern DWORD _pthread_threads_count;
+extern _pthread_threads_thread_t _pthread_threads_table[];
+#endif
+
+/* End of application static data */
+
 #endif /* _PTHREADS_H */
