@@ -1,8 +1,12 @@
 1998-07-10  Ben Elliston  <bje@cygnus.com>
 
+	* misc.c (pthread_self): Implement.
+
 	* exit.c (pthread_exit): Implement.
 
 	* pthread.h (pthread_exit): Add function prototype.
+	(pthread_self): Likewise.
+	(pthread_t): Define this type.
 
 1998-07-09  Ben Elliston  <bje@cygnus.com>
 
