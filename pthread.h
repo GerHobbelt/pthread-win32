@@ -686,7 +686,7 @@ struct ptw32_cleanup_t
 	    {
 	      if ( executeIt && ((void *) cleanUpRout != NULL) )
 		{
-          (void) (*cleanUpRout)( obj );
+                  (void) (*cleanUpRout)( obj );
 		}
 	    }
 

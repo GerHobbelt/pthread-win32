@@ -382,7 +382,7 @@ sem_wait (sem_t * sem)
 
 #ifdef NEED_SEM
 
-  _decrease_semaphore(sem);
+  ptw32_decrease_semaphore(sem);
 
 #endif /* NEED_SEM */
 
@@ -426,7 +426,7 @@ sem_post (sem_t * sem)
 
 #ifdef NEED_SEM
 
-  else if (! _increase_semaphore (sem, 1))
+  else if (! ptw32_increase_semaphore (sem, 1))
 
 #else /* NEED_SEM */
 

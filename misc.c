@@ -237,7 +237,7 @@ pthread_equal (pthread_t t1, pthread_t t2)
 
 
 static int
-CancelableWait (HANDLE waitHandle, DWORD timeout)
+ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
      /*
       * -------------------------------------------------------------------
       * This provides an extra hook into the pthread_cancel
@@ -346,13 +346,13 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
 int
 pthreadCancelableWait (HANDLE waitHandle)
 {
-  return (CancelableWait(waitHandle, INFINITE));
+  return (ptw32_cancelable_wait(waitHandle, INFINITE));
 }
 
 int
 pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout)
 {
-  return (CancelableWait(waitHandle, timeout));
+  return (ptw32_cancelable_wait(waitHandle, timeout));
 }
 
 
