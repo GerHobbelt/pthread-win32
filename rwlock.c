@@ -29,7 +29,7 @@
 #include "implement.h"
 
 static int
-_rwlock_check_need_init(pthread_rwlock_t *rwlock)
+ptw32_rwlock_check_need_init(pthread_rwlock_t *rwlock)
 {
   int result = 0;
 
@@ -198,7 +198,7 @@ pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
     else
       {
         /*
-         * See notes in _rwlock_check_need_init() above also.
+         * See notes in ptw32_rwlock_check_need_init() above also.
          */
         EnterCriticalSection(&ptw32_rwlock_test_init_lock);
 
@@ -254,12 +254,12 @@ pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
     /*
      * We do a quick check to see if we need to do more work
      * to initialise a static rwlock. We check
-     * again inside the guarded section of _rwlock_check_need_init()
+     * again inside the guarded section of ptw32_rwlock_check_need_init()
      * to avoid race conditions.
      */
     if (*rwlock == (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
       {
-        result = _rwlock_check_need_init(rwlock);
+        result = ptw32_rwlock_check_need_init(rwlock);
 
         if (result != 0 && result != EBUSY)
           {
@@ -332,12 +332,12 @@ pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
     /*
      * We do a quick check to see if we need to do more work
      * to initialise a static rwlock. We check
-     * again inside the guarded section of _rwlock_check_need_init()
+     * again inside the guarded section of ptw32_rwlock_check_need_init()
      * to avoid race conditions.
      */
     if (*rwlock == (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
       {
-        result = _rwlock_check_need_init(rwlock);
+        result = ptw32_rwlock_check_need_init(rwlock);
 
         if (result != 0 && result != EBUSY)
           {
@@ -463,12 +463,12 @@ pthread_rwlock_tryrdlock(pthread_rwlock_t * rwlock)
     /*
      * We do a quick check to see if we need to do more work
      * to initialise a static rwlock. We check
-     * again inside the guarded section of _rwlock_check_need_init()
+     * again inside the guarded section of ptw32_rwlock_check_need_init()
      * to avoid race conditions.
      */
     if (*rwlock == (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
       {
-        result = _rwlock_check_need_init(rwlock);
+        result = ptw32_rwlock_check_need_init(rwlock);
 
         if (result != 0 && result != EBUSY)
           {
@@ -518,12 +518,12 @@ pthread_rwlock_trywrlock(pthread_rwlock_t * rwlock)
     /*
      * We do a quick check to see if we need to do more work
      * to initialise a static rwlock. We check
-     * again inside the guarded section of _rwlock_check_need_init()
+     * again inside the guarded section of ptw32_rwlock_check_need_init()
      * to avoid race conditions.
      */
     if (*rwlock == (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
       {
-        result = _rwlock_check_need_init(rwlock);
+        result = ptw32_rwlock_check_need_init(rwlock);
 
         if (result != 0 && result != EBUSY)
           {
