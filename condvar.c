@@ -827,8 +827,6 @@ pthread_cond_broadcast (pthread_cond_t * cond)
 
   cv = *cond;
 
-  cv->wasBroadcast = TRUE;
-
   /*
    * No-op if the CV is static and hasn't been initialised yet.
    */
@@ -837,13 +835,14 @@ pthread_cond_broadcast (pthread_cond_t * cond)
       return 0;
     }
 
+  cv->wasBroadcast = TRUE;
+
   /*
    * Wake up all waiters
    */
-  for (i = cv->waiters; i > 0 && result == 0; i--)
-    {
-      result = sem_post (&(cv->sema));
-    }
+  result = (ReleaseSemaphore( cv->sema, cond->waiters, NULL )
+	    ? 0
+	    : EINVAL);
 
   if (cv->waiters > 0 && result == 0)
     {
@@ -851,7 +850,7 @@ pthread_cond_broadcast (pthread_cond_t * cond)
        * Wait for all the awakened threads to acquire their part of
        * the counting semaphore
        */
-      if (WaitForSingleObject (cv->waitersDone, INFINITE) !=
+      if (WaitForSingleObject (cv->waitersDone, INFINITE) ==
           WAIT_OBJECT_0)
         {
           result = 0;
