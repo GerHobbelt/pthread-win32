@@ -1,3 +1,30 @@
+RELEASE 2.2.0
+-------------
+(2005-04-04)
+
+General
+-------
+
+* Added makefile targets to build static link versions of the library.
+Both MinGW and MSVC. Please note that this does not imply any change
+to the LGPL licensing, which still imposes psecific conditions on
+distributing software that has been statically linked with this library.
+
+* There is a known bug in pthread_once(). Cancellation of the init_routine
+exposes a potential starvation (i.e. deadlock) problem if a waiting thread
+has a higher priority than the initting thread. This problem will be fixed
+in version 3.0.0 of the library.
+
+Bugs fixed
+----------
+
+* Fix integer overrun error in sem_timedwait().
+Kevin Lussier
+
+* Fix preprocessor directives for static linking.
+Dimitar Panayotov
+
+
 RELEASE 2.1.0
 -------------
 (2005-03-16)
