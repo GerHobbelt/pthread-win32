@@ -2,7 +2,6 @@ This directory contains an implementation of pthreads for Win32.
 
 Mailing list
 ------------
-Dec 10, 1998
 
 There is a mailing list for discussing pthreads on Win32 which is
 managed by Majordomo. To subscribe, send mail to majordomo@air.net.au
@@ -13,20 +12,53 @@ and place the fllowing text in the message body:
 
 Building the library with Cygwin32 or Mingw32
 ---------------------------------------------
-Feb 10, 1999
+Feb 18, 1999
 
-If you have a suitable environment run the configure script, otherwise you
-can copy Makefile.in to Makefile and edit it as required.
+If you have a suitable environment then you can run the configure script,
+otherwise you should edit "Makefile" and "config.h" as required.
 
-There is an unresolved bug which shows up as a segmentation fault
-(memory access violation) when the library is built using g++. Build
-the test program "eyal1.c" and run with an argument of "2" or greater.
-The argument is the number of threads to run, excluding the main thread,
-so the bug appears with 2 or more worker threads.
+gcc cannot be used because the library requires C++ EH. g++ must be usedi
+(but see below).
 
-The complete source code in tar format and a precompiled DLL and
-matching pthread.h can be found at:
+The DLL pthread.dll still cannot be built using g++ due to non thread-safe
+exception handling in g++.  Thanks to Kevin Ruland for researching this
+one. See the FAQ Question 2 for more information.
+
+However, you can use the export library libpthread32.a built under
+Mingw32 (not tested under Cygwin32) together with the pthread.dll built
+with MSVC. Thanks to Anders Norlander for pointing this out.
+
+For convenience, the following pre-built files can be downloaded from
+the FTP site (see under "Availability" below):
+
+	pthread.h	- the standard include file
+	pthread.dll	- built with MSVC cl compiler
+	pthread.lib	- built with MSVC cl compiler
+	libpthread32.a	- built with Mingw32 (use with MSVC pthread.dll)
+
+With these files in the same directory as your application myapp.c,
+you could compile, link and run myapp.c under Mingw32 as follows:
+
+	gcc -o myapp.exe myapp.c -I. -L. -lpthread32
+	myapp
+
+Or put pthread.dll in an appropriate directory in your PATH,
+put libpthread32.a in MINGW_ROOT\i386-mingw32\lib, and
+put pthread.h in MINGW_ROOT\i386-mingw32\include, then use:
+
+	gcc -o myapp.exe myapp.c -lpthread32
+	myapp
+
+
+Availability
+------------
+
+The complete source code in either unbundled or tar/gzipped format
+can be found at:
 	ftp://sourceware.cygnus.com/pub/pthreads-win32
+
+The pre-built DLL, export libraries and matching pthread.h can be found at:
+	ftp://sourceware.cygnus.com/pub/pthreads-win32/dll-latest
 
 Home page:
 	http://sourceware.cygnus.com/pthreads-win32/
