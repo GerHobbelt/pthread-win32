@@ -1,5 +1,10 @@
 1999-02-23  Ross Johnson  <rpj@ise.canberra.edu.au>
 
+	* Makefile: Some refinement.
+
+	* *.c: More exhaustive checking through assertions; clean up;
+	add some more tests.
+
 	* Makefile: Now actually runs the tests.
 
 	* tests.h: Define our own assert macro. The Mingw32

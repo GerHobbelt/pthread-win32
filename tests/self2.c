@@ -1,32 +1,45 @@
-#include <pthread.h>
-#include <assert.h>
-#include <stdio.h>
+/*
+ * self2.c
+ *
+ * Test for pthread_self().
+ *
+ * Depends on API functions:
+ *	pthread_create()
+ *	pthread_self()
+ *
+ * Implicitly depends on:
+ *	pthread_getspecific()
+ *	pthread_setspecific()
+ */
+
+#include "test.h"
+#include <string.h>
+
+static pthread_t me;
 
 void *
 entry(void * arg)
 {
-  /* Like systems such as HP-UX, we can't print the value of the thread ID
-     because it's not an integral type. Instead, we'll poke our noses into
-     the pthread_t structure and dump a useful internal value. This is
-     ordinarily bad, m'kay? */
+  me = pthread_self();
 
-  pthread_t t = pthread_self();
-  printf("my thread is %lx\n", t->threadH); 
   return arg;
 }
 
 int
 main()
 {
-  int rc;
   pthread_t t;
 
-  if (pthread_create(&t, NULL, entry, NULL) != 0)
-    {
-      return 1;
-    }
+  assert(pthread_create(&t, NULL, entry, NULL) == 0);
 
   Sleep(2000);
+
+  /*
+   * Not much more we can do here but bytewise compare t with
+   * what pthread_self returned.
+   */
+  assert(t == me);
+  assert(memcmp((const void *) t, (const void *) me, sizeof t) == 0);
 
   /* Success. */
   return 0;

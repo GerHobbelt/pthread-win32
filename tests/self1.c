@@ -1,21 +1,26 @@
 /*
+ * self1.c
+ *
  * Test for pthread_self().
  *
- * Depends on API functions: None.
+ * Depends on API functions:
+ *	pthread_self()
+ *
+ * Implicitly depends on:
+ *	pthread_getspecific()
+ *	pthread_setspecific()
  */
 
-#include <pthread.h>
+#include "test.h"
 
 int
 main(int argc, char * argv[])
 {
-	pthread_t id;
-
-	/* We can't do anything with this, though, because it is not
-	   safe to assume anything about the internal structure of
-	   a `pthread_t'. */
-
-	id = pthread_self();
+	/*
+	 * This should always succeed unless the system has no
+	 * resources (memory) left.
+	 */
+	assert(pthread_self() != NULL);
 
 	return 0;
 }

@@ -4,52 +4,66 @@
 
 CP	= copy
 RM	= erase
+MKDIR	= mkdir
 TOUCH	= echo Passed >
+ECHO	= @echo
 
 #
 # Mingw32
 #
 CC	= gcc
 CFLAGS	= -g -O2 -UNDEBUG -Wall -o $@ $^
-BUILD_DIR	= ../build
-RELEASE_DIR	= ../release
-INCLUDES	= -I$(BUILD_DIR)/include
-LIBS	= $(BUILD_DIR)/lib/libpthread32.a
+BUILD_DIR	= ..\build
+INCLUDES	= -I./include
+LIBS	= ./lib/libpthread32.a
 
 ##
 ## MSVC
 ##
 #CC	= cl
 #CFLAGS	= /W3 /MT /nologo /Yd /Zi /Fe$@ $^
-#BUILD_DIR	= ..\build
-#RELEASE_DIR	= ..\release
-#INCLUDES	= -I$(BUILD_DIR)\include
-#LIBS	= $(BUILD_DIR)\lib\pthread.lib
+#BUILD_DIR	= ..
+#INCLUDES	= -I.\include
+#LIBS	= .\lib\pthread.lib
 
+HDR	= .\include\pthread.h
+LIB	= .\lib\libpthread32.a
 DLL	= pthread.dll
 
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
-TESTS	= count1 create1 equal1 exit1 exit2 \
-	 exit3 eyal1 mutex1 mutex2 mutex3 \
-	 once1 self1 self2 self3 tsd1
+TESTS	= count1 create1 equal1 exit1 exit2 exit3 \
+	 join1 eyal1 mutex1 mutex2 mutex3 \
+	 once1 self1 self2 tsd1
 
 PASSES	= $(TESTS:%=%.pass)
 
 all:	$(PASSES)
+	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
-%.pass: %.exe $(DLL)
+%.pass: %.exe $(LIB) $(DLL) $(HDR)
 	$*
-	$(TOUCH) $@
+	@$(ECHO) Passed
+	@ $(TOUCH) $@
 
 %.exe: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) $(LIBS)
+	@ $(CC) $(CFLAGS) $(INCLUDES) $(LIBS)
+
+$(LIB):
+	@- $(MKDIR) .\lib
+	@ $(CP) $(BUILD_DIR)\$@ .\$@
+
+$(HDR):
+	@- $(MKDIR) .\include
+	@ $(CP) $(BUILD_DIR)\$@ .\$@
 
 $(DLL):
-	$(CP) ..\build\bin\$@ .
+	@ $(CP) $(BUILD_DIR)\$@ .\$@
 
 clean:
+	- $(RM) *.dll
+	- $(RM) $(LIB)
+	- $(RM) $(HDR)
 	- $(RM) *.exe
 	- $(RM) *.pass
-

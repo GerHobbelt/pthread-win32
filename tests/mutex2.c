@@ -1,29 +1,24 @@
 /* 
- * mutex1.c
+ * mutex2.c
  *
- * Declare a static mutex object, lock it, and then unlock it again.
+ * Declare a static mutex object, lock it, 
+ * and then unlock it again.
+ *
+ * Depends on API functions: 
+ *	pthread_mutex_lock()
+ *	pthread_mutex_unlock()
  */
 
-#include <pthread.h>
 #include "test.h"
  
-pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
+int
 main()
 {
-  int result;
+  assert(pthread_mutex_lock(&mutex) == 0);
 
-  result = pthread_mutex_trylock(&mutex1);
-  printf("pthread_mutex_trylock returned %s\n", error_string[result]);
-  if (result != 0)
-    {
-      return 1;
-    }
-
-  if (pthread_mutex_unlock(&mutex1) != 0)
-    {
-      return 1;
-    }
+  assert(pthread_mutex_unlock(&mutex) == 0);
 
   return 0;
 }

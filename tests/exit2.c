@@ -1,12 +1,30 @@
 /*
  * Test for pthread_exit().
+ *
+ * Depends on API functions:
+ *	pthread_create()
+ *	pthread_exit()
  */
 
-#include <pthread.h>
+#include "test.h"
+
+void *
+func(void * arg)
+{
+	pthread_exit(arg);
+
+	/* Never reached. */
+	exit(1);
+}
 
 int
 main(int argc, char * argv[])
 {
-  /* Should be the same as return 0; */
-  pthread_exit(0);
+  pthread_t t;
+
+  assert(pthread_create(&t, NULL, func, (void *) NULL) == 0);
+
+  Sleep(2000);
+
+  return 0;
 }
