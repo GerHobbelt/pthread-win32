@@ -1,5 +1,13 @@
 Fri Jul 31 00:05:45 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* implement.h (_pthread_handler_pop_all): Add prototype.
+	(_pthread_destructor_pop_all): Ditto.
+
+	* cleanup.c (_pthread_destructor_push): Implement. This is just a
+	call to _pthread_handler_push().
+	(_pthread_destructor_pop_all): Implement. This is significantly
+	different to _pthread_handler_pop_all().
+
 	* Makefile (SRCS): Create. Preliminary.
 
 	* windows.h: Create. Contains Win32 definitions for compile

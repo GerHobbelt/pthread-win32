@@ -116,3 +116,70 @@ _pthread_handler_pop_all(int stack, int execute)
 	}
     }
 }
+
+int
+_pthread_destructor_push(void (* routine)(void *), pthread_key_t key)
+{
+  return _pthread_handler_push(_PTHREAD_DESTRUCTOR_STACK, 
+			       _PTHREAD_HANDLER_POP_LIFO,
+			       routine, 
+			       key);
+}
+
+void
+_pthread_destructor_pop_all()
+{
+  _pthread_handler_node_t ** head;
+  _pthread_handler_node_t * current;
+  _pthread_handler_node_t * next;
+  void (* func)(void *);
+  void * arg;
+  int count;
+
+  head = _PTHREAD_STACK(_PTHREAD_DESTRUCTOR_STACK);
+
+  /* Stop destructor execution at a finite time. POSIX allows us
+     to ignore this if we like, even at the risk of an infinite loop.
+   */
+  for (count = 0; count < _PTHREAD_DESTRUCTOR_ITERATIONS; count++)
+    {
+      /* Loop through all destructors for this thread. */
+      while (current != NULL)
+	{
+	  func = current->routine;
+
+	  /* Get the key value using the key which is in current->arg. */
+	  arg = pthread_getspecific(current->arg);
+
+	  next = current->next;
+
+	  /* If the key value is non-NULL run the destructor, otherwise
+	     unlink it from the list.
+	   */
+	  if (arg != NULL)
+	    {
+	      if (func != NULL)
+		{
+		  (void) func(arg);
+		}
+	    }
+	  else
+	    {
+	      if (current == *head)
+		{
+		  *head = next;
+		}
+	      free(current);
+	    }
+	  current = next;
+	}
+    }
+
+  /* Free the destructor list even if we still have non-NULL key values. */
+  while (*head != NULL)
+    {
+      next = (*head)->next;
+      free(*head);
+      *head = next;
+    }
+}
