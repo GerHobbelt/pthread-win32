@@ -28,7 +28,7 @@ VCFLAGS	= /D__CLEANUP_C $(CFLAGS)
 DLL_INLINED_OBJS = \
 		pthread.obj
 
-# Agregate modules for inlinability
+# Aggregate modules for inlinability
 DLL_OBJS	= \
 		attr.obj \
 		barrier.obj \
@@ -152,6 +152,7 @@ SMALL_STATIC_OBJS	= \
 		ptw32_rwlock_check_need_init.obj \
 		ptw32_cond_check_need_init.obj \
 		ptw32_mutex_check_need_init.obj \
+		ptw32_semwait.obj \
 		sched_get_priority_max.obj \
 		sched_get_priority_min.obj \
 		sched_setscheduler.obj \
@@ -274,6 +275,7 @@ PRIVATE_SRCS	= \
 		ptw32_tkAssocCreate.c \
 		ptw32_tkAssocDestroy.c \
 		ptw32_callUserDestroyRoutines.c \
+		ptw32_semwait.c \
 		ptw32_timespec.c \
 		ptw32_throw.c \
 		ptw32_InterlockedCompareExchange.c \
@@ -400,12 +402,12 @@ install: $(DLLS)
 	copy pthread*.lib $(LIBDEST)
 
 $(DLLS): $(DLL_OBJS)
-	cl /LD /Zi /nologo $(DLL_OBJS) \
+	cl /LDd /Zi /nologo $(DLL_OBJS) \
 		/link /nodefaultlib:libcmt /implib:$*.lib \
 		msvcrt.lib wsock32.lib /out:$@
 
 $(INLINED_STAMPS): $(DLL_INLINED_OBJS)
-	cl /LD /Zi /nologo $(DLL_INLINED_OBJS) \
+	cl /LDd /Zi /nologo $(DLL_INLINED_OBJS) \
 		/link /nodefaultlib:libcmt /implib:$*.lib \
 		msvcrt.lib wsock32.lib /out:$*.dll
 

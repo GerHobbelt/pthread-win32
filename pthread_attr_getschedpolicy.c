@@ -39,10 +39,9 @@
 #include "sched.h"
 
 int
-pthread_attr_getschedpolicy(pthread_attr_t *attr,
-                            int * policy)
+pthread_attr_getschedpolicy (pthread_attr_t * attr, int *policy)
 {
-  if (ptw32_is_attr(attr) != 0 || policy == NULL)
+  if (ptw32_is_attr (attr) != 0 || policy == NULL)
     {
       return EINVAL;
     }

@@ -47,7 +47,7 @@
 
 
 int
-sem_getvalue(sem_t * sem, int * sval)
+sem_getvalue (sem_t * sem, int *sval)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -57,20 +57,20 @@ sem_getvalue(sem_t * sem, int * sval)
       *
       * Return value
       *
-      *       0 		 sval has been set.
-      *      -1 		 failed, error in errno
+      *       0                  sval has been set.
+      *      -1                  failed, error in errno
       *
       *  in global errno
       *
-      *      EINVAL		 'sem' is not a valid semaphore,
-      *      ENOSYS		 this function is not supported,
+      *      EINVAL              'sem' is not a valid semaphore,
+      *      ENOSYS              this function is not supported,
       *
       *
       * PARAMETERS
       *
-      *      sem		 pointer to an instance of sem_t
+      *      sem                 pointer to an instance of sem_t
       *
-      *      sval		 pointer to int.
+      *      sval                pointer to int.
       *
       * DESCRIPTION
       *      This function stores the current count value of the semaphore
@@ -78,21 +78,21 @@ sem_getvalue(sem_t * sem, int * sval)
       */
 {
   int result = 0;
-	long value;
- 
-  if ( sem == NULL || *sem == NULL || sval == NULL )
+  long value;
+
+  if (sem == NULL || *sem == NULL || sval == NULL)
     {
       result = EINVAL;
     }
   else
     {
-			register sem_t s = *sem;
-			
+      register sem_t s = *sem;
+
 #ifdef NEED_SEM
 
-			EnterCriticalSection(&s->sem_lock_cs);
-			value = s->value;
-			LeaveCriticalSection(&s->sem_lock_cs);
+      EnterCriticalSection (&s->sem_lock_cs);
+      value = s->value;
+      LeaveCriticalSection (&s->sem_lock_cs);
 
 #else
 
@@ -126,29 +126,29 @@ sem_getvalue(sem_t * sem, int * sval)
        * decrement/increment it inside of sem_wait() and sem_post()
        * etc using the Interlocked* functions.
        */
-      if ( WaitForSingleObject( s->sem, 0 ) == WAIT_TIMEOUT )
-				{
-					/* Failed - must be zero */
-					value = 0;
-				}
+      if (WaitForSingleObject (s->sem, 0) == WAIT_TIMEOUT)
+	{
+	  /* Failed - must be zero */
+	  value = 0;
+	}
       else
-				{
-					/* Decremented semaphore - release it and note the value */
-					(void) ReleaseSemaphore( s->sem, 1L, &value);
-					value++;
-				}
+	{
+	  /* Decremented semaphore - release it and note the value */
+	  (void) ReleaseSemaphore (s->sem, 1L, &value);
+	  value++;
+	}
 
 #endif
     }
 
 
-  if ( result != 0 )
+  if (result != 0)
     {
       errno = result;
       return -1;
     }
 
-	*sval = value;
+  *sval = value;
   return 0;
 
-}   /* sem_getvalue */
+}				/* sem_getvalue */

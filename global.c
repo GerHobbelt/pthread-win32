@@ -48,13 +48,26 @@ pthread_cond_t ptw32_cond_list_tail = NULL;
 
 int ptw32_concurrency = 0;
 
+/* What features have been auto-detaected */
+int ptw32_features = 0;
+
 /* 
- * Function pointer to InterlockedCompareExchange if it exists; otherwise NULL 
+ * Function pointer to InterlockedCompareExchange if it exists, otherwise
+ * it will be set at runtime to a substitute local version with the same
+ * functionality but may be architecture specific.
  */
 PTW32_INTERLOCKED_LONG
-(WINAPI *ptw32_interlocked_compare_exchange)(PTW32_INTERLOCKED_LPLONG,
-                                             PTW32_INTERLOCKED_LONG,
-                                             PTW32_INTERLOCKED_LONG) = NULL;
+  (WINAPI * ptw32_interlocked_compare_exchange) (PTW32_INTERLOCKED_LPLONG,
+						 PTW32_INTERLOCKED_LONG,
+						 PTW32_INTERLOCKED_LONG) =
+  NULL;
+
+/* 
+ * Function pointer to QueueUserAPCEx if it exists, otherwise
+ * it will be set at runtime to a substitute routine which cannot unblock
+ * blocked threads.
+ */
+DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD) = NULL;
 
 /*
  * Global lock for managing pthread_t struct reuse.

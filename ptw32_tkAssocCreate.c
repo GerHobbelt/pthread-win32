@@ -41,8 +41,7 @@
 
 int
 ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
-			pthread_t thread,
-			pthread_key_t key)
+		     pthread_t thread, pthread_key_t key)
      /*
       * -------------------------------------------------------------------
       * This routine creates an association that
@@ -56,25 +55,25 @@ ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
       *
       * Notes:
       *      1)      New associations are pushed to the beginning of the
-      * 	     chain so that the internal ptw32_selfThreadKey association
-      * 	     is always last, thus allowing selfThreadExit to
-      * 	     be implicitly called by pthread_exit last.
+      *              chain so that the internal ptw32_selfThreadKey association
+      *              is always last, thus allowing selfThreadExit to
+      *              be implicitly called by pthread_exit last.
       *
       * Parameters:
-      * 	     assocP
-      * 		     address into which the association is returned.
-      * 	     thread
-      * 		     current running thread. If NULL, then association
-      * 		     is only added to the key. A NULL thread indicates
-      * 		     that the user called pthread_setspecific prior
-      * 		     to starting a thread. That's ok.
-      * 	     key
-      * 		     key on which to create an association.
+      *              assocP
+      *                      address into which the association is returned.
+      *              thread
+      *                      current running thread. If NULL, then association
+      *                      is only added to the key. A NULL thread indicates
+      *                      that the user called pthread_setspecific prior
+      *                      to starting a thread. That's ok.
+      *              key
+      *                      key on which to create an association.
       * Returns:
-      *       0 	     - if successful,
-      *       ENOMEM	     - not enough memory to create assoc or other object
-      *       EINVAL	     - an internal error occurred
-      *       ENOSYS	     - an internal error occurred
+      *       0              - if successful,
+      *       ENOMEM         - not enough memory to create assoc or other object
+      *       EINVAL         - an internal error occurred
+      *       ENOSYS         - an internal error occurred
       * -------------------------------------------------------------------
       */
 {

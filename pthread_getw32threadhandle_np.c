@@ -47,7 +47,7 @@
  * win32 specific attributes of the thread.
  */
 HANDLE
-pthread_getw32threadhandle_np(pthread_t thread)
+pthread_getw32threadhandle_np (pthread_t thread)
 {
   return (thread != NULL) ? (thread->threadH) : 0;
 }

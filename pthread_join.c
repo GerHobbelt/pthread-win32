@@ -84,7 +84,7 @@ pthread_join (pthread_t thread, void **value_ptr)
   pthread_t self;
 
   /* This is the proper way to test for a valid thread ID */
-  result = pthread_kill(thread, 0);
+  result = pthread_kill (thread, 0);
   if (0 != result)
     {
       return result;
@@ -93,7 +93,7 @@ pthread_join (pthread_t thread, void **value_ptr)
   self = pthread_self ();
   if (NULL == self)
     {
-       return ENOENT;
+      return ENOENT;
     }
 
   if (0 != pthread_equal (self, thread))
@@ -113,7 +113,7 @@ pthread_join (pthread_t thread, void **value_ptr)
        * pthreadCancelableWait will not return if we
        * are canceled.
        */
-      result = pthreadCancelableWait(thread->threadH);
+      result = pthreadCancelableWait (thread->threadH);
 
       if (result == 0)
 	{
@@ -144,7 +144,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 	    {
 	      *value_ptr = thread->exitStatus;
 	    }
-      
+
 	  /*
 	   * The result of making multiple simultaneous calls to
 	   * pthread_join() specifying the same target is undefined.

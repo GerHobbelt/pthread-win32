@@ -57,6 +57,3 @@
 #include "pthread_mutex_timedlock.c"
 #include "pthread_mutex_unlock.c"
 #include "pthread_mutex_trylock.c"
-
-
-

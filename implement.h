@@ -38,17 +38,17 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
+#include <windows.h>
 /*
  * note: ETIMEDOUT is correctly defined in winsock.h
  */
-#include <windows.h>
 #include <winsock.h>
 
 /*
  * In case ETIMEDOUT hasn't been defined above somehow.
  */
 #ifndef ETIMEDOUT
-#  define ETIMEDOUT 10060     /* This is the value in winsock.h. */
+#  define ETIMEDOUT 10060	/* This is the value in winsock.h. */
 #endif
 
 #if !defined(malloc)
@@ -77,63 +77,66 @@
 #define PTW32_INTERLOCKED_LPLONG PVOID*
 #endif
 
-typedef enum {
+typedef enum
+{
   /*
    * This enumeration represents the state of the thread;
    * The thread is still "alive" if the numeric value of the
    * state is greater or equal "PThreadStateRunning".
    */
-  PThreadStateInitial = 0,      /* Thread not running                   */
-  PThreadStateRunning,          /* Thread alive & kicking               */
-  PThreadStateSuspended,        /* Thread alive but suspended           */
-  PThreadStateCanceling,        /* Thread alive but is                  */
-                                /* in the process of terminating        */
-                                /* due to a cancellation request        */
-  PThreadStateException,        /* Thread alive but exiting             */
-                                /* due to an exception                  */
+  PThreadStateInitial = 0,	/* Thread not running                   */
+  PThreadStateRunning,		/* Thread alive & kicking               */
+  PThreadStateSuspended,	/* Thread alive but suspended           */
+  PThreadStateCanceling,	/* Thread alive but is                  */
+  /* in the process of terminating        */
+  /* due to a cancellation request        */
+  PThreadStateException,	/* Thread alive but exiting             */
+  /* due to an exception                  */
   PThreadStateLast
 }
 PThreadState;
 
 
-typedef enum {
+typedef enum
+{
   /*
    * This enumeration represents the reason why a thread has
    * terminated/is terminating.
    */
-  PThreadDemisePeaceful = 0,    /* Death due natural causes     */
-  PThreadDemiseCancelled,       /* Death due to user cancel     */
-  PThreadDemiseException,       /* Death due to unhandled       */
-                                /* exception                    */
-  PThreadDemiseNotDead  /* I'm not dead!                */
+  PThreadDemisePeaceful = 0,	/* Death due natural causes     */
+  PThreadDemiseCancelled,	/* Death due to user cancel     */
+  PThreadDemiseException,	/* Death due to unhandled       */
+  /* exception                    */
+  PThreadDemiseNotDead		/* I'm not dead!                */
 }
 PThreadDemise;
 
-struct pthread_t_ {
+struct pthread_t_
+{
 #ifdef _UWIN
   DWORD dummy[5];
 #endif
   DWORD thread;
-  HANDLE threadH;             /* POSIX thread is invalid if threadH == 0 */
-  pthread_t prevReuse;        /* Links threads on reuse stack */
+  HANDLE threadH;		/* POSIX thread is invalid if threadH == 0 */
+  pthread_t prevReuse;		/* Links threads on reuse stack */
   PThreadState state;
   PThreadDemise demise;
   void *exitStatus;
   void *parms;
   int ptErrno;
   int detachState;
-  pthread_mutex_t threadLock;  /* Used for serialised access to public thread state */
-  int sched_priority;          /* As set, not as currently is */
-  pthread_mutex_t cancelLock;  /* Used for async-cancel safety */
+  pthread_mutex_t threadLock;	/* Used for serialised access to public thread state */
+  int sched_priority;		/* As set, not as currently is */
+  pthread_mutex_t cancelLock;	/* Used for async-cancel safety */
   int cancelState;
   int cancelType;
   HANDLE cancelEvent;
 #ifdef __CLEANUP_C
   jmp_buf start_mark;
-#endif /* __CLEANUP_C */
+#endif				/* __CLEANUP_C */
 #if HAVE_SIGSET_T
   sigset_t sigmask;
-#endif /* HAVE_SIGSET_T */
+#endif				/* HAVE_SIGSET_T */
   int implicit:1;
   void *keys;
 };
@@ -144,7 +147,8 @@ struct pthread_t_ {
  */
 #define PTW32_ATTR_VALID ((unsigned long) 0xC4C0FFEE)
 
-struct pthread_attr_t_ {
+struct pthread_attr_t_
+{
   unsigned long valid;
   void *stackaddr;
   size_t stacksize;
@@ -154,7 +158,7 @@ struct pthread_attr_t_ {
   int contentionscope;
 #if HAVE_SIGSET_T
   sigset_t sigmask;
-#endif /* HAVE_SIGSET_T */
+#endif				/* HAVE_SIGSET_T */
 };
 
 
@@ -166,36 +170,39 @@ struct pthread_attr_t_ {
  * ====================
  */
 
-struct sem_t_ {
+struct sem_t_
+{
 #ifdef NEED_SEM
-  unsigned int  value;
+  unsigned int value;
   CRITICAL_SECTION sem_lock_cs;
-  HANDLE        event;
-#else /* NEED_SEM */
+  HANDLE event;
+#else				/* NEED_SEM */
   HANDLE sem;
-#endif /* NEED_SEM */
+#endif				/* NEED_SEM */
 };
 
 #define PTW32_OBJECT_AUTO_INIT ((void *) -1)
 #define PTW32_OBJECT_INVALID   NULL
 
-struct pthread_mutex_t_ {
-  LONG lock_idx;               /* Provides exclusive access to mutex state
-                                  via the Interlocked* mechanism, as well
-                                  as a count of the number of threads
-                                  waiting on the mutex. */
-  int recursive_count;         /* Number of unlocks a thread needs to perform
-                                  before the lock is released (recursive
-                                  mutexes only). */
-  int kind;                    /* Mutex type. */
+struct pthread_mutex_t_
+{
+  LONG lock_idx;		/* Provides exclusive access to mutex state
+				   via the Interlocked* mechanism, as well
+				   as a count of the number of threads
+				   waiting on the mutex. */
+  int recursive_count;		/* Number of unlocks a thread needs to perform
+				   before the lock is released (recursive
+				   mutexes only). */
+  int kind;			/* Mutex type. */
   pthread_t ownerThread;
-  sem_t wait_sema;             /* Mutex release notification to waiting
-                                  threads. */
-  CRITICAL_SECTION wait_cs;    /* Serialise lock_idx decrement after mutex
-                                  timeout. */
+  sem_t wait_sema;		/* Mutex release notification to waiting
+				   threads. */
+  CRITICAL_SECTION wait_cs;	/* Serialise lock_idx decrement after mutex
+				   timeout. */
 };
 
-struct pthread_mutexattr_t_ {
+struct pthread_mutexattr_t_
+{
   int pshared;
   int kind;
 };
@@ -221,15 +228,18 @@ struct pthread_mutexattr_t_ {
 #define PTW32_SPIN_LOCKED      (2)
 #define PTW32_SPIN_USE_MUTEX   (3)
 
-struct pthread_spinlock_t_ {
-  long interlock;              /* Locking element for multi-cpus. */
-  union {
-    int cpus;                  /* No. of cpus if multi cpus, or   */
-    pthread_mutex_t mutex;     /* mutex if single cpu.            */
+struct pthread_spinlock_t_
+{
+  long interlock;		/* Locking element for multi-cpus. */
+  union
+  {
+    int cpus;			/* No. of cpus if multi cpus, or   */
+    pthread_mutex_t mutex;	/* mutex if single cpu.            */
   } u;
 };
 
-struct pthread_barrier_t_ {
+struct pthread_barrier_t_
+{
   unsigned int nCurrentBarrierHeight;
   unsigned int nInitialBarrierHeight;
   int iStep;
@@ -237,11 +247,13 @@ struct pthread_barrier_t_ {
   sem_t semBarrierBreeched[2];
 };
 
-struct pthread_barrierattr_t_ {
+struct pthread_barrierattr_t_
+{
   int pshared;
 };
 
-struct pthread_key_t_ {
+struct pthread_key_t_
+{
   DWORD key;
   void (*destructor) (void *);
   pthread_mutex_t threadsLock;
@@ -252,52 +264,58 @@ struct pthread_key_t_ {
 typedef struct ThreadParms ThreadParms;
 typedef struct ThreadKeyAssoc ThreadKeyAssoc;
 
-struct ThreadParms {
+struct ThreadParms
+{
   pthread_t tid;
   void *(*start) (void *);
   void *arg;
 };
 
 
-struct pthread_cond_t_ {
-  long            nWaitersBlocked;   /* Number of threads blocked            */
-  long            nWaitersGone;      /* Number of threads timed out          */
-  long            nWaitersToUnblock; /* Number of threads to unblock         */
-  sem_t           semBlockQueue;     /* Queue up threads waiting for the     */
-                                     /*   condition to become signalled      */
-  sem_t           semBlockLock;      /* Semaphore that guards access to      */
-                                     /* | waiters blocked count/block queue  */
-                                     /* +-> Mandatory Sync.LEVEL-1           */
-  pthread_mutex_t mtxUnblockLock;    /* Mutex that guards access to          */
-                                     /* | waiters (to)unblock(ed) counts     */
-                                     /* +-> Optional* Sync.LEVEL-2           */
-  pthread_cond_t next;               /* Doubly linked list                   */
+struct pthread_cond_t_
+{
+  long nWaitersBlocked;		/* Number of threads blocked            */
+  long nWaitersGone;		/* Number of threads timed out          */
+  long nWaitersToUnblock;	/* Number of threads to unblock         */
+  sem_t semBlockQueue;		/* Queue up threads waiting for the     */
+  /*   condition to become signalled      */
+  sem_t semBlockLock;		/* Semaphore that guards access to      */
+  /* | waiters blocked count/block queue  */
+  /* +-> Mandatory Sync.LEVEL-1           */
+  pthread_mutex_t mtxUnblockLock;	/* Mutex that guards access to          */
+  /* | waiters (to)unblock(ed) counts     */
+  /* +-> Optional* Sync.LEVEL-2           */
+  pthread_cond_t next;		/* Doubly linked list                   */
   pthread_cond_t prev;
 };
 
 
-struct pthread_condattr_t_ {
+struct pthread_condattr_t_
+{
   int pshared;
 };
 
 #define PTW32_RWLOCK_MAGIC 0xfacade2
 
-struct pthread_rwlock_t_ {
-  pthread_mutex_t   mtxExclusiveAccess;
-  pthread_mutex_t   mtxSharedAccessCompleted;
-  pthread_cond_t    cndSharedAccessCompleted;
-  int               nSharedAccessCount;
-  int               nExclusiveAccessCount;
-  int               nCompletedSharedAccessCount;
-  int               nMagic;
+struct pthread_rwlock_t_
+{
+  pthread_mutex_t mtxExclusiveAccess;
+  pthread_mutex_t mtxSharedAccessCompleted;
+  pthread_cond_t cndSharedAccessCompleted;
+  int nSharedAccessCount;
+  int nExclusiveAccessCount;
+  int nCompletedSharedAccessCount;
+  int nMagic;
 };
 
-struct pthread_rwlockattr_t_ {
-  int               pshared;
+struct pthread_rwlockattr_t_
+{
+  int pshared;
 };
 
 
-struct ThreadKeyAssoc {
+struct ThreadKeyAssoc
+{
   /*
    * Purpose:
    *      This structure creates an association between a
@@ -411,8 +429,9 @@ struct ThreadKeyAssoc {
 #define PTW32_EPS_CANCEL                (2)
 
 /* Mutex constants */
-enum {
-  PTW32_MUTEX_LOCK_IDX_INIT     = -1,
+enum
+{
+  PTW32_MUTEX_LOCK_IDX_INIT = -1,
   PTW32_MUTEX_OWNER_ANONYMOUS = 1
 };
 
@@ -423,9 +442,12 @@ enum {
 
 
 /* Declared in global.c */
-extern PTW32_INTERLOCKED_LONG (WINAPI *ptw32_interlocked_compare_exchange)(PTW32_INTERLOCKED_LPLONG,
-                                                                           PTW32_INTERLOCKED_LONG,
-                                                                           PTW32_INTERLOCKED_LONG);
+extern PTW32_INTERLOCKED_LONG (WINAPI *
+			       ptw32_interlocked_compare_exchange)
+  (PTW32_INTERLOCKED_LPLONG, PTW32_INTERLOCKED_LONG, PTW32_INTERLOCKED_LONG);
+
+/* Declared in pthread_cancel.c */
+extern DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD);
 
 /* Thread Reuse stack bottom marker. Must not be NULL or any valid pointer to memory. */
 #define PTW32_THREAD_REUSE_BOTTOM ((pthread_t) 1)
@@ -441,6 +463,8 @@ extern int ptw32_mutex_default_kind;
 
 extern int ptw32_concurrency;
 
+extern int ptw32_features;
+
 extern CRITICAL_SECTION ptw32_thread_reuse_lock;
 extern CRITICAL_SECTION ptw32_mutex_test_init_lock;
 extern CRITICAL_SECTION ptw32_cond_list_lock;
@@ -452,18 +476,10 @@ extern CRITICAL_SECTION ptw32_spinlock_test_init_lock;
 extern int pthread_count;
 #endif
 
-/* Declared in misc.c */
-#ifdef NEED_CALLOC
-#define calloc(n, s) ptw32_calloc(n, s)
-void *ptw32_calloc(size_t n, size_t s);
-#endif
-
-/* Declared in private.c */
-void ptw32_throw(DWORD exception);
-
 #ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+extern "C"
+{
+#endif				/* __cplusplus */
 
 /*
  * =====================
@@ -473,84 +489,97 @@ extern "C" {
  * =====================
  */
 
-int ptw32_is_attr (const pthread_attr_t *attr);
+  int ptw32_is_attr (const pthread_attr_t * attr);
 
-int ptw32_cond_check_need_init(pthread_cond_t *cond);
-int ptw32_mutex_check_need_init(pthread_mutex_t *mutex);
-int ptw32_rwlock_check_need_init(pthread_rwlock_t *rwlock);
+  int ptw32_cond_check_need_init (pthread_cond_t * cond);
+  int ptw32_mutex_check_need_init (pthread_mutex_t * mutex);
+  int ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock);
 
-PTW32_INTERLOCKED_LONG WINAPI
-ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG location,
-                                 PTW32_INTERLOCKED_LONG   value,
-                                 PTW32_INTERLOCKED_LONG   comparand);
+  PTW32_INTERLOCKED_LONG WINAPI
+    ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
+				      PTW32_INTERLOCKED_LONG value,
+				      PTW32_INTERLOCKED_LONG comparand);
 
-int ptw32_processInitialize (void);
+    DWORD
+    ptw32_RegisterCancelation (PAPCFUNC callback,
+			       HANDLE threadH, DWORD callback_arg);
 
-void ptw32_processTerminate (void);
+  int ptw32_processInitialize (void);
 
-void ptw32_threadDestroy (pthread_t tid);
+  void ptw32_processTerminate (void);
 
-void ptw32_pop_cleanup_all (int execute);
+  void ptw32_threadDestroy (pthread_t tid);
 
-pthread_t ptw32_new (void);
+  void ptw32_pop_cleanup_all (int execute);
 
-pthread_t ptw32_threadReusePop (void);
+  pthread_t ptw32_new (void);
 
-void ptw32_threadReusePush (pthread_t thread);
+  pthread_t ptw32_threadReusePop (void);
 
-int ptw32_getprocessors (int * count);
+  void ptw32_threadReusePush (pthread_t thread);
 
-int ptw32_setthreadpriority (pthread_t thread,
-                             int policy,
-                             int priority);
+  int ptw32_getprocessors (int *count);
 
-void ptw32_rwlock_cancelwrwait(void * arg);
+  int ptw32_setthreadpriority (pthread_t thread, int policy, int priority);
+
+  void ptw32_rwlock_cancelwrwait (void *arg);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
-unsigned __stdcall
+  unsigned __stdcall
 #else
-void
+  void
 #endif
-ptw32_threadStart (void * vthreadParms);
+    ptw32_threadStart (void *vthreadParms);
 
-void ptw32_callUserDestroyRoutines (pthread_t thread);
+  void ptw32_callUserDestroyRoutines (pthread_t thread);
 
-int ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
-                            pthread_t thread,
-                            pthread_key_t key);
+  int ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
+			   pthread_t thread, pthread_key_t key);
 
-void ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc);
+  void ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
+  int ptw32_semwait (sem_t * sem);
 
 #ifdef NEED_SEM
-void ptw32_decrease_semaphore(sem_t * sem);
-BOOL ptw32_increase_semaphore(sem_t * sem,
-                                 unsigned int n);
-#endif /* NEED_SEM */
+  void ptw32_decrease_semaphore (sem_t * sem);
+  BOOL ptw32_increase_semaphore (sem_t * sem, unsigned int n);
+#endif				/* NEED_SEM */
 
 #ifdef NEED_FTIME
-void ptw32_timespec_to_filetime(const struct timespec *ts, FILETIME *ft);
-void ptw32_filetime_to_timespec(const FILETIME *ft, struct timespec *ts);
+  void ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft);
+  void ptw32_filetime_to_timespec (const FILETIME * ft, struct timespec *ts);
 #endif
+
+/* Declared in misc.c */
+#ifdef NEED_CALLOC
+#define calloc(n, s) ptw32_calloc(n, s)
+  void *ptw32_calloc (size_t n, size_t s);
+#endif
+
+/* Declared in private.c */
+  void ptw32_throw (DWORD exception);
 
 #ifdef __cplusplus
 }
-#endif /* __cplusplus */
+#endif				/* __cplusplus */
 
 
 #ifdef _UWIN_
 #   ifdef       _MT
 #       ifdef __cplusplus
-        extern "C" {
+extern "C"
+{
 #       endif
-        _CRTIMP unsigned long  __cdecl _beginthread (void (__cdecl *) (void *),
-                unsigned, void *);
-        _CRTIMP void __cdecl _endthread(void);
-        _CRTIMP unsigned long __cdecl _beginthreadex(void *, unsigned,
-                unsigned (__stdcall *) (void *), void *, unsigned, unsigned *);
-        _CRTIMP void __cdecl _endthreadex(unsigned);
+  _CRTIMP unsigned long __cdecl _beginthread (void (__cdecl *) (void *),
+					      unsigned, void *);
+  _CRTIMP void __cdecl _endthread (void);
+  _CRTIMP unsigned long __cdecl _beginthreadex (void *, unsigned,
+						unsigned (__stdcall *) (void
+									*),
+						void *, unsigned, unsigned *);
+  _CRTIMP void __cdecl _endthreadex (unsigned);
 #       ifdef __cplusplus
-        }
+}
 #       endif
 #   endif
 #else
@@ -586,8 +615,7 @@ void ptw32_filetime_to_timespec(const FILETIME *ft, struct timespec *ts);
 
 #define _endthreadex ExitThread
 
-#endif /* __CYGWIN32__ || __CYGWIN__ || NEED_CREATETHREAD*/
+#endif				/* __CYGWIN32__ || __CYGWIN__ || NEED_CREATETHREAD */
 
 
-#endif /* _IMPLEMENT_H */
-
+#endif				/* _IMPLEMENT_H */

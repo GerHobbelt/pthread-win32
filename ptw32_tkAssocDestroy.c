@@ -48,16 +48,15 @@ ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
       * ie) both the key and thread have stopped referencing it.
       *
       * Parameters:
-      * 	     assoc
-      * 		     an instance of ThreadKeyAssoc.
+      *              assoc
+      *                      an instance of ThreadKeyAssoc.
       * Returns:
       *      N/A
       * -------------------------------------------------------------------
       */
 {
 
-  if ((assoc != NULL) &&
-      (assoc->key == NULL && assoc->thread == NULL))
+  if ((assoc != NULL) && (assoc->key == NULL && assoc->thread == NULL))
     {
 
       pthread_mutex_destroy (&(assoc->lock));

@@ -51,7 +51,7 @@
 #endif
 
 int
-sem_open (const char * name, int oflag, mode_t mode, unsigned int value)
+sem_open (const char *name, int oflag, mode_t mode, unsigned int value)
 {
   errno = ENOSYS;
   return -1;

@@ -53,7 +53,7 @@ ptw32_threadReusePop (void)
 {
   pthread_t t;
 
-  EnterCriticalSection(&ptw32_thread_reuse_lock);
+  EnterCriticalSection (&ptw32_thread_reuse_lock);
 
   t = ptw32_threadReuseTop;
 
@@ -67,7 +67,7 @@ ptw32_threadReusePop (void)
       t = NULL;
     }
 
-  LeaveCriticalSection(&ptw32_thread_reuse_lock);
+  LeaveCriticalSection (&ptw32_thread_reuse_lock);
 
   return t;
 
@@ -79,12 +79,11 @@ ptw32_threadReusePop (void)
 void
 ptw32_threadReusePush (pthread_t thread)
 {
-  EnterCriticalSection(&ptw32_thread_reuse_lock);
+  EnterCriticalSection (&ptw32_thread_reuse_lock);
 
-  memset(thread, 0, sizeof (*thread));
+  memset (thread, 0, sizeof (*thread));
   thread->prevReuse = ptw32_threadReuseTop;
   ptw32_threadReuseTop = thread;
 
-  LeaveCriticalSection(&ptw32_thread_reuse_lock);
+  LeaveCriticalSection (&ptw32_thread_reuse_lock);
 }
-

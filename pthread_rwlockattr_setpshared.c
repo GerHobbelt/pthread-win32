@@ -41,8 +41,7 @@
 #include "implement.h"
 
 int
-pthread_rwlockattr_setpshared (pthread_rwlockattr_t * attr,
-			      int pshared)
+pthread_rwlockattr_setpshared (pthread_rwlockattr_t * attr, int pshared)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -52,16 +51,16 @@ pthread_rwlockattr_setpshared (pthread_rwlockattr_t * attr,
       *
       * PARAMETERS
       *      attr
-      * 	     pointer to an instance of pthread_rwlockattr_t
+      *              pointer to an instance of pthread_rwlockattr_t
       *
       *      pshared
-      * 	     must be one of:
+      *              must be one of:
       *
-      * 		     PTHREAD_PROCESS_SHARED
-      * 			     May be shared if in shared memory
+      *                      PTHREAD_PROCESS_SHARED
+      *                              May be shared if in shared memory
       *
-      * 		     PTHREAD_PROCESS_PRIVATE
-      * 			     Cannot be shared.
+      *                      PTHREAD_PROCESS_PRIVATE
+      *                              Cannot be shared.
       *
       * DESCRIPTION
       *      Rwlocks creatd with 'attr' can be shared between
@@ -69,17 +68,17 @@ pthread_rwlockattr_setpshared (pthread_rwlockattr_t * attr,
       *      in memory shared by these processes.
       *
       *      NOTES:
-      * 	     1)      pshared rwlocks MUST be allocated in shared
-      * 		     memory.
+      *              1)      pshared rwlocks MUST be allocated in shared
+      *                      memory.
       *
-      * 	     2)      The following macro is defined if shared rwlocks
-      * 		     are supported:
-      * 			     _POSIX_THREAD_PROCESS_SHARED
+      *              2)      The following macro is defined if shared rwlocks
+      *                      are supported:
+      *                              _POSIX_THREAD_PROCESS_SHARED
       *
       * RESULTS
-      * 	     0		     successfully set attribute,
-      * 	     EINVAL	     'attr' or pshared is invalid,
-      * 	     ENOSYS	     PTHREAD_PROCESS_SHARED not supported,
+      *              0               successfully set attribute,
+      *              EINVAL          'attr' or pshared is invalid,
+      *              ENOSYS          PTHREAD_PROCESS_SHARED not supported,
       *
       * ------------------------------------------------------
       */

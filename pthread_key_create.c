@@ -82,7 +82,7 @@ pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
     {
       result = ENOMEM;
     }
-  else if ((newkey->key = TlsAlloc()) == TLS_OUT_OF_INDEXES)
+  else if ((newkey->key = TlsAlloc ()) == TLS_OUT_OF_INDEXES)
     {
       result = EAGAIN;
 

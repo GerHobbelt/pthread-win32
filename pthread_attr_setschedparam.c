@@ -39,12 +39,12 @@
 #include "sched.h"
 
 int
-pthread_attr_setschedparam(pthread_attr_t *attr,
-			   const struct sched_param *param)
+pthread_attr_setschedparam (pthread_attr_t * attr,
+			    const struct sched_param *param)
 {
   int priority;
 
-  if (ptw32_is_attr(attr) != 0 || param == NULL)
+  if (ptw32_is_attr (attr) != 0 || param == NULL)
     {
       return EINVAL;
     }
@@ -52,12 +52,12 @@ pthread_attr_setschedparam(pthread_attr_t *attr,
   priority = param->sched_priority;
 
   /* Validate priority level. */
-  if (priority < sched_get_priority_min(SCHED_OTHER) ||
-      priority > sched_get_priority_max(SCHED_OTHER))
+  if (priority < sched_get_priority_min (SCHED_OTHER) ||
+      priority > sched_get_priority_max (SCHED_OTHER))
     {
       return EINVAL;
     }
 
-  memcpy(&(*attr)->param, param, sizeof(*param));
+  memcpy (&(*attr)->param, param, sizeof (*param));
   return 0;
 }

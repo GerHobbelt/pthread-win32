@@ -126,6 +126,7 @@ benchtest4::    benchtest4.c
 benchtest5::    benchtest5.c
 valid1::	valid1.c
 valid2::	valid2.c
+cancel9::	cancel9.c
 
 sizes:		:test:	sizes
 loadfree:	:test:
@@ -232,4 +233,4 @@ exception3	:test:	exception2
 exit4		:test:	exit3
 valid1		:test:	join1
 valid2		:test:	valid1
-
+cancel9		:test:	cancel8

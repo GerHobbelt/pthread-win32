@@ -65,26 +65,26 @@ pthread_kill (pthread_t thread, int sig)
       *      function can be used to check for a valid thread ID.
       *
       * RESULTS
-      * 	     ESRCH	     the thread is not a valid thread ID,
+      *              ESRCH           the thread is not a valid thread ID,
       *              EINVAL          the value of the signal is invalid
       *                              or unsupported.
-      * 	     0		     the signal was successfully sent.
+      *              0               the signal was successfully sent.
       *
       * ------------------------------------------------------
       */
 {
   int result = 0;
 
-  EnterCriticalSection(&ptw32_thread_reuse_lock);
+  EnterCriticalSection (&ptw32_thread_reuse_lock);
 
   if (NULL == thread
-        || NULL == thread->threadH
-        || THREAD_PRIORITY_ERROR_RETURN == GetThreadPriority(thread->threadH))
+      || NULL == thread->threadH
+      || THREAD_PRIORITY_ERROR_RETURN == GetThreadPriority (thread->threadH))
     {
       result = ESRCH;
     }
 
-  LeaveCriticalSection(&ptw32_thread_reuse_lock);
+  LeaveCriticalSection (&ptw32_thread_reuse_lock);
 
   if (0 == result && 0 != sig)
     {

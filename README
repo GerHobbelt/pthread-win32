@@ -25,6 +25,27 @@ conformance details and the list of supported and unsupported
 routines.
 
 
+Prerequisites
+-------------
+MSVC or GNU C (MSys - MinGW32)
+	To build from source.
+
+QueueUserAPCEx by Panagiotis E. Hadjidoukas
+	For true async cancelation of threads (including blocked threads).
+	This is a DLL and Windows driver that provides pre-emptive APC
+	by forcing threads into an alertable state when the APC is queued.
+	Both the DLL and driver are provided with the pthreads-win32.exe
+	self-unpacking ZIP, and on the pthreads-win32 FTP site  (in source
+	and pre-built forms). Currently this is a separate LGPL package to
+	pthreads-win32. See the README in the QueueUserAPCEx folder for
+	installation instructions.
+
+	Pthreads-win32 will automatically detect if the QueueUserAPCEx DLL
+	QuserEx.DLL is available and whether the driver AlertDrv.sys is
+	loaded. If it is not available, pthreads-win32 will simulate async
+	cancelation, which means that it cannot pre-empt blocked threads.
+
+
 Library naming
 --------------
 

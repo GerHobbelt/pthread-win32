@@ -87,26 +87,26 @@
 #if HAVE_SIGSET_T
 
 static void
-ptw32_signal_thread()
+ptw32_signal_thread ()
 {
 }
 
 static void
-ptw32_signal_callhandler()
+ptw32_signal_callhandler ()
 {
 }
 
 int
-pthread_sigmask(int how, sigset_t const *set, sigset_t *oset)
+pthread_sigmask (int how, sigset_t const *set, sigset_t * oset)
 {
-  pthread_t thread = pthread_self();
+  pthread_t thread = pthread_self ();
 
   if (thread == NULL)
     {
       return ENOENT;
     }
 
-  /* Validate the `how' argument.*/
+  /* Validate the `how' argument. */
   if (set != NULL)
     {
       switch (how)
@@ -126,7 +126,7 @@ pthread_sigmask(int how, sigset_t const *set, sigset_t *oset)
   /* Copy the old mask before modifying it. */
   if (oset != NULL)
     {
-      memcpy(oset, &(thread->sigmask), sizeof(sigset_t));
+      memcpy (oset, &(thread->sigmask), sizeof (sigset_t));
     }
 
   if (set != NULL)
@@ -134,7 +134,7 @@ pthread_sigmask(int how, sigset_t const *set, sigset_t *oset)
       unsigned int i;
 
       /* FIXME: this code assumes that sigmask is an even multiple of
-	 the size of a long integer. */
+         the size of a long integer. */
 
       unsigned long *src = (unsigned long const *) set;
       unsigned long *dest = (unsigned long *) &(thread->sigmask);
@@ -142,21 +142,21 @@ pthread_sigmask(int how, sigset_t const *set, sigset_t *oset)
       switch (how)
 	{
 	case SIG_BLOCK:
-	  for (i = 0; i < (sizeof(sigset_t) / sizeof(unsigned long)); i++)
+	  for (i = 0; i < (sizeof (sigset_t) / sizeof (unsigned long)); i++)
 	    {
 	      /* OR the bit field longword-wise. */
 	      *dest++ |= *src++;
 	    }
 	  break;
 	case SIG_UNBLOCK:
-	  for (i = 0; i < (sizeof(sigset_t) / sizeof(unsigned long)); i++)
+	  for (i = 0; i < (sizeof (sigset_t) / sizeof (unsigned long)); i++)
 	    {
 	      /* XOR the bitfield longword-wise. */
 	      *dest++ ^= *src++;
 	    }
 	case SIG_SETMASK:
 	  /* Replace the whole sigmask. */
-	  memcpy(&(thread->sigmask), set, sizeof(sigset_t));
+	  memcpy (&(thread->sigmask), set, sizeof (sigset_t));
 	  break;
 	}
     }
@@ -164,14 +164,13 @@ pthread_sigmask(int how, sigset_t const *set, sigset_t *oset)
   return 0;
 }
 
-int sigwait(const sigset_t *set,
-	    int *sig)
+int
+sigwait (const sigset_t * set, int *sig)
 {
 }
 
-int sigaction(int signum,
-	      const  struct  sigaction	*act,
-	      struct sigaction *oldact)
+int
+sigaction (int signum, const struct sigaction *act, struct sigaction *oldact)
 {
 }
 

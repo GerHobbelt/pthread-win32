@@ -39,7 +39,7 @@
 
 
 INLINE int
-ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
+ptw32_mutex_check_need_init (pthread_mutex_t * mutex)
 {
   int result = 0;
 
@@ -64,7 +64,7 @@ ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
    * the number of processors + 1.
    *
    */
-  EnterCriticalSection(&ptw32_mutex_test_init_lock);
+  EnterCriticalSection (&ptw32_mutex_test_init_lock);
 
   /*
    * We got here possibly under race
@@ -76,7 +76,7 @@ ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
    */
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     {
-      result = pthread_mutex_init(mutex, NULL);
+      result = pthread_mutex_init (mutex, NULL);
     }
   else if (*mutex == NULL)
     {
@@ -88,7 +88,7 @@ ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
       result = EINVAL;
     }
 
-  LeaveCriticalSection(&ptw32_mutex_test_init_lock);
+  LeaveCriticalSection (&ptw32_mutex_test_init_lock);
 
-  return(result);
+  return (result);
 }

@@ -68,24 +68,22 @@ pthread_testcancel (void)
       * ------------------------------------------------------
       */
 {
-  pthread_t self = pthread_self();
+  pthread_t self = pthread_self ();
 
-  (void) pthread_mutex_lock(&self->cancelLock);
+  (void) pthread_mutex_lock (&self->cancelLock);
 
   if (self != NULL
       && self->cancelState != PTHREAD_CANCEL_DISABLE
-      && WaitForSingleObject (self->cancelEvent, 0) == WAIT_OBJECT_0
-      )
+      && WaitForSingleObject (self->cancelEvent, 0) == WAIT_OBJECT_0)
     {
       /*
        * Canceling!
        */
       self->state = PThreadStateCanceling;
       self->cancelState = PTHREAD_CANCEL_DISABLE;
-      (void) pthread_mutex_unlock(&self->cancelLock);
-      ptw32_throw(PTW32_EPS_CANCEL);
+      (void) pthread_mutex_unlock (&self->cancelLock);
+      ptw32_throw (PTW32_EPS_CANCEL);
     }
 
-  (void) pthread_mutex_unlock(&self->cancelLock);
-}                               /* pthread_testcancel */
-
+  (void) pthread_mutex_unlock (&self->cancelLock);
+}				/* pthread_testcancel */

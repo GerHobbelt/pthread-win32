@@ -1,3 +1,39 @@
+SNAPSHOT 2004-05-16
+-------------------
+
+Attempt to add Watcom to the list of compilers that can build the library.
+This failed in the end due to it's non-thread-aware errno. The library
+builds but the test suite fails. See README.Watcom for more details.
+
+Bug fixes
+---------
+* Bug and memory leak in sem_init()
+- Alex Blanco  <Alex.Blanco at motorola.com>
+
+* ptw32_getprocessors() now returns CPU count of 1 for WinCE.
+- James Ewing  <james.ewing at sveasoft.com>
+
+* pthread_cond_wait() could be canceled at a point where it should not
+be cancelable. Fixed.
+- Alexander Terekhov  <TEREKHOV at de.ibm.com>
+
+* sem_timedwait() had an incorrect timeout calculation.
+- Philippe Di Cristo  <philipped at voicebox.com>
+
+* Fix a memory leak left behind after threads are destroyed.
+- P. van Bruggen  <pietvb at newbridges.nl>
+
+New features
+------------
+* Ported to AMD64.
+- Makoto Kato  <raven at oldskool.jp>
+
+* True pre-emptive asynchronous cancelation of threads. Requires that
+Panagiotis E. Hadjidoukas's QueueUserAPCEx package be installed. This
+package is included in the pthreads-win32 self-unpacking Zip archive
+starting from this snapshot.
+
+
 SNAPSHOT 2003-09-18
 -------------------
 

@@ -39,8 +39,7 @@
 
 
 int
-pthread_mutexattr_setpshared (pthread_mutexattr_t * attr,
-			      int pshared)
+pthread_mutexattr_setpshared (pthread_mutexattr_t * attr, int pshared)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -50,16 +49,16 @@ pthread_mutexattr_setpshared (pthread_mutexattr_t * attr,
       *
       * PARAMETERS
       *      attr
-      * 	     pointer to an instance of pthread_mutexattr_t
+      *              pointer to an instance of pthread_mutexattr_t
       *
       *      pshared
-      * 	     must be one of:
+      *              must be one of:
       *
-      * 		     PTHREAD_PROCESS_SHARED
-      * 			     May be shared if in shared memory
+      *                      PTHREAD_PROCESS_SHARED
+      *                              May be shared if in shared memory
       *
-      * 		     PTHREAD_PROCESS_PRIVATE
-      * 			     Cannot be shared.
+      *                      PTHREAD_PROCESS_PRIVATE
+      *                              Cannot be shared.
       *
       * DESCRIPTION
       *      Mutexes creatd with 'attr' can be shared between
@@ -67,17 +66,17 @@ pthread_mutexattr_setpshared (pthread_mutexattr_t * attr,
       *      in memory shared by these processes.
       *
       *      NOTES:
-      * 	     1)      pshared mutexes MUST be allocated in shared
-      * 		     memory.
+      *              1)      pshared mutexes MUST be allocated in shared
+      *                      memory.
       *
-      * 	     2)      The following macro is defined if shared mutexes
-      * 		     are supported:
-      * 			     _POSIX_THREAD_PROCESS_SHARED
+      *              2)      The following macro is defined if shared mutexes
+      *                      are supported:
+      *                              _POSIX_THREAD_PROCESS_SHARED
       *
       * RESULTS
-      * 	     0		     successfully set attribute,
-      * 	     EINVAL	     'attr' or pshared is invalid,
-      * 	     ENOSYS	     PTHREAD_PROCESS_SHARED not supported,
+      *              0               successfully set attribute,
+      *              EINVAL          'attr' or pshared is invalid,
+      *              ENOSYS          PTHREAD_PROCESS_SHARED not supported,
       *
       * ------------------------------------------------------
       */

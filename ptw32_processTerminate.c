@@ -57,13 +57,12 @@ ptw32_processTerminate (void)
       *      ptw32_processInitialized to FALSE
       *
       * RESULTS
-      * 	     N/A
+      *              N/A
       *
       * ------------------------------------------------------
       */
 {
-  pthread_t thread,
-            nextThread;
+  pthread_t thread, nextThread;
 
   if (ptw32_processInitialized)
     {
@@ -88,27 +87,27 @@ ptw32_processTerminate (void)
 	  ptw32_cleanupKey = NULL;
 	}
 
-      EnterCriticalSection(&ptw32_thread_reuse_lock);
+      EnterCriticalSection (&ptw32_thread_reuse_lock);
 
       thread = ptw32_threadReuseTop;
       while (thread != PTW32_THREAD_REUSE_BOTTOM)
-        {
-          nextThread = thread->prevReuse;
-          free(thread);
-          thread = nextThread;
-        }
+	{
+	  nextThread = thread->prevReuse;
+	  free (thread);
+	  thread = nextThread;
+	}
 
-      LeaveCriticalSection(&ptw32_thread_reuse_lock);
+      LeaveCriticalSection (&ptw32_thread_reuse_lock);
 
       /* 
        * Destroy the global locks.
        */
-      DeleteCriticalSection(&ptw32_spinlock_test_init_lock);
-      DeleteCriticalSection(&ptw32_rwlock_test_init_lock);
-      DeleteCriticalSection(&ptw32_cond_test_init_lock);
-      DeleteCriticalSection(&ptw32_cond_list_lock);
-      DeleteCriticalSection(&ptw32_mutex_test_init_lock);
-      DeleteCriticalSection(&ptw32_thread_reuse_lock);
+      DeleteCriticalSection (&ptw32_spinlock_test_init_lock);
+      DeleteCriticalSection (&ptw32_rwlock_test_init_lock);
+      DeleteCriticalSection (&ptw32_cond_test_init_lock);
+      DeleteCriticalSection (&ptw32_cond_list_lock);
+      DeleteCriticalSection (&ptw32_mutex_test_init_lock);
+      DeleteCriticalSection (&ptw32_thread_reuse_lock);
 
       ptw32_processInitialized = PTW32_FALSE;
     }

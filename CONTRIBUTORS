@@ -108,3 +108,6 @@ Piet van Bruggen	pietvb at newbridges dot nl
 					Bug fix.
 Makoto Kato		raven at oldskool dot jp
 					AMD64 port.
+Panagiotis E. Hadjidoukas	peh at hpclab dot ceid dotupatras dot gr
+					Contributed the QueueUserAPCEx package which
+					makes preemptive async cancelation possible.

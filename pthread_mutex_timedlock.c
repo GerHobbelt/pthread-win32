@@ -35,7 +35,7 @@
  */
 
 #ifndef _UWIN
-#   include <process.h>
+//#   include <process.h>
 #endif
 #ifndef NEED_FTIME
 #include <sys/timeb.h>
@@ -45,7 +45,7 @@
 
 
 static INLINE int
-ptw32_timed_semwait (sem_t * sem, const struct timespec * abstime)
+ptw32_timed_semwait (sem_t * sem, const struct timespec *abstime)
      /*
       * ------------------------------------------------------
       * DESCRIPTION
@@ -66,15 +66,15 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec * abstime)
       *      Unlike sem_timedwait(), this routine is non-cancelable.
       *
       * RESULTS
-      * 	     2		     abstime has passed already
-      * 	     1		     abstime timed out while waiting
-      * 	     0		     successfully decreased semaphore,
-      * 	     -1 	     failed, error in errno.
+      *              2               abstime has passed already
+      *              1               abstime timed out while waiting
+      *              0               successfully decreased semaphore,
+      *              -1              failed, error in errno.
       * ERRNO
-      * 	     EINVAL	     'sem' is not a valid semaphore,
-      * 	     ENOSYS	     semaphores are not supported,
-      * 	     EINTR	     the function was interrupted by a signal,
-      * 	     EDEADLK	     a deadlock condition was detected.
+      *              EINVAL          'sem' is not a valid semaphore,
+      *              ENOSYS          semaphores are not supported,
+      *              EINTR           the function was interrupted by a signal,
+      *              EDEADLK         a deadlock condition was detected.
       *
       * ------------------------------------------------------
       */
@@ -111,41 +111,46 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec * abstime)
 	  /* 
 	   * Calculate timeout as milliseconds from current system time. 
 	   */
-					
+
 	  /* get current system time */
-					
+
 #ifdef NEED_FTIME
-					
+
 	  {
 	    FILETIME ft;
 	    SYSTEMTIME st;
-						
-	    GetSystemTime(&st);
-	    SystemTimeToFileTime(&st, &ft);
+
+	    GetSystemTime (&st);
+	    SystemTimeToFileTime (&st, &ft);
 	    /*
 	     * GetSystemTimeAsFileTime(&ft); would be faster,
 	     * but it does not exist on WinCE
 	     */
-	    
-	    ptw32_filetime_to_timespec(&ft, &currSysTime);
+
+	    ptw32_filetime_to_timespec (&ft, &currSysTime);
 	  }
-					
+
 	  /*
 	   * subtract current system time from abstime
 	   */
-	  milliseconds = (abstime->tv_sec - currSysTime.tv_sec) * MILLISEC_PER_SEC;
-	  milliseconds += ((abstime->tv_nsec - currSysTime.tv_nsec)
-			   + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
+	  milliseconds =
+	    (abstime->tv_sec - currSysTime.tv_sec) * MILLISEC_PER_SEC;
+	  milliseconds +=
+	    ((abstime->tv_nsec - currSysTime.tv_nsec) +
+	     (NANOSEC_PER_MILLISEC / 2)) / NANOSEC_PER_MILLISEC;
 
 #else /* NEED_FTIME */
-	  _ftime(&currSysTime);
+	  _ftime (&currSysTime);
 
 	  /*
 	   * subtract current system time from abstime
 	   */
-	  milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
-	  milliseconds += ((abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC)
-            - currSysTime.millitm;
+	  milliseconds =
+	    (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
+	  milliseconds +=
+	    ((abstime->tv_nsec +
+	      (NANOSEC_PER_MILLISEC / 2)) / NANOSEC_PER_MILLISEC) -
+	    currSysTime.millitm;
 
 #endif /* NEED_FTIME */
 
@@ -157,11 +162,11 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec * abstime)
 
 #ifdef NEED_SEM
 
-      status = WaitForSingleObject( (*sem)->event, milliseconds );
+      status = WaitForSingleObject ((*sem)->event, milliseconds);
 
 #else /* NEED_SEM */
-	    
-      status = WaitForSingleObject( (*sem)->sem, milliseconds );
+
+      status = WaitForSingleObject ((*sem)->sem, milliseconds);
 
 #endif
 
@@ -170,7 +175,7 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec * abstime)
 
 #ifdef NEED_SEM
 
-	  ptw32_decrease_semaphore(sem);
+	  ptw32_decrease_semaphore (sem);
 
 #endif /* NEED_SEM */
 
@@ -198,7 +203,8 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec * abstime)
 
 
 int
-pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
+pthread_mutex_timedlock (pthread_mutex_t * mutex,
+			 const struct timespec *abstime)
 {
   int result = 0;
   pthread_mutex_t mx;
@@ -221,29 +227,29 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
    */
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     {
-      if ((result = ptw32_mutex_check_need_init(mutex)) != 0)
+      if ((result = ptw32_mutex_check_need_init (mutex)) != 0)
 	{
-	  return(result);
+	  return (result);
 	}
     }
 
   mx = *mutex;
 
-  if( 0 == InterlockedIncrement( &mx->lock_idx ) )
+  if (0 == InterlockedIncrement (&mx->lock_idx))
     {
       mx->recursive_count = 1;
       mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-			 ? pthread_self()
+			 ? pthread_self ()
 			 : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
     }
   else
     {
-      if( mx->kind != PTHREAD_MUTEX_FAST_NP &&
-	  pthread_equal( mx->ownerThread, pthread_self() ) )
+      if (mx->kind != PTHREAD_MUTEX_FAST_NP &&
+	  pthread_equal (mx->ownerThread, pthread_self ()))
 	{
-	  (void) InterlockedDecrement( &mx->lock_idx );
+	  (void) InterlockedDecrement (&mx->lock_idx);
 
-	  if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP )
+	  if (mx->kind == PTHREAD_MUTEX_RECURSIVE_NP)
 	    {
 	      mx->recursive_count++;
 	    }
@@ -260,22 +266,23 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 	    }
 	  else
 	    {
-	      switch (ptw32_timed_semwait( &mx->wait_sema, abstime ))
+	      switch (ptw32_timed_semwait (&mx->wait_sema, abstime))
 		{
-		case 0: /* We got the mutex. */
+		case 0:	/* We got the mutex. */
 		  {
 		    mx->recursive_count = 1;
 		    mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-				       ? pthread_self()
-				       : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
+				       ? pthread_self ()
+				       : (pthread_t)
+				       PTW32_MUTEX_OWNER_ANONYMOUS);
 		    break;
 		  }
-		case 1: /* Timedout, try a second grab. */
+		case 1:	/* Timedout, try a second grab. */
 		  {
 		    int busy;
 
-		    EnterCriticalSection(&mx->wait_cs);
-		    
+		    EnterCriticalSection (&mx->wait_cs);
+
 		    /*
 		     * If we timeout, it is up to us to adjust lock_idx to say
 		     * we're no longer waiting. If the mutex was also unlocked
@@ -302,28 +309,29 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 		     * We can almost guarrantee that EAGAIN is the only
 		     * possible error, so no need to test errno.
 		     */
-		    
-		    if ( -1 == (busy = sem_trywait( &mx->wait_sema )) )
+
+		    if (-1 == (busy = sem_trywait (&mx->wait_sema)))
 		      {
-			(void) InterlockedDecrement( &mx->lock_idx );
+			(void) InterlockedDecrement (&mx->lock_idx);
 			result = ETIMEDOUT;
 		      }
-		    
-		    LeaveCriticalSection(&mx->wait_cs);
 
-		    if ( ! busy )
+		    LeaveCriticalSection (&mx->wait_cs);
+
+		    if (!busy)
 		      {
 			/*
 			 * We have acquired the lock on second grab - keep it.
 			 */
 			mx->recursive_count = 1;
 			mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-					   ? pthread_self()
-					   : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
+					   ? pthread_self ()
+					   : (pthread_t)
+					   PTW32_MUTEX_OWNER_ANONYMOUS);
 		      }
 		    break;
 		  }
-		case 2: /* abstime passed before we started to wait. */
+		case 2:	/* abstime passed before we started to wait. */
 		  {
 		    /*
 		     * If we timeout, it is up to us to adjust lock_idx to say
@@ -335,27 +343,27 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 		     * we don't how long ago abstime was. We MUST just release it
 		     * immediately.
 		     */
-		    EnterCriticalSection(&mx->wait_cs);
-		    
+		    EnterCriticalSection (&mx->wait_cs);
+
 		    result = ETIMEDOUT;
 
-		    if ( -1 == sem_trywait( &mx->wait_sema ) )
+		    if (-1 == sem_trywait (&mx->wait_sema))
 		      {
-			(void) InterlockedDecrement( &mx->lock_idx );
+			(void) InterlockedDecrement (&mx->lock_idx);
 		      }
 		    else
 		      {
-			if ( InterlockedDecrement( &mx->lock_idx ) >= 0 )
+			if (InterlockedDecrement (&mx->lock_idx) >= 0)
 			  {
 			    /* Someone else is waiting on that mutex */
-			    if ( sem_post( &mx->wait_sema ) != 0 )
+			    if (sem_post (&mx->wait_sema) != 0)
 			      {
 				result = errno;
 			      }
 			  }
 		      }
-		    
-		    LeaveCriticalSection(&mx->wait_cs);
+
+		    LeaveCriticalSection (&mx->wait_cs);
 		    break;
 		  }
 		default:
@@ -368,5 +376,5 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 	}
     }
 
-  return(result);
+  return (result);
 }

@@ -62,7 +62,7 @@
  */
 
 void *
-pthread_timechange_handler_np(void * arg)
+pthread_timechange_handler_np (void *arg)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -82,8 +82,8 @@ pthread_timechange_handler_np(void * arg)
       *
       *
       * RESULTS
-      * 	     0		     successfully broadcast all CVs
-      * 	     EAGAIN	     Not all CVs were broadcast
+      *              0               successfully broadcast all CVs
+      *              EAGAIN          Not all CVs were broadcast
       *
       * ------------------------------------------------------
       */
@@ -91,18 +91,17 @@ pthread_timechange_handler_np(void * arg)
   int result = 0;
   pthread_cond_t cv;
 
-  EnterCriticalSection(&ptw32_cond_list_lock);
+  EnterCriticalSection (&ptw32_cond_list_lock);
 
   cv = ptw32_cond_list_head;
 
   while (cv != NULL && 0 == result)
     {
-      result = pthread_cond_broadcast(&cv);
+      result = pthread_cond_broadcast (&cv);
       cv = cv->next;
     }
 
-  LeaveCriticalSection(&ptw32_cond_list_lock);
+  LeaveCriticalSection (&ptw32_cond_list_lock);
 
-  return (void *)(result != 0 ? EAGAIN : 0);
+  return (void *) (result != 0 ? EAGAIN : 0);
 }
-

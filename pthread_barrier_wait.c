@@ -39,7 +39,7 @@
 
 
 int
-pthread_barrier_wait(pthread_barrier_t *barrier)
+pthread_barrier_wait (pthread_barrier_t * barrier)
 {
   int result;
   int step;
@@ -53,7 +53,7 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
   b = *barrier;
   step = b->iStep;
 
-  if (0 == InterlockedDecrement((long *) &(b->nCurrentBarrierHeight)))
+  if (0 == InterlockedDecrement ((long *) &(b->nCurrentBarrierHeight)))
     {
       /* Must be done before posting the semaphore. */
       b->nCurrentBarrierHeight = b->nInitialBarrierHeight;
@@ -68,15 +68,14 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
        * and will not be left stranded.
        */
       result = (b->nInitialBarrierHeight > 1
-                ? sem_post_multiple(&(b->semBarrierBreeched[step]),
-                                    b->nInitialBarrierHeight - 1)
-                : 0);
+		? sem_post_multiple (&(b->semBarrierBreeched[step]),
+				     b->nInitialBarrierHeight - 1) : 0);
     }
   else
     {
       BOOL switchCancelState;
       int oldCancelState;
-      pthread_t self = pthread_self();
+      pthread_t self = pthread_self ();
 
       /*
        * This routine is not a cancelation point, so temporarily
@@ -84,15 +83,16 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
        * PTHREAD_CANCEL_ASYNCHRONOUS threads can still be canceled.
        */
       switchCancelState = (self->cancelType == PTHREAD_CANCEL_DEFERRED &&
-                           0 == pthread_setcancelstate(PTHREAD_CANCEL_DISABLE,
-                                                       &oldCancelState));
+			   0 ==
+			   pthread_setcancelstate (PTHREAD_CANCEL_DISABLE,
+						   &oldCancelState));
 
-      result = sem_wait(&(b->semBarrierBreeched[step]));
+      result = sem_wait (&(b->semBarrierBreeched[step]));
 
       if (switchCancelState)
-        {
-          (void) pthread_setcancelstate(oldCancelState, NULL);
-        }
+	{
+	  (void) pthread_setcancelstate (oldCancelState, NULL);
+	}
     }
 
   /*
@@ -102,13 +102,14 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
   if (0 == result)
     {
       result = ((PTW32_INTERLOCKED_LONG) step ==
-                ptw32_interlocked_compare_exchange((PTW32_INTERLOCKED_LPLONG) &(b->iStep),
-                                                   (PTW32_INTERLOCKED_LONG) (1L - step),
-                                                   (PTW32_INTERLOCKED_LONG) step)
-                ? PTHREAD_BARRIER_SERIAL_THREAD
-                : 0);
+		ptw32_interlocked_compare_exchange ((PTW32_INTERLOCKED_LPLONG)
+						    & (b->iStep),
+						    (PTW32_INTERLOCKED_LONG)
+						    (1L - step),
+						    (PTW32_INTERLOCKED_LONG)
+						    step) ?
+		PTHREAD_BARRIER_SERIAL_THREAD : 0);
     }
 
-  return(result);
+  return (result);
 }
-

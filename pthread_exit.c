@@ -38,7 +38,7 @@
 #include "pthread.h"
 #include "implement.h"
 #ifndef _UWIN
-#   include <process.h>
+//#   include <process.h>
 #endif
 
 void
@@ -74,8 +74,8 @@ pthread_exit (void *value_ptr)
   self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
 
 #ifdef _UWIN
-	 if(--pthread_count <= 0)
-		exit((int)value_ptr);
+  if (--pthread_count <= 0)
+    exit ((int) value_ptr);
 #endif
 
   if (NULL == self)
@@ -99,7 +99,7 @@ pthread_exit (void *value_ptr)
 
   self->exitStatus = value_ptr;
 
-  ptw32_throw(PTW32_EPS_EXIT);
+  ptw32_throw (PTW32_EPS_EXIT);
 
   /* Never reached. */
 

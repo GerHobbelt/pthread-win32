@@ -39,7 +39,7 @@
 
 
 INLINE int
-ptw32_spinlock_check_need_init(pthread_spinlock_t *lock)
+ptw32_spinlock_check_need_init (pthread_spinlock_t * lock)
 {
   int result = 0;
 
@@ -51,7 +51,7 @@ ptw32_spinlock_check_need_init(pthread_spinlock_t *lock)
    * introducing race conditions into applications which are
    * correctly written.
    */
-  EnterCriticalSection(&ptw32_spinlock_test_init_lock);
+  EnterCriticalSection (&ptw32_spinlock_test_init_lock);
 
   /*
    * We got here possibly under race
@@ -63,7 +63,7 @@ ptw32_spinlock_check_need_init(pthread_spinlock_t *lock)
    */
   if (*lock == PTHREAD_SPINLOCK_INITIALIZER)
     {
-      result = pthread_spin_init(lock, PTHREAD_PROCESS_PRIVATE);
+      result = pthread_spin_init (lock, PTHREAD_PROCESS_PRIVATE);
     }
   else if (*lock == NULL)
     {
@@ -75,7 +75,7 @@ ptw32_spinlock_check_need_init(pthread_spinlock_t *lock)
       result = EINVAL;
     }
 
-  LeaveCriticalSection(&ptw32_spinlock_test_init_lock);
+  LeaveCriticalSection (&ptw32_spinlock_test_init_lock);
 
-  return(result);
+  return (result);
 }

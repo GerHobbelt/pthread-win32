@@ -35,9 +35,11 @@
 CP	= cp -f
 MV	= mv -f
 RM	= rm -f
+CAT	= cat
 #CP	= copy
 #MV	= rename
 #RM	= erase
+#CAT	= type
 MKDIR	= mkdir
 TOUCH	= echo Passed >
 ECHO	= @echo
@@ -47,18 +49,22 @@ MAKE	= make
 # Mingw32
 #
 XXCFLAGS	= 
-XXLIBS	=
+XXLIBS	= -lws2_32
 CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
 #CFLAGS	= -g -O0 -UNDEBUG -Wall $(XXCFLAGS)
 BUILD_DIR	= ..
 INCLUDES	= -I.
 
-GCX	= DUMMY
+# Default lib version
+GCX	= GC
+# Files we need to run the tests
+# - paths are relative to pthreads build dir.
 HDR	= pthread.h semaphore.h sched.h
 LIB	= libpthread$(GCX).a
 DLL	= pthread$(GCX).dll
+QAPC	= ../QueueUserAPCEx/User/quserex.dll
 
-COPYFILES	= $(HDR) $(LIB) $(DLL)
+COPYFILES	= $(HDR) $(LIB) $(DLL) $(QAPC)
 
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
@@ -85,7 +91,8 @@ TESTS	= sizes loadfree \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
 	  barrier1 barrier2 barrier3 barrier4 barrier5 \
-	  exception1 exception2 exception3
+	  exception1 exception2 exception3 \
+	  cancel9
 
 BENCHTESTS = \
 	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
@@ -240,30 +247,37 @@ spin4.pass: spin3.pass
 tsd1.pass: join1.pass
 valid1.pass: join1.pass
 valid2.pass: valid1.pass
+cancel9.pass: cancel8.pass
 
-#%.pass: %.exe $(HDR)
-%.pass: %.exe $(LIB) $(DLL) $(HDR)
+sizes.pass: sizes.exe
+	@ $(ECHO) Running $*
+	$< > SIZES.$(GCX)
+	@ $(CAT) SIZES.$(GCX)
+	@ $(ECHO) Passed
+	@ $(TOUCH) $@
+
+%.pass: %.exe
 	@ $(ECHO) Running $*
 	$*
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
-%.bench: $(LIB) $(DLL) $(HDR) $(XXLIBS) %.exe
+%.bench: $(XXLIBS) %.exe
 	@ $(ECHO) Running $*
 	$*
 	@ $(ECHO) Done
 	@ $(TOUCH) $@
 
-%.exe: %.c
+%.exe: %.c $(LIB) $(DLL) $(HDR) $(QAPC)
 	@ $(ECHO) Compiling $@
-	@ $(ECHO) $(CC) $(CFLAGS) -o $@ $^ $(INCLUDES) -L. -lpthread$(GCX) -lsupc++ $(XXLIBS)
-	@ $(CC) $(CFLAGS) -o $@ $^ $(INCLUDES) -L. -lpthread$(GCX) -lsupc++ $(XXLIBS)
+	@ $(ECHO) $(CC) $(CFLAGS) -o $@ $< $(INCLUDES) -L. -lpthread$(GCX) -lsupc++ $(XXLIBS)
+	@ $(CC) $(CFLAGS) -o $@ $< $(INCLUDES) -L. -lpthread$(GCX) -lsupc++ $(XXLIBS)
 
-%.pre: %.c
-	@ $(CC) -E $(CFLAGS) -o $@ $^ $(INCLUDES)
+%.pre: %.c $(HDR)
+	@ $(CC) -E $(CFLAGS) -o $@ $< $(INCLUDES)
 
-%.s: %.c
-	@ $(CC) -S $(CFLAGS) -o $@ $^ $(INCLUDES)
+%.s: %.c $(HDR)
+	@ $(CC) -S $(CFLAGS) -o $@ $< $(INCLUDES)
 
 $(COPYFILES):
 	@ $(ECHO) Copying $@
@@ -274,8 +288,8 @@ pthread.dll:
 
 benchlib.o: benchlib.c
 	@ $(ECHO) Compiling $@
-	@ $(ECHO) $(CC) -c $(CFLAGS) $^ $(INCLUDES)
-	@ $(CC) -c $(CFLAGS) $^ $(INCLUDES)
+	@ $(ECHO) $(CC) -c $(CFLAGS) $< $(INCLUDES)
+	@ $(CC) -c $(CFLAGS) $< $(INCLUDES)
 
 clean:
 	- $(RM) *.dll

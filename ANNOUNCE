@@ -1,8 +1,8 @@
-		 PTHREADS-WIN32 SNAPSHOT 2003-09-18
+		 PTHREADS-WIN32 SNAPSHOT 2004-05-16
 		 ----------------------------------
 	 Web Site: http://sources.redhat.com/pthreads-win32/
 	FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
-	 Maintainer: Ross Johnson <rpj@ise.canberra.edu.au>
+	 Maintainer: Ross Johnson <rpj@callisto.canberra.edu.au>
 
 
 We are pleased to announce the availability of a new snapshot of
@@ -414,9 +414,9 @@ Documentation
 -------------
 
 For the authoritative reference, see the online POSIX
-standard reference:
+standard reference at:
 
-       http://www.UNIX-systems.org/version3/ieee_std.html
+       http://www.OpenGroup.org
 
 For POSIX Thread API programming, several reference books are
 available:

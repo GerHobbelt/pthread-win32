@@ -39,6 +39,9 @@
 #include "pthread.h"
 #include "implement.h"
 
+/* The following are ordered for inlining */
+
+#include "private.c"
 #include "attr.c"
 #include "barrier.c"
 #include "cancel.c"
@@ -53,7 +56,6 @@
 #include "misc.c"
 #include "mutex.c"
 #include "nonportable.c"
-#include "private.c"
 #include "rwlock.c"
 #include "sched.c"
 #include "semaphore.c"

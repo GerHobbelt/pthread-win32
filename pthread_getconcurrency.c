@@ -39,7 +39,7 @@
 
 
 int
-pthread_getconcurrency(void)
+pthread_getconcurrency (void)
 {
   return ptw32_concurrency;
-}										
+}

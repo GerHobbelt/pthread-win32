@@ -84,4 +84,4 @@ pthread_condattr_init (pthread_condattr_t * attr)
 
   return result;
 
-}                               /* pthread_condattr_init */
+}				/* pthread_condattr_init */

@@ -55,7 +55,7 @@ sem_wait (sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      * 	     pointer to an instance of sem_t
+      *              pointer to an instance of sem_t
       *
       * DESCRIPTION
       *      This function waits on a semaphore. If the
@@ -66,13 +66,13 @@ sem_wait (sem_t * sem)
       *      a signal.
       *
       * RESULTS
-      * 	     0		     successfully decreased semaphore,
-      * 	     -1 	     failed, error in errno
+      *              0               successfully decreased semaphore,
+      *              -1              failed, error in errno
       * ERRNO
-      * 	     EINVAL	     'sem' is not a valid semaphore,
-      * 	     ENOSYS	     semaphores are not supported,
-      * 	     EINTR	     the function was interrupted by a signal,
-      * 	     EDEADLK	     a deadlock condition was detected.
+      *              EINVAL          'sem' is not a valid semaphore,
+      *              ENOSYS          semaphores are not supported,
+      *              EINTR           the function was interrupted by a signal,
+      *              EDEADLK         a deadlock condition was detected.
       *
       * ------------------------------------------------------
       */
@@ -88,11 +88,11 @@ sem_wait (sem_t * sem)
 
 #ifdef NEED_SEM
 
-	result = pthreadCancelableWait ((*sem)->event);
+      result = pthreadCancelableWait ((*sem)->event);
 
 #else /* NEED_SEM */
 
-	result = pthreadCancelableWait ((*sem)->sem);
+      result = pthreadCancelableWait ((*sem)->sem);
 
 #endif /* NEED_SEM */
 
@@ -106,7 +106,7 @@ sem_wait (sem_t * sem)
 
 #ifdef NEED_SEM
 
-  ptw32_decrease_semaphore(sem);
+  ptw32_decrease_semaphore (sem);
 
 #endif /* NEED_SEM */
 

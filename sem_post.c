@@ -55,7 +55,7 @@ sem_post (sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      * 	     pointer to an instance of sem_t
+      *              pointer to an instance of sem_t
       *
       * DESCRIPTION
       *      This function posts a wakeup to a semaphore. If there
@@ -63,11 +63,11 @@ sem_post (sem_t * sem)
       *      otherwise, the semaphore value is incremented by one.
       *
       * RESULTS
-      * 	     0		     successfully posted semaphore,
-      * 	     -1 	     failed, error in errno
+      *              0               successfully posted semaphore,
+      *              -1              failed, error in errno
       * ERRNO
-      * 	     EINVAL	     'sem' is not a valid semaphore,
-      * 	     ENOSYS	     semaphores are not supported,
+      *              EINVAL          'sem' is not a valid semaphore,
+      *              ENOSYS          semaphores are not supported,
       *
       * ------------------------------------------------------
       */
@@ -76,21 +76,21 @@ sem_post (sem_t * sem)
 
   if (sem == NULL || *sem == NULL)
     {
-			result = EINVAL;
+      result = EINVAL;
     }
 
 #ifdef NEED_SEM
 
-  else if (! ptw32_increase_semaphore (sem, 1))
+  else if (!ptw32_increase_semaphore (sem, 1))
 
 #else /* NEED_SEM */
 
-  else if (! ReleaseSemaphore ((*sem)->sem, 1, 0))
+  else if (!ReleaseSemaphore ((*sem)->sem, 1, 0))
 
 #endif /* NEED_SEM */
 
     {
-			result = EINVAL;
+      result = EINVAL;
     }
 
   if (result != 0)

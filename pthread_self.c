@@ -55,7 +55,7 @@ pthread_self (void)
       *      thread.
       *
       * RESULTS
-      * 	     pthread_t	     reference to the current thread
+      *              pthread_t       reference to the current thread
       *
       * ------------------------------------------------------
       */
@@ -63,8 +63,8 @@ pthread_self (void)
   pthread_t self;
 
 #ifdef _UWIN
-	if(!ptw32_selfThreadKey)
-		return(NULL);
+  if (!ptw32_selfThreadKey)
+    return (NULL);
 #endif
 
   self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
@@ -75,7 +75,7 @@ pthread_self (void)
        * Need to create an implicit 'self' for the currently
        * executing thread.
        */
-      self = ptw32_new();
+      self = ptw32_new ();
 
       if (self != NULL)
 	{
@@ -99,28 +99,25 @@ pthread_self (void)
 	   * Therefore, you should not pass the handle to
 	   * other threads for whatever purpose.
 	   */
-	  self->threadH = GetCurrentThread();
+	  self->threadH = GetCurrentThread ();
 #else
-	  if( !DuplicateHandle(
-			       GetCurrentProcess(),
-			       GetCurrentThread(),
-			       GetCurrentProcess(),
-			       &self->threadH,
-			       0,
-			       FALSE,
-			       DUPLICATE_SAME_ACCESS ) )
+	  if (!DuplicateHandle (GetCurrentProcess (),
+				GetCurrentThread (),
+				GetCurrentProcess (),
+				&self->threadH,
+				0, FALSE, DUPLICATE_SAME_ACCESS))
 	    {
 	      /* Thread structs are never freed. */
-	      ptw32_threadReusePush(self);
+	      ptw32_threadReusePush (self);
 	      return (NULL);
 	    }
 #endif
 
-          /*
-           * No need to explicitly serialise access to sched_priority
-           * because the new handle is not yet public.
-           */
-          self->sched_priority = GetThreadPriority(self->threadH);
+	  /*
+	   * No need to explicitly serialise access to sched_priority
+	   * because the new handle is not yet public.
+	   */
+	  self->sched_priority = GetThreadPriority (self->threadH);
 	}
 
       pthread_setspecific (ptw32_selfThreadKey, self);

@@ -155,15 +155,14 @@
 
 #ifdef PTW32_INCLUDE_WINDOWS_H
 #include <windows.h>
+#endif
 
-#if _MSC_VER < 1300
+#if defined(_MSC_VER) && _MSC_VER < 1300
 /*
  * VC++6.0 or early compiler's header has no DWORD_PTR type.
  */
 typedef unsigned long DWORD_PTR;
 #endif
-#endif
-
 /*
  * -----------------
  * autoconf switches
@@ -507,11 +506,12 @@ extern "C"
 /*
  * The Open Watcom C/C++ compiler uses a non-standard calling convention
  * that passes function args in registers unless __cdecl is explicitly specified
- * in function prototypes.
+ * in exposed function prototypes.
  *
- * We force all calls to cdecl even though this will slow Watcom code down
+ * We force all calls to cdecl even though this could slow Watcom code down
  * slightly. If you know that the Watcom compiler will be used to build both
- * the DLL and application, then you could probably define this as a null string.
+ * the DLL and application, then you can probably define this as a null string.
+ * Remember that pthread.h (this file) is used for both the DLL and application builds.
  */
 #define PTW32_CDECL __cdecl
 
@@ -1135,6 +1135,15 @@ PTW32_DLLPORT int PTW32_CDECL pthread_win32_process_attach_np(void);
 PTW32_DLLPORT int PTW32_CDECL pthread_win32_process_detach_np(void);
 PTW32_DLLPORT int PTW32_CDECL pthread_win32_thread_attach_np(void);
 PTW32_DLLPORT int PTW32_CDECL pthread_win32_thread_detach_np(void);
+
+/*
+ * Features that are auto-detected at load/run time.
+ */
+PTW32_DLLPORT int PTW32_CDECL pthread_win32_test_features_np(int);
+enum ptw32_features {
+  PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE = 0x0001, /* System provides it. */
+  PTW32_ALERTABLE_ASYNC_CANCEL              = 0x0002  /* Can cancel blocked threads. */
+};
 
 /*
  * Register a system time change with the library.

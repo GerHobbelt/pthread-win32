@@ -46,7 +46,7 @@ ptw32_new (void)
   /*
    * If there's a reusable pthread_t then use it.
    */
-  t = ptw32_threadReusePop();
+  t = ptw32_threadReusePop ();
 
   if (NULL == t)
     {
@@ -56,23 +56,21 @@ ptw32_new (void)
   if (t != NULL)
     {
       t->sched_priority = THREAD_PRIORITY_NORMAL;
-      t->detachState    = PTHREAD_CREATE_JOINABLE;
-      t->cancelState    = PTHREAD_CANCEL_ENABLE;
-      t->cancelType     = PTHREAD_CANCEL_DEFERRED;
-      t->cancelLock     = PTHREAD_MUTEX_INITIALIZER;
-      t->threadLock     = PTHREAD_MUTEX_INITIALIZER;
-      t->cancelEvent    = CreateEvent (
-				       0,
-				       (int) PTW32_TRUE,    /* manualReset  */
-				       (int) PTW32_FALSE,   /* setSignaled  */
-				       NULL);
+      t->detachState = PTHREAD_CREATE_JOINABLE;
+      t->cancelState = PTHREAD_CANCEL_ENABLE;
+      t->cancelType = PTHREAD_CANCEL_DEFERRED;
+      t->cancelLock = PTHREAD_MUTEX_INITIALIZER;
+      t->threadLock = PTHREAD_MUTEX_INITIALIZER;
+      t->cancelEvent = CreateEvent (0, (int) PTW32_TRUE,	/* manualReset  */
+				    (int) PTW32_FALSE,	/* setSignaled  */
+				    NULL);
 
       if (t->cancelEvent == NULL)
 	{
 	  /*
 	   * Thread ID structs are never freed.
 	   */
-	  ptw32_threadReusePush(t);
+	  ptw32_threadReusePush (t);
 	  t = NULL;
 	}
     }

@@ -39,7 +39,7 @@
 
 
 int
-pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
+pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
 {
   int result = 0;
   pthread_mutex_t mx;
@@ -50,9 +50,7 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
     }
 
   if (attr != NULL
-      && *attr != NULL
-      && (*attr)->pshared == PTHREAD_PROCESS_SHARED
-      )
+      && *attr != NULL && (*attr)->pshared == PTHREAD_PROCESS_SHARED)
     {
       /*
        * Creating mutex that can be shared between
@@ -74,7 +72,7 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 
     }
 
-  mx = (pthread_mutex_t) calloc(1, sizeof(*mx));
+  mx = (pthread_mutex_t) calloc (1, sizeof (*mx));
 
   if (mx == NULL)
     {
@@ -85,23 +83,22 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
       mx->lock_idx = PTW32_MUTEX_LOCK_IDX_INIT;
       mx->recursive_count = 0;
       mx->kind = (attr == NULL || *attr == NULL
-		  ? PTHREAD_MUTEX_DEFAULT
-		  : (*attr)->kind);
+		  ? PTHREAD_MUTEX_DEFAULT : (*attr)->kind);
       mx->ownerThread = NULL;
 
-      if ( 0 != sem_init( &mx->wait_sema, 0, 0 ))
+      if (0 != sem_init (&mx->wait_sema, 0, 0))
 	{
 	  result = EAGAIN;
-	  free(mx);
+	  free (mx);
 	  mx = NULL;
 	}
       else
 	{
-	  InitializeCriticalSection( &mx->wait_cs );
+	  InitializeCriticalSection (&mx->wait_cs);
 	}
     }
 
   *mutex = mx;
 
-  return(result);
+  return (result);
 }

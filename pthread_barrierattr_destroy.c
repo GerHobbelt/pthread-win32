@@ -80,5 +80,4 @@ pthread_barrierattr_destroy (pthread_barrierattr_t * attr)
     }
 
   return (result);
-}                               /* pthread_barrierattr_destroy */
-
+}				/* pthread_barrierattr_destroy */

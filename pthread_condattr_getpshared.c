@@ -94,4 +94,4 @@ pthread_condattr_getpshared (const pthread_condattr_t * attr, int *pshared)
 
   return result;
 
-}                               /* pthread_condattr_getpshared */
+}				/* pthread_condattr_getpshared */

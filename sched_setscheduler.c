@@ -39,7 +39,7 @@
 #include "sched.h"
 
 int
-sched_setscheduler(pid_t pid, int policy)
+sched_setscheduler (pid_t pid, int policy)
 {
   /*
    * Win32 only has one policy which we call SCHED_OTHER.
@@ -50,18 +50,21 @@ sched_setscheduler(pid_t pid, int policy)
    */
   if (0 != pid)
     {
-      int selfPid = (int) GetCurrentProcessId();
+      int selfPid = (int) GetCurrentProcessId ();
 
       if (pid != selfPid)
-        {
-          HANDLE h = OpenProcess(PROCESS_SET_INFORMATION, PTW32_FALSE, (DWORD) pid);
+	{
+	  HANDLE h =
+	    OpenProcess (PROCESS_SET_INFORMATION, PTW32_FALSE, (DWORD) pid);
 
-          if (NULL == h)
-            {
-              errno = (GetLastError() == (0xFF & ERROR_ACCESS_DENIED)) ? EPERM : ESRCH;
-              return -1;
-            }
-        }
+	  if (NULL == h)
+	    {
+	      errno =
+		(GetLastError () ==
+		 (0xFF & ERROR_ACCESS_DENIED)) ? EPERM : ESRCH;
+	      return -1;
+	    }
+	}
     }
 
   if (SCHED_OTHER != policy)

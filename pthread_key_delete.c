@@ -71,51 +71,51 @@ pthread_key_delete (pthread_key_t key)
   if (key != NULL)
     {
       if (key->threads != NULL &&
-          key->destructor != NULL &&
-          pthread_mutex_lock (&(key->threadsLock)) == 0)
-        {
-          /*
-           * Run through all Thread<-->Key associations
-           * for this key.
-           * If the pthread_t still exists (ie the assoc->thread
-           * is not NULL) then leave the assoc for the thread to
-           * destroy.
-           * Notes:
-           *      If assoc->thread is NULL, then the associated thread
-           *      is no longer referencing this assoc.
-           *      The association is only referenced
-           *      by this key and must be released; otherwise
-           *      the assoc will be destroyed when the thread is destroyed.
-           */
-          ThreadKeyAssoc *assoc;
+	  key->destructor != NULL &&
+	  pthread_mutex_lock (&(key->threadsLock)) == 0)
+	{
+	  /*
+	   * Run through all Thread<-->Key associations
+	   * for this key.
+	   * If the pthread_t still exists (ie the assoc->thread
+	   * is not NULL) then leave the assoc for the thread to
+	   * destroy.
+	   * Notes:
+	   *      If assoc->thread is NULL, then the associated thread
+	   *      is no longer referencing this assoc.
+	   *      The association is only referenced
+	   *      by this key and must be released; otherwise
+	   *      the assoc will be destroyed when the thread is destroyed.
+	   */
+	  ThreadKeyAssoc *assoc;
 
-          assoc = (ThreadKeyAssoc *) key->threads;
+	  assoc = (ThreadKeyAssoc *) key->threads;
 
-          while (assoc != NULL)
-            {
-              if (pthread_mutex_lock (&(assoc->lock)) == 0)
-                {
-                  ThreadKeyAssoc *next;
+	  while (assoc != NULL)
+	    {
+	      if (pthread_mutex_lock (&(assoc->lock)) == 0)
+		{
+		  ThreadKeyAssoc *next;
 
-                  assoc->key = NULL;
-                  next = assoc->nextThread;
-                  assoc->nextThread = NULL;
+		  assoc->key = NULL;
+		  next = assoc->nextThread;
+		  assoc->nextThread = NULL;
 
-                  pthread_mutex_unlock (&(assoc->lock));
+		  pthread_mutex_unlock (&(assoc->lock));
 
-                  ptw32_tkAssocDestroy (assoc);
+		  ptw32_tkAssocDestroy (assoc);
 
-                  assoc = next;
-                }
-            }
-          pthread_mutex_unlock (&(key->threadsLock));
-        }
+		  assoc = next;
+		}
+	    }
+	  pthread_mutex_unlock (&(key->threadsLock));
+	}
 
       TlsFree (key->key);
       if (key->destructor != NULL)
-        {
-          pthread_mutex_destroy (&(key->threadsLock));
-        }
+	{
+	  pthread_mutex_destroy (&(key->threadsLock));
+	}
 
 #if defined( _DEBUG )
       memset ((char *) key, 0, sizeof (*key));

@@ -51,4 +51,3 @@
 #include "pthread_attr_setstacksize.c"
 #include "pthread_attr_getscope.c"
 #include "pthread_attr_setscope.c"
-

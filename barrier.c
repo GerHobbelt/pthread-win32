@@ -45,4 +45,3 @@
 #include "pthread_barrierattr_destroy.c"
 #include "pthread_barrierattr_getpshared.c"
 #include "pthread_barrierattr_setpshared.c"
-

@@ -188,6 +188,7 @@ SMALL_STATIC_OBJS	= \
 		ptw32_calloc.o \
 		ptw32_new.o \
 		ptw32_reuse.o \
+		ptw32_semwait.o \
 		ptw32_rwlock_check_need_init.o \
 		sched_get_priority_max.o \
 		sched_get_priority_min.o \
@@ -316,6 +317,7 @@ PRIVATE_SRCS	= \
 		ptw32_tkAssocCreate.c \
 		ptw32_tkAssocDestroy.c \
 		ptw32_callUserDestroyRoutines.c \
+		ptw32_semwait.c \
 		ptw32_timespec.c \
 		ptw32_throw.c \
 		ptw32_InterlockedCompareExchange.c \

@@ -3,6 +3,10 @@
 #ifndef PTW32_CONFIG_H
 #define PTW32_CONFIG_H
 
+/*********************************************************************
+ * Defaults: see target specific redefinitions below.
+ *********************************************************************/
+
 /* We're building the pthreads-win32 library */
 #define PTW32_BUILD
 
@@ -42,9 +46,13 @@
 /* Define if you have the timespec struct */
 #undef HAVE_STRUCT_TIMESPEC
 
-/*
+/* Define if you don't have the GetProcessAffinityMask() */
+#undef NEED_PROCESS_AFFINITY_MASK
+
+
+/*********************************************************************
  * Target specific groups
- */
+ *********************************************************************/
 #ifdef WINCE
 #define NEED_DUPLICATEHANDLE
 #define NEED_CREATETHREAD
@@ -53,6 +61,7 @@
 #define NEED_FTIME
 #define NEED_SEM
 #define NEED_UNICODE_CONSTS
+#define NEED_PROCESS_AFFINITY_MASK
 #endif
 
 #ifdef _UWIN
@@ -66,6 +75,9 @@
 
 #ifdef __MINGW32__
 #define HAVE_MODE_T
+#endif
+
+#ifdef __WATCOMC__
 #endif
 
 #endif

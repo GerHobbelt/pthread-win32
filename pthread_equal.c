@@ -49,7 +49,7 @@ pthread_equal (pthread_t t1, pthread_t t2)
       * PARAMETERS
       *      t1,
       *      t2
-      * 	     thread IDs
+      *              thread IDs
       *
       *
       * DESCRIPTION
@@ -57,8 +57,8 @@ pthread_equal (pthread_t t1, pthread_t t2)
       *      returns zero.
       *
       * RESULTS
-      * 	     non-zero	     if t1 and t2 refer to the same thread,
-      * 	     0		     t1 and t2 do not refer to the same thread
+      *              non-zero        if t1 and t2 refer to the same thread,
+      *              0               t1 and t2 do not refer to the same thread
       *
       * ------------------------------------------------------
       */

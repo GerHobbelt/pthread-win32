@@ -47,6 +47,7 @@
 #include "ptw32_tkAssocCreate.c"
 #include "ptw32_tkAssocDestroy.c"
 #include "ptw32_callUserDestroyRoutines.c"
+#include "ptw32_semwait.c"
 #include "ptw32_timespec.c"
 #include "ptw32_throw.c"
 #include "ptw32_InterlockedCompareExchange.c"

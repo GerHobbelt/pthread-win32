@@ -77,7 +77,7 @@ pthread_detach (pthread_t thread)
   int result;
 
   /* This is the proper way to test for a valid thread. */
-  result = pthread_kill(thread, 0);
+  result = pthread_kill (thread, 0);
   if (0 != result)
     {
       return result;

@@ -39,32 +39,36 @@
 
 
 int
-pthread_spin_lock(pthread_spinlock_t *lock)
+pthread_spin_lock (pthread_spinlock_t * lock)
 {
   register pthread_spinlock_t s;
 
   if (NULL == lock || NULL == *lock)
     {
-      return(EINVAL);
+      return (EINVAL);
     }
 
   if (*lock == PTHREAD_SPINLOCK_INITIALIZER)
     {
       int result;
 
-      if ((result = ptw32_spinlock_check_need_init(lock)) != 0)
-        {
-          return(result);
-        }
+      if ((result = ptw32_spinlock_check_need_init (lock)) != 0)
+	{
+	  return (result);
+	}
     }
 
   s = *lock;
 
-  while ( (PTW32_INTERLOCKED_LONG) PTW32_SPIN_LOCKED ==
-          ptw32_interlocked_compare_exchange((PTW32_INTERLOCKED_LPLONG) &(s->interlock),
-                                             (PTW32_INTERLOCKED_LONG) PTW32_SPIN_LOCKED,
-                                             (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED) )
-    {}
+  while ((PTW32_INTERLOCKED_LONG) PTW32_SPIN_LOCKED ==
+	 ptw32_interlocked_compare_exchange ((PTW32_INTERLOCKED_LPLONG) &
+					     (s->interlock),
+					     (PTW32_INTERLOCKED_LONG)
+					     PTW32_SPIN_LOCKED,
+					     (PTW32_INTERLOCKED_LONG)
+					     PTW32_SPIN_UNLOCKED))
+    {
+    }
 
   if (s->interlock == PTW32_SPIN_LOCKED)
     {
@@ -72,7 +76,7 @@ pthread_spin_lock(pthread_spinlock_t *lock)
     }
   else if (s->interlock == PTW32_SPIN_USE_MUTEX)
     {
-      return pthread_mutex_lock(&(s->u.mutex));
+      return pthread_mutex_lock (&(s->u.mutex));
     }
 
   return EINVAL;

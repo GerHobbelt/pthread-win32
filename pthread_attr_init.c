@@ -39,7 +39,7 @@
 
 
 int
-pthread_attr_init(pthread_attr_t *attr)
+pthread_attr_init (pthread_attr_t * attr)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -97,7 +97,7 @@ pthread_attr_init(pthread_attr_t *attr)
   attr_result->detachstate = PTHREAD_CREATE_JOINABLE;
 
 #if HAVE_SIGSET_T
-  memset(&(attr_result->sigmask), 0, sizeof(sigset_t));
+  memset (&(attr_result->sigmask), 0, sizeof (sigset_t));
 #endif /* HAVE_SIGSET_T */
 
   /*
@@ -115,4 +115,3 @@ pthread_attr_init(pthread_attr_t *attr)
 
   return 0;
 }
-

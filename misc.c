@@ -48,4 +48,3 @@
 #include "ptw32_calloc.c"
 #include "ptw32_reuse.c"
 #include "w32_CancelableWait.c"
-

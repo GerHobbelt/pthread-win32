@@ -48,7 +48,7 @@ pthread_mutexattr_destroy (pthread_mutexattr_t * attr)
       *
       * PARAMETERS
       *      attr
-      * 	     pointer to an instance of pthread_mutexattr_t
+      *              pointer to an instance of pthread_mutexattr_t
       *
       *
       * DESCRIPTION
@@ -56,11 +56,11 @@ pthread_mutexattr_destroy (pthread_mutexattr_t * attr)
       *      no longer be used.
       *
       *      NOTES:
-      * 	     1)      Does not affect mutexes created using 'attr'
+      *              1)      Does not affect mutexes created using 'attr'
       *
       * RESULTS
-      * 	     0		     successfully released attr,
-      * 	     EINVAL	     'attr' is invalid.
+      *              0               successfully released attr,
+      *              EINVAL          'attr' is invalid.
       *
       * ------------------------------------------------------
       */
@@ -79,5 +79,5 @@ pthread_mutexattr_destroy (pthread_mutexattr_t * attr)
       free (ma);
     }
 
-  return(result);
+  return (result);
 }				/* pthread_mutexattr_destroy */

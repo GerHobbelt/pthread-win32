@@ -48,7 +48,7 @@
 	  ( ((LONGLONG) 27111902 << 32) + (LONGLONG) 3577643008 )
 
 INLINE void
-ptw32_timespec_to_filetime(const struct timespec *ts, FILETIME *ft)
+ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft)
      /*
       * -------------------------------------------------------------------
       * converts struct timespec
@@ -58,13 +58,12 @@ ptw32_timespec_to_filetime(const struct timespec *ts, FILETIME *ft)
       * -------------------------------------------------------------------
       */
 {
-	*(LONGLONG *)ft = ts->tv_sec * 10000000
-          + (ts->tv_nsec + 50) / 100
-          + PTW32_TIMESPEC_TO_FILETIME_OFFSET;
+  *(LONGLONG *) ft = ts->tv_sec * 10000000
+    + (ts->tv_nsec + 50) / 100 + PTW32_TIMESPEC_TO_FILETIME_OFFSET;
 }
 
 INLINE void
-ptw32_filetime_to_timespec(const FILETIME *ft, struct timespec *ts)
+ptw32_filetime_to_timespec (const FILETIME * ft, struct timespec *ts)
      /*
       * -------------------------------------------------------------------
       * converts FILETIME (as set by GetSystemTimeAsFileTime), where the time is
@@ -74,8 +73,11 @@ ptw32_filetime_to_timespec(const FILETIME *ft, struct timespec *ts)
       * -------------------------------------------------------------------
       */
 {
-	ts->tv_sec = (int)((*(LONGLONG *)ft - PTW32_TIMESPEC_TO_FILETIME_OFFSET) / 10000000);
-	ts->tv_nsec = (int)((*(LONGLONG *)ft - PTW32_TIMESPEC_TO_FILETIME_OFFSET - ((LONGLONG)ts->tv_sec * (LONGLONG)10000000)) * 100);
+  ts->tv_sec =
+    (int) ((*(LONGLONG *) ft - PTW32_TIMESPEC_TO_FILETIME_OFFSET) / 10000000);
+  ts->tv_nsec =
+    (int) ((*(LONGLONG *) ft - PTW32_TIMESPEC_TO_FILETIME_OFFSET -
+	    ((LONGLONG) ts->tv_sec * (LONGLONG) 10000000)) * 100);
 }
 
 #endif /* NEED_FTIME */

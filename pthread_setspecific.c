@@ -44,13 +44,13 @@ pthread_setspecific (pthread_key_t key, const void *value)
       * ------------------------------------------------------
       * DOCPUBLIC
       *      This function sets the value of the thread specific
-      *	     key in the calling thread.
+      *      key in the calling thread.
       *
       * PARAMETERS
       *      key
       *              an instance of pthread_key_t
-      *	     value
-      *		     the value to set key to
+      *      value
+      *              the value to set key to
       *
       *
       * DESCRIPTION
@@ -77,9 +77,9 @@ pthread_setspecific (pthread_key_t key, const void *value)
        */
       self = pthread_self ();
       if (self == NULL)
-        {
-          return ENOENT;
-        }
+	{
+	  return ENOENT;
+	}
     }
   else
     {
@@ -89,9 +89,9 @@ pthread_setspecific (pthread_key_t key, const void *value)
        */
       self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
       if (self == NULL)
-        {
-          self = (pthread_t) value;
-        }
+	{
+	  self = (pthread_t) value;
+	}
     }
 
   result = 0;
@@ -100,52 +100,50 @@ pthread_setspecific (pthread_key_t key, const void *value)
     {
       ThreadKeyAssoc *assoc;
 
-      if (self != NULL &&
-          key->destructor != NULL &&
-          value != NULL)
-        {
-          /*
-           * Only require associations if we have to
-           * call user destroy routine.
-           * Don't need to locate an existing association
-           * when setting data to NULL for WIN32 since the
-           * data is stored with the operating system; not
-           * on the association; setting assoc to NULL short
-           * circuits the search.
-           */
-          assoc = (ThreadKeyAssoc *) self->keys;
-          /*
-           * Locate existing association
-           */
-          while (assoc != NULL)
-            {
-              if (assoc->key == key)
-                {
-                  /*
-                   * Association already exists
-                   */
-                  break;
-                }
-              assoc = assoc->nextKey;
-            }
+      if (self != NULL && key->destructor != NULL && value != NULL)
+	{
+	  /*
+	   * Only require associations if we have to
+	   * call user destroy routine.
+	   * Don't need to locate an existing association
+	   * when setting data to NULL for WIN32 since the
+	   * data is stored with the operating system; not
+	   * on the association; setting assoc to NULL short
+	   * circuits the search.
+	   */
+	  assoc = (ThreadKeyAssoc *) self->keys;
+	  /*
+	   * Locate existing association
+	   */
+	  while (assoc != NULL)
+	    {
+	      if (assoc->key == key)
+		{
+		  /*
+		   * Association already exists
+		   */
+		  break;
+		}
+	      assoc = assoc->nextKey;
+	    }
 
-          /*
-           * create an association if not found
-           */
+	  /*
+	   * create an association if not found
+	   */
 	  if (assoc == NULL)
 	    {
 	      result = ptw32_tkAssocCreate (&assoc, self, key);
 	    }
-        }
+	}
 
       if (result == 0)
-        {
-          if ( ! TlsSetValue (key->key, (LPVOID) value))
+	{
+	  if (!TlsSetValue (key->key, (LPVOID) value))
 	    {
 	      result = EAGAIN;
 	    }
-        }
+	}
     }
 
   return (result);
-}                               /* pthread_setspecific */
+}				/* pthread_setspecific */

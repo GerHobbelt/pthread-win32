@@ -37,7 +37,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-
 #if defined(_M_IX86) || defined(_X86_)
 #define PTW32_PROGCTR(Context)  ((Context).Eip)
 #endif
@@ -62,12 +61,37 @@
 #error Module contains CPU-specific code; modify and recompile.
 #endif
 
-static INLINE void
-ptw32_cancel_self(void)
+static void
+ptw32_cancel_self (void)
 {
-  ptw32_throw(PTW32_EPS_CANCEL);
+  ptw32_throw (PTW32_EPS_CANCEL);
 
   /* Never reached */
+}
+
+static void CALLBACK
+ptw32_cancel_callback (DWORD unused)
+{
+  ptw32_throw (PTW32_EPS_CANCEL);
+
+  /* Never reached */
+}
+
+/*
+ * ptw32_RegisterCancelation() -
+ * Must have args of same type as QueueUserAPCEx because this function
+ * is a substitute for QueueUserAPCEx if it's not available.
+ */
+DWORD
+ptw32_RegisterCancelation (PAPCFUNC unused1, HANDLE threadH, DWORD unused2)
+{
+  CONTEXT context;
+
+  context.ContextFlags = CONTEXT_CONTROL;
+  GetThreadContext (threadH, &context);
+  PTW32_PROGCTR (context) = (DWORD_PTR) ptw32_cancel_self;
+  SetThreadContext (threadH, &context);
+  return 0;
 }
 
 int
@@ -99,13 +123,13 @@ pthread_cancel (pthread_t thread)
   pthread_t self;
 
   /* This is the proper way to test thread validity. */
-  result = pthread_kill(thread, 0);
+  result = pthread_kill (thread, 0);
   if (0 != result)
     {
       return result;
     }
 
-  if ((self = pthread_self()) == NULL)
+  if ((self = pthread_self ()) == NULL)
     {
       return ENOMEM;
     };
@@ -124,62 +148,62 @@ pthread_cancel (pthread_t thread)
    * (pthread_cancel is required to be an async-cancel
    * safe function).
    */
-  cancel_self = pthread_equal(thread, self);
+  cancel_self = pthread_equal (thread, self);
 
   /*
    * Lock for async-cancel safety.
    */
-  (void) pthread_mutex_lock(&thread->cancelLock);
+  (void) pthread_mutex_lock (&thread->cancelLock);
 
   if (thread->cancelType == PTHREAD_CANCEL_ASYNCHRONOUS
       && thread->cancelState == PTHREAD_CANCEL_ENABLE
-      && thread->state < PThreadStateCanceling )
+      && thread->state < PThreadStateCanceling)
     {
       if (cancel_self)
-        {
-          thread->state = PThreadStateCanceling;
-          thread->cancelState = PTHREAD_CANCEL_DISABLE;
+	{
+	  thread->state = PThreadStateCanceling;
+	  thread->cancelState = PTHREAD_CANCEL_DISABLE;
 
-          (void) pthread_mutex_unlock(&thread->cancelLock);
-          ptw32_throw(PTW32_EPS_CANCEL);
+	  (void) pthread_mutex_unlock (&thread->cancelLock);
+	  ptw32_throw (PTW32_EPS_CANCEL);
 
-          /* Never reached */
-        }
+	  /* Never reached */
+	}
       else
-        {
-          HANDLE threadH = thread->threadH;
+	{
+	  HANDLE threadH = thread->threadH;
 
-          SuspendThread(threadH);
+	  SuspendThread (threadH);
 
-          if (WaitForSingleObject(threadH, 0) == WAIT_TIMEOUT )
-            {
-              CONTEXT context;
-
-              thread->state = PThreadStateCanceling;
-              thread->cancelState = PTHREAD_CANCEL_DISABLE;
-              context.ContextFlags = CONTEXT_CONTROL;
-              GetThreadContext(threadH, &context);
-              PTW32_PROGCTR(context) = (DWORD_PTR) ptw32_cancel_self;
-              SetThreadContext(threadH, &context);
-              (void) pthread_mutex_unlock(&thread->cancelLock);
-              ResumeThread(threadH);
-            }
-        }
+	  if (WaitForSingleObject (threadH, 0) == WAIT_TIMEOUT)
+	    {
+	      thread->state = PThreadStateCanceling;
+	      thread->cancelState = PTHREAD_CANCEL_DISABLE;
+	      /*
+	       * If alertdrv and QueueUserAPCEx is available then the following
+	       * will result in a call to QueueUserAPCEx with the args given, otherwise
+	       * this will result in a call to ptw32_RegisterCancelation and only
+	       * the threadH arg will be used.
+	       */
+	      ptw32_register_cancelation (ptw32_cancel_callback, threadH, 0);
+	      (void) pthread_mutex_unlock (&thread->cancelLock);
+	      ResumeThread (threadH);
+	    }
+	}
     }
   else
     {
       /*
        * Set for deferred cancellation.
        */
-      if ( thread->state >= PThreadStateCanceling
-           || !SetEvent (thread->cancelEvent))
-        {
-          result = ESRCH;
-        }
+      if (thread->state >= PThreadStateCanceling
+	  || !SetEvent (thread->cancelEvent))
+	{
+	  result = ESRCH;
+	}
 
-      (void) pthread_mutex_unlock(&thread->cancelLock);
+      (void) pthread_mutex_unlock (&thread->cancelLock);
     }
 
   return (result);
 }
-

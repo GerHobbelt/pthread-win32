@@ -39,7 +39,7 @@
 
 
 int
-pthread_setconcurrency(int level)
+pthread_setconcurrency (int level)
 {
   if (level < 0)
     {

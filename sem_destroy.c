@@ -55,19 +55,19 @@ sem_destroy (sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      * 	     pointer to an instance of sem_t
+      *              pointer to an instance of sem_t
       *
       * DESCRIPTION
       *      This function destroys an unnamed semaphore.
       *
       * RESULTS
-      * 	     0		     successfully destroyed semaphore,
-      * 	     -1 	     failed, error in errno
+      *              0               successfully destroyed semaphore,
+      *              -1              failed, error in errno
       * ERRNO
-      * 	     EINVAL	     'sem' is not a valid semaphore,
-      * 	     ENOSYS	     semaphores are not supported,
-      * 	     EBUSY	     threads (or processes) are currently
-      * 				     blocked on 'sem'
+      *              EINVAL          'sem' is not a valid semaphore,
+      *              ENOSYS          semaphores are not supported,
+      *              EBUSY           threads (or processes) are currently
+      *                                      blocked on 'sem'
       *
       * ------------------------------------------------------
       */
@@ -86,19 +86,19 @@ sem_destroy (sem_t * sem)
 
 #ifdef NEED_SEM
 
-      if (! CloseHandle(s->event))
+      if (!CloseHandle (s->event))
 	{
 	  *sem = s;
 	  result = EINVAL;
 	}
       else
 	{
-	  DeleteCriticalSection(&s->sem_lock_cs);
+	  DeleteCriticalSection (&s->sem_lock_cs);
 	}
 
 #else /* NEED_SEM */
 
-      if (! CloseHandle (s->sem))
+      if (!CloseHandle (s->sem))
 	{
 	  *sem = s;
 	  result = EINVAL;
@@ -114,7 +114,7 @@ sem_destroy (sem_t * sem)
       return -1;
     }
 
-  free(s);
+  free (s);
 
   return 0;
 

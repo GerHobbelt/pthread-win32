@@ -39,8 +39,7 @@
 
 
 int
-pthread_attr_setstackaddr(pthread_attr_t *attr,
-                          void *stackaddr)
+pthread_attr_setstackaddr (pthread_attr_t * attr, void *stackaddr)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -82,7 +81,7 @@ pthread_attr_setstackaddr(pthread_attr_t *attr,
 {
 #if defined( _POSIX_THREAD_ATTR_STACKADDR )
 
-  if (ptw32_is_attr(attr) != 0)
+  if (ptw32_is_attr (attr) != 0)
     {
       return EINVAL;
     }
@@ -96,4 +95,3 @@ pthread_attr_setstackaddr(pthread_attr_t *attr,
 
 #endif /* _POSIX_THREAD_ATTR_STACKADDR */
 }
-
