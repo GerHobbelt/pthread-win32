@@ -16,7 +16,7 @@
 #include "implement.h"
 
 unsigned
-_pthread_start_call(void * us_arg)
+STDCALL _pthread_start_call(void * us_arg)
 {
   /* We're now in a running thread. Any local variables here are on
      this thread's private stack so we're safe to leave data in them
@@ -86,7 +86,7 @@ pthread_create(pthread_t *thread,
 	  attr_copy->detachedstate = attr->detachedstate;
 	  attr_copy->priority = attr->priority;
 
-#ifdef HAVE_SIGSET_T
+#if HAVE_SIGSET_T
 	  memcpy(&(attr_copy->sigmask), &(attr->sigmask), sizeof(sigset_t)); 
 #endif /* HAVE_SIGSET_T */
 	}
