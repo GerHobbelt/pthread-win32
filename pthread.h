@@ -376,7 +376,9 @@ extern "C"
 /*
  * POSIX Options
  */
+#ifndef _POSIX_THREADS
 #define _POSIX_THREADS
+#endif
 #define _POSIX_THREAD_SAFE_FUNCTIONS
 
 #define _POSIX_THREAD_ATTR_STACKSIZE
@@ -923,8 +925,8 @@ int * _errno( void );
 	  (_buf) )
 
 #define ctime_r( _clock, _buf ) \
-	( strcpy( (_buf), ctime( (_tm) ) ), \
-	  (_buf) )
+	( strcpy( (_buf), ctime( (_tm) ) ),  \
+          (_buf) )
 
 #define gmtime_r( _clock, _result ) \
 	( *(_result) = *gmtime( (_clock) ), \
