@@ -1,3 +1,8 @@
+2004-04-06  P. van Bruggen  <pietvb@newbridges.nl>
+
+	* ptw32_threadDestroy.c: Destroy threadLock mutex to
+	close a memory leak.
+
 2004-02-13  Gustav Hallberg  <gustav@virtutech.com>
 
 	* pthread_equal.c: Remove redundant equality logic.
@@ -6,7 +11,7 @@
 
 	* sem_timedwait.c (sem_timedwait): Fix timeout calculations.
 
-2003-09-14  Ross Johnson  <ross@callisto.canberra.edu.au>
+2003-09-14  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* pthread_setschedparam.c (pthread_setschedparam): Attempt to map
 	all priority levels between max and min (as returned by
@@ -39,7 +44,7 @@
 
 	* implement.h (struct pthread_t_): Add new sched_priority element.
 
-2003-09-12  Ross Johnson  <ross@callisto.canberra.edu.au>
+2003-09-12  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* sched_get_priority_min.c (sched_get_priority_min): On error should return -1
 	with errno set.

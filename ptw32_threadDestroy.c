@@ -70,6 +70,7 @@ ptw32_threadDestroy (pthread_t thread)
 	}
 
       (void) pthread_mutex_destroy(&threadCopy.cancelLock);
+      (void) pthread_mutex_destroy(&threadCopy.threadLock);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
       /*
