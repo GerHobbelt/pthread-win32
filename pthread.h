@@ -421,7 +421,7 @@ extern "C"
   typedef struct pthread_key_t_ *pthread_key_t;
   typedef struct pthread_mutex_t_ pthread_mutex_t;
   typedef struct pthread_mutexattr_t_ *pthread_mutexattr_t;
-  typedef struct pthread_cond_t_ *pthread_cond_t;
+  typedef struct pthread_cond_t_ pthread_cond_t;
   typedef struct pthread_condattr_t_ *pthread_condattr_t;
 
 
@@ -458,20 +458,6 @@ extern "C"
 #define PTHREAD_CANCEL_DEFERRED		1
 
 /*
- * ====================
- * ====================
- * Mutex
- * ====================
- * ====================
- */
-
-/* 
- * 
- */
-#define PTHREAD_MUTEX_INITIALIZER { 1, 1, 0, {NULL} }
-
-
-/*
  * pthread_mutexattr_{get,set}pshared
  * pthread_condattr_{get,set}pshared
  */
@@ -500,20 +486,11 @@ struct pthread_once_t_
                             /* to zero executes the user function   */
 };
 
-/*
- * ====================
- * ====================
- * Condition Variable
- * ====================
- * ====================
- */
-#define PTHREAD_COND_INITIALIZER { {0, 0}, 0, PTHREAD_MUTEX_INITIALIZER }
-
 
 /*
  * ====================
  * ====================
- * Opaque Structure Definitions
+ * Structure Definitions
  * ====================
  * ====================
  */
@@ -587,9 +564,19 @@ struct pthread_attr_t_ {
 };
 
 
+/*
+ * ====================
+ * ====================
+ * Mutex
+ * ====================
+ * ====================
+ */
+
+#define PTHREAD_MUTEX_INITIALIZER { 1, 1 /* Remaining are all 0 */ }
+
 struct pthread_mutex_t_ {
-  int staticinit;
-  int valid;
+  int staticinit;                     /* Needs implicit init if 1. */
+  int valid;                          /* Not destroyed if 1. */
   HANDLE mutex;
   CRITICAL_SECTION cs;
 };
@@ -609,9 +596,21 @@ struct pthread_key_t_ {
 };
 
 
+/*
+ * ====================
+ * ====================
+ * Condition Variable
+ * ====================
+ * ====================
+ */
+
+#define PTHREAD_COND_INITIALIZER { 1, 1 /* Remaining are all 0 */ }
+
 typedef HANDLE _pthread_sem_t;
 
 struct pthread_cond_t_ {
+  int staticinit;                     /* Needs implicit init if 1. */
+  int valid;                          /* Not destroyed if 1. */
   long waiters;                       /* # waiting threads             */
   pthread_mutex_t waitersLock;        /* Mutex that guards access to 
 					 waiter count                  */

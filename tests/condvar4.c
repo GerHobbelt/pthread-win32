@@ -43,14 +43,13 @@
  */
 
 #include "test.h"
+#include <sys/timeb.h>
 
 typedef struct cvthing_t_ cvthing_t;
 
 struct cvthing_t_ {
   pthread_cond_t notbusy;
   pthread_mutex_t lock;
-  int busy;
-  int count;
 };
 
 static cvthing_t cvthing = {
@@ -58,7 +57,7 @@ static cvthing_t cvthing = {
   PTHREAD_COND_INITIALIZER,
 };
 
-static enum {
+enum {
   NUMTHREADS = 2
 };
 
@@ -78,29 +77,45 @@ int
 main()
 {
   pthread_t t[NUMTHREADS];
-  int result[NUMTHREADS];
   struct timespec abstime = { 0, 0 };
-  struct timeval curtime;
+#if defined(__MINGW32__)
+  struct timeb currSysTime;
+#else
+  struct _timeb currSysTime;
+#endif
+  const DWORD NANOSEC_PER_MILLISEC = 1000000;
+
+  assert(cvthing.notbusy.staticinit == 1);
+  assert(cvthing.notbusy.valid == 1);
 
   assert((t[0] = pthread_self()) != NULL);
 
   assert(pthread_mutex_lock(&cvthing.lock) == 0);
 
-  gettimeofday(&curtime, NULL);
-  abstime.tv_sec = curtime.tv_sec + 5; 
+  /* get current system time */
+  _ftime(&currSysTime);
+
+  abstime.tv_sec = currSysTime.time;
+  abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
+
+  abstime.tv_sec += 5;
 
   assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == ETIMEDOUT);
   
   assert(pthread_create(&t[1], NULL, mythread, (void *) 1) == 0);
 
-  gettimeofday(&curtime, NULL);
-  abstime.tv_sec = curtime.tv_sec + 10;
+  _ftime(&currSysTime);
+
+  abstime.tv_sec = currSysTime.time;
+  abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
+
+  abstime.tv_sec += 5;
 
   assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == 0);
 
   assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
-  assert(pthread_cond_destroy(&cvthing) == 0);
+  assert(pthread_cond_destroy(&cvthing.notbusy) == 0);
 
   return 0;
 }

@@ -1,5 +1,5 @@
 /*
- * File: condvar1.c
+ * File: condvar3.c
  *
  * Test Synopsis:
  * - Test basic function of a CV
@@ -46,28 +46,25 @@
  */
 
 #include "test.h"
+#include <sys/timeb.h>
 
-typedef struct cvthing_t_ cvthing_t;
+pthread_cond_t cv;
+pthread_mutex_t mutex;
 
-struct cvthing_t_ {
-  pthread_cond_t notbusy;
-  pthread_mutex_t lock;
-};
-
-static cvthing_t cvthing;
-
-static enum {
+enum {
   NUMTHREADS = 2         /* Including the primary thread. */
 };
 
 void *
 mythread(void * arg)
 {
-  assert(pthread_mutex_lock(&cvthing.lock) == 0);
+  Sleep(1);
 
-  assert(pthread_cond_signal(&cvthing.notbusy) == 0);
+  assert(pthread_mutex_lock(&mutex) == 0);
 
-  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
+  assert(pthread_cond_signal(&cv) == 0);
+
+  assert(pthread_mutex_unlock(&mutex) == 0);
 
   return 0;
 }
@@ -77,27 +74,36 @@ main()
 {
   pthread_t t[NUMTHREADS];
   struct timespec abstime = { 0, 0 };
-  struct timeval curtime;
+#if defined(__MINGW32__)
+  struct timeb currSysTime;
+#else
+  struct _timeb currSysTime;
+#endif
+  const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   assert((t[0] = pthread_self()) != NULL);
 
-  assert(pthread_cond_init(&cvthing, NULL) == 0);
+  assert(pthread_cond_init(&cv, NULL) == 0);
 
-  assert(pthread_mutex_init(&cvthing.lock) == 0);
+  assert(pthread_mutex_init(&mutex, NULL) == 0);
 
-  assert(pthread_mutex_lock(&cvthing.lock) == 0);
+  assert(pthread_mutex_lock(&mutex) == 0);
 
-  assert(gettimeofday(&curtime, NULL) == 0);
+  /* get current system time */
+  _ftime(&currSysTime);
 
-  abstime.tv_sec = curtime.tv_sec + 5;
+  abstime.tv_sec = currSysTime.time;
+  abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
   assert(pthread_create(&t[1], NULL, mythread, (void *) 1) == 0);
 
-  assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == 0);
+  abstime.tv_sec += 5;
 
-  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
+  assert(pthread_cond_timedwait(&cv, &mutex, &abstime) == 0);
 
-  assert(pthread_cond_destroy(&cvthing) == 0);
+  assert(pthread_mutex_unlock(&mutex) == 0);
+
+  assert(pthread_cond_destroy(&cv) == 0);
 
   return 0;
 }

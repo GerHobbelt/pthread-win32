@@ -42,6 +42,7 @@
  */
 
 #include "test.h"
+#include <sys/timeb.h>
 
 pthread_cond_t cv;
 pthread_mutex_t mutex;
@@ -50,17 +51,26 @@ int
 main()
 {
   struct timespec abstime = { 0, 0 };
-  struct timeval curtime;
+#if defined(__MINGW32__)
+  struct timeb currSysTime;
+#else
+  struct _timeb currSysTime;
+#endif
+  const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   assert(pthread_cond_init(&cv, NULL) == 0);
 
-  assert(pthread_mutex_init(&mutex) == 0);
+  assert(pthread_mutex_init(&mutex, NULL) == 0);
 
   assert(pthread_mutex_lock(&mutex) == 0);
 
-  assert(gettimeofday(&curtime, NULL) == 0);
+  /* get current system time */
+  _ftime(&currSysTime);
 
-  abstime.tv_sec = curtime.tv_sec + 5; 
+  abstime.tv_sec = currSysTime.time;
+  abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
+
+  abstime.tv_sec += 5;
 
   assert(pthread_cond_timedwait(&cv, &mutex, &abstime) == ETIMEDOUT);
   
