@@ -1,0 +1,3 @@
+- Check behaviour of calling pthread_exit from main().
+  The main thread should wait for other threads to exit
+  before calling exit.
