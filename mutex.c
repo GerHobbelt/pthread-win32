@@ -171,7 +171,7 @@ pthread_mutexattr_getprioceiling(const pthread_mutexattr_t *attr,
 }
 
 int
-pthread_lock(pthread_mutex_t *mutex)
+pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   switch (WaitForSingleObject(*mutex, INFINITE))
     {
@@ -188,7 +188,7 @@ pthread_lock(pthread_mutex_t *mutex)
 }
 
 int
-pthread_unlock(pthread_mutex_t *mutex)
+pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   if (ReleaseMutex(*mutex) != TRUE)
     {
@@ -204,7 +204,7 @@ pthread_unlock(pthread_mutex_t *mutex)
 }
 
 int
-pthread_trylock(pthread_mutex_t *mutex)
+pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
   /* If the mutex is already held, return EBUSY. */
   switch (WaitForSingleObject(*mutex, 0))
