@@ -1,8 +1,6 @@
 /*
  * -------------------------------------------------------------
  *
- * $Header$
- *
  * Module: semaphore.c
  *
  * Purpose:
@@ -43,7 +41,6 @@
 #include <string.h>
 
 #include "semaphore.h"
-
 
 
 int

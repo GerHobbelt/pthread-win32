@@ -473,7 +473,3 @@ pthread_attr_setdetachstate(pthread_attr_t *attr,
   (*attr)->detachstate = detachstate;
   return 0;
 }
-
-
-
-

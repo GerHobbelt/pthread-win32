@@ -1,3 +1,12 @@
+Mon Jan  4 11:23:40 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* all: No code changes, just cleanup.
+	- remove #if 0 /* Pre Bossom */ enclosed code.
+	- Remove some redundant #includes.
+	* pthread.h: Update implemented/unimplemented routines list.
+	* Tag the bossom merge branch getting ready to merge back to main
+	trunk.
+
 Tue Dec 29 13:11:16 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* implement.h: Move the following struct definitions to pthread.h:
@@ -38,6 +47,7 @@ Tue Dec 29 13:11:16 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 	* dll.c: Remove defined(KLUDGE) wrapped code.
 
 	* fork.c: Remove redefinition of ENOMEM.
+	Remove pthread_atfork() and fork() with #if 0/#endif.
 
 	* create.c (pthread_create): Rename threadStart and threadDestroy calls
 	to _pthread_threadStart and _pthread_threadDestroy.
@@ -45,6 +55,11 @@ Tue Dec 29 13:11:16 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 	* implement.h: Rename "detachedstate" to "detachstate".
 
 	* attr.c: Rename "detachedstate" to "detachstate".
+
+Mon Dec 28 09:54:39 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* semaphore.c: Initial version. From John Bossom's implementation.
+	* semaphore.h: Initial version. From John Bossom's implementation.
 
 Mon Dec 28 09:54:39 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 

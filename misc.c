@@ -246,29 +246,3 @@ pthreadCancelableWait (HANDLE waitHandle)
 
 /* </JEB> */
 
-#if 0 /* Pre Bossom */
-
-pthread_t
-pthread_self(void)
-{
-  pthread_t ret;
-  /* This TLS index is allocated on DLL load by dll.c */
-  extern DWORD _pthread_threadID_TlsIndex;
- 
-  ret = (pthread_t) TlsGetValue(_pthread_threadID_TlsIndex);
-
-  if (ret == 0)
-    {
-      /* FIXME: Oh no! This can't happen. */
-    }
-
-  return ret;
-}
-
-int
-pthread_equal(pthread_t t1, pthread_t t2)
-{
-  return (t1 == t2);
-}
-
-#endif /* Pre Bossom */

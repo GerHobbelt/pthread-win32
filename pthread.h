@@ -100,6 +100,21 @@
  *      ---------------------------
  *      pthreadCancelableWait
  *
+ *      ---------------------------
+ *      RealTime Scheduling:
+ *      ---------------------------
+ *      pthread_attr_getschedparam
+ *      pthread_attr_setschedparam
+ *      pthread_getschedparam
+ *      pthread_setschedparam
+ *      sched_get_priority_max
+ *      sched_get_priority_min
+ *
+ *      ---------------------------
+ *      Signals:
+ *      ---------------------------
+ *      pthread_sigmask
+ *
  * Limitations
  * ===========
  *      The following functions are not implemented:
@@ -108,23 +123,17 @@
  *      RealTime Scheduling:
  *      ---------------------------
  *      pthread_attr_getinheritsched
- *      pthread_attr_getschedparam
  *      pthread_attr_getschedpolicy
  *      pthread_attr_getscope
  *      pthread_attr_setinheritsched
- *      pthread_attr_setschedparam
  *      pthread_attr_setschedpolicy
  *      pthread_attr_setscope
- *      pthread_getschedparam
  *      pthread_mutex_getprioceiling
  *      pthread_mutex_setprioceiling
  *      pthread_mutex_attr_getprioceiling
  *      pthread_mutex_attr_getprotocol
  *      pthread_mutex_attr_setprioceiling
  *      pthread_mutex_attr_setprotocol
- *      pthread_setschedparam
- *      sched_get_priority_max
- *      sched_get_priority_min
  *
  *      ---------------------------
  *      Fork Handlers:
@@ -155,7 +164,6 @@
  *      Signals:
  *      ---------------------------
  *      pthread_kill
- *      pthread_sigmask
  *      sigtimedwait
  *      sigwait
  *      sigwaitinfo
