@@ -29,7 +29,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-static int
+static INLINE int
 ptw32_rwlock_check_need_init(pthread_rwlock_t *rwlock)
 {
   int result = 0;
@@ -65,7 +65,7 @@ ptw32_rwlock_check_need_init(pthread_rwlock_t *rwlock)
    * re-initialise it only by calling pthread_rwlock_init()
    * explicitly.
    */
-  if (*rwlock == (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
+  if (*rwlock == PTHREAD_RWLOCK_INITIALIZER)
     {
       result = pthread_rwlock_init(rwlock, NULL);
     }
@@ -163,7 +163,7 @@ pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
         return EINVAL;
       }
 
-    if (*rwlock != (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
+    if (*rwlock != PTHREAD_RWLOCK_INITIALIZER)
       {
         rwl = *rwlock;
 
@@ -226,7 +226,7 @@ pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
         /*
          * Check again.
          */
-        if (*rwlock == (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
+        if (*rwlock == PTHREAD_RWLOCK_INITIALIZER)
           {
             /*
              * This is all we need to do to destroy a statically
@@ -268,7 +268,7 @@ pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
      * again inside the guarded section of ptw32_rwlock_check_need_init()
      * to avoid race conditions.
      */
-    if (*rwlock == (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
+    if (*rwlock == PTHREAD_RWLOCK_INITIALIZER)
       {
         result = ptw32_rwlock_check_need_init(rwlock);
 
@@ -340,7 +340,7 @@ pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
      * again inside the guarded section of ptw32_rwlock_check_need_init()
      * to avoid race conditions.
      */
-    if (*rwlock == (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
+    if (*rwlock == PTHREAD_RWLOCK_INITIALIZER)
       {
         result = ptw32_rwlock_check_need_init(rwlock);
 
@@ -435,7 +435,7 @@ pthread_rwlock_unlock(pthread_rwlock_t * rwlock)
         return(EINVAL);
       }
 
-    if (*rwlock == (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
+    if (*rwlock == PTHREAD_RWLOCK_INITIALIZER)
       {
         /*
          * Assume any race condition here is harmless.
@@ -493,7 +493,7 @@ pthread_rwlock_tryrdlock(pthread_rwlock_t * rwlock)
      * again inside the guarded section of ptw32_rwlock_check_need_init()
      * to avoid race conditions.
      */
-    if (*rwlock == (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
+    if (*rwlock == PTHREAD_RWLOCK_INITIALIZER)
       {
         result = ptw32_rwlock_check_need_init(rwlock);
 
@@ -553,7 +553,7 @@ pthread_rwlock_trywrlock(pthread_rwlock_t * rwlock)
      * again inside the guarded section of ptw32_rwlock_check_need_init()
      * to avoid race conditions.
      */
-    if (*rwlock == (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
+    if (*rwlock == PTHREAD_RWLOCK_INITIALIZER)
       {
         result = ptw32_rwlock_check_need_init(rwlock);
 

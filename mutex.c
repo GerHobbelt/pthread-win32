@@ -27,7 +27,7 @@
 #include "implement.h"
 
 
-static int
+static INLINE int
 ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
 {
   int result = 0;
@@ -63,7 +63,7 @@ ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
    * re-initialise it only by calling pthread_mutex_init()
    * explicitly.
    */
-  if (*mutex == (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
+  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     {
       result = pthread_mutex_init(mutex, NULL);
     }
@@ -170,7 +170,7 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
   /*
    * Check to see if we have something to delete.
    */
-  if (*mutex != (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
+  if (*mutex != PTHREAD_MUTEX_INITIALIZER)
     {
       mx = *mutex;
 
@@ -225,7 +225,7 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
       /*
        * Check again.
        */
-      if (*mutex == (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
+      if (*mutex == PTHREAD_MUTEX_INITIALIZER)
         {
           /*
            * This is all we need to do to destroy a statically
@@ -630,7 +630,7 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
    * again inside the guarded section of ptw32_mutex_check_need_init()
    * to avoid race conditions.
    */
-  if (*mutex == (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
+  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     {
       if ((result = ptw32_mutex_check_need_init(mutex)) != 0)
         {
@@ -694,7 +694,7 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
    * race condition. If another thread holds the
    * lock then we shouldn't be in here.
    */
-  if (mx != (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
+  if (mx != PTHREAD_MUTEX_INITIALIZER)
     {
       if (mx->ownerThread == (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS
           || pthread_equal(mx->ownerThread, pthread_self()))
@@ -745,7 +745,7 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
    * again inside the guarded section of ptw32_mutex_check_need_init()
    * to avoid race conditions.
    */
-  if (*mutex == (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
+  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     {
       result = ptw32_mutex_check_need_init(mutex);
     }

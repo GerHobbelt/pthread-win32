@@ -88,6 +88,7 @@ ptw32_processInitialize (void)
   InitializeCriticalSection(&ptw32_mutex_test_init_lock);
   InitializeCriticalSection(&ptw32_cond_test_init_lock);
   InitializeCriticalSection(&ptw32_rwlock_test_init_lock);
+  InitializeCriticalSection(&ptw32_spinlock_test_init_lock);
 
   return (ptw32_processInitialized);
 
@@ -142,6 +143,7 @@ ptw32_processTerminate (void)
       /* 
        * Destroy the global test and init check locks.
        */
+      DeleteCriticalSection(&ptw32_spinlock_test_init_lock);
       DeleteCriticalSection(&ptw32_rwlock_test_init_lock);
       DeleteCriticalSection(&ptw32_cond_test_init_lock);
       DeleteCriticalSection(&ptw32_mutex_test_init_lock);

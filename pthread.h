@@ -457,8 +457,7 @@ struct pthread_once_t_
 
 #define PTHREAD_RWLOCK_INITIALIZER ((pthread_rwlock_t) -1)
 
-#define PTHREAD_SPINLOCK_INITIALIZER {1}
-
+#define PTHREAD_SPINLOCK_INITIALIZER ((pthread_spinlock_t) -1)
 
 enum
 {

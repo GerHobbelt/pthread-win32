@@ -39,6 +39,12 @@
 #include "semaphore.h"
 #include "sched.h"
 
+#if defined(HAVE_C_INLINE) || defined(__cplusplus)
+#define INLINE inline
+#else
+#define INLINE
+#endif
+
 typedef enum {
   /*
    * This enumeration represents the state of the thread;
@@ -136,9 +142,6 @@ struct sem_t_ {
 
 #define PTW32_OBJECT_AUTO_INIT ((void *) -1)
 #define PTW32_OBJECT_INVALID   NULL
-#define PTW32_SPIN_UNLOCKED    (1)
-#define PTW32_SPIN_LOCKED      (2)
-#define PTW32_SPIN_INTERLOCK_MASK (~3L)
 
 struct pthread_mutex_t_ {
   LONG lock_idx;
@@ -154,10 +157,32 @@ struct pthread_mutexattr_t_ {
   int kind;
 };
 
+/*
+ * Possible values, other than PTW32_OBJECT_INVALID,
+ * for the "interlock" element in a spinlock.
+ *
+ * In this implementation, when a spinlock is initialised,
+ * the number of cpus available to the process is checked.
+ * If there is only one cpu then "interlock" is set equal to
+ * PTW32_SPIN_USE_MUTEX and u.mutex is a initialised mutex.
+ * If the number of cpus is greater than 1 then "interlock"
+ * is set equal to PTW32_SPIN_UNLOCKED and the number is
+ * stored in u.cpus. This arrangement allows the spinlock
+ * routines to attempt an InterlockedCompareExchange on "interlock"
+ * immediately and, if that fails, to try the inferior mutex.
+ *
+ * "u.cpus" isn't used for anything yet, but could be used at
+ * some point to optimise spinlock behaviour.
+ */
+#define PTW32_SPIN_UNLOCKED    (1)
+#define PTW32_SPIN_LOCKED      (2)
+#define PTW32_SPIN_USE_MUTEX   (3)
+
 struct pthread_spinlock_t_ {
+  long interlock;              /* Locking element for multi-cpus. */
   union {
-    LONG interlock;
-    pthread_mutex_t mx;
+    int cpus;                  /* No. of cpus if multi cpus, or   */
+    pthread_mutex_t mutex;     /* mutex if single cpu.            */
   } u;
 };
 
@@ -359,6 +384,7 @@ extern int ptw32_concurrency;
 extern CRITICAL_SECTION ptw32_mutex_test_init_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
 extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
+extern CRITICAL_SECTION ptw32_spinlock_test_init_lock;
 
 #ifdef _UWIN
 extern int pthread_count;

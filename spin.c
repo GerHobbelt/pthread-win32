@@ -26,25 +26,64 @@
 #include "pthread.h"
 #include "implement.h"
 
-/*
- * This works because the mask that is formed exposes all but the
- * first two LSBs. If the spinlock is using a mutex rather than
- * the interlock mechanism then there will always be high bits
- * to indicate this. This is all just to save the overhead of
- * using a non-simple struct for spinlocks.
- */
-#define PTW32_SPIN_SPINS(_lock) \
-  (0 == ((long) ((_lock->u).mx) & ~(PTW32_SPIN_LOCKED | PTW32_SPIN_UNLOCKED | (long) PTW32_OBJECT_INVALID)))
+#ifdef __MINGW32__
+#define _LONG long
+#define _LPLONG long*
+#else
+#define _LONG PVOID
+#define _LPLONG PVOID*
+#endif
+
+static INLINE int
+ptw32_spinlock_check_need_init(pthread_spinlock_t *lock)
+{
+  int result = 0;
+
+  /*
+   * The following guarded test is specifically for statically
+   * initialised spinlocks (via PTHREAD_SPINLOCK_INITIALIZER).
+   *
+   * Note that by not providing this synchronisation we risk
+   * introducing race conditions into applications which are
+   * correctly written.
+   */
+  EnterCriticalSection(&ptw32_spinlock_test_init_lock);
+
+  /*
+   * We got here possibly under race
+   * conditions. Check again inside the critical section
+   * and only initialise if the spinlock is valid (not been destroyed).
+   * If a static spinlock has been destroyed, the application can
+   * re-initialise it only by calling pthread_spin_init()
+   * explicitly.
+   */
+  if (*lock == PTHREAD_SPINLOCK_INITIALIZER)
+    {
+      result = pthread_spin_init(lock, PTHREAD_PROCESS_PRIVATE);
+    }
+  else if (*lock == NULL)
+    {
+      /*
+       * The spinlock has been destroyed while we were waiting to
+       * initialise it, so the operation that caused the
+       * auto-initialisation should fail.
+       */
+      result = EINVAL;
+    }
+
+  LeaveCriticalSection(&ptw32_spinlock_test_init_lock);
+
+  return(result);
+}
 
 
 int
 pthread_spin_init(pthread_spinlock_t *lock, int pshared)
 {
   pthread_spinlock_t s;
-  int CPUs = 1;
   int result = 0;
 
-  if (lock == NULL || *lock == NULL)
+  if (lock == NULL)
     {
       return EINVAL;
     }
@@ -56,9 +95,12 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
       return ENOMEM;
     }
 
-  (void) pthread_getprocessors_np(&CPUs);
+  if (0 != pthread_getprocessors_np(&(s->u.cpus)))
+    {
+      s->u.cpus = 1;
+    }
 
-  if (CPUs > 1)
+  if (s->u.cpus > 1)
     {
       if (pshared == PTHREAD_PROCESS_SHARED)
         {
@@ -84,7 +126,7 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
 
         }
 
-      s->u.interlock = PTW32_SPIN_UNLOCKED;
+      s->interlock = PTW32_SPIN_UNLOCKED;
     }
   else
     {
@@ -94,7 +136,11 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
       if (0 == result)
         {
           ma->pshared = pshared;
-          result = pthread_mutex_init(&(s->u.mx), &ma);
+          result = pthread_mutex_init(&(s->u.mutex), &ma);
+          if (0 == result)
+            {
+              s->interlock = PTW32_SPIN_USE_MUTEX;
+            }
         }
     }
 
@@ -106,126 +152,150 @@ FAIL0:
 int
 pthread_spin_destroy(pthread_spinlock_t *lock)
 {
-  pthread_spinlock_t s;
+  register pthread_spinlock_t s;
 
   if (lock == NULL || *lock == NULL)
     {
       return EINVAL;
     }
 
-  s = *lock;
-
-  if (PTW32_SPIN_SPINS(s))
+  if ((s = *lock) != PTHREAD_SPINLOCK_INITIALIZER)
     {
-      if ( PTW32_SPIN_UNLOCKED !=
-           InterlockedCompareExchange((LPLONG) &(s->u.interlock),
-                                      (LONG) PTW32_OBJECT_INVALID,
-                                      (LONG) PTW32_SPIN_UNLOCKED))
+      if (s->interlock == PTW32_SPIN_USE_MUTEX)
         {
-          return EINVAL;
+          return pthread_mutex_destroy(&(s->u.mutex));
         }
-      else
+
+      if ( (_LONG) PTW32_SPIN_UNLOCKED ==
+           InterlockedCompareExchange((_LPLONG) &(s->interlock),
+                                      (_LONG) PTW32_OBJECT_INVALID,
+                                      (_LONG) PTW32_SPIN_UNLOCKED))
         {
           return 0;
         }
+
+      return EINVAL;
     }
   else
     {
-      return pthread_mutex_destroy(&(s->u.mx));
+      int result = 0;
+
+      /*
+       * See notes in ptw32_spinlock_check_need_init() above also.
+       */
+      EnterCriticalSection(&ptw32_spinlock_test_init_lock);
+
+      /*
+       * Check again.
+       */
+      if (*lock == PTHREAD_SPINLOCK_INITIALIZER)
+        {
+          /*
+           * This is all we need to do to destroy a statically
+           * initialised spinlock that has not yet been used (initialised).
+           * If we get to here, another thread
+           * waiting to initialise this mutex will get an EINVAL.
+           */
+          *lock = NULL;
+        }
+      else
+        {
+          /*
+           * The spinlock has been initialised while we were waiting
+           * so assume it's in use.
+           */
+          result = EBUSY;
+        }
+
+      LeaveCriticalSection(&ptw32_spinlock_test_init_lock);
+      return(result);
     }
 }
 
-
+/*
+ * NOTE: For speed, these routines don't check if "lock" is valid.
+ */
 int
 pthread_spin_lock(pthread_spinlock_t *lock)
 {
-  pthread_spinlock_t s;
+  register pthread_spinlock_t s = *lock;
 
-  if (lock == NULL || *lock == NULL)
+  if (s == PTHREAD_SPINLOCK_INITIALIZER)
     {
-      return EINVAL;
-    }
+      int result;
 
-  s = *lock;
-
-  if (PTW32_SPIN_SPINS(s))
-    {
-      while ( PTW32_SPIN_UNLOCKED !=
-              InterlockedCompareExchange((LPLONG) &(s->u.interlock),
-                                         (LONG) PTW32_SPIN_LOCKED,
-                                         (LONG) PTW32_SPIN_UNLOCKED) )
+      if ((result = ptw32_spinlock_check_need_init(lock)) != 0)
         {
-          /* Spin */
+          return(result);
         }
     }
-  else
+
+  while ( (_LONG) PTW32_SPIN_LOCKED ==
+          InterlockedCompareExchange((_LPLONG) &(s->interlock),
+                                     (_LONG) PTW32_SPIN_LOCKED,
+                                     (_LONG) PTW32_SPIN_UNLOCKED) )
+    {}
+
+  if (s->interlock == PTW32_SPIN_LOCKED)
     {
-      return pthread_mutex_lock(&(s->u.mx));
+      return 0;
+    }
+  else if (s->interlock == PTW32_SPIN_USE_MUTEX)
+    {
+      return pthread_mutex_lock(&(s->u.mutex));
     }
 
-  return 0;
+  return EINVAL;
 }
 
 int
 pthread_spin_unlock(pthread_spinlock_t *lock)
 {
-  pthread_spinlock_t s;
+  register pthread_spinlock_t s = *lock;
 
-  if (lock == NULL || lock == NULL)
+  if (s->interlock == PTW32_SPIN_USE_MUTEX)
     {
-      return EINVAL;
+      return pthread_mutex_unlock(&(s->u.mutex));
     }
 
-  s = *lock;
+  if ((_LONG) PTW32_SPIN_LOCKED ==
+      InterlockedCompareExchange((_LPLONG) &(s->interlock),
+                                 (_LONG) PTW32_SPIN_UNLOCKED,
+                                 (_LONG) PTW32_SPIN_LOCKED ) )
+    {
+      return 0;
+    }
 
-  if (PTW32_SPIN_SPINS(s))
-    {
-      if (PTW32_SPIN_LOCKED !=
-          InterlockedCompareExchange((LPLONG) &(s->u.interlock),
-                                     (LONG) PTW32_SPIN_UNLOCKED,
-                                     (LONG) PTW32_SPIN_LOCKED ) )
-        {
-          return 0;
-        }
-      else
-        {
-          return EINVAL;
-        }
-    }
-  else
-    {
-      return pthread_mutex_unlock(&(s->u.mx));
-    }
+  return EINVAL;
 }
 
 int
 pthread_spin_trylock(pthread_spinlock_t *lock)
 {
-  pthread_spinlock_t s;
+  pthread_spinlock_t s = *lock;
 
-  if (lock == NULL || *lock == NULL)
+  if (s == PTHREAD_SPINLOCK_INITIALIZER)
     {
-      return EINVAL;
-    }
+      int result;
 
-  s = *lock;
-
-  if (PTW32_SPIN_SPINS(s))
-    {
-      if (PTW32_SPIN_UNLOCKED !=
-          InterlockedCompareExchange((LPLONG) &(s->u.interlock),
-                                     (LONG) PTW32_SPIN_LOCKED,
-                                     (LONG) PTW32_SPIN_UNLOCKED ) )
+      if ((result = ptw32_spinlock_check_need_init(lock)) != 0)
         {
-          return EBUSY;
-        }
-      else
-        {
-          return 0;
+          return(result);
         }
     }
-  else
+
+  if ((_LONG) PTW32_SPIN_UNLOCKED ==
+      InterlockedCompareExchange((_LPLONG) &(s->interlock),
+                                 (_LONG) PTW32_SPIN_LOCKED,
+                                 (_LONG) PTW32_SPIN_UNLOCKED ) )
     {
-      return pthread_mutex_trylock(&(s->u.mx));
+      return 0;
     }
+
+  if (s->interlock == PTW32_SPIN_USE_MUTEX)
+    {
+      return pthread_mutex_trylock(&(s->u.mutex));
+    }
+
+  return EINVAL;
 }
