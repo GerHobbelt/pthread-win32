@@ -1,3 +1,9 @@
+Wed Apr  7 14:09:52 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* errno.c (_REENTRANT || _MT): Invert condition.
+
+	* pthread.h (_errno): Conditionally include prototype.
+
 Wed Apr  7 09:37:00 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* *.c (comments): Remove individual attributions - these are
