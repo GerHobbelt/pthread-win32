@@ -8,8 +8,6 @@
 
  * config.h.in: Generate.
 
- * config.h: Remove.
-
  * Makefile.in: Renamed from Makefile.
 
  * COPYING: Import from a recent GNU package.
@@ -20,7 +18,9 @@
 
  * install-sh: Likewise.
 
- * Makefile: Remove.
+ * config.h: Remove.  
+
+ * Makefile: Likewise.
 
 1998-09-12  Ben Elliston  <bje@cygnus.com>
 
