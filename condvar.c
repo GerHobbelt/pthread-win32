@@ -4,6 +4,132 @@
  * Description:
  * This translation unit implements condition variables and their primitives.
  *
+ * Algorithm:
+ * The algorithm used in this implementation is that developed by
+ * Alexander Terekhov in colaboration with Louis Thomas. The bulk
+ * of the discussion is recorded in the file README.CV, which contains
+ * several generations of both colaborators original algorithms. The final
+ * algorithm used here is the one referred to as
+ *
+ *     Algorithm 8a / IMPL_SEM,UNBLOCK_STRATEGY == UNBLOCK_ALL
+ * 
+ * presented below in pseudo-code as it appeared:
+ *
+ *
+ * given:
+ * semBlockLock - bin.semaphore
+ * semBlockQueue - semaphore
+ * mtxExternal - mutex or CS
+ * mtxUnblockLock - mutex or CS
+ * nWaitersGone - int
+ * nWaitersBlocked - int
+ * nWaitersToUnblock - int
+ * 
+ * wait( timeout ) {
+ * 
+ *   [auto: register int result          ]     // error checking omitted
+ *   [auto: register int nSignalsWasLeft ]
+ *   [auto: register int nWaitersWasGone ]
+ * 
+ *   sem_wait( semBlockLock );
+ *   nWaitersBlocked++;
+ *   sem_post( semBlockLock );
+ * 
+ *   unlock( mtxExternal );
+ *   bTimedOut = sem_wait( semBlockQueue,timeout );
+ * 
+ *   lock( mtxUnblockLock );
+ *   if ( 0 != (nSignalsWasLeft = nWaitersToUnblock) ) {
+ *     if ( bTimeout ) {                       // timeout (or canceled)
+ *       if ( 0 != nWaitersBlocked ) {
+ *         nWaitersBlocked--;
+ *       }
+ *       else {
+ *         nWaitersGone++;                     // count spurious wakeups.
+ *       }
+ *     }
+ *     if ( 0 == --nWaitersToUnblock ) {
+ *       if ( 0 != nWaitersBlocked ) {
+ *         sem_post( semBlockLock );           // open the gate.
+ *         nSignalsWasLeft = 0;                // do not open the gate
+ *                                             // below again.
+ *       }
+ *       else if ( 0 != (nWaitersWasGone = nWaitersGone) ) {
+ *         nWaitersGone = 0;
+ *       }
+ *     }
+ *   }
+ *   else if ( INT_MAX/2 == ++nWaitersGone ) { // timeout/canceled or
+ *                                             // spurious semaphore :-)
+ *     sem_wait( semBlockLock );
+ *     nWaitersBlocked -= nWaitersGone;     // something is going on here
+ *                                          //  - test of timeouts? :-)
+ *     sem_post( semBlockLock );
+ *     nWaitersGone = 0;
+ *   }
+ *   unlock( mtxUnblockLock );
+ * 
+ *   if ( 1 == nSignalsWasLeft ) {
+ *     if ( 0 != nWaitersWasGone ) {
+ *       // sem_adjust( semBlockQueue,-nWaitersWasGone );
+ *       while ( nWaitersWasGone-- ) {
+ *         sem_wait( semBlockQueue );       // better now than spurious later
+ *       }
+ *     } sem_post( semBlockLock );          // open the gate
+ *   }
+ * 
+ *   lock( mtxExternal );
+ * 
+ *   return ( bTimedOut ) ? ETIMEOUT : 0;
+ * }
+ * 
+ * signal(bAll) {
+ * 
+ *   [auto: register int result         ]
+ *   [auto: register int nSignalsToIssue]
+ * 
+ *   lock( mtxUnblockLock );
+ * 
+ *   if ( 0 != nWaitersToUnblock ) {        // the gate is closed!!!
+ *     if ( 0 == nWaitersBlocked ) {        // NO-OP
+ *       return unlock( mtxUnblockLock );
+ *     }
+ *     if (bAll) {
+ *       nWaitersToUnblock += nSignalsToIssue=nWaitersBlocked;
+ *       nWaitersBlocked = 0;
+ *     }
+ *     else {
+ *       nSignalsToIssue = 1;
+ *       nWaitersToUnblock++;
+ *       nWaitersBlocked--;
+ *     }
+ *   }
+ *   else if ( nWaitersBlocked > nWaitersGone ) { // HARMLESS RACE CONDITION!
+ *     sem_wait( semBlockLock );                  // close the gate
+ *     if ( 0 != nWaitersGone ) {
+ *       nWaitersBlocked -= nWaitersGone;
+ *       nWaitersGone = 0;
+ *     }
+ *     if (bAll) {
+ *       nSignalsToIssue = nWaitersToUnblock = nWaitersBlocked;
+ *       nWaitersBlocked = 0;
+ *     }
+ *     else {
+ *       nSignalsToIssue = nWaitersToUnblock = 1;
+ *       nWaitersBlocked--;
+ *     }
+ *   }
+ *   else { // NO-OP
+ *     return unlock( mtxUnblockLock );
+ *   }
+ * 
+ *   unlock( mtxUnblockLock );
+ *   sem_post( semBlockQueue,nSignalsToIssue );
+ *   return result;
+ * }
+ *
+ * -------------------------------------------------------------
+ *
  * Pthreads-win32 - POSIX Threads Library for Win32
  * Copyright (C) 1998
  *
