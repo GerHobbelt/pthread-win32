@@ -7,14 +7,14 @@
 
 We are pleased to announce the availability of a new snapshot of
 Pthreads-win32, an Open Source Software implementation of the
-Threads component of the POSIX 1003.1c 1995 Standard for Microsoft's
-Win32 environment. Some functions from POSIX 1003.1b are also
-supported including semaphores. Other related functions include
-the set of read-write lock functions.
+Threads component of the POSIX 1003.1 2001 Standard for Microsoft's
+Win32 environment. Some functions from other sections of POSIX
+1003.1 2001 are also supported including semaphores and scheduling
+functions.
 
-Parts of the implementation also comply with the Open Group's
-Single Unix specification for compatibility with major Unix
-implementations and Linux.
+Some common non-portable functions are also implemented for
+additional compatibility, as are a few functions specific
+to pthreads-win32 for easier integration with Win32 applications.
 
 Pthreads-win32 is free software, distributed under the GNU Lesser
 General Public License (LGPL).
@@ -120,6 +120,7 @@ There are a few reasons:
   wants it, once it's removed from the current version it will not be
   nearly as visible to people who may have a use for it.
 
+
 Source module splitting
 -----------------------
 In order to enable smaller image sizes to be generated
@@ -148,11 +149,13 @@ I don't know what havoc this reorganisation may wreak amongst
 IDE project file users. You should be able to continue
 using your existing project files without modification.
 
+
 New non-portable function
 -------------------------
 pthread_num_processors_np(): Returns the number of processors
 in the system that are available to the process, as determined
 from the processor affinity mask.
+
 
 Platform dependence
 -------------------
@@ -165,17 +168,35 @@ is not available on i386 CPUs. This library (from snapshot
 20010712 onwards) is therefore no longer supported on i386
 processor platforms.
 
-New routines
-------------
+
+New standard routines
+---------------------
 For source code portability only - rwlocks cannot be process shared yet.
+
         pthread_rwlockattr_init()
         pthread_rwlockattr_destroy()
         pthread_rwlockattr_setpshared()
         pthread_rwlockattr_getpshared()
 
 As defined in the new POSIX standard, and the Single Unix Spec version 3:
+
         sem_timedwait()
         pthread_mutex_timedlock()
+
+
+New non-portable routine
+------------------------
+To improve tolerance against operator or time service initiated
+system clock changes, the following routine is provided:
+
+        pthread_timechange_handler_np()
+
+This routine can be called by an application when it
+receives a WM_TIMECHANGE message from the system. At present
+it broadcasts all condition variables so that waiting threads
+can wake up and re-evaluate their conditions and restart
+their timed waits if required.
+- Suggested by Alexander Terekhov
 
 pthread.h no longer includes windows.h
 --------------------------------------
@@ -185,6 +206,7 @@ This was done to prevent conflicts.
 
 HANDLE, DWORD, and NULL are temporarily defined within pthread.h if
 they are not already.
+
 
 Bug fixes
 ---------
@@ -509,6 +531,7 @@ The following functions are implemented:
       Non-portable routines (see the README.NONPORTABLE file for usage)
       ---------------------------
       pthread_getw32threadhandle_np
+      pthread_timechange_handler_np
       pthread_delay_np
       pthread_mutexattr_getkind_np
       pthread_mutexattr_setkind_np      (types: PTHREAD_MUTEX_FAST_NP,
