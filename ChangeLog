@@ -1,3 +1,8 @@
+2005-03-16  Ross Johnson  <ross at callisto.canberra.edu.au>^M
+
+        * pthread_setcancelstate.c: Don't check for an async cancel event
+        if the library is using alertable async cancel..
+
 2005-03-14  Ross Johnson  <ross at callisto.canberra.edu.au>
 
 	* pthread_once.c (pthread_once): Downgrade interlocked operations to simple

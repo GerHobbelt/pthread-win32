@@ -1,3 +1,40 @@
+RELEASE 2.0.0^M
+-------------^M
+(2005-03-16)
+^M
+General
+-------
+
+This release represents an ABI change and the DLL version naming has
+incremented from 1 to 2, e.g. pthreadVC2.dll.
+
+Version 1.4.0 back-ports the new functionality included in this
+release. Please distribute DLLs built from that version with updates
+to applications built on pthreads-win32 version 1.x.x.
+
+The package naming has changed, replacing the snapshot date with 
+the version number + descriptive information. E.g. this
+release is "pthreads-w32-2-0-0-release".
+
+Bugs fixed
+----------
+
+* pthread_setcancelstate() no longer checks for a pending
+async cancel event if the library is using alertable async
+cancel. See the README file (Prerequisites section) for info
+on adding alertable async cancelation.
+
+New features
+------------^M
+
+* pthread_once() now supports init_routine cancellability.
+
+New tests
+---------
+
+* Agressively test pthread_once() init_routine cancellability.
+
+
 SNAPSHOT 2005-03-08
 -------------------
 Version 1.3.0
