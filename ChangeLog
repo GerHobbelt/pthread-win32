@@ -1,5 +1,8 @@
 Wed Jul 29 11:39:03 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* private.c: Corrections in comments.
+	(_pthread_new_thread): Alter "if" flow to be more natural.
+
 	* cleanup.c (_pthread_handler_push): Same as below.
 
 	* create.c (pthread_create): Same as below.
