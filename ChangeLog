@@ -1,3 +1,11 @@
+Sun Dec  6 21:54:35 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* build.bat: New DOS script to compile and link a pthreads app
+	using Microsoft's CL compiler linker.
+	* buildlib.bat: New DOS script to compile all the object files
+	and create pthread.lib and pthread.dll using Microsoft's CL
+	compiler linker.
+
 1998-12-05  Anders Norlander  <anorland@hem2.passagen.se>
 
 	* implement.h (_pthread_try_enter_critical_section): New extern
