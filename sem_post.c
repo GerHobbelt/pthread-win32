@@ -76,7 +76,7 @@ sem_post (sem_t * sem)
 
   if (sem == NULL || *sem == NULL)
     {
-	result = EINVAL;
+			result = EINVAL;
     }
 
 #ifdef NEED_SEM
@@ -90,7 +90,7 @@ sem_post (sem_t * sem)
 #endif /* NEED_SEM */
 
     {
-	result = EINVAL;
+			result = EINVAL;
     }
 
   if (result != 0)

@@ -1,3 +1,12 @@
+2002-06-04  Rob Fanner  <rfanner@stonethree.com>
+
+	* sem_getvalue.c (sem_getvalue): The Johnson M. Hart
+	approach didn't work - we are forced to take an
+	intrusive approach. We try to decrement the sema
+	and then immediately release it again to get the
+	value. There is a small probability that this may
+	block other threads, but only momentarily.
+
 2002-06-03  Ross Johnson  <rpj@digit.ise.canberra.edu.au>
 
 	* sem_init.c (sem_init): Initialise Win32 semaphores

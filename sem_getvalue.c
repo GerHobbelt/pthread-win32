@@ -76,6 +76,7 @@ sem_getvalue(sem_t * sem, int * sval)
       */
 {
   int result = 0;
+	long value;
  
   if ( sem == NULL || *sem == NULL || sval == NULL )
     {
@@ -89,27 +90,17 @@ sem_getvalue(sem_t * sem, int * sval)
       result = ENOSYS;
  
 #else
-      long value = *sval;
- 
-			/* From "Win32 System Programming - Second Edition"
-			 * by Johnson M Hart, chapter 9, page 256 :
-			 *
-			 * "The release count must be greater than zero, but if it
-			 * would cause the semaphore count to exceed the maximum,
-			 * the call will fail, returning FALSE, and the count will
-			 * remain unchanged. Releasing a semaphore with a large count
-			 * is a method used to obtain the current count atomically
-			 * (of course, another thread might change the value immediately)."
-			 */
-
-      if ( ! ReleaseSemaphore( (*sem)->sem, _POSIX_SEM_VALUE_MAX + 1, &value) )
+			
+      if ( WaitForSingleObject( (*sem)->sem, 0 ) == WAIT_TIMEOUT )
         {
-          *sval = value;
+					/* Failed - must be zero. */
+          value = 0;
         }
       else
         {
-					/* This should NEVER occur. */
-          result = ENOSYS;
+					/* Decremented sema - release it and note the value. */
+					(void) ReleaseSemaphore( (*sem)->sem, 1L, &value );
+          value++;
         }
  
 #endif
@@ -121,7 +112,8 @@ sem_getvalue(sem_t * sem, int * sval)
       errno = result;
       return -1;
     }
- 
+
+	*sval = value;
   return 0;
  
 }   /* sem_getvalue */
