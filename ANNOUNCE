@@ -363,24 +363,10 @@ The implementation of condition variables is derived from the work
 of Douglas Schmidt et al
 (http://www.cs.wustl.edu/~schmidt/win32-cv-1.html).
 
-Contributors (in approximate order of appearance)
+There is also a separate CONTRIBUTORS file. This file and others are
+on the web site:
 
-Ben Elliston		bje@cygnus.com
-Ross Johnson		rpj@ise.canberra.edu.au
-Robert Colquhoun	rjc@trump.net.au
-John E. Bossom		John.Bossom@cognos.com
-Anders Norlander	anorland@hem2.passagen.se
-Tor Lillqvist		tml@iki.fi
-Kevin Ruland		Kevin.Ruland@anheuser-busch.com
-Mike Russo		miker@eai.com
-Mark E. Armstrong	avail@pacbell.net
-Lorin Hochstein		lmh@xiphos.ca
-Peter Slacik		Peter.Slacik@tatramed.sk
-Mumit Khan              khan@xraylith.wisc.edu
-Aurelio Medina          aureliom@crt.com
-Milan Gardian           mg@tatramed.sk
-
-If you aren't on the list and believe you should be let me know.
+        http://sourceware.cygnus.com/pthreads-win32
 
 Enjoy!
 
