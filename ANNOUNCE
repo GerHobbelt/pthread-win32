@@ -16,7 +16,7 @@ Parts of the implementation also comply with the Open Group's
 Single Unix specification for compatibility with major Unix
 implementations and Linux.
 
-Pthreads-win32 is free software, distributed under the GNU Library
+Pthreads-win32 is free software, distributed under the GNU Lesser
 General Public License (LGPL).
 
 Please see the 'Acknowledgements' section at the end of this
@@ -29,13 +29,14 @@ Changes since the last snapshot
 
 platform dependence
 -------------------
-As Win9x doesn't provide one, the library now contains
-it's own InterlockedCompareExchange() routine. It is used to
-implement spinlocks and barriers, and also in mutexes.
+As Win95 doesn't provide one, the library now contains
+it's own InterlockedCompareExchange() routine, which is used
+whenever Windows doesn't provide it. InterlockedCompareExchange()
+is used to implement spinlocks and barriers, and also in mutexes.
 This routine relies on the CMPXCHG machine instruction which
-is only available in i486 or above CPUs. This library
-(from snapshot 20010712 onwards) therefore no longer runs on
-i386 platforms.
+is not available on i386 CPUs. This library (from snapshot
+20010712 onwards) is therefore no longer supported on i386
+processor platforms.
 
 rwlocks
 -------
@@ -55,10 +56,10 @@ pthread_mutex_lock;
 
 The behaviour of pthread_mutex_trylock in relation to
 recursive mutexes was inconsistent with commercial implementations.
-Trylock would return EBUSY if the lock was owned already
-regardless of mutex type. Trylock now increments the recursion
-count and returns 0 for RECURSIVE mutexes, and will now return
-EDEADLCK instead of EBUSY for ERRORCHECK mutexes. This is
+Trylock would return EBUSY if the lock was owned already by the
+calling thread regardless of mutex type. Trylock now increments the
+recursion count and returns 0 for RECURSIVE mutexes, and will
+return EDEADLK rather than EBUSY for ERRORCHECK mutexes. This is
 consistent with Solaris.
 - Thomas Pfaff <tpfaff@gmx.net>
 
