@@ -1,3 +1,10 @@
+1998-10-03  Ben Elliston  <bje@cygnus.com>
+
+	* process.h: Remove. This was a stand-in before we started doing
+	native compilation under Win32.
+
+	* pthread.h (pthread_mutex_init): Make `attr' argument const.
+	
 1998-10-02  Ben Elliston  <bje@cygnus.com>
 
 	* COPYING: Remove.
