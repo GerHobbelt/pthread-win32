@@ -1,11 +1,26 @@
-This directory contains an implementation of pthreads for Win32.  If
-desired, it can work with the Cygwin32 porting layer to provide closer
-POSIX standards conformance (ie. by providing process control).
+This directory contains an implementation of pthreads for Win32. 
 
 There is a mailing list for discussing pthreads on Win32 which is
 manually operated at present.  Send mail to postmaster@air.net.au to
 request that you be subscribed.
 
----
-Ben Elliston
-bje@cygnus.com
+
+Building the library with Cygwin32 or Mingw32
+---------------------------------------------
+Dec 2 1998
+
+The package cannot yet be built using cygwin32 or mingw32 because
+the win32 compatibility stub libraries that come with those tools generate
+their stub library function calls from the Win95 dll set
+which don't include the _beginthreadx or _endthreadx functions used in this
+package.
+
+A precompiled DLL and matching include file can be found at:
+	ftp://sourceware.cygnus.com/pub/pthreads-win32
+
+Home page:
+	http://sourceware.cygnus.com/pthreads-win32/
+
+----
+Ross Johnson
+<rpj@ise.canberra.edu.au>

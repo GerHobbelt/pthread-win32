@@ -11,6 +11,10 @@
 	pointer to a function. Call _pthread_try_enter_critical_section
 	instead of TryEnterCriticalSection to avoid errors on Win95.
 
+Thu Dec 3 13:32:00 1998  Ross Johnson  <rpj@ise.canberra.edu.au>
+
+	* README: Correct cygwin32 compatibility statement.
+
 Sun Nov 15 21:24:06 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* cleanup.c (_pthread_destructor_run_all): Declare missing void * arg.
