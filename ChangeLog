@@ -1,3 +1,24 @@
+2001-02-09  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* nonportable.c (pthread_mutex_setdefaulttype_np): New
+	function for changing the default mutex type.
+
+	* mutex.c (ptw32_InitializeCriticalSection): Removed.
+	(ptw32_InitializeCriticalSection): Removed.
+	(ptw32_InitializeCriticalSection): Removed.
+	(ptw32_InitializeCriticalSection): Removed.
+	(ptw32_InitializeCriticalSection): Removed.
+	(pthread_mutex_init): Apply Thomas Pfaff's original
+	patches but altered slightly to avoid using
+	critical sections and retain/adapt for different
+	mutex types (see log entry for 2001-01-10).
+	(pthread_mutex_destroy): Likewise.
+	(pthread_mutex_lock): Likewise.
+	(pthread_mutex_unlock): Likewise.
+	(pthread_mutex_trylock): Likewise.
+
+	* Tagged repository 'exp-2001-02-09-passed'.
+	
 2001-02-09  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* sched.c (pthread_setconcurrency): Moved to misc.c.

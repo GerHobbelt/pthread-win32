@@ -54,3 +54,9 @@ CRITICAL_SECTION ptw32_cond_test_init_lock;
  * created read/write locks.
  */
 CRITICAL_SECTION ptw32_rwlock_test_init_lock;
+
+/*
+ * The default mutex type can be remapped by teh application
+ * via the pthread_mutex_setdefaulttype_np() function.
+ */
+int ptw32_mutex_mapped_default = PTHREAD_MUTEX_DEFAULT;

@@ -55,23 +55,46 @@ New:
         be different to some other implementations, eg
         Solaris.
 
-        PTHREAD_MUTEX_NORMAL will simulate thread deadlock
+        PTHREAD_MUTEX_NORMAL will cause thread deadlock
         if the owner of a mutex tries to relock it without
-        first unlocking it, however the lock will be released
-        if the owner thread is async-canceled.
+        first unlocking it. It has slightly less overhead.
 
--       Pthreads-win32 mutexes are now always based on
-        Win32 critical sections. We no longer use Win32
-        mutexes when TryEnterCriticalSection isn't
-        supported.
+        The behaviour of PTHREAD_MUTEX_DEFAULT can be
+        remapped to any other type through the new
+        non-portable function
+
+          pthread_mutex_setdefaulttype_np()
+
+        (see README.NONPORTABLE)
+
+        Remapping only effects newly initialised mutexes.
+        So if you want behaviour more like Solaris
+        POSIX mutexes, which are non-recursive by default,
+        you can call this at the start of your application:
+
+        int previousType;
+        pthread_mutex_setdefaulttype_np(PTHREAD_MUTEX_ERRORCHECK,
+                                        &previousType);
+
+-       Pthreads-win32 mutexes are now based on Win32
+        critical sections for all Windows versions. We no longer
+        depend on TryEnterCriticalSection.
         - Thomas Pfaff <tpfaff@gmx.net>
 
-Bugs fixed:
--       The condition variable and read-write lock functions
-        have been improved. For details re the [fixed] problems
-        in the CV implementation see the file README.CV
-        - Alexander Terekhov <TEREKHOV@de.ibm.com>
+        This may change again before the next snapshot
+        to rely solely on Win32's Interlocked* routines.
 
+Bugs fixed:
+-       Pthread_mutex_trylock() now properly returns EBUSY
+        even when the current thread owns the mutex.
+        Consequently, pthread_mutex_destroy() will no longer
+        destroy a locked mutex (it will return EBUSY).
+        - Thomas Pfaff <tpfaff@gmx.net>
+
+-       The condition variable and read-write lock functions
+        have been improved. For discussion re the [fixed]
+        problems in the CV implementation see the file README.CV
+        - Alexander Terekhov <TEREKHOV@de.ibm.com>
 
 Known bugs in this snapshot
 ---------------------------

@@ -107,6 +107,7 @@ pthread_rwlock_unlock
 ;
 pthread_getw32threadhandle_np
 pthread_delay_np
+pthread_mutex_setdefaulttype_np
 pthreadCancelableWait
 pthreadCancelableTimedWait
 ; For use when linking statically

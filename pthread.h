@@ -631,10 +631,10 @@ int pthread_attr_setschedparam (pthread_attr_t *attr,
 				const struct sched_param *param);
 
 int pthread_attr_setscope (pthread_attr_t *,
-                       int);
+                           int);
 
 int pthread_attr_getscope (const pthread_attr_t *,
-                       int *);
+                           int *);
 
 /*
  * PThread Functions
@@ -793,8 +793,17 @@ int pthread_rwlock_unlock(pthread_rwlock_t *lock);
  * Non-portable functions
  */
 
-/* Possibly supported by other POSIX threads implimentations */
+/*
+ * Possibly supported by other POSIX threads implimentations
+ */
 int pthread_delay_np (struct timespec * interval);
+
+/*
+ * Remaps the default mutex type to any of the
+ * other possible types. Returns the previous type.
+ */
+int pthread_mutex_setdefaulttype_np (int newtype,
+                                     int * oldtype);
 
 /*
  * Returns the Win32 thread HANDLE associated
@@ -828,7 +837,8 @@ int pthread_win32_thread_detach_np(void);
  * WaitForMultipleObjects.
  */
 int pthreadCancelableWait (HANDLE waitHandle);
-int pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
+int pthreadCancelableTimedWait (HANDLE waitHandle,
+                                DWORD timeout);
 
 /*
  * Thread-Safe C Runtime Library Mappings.

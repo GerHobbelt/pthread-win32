@@ -248,3 +248,59 @@ pthread_win32_thread_detach_np ()
 
   return TRUE;
 }
+
+
+/*
+ * pthread_mutex_setdefaulttype_np --
+ *
+ * Sets the default type to be given to all
+ * POSIX mutexes initialised after the function
+ * is called. Any of the following type values
+ * can be made the default type:
+ *
+ *   PTHREAD_MUTEX_NORMAL
+ *   PTHREAD_MUTEX_ERRORCHECK
+ *   PTHREAD_MUTEX_RECURSIVE
+ *   PTHREAD_MUTEX_DEFAULT
+ *
+ * Any mutex initialised with type PTHREAD_MUTEX_DEFAULT
+ * will be set to the mapped type instead. Previously
+ * initialised mutexes are not changed.
+ *
+ * When set to PTHREAD_MUTEX_DEFAULT (the initial
+ * value), mutexes will behave as for the
+ * PTHREAD_MUTEX_RECURSIVE type.
+ *
+ * If 'oldtype' is a non-NULL pointer, the previous type is
+ * returned through it.
+ * To get the previous type without setting a new type,
+ * use -1 as the 'newtype' value. Of course, the following:
+ *
+ *   pthread_mutex_setdefaulttype_np(-1, NULL);
+ *
+ * is then an extravagant equivalent to the value 0 (zero).
+ */
+int
+pthread_mutex_setdefaulttype_np (int newtype, int * oldtype)
+{
+  int result = 0;
+
+  if (oldtype != NULL)
+    {
+      *oldType = ptw32_mutex_mapped_default;
+    }
+
+  switch (newtype)
+    {
+    case PTHREAD_MUTEX_DEFAULT:
+    case PTHREAD_MUTEX_NORMAL:
+    case PTHREAD_MUTEX_ERRORCHECK:
+    case PTHREAD_MUTEX_RECURSIVE:
+      ptw32_mutex_mapped_default = newtype;
+      break;
+    default:
+      result = EINVAL;
+    }
+
+  return result;
+}
