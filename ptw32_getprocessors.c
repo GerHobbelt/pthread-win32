@@ -55,15 +55,15 @@
 int
 ptw32_getprocessors(int * count)
 {
-  DWORD vProcessCPUs;
-  DWORD vSystemCPUs;
+  DWORD_PTR vProcessCPUs;
+  DWORD_PTR vSystemCPUs;
   int result = 0;
 
   if (GetProcessAffinityMask(GetCurrentProcess(),
 			     &vProcessCPUs,
 			     &vSystemCPUs))
     {
-      DWORD bit;
+      DWORD_PTR bit;
       int CPUs = 0;
 
       for (bit = 1; bit != 0; bit <<= 1)

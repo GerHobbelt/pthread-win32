@@ -155,6 +155,13 @@
 
 #ifdef PTW32_INCLUDE_WINDOWS_H
 #include <windows.h>
+
+#if _MSC_VER < 1300
+/*
+ * VC++6.0 or early compiler's header has no DWORD_PTR type.
+ */
+typedef unsigned long DWORD_PTR;
+#endif
 #endif
 
 /*
