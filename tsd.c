@@ -12,15 +12,6 @@ pthread_key_create(pthread_key_t *key, void (*destructor)(void *))
 {
   DWORD index;
 
-  /* FIXME: the destructor function is ignored for now.  This needs to
-     be managed via the same cleanup handler mechanism as user-define
-     cleanup handlers during a thread exit. */
-
-  if (destructor != NULL)
-    {
-      return EINVAL;
-    }
-
   index = TlsAlloc();
   if (index == 0xFFFFFFFF)
     {
@@ -29,6 +20,11 @@ pthread_key_create(pthread_key_t *key, void (*destructor)(void *))
 
   /* Only modify the `key' parameter if allocation was successful. */
   *key = index;
+
+  if (destructor != NULL)
+    {
+      return (_pthread_destructor_push(destructor, *key));
+    }
 
   return 0;
 }

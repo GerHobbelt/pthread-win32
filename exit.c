@@ -16,8 +16,8 @@ _pthread_vacuum(void)
   _pthread_handler_pop_all(_PTHREAD_CLEANUP_STACK, 
 			   _PTHREAD_HANDLER_EXECUTE);
 
-  _pthread_handler_pop_all(_PTHREAD_DESTRUCTOR_STACK, 
-			   _PTHREAD_HANDLER_EXECUTE);
+  /* Run all TSD key destructors. */
+  _pthread_destructor_pop_all();
 
   /* Pop any atfork handlers without executing them. */
   _pthread_handler_pop_all(_PTHREAD_FORKPREPARE_STACK, 
