@@ -52,7 +52,9 @@ sem_getvalue (sem_t * sem, int *sval)
       * ------------------------------------------------------
       * DOCPUBLIC
       *      This function stores the current count value of the
-      *      semaphore.
+      *      semaphore. If the count is negative, it's absolute
+      *      value is the number of threads currently waiting on
+      *      the semaphore.
       * RESULTS
       *
       * Return value
