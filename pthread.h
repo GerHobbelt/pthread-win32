@@ -250,11 +250,9 @@ struct timespec {
 #include <process.h>
 
 /*
- * note: ETIMEDOUT is correctly defined in winsock.h on winCE
+ * note: ETIMEDOUT is correctly defined in winsock.h
  */
-#ifdef HAVE_WINSOCK_H
 #include <winsock.h>
-#endif
 
 #ifdef NEED_ERRNO
 #include "need_errno.h"
@@ -262,8 +260,11 @@ struct timespec {
 #include <errno.h>
 #endif
 
+/*
+ * In case ETIMEDOUT hasn't been defined above somehow.
+ */
 #ifndef ETIMEDOUT
-#define ETIMEDOUT 19981220     /* FIXME: Need the proper value here. */
+#define ETIMEDOUT 10060     /* This is the value in winsock.h. */
 #endif
 
 #ifdef _MSC_VER

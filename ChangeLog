@@ -1,5 +1,8 @@
 1999-11-05  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* pthread.h (winsock.h): Include unconditionally.
+	(ETIMEDOUT): Change fallback value to that defined by winsock.h.
+	
 	* general: Patched for portability to WinCE. The details are
 	described in the file WinCE-PORT. Follow the instructions
 	in README.WinCE to make the appropriate changes in config.h.
