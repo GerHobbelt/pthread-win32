@@ -9,6 +9,7 @@
 
 /* Use internally to initialise const ints and thread admin array sizes. */
 #define _PTHREAD_MAX_THREADS 128
+#define _PTHREAD_MAX_KEYS 128
 
 #define _PTHREAD_HASH_INDEX(x) (((ULONG) x) % PTHREAD_THREADS_MAX)
 
@@ -142,6 +143,8 @@ void _pthread_exit(pthread_t thread, void * value, int return_code);
 
 extern DWORD _pthread_threadID_TlsIndex;
 
+extern DWORD _pthread_TSD_keys_TlsIndex;
+
 
 /* Global data declared in global.c */
 
@@ -171,8 +174,10 @@ extern pthread_mutex_t _pthread_threads_mutex_table[];
 /* Global TSD key array. */
 extern _pthread_tsd_key_t _pthread_tsd_key_table[];
 
+/* Mutex lock for TSD operations */
+extern pthread_mutex_t _pthread_tsd_mutex;
+
+/* Index to the next available TSD key. */
+extern int _pthread_tsd_key_next;
+
 #endif /* _IMPLEMENT_H */
-
-
-
-

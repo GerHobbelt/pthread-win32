@@ -125,31 +125,34 @@ _pthread_handler_pop_all(int stack, int execute)
 void
 _pthread_destructor_run_all()
 {
-  _pthread_tsd_key_t * k;
+  _pthread_tsd_key_t * key;
   void * arg;
   int count;
 
-  k = _pthread_tsd_key_table;
+  /* This threads private keys */
+  key = _pthread_tsd_key_table;
 
   /* Stop destructor execution at a finite time. POSIX allows us
      to ignore this if we like, even at the risk of an infinite loop.
    */
   for (count = 0; count < PTHREAD_DESTRUCTOR_ITERATIONS; count++)
     {
+      int k;
+
       /* Loop through all keys. */
-      for (key = 0; key < _POSIX_THREAD_KEYS_MAX; key++)
+      for (k = 0; k < _POSIX_THREAD_KEYS_MAX; k++)
 	{
-	  if (k->in_use != 1)
+	  if (key->in_use != _PTHREAD_TSD_KEY_INUSE)
 	    continue;
 
-	  arg = pthread_getspecific(key);
+	  arg = pthread_getspecific((pthread_key_t) k);
 
-	  if (arg != NULL && k->destructor != NULL)
+	  if (arg != NULL && key->destructor != NULL)
 	    {
-	      (void) (k->destructor)(arg);
+	      (void) (key->destructor)(arg);
 	    }
 
-	  k++;
+	  key++;
 	}
     }
 }

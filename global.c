@@ -11,13 +11,17 @@
 #include "pthread.h"
 #include "implement.h"
 
-/* Making these constants will mean that applications remain binary
-   compatible between versions of the DLL. */
+/* POSIX run-time invariant values. (Currently POSIX minimum values)
 
-/* POSIX run-time invariant values. (Currently POSIX minimum values) */
+   Making these constants will mean that applications remain binary
+   compatible between versions of the DLL. 
+
+   FIXME: There are still places in the package that break this.
+*/
+
 const int _POSIX_THREAD_THREADS_MAX = _PTHREAD_MAX_THREADS;
 const int _POSIX_THREAD_DESTRUCTOR_ITERATIONS = 4;
-const int _POSIX_THREAD_KEYS_MAX = 128;
+const int _POSIX_THREAD_KEYS_MAX = _PTHREAD_MAX_KEYS;
 
 
 const int _pthread_create_joinable     = 0;
@@ -58,7 +62,7 @@ pthread_t _pthread_win32handle_map[_PTHREAD_MAX_THREADS];
 pthread_mutex_t _pthread_threads_mutex_table[_PTHREAD_MAX_THREADS];
 
 /* Global TSD key array. */
-_pthread_tsd_key_t _pthread_tsd_key_table[_POSIX_THREAD_KEYS_MAX];
+_pthread_tsd_key_t _pthread_tsd_key_table[_PTHREAD_MAX_KEYS];
 
 /* Mutex lock for TSD operations */
 pthread_mutex_t _pthread_tsd_mutex = PTHREAD_MUTEX_INITIALIZER;
