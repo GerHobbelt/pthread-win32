@@ -29,6 +29,20 @@ static HINSTANCE _pthread_h_kernel32;
 #pragma warning( disable : 4100 )
 #endif
 
+#ifdef __cplusplus
+/*
+ * Dear c++: Please don't mangle this name. -thanks
+ */
+extern "C"
+{
+#endif /* __cplusplus */
+
+  BOOL WINAPI DllMain( HINSTANCE, DWORD, LPVOID);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 BOOL WINAPI
 DllMain (
 	  HINSTANCE hinstDll,
@@ -50,6 +64,7 @@ DllMain (
       /* Load KERNEL32 and try to get address of TryEnterCriticalSection */
       _pthread_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
       _pthread_try_enter_critical_section =
+	(BOOL (PT_STDCALL *)(LPCRITICAL_SECTION))
 	GetProcAddress(_pthread_h_kernel32,
 		       (LPCSTR) "TryEnterCriticalSection");
       break;

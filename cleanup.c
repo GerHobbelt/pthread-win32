@@ -6,7 +6,11 @@
  * threads.
  */
 
-#include <malloc.h>
+#if !defined(_MSC_VER) && !defined(__cplusplus) && defined(__GNUC__)
+
+#warning Compile __FILE__ as C++ or thread cancellation will not work properly.
+
+#endif /* !_MSC_VER && !__cplusplus && __GNUC__ */
 
 #include "pthread.h"
 #include "implement.h"
@@ -91,10 +95,6 @@ _pthread_pop_cleanup (int execute)
 
 #else /* __cplusplus */
       
-#if defined(__GNUC__)
-#warning Compile __FILE__ as C++ or thread cancellation will not work properly.
-#endif
-
 	  /*
 	   * Run the caller's cleanup routine and FIXME: hope for the best.
 	   */
@@ -110,7 +110,7 @@ _pthread_pop_cleanup (int execute)
 
       pthread_setspecific (_pthread_cleanupKey, (void *) cleanup->prev);
 
-#endif
+#endif /* !_MSC_VER && !__cplusplus */
 
     }
 
@@ -170,7 +170,7 @@ _pthread_push_cleanup (_pthread_cleanup_t * cleanup,
 
   cleanup->prev = (_pthread_cleanup_t *) pthread_getspecific (_pthread_cleanupKey);
 
-#endif
+#endif /* !_MSC_VER && !__cplusplus */
 
   pthread_setspecific (_pthread_cleanupKey, (void *) cleanup);
 

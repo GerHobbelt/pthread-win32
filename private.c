@@ -6,7 +6,11 @@
  * the implementation and may be used throughout it.
  */
 
-#include <sys/timeb.h>
+#if !defined(_MSC_VER) && !defined(__cplusplus) && defined(__GNUC__)
+
+#warning Compile __FILE__ as C++ or thread cancellation will not work properly.
+
+#endif /* !_MSC_VER && !__cplusplus && __GNUC__ */
 
 #include "pthread.h"
 #include "implement.h"
@@ -181,10 +185,6 @@ _pthread_threadStart (ThreadParms * threadParms)
     }
 
 #else /* __cplusplus */
-
-#if defined(__CYGWIN__) || defined(__CYGWIN32__)
-#warning File __FILE__, Line __LINE__: Cancelation not supported under C.
-#endif
 
   /*
    * Run the caller's routine;
@@ -487,74 +487,5 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 
 /* </JEB> */
 
-
-int
-_pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
-     /*
-      * ------------------------------------------------------
-      * DOCPUBLIC
-      *      This function waits on a semaphore possibly until
-      *      'abstime' time.
-      *
-      * PARAMETERS
-      *      sem
-      *              pointer to an instance of sem_t
-      *
-      *      abstime
-      *              pointer to an instance of struct timespec
-      *
-      * DESCRIPTION
-      *      This function waits on a semaphore. If the
-      *      semaphore value is greater than zero, it decreases
-      *      its value by one. If the semaphore value is zero, then
-      *      the calling thread (or process) is blocked until it can
-      *      successfully decrease the value or until interrupted by
-      *      a signal.
-      *
-      *      If 'abstime' is a NULL pointer then this function will
-      *      block until it can successfully decrease the value or
-      *      until interrupted by a signal.
-      *
-      * RESULTS
-      *              0               successfully decreased semaphore,
-      *              EINVAL          'sem' is not a valid semaphore,
-      *              ENOSYS          semaphores are not supported,
-      *              EINTR           the function was interrupted by a signal,
-      *              EDEADLK         a deadlock condition was detected.
-      *              ETIMEDOUT       abstime elapsed before success.
-      *
-      * ------------------------------------------------------
-      */
-{
-  struct _timeb currSysTime;
-  const DWORD NANOSEC_PER_MILLISEC = 1000000;
-  const DWORD MILLISEC_PER_SEC = 1000;
-  DWORD milliseconds;
-
-  if (abstime == NULL)
-    {
-      milliseconds = INFINITE;
-    }
-  else
-    {
-      /* 
-       * Calculate timeout as milliseconds from current system time. 
-       */
-
-      /* get current system time */
-      _ftime(&currSysTime);
-
-      /* subtract current system time from abstime */
-      milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
-      milliseconds += (abstime->tv_nsec / NANOSEC_PER_MILLISEC) -
-	currSysTime.millitm;
-    }
-
-  return ((sem == NULL)
-	  ? EINVAL
-	  : pthreadCancelableTimedWait (*sem, milliseconds)
-    );
-
-}				/* _pthread_sem_timedwait */
 
 

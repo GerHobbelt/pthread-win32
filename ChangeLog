@@ -1,3 +1,61 @@
+Tue Feb  2 18:07:43 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* implement.h: Add #include <pthread.h>.
+	Change sem_t to _pthread_sem_t.
+
+	Various patches by Kevin Ruland <Kevin.Ruland@anheuser-busch.com>
+
+	* signal.c (pthread_sigmask): Add and modify casts.
+	Reverse LHS/RHS bitwise assignments.
+
+	* pthread.h: Remove #include <semaphore.h>.
+	(_PTHREAD_ATTR_VALID): Add cast.
+	(struct pthread_t_): Add sigmask element.
+
+	* dll.c: Add "extern C" for DLLMain.
+	(DllMain): Add cast.
+
+	* create.c (pthread_create): Set sigmask in thread.
+
+	* condvar.c: Remove #include. Change sem_* to _pthread_sem_*.
+
+	* attr.c: Changed #include.
+
+	* Makefile.in: Additional targets and changes to build the library
+	as a DLL.
+
+Fri Jan 29 11:56:28 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* Makefile.in (OBJS): Add semaphore.o to list.
+
+	* semaphore.c (_pthread_sem_timedwait): Move from private.c.
+	Rename sem_* to _pthread_sem_*.
+
+	* pthread.h (pthread_cond_t): Change type of sem_t.
+	_POSIX_SEMAPHORES no longer defined.
+
+	* semaphore.h: Contents moved to implement.h.
+	Removed from source tree.
+
+	* implement.h: Add semaphore function prototypes and ename all
+	functions to prepend '_pthread_'. They are
+	now private to the pthreads-win32 implementation.
+
+	* private.c: Change #warning.
+	Move _pthread_sem_timedwait() to semaphore.c.
+
+	* cleanup.c: Change #warning.
+
+	* misc.c: Remove #include <errno.h>
+
+	* pthread.def: Cleanup CVS merge conflicts.
+
+	* global.c: Ditto.
+
+	* ChangeLog: Ditto.
+
+	* cleanup.c: Ditto.
+
 Sun Jan 24 01:34:52 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* semaphore.c (sem_wait): Remove second arg to 

@@ -154,6 +154,8 @@ extern pthread_key_t _pthread_cleanupKey;
 extern CRITICAL_SECTION _pthread_mutex_test_init_lock;
 
 
+#include <pthread.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -183,7 +185,20 @@ int _pthread_tkAssocCreate (ThreadKeyAssoc ** assocP,
 
 void _pthread_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
-int _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime);
+int _pthread_sem_init (_pthread_sem_t * sem, 
+		       int pshared, 
+		       unsigned int value);
+
+int _pthread_sem_destroy (_pthread_sem_t * sem);
+
+int _pthread_sem_trywait (_pthread_sem_t * sem);
+
+int _pthread_sem_wait (_pthread_sem_t * sem);
+
+int _pthread_sem_timedwait (_pthread_sem_t * sem,
+			    const struct timespec * abstime);
+
+int _pthread_sem_post (_pthread_sem_t * sem);
 
 #ifdef __cplusplus
 }

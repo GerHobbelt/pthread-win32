@@ -90,6 +90,13 @@ pthread_create (pthread_t * tid,
     {
       stackSize = (*attr)->stacksize;
       thread->detachState = (*attr)->detachstate;
+
+#if HAVE_SIGSET_T
+
+      thread->sigmask = (*attr)->sigmask;
+
+#endif /* HAVE_SIGSET_T */
+
     }
   else
     {

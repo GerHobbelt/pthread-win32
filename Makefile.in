@@ -6,18 +6,34 @@ CFLAGS	= -g -I. -DHAVE_CONFIG_H -Wall
 # Cygwin G++
 #CFLAGS	= -fhandle-exceptions -I. -DHAVE_CONFIG_H -Wall
 
+LD	= gcc -mdll -e _DllMain@12
+
 OBJS	= attr.o cancel.o cleanup.o condvar.o create.o dll.o \
 	  exit.o fork.o global.o misc.o mutex.o private.o sched.o \
-	  signal.o sync.o tsd.o
+	  semaphore.o signal.o sync.o tsd.o
 
 INCL	= implement.h pthread.h windows.h
 
+DLL     = pthread.dll
+
 LIB	= libpthread32.a
 
-all:	$(LIB)
+all:	$(DLL)
 
 $(LIB):	$(OBJS)
-	$(AR) r $(LIB) $(OBJS)
+	$(AR) r $@ $^
+
+.SUFFIXES: .dll
+
+$(DLL): $(OBJS) 
+	$(LD) -o $@ $^ -Wl,--base-file,$*.base
+	dlltool --base-file=$*.base --def $*.def --output-exp $*.exp --dllname $@
+	$(LD) -o $@ $^ -Wl,--base-file,$*.base,$*.exp
+	dlltool --base-file=$*.base --def $*.def --output-exp $*.exp --dllname $@
+	$(LD) -o $@ $^ -Wl,$*.exp
+	dlltool --def $*.def --output-lib $*.lib --dllname $@
 
 clean:
-	-rm $(LIB) *.o
+	-rm *~
+	-rm $(LIB) *.o *.exe
+	-rm $(DLL) $(DLL:.dll=.base) $(DLL:.dll=.exp) $(DLL:.dll=.lib)

@@ -34,14 +34,16 @@
  *
  * -------------------------------------------------------------
  */
-#include <pthread.h>
+
+#include <sys/timeb.h>
+
 #include <string.h>
 
-#include "semaphore.h"
-
+#include <pthread.h>
+#include "implement.h"
 
 int
-sem_init (sem_t * sem, int pshared, unsigned int value)
+_pthread_sem_init (_pthread_sem_t * sem, int pshared, unsigned int value)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -50,7 +52,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
       *
       * PARAMETERS
       *      sem
-      *              pointer to an instance of sem_t
+      *              pointer to an instance of _pthread_sem_t
       *
       *      pshared
       *              if zero, this semaphore may only be shared between
@@ -90,7 +92,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
     {
       /*
        * NOTE: Taking advantage of the fact that
-       *               sem_t is a simple structure with one entry;
+       *               _pthread_sem_t is a simple structure with one entry;
        *               We don't have to allocate it...
        */
       *sem = CreateSemaphore (
@@ -111,7 +113,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 
 
 int
-sem_destroy (sem_t * sem)
+_pthread_sem_destroy (_pthread_sem_t * sem)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -119,7 +121,7 @@ sem_destroy (sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      *              pointer to an instance of sem_t
+      *              pointer to an instance of _pthread_sem_t
       *
       * DESCRIPTION
       *      This function destroys an unnamed semaphore.
@@ -144,7 +146,7 @@ sem_destroy (sem_t * sem)
 
 
 int
-sem_trywait (sem_t * sem)
+_pthread_sem_trywait (_pthread_sem_t * sem)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -152,7 +154,7 @@ sem_trywait (sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      *              pointer to an instance of sem_t
+      *              pointer to an instance of _pthread_sem_t
       *
       * DESCRIPTION
       *      This function tries to wait on a semaphore. If the
@@ -181,7 +183,7 @@ sem_trywait (sem_t * sem)
 
 
 int
-sem_wait (sem_t * sem)
+_pthread_sem_wait (_pthread_sem_t * sem)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -189,7 +191,7 @@ sem_wait (sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      *              pointer to an instance of sem_t
+      *              pointer to an instance of _pthread_sem_t
       *
       * DESCRIPTION
       *      This function waits on a semaphore. If the
@@ -219,7 +221,81 @@ sem_wait (sem_t * sem)
 
 
 int
-sem_post (sem_t * sem)
+_pthread_sem_timedwait (_pthread_sem_t * sem, const struct timespec * abstime)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      This function waits on a semaphore possibly until
+      *      'abstime' time.
+      *
+      * PARAMETERS
+      *      sem
+      *              pointer to an instance of _pthread_sem_t
+      *
+      *      abstime
+      *              pointer to an instance of struct timespec
+      *
+      * DESCRIPTION
+      *      This function waits on a semaphore. If the
+      *      semaphore value is greater than zero, it decreases
+      *      its value by one. If the semaphore value is zero, then
+      *      the calling thread (or process) is blocked until it can
+      *      successfully decrease the value or until interrupted by
+      *      a signal.
+      *
+      *      If 'abstime' is a NULL pointer then this function will
+      *      block until it can successfully decrease the value or
+      *      until interrupted by a signal.
+      *
+      * RESULTS
+      *              0               successfully decreased semaphore,
+      *              EINVAL          'sem' is not a valid semaphore,
+      *              ENOSYS          semaphores are not supported,
+      *              EINTR           the function was interrupted by a signal,
+      *              EDEADLK         a deadlock condition was detected.
+      *              ETIMEDOUT       abstime elapsed before success.
+      *
+      * ------------------------------------------------------
+      */
+{
+#if defined(__MINGW32__)
+  struct timeb currSysTime;
+#else
+  struct _timeb currSysTime;
+#endif
+  const DWORD NANOSEC_PER_MILLISEC = 1000000;
+  const DWORD MILLISEC_PER_SEC = 1000;
+  DWORD milliseconds;
+
+  if (abstime == NULL)
+    {
+      milliseconds = INFINITE;
+    }
+  else
+    {
+      /* 
+       * Calculate timeout as milliseconds from current system time. 
+       */
+
+      /* get current system time */
+      _ftime(&currSysTime);
+
+      /* subtract current system time from abstime */
+      milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
+      milliseconds += (abstime->tv_nsec / NANOSEC_PER_MILLISEC) -
+	currSysTime.millitm;
+    }
+
+  return ((sem == NULL)
+	  ? EINVAL
+	  : pthreadCancelableTimedWait (*sem, milliseconds)
+    );
+
+}				/* _pthread_sem_timedwait */
+
+
+int
+_pthread_sem_post (_pthread_sem_t * sem)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -227,7 +303,7 @@ sem_post (sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      *              pointer to an instance of sem_t
+      *              pointer to an instance of _pthread_sem_t
       *
       * DESCRIPTION
       *      This function posts a wakeup to a semaphore. If there
@@ -249,5 +325,3 @@ sem_post (sem_t * sem)
 	     : EINVAL));
 
 }				/* sem_post */
-
-

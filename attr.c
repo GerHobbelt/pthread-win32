@@ -5,8 +5,7 @@
  * This translation unit implements operations on thread attribute objects.
  */
 
-#include <errno.h>
-#include <string.h>
+#include <memory.h>
 
 #include "pthread.h"
 #include "implement.h"

@@ -24,8 +24,8 @@ pthread_attr_setschedparam
 ;pthread_attr_setstackaddr
 pthread_attr_setstacksize
 pthread_cancel
-;pthread_cleanup_pop
-;pthread_cleanup_push
+pthread_cleanup_pop
+pthread_cleanup_push
 pthread_condattr_destroy
 pthread_condattr_getpshared
 pthread_condattr_init
