@@ -57,6 +57,8 @@ struct _timeb currSysTimeStart;
 struct _timeb currSysTimeStop;
 long durationMilliSecs;
 long overHeadMilliSecs = 0;
+int one = 1;
+int zero = 0;
 
 #define GetDurationMilliSecs(_TStart, _TStop) ((_TStop.time*1000+_TStop.millitm) \
                                                - (_TStart.time*1000+_TStart.millitm))
@@ -81,8 +83,8 @@ runTest (char * testNameString, int mType)
   assert(pthread_mutex_init(&mx, &ma) == 0);
 
   TESTSTART
-  assert(pthread_mutex_lock(&mx) == 0);
-  assert(pthread_mutex_unlock(&mx) == 0);
+  assert(pthread_mutex_lock(&mx) == zero);
+  assert(pthread_mutex_unlock(&mx) == zero);
   TESTSTOP
 
   assert(pthread_mutex_destroy(&mx) == 0);
@@ -101,7 +103,6 @@ main (int argc, char *argv[])
 {
   CRITICAL_SECTION cs;
   old_mutex_t ox;
-
   pthread_mutexattr_init(&ma);
 
   printf( "=============================================================================\n");
@@ -118,8 +119,8 @@ main (int argc, char *argv[])
    */
 
   TESTSTART
-  assert(1 == 1);
-  assert(1 == 1);
+  assert(1 == one);
+  assert(1 == one);
   TESTSTOP
 
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
@@ -129,8 +130,8 @@ main (int argc, char *argv[])
   InitializeCriticalSection(&cs);
 
   TESTSTART
-  assert((EnterCriticalSection(&cs), 1) == 1);
-  assert((LeaveCriticalSection(&cs), 1) == 1);
+  assert((EnterCriticalSection(&cs), 1) == one);
+  assert((LeaveCriticalSection(&cs), 1) == one);
   TESTSTOP
 
   DeleteCriticalSection(&cs);
@@ -147,8 +148,8 @@ main (int argc, char *argv[])
   assert(old_mutex_init(&ox, NULL) == 0);
 
   TESTSTART
-  assert(old_mutex_lock(&ox) == 0);
-  assert(old_mutex_unlock(&ox) == 0);
+  assert(old_mutex_lock(&ox) == zero);
+  assert(old_mutex_unlock(&ox) == zero);
   TESTSTOP
 
   assert(old_mutex_destroy(&ox) == 0);
@@ -165,8 +166,8 @@ main (int argc, char *argv[])
   assert(old_mutex_init(&ox, NULL) == 0);
 
   TESTSTART
-  assert(old_mutex_lock(&ox) == 0);
-  assert(old_mutex_unlock(&ox) == 0);
+  assert(old_mutex_lock(&ox) == zero);
+  assert(old_mutex_unlock(&ox) == zero);
   TESTSTOP
 
   assert(old_mutex_destroy(&ox) == 0);

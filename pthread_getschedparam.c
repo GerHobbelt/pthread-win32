@@ -42,7 +42,6 @@ int
 pthread_getschedparam(pthread_t thread, int *policy,
 			  struct sched_param *param)
 {
-  int prio;
   int result;
 
   /* Validate the thread id. */
@@ -64,13 +63,13 @@ pthread_getschedparam(pthread_t thread, int *policy,
   /* Fill out the policy. */
   *policy = SCHED_OTHER;
 
-  /* Fill out the sched_param structure. */
-  prio = GetThreadPriority(thread->threadH);
-  if (prio == THREAD_PRIORITY_ERROR_RETURN)
-    {
-      return EINVAL;
-    }
-  
-  param->sched_priority = prio;
+  /*
+   * This function must return the priority value set by
+   * the most recent pthread_setschedparam() or pthread_create()
+   * for the target thread. It must not return the actual thread
+   * priority as altered by any system priority adjustments etc.
+   */
+  param->sched_priority = thread->sched_priority;
+
   return 0;
 }

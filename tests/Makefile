@@ -42,6 +42,8 @@ CPHDR	= pthread.h semaphore.h sched.h
 
 OPTIM	= /O2 /Ob0
 
+XXLIBS	=
+
 # C++ Exceptions
 VCEFLAGS	= /GX /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
 VCELIB	= pthreadVCE.lib
@@ -70,7 +72,7 @@ EHFLAGS	=
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
-PASSES= loadfree.pass \
+PASSES= sizes.pass  loadfree.pass \
 	  semaphore1.pass  semaphore2.pass  self1.pass  mutex5.pass  \
 	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  mutex2.pass  mutex3.pass  \
 	  condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
@@ -124,7 +126,7 @@ all:
 tests: $(CPLIB) $(CPDLL) $(CPHDR) $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
-benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(BENCHRESULTS)
+benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(XXLIBS) $(BENCHRESULTS)
 	@ $(ECHO) ALL BENCH TESTS DONE.
 
 $(PASSES): $*.exe
@@ -152,20 +154,24 @@ VCX:
 	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
 
 VCE-bench:
-	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" benchtests
+	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VSE-bench:
-	@ nmake TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" benchtests
+	@ nmake TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VC-bench:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" benchtests
+	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VCX-bench:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" benchtests
+	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" benchtests
 
 .c.exe:
-	@ $(ECHO) $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB)
-	@ $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB)
+	@ $(ECHO) $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
+	@ $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
+
+.c.o:
+	@ $(ECHO) $(CC) $(EHFLAGS) /c $(CFLAGS) $(INCLUDES) $< /Fo$@
+	@ $(CC) $(EHFLAGS) $(CFLAGS) /c $(INCLUDES) $< /Fo$@
 
 .c.i:
 	@ $(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<
@@ -250,7 +256,7 @@ exit3.pass: create1.pass
 exit4.pass:
 exit5.pass: kill1.pass
 eyal1.pass: tsd1.pass
-inherit1.pass: join1.pass
+inherit1.pass: join1.pass priority1.pass
 join0.pass: create1.pass
 join1.pass: create1.pass
 join2.pass: create1.pass
@@ -278,7 +284,7 @@ mutex8e.pass: mutex7e.pass
 mutex8r.pass: mutex7r.pass
 once1.pass: create1.pass
 priority1.pass: join1.pass
-priority2.pass: priority1.pass
+priority2.pass: priority1.pass barrier3.pass
 reuse1.pass: create2.pass
 reuse2.pass: reuse1.pass
 rwlock1.pass: condvar6.pass
@@ -298,6 +304,7 @@ self1.pass:
 self2.pass: create1.pass
 semaphore1.pass:
 semaphore2.pass:
+sizes.pass:
 spin1.pass:
 spin2.pass: spin1.pass
 spin3.pass: spin2.pass

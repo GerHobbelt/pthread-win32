@@ -47,6 +47,7 @@ MAKE	= make
 # Mingw32
 #
 XXCFLAGS	= 
+XXLIBS	=
 CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
 #CFLAGS	= -g -O0 -UNDEBUG -Wall $(XXCFLAGS)
 BUILD_DIR	= ..
@@ -62,7 +63,7 @@ COPYFILES	= $(HDR) $(LIB) $(DLL)
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
-TESTS	= loadfree \
+TESTS	= sizes loadfree \
 	  semaphore1 semaphore2 self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
 	  create1 create2 reuse1 reuse2 equal1 \
@@ -115,10 +116,10 @@ GCX:
 	$(MAKE) GCX=GC CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
 
 GC-bench:
-	$(MAKE) GCX=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" all-bench
+	$(MAKE) GCX=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
 
 GCE-bench:
-	$(MAKE) GCX=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-bench
+	$(MAKE) GCX=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
 
 all-pass: $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
@@ -183,7 +184,7 @@ exit3.pass: create1.pass
 exit4.pass:
 exit5.pass: exit4.pass kill1.pass
 eyal1.pass: tsd1.pass
-inherit1.pass: join1.pass
+inherit1.pass: join1.pass priority1.pass
 join0.pass: create1.pass
 join1.pass: create1.pass
 join2.pass: create1.pass
@@ -211,7 +212,7 @@ mutex8e.pass: mutex7e.pass
 mutex8r.pass: mutex7r.pass
 once1.pass: create1.pass
 priority1.pass: join1.pass
-priority2.pass: priority1.pass
+priority2.pass: priority1.pass barrier3.pass
 reuse1.pass: create2.pass
 reuse2.pass: reuse1.pass
 rwlock1.pass: condvar6.pass
@@ -231,6 +232,7 @@ self1.pass:
 self2.pass: create1.pass
 semaphore1.pass:
 semaphore2.pass:
+sizes.pass:
 spin1.pass:
 spin2.pass: spin1.pass
 spin3.pass: spin2.pass
@@ -246,7 +248,7 @@ valid2.pass: valid1.pass
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
-%.bench: %.exe $(LIB) $(DLL) $(HDR)
+%.bench: $(LIB) $(DLL) $(HDR) $(XXLIBS) %.exe
 	@ $(ECHO) Running $*
 	$*
 	@ $(ECHO) Done
@@ -254,8 +256,8 @@ valid2.pass: valid1.pass
 
 %.exe: %.c
 	@ $(ECHO) Compiling $@
-	@ $(ECHO) $(CC) $(CFLAGS) -o $@ $^ $(INCLUDES) -L. -lpthread$(GCX)
-	@ $(CC) $(CFLAGS) -o $@ $^ $(INCLUDES) -L. -lpthread$(GCX) -lsupc++
+	@ $(ECHO) $(CC) $(CFLAGS) -o $@ $^ $(INCLUDES) -L. -lpthread$(GCX) -lsupc++ $(XXLIBS)
+	@ $(CC) $(CFLAGS) -o $@ $^ $(INCLUDES) -L. -lpthread$(GCX) -lsupc++ $(XXLIBS)
 
 %.pre: %.c
 	@ $(CC) -E $(CFLAGS) -o $@ $^ $(INCLUDES)
@@ -270,6 +272,11 @@ $(COPYFILES):
 pthread.dll:
 	@ $(CP) $(DLL) $@
 
+benchlib.o: benchlib.c
+	@ $(ECHO) Compiling $@
+	@ $(ECHO) $(CC) -c $(CFLAGS) $^ $(INCLUDES)
+	@ $(CC) -c $(CFLAGS) $^ $(INCLUDES)
+
 clean:
 	- $(RM) *.dll
 	- $(RM) *.lib
@@ -279,6 +286,7 @@ clean:
 	- $(RM) *.a
 	- $(RM) *.e
 	- $(RM) *.i
+	- $(RM) *.o
 	- $(RM) *.obj
 	- $(RM) *.pdb
 	- $(RM) *.exe

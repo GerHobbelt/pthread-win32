@@ -179,7 +179,7 @@ main (int argc, char *argv[])
   assert(pthread_mutexattr_init(&ma) == 0);
 
   printf( "=============================================================================\n");
-  printf( "\nLock plus unlock on an unlocked mutex.\n");
+  printf( "\nLock plus unlock on a locked mutex.\n");
   printf("%ld iterations, four locks/unlocks per iteration.\n\n", ITERATIONS);
 
   printf( "%-45s %15s %15s\n",

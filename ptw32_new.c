@@ -55,15 +55,17 @@ ptw32_new (void)
 
   if (t != NULL)
     {
-      t->detachState = PTHREAD_CREATE_JOINABLE;
-      t->cancelState = PTHREAD_CANCEL_ENABLE;
-      t->cancelType  = PTHREAD_CANCEL_DEFERRED;
-      t->cancelLock  = PTHREAD_MUTEX_INITIALIZER;
-      t->cancelEvent = CreateEvent (
-				    0,
-				    (int) PTW32_TRUE,    /* manualReset  */
-				    (int) PTW32_FALSE,   /* setSignaled  */
-				    NULL);
+      t->sched_priority = THREAD_PRIORITY_NORMAL;
+      t->detachState    = PTHREAD_CREATE_JOINABLE;
+      t->cancelState    = PTHREAD_CANCEL_ENABLE;
+      t->cancelType     = PTHREAD_CANCEL_DEFERRED;
+      t->cancelLock     = PTHREAD_MUTEX_INITIALIZER;
+      t->threadLock     = PTHREAD_MUTEX_INITIALIZER;
+      t->cancelEvent    = CreateEvent (
+				       0,
+				       (int) PTW32_TRUE,    /* manualReset  */
+				       (int) PTW32_FALSE,   /* setSignaled  */
+				       NULL);
 
       if (t->cancelEvent == NULL)
 	{

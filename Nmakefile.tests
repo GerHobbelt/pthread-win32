@@ -18,6 +18,7 @@ set keepgoing
 		$(I:D:B:S=.pass) : .VIRTUAL .FORCE $(I)
 			$(>)
 	end
+sizes::		sizes.c
 loadfree::	loadfree.c
 mutex1::	mutex1.c
 mutex1e::	mutex1e.c
@@ -57,6 +58,7 @@ equal1::	equal1.c
 exit2::		exit2.c
 exit3::		exit3.c
 exit4::		exit4.c
+exit5::		exit5.c
 join0::		join0.c
 join1::		join1.c
 join2::		join2.c
@@ -97,6 +99,7 @@ cancel4::	cancel4.c
 cancel5::	cancel5.c
 cancel6a::	cancel6a.c
 cancel6d::	cancel6d.c
+cancel7::	cancel7.c
 cleanup0::	cleanup0.c
 cleanup1::	cleanup1.c
 cleanup2::	cleanup2.c
@@ -124,6 +127,7 @@ benchtest5::    benchtest5.c
 valid1::	valid1.c
 valid2::	valid2.c
 
+sizes:		:test:	sizes
 loadfree:	:test:
 semaphore1	:test:	loadfree
 semaphore2	:test:	loadfree
@@ -161,6 +165,8 @@ mutex8r		:test:	mutex7r
 equal1		:test:	create1
 exit2		:test:	create1
 exit3		:test:	create1
+exit4		:test:	kill1
+exit5		:test:	exit4
 join0		:test:	create1
 join1		:test:	create1
 join2		:test:	create1
@@ -196,8 +202,9 @@ context1	:test:	cancel2
 cancel3		:test:	context1
 cancel4		:test:	cancel3
 cancel5		:test:	cancel3
-cancel6a		:test:	cancel3
-cancel6d		:test:	cancel3
+cancel6a	:test:	cancel3
+cancel6d	:test:	cancel3
+cancel7		:test:	kill1
 cleanup0	:test:	cancel5
 cleanup1	:test:	cleanup0
 cleanup2	:test:	cleanup1

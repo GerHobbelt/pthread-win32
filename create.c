@@ -87,11 +87,14 @@ pthread_create (pthread_t * tid,
   int run = PTW32_TRUE;
   ThreadParms *parms = NULL;
   long stackSize;
+  int priority;
 
   if ((thread = ptw32_new()) == NULL)
     {
       goto FAIL0;
     }
+
+  priority = thread->sched_priority;
 
   if ((parms = (ThreadParms *) malloc (sizeof (*parms))) == NULL)
     {
@@ -106,6 +109,7 @@ pthread_create (pthread_t * tid,
     {
       stackSize = (*attr)->stacksize;
       thread->detachState = (*attr)->detachstate;
+      priority = (*attr)->param.sched_priority;
 
 #if HAVE_SIGSET_T
 
@@ -113,6 +117,36 @@ pthread_create (pthread_t * tid,
 
 #endif /* HAVE_SIGSET_T */
 
+#if (THREAD_PRIORITY_LOWEST > THREAD_PRIORITY_NORMAL)     
+      /* WinCE */
+#else     
+      /* Everything else */
+
+      /*
+       * Thread priority must be set to a valid system level
+       * without altering the value set by pthread_attr_setschedparam().
+       */
+
+      /*
+       * PTHREAD_EXPLICIT_SCHED is the default because Win32 threads
+       * don't inherit their creator's priority. They are started with
+       * THREAD_PRIORITY_NORMAL (win32 value). The result of not supplying
+       * an 'attr' arg to pthread_create() is equivalent to defaulting to
+       * PTHREAD_EXPLICIT_SCHED and priority THREAD_PRIORITY_NORMAL.
+       */
+      if (PTHREAD_INHERIT_SCHED == (*attr)->inheritsched)
+        {
+          /*
+           * If the thread that called pthread_create() is a Win32 thread
+           * then the inherited priority could be the result of a temporary
+           * system adjustment. This is not the case for POSIX threads.
+           */
+          pthread_t self = pthread_self();
+          priority = self->sched_priority;
+        }
+
+#endif    
+          
     }
   else
     {
@@ -150,19 +184,9 @@ pthread_create (pthread_t * tid,
 
   if (threadH != 0)
     {
-      /*
-       * PTHREAD_EXPLICIT_SCHED is the default because Win32 threads
-       * don't inherit their creator's priority. They are started with
-       * THREAD_PRIORITY_NORMAL (win32 value). The result of not supplying
-       * an 'attr' arg to pthread_create() is equivalent to defaulting to
-       * PTHREAD_EXPLICIT_SCHED and priority THREAD_PRIORITY_NORMAL.
-       */
       if (attr != NULL && *attr != NULL)
 	{
-	  (void) SetThreadPriority(threadH,
-				   PTHREAD_INHERIT_SCHED == (*attr)->inheritsched
-				   ? GetThreadPriority(GetCurrentThread())
-				   : (*attr)->param.sched_priority );
+	  (void) ptw32_setthreadpriority(thread, SCHED_OTHER, priority);
 	}
 
       if (run)
@@ -204,19 +228,9 @@ pthread_create (pthread_t * tid,
 	  SuspendThread (threadH);
 	}
       
-      /*
-       * PTHREAD_EXPLICIT_SCHED is the default because Win32 threads
-       * don't inherit their creator's priority. They are started with
-       * THREAD_PRIORITY_NORMAL (win32 value). The result of not supplying
-       * an 'attr' arg to pthread_create() is equivalent to defaulting to
-       * PTHREAD_EXPLICIT_SCHED and priority THREAD_PRIORITY_NORMAL.
-       */
       if (attr != NULL && *attr != NULL)
 	{
-	  (void) SetThreadPriority(threadH,
-				   PTHREAD_INHERIT_SCHED == (*attr)->inheritsched
-				   ? GetThreadPriority(GetCurrentThread())
-				   : (*attr)->param.sched_priority );
+	  (void) ptw32_setthreadpriority(thread, SCHED_OTHER, priority);
 	}
     }
 

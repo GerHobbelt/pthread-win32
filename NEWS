@@ -1,3 +1,23 @@
+SNAPSHOT 2003-09-18
+-------------------
+
+Cleanup of thread priority management. In particular, setting of thread
+priority now attempts to map invalid Win32 values within the range returned
+by sched_get_priority_min/max() to useful values. See README.NONPORTABLE
+under "Thread priority".
+
+Bug fixes
+---------
+* pthread_getschedparam() now returns the priority given by the most recent
+call to pthread_setschedparam() or established by pthread_create(), as
+required by the standard. Previously, pthread_getschedparam() incorrectly
+returned the running thread priority at the time of the call, which may have
+been adjusted or temporarily promoted/demoted.
+
+* sched_get_priority_min() and sched_get_priority_max() now return -1 on error
+and set errno. Previously, they incorrectly returned the error value directly.
+
+
 SNAPSHOT 2003-09-04
 -------------------
 

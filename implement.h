@@ -122,6 +122,8 @@ struct pthread_t_ {
   void *parms;
   int ptErrno;
   int detachState;
+  pthread_mutex_t threadLock;  /* Used for serialised access to public thread state */
+  int sched_priority;          /* As set, not as currently is */
   pthread_mutex_t cancelLock;  /* Used for async-cancel safety */
   int cancelState;
   int cancelType;
@@ -497,6 +499,10 @@ pthread_t ptw32_threadReusePop (void);
 void ptw32_threadReusePush (pthread_t thread);
 
 int ptw32_getprocessors (int * count);
+
+int ptw32_setthreadpriority (pthread_t thread,
+                             int policy,
+                             int priority);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
 unsigned __stdcall
