@@ -37,6 +37,8 @@ pthread_join(pthread_t thread, void ** valueptr)
       return EINVAL;
     }
 
+  this->joinvalueptr = valueptr;
+
   /* Wait on the kernel thread object. */
   switch (WaitForSingleObject(thread, INFINITE))
     {

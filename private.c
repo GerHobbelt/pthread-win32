@@ -59,6 +59,7 @@ _pthread_new_thread_entry(pthread_t thread, _pthread_threads_thread_t * entry)
     {
       this->thread = thread;
       pthread_attr_init(&(this->attr));
+      this->joinvalueptr = NULL;
       this->cleanupstack = NULL;
       this->destructorstack = NULL;
       this->forkpreparestack = NULL;

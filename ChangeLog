@@ -1,5 +1,25 @@
 Fri Jul 24 03:00:25 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* sync.c (pthread_join): Save valueptr arg in joinvalueptr for
+	pthread_exit() to use.
+
+	* private.c (_pthread_new_thread_entry): Initialise joinvalueptr to
+	NULL.
+
+	* create.c (_pthread_start_call): Rewrite to facilitate joins.
+	pthread_exit() will do a longjmp() back to here. Does appropriate
+	cleanup and exit/return from the thread.
+	(pthread_create): _beginthreadex() now passes a pointer to our
+	thread table entry instead of just the call member of that entry.
+
+	* implement.h (_pthread_threads_thread): New member 
+	void ** joinvalueptr.
+	(_pthread_call_t): New member jmpbuf env.
+
+	* exit.c (pthread_exit): Major rewrite to handle joins and handing
+	value pointer to joining thread. Uses longjmp() back to 
+	_pthread_start_call().
+
 	* create.c (pthread_create): Ensure values of new attribute members
 	are copied to the thread attribute object.
 

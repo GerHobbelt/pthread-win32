@@ -37,6 +37,7 @@ struct _pthread_handler_node {
 typedef struct {
   unsigned (*routine)(void *);
   void * arg;
+  jmpbuf env;
 } _pthread_call_t;
 
 #define _PTHREAD_THIS (_pthread_find_thread_entry(pthread_this()))
@@ -51,6 +52,7 @@ struct _pthread_threads_thread {
   pthread_t                   thread;
   pthread_attr_t              attr;
   _pthread_call_t             call;
+  void **                     joinvalueptr;
   _pthread_handler_node_t *   cleanupstack;
   _pthread_handler_node_t *   destructorstack;
   _pthread_handler_node_t *   forkpreparestack;

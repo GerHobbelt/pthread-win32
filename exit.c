@@ -36,6 +36,17 @@ _pthread_vacuum(void)
 void
 pthread_exit(void * value)
 {
-  _pthread_vacuum();
-  _endthreadex((DWORD) value);
+  _pthread_threads_thread_t * this;
+
+  this = _PTHREAD_THIS;
+
+  if (this->joinvalueptr != NULL)
+    {
+      *(this->joinvalueptr) = value;
+    }
+
+  /* FIXME: More to do here. IE, if pthread_detach() was called
+     and value != NULL, do we free(value)? */
+
+  longjmp(this->call.env, 1);
 }
