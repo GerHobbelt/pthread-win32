@@ -27,8 +27,9 @@ Known bugs
 
    This is suspected to be a compiler bug in VC6.0, and also seen in
    VC7.0 and VS .NET 2003. The GNU C++ compiler does not have a problem
-   with this test, and it has been reported that the Intel C++ 8.1 compiler
-   and Visual C++ 2005 Express Edition Beta2 are also ok with this test.
+   with this, and it has been reported that the Intel C++ 8.1 compiler
+   and Visual C++ 2005 Express Edition Beta2 pass tests\semaphore4.c
+   (which exposes the bug).
 
    Workaround [rpj - 2 Feb 2002]
    -----------------------------
