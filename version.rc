@@ -33,7 +33,16 @@
 #include <winver.h>
 #include "pthread.h"
 
-#ifdef _MS_VER
+/*
+ * Note: the correct __CLEANUP_* macro must be defined corresponding to
+ * the definition used for the object file builds. This is done in the
+ * relevent makefiles for the command line builds, but users should ensure
+ * that their resource compiler knows what it is too.
+ * If using the default (no __CLEANUP_* defined), pthread.h will define it
+ * as __CLEANUP_C.
+ */
+
+#ifdef PTW32_RC_MSC
 #  if defined(__CLEANUP_C)
 #    define PTW32_VERSIONINFO_NAME "pthreadVC\0"
 #    define PTW32_VERSIONINFO_COMMENT "MS C build -- longjmp thread exiting\0"
@@ -43,6 +52,8 @@
 #  elif defined(__CLEANUP_SEH)
 #    define PTW32_VERSIONINFO_NAME "pthreadVSE\0"
 #    define PTW32_VERSIONINFO_COMMENT "MS C build -- structured exception thread exiting\0"
+#  else
+#    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
 #elif defined(__GNUC__)
 #  if defined(__CLEANUP_C)
@@ -51,7 +62,31 @@
 #  elif defined(__CLEANUP_CXX)
 #    define PTW32_VERSIONINFO_NAME "pthreadGCE\0"
 #    define PTW32_VERSIONINFO_COMMENT "GNU C++ build -- C++ exception thread exiting\0"
+#  else
+#    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
+#elif defined(__BORLANDC__)
+#  if defined(__CLEANUP_C)
+#    define PTW32_VERSIONINFO_NAME "pthreadBC\0"
+#    define PTW32_VERSIONINFO_COMMENT "BORLAND C build -- longjmp thread exiting\0"
+#  elif defined(__CLEANUP_CXX)
+#    define PTW32_VERSIONINFO_NAME "pthreadBCE\0"
+#    define PTW32_VERSIONINFO_COMMENT "BORLAND C++ build -- C++ exception thread exiting\0"
+#  else
+#    error Resource compiler doesn't know which cleanup style you're using - see version.rc
+#  endif
+#elif defined(__WATCOMC__)
+#  if defined(__CLEANUP_C)
+#    define PTW32_VERSIONINFO_NAME "pthreadWC\0"
+#    define PTW32_VERSIONINFO_COMMENT "WATCOM C build -- longjmp thread exiting\0"
+#  elif defined(__CLEANUP_CXX)
+#    define PTW32_VERSIONINFO_NAME "pthreadWCE\0"
+#    define PTW32_VERSIONINFO_COMMENT "WATCOM C++ build -- C++ exception thread exiting\0"
+#  else
+#    error Resource compiler doesn't know which cleanup style you're using - see version.rc
+#  endif
+#else
+#  error Resource compiler doesn't know which compiler you're using - see version.rc
 #endif
 
 
@@ -73,7 +108,7 @@ BEGIN
             VALUE "InternalName", PTW32_VERSIONINFO_NAME
             VALUE "OriginalFilename", PTW32_VERSIONINFO_NAME
             VALUE "CompanyName", "Open Source Software community project\0"
-            VALUE "LegalCopyright", "Copyright (C) Project contributors 1998-2005\0"
+            VALUE "LegalCopyright", "Copyright (C) Project contributors 1998-2004\0"
             VALUE "Licence", "LGPL\0"
             VALUE "Info", "http://sources.redhat.com/pthreads-win32/\0"
 	    VALUE "Comment", PTW32_VERSIONINFO_COMMENT

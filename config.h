@@ -16,6 +16,9 @@
 /* Define if you have the <signal.h> header file.  */
 #undef HAVE_SIGNAL_H
 
+/* Define if you have the Borland TASM32 or compatible assembler.  */
+#undef HAVE_TASM32
+
 /* Define if you don't have Win32 DuplicateHandle. (eg. WinCE) */
 #undef NEED_DUPLICATEHANDLE
 
@@ -87,6 +90,9 @@
 
 /*********************************************************************
  * Target specific groups
+ *
+ * If you find that these are incorrect or incomplete please report it
+ * to the pthreads-win32 maintainer. Thanks.
  *********************************************************************/
 #ifdef WINCE
 #define NEED_DUPLICATEHANDLE
@@ -110,6 +116,9 @@
 
 #ifdef __MINGW32__
 #define HAVE_MODE_T
+#endif
+
+#ifdef __BORLANDC__
 #endif
 
 #ifdef __WATCOMC__
