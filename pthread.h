@@ -239,7 +239,7 @@ int pthread_cond_destroy(pthread_cond_t *cv);
 /* Primitives for mutexes. */
 
 int pthread_mutex_init(pthread_mutex_t *mutex,
-		       pthread_mutexattr_t *attr);
+		       const pthread_mutexattr_t *attr);
 
 int pthread_mutex_destroy(pthread_mutex_t *mutex);
 
