@@ -1,3 +1,21 @@
+SNAPSHOT 2005-03-08
+-------------------
+
+Bug reports (fixed)
+-------------------
+
+* Implicitly created threads leave Win32 handles behind after exiting.
+- Dmitrii Semii
+
+* pthread_once() starvation problem.
+- Gottlob Frege
+
+New tests
+---------
+
+* More intense testing of pthread_once().
+
+
 SNAPSHOT 2005-01-25
 -------------------
 

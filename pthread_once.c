@@ -87,41 +87,62 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
     }
 
   /*
-   * The race condition involving once_control->done is harmless.
-   * The problem experienced in MPU environments with multibyte variables
-   * is also not a problem because the value (initially zero i.e. PTW32_FALSE)
-   * is only ever tested for non-zero. In the event of a race occuring, the
-   * worst result is that up to N-1 threads (N = number of CPUs) may enter the
-   * while loop and yield their run state unnecessarily, and this can only
-   * ever occur at most once.
+   * Use a single global cond+mutex to manage access to all once_control objects.
+   * Unlike a global mutex on it's own, the global cond+mutex allows faster
+   * once_controls to overtake slower ones. Spurious wakeups may occur, but
+   * can be tolerated.
    *
-   * The alternatives are to use a condition variable (overkill?), or
-   * InterlockedCompareExchange() to test/set once_control->done.
+   * To maintain a separate mutex for each once_control object requires either
+   * cleaning up the mutex (difficult to synchronise reliably), or leaving it
+   * around forever. Since we can't make assumptions about how an application might
+   * employ pthread_once objects, the later is considered to be unacceptable.
+   *
+   * Since this is being introduced as a bug fix, the global cond+mtx also avoids
+   * a change in the ABI, maintaining backwards compatibility.
+   *
+   * The mutex should be an ERRORCHECK type to be sure we will never, in the event
+   * we're cancelled before we get the lock, unlock the mutex when it's held by
+   * another thread (possible with NORMAL/DEFAULT mutexes because they don't check
+   * ownership).
    */
+
   if (!once_control->done)
     {
-      if (InterlockedIncrement (&(once_control->started)) == 0)
+      if (InterlockedExchange((LPLONG) &once_control->started, (LONG) 0) == -1)
 	{
-	  /*
-	   * First thread to increment the started variable
-	   */
 	  (*init_routine) ();
-	  once_control->done = PTW32_TRUE;
 
+#ifdef _MSC_VER
+#pragma inline_depth(0)
+#endif
+	  /*
+	   * Holding the mutex during the broadcast prevents threads being left
+	   * behind waiting.
+	   */
+	  pthread_cleanup_push(pthread_mutex_unlock, (void *) &ptw32_once_control.mtx);
+	  (void) pthread_mutex_lock(&ptw32_once_control.mtx);
+	  once_control->done = PTW32_TRUE;
+	  (void) pthread_cond_broadcast(&ptw32_once_control.cond);
+	  pthread_cleanup_pop(1);
+#ifdef _MSC_VER
+#pragma inline_depth()
+#endif
 	}
       else
 	{
-	  /*
-	   * Block until other thread finishes executing the onceRoutine
-	   */
-	  while (!(once_control->done))
+#ifdef _MSC_VER
+#pragma inline_depth(0)
+#endif
+	  pthread_cleanup_push(pthread_mutex_unlock, (void *) &ptw32_once_control.mtx);
+	  (void) pthread_mutex_lock(&ptw32_once_control.mtx);
+	  while (!once_control->done)
 	    {
-	      /*
-	       * The following gives up CPU cycles without pausing
-	       * unnecessarily
-	       */
-	      Sleep (0);
+	      (void) pthread_cond_wait(&ptw32_once_control.cond, &ptw32_once_control.mtx);
 	    }
+	  pthread_cleanup_pop(1);
+#ifdef _MSC_VER
+#pragma inline_depth()
+#endif
 	}
     }
 

@@ -124,7 +124,7 @@ waste_time (int n)
   int		i;
   double	f, g, h, s;
 
-  s = 0;
+  s = 0.0;
 
   /*
    * Useless work.
@@ -134,7 +134,7 @@ waste_time (int n)
       f = rand ();
       g = rand ();
       h = rand ();
-      s += 2 * f * g / (h != 0 ? (h * h) : 1);
+      s += 2.0 * f * g / (h != 0.0 ? (h * h) : 1.0);
     }
   return s;
 }

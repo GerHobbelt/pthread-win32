@@ -86,7 +86,7 @@ TESTS	= sizes loadfree \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
-	  count1 once1 tsd1 self2 \
+	  count1 once1 once2 tsd1 self2 \
 	  cancel1 cancel2 \
 	  semaphore4 semaphore4t \
 	  delay1 delay2 eyal1 \
@@ -237,6 +237,7 @@ mutex8n.pass: mutex7n.pass
 mutex8e.pass: mutex7e.pass
 mutex8r.pass: mutex7r.pass
 once1.pass: create1.pass
+once2.pass: once1.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass barrier3.pass
 reuse1.pass: create2.pass

@@ -47,6 +47,8 @@ func(void * arg)
 
 	/* Never reached. */
 	assert(0);
+
+	return NULL;
 }
 
 int

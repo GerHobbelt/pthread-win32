@@ -1,3 +1,13 @@
+2005-03-08  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* pthread_once.c (pthread_once): Redesigned to elliminate potential
+	starvation problem.
+	- reported by Gottlob Frege  <gottlobfrege at gmail.com>
+
+	* ptw32_threadDestroy.c (ptw32_threadDestroy): Implicit threads were
+	not closing their Win32 thread duplicate handle.
+	- reported by Dmitrii Semii <bogolt at gmail.com>
+
 2005-01-25  Ralf Kubis  <RKubis at mc.com>
 
 	* Attempted acquisition of recursive mutex was causing waiting
