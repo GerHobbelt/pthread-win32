@@ -20,7 +20,7 @@
 enum { _PTHREAD_HANDLER_POP_LIFO, _PTHREAD_HANDLER_POP_FIFO };
 
 /* Special value to mark attribute objects as valid. */
-#define _PTHREAD_ATTR_INVALID 0xC0FFEE
+#define _PTHREAD_ATTR_VALID 0xC0FFEE
 
 /* General description of a handler function on a stack. */
 typedef struct _pthread_handler_node _pthread_handler_node_t;
@@ -35,7 +35,6 @@ struct _pthread_handler_node {
 typedef struct {
   unsigned (*routine)(void *);
   void * arg;
-  jmpbuf env;
 } _pthread_call_t;
 
 /* Macro to return the address of the thread entry of the calling thread. */

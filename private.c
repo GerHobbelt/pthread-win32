@@ -109,8 +109,9 @@ _pthread_delete_thread_entry(_pthread_threads_thread_t * entry)
 
   if (entry->thread != NULL)
     {
+      pthread_attr_destroy(&(entry->attr));
       entry->thread = NULL;
-      
+
       if (_pthread_threads_count > 0)
 	{
 	  _pthread_threads_count--;

@@ -100,13 +100,14 @@ pthread_attr_init(pthread_attr_t *attr)
 
   attr->cancelstate = PTHREAD_CANCEL_ENABLE;
   attr->canceltype = PTHREAD_CANCEL_DEFERRED;
+  attr->cancel_pending = FALSE;
   attr->detachedstate = PTHREAD_CREATE_JOINABLE;
   memset(&(attr->sigmask), 0, sizeof(sigset_t));
 
   /* Priority uses Win32 priority values. */
   int priority = THREAD_PRIORITY_NORMAL;
 
-  attr->valid = 0;
+  attr->valid = _PTHREAD_ATTR_VALID;
 
   return 0;
 }
@@ -120,7 +121,7 @@ pthread_attr_destroy(pthread_attr_t *attr)
     }
 
   /* Set the attribute object to a specific invalid value. */
-  attr->valid = _PTHREAD_ATTR_INVALID;
+  attr->valid = 0;
 
   return 0;
 }
@@ -134,7 +135,7 @@ pthread_attr_getdetachstate(const pthread_attr_t *attr,
       return EINVAL;
     }
 
-  *detachstate = attr->detached;
+  *detachstate = attr->detachedstate;
   return 0;
 }
 
@@ -153,6 +154,6 @@ pthread_attr_setdetachstate(pthread_attr_t *attr,
       return EINVAL;
     }
   
-  attr->detached = detachstate;
+  attr->detachedstate = detachstate;
   return 0;
 }
