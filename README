@@ -222,7 +222,7 @@ from the FTP site (see under "Availability" below):
 	pthreadVCE.lib
 	pthreadVSE.dll	- built with MSVC++ compiler using SEH
 	pthreadVSE.lib
-	pthreadGCE.dll	- currently a copy of pthreadVCE.dll
+	pthreadGCE.dll	- built with Mingw32 G++ (see "Known Bugs")
 	libpthreadw32.a	- derived from pthreadGCE.dll
 
 
