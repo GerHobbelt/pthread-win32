@@ -47,7 +47,7 @@ pthread_cond_init(pthread_cond_t *cv, const pthread_condattr_t *attr)
   cv->waiters_count = 0;
 
   /* Initialize the "mutex". FIXME: Check attributes arg. */
-  pthread_mutex_init(cv->waiters_count_lock, NULL);
+  pthread_mutex_init(&cv->waiters_count_lock, NULL);
 
   /* Create an auto-reset event. */
   cv->events[SIGNAL] = CreateEvent (NULL,     /* no security */
@@ -198,5 +198,5 @@ pthread_cond_destroy(pthread_cond_t *cv)
 	return EINVAL;
     }
 
-  return pthread_mutex_destroy(cv->waiters_count_lock);
+  return pthread_mutex_destroy(&cv->waiters_count_lock);
 }
