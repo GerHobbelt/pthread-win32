@@ -41,10 +41,10 @@
 static void
 ptw32_once_init_routine_cleanup(void * arg)
 {
-  int oldCancelState;
   pthread_once_t * once_control = (pthread_once_t *) arg;
 
-  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->done, (LONG)PTW32_ONCE_CANCELLED);
+  (void) pthread_mutex_lock(&ptw32_once_control.mtx);
+  once_control->done = PTW32_ONCE_CANCELLED;
   (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->started, -1L);
   /*
    * Wake everyone up.
@@ -52,7 +52,6 @@ ptw32_once_init_routine_cleanup(void * arg)
    * Holding the mutex during the broadcast prevents threads being left
    * behind waiting.
    */
-  (void) pthread_mutex_lock(&ptw32_once_control.mtx);
   (void) pthread_cond_broadcast(&ptw32_once_control.cond);
   (void) pthread_mutex_unlock(&ptw32_once_control.mtx);
 }
@@ -93,7 +92,6 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	 */
 {
   int result;
-  int oldCancelState;
 
   if (once_control == NULL || init_routine == NULL)
     {
@@ -122,13 +120,15 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
    * a change in the ABI, maintaining backwards compatibility.
    */
 
-  while (!InterlockedExchangeAdd((LPLONG)&once_control->done, 0L) /* Full mem barrier read */
-	 & PTW32_ONCE_DONE)
+  while (!(InterlockedExchangeAdd((LPLONG)&once_control->done, 0L) /* Full mem barrier read */
+	   & PTW32_ONCE_DONE))
     {
       if (PTW32_INTERLOCKED_EXCHANGE((LPLONG) &once_control->started, 0L) == -1)
 	{
 	  /* In case the previous initter was cancelled, reset cancelled state */
-	  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->done, (LONG)PTW32_ONCE_CLEAR);
+	  (void) pthread_mutex_lock(&ptw32_once_control.mtx);
+	  once_control->done = PTW32_ONCE_CLEAR;
+	  (void) pthread_mutex_unlock(&ptw32_once_control.mtx);
 
 #ifdef _MSC_VER
 #pragma inline_depth(0)
@@ -147,12 +147,14 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	   * behind waiting.
 	   */
 	  (void) pthread_mutex_lock(&ptw32_once_control.mtx);
-	  once_control->done = PTW32_TRUE;
+	  once_control->done = PTW32_ONCE_DONE;
 	  (void) pthread_cond_broadcast(&ptw32_once_control.cond);
 	  (void) pthread_mutex_unlock(&ptw32_once_control.mtx);
 	}
       else
 	{
+	  int oldCancelState;
+
 	  pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldCancelState);
 	  (void) pthread_mutex_lock(&ptw32_once_control.mtx);
 	  while (!once_control->done)
