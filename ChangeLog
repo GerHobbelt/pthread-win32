@@ -1,5 +1,7 @@
 1999-08-12  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* private.c (_pthread_threadStart): ei[] only declared if _MSC_VER.
+
 	* exit.c (pthread_exit): Check for implicitly created threads
 	to avoid raising an unhandled exception.
 	

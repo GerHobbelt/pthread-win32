@@ -1,3 +1,7 @@
+Wed Aug 12 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* Makefile (LIBS): Add -L.
+
 Mon May 31 10:25:01 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* Makefile (GLANG): Add GCC language option.
