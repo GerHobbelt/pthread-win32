@@ -47,11 +47,13 @@
 #include <sys/timeb.h>
 
 static pthread_cond_t cv;
+static pthread_cond_t cv1;
 static pthread_mutex_t mutex;
 static struct timespec abstime = { 0, 0 };
 static int timedout = 0;
 static int signaled = 0;
 static int awoken = 0;
+static int waiting = 0;
 
 enum {
   NUMTHREADS = 60
@@ -63,6 +65,9 @@ mythread(void * arg)
   int result;
 
   assert(pthread_mutex_lock(&mutex) == 0);
+
+  if ( ++waiting == NUMTHREADS)
+    assert(pthread_cond_signal(&cv1) == 0);
 
   result = pthread_cond_timedwait(&cv, &mutex, &abstime);
   if (result == ETIMEDOUT)
@@ -91,6 +96,7 @@ main()
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   assert(pthread_cond_init(&cv, NULL) == 0);
+  assert(pthread_cond_init(&cv1, NULL) == 0);
 
   assert(pthread_mutex_init(&mutex, NULL) == 0);
 
@@ -109,6 +115,10 @@ main()
       assert(pthread_create(&t[i], NULL, mythread, (void *) i) == 0);
     }
 
+  do {
+    assert(pthread_cond_wait(&cv1,&mutex) == 0);
+  } while ( NUMTHREADS != waiting );
+
   assert(pthread_mutex_unlock(&mutex) == 0);
 
   for (i = NUMTHREADS/3; i <= 2*NUMTHREADS/3; i++)
@@ -120,8 +130,12 @@ main()
   for (i = 1; i <= NUMTHREADS; i++)
     {
       assert(pthread_join(t[i], (void **) &result) == 0);
-	assert(result == i);
+        assert(result == i);
     }
+
+      fprintf(stderr, "awk = %d\n", awoken);
+      fprintf(stderr, "sig = %d\n", signaled);
+      fprintf(stderr, "tot = %d\n", timedout);
 
   assert(signaled == awoken);
   assert(timedout == NUMTHREADS - signaled);
@@ -131,11 +145,11 @@ main()
   if (result != 0)
     {
       fprintf(stderr, "Result = %s\n", error_string[result]);
-	fprintf(stderr, "\tWaitersBlocked = %ld\n", cv->nWaitersBlocked);
-	fprintf(stderr, "\tWaitersUnblocked = %ld\n", cv->nWaitersUnblocked);
-	fprintf(stderr, "\tWaitersGone = %ld\n", cv->nWaitersGone);
-	fprintf(stderr, "\tWaitersToUnblock = %ld\n", cv->nWaitersToUnblock);
-	fflush(stderr);
+        fprintf(stderr, "\tWaitersBlocked = %ld\n", cv->nWaitersBlocked);
+        fprintf(stderr, "\tWaitersUnblocked = %ld\n", cv->nWaitersUnblocked);
+        fprintf(stderr, "\tWaitersGone = %ld\n", cv->nWaitersGone);
+        fprintf(stderr, "\tWaitersToUnblock = %ld\n", cv->nWaitersToUnblock);
+        fflush(stderr);
     }
   assert(result == 0);
   }

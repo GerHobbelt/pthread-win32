@@ -1,10 +1,10 @@
 /*
- * benchtest1.c
+ * benchtest4.c
  *
  * Measure time taken to complete an elementary operation.
  *
  * - Mutex
- *   Single thread iteration over lock/unlock for each mutex type.
+ *   Single thread iteration over trylock/unlock for each mutex type.
  */
 
 #include "test.h"
@@ -20,6 +20,7 @@
 #define ITERATIONS      10000000L
 
 pthread_mutex_t mx;
+old_mutex_t ox;
 pthread_mutexattr_t ma;
 struct _timeb currSysTimeStart;
 struct _timeb currSysTimeStop;
@@ -41,19 +42,25 @@ long overHeadMilliSecs = 0;
 
 
 void
+oldRunTest (char * testNameString, int mType)
+{
+}
+
+
+void
 runTest (char * testNameString, int mType)
 {
 #ifdef PTW32_MUTEX_TYPES
-  assert(pthread_mutexattr_settype(&ma, mType) == 0);
+  pthread_mutexattr_settype(&ma, mType);
 #endif
-  assert(pthread_mutex_init(&mx, &ma) == 0);
+  pthread_mutex_init(&mx, &ma);
 
   TESTSTART
-  assert(pthread_mutex_lock(&mx) == 0);
-  assert(pthread_mutex_unlock(&mx) == 0);
+  (void) pthread_mutex_trylock(&mx);
+  (void) pthread_mutex_unlock(&mx);
   TESTSTOP
 
-  assert(pthread_mutex_destroy(&mx) == 0);
+  pthread_mutex_destroy(&mx);
 
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
 
@@ -67,14 +74,11 @@ runTest (char * testNameString, int mType)
 int
 main (int argc, char *argv[])
 {
-  CRITICAL_SECTION cs;
-  old_mutex_t ox;
-
   pthread_mutexattr_init(&ma);
 
   printf( "========================================================================\n");
-  printf( "\nNon-blocking mutex lock plus unlock.\n%ld iterations\n\n",
-          ITERATIONS);
+  printf( "Non-blocking mutex trylock plus unlock.\n");
+  printf( "%ld iterations.\n\n", ITERATIONS);
   printf( "%-40s %15s %15s\n",
 	    "Test",
 	    "Total(msec)",
@@ -86,61 +90,32 @@ main (int argc, char *argv[])
    */
 
   TESTSTART
-  assert(1 == 1);
-  assert(1 == 1);
   TESTSTOP
 
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
   overHeadMilliSecs = durationMilliSecs;
 
-
-  InitializeCriticalSection(&cs);
-
-  TESTSTART
-  assert((EnterCriticalSection(&cs), 1) == 1);
-  assert((LeaveCriticalSection(&cs), 1) == 1);
-  TESTSTOP
-
-  DeleteCriticalSection(&cs);
-
-  durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
-
-  printf( "%-40s %15ld %15.3f\n",
-	    "Simple Critical Section",
-          durationMilliSecs,
-          (float) durationMilliSecs * 1E3 / ITERATIONS);
-
-
   old_mutex_use = OLD_WIN32CS;
   assert(old_mutex_init(&ox, NULL) == 0);
-
   TESTSTART
-  assert(old_mutex_lock(&ox) == 0);
-  assert(old_mutex_unlock(&ox) == 0);
+  (void) old_mutex_trylock(&ox);
+  (void) old_mutex_unlock(&ox);
   TESTSTOP
-
   assert(old_mutex_destroy(&ox) == 0);
-
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
-
   printf( "%-40s %15ld %15.3f\n",
 	    "PT Mutex using a Critical Section (WNT)",
           durationMilliSecs,
           (float) durationMilliSecs * 1E3 / ITERATIONS);
 
-
   old_mutex_use = OLD_WIN32MUTEX;
   assert(old_mutex_init(&ox, NULL) == 0);
-
   TESTSTART
-  assert(old_mutex_lock(&ox) == 0);
-  assert(old_mutex_unlock(&ox) == 0);
+  (void) old_mutex_trylock(&ox);
+  (void) old_mutex_unlock(&ox);
   TESTSTOP
-
   assert(old_mutex_destroy(&ox) == 0);
-
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
-
   printf( "%-40s %15ld %15.3f\n",
 	    "PT Mutex using a Win32 Mutex (W9x)",
           durationMilliSecs,

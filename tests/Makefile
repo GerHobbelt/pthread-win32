@@ -48,7 +48,8 @@ PASSES= loadfree.pass \
 	  self2.pass  \
 	  cancel1.pass  cancel2.pass  \
 	  eyal1.pass  \
-	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar4.pass  condvar5.pass  condvar6.pass  \
+	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  \
+	  condvar4.pass  condvar5.pass  condvar6.pass  \
 	  condvar7.pass  condvar8.pass  condvar9.pass  \
 	  errno1.pass  \
 	  rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  rwlock5.pass  rwlock6.pass  rwlock7.pass  \
@@ -56,14 +57,19 @@ PASSES= loadfree.pass \
 	  cancel3.pass  cancel4.pass  cancel5.pass  \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  priority1.pass priority2.pass inherit1.pass  \
-	  exception1.pass  exception2.pass  \
-	  benchtest1.pass benchtest2.pass exception3.pass  \
+	  exception1.pass  exception2.pass  exception3.pass
+
+BENCHRESULTS = \
+	  benchtest1.pass benchtest2.pass
 
 all:
 	@ $(ECHO) Run one of the following command lines:
 	@ $(ECHO) nmake clean VCE   (to test using MSVC dll with C++ exception handling)
 	@ $(ECHO) nmake clean VSE   (to test using MSVC dll with structured exception handling)
 	@ $(ECHO) nmake clean VC    (to test using MSVC dll with C cleanup code)
+	@ $(ECHO) nmake clean VCE-bench   (to benchtest using MSVC dll with C++ exception handling)
+	@ $(ECHO) nmake clean VSE-bench   (to benchtest using MSVC dll with structured exception handling)
+	@ $(ECHO) nmake clean VC-bench    (to benchtest using MSVC dll with C cleanup code)
 
 auto:
 	@ nmake clean VCE
@@ -73,11 +79,20 @@ auto:
 tests: $(CPLIB) $(CPDLL) $(CPHDR) $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
+benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(BENCHRESULTS)
+	@ $(ECHO) ALL BENCH TESTS DONE.
+
 $(PASSES): $*.exe
 	@ $(ECHO) ... Running $(TEST) test: $*.exe
 	@ .\$*.exe
 	@ $(ECHO) ...... Passed
 	@ $(TOUCH) $*.pass
+
+$(BENCHRESULTS): $*.exe
+	@ $(ECHO) ... Running $(TEST) benchtest: $*.exe
+	@ .\$*.exe
+	@ $(ECHO) ...... Done
+	@ $(TOUCH) $*.bench
 
 VCE:
 	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
@@ -87,6 +102,15 @@ VSE:
 
 VC:
 	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
+
+VCE-bench:
+	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" benchtests
+
+VSE-bench:
+	@ nmake TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" benchtests
+
+VC-bench:
+	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" benchtests
 
 .c.exe:
 	@ $(ECHO) Compiling $@
@@ -115,9 +139,11 @@ clean:
 	- $(RM) *.o
 	- $(RM) *.exe
 	- $(RM) *.pass
+	- $(RM) *.bench
 
-benchtest1.pass: mutex3.pass
-benchtest2.pass: benchtest1.pass
+benchtest1.bench:
+benchtest2.bench:
+benchtest3.bench:
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
 cancel3.pass: context1.pass
@@ -133,6 +159,7 @@ condvar2_1.pass: condvar2.pass join2.pass
 condvar3.pass: create1.pass condvar2.pass
 condvar3_1.pass: condvar3.pass join2.pass
 condvar3_2.pass: condvar3_1.pass
+condvar3_3.pass: condvar3_2.pass
 condvar4.pass: create1.pass
 condvar5.pass: condvar4.pass
 condvar6.pass: condvar5.pass
@@ -177,5 +204,3 @@ rwlock7.pass: rwlock6.pass
 self1.pass:
 self2.pass: create1.pass
 tsd1.pass: join1.pass
-
-
