@@ -1,3 +1,7 @@
+Fri May 14 12:13:18 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* attr.c (pthread_attr_setdetachstate): Fix logic bug.
+
 Wed Apr  7 14:09:52 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* errno.c (_REENTRANT || _MT): Invert condition.
