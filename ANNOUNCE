@@ -1,5 +1,5 @@
 
-                PTHREADS-WIN32 SNAPSHOT 1999-03-15
+                PTHREADS-WIN32 SNAPSHOT 1999-03-16
                 ----------------------------------
        Web Site: http://sourceware.cygnus.com/pthreads-win32/
         Coordinator: Ross Johnson <rpj@ise.canberra.edu.au>
@@ -209,11 +209,11 @@ Availability
 For the prebuilt DLL, export libs (for both MSVC and Mingw32), and
 pthread.h:
 
-ftp://sourceware.cygnus.com/pub/pthreads-win32/pthreads-dll-1999-03-15
+ftp://sourceware.cygnus.com/pub/pthreads-win32/pthreads-dll-1999-03-16
 
 Source tree:
       
-ftp://sourceware.cygnus.com/pub/pthreads-win32/pthreads-snap-1999-03-15.tar.gz
+ftp://sourceware.cygnus.com/pub/pthreads-win32/pthreads-snap-1999-03-16.tar.gz
       
 Source files are available in unpacked form at:
       
