@@ -237,8 +237,7 @@ _pthread_threadStart (ThreadParms * threadParms)
     /*
      * Run the caller's routine;
      */
-    (*start) (arg);
-    status = self->exitStatus = (void *) 0;
+    status = self->exitStatus = (*start) (arg);
   }
   catch (Pthread_exception_cancel)
     {
@@ -269,8 +268,7 @@ _pthread_threadStart (ThreadParms * threadParms)
    * Run the caller's routine; no cancelation or other exceptions will
    * be honoured.
    */
-  (*start) (arg);
-  status = (void *) 0;
+  status = (*start) (arg);
 
 #endif /* __cplusplus */
 
