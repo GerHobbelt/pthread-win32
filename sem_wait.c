@@ -45,15 +45,16 @@
 #include "semaphore.h"
 #include "implement.h"
 
-static inline void
+
+static void PTW32_CDECL
 ptw32_sem_wait_cleanup(void * sem)
 {
   sem_t s = (sem_t) sem;
 
   if (pthread_mutex_lock (&s->lock) == 0)
     {
-      s->value++;
-      ReleaseSemaphore(s->sem, 1, 0);
+      ++s->value;
+      /* Don't release the W32 sema, it should always == 0. */
       (void) pthread_mutex_unlock (&s->lock);
     }
 }
@@ -105,6 +106,12 @@ sem_wait (sem_t * sem)
 
 #else /* NEED_SEM */
 
+      /*
+       * sem_wait is a cancelation point and it's easy to test before
+       * modifying the sem value
+       */
+      pthread_testcancel();
+
       if ((result = pthread_mutex_lock (&s->lock)) == 0)
 	{
 	  int v = --s->value;
@@ -114,18 +121,18 @@ sem_wait (sem_t * sem)
 	  if (v < 0)
 	    {
 	      /* Must wait */
-	      pthread_cleanup_push(ptw32_sem_wait_cleanup, s);
+#ifdef _MSC_VER
+#pragma inline_depth(0)
+#endif
+	      pthread_cleanup_push(ptw32_sem_wait_cleanup, (void *) s);
 	      result = pthreadCancelableWait (s->sem);
-	      /*
-	       * Restore the semaphore counters if no longer waiting
-	       * and not taking the semaphore. This will occur if the
-	       * thread is cancelled while waiting, or the wake was
-	       * not the result of a post event given to us.
-	       */
-	      pthread_cleanup_pop(result);
+	      pthread_cleanup_pop(result != 0);
+#ifdef _MSC_VER
+#pragma inline_depth()
+#endif
 	    }
 	}
-     
+
 #endif /* NEED_SEM */
 
     }

@@ -1,19 +1,59 @@
-2004-10-23  Ross Johnson  <ross@localhost.localdomain>
+2004-11-02  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
-	* sem_timedwait.c (ptw32_sem_timedwait_cleanup): Release
-	Win32 semaphore.
-	sem_wait.c (ptw32_sem_wait_cleanup): Likewise.
+	* pthread_cond_wait.c (ptw32_cond_wait_cleanup): Lock CV mutex at
+	start of cleanup handler rather than at the end.
+	* implement.h (PTW32_THREAD_REUSE_EMPTY): Renamed from *_BOTTOM.
+	(ptw32_threadReuseBottom): New global variable.
+	* global.c (ptw32_threadReuseBottom): Declare new variable.
+	* ptw32_reuse.c (ptw32_reuse): Change reuse LIFO stack to LILO queue
+	to more evenly distribute use of reusable thread IDs; use renamed
+	PTW32_THREAD_REUSE_EMPTY.
+	* ptw32_processTerminate.c (ptw2_processTerminate): Use renamed
+	PTW32_THREAD_REUSE_EMPTY.
+
+2004-10-31  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* implement.h (PThreadState): Add new state value
+	'PThreadStateCancelPending'.
+	* pthread_testcancel.c (pthread_testcancel): Use new thread
+	'PThreadStateCancelPending' state as short cut to avoid entering
+	kernel space via WaitForSingleObject() call. This was obviated
+	by user space sema acquisition in sem_wait() and sem_timedwait(),
+	which are also cancelation points. A call to pthread_testcancel()
+	was required, which introduced a kernel call, effectively nullifying
+	any gains made by the user space sem acquisition checks.
+	* pthread_cancel.c (pthread_cancel): Set new thread
+	'PThreadStateCancelPending' state.
+
+2004-10-29  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* implement.h (pthread_t): Renamed to ptw32_thread_t; struct contains
+	all thread state.
+	* pthread.h (ptw32_handle_t): New general purpose struct to serve
+	as a handle for various reusable object IDs - currently only used
+	by pthread_t; contains a pointer to ptw32_thread_t (thread state)
+	and a general purpose uint for use as a reuse counter or flags etc.
+	(pthread_t): typedef'ed to ptw32_handle_t; the uint is the reuse
+	counter that allows the library to maintain unique POSIX thread IDs.
+	When the pthread struct reuse stack was introduced, threads would
+	often acquire an identical ID to a previously destroyed thread. The
+	same was true for the pre-reuse stack library, by virtue of pthread_t
+	being the address of the thread struct. The new pthread_t retains
+	the reuse stack but provides virtually unique thread IDs.
+	* sem_wait.c (ptw32_sem_wait_cleanup): New routine used for
+	cancelation cleanup.
+	* sem_timedwait.c (ptw32_sem_timedwait_cleanup): Likewise.
 
 2004-10-22  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* sem_init.c (sem_init): Introduce a 'lock' element in order to
 	replace the interlocked operations with conventional serialisation.
-	This is needed in order to be able to atomically modify the sema value
-	and perform Win32 sema release operations. Win32 semaphores are used
-	instead of events in order to support efficient multiple posting.
-	If the whole modify/release isn't atomic, a race between sem_timedwait()
-	and sem_post() could result in a release when there is no waiting
-	semaphore, which would cause too many threads to proceed.
+	This is needed in order to be able to atomically modify the sema
+	value and perform Win32 sema release operations. Win32 semaphores are
+	used instead of events in order to support efficient multiple posting.
+	If the whole modify/release isn't atomic, a race between
+	sem_timedwait() and sem_post() could result in a release when there is
+	no waiting semaphore, which would cause too many threads to proceed.
 	* sem_wait.c (sem_wait): Use new 'lock'element.
 	* sem_timedwait.c (sem_timedwait): Likewise.
 	* sem_trywait.c (sem_trywait): Likewise.
@@ -38,7 +78,17 @@
 	* sem_init.c (sem_init): New semaphore model based on the same idea
 	as mutexes, i.e. user space interlocked check to avoid 
 	unnecessarily entering kernel space. Wraps the Win32 semaphore and
-	keeps it's own counter.
+	keeps it's own counter. Although the motivation to do this has existed
+	for a long time, credit goes to Alexander Terekhov for providing
+	the logic. I have deviated slightly from AT's logic to add the waiters
+	count, which has made the code more complicated by adding cancelation
+	cleanup. This also appears to have broken the VCE (C++ EH) version of
+	the library (the same problem as previously reported - see BUGS #2),
+	only apparently not fixable using the usual workaround, nor by turning
+	all optimisation off. The GCE version works fine, so it is presumed to
+	be a bug in MSVC++ 6.0. The cancelation exception is thrown and caught
+	correctly, but the cleanup class destructor is never called. The failing
+	test is tests\semaphore4.c.
 	* sem_wait.c (sem_wait): Implemented user space check model.
 	* sem_post.c (sem_post): Likewise.
 	* sem_trywait.c (sem_trywait): Likewise.
@@ -50,7 +100,7 @@
 
 2004-10-15  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
-	* implement.h (othread_mutex_t_): Use an event in place of
+	* implement.h (pthread_mutex_t_): Use an event in place of
 	the POSIX semaphore.
 	* pthread_mutex_init.c: Create the event; remove semaphore init.
 	* pthread_mutex_destroy.c: Delete the event.

@@ -52,7 +52,11 @@ main(int argc, char * argv[])
 	 * This should always succeed unless the system has no
 	 * resources (memory) left.
 	 */
-	assert(pthread_self() != NULL);
+	pthread_t self;
+
+	self = pthread_self();
+
+	assert(self.p != NULL);
 
 	return 0;
 }

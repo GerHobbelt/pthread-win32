@@ -42,37 +42,48 @@ pthread_t
 ptw32_new (void)
 {
   pthread_t t;
+  pthread_t nil = {NULL, 0};
+  ptw32_thread_t * tp;
 
   /*
    * If there's a reusable pthread_t then use it.
    */
   t = ptw32_threadReusePop ();
 
-  if (NULL == t)
+  if (NULL != t.p)
     {
-      t = (pthread_t) calloc (1, sizeof (*t));
+      tp = (ptw32_thread_t *) t.p;
+    }
+  else
+    {
+      /* No reuse threads available */
+      tp = (ptw32_thread_t *) calloc (1, sizeof(ptw32_thread_t));
+
+      if (tp == NULL)
+	{
+	  return nil;
+	}
+
+      /* ptHandle.p needs to point to it's parent ptw32_thread_t. */
+      t.p = tp->ptHandle.p = tp;
+      t.x = tp->ptHandle.x = 0;
     }
 
-  if (t != NULL)
-    {
-      t->sched_priority = THREAD_PRIORITY_NORMAL;
-      t->detachState = PTHREAD_CREATE_JOINABLE;
-      t->cancelState = PTHREAD_CANCEL_ENABLE;
-      t->cancelType = PTHREAD_CANCEL_DEFERRED;
-      t->cancelLock = PTHREAD_MUTEX_INITIALIZER;
-      t->threadLock = PTHREAD_MUTEX_INITIALIZER;
-      t->cancelEvent = CreateEvent (0, (int) PTW32_TRUE,	/* manualReset  */
-				    (int) PTW32_FALSE,	/* setSignaled  */
-				    NULL);
+  /* Set default state. */
+  tp->sched_priority = THREAD_PRIORITY_NORMAL;
+  tp->detachState = PTHREAD_CREATE_JOINABLE;
+  tp->cancelState = PTHREAD_CANCEL_ENABLE;
+  tp->cancelType = PTHREAD_CANCEL_DEFERRED;
+  tp->cancelLock = PTHREAD_MUTEX_INITIALIZER;
+  tp->threadLock = PTHREAD_MUTEX_INITIALIZER;
+  tp->cancelEvent = CreateEvent (0, (int) PTW32_TRUE,	/* manualReset  */
+				 (int) PTW32_FALSE,	/* setSignaled  */
+				 NULL);
 
-      if (t->cancelEvent == NULL)
-	{
-	  /*
-	   * Thread ID structs are never freed.
-	   */
-	  ptw32_threadReusePush (t);
-	  t = NULL;
-	}
+  if (tp->cancelEvent == NULL)
+    {
+      ptw32_threadReusePush (tp->ptHandle);
+      return nil;
     }
 
   return t;

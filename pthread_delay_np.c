@@ -86,6 +86,7 @@ pthread_delay_np (struct timespec *interval)
   DWORD millisecs;
   DWORD status;
   pthread_t self;
+  ptw32_thread_t * sp;
 
   if (interval == NULL)
     {
@@ -124,34 +125,36 @@ pthread_delay_np (struct timespec *interval)
 #pragma enable_message (124)
 #endif
 
-  if (NULL == (self = pthread_self ()))
+  if (NULL == (self = pthread_self ()).p)
     {
       return ENOMEM;
     }
 
-  if (self->cancelState == PTHREAD_CANCEL_ENABLE)
+  sp = (ptw32_thread_t *) self.p;
+
+  if (sp->cancelState == PTHREAD_CANCEL_ENABLE)
     {
       /*
        * Async cancelation won't catch us until wait_time is up.
        * Deferred cancelation will cancel us immediately.
        */
       if (WAIT_OBJECT_0 ==
-	  (status = WaitForSingleObject (self->cancelEvent, wait_time)))
+	  (status = WaitForSingleObject (sp->cancelEvent, wait_time)))
 	{
 	  /*
 	   * Canceling!
 	   */
-	  (void) pthread_mutex_lock (&self->cancelLock);
-	  if (self->state < PThreadStateCanceling)
+	  (void) pthread_mutex_lock (&sp->cancelLock);
+	  if (sp->state < PThreadStateCanceling)
 	    {
-	      self->state = PThreadStateCanceling;
-	      self->cancelState = PTHREAD_CANCEL_DISABLE;
-	      (void) pthread_mutex_unlock (&self->cancelLock);
+	      sp->state = PThreadStateCanceling;
+	      sp->cancelState = PTHREAD_CANCEL_DISABLE;
+	      (void) pthread_mutex_unlock (&sp->cancelLock);
 
 	      ptw32_throw (PTW32_EPS_CANCEL);
 	    }
 
-	  (void) pthread_mutex_unlock (&self->cancelLock);
+	  (void) pthread_mutex_unlock (&sp->cancelLock);
 	  return ESRCH;
 	}
       else if (status != WAIT_TIMEOUT)

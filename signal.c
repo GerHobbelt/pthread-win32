@@ -101,7 +101,7 @@ pthread_sigmask (int how, sigset_t const *set, sigset_t * oset)
 {
   pthread_t thread = pthread_self ();
 
-  if (thread == NULL)
+  if (thread.p == NULL)
     {
       return ENOENT;
     }
@@ -126,7 +126,7 @@ pthread_sigmask (int how, sigset_t const *set, sigset_t * oset)
   /* Copy the old mask before modifying it. */
   if (oset != NULL)
     {
-      memcpy (oset, &(thread->sigmask), sizeof (sigset_t));
+      memcpy (oset, &(thread.p->sigmask), sizeof (sigset_t));
     }
 
   if (set != NULL)
@@ -137,7 +137,7 @@ pthread_sigmask (int how, sigset_t const *set, sigset_t * oset)
          the size of a long integer. */
 
       unsigned long *src = (unsigned long const *) set;
-      unsigned long *dest = (unsigned long *) &(thread->sigmask);
+      unsigned long *dest = (unsigned long *) &(thread.p->sigmask);
 
       switch (how)
 	{
@@ -156,7 +156,7 @@ pthread_sigmask (int how, sigset_t const *set, sigset_t * oset)
 	    }
 	case SIG_SETMASK:
 	  /* Replace the whole sigmask. */
-	  memcpy (&(thread->sigmask), set, sizeof (sigset_t));
+	  memcpy (&(thread.p->sigmask), set, sizeof (sigset_t));
 	  break;
 	}
     }

@@ -56,21 +56,25 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 {
   int result;
   pthread_t self;
+  ptw32_thread_t * sp;
   HANDLE handles[2];
   DWORD nHandles = 1;
   DWORD status;
 
   handles[0] = waitHandle;
 
-  if ((self = pthread_self ()) != NULL)
+  self = pthread_self();
+  sp = (ptw32_thread_t *) self.p;
+
+  if (sp != NULL)
     {
       /*
        * Get cancelEvent handle
        */
-      if (self->cancelState == PTHREAD_CANCEL_ENABLE)
+      if (sp->cancelState == PTHREAD_CANCEL_ENABLE)
 	{
 
-	  if ((handles[1] = self->cancelEvent) != NULL)
+	  if ((handles[1] = sp->cancelEvent) != NULL)
 	    {
 	      nHandles++;
 	    }
@@ -82,7 +86,6 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
     }
 
   status = WaitForMultipleObjects (nHandles, handles, PTW32_FALSE, timeout);
-
 
   switch (status - WAIT_OBJECT_0)
     {
@@ -105,23 +108,23 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
        */
       ResetEvent (handles[1]);
 
-      if (self != NULL)
+      if (sp != NULL)
 	{
 	  /*
 	   * Should handle POSIX and implicit POSIX threads..
 	   * Make sure we haven't been async-canceled in the meantime.
 	   */
-	  (void) pthread_mutex_lock (&self->cancelLock);
-	  if (self->state < PThreadStateCanceling)
+	  (void) pthread_mutex_lock (&sp->cancelLock);
+	  if (sp->state < PThreadStateCanceling)
 	    {
-	      self->state = PThreadStateCanceling;
-	      self->cancelState = PTHREAD_CANCEL_DISABLE;
-	      (void) pthread_mutex_unlock (&self->cancelLock);
+	      sp->state = PThreadStateCanceling;
+	      sp->cancelState = PTHREAD_CANCEL_DISABLE;
+	      (void) pthread_mutex_unlock (&sp->cancelLock);
 	      ptw32_throw (PTW32_EPS_CANCEL);
 
 	      /* Never reached */
 	    }
-	  (void) pthread_mutex_unlock (&self->cancelLock);
+	  (void) pthread_mutex_unlock (&sp->cancelLock);
 	}
 
       /* Should never get to here. */

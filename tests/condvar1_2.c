@@ -79,8 +79,8 @@
 #include "test.h"
 
 enum {
-  NUM_CV = 100,
-  NUM_LOOPS = 100
+  NUM_CV = 5,
+  NUM_LOOPS = 5
 };
 
 static pthread_cond_t cv[NUM_CV];

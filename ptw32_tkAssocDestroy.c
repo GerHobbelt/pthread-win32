@@ -56,7 +56,7 @@ ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
       */
 {
 
-  if ((assoc != NULL) && (assoc->key == NULL && assoc->thread == NULL))
+  if ((assoc != NULL) && (assoc->key == NULL && assoc->thread.p == NULL))
     {
 
       pthread_mutex_destroy (&(assoc->lock));

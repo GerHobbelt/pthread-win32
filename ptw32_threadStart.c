@@ -69,7 +69,7 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
 	 */
 	pthread_t self = pthread_self ();
 
-	(void) pthread_mutex_destroy (&self->cancelLock);
+	(void) pthread_mutex_destroy (&((ptw32_thread_t *)self.p)->cancelLock);
 	ptw32_callUserDestroyRoutines (self);
 
 	return EXCEPTION_CONTINUE_SEARCH;
@@ -109,10 +109,11 @@ static terminate_function
 void
 ptw32_terminate ()
 {
-  pthread_t
-    self = pthread_self ();
+  pthread_t self = pthread_self ();
+  ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
+
   set_terminate (ptw32_oldTerminate);
-  (void) pthread_mutex_destroy (&self->cancelLock);
+  (void) pthread_mutex_destroy (&sp->cancelLock);
   ptw32_callUserDestroyRoutines (self);
   terminate ();
 }
@@ -127,13 +128,11 @@ void
 #endif
 ptw32_threadStart (void *vthreadParms)
 {
-  ThreadParms *
-    threadParms = (ThreadParms *) vthreadParms;
-  pthread_t
-    self;
+  ThreadParms * threadParms = (ThreadParms *) vthreadParms;
+  pthread_t self;
+  ptw32_thread_t * sp;
   void *(*start) (void *);
-  void *
-    arg;
+  void * arg;
 
 #ifdef __CLEANUP_SEH
   DWORD
@@ -141,14 +140,13 @@ ptw32_threadStart (void *vthreadParms)
 #endif
 
 #ifdef __CLEANUP_C
-  int
-    setjmp_rc;
+  int setjmp_rc;
 #endif
 
-  void *
-    status = (void *) 0;
+  void * status = (void *) 0;
 
   self = threadParms->tid;
+  sp = (ptw32_thread_t *) self.p;
   start = threadParms->start;
   arg = threadParms->arg;
 
@@ -159,21 +157,21 @@ ptw32_threadStart (void *vthreadParms)
    * beginthread does not return the thread id and is running
    * before it returns us the thread handle, and so we do it here.
    */
-  self->thread = GetCurrentThreadId ();
+  sp->thread = GetCurrentThreadId ();
   /*
    * Here we're using cancelLock as a general-purpose lock
    * to make the new thread wait until the creating thread
    * has the new handle.
    */
-  if (pthread_mutex_lock (&self->cancelLock) == 0)
+  if (pthread_mutex_lock (&sp->cancelLock) == 0)
     {
-      (void) pthread_mutex_unlock (&self->cancelLock);
+      (void) pthread_mutex_unlock (&sp->cancelLock);
     }
 #endif
 
-  pthread_setspecific (ptw32_selfThreadKey, self);
+  pthread_setspecific (ptw32_selfThreadKey, sp);
 
-  self->state = PThreadStateRunning;
+  sp->state = PThreadStateRunning;
 
 #ifdef __CLEANUP_SEH
 
@@ -182,7 +180,7 @@ ptw32_threadStart (void *vthreadParms)
     /*
      * Run the caller's routine;
      */
-    status = self->exitStatus = (*start) (arg);
+    status = sp->exitStatus = (*start) (arg);
 
 #ifdef _UWIN
     if (--pthread_count <= 0)
@@ -202,7 +200,7 @@ ptw32_threadStart (void *vthreadParms)
 #endif
 	break;
       case PTW32_EPS_EXIT:
-	status = self->exitStatus;
+	status = sp->exitStatus;
 	break;
       default:
 	status = PTHREAD_CANCELED;
@@ -214,7 +212,7 @@ ptw32_threadStart (void *vthreadParms)
 
 #ifdef __CLEANUP_C
 
-  setjmp_rc = setjmp (self->start_mark);
+  setjmp_rc = setjmp (sp->start_mark);
 
   if (0 == setjmp_rc)
     {
@@ -222,9 +220,8 @@ ptw32_threadStart (void *vthreadParms)
       /*
        * Run the caller's routine;
        */
-      status = self->exitStatus = (*start) (arg);
+      status = sp->exitStatus = (*start) (arg);
     }
-
   else
     {
       switch (setjmp_rc)
@@ -233,7 +230,7 @@ ptw32_threadStart (void *vthreadParms)
 	  status = PTHREAD_CANCELED;
 	  break;
 	case PTW32_EPS_EXIT:
-	  status = self->exitStatus;
+	  status = sp->exitStatus;
 	  break;
 	default:
 	  status = PTHREAD_CANCELED;
@@ -256,7 +253,7 @@ ptw32_threadStart (void *vthreadParms)
      */
     try
     {
-      status = self->exitStatus = (*start) (arg);
+      status = sp->exitStatus = (*start) (arg);
     }
     catch (ptw32_exception &)
     {
@@ -293,14 +290,14 @@ ptw32_threadStart (void *vthreadParms)
     /*
      * Thread was canceled.
      */
-    status = self->exitStatus = PTHREAD_CANCELED;
+    status = sp->exitStatus = PTHREAD_CANCELED;
   }
   catch (ptw32_exception_exit &)
   {
     /*
      * Thread was exited via pthread_exit().
      */
-    status = self->exitStatus;
+    status = sp->exitStatus;
   }
   catch (...)
   {
@@ -309,11 +306,11 @@ ptw32_threadStart (void *vthreadParms)
      * terminate routine. We get control back within this block - cleanup
      * and release the exception out of thread scope.
      */
-    status = self->exitStatus = PTHREAD_CANCELED;
-    (void) pthread_mutex_lock (&self->cancelLock);
-    self->state = PThreadStateException;
-    (void) pthread_mutex_unlock (&self->cancelLock);
-    (void) pthread_mutex_destroy (&self->cancelLock);
+    status = sp->exitStatus = PTHREAD_CANCELED;
+    (void) pthread_mutex_lock (&sp->cancelLock);
+    sp->state = PThreadStateException;
+    (void) pthread_mutex_unlock (&sp->cancelLock);
+    (void) pthread_mutex_destroy (&sp->cancelLock);
     (void) set_terminate (ptw32_oldTerminate);
     ptw32_callUserDestroyRoutines (self);
     throw;
@@ -333,7 +330,7 @@ ptw32_threadStart (void *vthreadParms)
 #endif /* __CLEANUP_C */
 #endif /* __CLEANUP_SEH */
 
-  if (self->detachState == PTHREAD_CREATE_DETACHED)
+  if (sp->detachState == PTHREAD_CREATE_DETACHED)
     {
       /*
        * We need to cleanup the pthread now in case we have

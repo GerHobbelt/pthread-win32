@@ -119,7 +119,7 @@ main()
   int i;
   pthread_t t[NUMTHREADS + 1];
 
-  assert((t[0] = pthread_self()) != NULL);
+  assert((t[0] = pthread_self()).p != NULL);
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
@@ -167,11 +167,6 @@ main()
       int fail = 0;
       int result = 0;
 
-      /*
-       * The thread does not contain any cancelation points, so
-       * a return value of PTHREAD_CANCELED confirms that async
-       * cancelation succeeded.
-       */
       assert(pthread_join(t[i], (void **) &result) == 0);
 
       fail = (result != (int) PTHREAD_CANCELED);

@@ -27,7 +27,7 @@ routines.
 
 Prerequisites
 -------------
-MSVC or GNU C (MSys - MinGW32)
+MSVC or GNU C (MinGW32 MSys development kit)
 	To build from source.
 
 QueueUserAPCEx by Panagiotis E. Hadjidoukas
@@ -203,10 +203,10 @@ from the compiler used, and one of the following was defined accordingly:
 
 These defines determine the style of cleanup (see pthread.h) and,
 most importantly, the way that cancelation and thread exit (via
-pthread_exit) is performed (see the routine ptw32_throw() in private.c).
+pthread_exit) is performed (see the routine ptw32_throw()).
 
 In short, the exceptions versions of the library throw an exception
-when a thread is canceled or exits (via pthread_exit()), which is
+when a thread is canceled, or exits via pthread_exit(). This exception is
 caught by a handler in the thread startup routine, so that the
 the correct stack unwinding occurs regardless of where the thread
 is when it's canceled or exits via pthread_exit().
@@ -229,42 +229,21 @@ defines require the following library versions:
 	__CLEANUP_CXX	pthreadVCE.dll or pthreadGCE.dll
 	__CLEANUP_C	pthreadVC.dll or pthreadGC.dll
 
-THE POINT OF ALL THIS IS: if you have not been defining one of these
-explicitly, then the defaults as described at the top of this
-section were being used.
-
-THIS NOW CHANGES, as has been explained above, but to try to make this
-clearer here's an example:
-
-If you were building your application with MSVC++ i.e. using C++
-exceptions (rather than SEH) and not explicitly defining one of
-__CLEANUP_*, then __CLEANUP_C++ was defined for you in pthread.h.
-You should have been linking with pthreadVCE.dll, which does
-stack unwinding.
-
-If you now build your application as you had before, pthread.h will now
-set __CLEANUP_C as the default style, and you will need to link
-with pthreadVC.dll. Stack unwinding will now NOT occur when a thread
-is canceled, or the thread calls pthread_exit().
-
-Your application will now most likely behave differently to previous
-versions, and in non-obvious ways. Most likely is that locally
-instantiated objects may not be destroyed or cleaned up after a thread
-is canceled.
-
-If you want the same behaviour as before, then you must now define
-__CLEANUP_C++ explicitly using a compiler option and link with
-pthreadVCE.dll as you did before.
-
+It is recommended that you let pthread.h use it's default __CLEANUP_C
+for both library and application builds. That is, don't define any of
+the above, and then link with pthreadVC.lib (MSVC or MSVC++) and
+libpthreadGC.a (MinGW GCC or G++). The reason is explained below, but
+another reason is that the prebuilt pthreadVCE.dll is currently broken.
+Versions built with MSVC++ later than version 6 may not be broken, but I
+can't verify this yet.
 
 WHY ARE WE MAKING THE DEFAULT STYLE LESS EXCEPTION-FRIENDLY?
 Because no commercial Unix POSIX threads implementation allows you to
 choose to have stack unwinding. Therefore, providing it in pthread-win32
 as a default is dangerous. We still provide the choice but unless
 you consciously choose to do otherwise, your pthreads applications will
-now run or crash in similar ways irrespective of the threads platform
+now run or crash in similar ways irrespective of the pthreads platform
 you use. Or at least this is the hope.
-
 
 
 Building under VC++ using C++ EH, Structured EH, or just C
@@ -272,15 +251,17 @@ Building under VC++ using C++ EH, Structured EH, or just C
 
 From the source directory run one of the following:
 
-nmake clean VC	(builds the VC setjmp/longjmp version of pthreadVC.dll)
+nmake clean VC-inlined	(builds the VC setjmp/longjmp version of
+pthreadVC.dll)
 
 or:
 
-nmake clean VCE (builds the VC++ C++ EH version pthreadVCE.dll)
+nmake clean VCE-inlined (builds the VC++ C++ EH version pthreadVCE.dll)
 
 or:
 
-nmake clean VSE (builds the VC++ structured EH version pthreadVSE.dll)
+nmake clean VSE-inlined (builds the VC++ structured EH version
+pthreadVSE.dll)
 
 You can run the testsuite by changing to the "tests" directory and
 running the target corresponding to the DLL version you built:
@@ -310,11 +291,11 @@ from www.mingw32.org.)
 
 From the source directory, run
 
-make clean GC
+make clean GC-inlined
 
 or:
 
-make clean GCE
+make clean GCE-inlined
 
 You can run the testsuite by changing to the "tests" directory and
 running
@@ -334,9 +315,6 @@ make clean GCX	(tests the GC version of the library with C++ (EH)
 Building the library under Cygwin
 ---------------------------------
 
-Not tested by me although I think some people have done this.
-Not sure how successfully though.
-
 Cygwin is implementing it's own POSIX threads routines and these
 will be the ones to use if you develop using Cygwin.
 
@@ -350,7 +328,6 @@ from the FTP site (see under "Availability" below):
 	pthread.h
 	semaphore.h
 	sched.h
-	pthread.def
 	pthreadVC.dll	- built with MSVC compiler using C setjmp/longjmp
 	pthreadVC.lib
 	pthreadVCE.dll	- built with MSVC++ compiler using C++ EH
@@ -443,19 +420,7 @@ Unsubscribe by sending mail to:
 Acknowledgements
 ----------------
 
-Pthreads-win32 is based substantially on a Win32 Pthreads
-implementation contributed by John E. Bossom.
-
-Many others have contributed important new code,
-improvements and bug fixes. Thanks go to Alexander Terekhov
-and Louis Thomas for their implementation of condition variables
-(see README.CV).
-
-Thanks also to the authors of the following paper, which served as
-the first CV design, and which identifies the important issues:
-"Strategies for Implementing POSIX Condition Variables on Win32"
-- http://www.cs.wustl.edu/~schmidt/win32-cv-1.html
-
+See the ANNOUNCE file for acknowledgements.
 See the 'CONTRIBUTORS' file for the list of contributors.
 
 As much as possible, the ChangeLog file attributes

@@ -158,7 +158,7 @@ main()
   pthread_t et[NUMTHREADS];
   pthread_mutexattr_t ma;
 
-  assert((mt = pthread_self()) != NULL);
+  assert((mt = pthread_self()).p != NULL);
 
   printf("See the notes inside of exception3.c re term_funcs.\n");
 

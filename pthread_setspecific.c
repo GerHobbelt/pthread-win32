@@ -76,7 +76,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
        * thread if one wasn't explicitly created
        */
       self = pthread_self ();
-      if (self == NULL)
+      if (self.p == NULL)
 	{
 	  return ENOENT;
 	}
@@ -87,11 +87,21 @@ pthread_setspecific (pthread_key_t key, const void *value)
        * Resolve catch-22 of registering thread with selfThread
        * key
        */
-      self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
-      if (self == NULL)
-	{
-	  self = (pthread_t) value;
-	}
+      ptw32_thread_t * sp;
+
+      sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
+      if (sp == NULL)
+        {
+	  if (value == NULL)
+	    {
+	      return ENOENT;
+	    }
+          self = *((pthread_t *) value);
+        }
+      else
+        {
+	  self = sp->ptHandle;
+        }
     }
 
   result = 0;
@@ -100,8 +110,10 @@ pthread_setspecific (pthread_key_t key, const void *value)
     {
       ThreadKeyAssoc *assoc;
 
-      if (self != NULL && key->destructor != NULL && value != NULL)
+      if (self.p != NULL && key->destructor != NULL && value != NULL)
 	{
+          ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
+
 	  /*
 	   * Only require associations if we have to
 	   * call user destroy routine.
@@ -111,7 +123,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
 	   * on the association; setting assoc to NULL short
 	   * circuits the search.
 	   */
-	  assoc = (ThreadKeyAssoc *) self->keys;
+	  assoc = (ThreadKeyAssoc *) sp->keys;
 	  /*
 	   * Locate existing association
 	   */

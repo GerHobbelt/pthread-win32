@@ -46,7 +46,7 @@
  * We now use this version wherever possible so we can inline it.
  */
 
-INLINE PTW32_INTERLOCKED_LONG WINAPI
+PTW32_INTERLOCKED_LONG WINAPI
 ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 				  PTW32_INTERLOCKED_LONG value,
 				  PTW32_INTERLOCKED_LONG comparand)
@@ -159,7 +159,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
  * We now use this version wherever possible so we can inline it.
  */
 
-INLINE LONG WINAPI
+LONG WINAPI
 ptw32_InterlockedExchange (LPLONG location,
 			   LONG value)
 {

@@ -86,6 +86,7 @@ typedef struct bag_t_ bag_t;
 struct bag_t_ {
   int threadnum;
   int started;
+  int finished;
   /* Add more per-thread state variables here */
 };
 
@@ -127,8 +128,8 @@ mythread(void * arg)
   assert(pthread_mutex_lock(&cvthing.lock) == 0);
 
   /*
-   * pthread_cond_timedwait is a cancelation point and we
-   * going to cancel one deliberately.
+   * pthread_cond_timedwait is a cancelation point and we're
+   * going to cancel some threads deliberately.
    */
 #ifdef _MSC_VER
 #pragma inline_depth(0)
@@ -146,6 +147,7 @@ mythread(void * arg)
   assert(cvthing.shared > 0);
 
   awoken++;
+  bag->finished = 1;
 
   assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
@@ -164,7 +166,7 @@ main()
   struct _timeb currSysTime;
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
-  assert((t[0] = pthread_self()) != NULL);
+  assert((t[0] = pthread_self()).p != NULL);
 
   assert(cvthing.notbusy == PTHREAD_COND_INITIALIZER);
 
@@ -177,7 +179,7 @@ main()
 
   abstime.tv_sec += 5;
 
-  assert((t[0] = pthread_self()) != NULL);
+  assert((t[0] = pthread_self()).p != NULL);
 
   awoken = 0;
 
@@ -185,14 +187,15 @@ main()
        first < NUMTHREADS;
        first = last + 1, last = NUMTHREADS)
     {
+      int ct;
+
       assert(pthread_mutex_lock(&start_flag) == 0);
 
       for (i = first; i <= last; i++)
 	{
-	  threadbag[i].started = 0;
+	  threadbag[i].started = threadbag[i].finished = 0;
 	  threadbag[i].threadnum = i;
 	  assert(pthread_create(&t[i], NULL, mythread, (void *) &threadbag[i]) == 0);
-	  assert(pthread_detach(t[i]) == 0);
 	}
 
       /*
@@ -207,46 +210,47 @@ main()
        */
       Sleep(1000);
 
+      ct = (first + last) / 2;
+      assert(pthread_cancel(t[ct]) == 0);
+      canceledThreads++;
+      assert(pthread_join(t[ct], NULL) == 0);
+
       assert(pthread_mutex_lock(&cvthing.lock) == 0);
 
       cvthing.shared++;
-
-      assert(pthread_cancel(t[(first + last) / 2]) == 0);
-      canceledThreads++;
 
       assert(pthread_cond_broadcast(&cvthing.notbusy) == 0);
 
       assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
       /*
-       * Give threads time to complete.
+       * Standard check that all threads started - and wait for them to finish.
        */
-      Sleep(1000);
-    }
+      for (i = first; i <= last; i++)
+	{ 
+	  failed = !threadbag[i].started;
 
-
-  /*
-   * Standard check that all threads started.
-   */
-  for (i = 1; i <= NUMTHREADS; i++)
-    { 
-      failed = !threadbag[i].started;
-
-      if (failed)
-	{
-	  fprintf(stderr, "Thread %d: started %d\n", i, threadbag[i].started);
+          if (failed)
+	    {
+	      fprintf(stderr, "Thread %d: started %d\n", i, threadbag[i].started);
+	    }
+	  else
+	    {
+	      assert(pthread_join(t[i], NULL) == 0 || threadbag[i].finished == 0);
+//	      fprintf(stderr, "Thread %d: finished %d\n", i, threadbag[i].finished);
+	    }
 	}
     }
 
   /* 
    * Cleanup the CV.
    */
-  
+
   assert(pthread_mutex_destroy(&cvthing.lock) == 0);
 
   assert(cvthing.lock == NULL);
 
-  assert(pthread_cond_destroy(&cvthing.notbusy) == 0);
+  assert_e(pthread_cond_destroy(&cvthing.notbusy), ==, 0);
 
   assert(cvthing.notbusy == NULL);
 

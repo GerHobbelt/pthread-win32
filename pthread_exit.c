@@ -65,20 +65,20 @@ pthread_exit (void *value_ptr)
       * ------------------------------------------------------
       */
 {
-  pthread_t self;
+  ptw32_thread_t * sp;
 
   /*
    * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
    * unnecessarily.
    */
-  self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
+  sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
 #ifdef _UWIN
   if (--pthread_count <= 0)
     exit ((int) value_ptr);
 #endif
 
-  if (NULL == self)
+  if (NULL == sp)
     {
       /*
        * A POSIX thread handle was never created. I.e. this is a
@@ -97,7 +97,7 @@ pthread_exit (void *value_ptr)
       /* Never reached */
     }
 
-  self->exitStatus = value_ptr;
+  sp->exitStatus = value_ptr;
 
   ptw32_throw (PTW32_EPS_EXIT);
 

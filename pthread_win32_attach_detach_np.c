@@ -92,8 +92,6 @@ pthread_win32_process_attach_np ()
 
 #endif
 
-#ifndef TEST_ICE
-
   /*
    * Load KERNEL32 and try to get address of InterlockedCompareExchange
    */
@@ -135,12 +133,6 @@ pthread_win32_process_attach_np ()
     {
       ptw32_features |= PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE;
     }
-
-#else /* TEST_ICE */
-
-  ptw32_interlocked_compare_exchange = ptw32_InterlockedCompareExchange;
-
-#endif /* TEST_ICE */
 
   /*
    * Load QUSEREX.DLL and try to get address of QueueUserAPCEx
@@ -204,16 +196,19 @@ pthread_win32_process_detach_np ()
 {
   if (ptw32_processInitialized)
     {
-      pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
+      ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
-      /*
-       * Detached threads have their resources automatically
-       * cleaned up upon exit (others must be 'joined').
-       */
-      if (self != NULL && self->detachState == PTHREAD_CREATE_DETACHED)
+      if (sp != NULL)
 	{
-	  ptw32_threadDestroy (self);
-	  TlsSetValue (ptw32_selfThreadKey->key, NULL);
+	  /*
+	   * Detached threads have their resources automatically
+	   * cleaned up upon exit (others must be 'joined').
+	   */
+	  if (sp->detachState == PTHREAD_CREATE_DETACHED)
+	    {
+	      ptw32_threadDestroy (sp->ptHandle);
+	      TlsSetValue (ptw32_selfThreadKey->key, NULL);
+	    }
 	}
 
       /*
@@ -265,16 +260,19 @@ pthread_win32_thread_detach_np ()
        * Don't use pthread_self() - to avoid creating an implicit POSIX thread handle
        * unnecessarily.
        */
-      pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
+      ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
-      /*
-       * Detached threads have their resources automatically
-       * cleaned up upon exit (others must be 'joined').
-       */
-      if (self != NULL && self->detachState == PTHREAD_CREATE_DETACHED)
+      if (sp != NULL)
 	{
-	  ptw32_threadDestroy (self);
-	  TlsSetValue (ptw32_selfThreadKey->key, NULL);
+	  /*
+	   * Detached threads have their resources automatically
+	   * cleaned up upon exit (others must be 'joined').
+	   */
+	  if (sp->detachState == PTHREAD_CREATE_DETACHED)
+	    {
+	      ptw32_threadDestroy (sp->ptHandle);
+	      TlsSetValue (ptw32_selfThreadKey->key, NULL);
+	    }
 	}
     }
 

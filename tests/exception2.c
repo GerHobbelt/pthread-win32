@@ -129,7 +129,7 @@ main(int argc, char argv[])
       exit(0);
     }
 
-  assert((mt = pthread_self()) != NULL);
+  assert((mt = pthread_self()).p != NULL);
 
   for (i = 0; i < NUMTHREADS; i++)
     {

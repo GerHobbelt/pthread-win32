@@ -64,14 +64,9 @@ main()
 
   assert(pthread_create(&t, NULL, entry, NULL) == 0);
 
-  Sleep(2000);
+  Sleep(100);
 
-  /*
-   * Not much more we can do here but bytewise compare t with
-   * what pthread_self returned.
-   */
-  assert(t == me);
-  assert(memcmp((const void *) t, (const void *) me, sizeof t) == 0);
+  assert(pthread_equal(t, me) != 0);
 
   /* Success. */
   return 0;

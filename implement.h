@@ -38,6 +38,9 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
+#ifdef _WIN32_WINNT
+#undef _WIN32_WINNT
+#endif
 #define _WIN32_WINNT 0x400
 
 #include <windows.h>
@@ -97,6 +100,8 @@ typedef enum
   PThreadStateInitial = 0,	/* Thread not running                   */
   PThreadStateRunning,		/* Thread alive & kicking               */
   PThreadStateSuspended,	/* Thread alive but suspended           */
+  PThreadStateCancelPending,	/* Thread alive but is                  */
+  /* has cancelation pending.        */
   PThreadStateCanceling,	/* Thread alive but is                  */
   /* in the process of terminating        */
   /* due to a cancellation request        */
@@ -107,15 +112,18 @@ typedef enum
 PThreadState;
 
 
-struct pthread_t_
+typedef struct ptw32_thread_t_ ptw32_thread_t;
+
+struct ptw32_thread_t_
 {
 #ifdef _UWIN
   DWORD dummy[5];
 #endif
   DWORD thread;
-  HANDLE threadH;		/* POSIX thread is invalid if threadH == 0 */
-  pthread_t prevReuse;		/* Links threads on reuse stack */
-  PThreadState state;
+  HANDLE threadH;		/* Win32 thread handle - POSIX thread is invalid if threadH == 0 */
+  pthread_t ptHandle;		/* This thread's permanent pthread_t handle */
+  ptw32_thread_t * prevReuse;	/* Links threads on reuse stack */
+  volatile PThreadState state;
   void *exitStatus;
   void *parms;
   int ptErrno;
@@ -440,10 +448,11 @@ extern PTW32_INTERLOCKED_LONG (WINAPI *
 extern DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD);
 
 /* Thread Reuse stack bottom marker. Must not be NULL or any valid pointer to memory. */
-#define PTW32_THREAD_REUSE_BOTTOM ((pthread_t) 1)
+#define PTW32_THREAD_REUSE_EMPTY ((ptw32_thread_t *) 1)
 
 extern int ptw32_processInitialized;
-extern pthread_t ptw32_threadReuseTop;
+extern ptw32_thread_t * ptw32_threadReuseTop;
+extern ptw32_thread_t * ptw32_threadReuseBottom;
 extern pthread_key_t ptw32_selfThreadKey;
 extern pthread_key_t ptw32_cleanupKey;
 extern pthread_cond_t ptw32_cond_list_head;

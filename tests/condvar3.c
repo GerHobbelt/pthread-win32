@@ -120,7 +120,7 @@ main()
   assert(pthread_attr_init(&attr) == 0);
   assert(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) == 0);
 
-  assert((t[0] = pthread_self()) != NULL);
+  assert((t[0] = pthread_self()).p != NULL);
 
   assert(pthread_cond_init(&cv, NULL) == 0);
 

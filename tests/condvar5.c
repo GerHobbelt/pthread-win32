@@ -118,7 +118,7 @@ main()
 
   cvthing.shared = 0;
 
-  assert((t[0] = pthread_self()) != NULL);
+  assert((t[0] = pthread_self()).p != NULL);
 
   assert(cvthing.notbusy == PTHREAD_COND_INITIALIZER);
 

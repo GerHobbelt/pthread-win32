@@ -109,7 +109,7 @@ Win32thread(void * arg)
   assert(bag->started == 0);
   bag->started = 1;
 
-  assert((bag->self = pthread_self()) != NULL);
+  assert((bag->self = pthread_self()).p != NULL);
   assert(pthread_kill(bag->self, 0) == 0);
 
   for (i = 0; i < 100; i++)
@@ -191,7 +191,7 @@ main()
       result = (int) PTHREAD_CANCELED;
 #endif
 
-      assert(threadbag[i].self != NULL);
+      assert(threadbag[i].self.p != NULL);
       assert(pthread_kill(threadbag[i].self, 0) == ESRCH);
 
       fail = (result != (int) PTHREAD_CANCELED);
