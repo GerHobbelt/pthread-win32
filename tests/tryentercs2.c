@@ -6,7 +6,7 @@
  */
 
 #include <windows.h>
-#include<process.h>
+#include <process.h>
 #include <stdio.h>
 
 /*
@@ -57,3 +57,4 @@ main()
 
   return(0);
 }
+
