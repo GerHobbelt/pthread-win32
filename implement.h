@@ -51,13 +51,6 @@ struct _pthread_threads_thread {
   pthread_t                   thread;
   pthread_attr_t              attr;
   _pthread_call_t             call;
-  enum {
-    _PTHREAD_CLEANUP_STACK,
-    _PTHREAD_DESTRUCTOR_STACK,
-    _PTHREAD_FORKPREPARE_STACK,
-    _PTHREAD_FORKPARENT_STACK,
-    _PTHREAD_FORKCHILD_STACK
-  };
   _pthread_handler_node_t *   cleanupstack;
   _pthread_handler_node_t *   destructorstack;
   _pthread_handler_node_t *   forkpreparestack;
@@ -68,6 +61,19 @@ struct _pthread_threads_thread {
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
+/* Generic handler push and pop routines. */
+
+void _pthread_handler_push(_pthread_handler_node_t ** stacktop,
+			   int poporder,
+			   void (*routine)(void *),
+			   void *arg);
+
+void _pthread_handler_pop(_pthread_handler_node_t ** stacktop,
+			  int execute);
+
+void _pthread_handler_pop_all(_pthread_handler_node_t ** stacktop,
+			      int execute);
 
 /* Primitives to manage threads table entries. */
 
@@ -87,6 +93,18 @@ void _pthread_vacuum(void);
 #endif /* __cplusplus */
 
 
-#endif /* _IMPLEMENT_H */
+/* Global data declared in global.c */
 
+extern pthread_mutex_t _pthread_count_mutex;
+
+extern DWORD _pthread_threads_count;
+
+extern _pthread_threads_thread_t _pthread_threads_table[];
+
+extern unsigned short _pthread_once_flag;
+
+extern pthread_mutex_t _pthread_once_lock;
+
+
+#endif /* _IMPLEMENT_H */
 

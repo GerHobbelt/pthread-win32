@@ -38,7 +38,7 @@ no.	name					status
 29	pthread_cond_timedwait			*
 30	pthread_cond_wait			*
 31	pthread_create				*
-32	pthread_detach
+32	pthread_detach				*
 33	pthread_equal				*
 34	pthread_exit				*
 35	pthread_getschedparam			*
@@ -66,5 +66,5 @@ no.	name					status
 57	pthread_setcanceltype			*	
 58	pthread_setschedparam			*
 59	pthread_setspecific			*
-60	pthread_sigmask
+60	pthread_sigmask				
 61	pthread_testcancel

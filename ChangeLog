@@ -1,3 +1,29 @@
+Fri Jul 24 03:00:25 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* attr.c (pthread_attr_destroy):  Fix merge conflicts.
+	(pthread_attr_getdetachstate):  Fix merge conflicts.
+	(pthread_attr_setdetachstate):  Fix merge conflicts.
+
+	* pthread.h:  Fix merge conflicts.
+
+	* sync.c (pthread_join): Fix merge conflicts.
+
+Fri Jul 24 00:21:21 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* sync.c (pthread_join): Add check for valid and joinable
+	thread.
+	(pthread_detach): Implement. After checking for a valid and joinable
+	thread, it's still a no-op.
+
+	* private.c (_pthread_find_thread_entry): Bug prevented returning
+	an error value in some cases.
+
+	* attr.c (pthread_attr_setdetachedstate): Implement.
+	(pthread_attr_getdetachedstate): Implement.
+
+	* implement.h: Move more hidden definitions into here from
+	pthread.h.
+
 1998-07-24  Ben Elliston  <bje@cygnus.com>
 
 	* pthread.h (PTHREAD_CREATE_JOINABLE): Define.
