@@ -36,7 +36,7 @@ TESTS	= loadfree \
 	  count1 once1 tsd1 self1 self2 cancel1 cancel2 eyal1 \
 	  condvar3 condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
-	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 \
+	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 rwlock7 \
 	  context1 cancel3 cancel4 cancel5 \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  exception1 exception2 exception3
@@ -83,6 +83,7 @@ rwlock3.pass: rwlock2.pass
 rwlock4.pass: rwlock3.pass
 rwlock5.pass: rwlock4.pass
 rwlock6.pass: rwlock5.pass
+rwlock7.pass: rwlock6.pass
 context1.pass: cancel2.pass
 cancel3.pass: context1.pass
 cancel4.pass: cancel3.pass

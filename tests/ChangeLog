@@ -1,3 +1,10 @@
+2001-02-08  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* Makefile (rwlock7): Add new test.
+	* GNUmakefile (rwlock7): Add new test.
+	* rwlock7.c: New test.
+	* rwlock6.c: Changed to test that writer has priority.
+
 2000-12-29  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* GNUmakefile: Add mutex4 test; ensure libpthreadw32.a is

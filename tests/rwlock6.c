@@ -1,4 +1,4 @@
-/* 
+/*
  * rwlock6.c
  *
  * Check that writer locks have priority.
@@ -10,7 +10,7 @@
  */
 
 #include "test.h"
- 
+
 static pthread_rwlock_t rwlock1 = PTHREAD_RWLOCK_INITIALIZER;
 
 static int bankAccount;
@@ -22,9 +22,9 @@ void * wrfunc(void * arg)
   bankAccount += 10;
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
-  return((void *) bankAccount); 
+  return ((void *) bankAccount);
 }
- 
+
 void * rdfunc(void * arg)
 {
   int ba = 0;
@@ -34,9 +34,9 @@ void * rdfunc(void * arg)
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
   ba += 10;
-  return((void *) ba); 
+  return ((void *) ba);
 }
- 
+
 int
 main()
 {
