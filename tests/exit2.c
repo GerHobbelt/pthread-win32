@@ -17,14 +17,14 @@ func(void * arg)
 int
 main(int argc, char * argv[])
 {
-	pthread_t id[2];
+	pthread_t id[4];
 	int i;
 
 	/* Create a few threads, make them say hello and then exit. */
 
 	for (i = 0; i < 4; i++)
 	{
-		pthread_create(&id, NULL, entry, (void *) i);
+		pthread_create(&id[i], NULL, entry, (void *) i);
 	}
 
 	/* Semantics should be the same as POSIX. Wait for the workers. */
