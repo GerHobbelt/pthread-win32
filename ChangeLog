@@ -1,5 +1,13 @@
 2002-02-02  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
+	Contributed by - Alexander Terekhov<TEREKHOV@de.ibm.com>
+	
+	* nonportable.c (pthread_delay_np): Make a true
+	cancelation point. Deferred cancels will interrupt the
+	wait.
+	
+2002-02-02  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
 	* cancel.c: Rearranged some code and introduced checks
 	to disable cancelation at the start of a thread's cancelation
 	run to prevent double cancelation. The main problem
