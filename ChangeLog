@@ -1,3 +1,13 @@
+2002-01-08  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* mutex.c (pthread_mutex_trylock): use
+	ptw32_interlocked_compare_exchange function pointer
+	rather than ptw32_InterlockedCompareExchange() directly
+	to retain portability to non-iX86 processors,
+	e.g. WinCE etc. The pointer will point to the native
+	OS version of InterlockedCompareExchange() if the
+	OS supports it (see ChangeLog entry of 2001-10-17).
+
 2002-01-07  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	Contributed by - Thomas Pfaff <tpfaff@gmx.net>
@@ -7,12 +17,13 @@
 	section calls.
 	(pthread_mutex_destroy): Likewise.
 	(pthread_mutex_unlock): Likewise.
-	(pthread_mutex_trylock): Likewise; recursive mutexes
-	now increment the lock count rather than return EBUSY;
-	errorcheck mutexes return EDEADLCK rather than
-	EBUSY. This behaviour is consistent with the Solaris
-	pthreads implementation.
-
+	(pthread_mutex_trylock): Likewise; uses
+	ptw32_InterlockedCompareExchange() to avoid need for
+	critical section; library is no longer i386 compatible;
+	recursive mutexes now increment the lock count rather
+	than return EBUSY; errorcheck mutexes return EDEADLCK
+	rather than EBUSY. This behaviour is consistent with the
+	Solaris pthreads implementation.
 	* implement.h (pthread_mutex_t_): Remove critical
 	section element - no longer needed.
 	
