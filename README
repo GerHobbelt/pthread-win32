@@ -1,9 +1,10 @@
 PTHREADS-WIN32
 ==============
 
-Pthreads-win32 is free software, distributed under the GNU Library
+Pthreads-win32 is free software, distributed under the GNU Lesser
 General Public License (LGPL). See the file 'COPYING.LIB' for terms
-and conditions.
+and conditions. Also see the file 'COPYING' for information
+specific to pthreads-win32, copyrights and the LGPL.
 
 
 What is it?
@@ -19,6 +20,44 @@ specification, version 2, namely mutex types.
 
 See the file "ANNOUNCE" for more information including standards
 conformance details and list of supported routines.
+
+
+Which of the several dll versions to use?
+-----------------------------------------
+or, What are all these pthread*.dll files?
+------------------------------------------
+
+Simply, you only use one of them, but you need to choose carefully.
+
+The most important choice you need to make is whether to use a
+version that uses exceptions internally, or not (there are versions
+of the library that use exceptions as part of the thread
+cancelation and exit implementation, and one that uses
+setjmp/longjmp instead).
+
+There is some contension amongst POSIX threads experts as
+to how POSIX threads cancelation and exit should work
+with languages that include exceptions and handlers, e.g.
+C++ and even C (Microsoft's Structured Exceptions).
+
+The issue is: should cancelation of a thread in a, say,
+C++ application cause object destructors and C++ exception
+handlers to be invoked as the stack unwinds during thread
+exit, or not?
+
+Your choice will depend primarily on whether your application
+is intended to be cross-platform or not, and how the POSIX threads
+implementations on the target platforms handle this issue. That is,
+you'll want consistent behaviour.
+
+If you can't choose now, it's probably best to use the
+standard C version of the library, even if your application
+is being written in C++. You will need to handle the
+potentially adverse effects of thread cancelation in your
+code, but at least you will have the best chance of
+consistency of behaviour across platforms. If you later
+decide to use an exception handling version of the library
+then you will hopefully have fewer, if any, changes to make.
 
 
 Library naming
