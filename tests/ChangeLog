@@ -1,3 +1,11 @@
+2004-09-08  Alexandre Girao  <alexgirao@gmail.com>
+
+	* cancel7.c (main): Win98 wants a valid (non-NULL) location
+	for the last arg of _beginthreadex().
+	* cancel8.c (main): Likewise.
+	* exit4.c (main): Likewise.
+	* exit5.c (main): Likewise.
+
 2004-06-21  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* mutex2r.c: New test.

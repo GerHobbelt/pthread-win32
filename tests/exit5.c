@@ -126,13 +126,14 @@ main()
   int failed = 0;
   int i;
   HANDLE h[NUMTHREADS + 1];
+  unsigned thrAddr; /* Dummy variable to pass a valid location to _beginthreadex (Win98). */
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
       threadbag[i].started = 0;
       threadbag[i].threadnum = i;
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
-      h[i] = (HANDLE) _beginthreadex(NULL, 0, Win32thread, (void *) &threadbag[i], 0, NULL);
+      h[i] = (HANDLE) _beginthreadex(NULL, 0, Win32thread, (void *) &threadbag[i], 0, &thrAddr);
 #else
       h[i] = (HANDLE) _beginthread(Win32thread, 0, (void *) &threadbag[i]);
 #endif
