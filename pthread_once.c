@@ -86,6 +86,18 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
       result = 0;
     }
 
+  /*
+   * The race condition involving once_control->done is harmless.
+   * The problem experienced in MPU environments with multibyte variables
+   * is also not a problem because the value (initially zero i.e. PTW32_FALSE)
+   * is only ever tested for non-zero. In the event of a race occuring, the
+   * worst result is that up to N-1 threads (N = number of CPUs) may enter the
+   * while loop and yield their run state unnecessarily, and this can only
+   * ever occur at most once.
+   *
+   * The alternatives are to use a condition variable (overkill?), or
+   * InterlockedCompareExchange() to test/set once_control->done.
+   */
   if (!once_control->done)
     {
       if (InterlockedIncrement (&(once_control->started)) == 0)

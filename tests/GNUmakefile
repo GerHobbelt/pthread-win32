@@ -94,7 +94,7 @@ TESTS	= sizes loadfree \
 	  spin1 spin2 spin3 spin4 \
 	  barrier1 barrier2 barrier3 barrier4 barrier5 \
 	  exception1 exception2 exception3 \
-	  cancel9
+	  cancel9 create3
 
 BENCHTESTS = \
 	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
@@ -180,6 +180,7 @@ context1.pass: cancel2.pass
 count1.pass: join1.pass
 create1.pass: mutex2.pass
 create2.pass: create1.pass
+create3.pass:
 delay1.pass: cancel2.pass
 delay2.pass: delay1.pass
 equal1.pass: create1.pass

@@ -73,26 +73,10 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
     }
   else
     {
-      BOOL switchCancelState;
-      int oldCancelState;
-      pthread_t self = pthread_self ();
-
       /*
-       * This routine is not a cancelation point, so temporarily
-       * prevent sem_wait() from being one.
-       * PTHREAD_CANCEL_ASYNCHRONOUS threads can still be canceled.
+       * Use the non-cancelable version of sem_wait().
        */
-      switchCancelState = (self->cancelType == PTHREAD_CANCEL_DEFERRED &&
-			   0 ==
-			   pthread_setcancelstate (PTHREAD_CANCEL_DISABLE,
-						   &oldCancelState));
-
-      result = sem_wait (&(b->semBarrierBreeched[step]));
-
-      if (switchCancelState)
-	{
-	  (void) pthread_setcancelstate (oldCancelState, NULL);
-	}
+      result = ptw32_semwait (&(b->semBarrierBreeched[step]));
     }
 
   /*

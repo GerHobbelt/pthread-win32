@@ -6,6 +6,10 @@
 	* exit4.c (main): Likewise.
 	* exit5.c (main): Likewise.
 
+2004-08-26  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* create3.c: New test.
+
 2004-06-21  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* mutex2r.c: New test.

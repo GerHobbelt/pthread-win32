@@ -49,7 +49,10 @@ pthread_create (pthread_t * tid,
       * ------------------------------------------------------
       * DOCPUBLIC
       *      This function creates a thread running the start function,
-      *      passing it the parameter value, 'arg'.
+      *      passing it the parameter value, 'arg'. The 'attr'
+      *      argument specifies optional creation attributes.
+      *      The identity of the new thread is returned
+      *      via 'tid', which should not be NULL.
       *
       * PARAMETERS
       *      tid
@@ -69,8 +72,8 @@ pthread_create (pthread_t * tid,
       *      This function creates a thread running the start function,
       *      passing it the parameter value, 'arg'. The 'attr'
       *      argument specifies optional creation attributes.
-      *      The thread is identity of the new thread is returned
-      *      as 'tid'
+      *      The identity of the new thread is returned
+      *      via 'tid', which should not be the NULL pointer.
       *
       * RESULTS
       *              0               successfully created thread,
@@ -81,12 +84,30 @@ pthread_create (pthread_t * tid,
       */
 {
   pthread_t thread;
+  register pthread_attr_t a;
   HANDLE threadH = 0;
   int result = EAGAIN;
   int run = PTW32_TRUE;
   ThreadParms *parms = NULL;
   long stackSize;
   int priority;
+
+  /*
+   * Before doing anything, check that tid can be stored through
+   * without invoking a memory protection error (segfault).
+   * Make sure that the assignment below can't be optimised out by the compiler.
+   * This is assured by conditionally assigning *tid again at the end.
+   */
+  *tid = NULL;
+
+  if (attr != NULL)
+    {
+      a = *attr;
+    }
+  else
+    {
+      a = NULL;
+    }
 
   if ((thread = ptw32_new ()) == NULL)
     {
@@ -104,15 +125,15 @@ pthread_create (pthread_t * tid,
   parms->start = start;
   parms->arg = arg;
 
-  if (attr != NULL && *attr != NULL)
+  if (a != NULL)
     {
-      stackSize = (*attr)->stacksize;
-      thread->detachState = (*attr)->detachstate;
-      priority = (*attr)->param.sched_priority;
+      stackSize = a->stacksize;
+      thread->detachState = a->detachstate;
+      priority = a->param.sched_priority;
 
 #if HAVE_SIGSET_T
 
-      thread->sigmask = (*attr)->sigmask;
+      thread->sigmask = a->sigmask;
 
 #endif /* HAVE_SIGSET_T */
 
@@ -133,7 +154,7 @@ pthread_create (pthread_t * tid,
        * an 'attr' arg to pthread_create() is equivalent to defaulting to
        * PTHREAD_EXPLICIT_SCHED and priority THREAD_PRIORITY_NORMAL.
        */
-      if (PTHREAD_INHERIT_SCHED == (*attr)->inheritsched)
+      if (PTHREAD_INHERIT_SCHED == a->inheritsched)
 	{
 	  /*
 	   * If the thread that called pthread_create() is a Win32 thread
@@ -181,7 +202,7 @@ pthread_create (pthread_t * tid,
 
   if (threadH != 0)
     {
-      if (attr != NULL && *attr != NULL)
+      if (a != NULL)
 	{
 	  (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
 	}
@@ -222,7 +243,7 @@ pthread_create (pthread_t * tid,
 	  SuspendThread (threadH);
 	}
 
-      if (attr != NULL && *attr != NULL)
+      if (a != NULL)
 	{
 	  (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
 	}
@@ -256,7 +277,10 @@ FAIL0:
 	  free (parms);
 	}
     }
-  *tid = thread;
+  else
+    {
+      *tid = thread;
+    }
 
 #ifdef _UWIN
   if (result == 0)
