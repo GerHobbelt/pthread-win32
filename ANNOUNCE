@@ -1,5 +1,5 @@
 
-                 PTHREADS-WIN32 SNAPSHOT 2000-12-29
+                 PTHREADS-WIN32 SNAPSHOT ????-??-??
                  ----------------------------------
        Web Site: http://sources.redhat.com/pthreads-win32/
       FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -26,40 +26,21 @@ Change Summary (since the last snapshot)
 (See the ChangeLog file for details.)
 
 New:
--	New non-portable functions for use when statically linking the library
-	(see the README file):
-		pthread_delay_np
-		pthread_win32_process_attach_np
-		pthread_win32_process_detach_np
-		pthread_win32_thread_attach_np
-		pthread_win32_thread_detach_np
-	Also, the start of support within the library for statically
-	linked applications, but this has not been tested by statically
-	linking yet.
--	A fully working MinGW32 g++ compiled version of the library
-	is now supplied. To use with g++ compiled applications
-	please see the FAQ "How do I generate pthreadGCE.dll and
-	libpthreadw32.a for use with Mingw32", which you need to do
-	before compiling and linking applications as well.
--	Unhandled exceptions, whether SEH or C++, are no longer
-	silently caught and ignored but are passed out of threads for
-	the system to deal with. C++ applications can override
-	the default termination handler via set_terminate().
-	set_terminate() works fine for MinGW32 g++ but not yet with MS VC++
-	(see known bugs (2)) even though it's the same code. See
-	tests/exception3.c for an example of using set_terminate().
+-       New functions (no-ops) for source code compatibility:
+                pthread_getconcurrency
+                        (Only returns the value '0' to indicate
+                        that the system default concurrency is
+                        used)
+                pthread_setconcurrency
+                        (Accepts any value >= 0 but does not
+                        have any effect; always returns '0' or
+                        EINVAL if arg < 0)
+                pthread_attr_getscope
+                pthread_attr_setscope
+                        (Currently only return ENOSYS)
 
 Bugs fixed:
--	Pthread_mutex_unlock() now returns EPERM if the unlocking
-	thread does not currently hold the thread.
--	Args in the ctime_r macro in pthread.h are fixed.
--	Made semaphore.h independent of config.h when building
-	applications. Don't know how this went unnoticed for so long
-	- the default defines must have been correct for my test
-	environment.
-
-Some new tests have been added.
-
+-       
 
 Known bugs in this snapshot
 ---------------------------
