@@ -27,7 +27,7 @@ pthread_atfork(void (*prepare)(void),
       /* Push prepare. */
       if (_pthread_handler_push(_PTHREAD_FORKPREPARE_STACK,
 				_PTHREAD_HANDLER_POP_FIFO,
-				prepare,
+				(void (*)(void *)) prepare,
 				NULL) == ENOMEM)
 	{
 	  ret = ENOMEM;
@@ -40,7 +40,7 @@ pthread_atfork(void (*prepare)(void),
       /* Push parent. */
       if (_pthread_handler_push(_PTHREAD_FORKPARENT_STACK,
 				_PTHREAD_HANDLER_POP_LIFO,
-				parent,
+				(void (*)(void *)) parent,
 				NULL) == ENOMEM)
 	{
 	  ret = ENOMEM;
@@ -53,7 +53,7 @@ pthread_atfork(void (*prepare)(void),
       /* Push child. */
       if (_pthread_handler_push(_PTHREAD_FORKCHILD_STACK,
 				_PTHREAD_HANDLER_POP_LIFO,
-				child,
+				(void (*)(void *)) child,
 				NULL) == ENOMEM)
 	{
 	  ret = ENOMEM;

@@ -7,6 +7,9 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
+/* Use internally to initialise const ints and thread admin array sizes. */
+#define _PTHREAD_MAX_THREADS 128
+
 #define _PTHREAD_HASH_INDEX(x) (((ULONG) x) % PTHREAD_THREADS_MAX)
 
 enum {

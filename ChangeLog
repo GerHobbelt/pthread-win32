@@ -1,5 +1,34 @@
 Thu Aug  6 15:19:22 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* misc.c (pthread_once): Fix arg 1 of EnterCriticalSection()
+ 	and LeaveCriticalSection() calls to pass address-of lock.
+
+	* fork.c (pthread_atfork): Typecast (void (*)(void *)) funcptr
+	in each _pthread_handler_push() call.
+
+	* exit.c (_pthread_exit): Fix attr arg in 
+	pthread_attr_getdetachstate() call.
+
+	* private.c (_pthread_new_thread): Typecast (HANDLE) NULL.
+	(_pthread_delete_thread): Ditto.
+
+	* implement.h: (_PTHREAD_MAX_THREADS): Add define. This keeps
+	changing in an attempt to make thread administration data types
+	opaque and cleanup DLL startup.
+
+	* dll.c (PthreadsEntryPoint): 
+	(_pthread_virgins): Remove malloc() and free() calls.
+	(_pthread_reuse): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
+	* global.c (_POSIX_THREAD_THREADS_MAX): Initialise with 
+	_PTHREAD_MAX_THREADS.
+	(_pthread_virgins): Ditto.
+	(_pthread_reuse): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
 	* create.c (pthread_create): Typecast (HANDLE) NULL.
 	Typecast (unsigned (*)(void *)) start_routine.
 

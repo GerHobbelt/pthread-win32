@@ -25,12 +25,12 @@ pthread_once(pthread_once_t *once_control,
      the DLL is unloaded. */
 
   /* An atomic test-and-set of the "once" flag. */
-  EnterCriticalSection(once_control->lock);
+  EnterCriticalSection(&once_control->lock);
   if (once_control->flag == 0)
     {
       flag = once_control->flag = 1;
     }
-  LeaveCriticalSection(once_control->lock);
+  LeaveCriticalSection(&once_control->lock);
 
   if (flag)
     {
