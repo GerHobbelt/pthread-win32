@@ -31,6 +31,7 @@ condvar2::	condvar2.c
 condvar2_1::	condvar2_1.c
 condvar3_1::	condvar3_1.c
 condvar3_2::	condvar3_2.c
+condvar3_3::	condvar3_3.c
 create1.::	create1.c
 cancel1::	cancel1.c
 cancel2::	cancel2.c
@@ -75,23 +76,25 @@ cleanup0::	cleanup0.c
 cleanup1::	cleanup1.c
 cleanup2::	cleanup2.c
 cleanup3::	cleanup3.c
+priority1::     priority1.c
+priority2::     priority2.c
+inherit1::      inherit1.c
 exception1::	exception1.c
 exception2::	exception2.c
 exception3::	exception3.c
-priority1::	priority1.c
-priority2::	priority2.c
-inherit1::	inherit1.c
-benchtest1::	benchtest1.c
-benchtest2::	benchtest2.c
+benchtest1::    benchtest1.c
+benchtest2::    benchtest2.c
+benchtest3::    benchtest3.c
+benchtest4::    benchtest4.c
 
 loadfree:	:test:
-mutex5		:test: loadfree
-mutex1		:test: loadfree
-mutex2		:test: loadfree
-exit1		:test: loadfree
-condvar1	:test: loadfree
-self1		:test: loadfree
+mutex1		:test:	loadfree
+mutex2		:test:	loadfree
+exit1		:test:	loadfree
+condvar1	:test:	loadfree
+self1		:test:	loadfree
 condvar2	:test:	condvar1
+condvar2_1	:test:	condvar2
 create1 	:test:	mutex2
 cancel1		:test:	create1
 cancel2		:test:	cancel1
@@ -109,6 +112,9 @@ tsd1		:test:	join1
 self2		:test:	create1
 eyal1		:test:	tsd1
 condvar3	:test:	create1
+condvar3_1	:test:	condvar3
+condvar3_2	:test:	condvar3_1
+condvar3_3	:test:	condvar3_2
 condvar4	:test:	create1
 condvar5	:test:	condvar4
 condvar6	:test:	condvar5
@@ -130,12 +136,14 @@ cleanup0	:test:	cancel5
 cleanup1	:test:	cleanup0
 cleanup2	:test:	cleanup1
 cleanup3	:test:	cleanup2
-priority1	:test:  join1
-priority2	:test:  priority1
-inherit1	:test:  join1
+priority1       :test:  join1
+priority2       :test:  priority1
+inherit1        :test:  join1
+benchtest1      :test:  mutex3
+benchtest2      :test:  benchtest1
+benchtest3      :test:  benchtest2
+benchtest4      :test:  benchtest3
 exception1	:test:	cancel4
 exception2	:test:	exception1
-benchtest1	:test:  mutex3
-benchtest2	:test:  benchtest1
 exception3	:test:	exception2
 

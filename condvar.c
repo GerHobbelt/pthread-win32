@@ -693,7 +693,7 @@ ptw32_cond_wait_cleanup(void * args)
   pthread_cond_t cv = cleanup_args->cv;
   int * resultPtr = cleanup_args->resultPtr;
   int nSignalsWasLeft;
-  int nWaitersWasGone = 0;
+  int nWaitersWasGone = 0; /* Initialised to quell warnings. */
   int result;
 
   /*
@@ -701,17 +701,16 @@ ptw32_cond_wait_cleanup(void * args)
    * timeout on wait or thread cancellation we indicate that we are no 
    * longer waiting. The waiter is responsible for adjusting waiters 
    * (to)unblock(ed) counts (protected by unblock lock).
-   * Unblock lock/Sync.LEVEL-2 supports _timedwait and cancellation.
    */
   if ((result = pthread_mutex_lock(&(cv->mtxUnblockLock))) != 0)
     {
       *resultPtr = result;
-      goto FAIL0;
+      return;
     }
 
   if ( 0 != (nSignalsWasLeft = cv->nWaitersToUnblock) )
     {
-      if ( ! cleanup_args->signaled )
+      if ( !cleanup_args->signaled )
         {
           if ( 0 != cv->nWaitersBlocked )
             {
@@ -729,7 +728,8 @@ ptw32_cond_wait_cleanup(void * args)
               if (sem_post( &(cv->semBlockLock) ) != 0)
                 {
                   *resultPtr = errno;
-                  goto FAIL1;
+                  (void) pthread_mutex_unlock( &(cv->mtxUnblockLock) );
+                  return;
                 }
               nSignalsWasLeft = 0;
             }
@@ -744,64 +744,46 @@ ptw32_cond_wait_cleanup(void * args)
       if (sem_wait( &(cv->semBlockLock) ) != 0)
         {
           *resultPtr = errno;
-          goto FAIL1;
+          (void) pthread_mutex_unlock( &(cv->mtxUnblockLock) );
+          return;
         }
       cv->nWaitersBlocked -= cv->nWaitersGone;
       if (sem_post( &(cv->semBlockLock) ) != 0)
         {
           *resultPtr = errno;
-          goto FAIL1;
+          (void) pthread_mutex_unlock( &(cv->mtxUnblockLock) );
+          return;
         }
       cv->nWaitersGone = 0;
     }
 
-  /*
-   * No more LEVEL-2 access to waiters (to)unblock(ed) counts needed
-   */
   if ((result = pthread_mutex_unlock(&(cv->mtxUnblockLock))) != 0) 
     {
       *resultPtr = result;
-      goto FAIL0;
+      return;
     }
 
-  /*
-   * If last signal...
-   */
   if ( 1 == nSignalsWasLeft )
     {
       if ( 0 != nWaitersWasGone )
         {
           // sem_adjust( &(cv->semBlockQueue), -nWaitersWasGone );
-          while ( nWaitersWasGone-- ) {
-            if (sem_wait( &(cv->semBlockQueue)) != 0 )
-              {
-                *resultPtr = errno;
-                goto FAIL0;
-              }
-          }
+          while ( nWaitersWasGone-- ) 
+            {
+              if (sem_wait( &(cv->semBlockQueue)) != 0 )
+                {
+                  *resultPtr = errno;
+                  return;
+                }
+            }
         }
-      /*
-       * ...it means that we have end of 'atomic' signal/broadcast
-       */
       if (sem_post(&(cv->semBlockLock)) != 0)
         {
           *resultPtr = errno;
-          goto FAIL0;
+          return;
         }
     }
 
-  goto DONE;
-
- FAIL1:
-  if ((result = pthread_mutex_unlock(&(cv->mtxUnblockLock))) != 0) 
-    {
-      *resultPtr = result;
-    }
-
- FAIL0:
-  return;
-
- DONE:
   /*
    * XSH: Upon successful return, the mutex has been locked and is owned 
    * by the calling thread
@@ -845,9 +827,6 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
 
   cv = *cond;
 
-  /*
-   * Synchronize access to waiters blocked count (LEVEL-1)
-   */
   if (sem_wait(&(cv->semBlockLock)) != 0)
     {
       return errno;
@@ -855,9 +834,6 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
 
   cv->nWaitersBlocked++;
 
-  /*
-   * Thats it. Counted means waiting, no more access needed
-   */
   if (sem_post(&(cv->semBlockLock)) != 0)
     {
       return errno;
@@ -948,9 +924,8 @@ ptw32_cond_unblock (pthread_cond_t * cond,
       */
 {
   int result;
-  int result2;
   pthread_cond_t cv;
-  int nSignalsToIssue = 1;
+  int nSignalsToIssue;
 
   if (cond == NULL || *cond == NULL)
     {
@@ -968,10 +943,6 @@ ptw32_cond_unblock (pthread_cond_t * cond,
       return 0;
     }
 
-  /*
-   * Synchronize access to waiters (to)unblock(ed) counts (LEVEL-2)
-   * This sync.level supports _timedwait and cancellation
-   */
   if ((result = pthread_mutex_lock(&(cv->mtxUnblockLock))) != 0)
     {
       return result;
@@ -981,7 +952,7 @@ ptw32_cond_unblock (pthread_cond_t * cond,
     {
       if ( 0 == cv->nWaitersBlocked )
         {
-          goto FAIL1;
+          return pthread_mutex_unlock( &(cv->mtxUnblockLock) );
         }
       if (unblockAll)
         {
@@ -990,60 +961,48 @@ ptw32_cond_unblock (pthread_cond_t * cond,
         }
       else
         {
+          nSignalsToIssue = 1;
           cv->nWaitersToUnblock++;
+          cv->nWaitersBlocked--;
+        }
+    }
+  else if ( cv->nWaitersBlocked > cv->nWaitersGone ) 
+    {
+      if (sem_wait( &(cv->semBlockLock) ) != 0)
+        {
+          result = errno;
+          (void) pthread_mutex_unlock( &(cv->mtxUnblockLock) );
+          return result;
+        }
+      if ( 0 != cv->nWaitersGone )
+        {
+          cv->nWaitersBlocked -= cv->nWaitersGone;
+          cv->nWaitersGone = 0;
+        }
+      if (unblockAll)
+        {
+          nSignalsToIssue = cv->nWaitersToUnblock = cv->nWaitersBlocked;
+          cv->nWaitersBlocked = 0;
+        }
+      else
+        {
+          nSignalsToIssue = cv->nWaitersToUnblock = 1;
           cv->nWaitersBlocked--;
         }
     }
   else
     {
-      if (sem_wait( &(cv->semBlockLock) ) != 0)
+      return pthread_mutex_unlock( &(cv->mtxUnblockLock) );
+    }
+
+  if ((result = pthread_mutex_unlock( &(cv->mtxUnblockLock) )) == 0)
+    {
+      if (sem_post_multiple( &(cv->semBlockQueue), nSignalsToIssue ) != 0)
         {
           result = errno;
-          goto FAIL1;
-        }
-      if ( cv->nWaitersBlocked > cv->nWaitersGone )
-        {
-          if ( 0 != cv->nWaitersGone )
-            {
-              cv->nWaitersBlocked -= cv->nWaitersGone;
-              cv->nWaitersGone = 0;
-            }
-          if (unblockAll)
-            {
-              nSignalsToIssue = cv->nWaitersToUnblock = cv->nWaitersBlocked;
-              cv->nWaitersBlocked = 0;
-            }
-          else
-            {
-              nSignalsToIssue = cv->nWaitersToUnblock = 1;
-              cv->nWaitersBlocked--;
-            }
-        }
-      else
-        {
-          if (sem_post( &(cv->semBlockLock) ) != 0)
-            {
-              result = errno;
-              goto FAIL1;
-            }
         }
     }
 
- FAIL1:
-  if ((result2 = pthread_mutex_unlock( &(cv->mtxUnblockLock) )) != 0)
-    {
-      result = result2;
-    }
-  while (0 != nSignalsToIssue--)
-    {
-      if (sem_post( &(cv->semBlockQueue) ) != 0)
-        {
-          result = errno;
-          goto FAIL0;
-        }
-    }
-
- FAIL0:
   return result;
 
 }                               /* ptw32_cond_unblock */

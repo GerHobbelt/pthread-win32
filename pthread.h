@@ -22,17 +22,12 @@
 #if !defined( PTHREAD_H )
 #define PTHREAD_H
 
-#if !defined( PTW32_HEADER )
-#define PTW32_HEADER
-
 #ifdef _UWIN
 #   define HAVE_STRUCT_TIMESPEC 1
 #   define HAVE_SIGNAL_H        1
 #   undef HAVE_CONFIG_H
 #   pragma comment(lib, "pthread")
 #endif
-
-#endif /* PTW32_HEADER */
 
 /*
  * -------------------------------------------------------------
@@ -125,8 +120,7 @@
 
 #include <setjmp.h>
 
-#if ! defined(HAVE_STRUCT_TIMESPEC) && ! defined(PTW32_TIMESPEC)
-#define PTW32_TIMESPEC
+#ifndef HAVE_STRUCT_TIMESPEC
 struct timespec {
 	long tv_sec;
 	long tv_nsec;
@@ -162,7 +156,7 @@ struct timespec {
  * In case ETIMEDOUT hasn't been defined above somehow.
  */
 #ifndef ETIMEDOUT
-#define ETIMEDOUT 10060     /* This is the value in winsock.h. */
+#  define ETIMEDOUT 10060     /* This is the value in winsock.h. */
 #endif
 
 /*
@@ -172,7 +166,6 @@ struct timespec {
 #ifndef ENOTSUP
 #  define ENOTSUP 48
 #endif
-
 
 #ifdef __cplusplus
 extern "C"
@@ -657,7 +650,7 @@ int pthread_attr_setstacksize (pthread_attr_t * attr,
 
 int pthread_attr_getschedparam (const pthread_attr_t *attr,
                                 struct sched_param *param);
- 
+
 int pthread_attr_setschedparam (pthread_attr_t *attr,
                                 const struct sched_param *param);
 
@@ -675,7 +668,7 @@ int pthread_attr_getinheritsched(pthread_attr_t * attr,
 
 int pthread_attr_setscope (pthread_attr_t *,
                            int);
- 
+
 int pthread_attr_getscope (const pthread_attr_t *,
                            int *);
 

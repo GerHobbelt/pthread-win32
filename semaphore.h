@@ -69,36 +69,30 @@ typedef struct sem_t_ * sem_t;
 
 int sem_init (sem_t * sem,
 	      int pshared,
-	      unsigned int value
-	      );
+	      unsigned int value);
 
-int sem_destroy (sem_t * sem
-		 );
+int sem_destroy (sem_t * sem);
 
-int sem_trywait (sem_t * sem
-		 );
+int sem_trywait (sem_t * sem);
 
-int sem_wait (sem_t * sem
-	      );
+int sem_wait (sem_t * sem);
 
-int sem_post (sem_t * sem
-	      );
+int sem_post (sem_t * sem);
+
+int sem_post_multiple (sem_t * sem,
+                       int count);
 
 int sem_open (const char * name,
 	      int oflag,
 	      mode_t mode,
-            unsigned int value
-	      );
+            unsigned int value);
 
-int sem_close (sem_t * sem
-	       );
+int sem_close (sem_t * sem);
 
-int sem_unlink (const char * name
-		);
+int sem_unlink (const char * name);
 
 int sem_getvalue (sem_t * sem,
-		  int * sval
-		  );
+		  int * sval);
 
 #ifdef __cplusplus
 }                               /* End of extern "C" */

@@ -121,10 +121,10 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 
 #else /* NEED_SEM */
 
-      s->sem = CreateSemaphore (0,
-                                value,
-                                0x7FFFFFF,
-                                NULL);
+      s->sem = CreateSemaphore (NULL,        /* Always NULL */
+                                value,       /* Initial value */
+                                0x7FFFFFFFL, /* Maximum value */
+                                NULL);       /* Name */
 
       if (0 == s->sem)
 	{
@@ -461,6 +461,71 @@ sem_post (sem_t * sem)
   return 0;
 
 }				/* sem_post */
+
+
+int
+sem_post_multiple (sem_t * sem, int count )
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      This function posts multiple wakeups to a semaphore.
+      *
+      * PARAMETERS
+      *      sem
+      *              pointer to an instance of sem_t
+      *
+      *      count
+      *              counter, must be greater than or equal to zero.
+      *
+      * DESCRIPTION
+      *      This function posts multiple wakeups to a semaphore. If there
+      *      are waiting threads (or processes), n <= count are awakened;
+      *      the semaphore value is incremented by count - n.
+      *
+      * RESULTS
+      *              0               successfully posted semaphore,
+      *              -1              failed, error in errno
+      * ERRNO
+      *              EINVAL          'sem' is not a valid semaphore
+      *                              or count is less than zero.
+      *
+      * ------------------------------------------------------
+      */
+{
+  int result = 0;
+
+  if (sem == NULL || *sem == NULL || count < 0)
+    {
+      result = EINVAL;
+    }
+  else if (count == 0)
+    {
+      return 0;
+    }
+
+#ifdef NEED_SEM
+
+  else if (! ptw32_increase_semaphore (sem, count))
+
+#else /* NEED_SEM */
+
+  else if (! ReleaseSemaphore ((*sem)->sem, count, 0))
+
+#endif /* NEED_SEM */
+
+    {
+      result = EINVAL;
+    }
+
+  if (result != 0)
+    {
+      errno = result;
+      return -1;
+    }
+
+  return 0;
+
+}                               /* sem_post_multiple */
 
 
 int
