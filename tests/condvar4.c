@@ -85,9 +85,6 @@ main()
 #endif
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
-  assert(cvthing.notbusy.staticinit == 1);
-  assert(cvthing.notbusy.valid == 1);
-
   assert((t[0] = pthread_self()) != NULL);
 
   assert(pthread_mutex_lock(&cvthing.lock) == 0);

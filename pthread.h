@@ -419,9 +419,9 @@ extern "C"
   typedef struct pthread_attr_t_ *pthread_attr_t;
   typedef struct pthread_once_t_ pthread_once_t;
   typedef struct pthread_key_t_ *pthread_key_t;
-  typedef struct pthread_mutex_t_ pthread_mutex_t;
+  typedef struct pthread_mutex_t_ *pthread_mutex_t;
   typedef struct pthread_mutexattr_t_ *pthread_mutexattr_t;
-  typedef struct pthread_cond_t_ pthread_cond_t;
+  typedef struct pthread_cond_t_ *pthread_cond_t;
   typedef struct pthread_condattr_t_ *pthread_condattr_t;
 
 
@@ -567,16 +567,19 @@ struct pthread_attr_t_ {
 /*
  * ====================
  * ====================
- * Mutex
+ * Mutexes and Condition Variables
  * ====================
  * ====================
  */
 
-#define PTHREAD_MUTEX_INITIALIZER { 1, 1 /* Remaining are all 0 */ }
+enum {
+  _PTHREAD_OBJECT_INVALID = 0,  /* NULL */
+  _PTHREAD_OBJECT_AUTO_INIT
+};
+
+#define PTHREAD_MUTEX_INITIALIZER ((pthread_mutex_t) _PTHREAD_OBJECT_AUTO_INIT)
 
 struct pthread_mutex_t_ {
-  int staticinit;                     /* Needs implicit init if 1. */
-  int valid;                          /* Not destroyed if 1. */
   HANDLE mutex;
   CRITICAL_SECTION cs;
 };
@@ -596,21 +599,11 @@ struct pthread_key_t_ {
 };
 
 
-/*
- * ====================
- * ====================
- * Condition Variable
- * ====================
- * ====================
- */
-
-#define PTHREAD_COND_INITIALIZER { 1, 1 /* Remaining are all 0 */ }
+#define PTHREAD_COND_INITIALIZER ((pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
 
 typedef HANDLE _pthread_sem_t;
 
 struct pthread_cond_t_ {
-  int staticinit;                     /* Needs implicit init if 1. */
-  int valid;                          /* Not destroyed if 1. */
   long waiters;                       /* # waiting threads             */
   pthread_mutex_t waitersLock;        /* Mutex that guards access to 
 					 waiter count                  */
