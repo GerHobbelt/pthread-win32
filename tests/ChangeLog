@@ -1,3 +1,14 @@
+2000-01-06  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* cleanup1.c: New; Test cleanup handler executes (when thread is
+	canceled).
+
+	* cleanup2.c: New; Test cleanup handler executes (when thread is
+	not canceled).
+
+	* cleanup3.c: New; Test cleanup handler does not execute
+	(when thread is not canceled).
+
 2000-01-04  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* cancel4.c: New; Test cancelation does not occur in deferred
