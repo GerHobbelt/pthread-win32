@@ -1,3 +1,12 @@
+2005-04-06  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* cleanup0.c: Fix unguarded global variable accesses.
+	* cleanup1.c: Likewise.
+	* cleanup2.c: Likewise.
+	* cleanup3.c: Likewise.
+	* once2.c: Likewise.
+	* once3.c: Likewise.
+
 2005-04-01  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* GNUmakefile: Add target to test linking static link library.
