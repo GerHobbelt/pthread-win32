@@ -1,3 +1,7 @@
+Sat Feb 18 16:2s1703:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h (struct pthread_once_t_): Remove redefinition.
+
 Sat Feb 13 03:03:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* pthread.h (struct pthread_once_t_): Replaced.

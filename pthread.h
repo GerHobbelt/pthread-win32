@@ -632,12 +632,6 @@ struct pthread_condattr_t_ {
 };
 
 
-struct pthread_once_t_ {
-  unsigned short flag;
-  pthread_mutex_t lock;
-};
-
-
 /*
  * ====================
  * ====================
