@@ -47,9 +47,9 @@ CXX	= g++
 
 AR	= ar
 
-OPT	= -O3
+#OPT	= -g
 #OPT	= -O3 -DTEST_ICE
-#OPT	= -O2 -DNDEBUG -finline-functions
+OPT	= -O3 -finline-functions
 
 LFLAGS		= -lwsock32
 
@@ -62,6 +62,9 @@ CFLAGS	= $(OPT) -I. -D_WIN32_WINNT=0x400 -DHAVE_CONFIG_H -Wall
 
 ## Cygwin G++
 #CFLAGS	= $(OPT) -x $(GLANG) -fhandle-exceptions -D_WIN32_WINNT=0x400 -I. -DHAVE_CONFIG_H -Wall
+
+DLL_INLINED_OBJS	= \
+		pthread.o
 
 # Agregate modules for inlinability
 DLL_OBJS	= \
@@ -314,6 +317,7 @@ PRIVATE_SRCS	= \
 
 RWLOCK_SRCS	= \
 		ptw32_rwlock_check_need_init.c \
+		ptw32_rwlock_cancelwrwait.c \
 		pthread_rwlock_init.c \
 		pthread_rwlock_destroy.c \
 		pthread_rwlockattr_init.c \
@@ -321,7 +325,9 @@ RWLOCK_SRCS	= \
 		pthread_rwlockattr_getpshared.c \
 		pthread_rwlockattr_setpshared.c \
 		pthread_rwlock_rdlock.c \
+		pthread_rwlock_timedrdlock.c \
 		pthread_rwlock_wrlock.c \
+		pthread_rwlock_timedwrlock.c \
 		pthread_rwlock_unlock.c \
 		pthread_rwlock_tryrdlock.c \
 		pthread_rwlock_trywrlock.c
@@ -375,27 +381,38 @@ TSD_SRCS	= \
 		pthread_getspecific.c
 
 
-GC_DLL 	= pthreadGC.dll
 GCE_DLL	= pthreadGCE.dll
-
-GC_LIB	= libpthreadGC.a
 GCE_LIB	= libpthreadGCE.a
+GCE_INLINED_STAMP = pthreadGCE.stamp
 
+GC_DLL 	= pthreadGC.dll
+GC_LIB	= libpthreadGC.a
+GC_INLINED_STAMP = pthreadGC.stamp
+
+PTHREAD_DEF	= pthread.def
+
+help:
+	@ echo Run one of the following command lines:
+	@ echo make clean GCE           (to build the GNU C dll with C++ exception handling)
+	@ echo make clean GC            (to build the GNU C dll with C cleanup code)
+	@ echo make clean GCE-inlined   (to build the GNU C inlined dll with C++ exception handling)
+	@ echo make clean GC-inlined    (to build the GNU C inlined dll with C cleanup code)
 
 all:
-	@ echo Run one of the following command lines:
-	@ echo make clean GCE   (to build the GNU C dll with C++ exception handling)
-	@ echo make clean GC    (to build the GNU C dll with C cleanup code)
-
-auto:
 	@ $(MAKE) clean GCE
 	@ $(MAKE) clean GC
 
 GC:
-		$(MAKE) CLEANUP_FLAGS="$(GC_CFLAGS)" $(GC_DLL)
+		$(MAKE) CLEANUP_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_DLL)
 
 GCE:
-		$(MAKE) CLEANUP_FLAGS="$(GCE_CFLAGS)" $(GCE_DLL)
+		$(MAKE) CLEANUP_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_DLL)
+
+GC-inlined:
+		$(MAKE) CLEANUP_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_INLINED_STAMP)
+
+GCE-inlined:
+		$(MAKE) CLEANUP_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
 
 tests:
 	@ cd tests
@@ -412,19 +429,33 @@ tests:
 .c.o:;		 $(CC) -c -o $@ $(CFLAGS) $(CLEANUP_FLAGS) $<
 
 
-$(GC_DLL): $(DLL_OBJS)
-	$(CC) $(OPT) -shared -o $@ $^ $(LFLAGS)
-	dlltool -k --dllname $@ --output-lib $(GC_LIB) --def pthread.def
+$(PTHREAD_DEF): $(OBJS)
+	dlltool -z pthread.def $(DLL_INLINED_OBJS)
 
-$(GCE_DLL): $(DLL_OBJS)
-	$(CXX) $(OPT) -mthreads -shared -o $@ $^  $(LFLAGS)
-	dlltool -k --dllname $@ --output-lib $(GCE_LIB) --def pthread.def
+$(GC_DLL): $(DLL_OBJS) $(PTHREAD_DEF)
+	$(CC) $(OPT) -shared -o $(GC_DLL) $(DLL_OBJS) $(LFLAGS)
+	dlltool -k --dllname $@ --output-lib $(GC_LIB) --def $(PTHREAD_DEF)
+
+$(GCE_DLL): $(DLL_OBJS) $(PTHREAD_DEF)
+	$(CXX) $(OPT) -mthreads -shared -o $(GCE_DLL) $(DLL_OBJS) $(LFLAGS)
+	dlltool -k --dllname $@ --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
+
+$(GC_INLINED_STAMP): $(DLL_INLINED_OBJS) $(PTHREAD_DEF)
+	$(CC) $(OPT) -shared -o $(GC_DLL) $(DLL_INLINED_OBJS) $(LFLAGS)
+	dlltool -k --dllname $(GC_DLL) --output-lib $(GC_LIB) --def $(PTHREAD_DEF)
+	echo touched > $(GC_INLINED_STAMP)
+
+$(GCE_INLINED_STAMP): $(DLL_INLINED_OBJS) $(PTHREAD_DEF)
+	$(CXX) $(OPT) -mthreads -shared -o $(GCE_DLL) $(DLL_INLINED_OBJS)  $(LFLAGS)
+	dlltool -k --dllname $(GCE_DLL) --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
+	echo touched > $(GCE_INLINED_STAMP)
 
 clean:
 	-$(RM) *~
 	-$(RM) *.pre
 	-$(RM) *.o
 	-$(RM) *.exe
+	-$(RM) $(PTHREAD_DEF)
 
 realclean: clean
 	-$(RM) $(GC_LIB)

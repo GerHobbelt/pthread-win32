@@ -77,7 +77,7 @@ pthread_key_delete (pthread_key_t key)
           /*
            * Run through all Thread<-->Key associations
            * for this key.
-           * If the pthread_t still exits (ie the assoc->thread
+           * If the pthread_t still exists (ie the assoc->thread
            * is not NULL) then leave the assoc for the thread to
            * destroy.
            * Notes:
