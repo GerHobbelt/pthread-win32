@@ -87,11 +87,15 @@ pthread_attr_setstacksize(pthread_attr_t *attr,
 {
 #ifdef _POSIX_THREAD_ATTR_STACKSIZE
 
+#if PTHREAD_STACK_MIN > 0
+
   /*  Verify that the stack size is within range. */
   if (stacksize < PTHREAD_STACK_MIN)
     {
       return EINVAL;
     }
+
+#endif
 
   if (is_attr(attr) != 0)
     {
