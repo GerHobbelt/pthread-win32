@@ -35,14 +35,6 @@ typedef struct {
   size_t stacksize;
 } _pthread_attr_t;
 
-typedef struct {
-  /* Nothing needed yet. */
-} _pthread_mutexattr_t;
-
-typedef struct {
-  /* Nothing needed yet. */
-} _pthread_condattr_t;
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

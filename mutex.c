@@ -8,35 +8,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-static int
-insert_attr(pthread_mutexattr_t *attr)
-{
-  /* Add this attribute object to a list. */
-
-  /* FIXME: implement using some dynamic scheme. */
-  return 0;
-}
-
-static int
-is_attr(pthread_mutexattr_t *attr)
-{
-  /* Return 0 if present, 1 otherwise. */
-
-  /* FIXME: implement. For now, pretend the attribute is always okay, unless
-     it is NULL. */
-
-  return (attr == NULL) ? 1 : 0;
-}
-
-static int
-remove_attr(pthread_mutexattr_t *attr)
-{
-  /* Remove this attribute object from the list. */
-
-  /* FIXME: implement. */
-  return 0;
-}
-
 int
 pthread_mutex_init(pthread_mutex_t *mutex, pthread_mutex_attr_t *attr)
 {

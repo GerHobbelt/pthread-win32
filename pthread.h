@@ -27,6 +27,10 @@ typedef CRITICAL_SECTION pthread_mutex_t;
 typedef DWORD pthread_key_t;
 
 typedef struct {
+  size_t stacksize;
+} pthread_attr_t;
+
+typedef struct {
   enum { SIGNAL, BROADCAST, NUM_EVENTS };
 
   /* Signal and broadcast event HANDLEs. */
