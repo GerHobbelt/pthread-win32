@@ -1,3 +1,11 @@
+1999-10-30  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* cancel1.c: New. Test pthread_setcancelstate and
+	pthread_setcanceltype functions.
+	* eyal1.c (waste_time): Change calculation to avoid FP exception
+	on Aplhas
+	- Rich Peters <rpeters@micro-magic.com>
+
 Oct 14 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* condvar7.c: New. Test broadcast after waiting thread is canceled.

@@ -50,11 +50,15 @@ pthread_setcancelstate (int state, int *oldstate)
       *      This function atomically sets the calling thread's
       *      cancelability state to 'state' and returns the previous
       *      cancelability state at the location referenced by
-      *      'oldstate'
+      *      'oldstate'.
       *
       *      NOTES:
       *      1)      Use to disable cancellation around 'atomic' code that
       *              includes cancellation points
+      *
+      * COMPATIBILITY ADDITIONS
+      *      If 'oldstate' is NULL then the previous state is not returned
+      *      but the function still succeeds. (Solaris)
       *
       * RESULTS
       *              0               successfully set cancelability type,
@@ -71,7 +75,11 @@ pthread_setcancelstate (int state, int *oldstate)
        state == PTHREAD_CANCEL_DISABLE))
     {
 
-      *oldstate = self->cancelState;
+      if (oldstate != NULL)
+	{
+	  *oldstate = self->cancelState;
+	}
+
       self->cancelState = state;
       result = 0;
 
@@ -116,6 +124,10 @@ pthread_setcanceltype (int type, int *oldtype)
       *      1)      Use with caution; most code is not safe for use
       *              with asynchronous cancelability.
       *
+      * COMPATIBILITY ADDITIONS
+      *      If 'oldtype' is NULL then the previous type is not returned
+      *      but the function still succeeds. (Solaris)
+      *
       * RESULTS
       *              0               successfully set cancelability type,
       *              EINVAL          'type' is invalid
@@ -131,7 +143,11 @@ pthread_setcanceltype (int type, int *oldtype)
        type == PTHREAD_CANCEL_ASYNCHRONOUS))
     {
 
-      *oldtype = self->cancelType;
+      if (oldtype != NULL)
+	{
+	  *oldtype = self->cancelType;
+	}
+
       self->cancelType = type;
       result = 0;
 

@@ -1,5 +1,5 @@
 
-                 PTHREADS-WIN32 SNAPSHOT 1999-10-17
+                 PTHREADS-WIN32 SNAPSHOT 1999-??-??
                  ----------------------------------
        Web Site: http://sourceware.cygnus.com/pthreads-win32/
       FTP Site: ftp://sourceware.cygnus.com/pub/pthreads-win32
@@ -24,8 +24,17 @@ Change Summary (since the last snapshot)
 
 (See the ChangeLog file for details.)
 
-Bug fix - Cancelation of threads waiting on condition variables
-now works properly (Lorin Hochstein and Peter Slacik)
+Bugs fixed:
+-	ctime_r had incorrect argument (Erik Hensema),
+-	threads were being created with incorrect type
+	PTHREAD_CANCEL_ASYNCHRONOUS (Ross Johnson).
+
+Some compatibility improvements added, eg.
+-	pthread_setcancelstate accepts NULL pointer
+	for the previous value argument. Ditto for
+	pthread_setcanceltype. This is compatible
+	with Solaris but should not affect
+	standard applications (Erik Hensema)
 
 
 Level of standards conformance

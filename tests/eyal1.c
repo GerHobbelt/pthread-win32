@@ -96,7 +96,7 @@ waste_time (int n)
 
   for (i = n*100; i > 0; --i)
     {
-      f = sqrt (f) * f + 10000.0;
+      f = 2 * f * f / (f * f);
     }
 }
 

@@ -6,7 +6,11 @@ if %3==_ goto noprereq
 if NOT EXIST %3.pass goto needprereq
 
 :noprereq
+if EXIST %2.fail goto forcetest
 if EXIST %2.pass goto bypass
+
+:forcetest
+if EXIST %2.fail erase %2.fail
 
 REM Make sure we start with only those files we expect to need
 if exist tmp\*.* echo y | erase tmp\*.* > nul:

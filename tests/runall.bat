@@ -23,6 +23,7 @@ call runtest cl count1 join1
 call runtest cl once1 create1
 call runtest cl tsd1 join1
 call runtest cl self2 create1
+call runtest cl cancel1 self2
 call runtest cl eyal1 tsd1
 call runtest cl condvar3 create1
 call runtest cl condvar4 create1
