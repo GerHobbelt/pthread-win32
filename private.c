@@ -223,7 +223,7 @@ _pthread_threadStart (ThreadParms * threadParms)
      */
     status = (*start) (arg);
   }
-  _pthread__except (ExceptionFilter(GetExceptionInformation(), ei))
+  __except (ExceptionFilter(GetExceptionInformation(), ei))
   {
     DWORD ec = GetExceptionCode();
 
@@ -264,21 +264,21 @@ _pthread_threadStart (ThreadParms * threadParms)
      */
     status = self->exitStatus = (*start) (arg);
   }
-  _pthread_catch (Pthread_exception_cancel)
+  catch (Pthread_exception_cancel)
     {
       /*
        * Thread was cancelled.
        */
       status = self->exitStatus = PTHREAD_CANCELED;
     }
-  _pthread_catch (Pthread_exception_exit)
+  catch (Pthread_exception_exit)
     {
       /*
        * Thread was exited via pthread_exit().
        */
       status = self->exitStatus;
     }
-  _pthread_catch (...)
+  catch (...)
     {
       /*
        * A system unexpected exception had occurred running the user's
@@ -548,7 +548,7 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 			 */
 			(*(k->destructor)) (value);
 		      }
-		      _pthread__except (EXCEPTION_EXECUTE_HANDLER)
+		      __except (EXCEPTION_EXECUTE_HANDLER)
 		      {
 			/*
 			 * A system unexpected exception had occurred
@@ -567,7 +567,7 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 			 */
 			(*(k->destructor)) (value);
 		      }
-		      _pthread_catch (...)
+		      catch (...)
 		      {
 			/*
 			 * A system unexpected exception had occurred

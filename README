@@ -11,23 +11,79 @@ Mailing list
 There is a mailing list for discussing pthreads on Win32. To join, send email
 to:
 
-	pthreads-win32-subscribe@sourceware.cygnus.com
+	pthreads-win32-subscribe@sources.redhat.com
+
+Unsubscribe by sending mail to:
+
+	pthreads-win32-unsubscribe@sources.redhat.com
 
 
 Acknowledgements
 ----------------
 
 Pthreads-win32 is based substantially on a Win32 Pthreads implementation
-contributed by John E. Bossom <jebossom@cognos.com>.
+contributed by John E. Bossom <jebossom@cognos.com>. Many others
+have contributed important new code and bug fixes.
 
 See the 'CONTRIBUTORS' file for the list of contributors.
+
+
+Known bugs in this snapshot
+---------------------------
+
+1. Running the test "join1.c" with the library built with Mingw32
+and the GNUmakefile included, the test fails with a segmentation (invalid
+page access) exception. The fault appears to be in the assembler code
+emmitted by the compiler [to handle exception contexts] at the
+end of the try block in _pthread_threadStart().
+
+2. There are problems with using the libpthread32.a file derived
+from the VC++ SEH version of pthread.dll. You may have to wait until
+bug(1.) is fixed.
+
+3. I have not been able to build with VC++ using C++ EH. This is a
+maintainer problem who doesn't know how to do it. Consequently
+there may also be basic parser errors and warnings to be cleaned
+up in the code.
+
+4. Due to what is believed to be C++ compliance error in VC++,
+if your application contains catch(...) blocks in your POSIX threads
+then you will need to replace the "catch(...)" with the macro
+"PtW32Catch", eg.
+
+	#ifdef PtW32Catch
+		PtW32Catch {
+			...
+		}
+	#else
+		catch(...) {
+			...
+		}
+	#endif
+
+Otherwise neither pthreads cancelation nor pthread_exit() will work
+reliably.
 
 
 Building under Mingw32
 ----------------------
 
-pthread.dll can be build with the current development version of mingw32.
-Use the GNUmakefile with GNU make should do the right thing.
+pthread.dll can be built with the current development version of mingw32.
+Run "make" in the soruce directory (uses GNUmakefile). This builds
+pthread.dll and libpthread32.a.
+
+You can run the testsuite by changing to the "tests" directory and
+running "make clean" and then "make". See the "Known bugs" section above.
+
+
+Building under VC++ using SEH
+-----------------------------
+
+From the source directory run "nmake". This builds pthread.dll and
+pthread.lib.
+
+You can run the testsuite by changing to the "tests" directory and
+running "nmake clean" and then "nmake".
 
 
 Why you cannot build the library with Cygwin yet
@@ -68,15 +124,18 @@ put pthread.h in MINGW_ROOT\i386-mingw32\include, then use:
 Availability
 ------------
 
-The complete source code in either unbundled or tar/gzipped format
-can be found at:
-	ftp://sourceware.cygnus.com/pub/pthreads-win32
+The complete source code in either unbundled, self-extracting
+Zip file, or tar/gzipped format can be found at:
+
+	ftp://sources.redhat.com/pub/pthreads-win32
 
 The pre-built DLL, export libraries and matching pthread.h can be found at:
-	ftp://sourceware.cygnus.com/pub/pthreads-win32/dll-latest
+
+	ftp://sources.redhat.com/pub/pthreads-win32/dll-latest
 
 Home page:
-	http://sourceware.cygnus.com/pthreads-win32/
+
+	http://sources.redhat.com/pthreads-win32/
 
 ----
 Ross Johnson

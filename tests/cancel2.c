@@ -187,7 +187,7 @@ main()
       int fail = 0;
       int result = 0;
 
-      assert(pthread_join(t[i], (void *) &result) == 0);
+      assert(pthread_join(t[i], (void **) &result) == 0);
       fail = (result != (int) PTHREAD_CANCELED);
       if (fail)
 	{

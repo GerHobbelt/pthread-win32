@@ -60,8 +60,6 @@ struct bag_t_ {
 
 static bag_t threadbag[NUMTHREADS + 1];
 
-static pthread_mutex_t waitLock = PTHREAD_MUTEX_INITIALIZER;
-
 static int pop_count = 0;
 
 static void
@@ -155,7 +153,7 @@ main()
       int fail = 0;
       int result = 0;
 
-      assert(pthread_join(t[i], (void *) &result) == 0);
+      assert(pthread_join(t[i], (void **) &result) == 0);
 
       fail = (result != (int) PTHREAD_CANCELED);
 

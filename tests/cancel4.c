@@ -150,7 +150,7 @@ main()
        * a return value of PTHREAD_CANCELED indicates that async
        * cancelation occurred.
        */
-      assert(pthread_join(t[i], (void *) &result) == 0);
+      assert(pthread_join(t[i], (void **) &result) == 0);
 
       fail = (result == (int) PTHREAD_CANCELED);
 
