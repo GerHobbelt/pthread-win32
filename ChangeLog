@@ -1,3 +1,8 @@
+Wed Feb  3 10:13:48 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* sync.c (pthread_join): Check for NULL value_ptr arg;
+	check for detached threads.
+
 Tue Feb  2 18:07:43 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* implement.h: Add #include <pthread.h>.

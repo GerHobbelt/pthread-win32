@@ -72,8 +72,11 @@ pthread_join (pthread_t thread, void **value_ptr)
       *      completion.
       *
       * PARAMETERS
-      *      sem
-      *              pointer to an instance of sem_t
+      *      thread
+      *              an instance of pthread_t
+      *
+      *      value_ptr
+      *              pointer to an instance of pointer to void
       *
       *
       * DESCRIPTION
@@ -100,7 +103,10 @@ pthread_join (pthread_t thread, void **value_ptr)
   if (pthread_equal (self, thread) == 0)
     {
       result = EDEADLK;
-
+    }
+  else if (thread->detachState == PTHREAD_CREATE_DETACHED)
+    {
+      result = EINVAL;
     }
   else
     {
@@ -108,14 +114,21 @@ pthread_join (pthread_t thread, void **value_ptr)
 
       stat = WaitForSingleObject (thread->threadH, INFINITE);
 
-      if (stat != WAIT_OBJECT_0 &&
-	  !GetExitCodeThread (thread->threadH, (LPDWORD) value_ptr))
+      if (stat == WAIT_OBJECT_0)
 	{
-	  result = ESRCH;
+	  if (value_ptr != NULL
+	      && !GetExitCodeThread (thread->threadH, (LPDWORD) value_ptr))
+	    {
+	      result = ESRCH;
+	    }
+	  else
+	    {
+	      _pthread_threadDestroy (thread);
+	    }
 	}
       else
 	{
-	  _pthread_threadDestroy (thread);
+	  result = ESRCH;
 	}
     }
 
@@ -124,4 +137,6 @@ pthread_join (pthread_t thread, void **value_ptr)
 }				/* pthread_join */
 
 /* </JEB> */
+
+
 
