@@ -75,6 +75,7 @@ struct timespec {
 #define PTHREAD_CANCELED            ((void *) 1)
 
 #define PTHREAD_MUTEX_INITIALIZER {0 /* ignore internals */ }
+#define PTHREAD_ONCE_INIT { 0, PTHREAD_MUTEX_INITIALIZER }
 
 typedef struct _pthread * pthread_t;
 typedef struct {

@@ -22,17 +22,13 @@ pthread_once(pthread_once_t *once_control,
       return EINVAL;
     }
 
-  /* FIXME: we are assuming that the `cs' object is initialised at DLL
-     load time.  Likewise, the object should be destroyed when (if)
-     the DLL is unloaded. */
-
   /* An atomic test-and-set of the "once" flag. */
-  EnterCriticalSection(&once_control->lock);
+  pthread_mutex_lock(&once_control->lock);
   if (once_control->flag == 0)
     {
       flag = once_control->flag = 1;
     }
-  LeaveCriticalSection(&once_control->lock);
+  pthread_mutex_unlock(&once_control->lock);
 
   if (flag)
     {
