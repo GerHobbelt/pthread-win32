@@ -1,5 +1,8 @@
 1998-10-03  Ben Elliston  <bje@cygnus.com>
 
+	* pthread.h: No need to include <unistd.h>.  It doesn't even exist
+	on Win32! Again, an artifact of cross-compilation.	
+
 	* process.h: Remove. This was a stand-in before we started doing
 	native compilation under Win32.
 
