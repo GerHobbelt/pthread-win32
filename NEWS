@@ -28,11 +28,23 @@ New features
 * Ported to AMD64.
 - Makoto Kato  <raven at oldskool.jp>
 
-* True pre-emptive asynchronous cancelation of threads. Requires that
-Panagiotis E. Hadjidoukas's QueueUserAPCEx package be installed. This
-package is included in the pthreads-win32 self-unpacking Zip archive
-starting from this snapshot.
+* True pre-emptive asynchronous cancelation of threads. This is optional
+and requires that Panagiotis E. Hadjidoukas's QueueUserAPCEx package be
+installed. This package is included in the pthreads-win32 self-unpacking
+Zip archive starting from this snapshot. See the README.txt file inside
+the package for installation details.
 
+Note: If you don't use async cancelation in your application, or don't need
+to cancel threads that are blocked on system resources such as network I/O,
+then the default non-preemptive async cancelation is probably good enough.
+However, pthreads-win32 auto-detects the availability of these components
+at run-time, so you don't need to rebuild the library from source if you
+change your mind later.
+
+All of the advice available in books and elsewhere on the undesirability
+of using async cancelation in any application still stands, but this
+feature is a welcome addition with respect to the library's conformance to
+the POSIX standard.
 
 SNAPSHOT 2003-09-18
 -------------------
