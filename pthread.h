@@ -22,12 +22,39 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef _PTHREADS_H
 #define _PTHREADS_H
 
+#define PTHREAD_THREADS_MAX 128
+#define PTHREAD_STACK_MIN   65535
+
+/* Convert these to defined when implemented. */
+#define _POSIX_THREAD_ATTR_STACKSIZE
+#ifdef _POSIX_THREAD_ATTR_STACKADDR
+#undef _POSIX_THREAD_ATTR_STACKADDR
+#endif
+
+
+/* Cancelability attributes */
+#define PTHREAD_CANCEL_ENABLE       0x00
+#define PTHREAD_CANCEL_DISABLE      0x01
+#define PTHREAD_CANCEL_ASYNCHRONOUS 0x02
+#define PTHREAD_CANCEL_DEFERRED     0x04
+
+
 typedef HANDLE pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
 typedef DWORD pthread_key_t;
 
+
+/*                                      Related constants */
 typedef struct {
-  size_t stacksize;
+  long valid;
+#ifdef _POSIX_THREAD_ATTR_STACKSIZE
+  size_t stacksize;                  /* PTHREAD_STACK_MIN */
+#endif
+  int cancelability;                 /* PTHREAD_CANCEL_DISABLE
+					PTHREAD_CANCEL_ENABLE
+					PTHREAD_CANCEL_ASYNCHRONOUS
+					PTHREAD_CANCEL_DEFERRED
+					_PTHREAD_CANCEL_DEFAULTS */
 } pthread_attr_t;
 
 typedef struct {
@@ -174,57 +201,121 @@ void *pthread_getspecific(pthread_key_t key);
 
 int pthread_key_delete(pthread_key_t key);
 
+
+/* Internal primitives that must be here. */
+
+/* Generic handler push and pop routines. */
+
+void _pthread_handler_push(_pthread_handler_node_t ** stacktop,
+			   int poporder,
+			   void (*routine)(void *),
+			   void *arg);
+
+void _pthread_handler_pop(_pthread_handler_node_t ** stacktop,
+			  int execute);
+
+void _pthread_handler_pop_all(_pthread_handler_node_t ** stacktop,
+			      int execute);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
 
 /* The following #defines implement POSIX cleanup handlers.
    The standard requires that these functions be used as statements and
    be used pairwise in the same scope. The standard suggests that, in C, they
    may be implemented as macros starting and ending the same block.
+
+   POSIX requires that applications observe scoping requirements, but
+   doesn't say if the implemention must enforce them. The macros below
+   partially enforce scope but can lead to compile or runtime errors.
  */
+enum { _PTHREAD_HANDLER_POP_LIFO, _PTHREAD_HANDLER_POP_FIFO };
+
+#define _PTHREAD_THIS (_pthread_find_thread_entry(pthread_this()))
+
 #ifdef pthread_cleanup_push
 #undef pthread_cleanup_push
 #endif
 #define pthread_cleanup_push(routine, arg) \
 { \
-  _pthread_cleanup_push(routine, arg);
+  _pthread_handler_push(&(_PTHREAD_THIS->cleanupstack), \
+			_PTHREAD_HANDLER_POP_LIFO, routine, arg);
 
 #ifdef pthread_cleanup_pop
 #undef pthread_cleanup_pop
 #endif
 #define pthread_cleanup_pop(execute) \
-  _pthread_cleanup_pop(execute);\
+  _pthread_handler_pop(&(_PTHREAD_THIS->cleanupstack), execute);\
 }
 
 
-/* Below here goes all internal definitions required by this implementation
-   of pthreads for Win32.
- */
+/**************************************************************************
+   Below here goes all internal definitions required by this implementation
+   of pthreads that must be global to any application that uses it.
+ **************************************************************************/
+
+/* General description of a cleanup handler or destructor */
+
+typedef struct _pthread_handler_node _pthread_handler_node_t;
+
+struct _pthread_handler_node {
+  _pthread_handler_node_t next;
+  void (* routine)(void *);
+  void * arg;
+};
+
+/* Stores a thread call routine and argument. */
+typedef struct {
+  unsigned (*routine)(void *);
+  void * arg;
+} _pthread_call_t;
 
 /* An element in the thread table. */
+
 typedef struct _pthread_threads_thread _pthread_threads_thread_t;
+
 struct _pthread_threads_thread {
-   pthread_t                  thread;
-  _pthread_attr_t            *attr;
+  pthread_t                   thread;
+  pthread_attr_t              attr;
+  _pthread_call_t             call;
+  _pthread_handler_node_t *   cleanupstack;
+  _pthread_handler_node_t *   destructorstack;
+  _pthread_handler_node_t *   forkpreparestack;
+  _pthread_handler_node_t *   forkparentstack;
+  _pthread_handler_node_t *   forkchildstack;
 };
 
 /* _PTHREAD_BUILD_DLL must only be defined if we are building the DLL. */
+
 #ifndef _PTHREADS_BUILD_DLL
-/* Static global data that must be static within the application
-   but not the DLL.
+
+/* Global data needed by the application but which must not be static
+   in the DLL.
  */
 pthread_mutex_t _pthread_count_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 DWORD _pthread_threads_count = 0;
-_pthread_threads_thread_t _pthread_threads_table[PTHREAD_THREADS_MAX];
+
+_pthread_threads_thread_t * _pthread_threads_table[PTHREAD_THREADS_MAX];
+
 unsigned short _pthread_once_flag;
+
 pthread_mutex_t _pthread_once_lock = PTHREAD_MUTEX_INITIALIZER;
+
 #else
+
 extern pthread_mutex_t _pthread_count_mutex;
+
 extern DWORD _pthread_threads_count;
+
 extern _pthread_threads_thread_t _pthread_threads_table[];
+
 extern unsigned short _pthread_once_flag;
-pthread_mutex_t _pthread_once_lock;
+
+extern pthread_mutex_t _pthread_once_lock;
+
 #endif
 
 /* End of application static data */

@@ -10,58 +10,82 @@
 #include "implement.h"
 
 void
-_pthread_cleanup_push(void (*routine)(void *), void *arg)
+_pthread_handler_push(_pthread_handler_node_t ** stacktop,
+		      int poporder,
+		      void (*routine)(void *), 
+		      void *arg)
 {
-  _pthread_cleanup_node_t * next;
-  int t;
+  /* Place the new handler into the list so that handlers are
+     popped off in the order given by poporder. */
+  _pthread_handler_node_t * new;
+  _pthread_handler_node_t * next;
 
-  t = _pthread_getthreadindex(pthread_self());
+  new = (_pthread_handler_node_t *) malloc(sizeof(_pthread_handler_node_t));
 
-  next = (_pthread_cleanup_node_t *) malloc(sizeof(_pthread_cleanup_node_t));
-  if (next == NULL) {
-    /* FIXME: INTERNAL ERROR */
-  }
+  if (new == NULL)
+    {
+      /* FIXME: INTERNAL ERROR */
+    }
 
-  next->next = _pthread_threads_table[t]->cleanupstack->first;
-  next->routine = routine;
-  next->arg = arg;
-  _pthread_threads_table[t]->cleanupstack->first = next;
+  new->routine = routine;
+  new->arg = arg;
+
+  if (poporder == _PTHREAD_HANDLER_POP_LIFO)
+    {
+      /* Add the new node to the start of the list. */
+      new->next = *stacktop;
+      stacktop = next;
+    }
+  else
+    {
+      /* Add the new node to the end of the list. */
+      new->next = NULL;
+
+      if (*stacktop == NULL)
+	{
+	  *stacktop = new;
+	}
+      else
+	{
+	  next = *stacktop;
+	  while (next != NULL)
+	    {
+	      next = next->next;
+	    }
+	  next = new;
+	}
+    }
 }
 
 void
-_pthread_cleanup_pop(int execute)
+_pthread_handler_pop(_pthread_handler_node_t ** stacktop,
+		     int execute)
 {
-  _pthread_cleanup_node_t * handler;
-  void (* func)(void *);
-  void * arg;
-  int t;
+  _pthread_handler_node_t * handler = *stacktop;
 
-  t = _pthread_getthreadindex(pthread_self());
-  handler = _pthread_threads_table[t]->cleanupstack->first;
+  if (handler != NULL)
+    {
+      void (* func)(void *) = handler->routine;
+      void * arg = handler->arg;
 
-  if (handler != NULL) {
-    next = handler->next;
-    func = handler->routine;
-    arg = handler->arg;
+      *stacktop = handler->next;
 
-    free(handler);
+      free(handler);
 
-    if (execute != 0)
-      (void) func(arg);
-
-    _pthread_threads_table[t]->cleanupstack->first = next;
-  }
+      if (execute != 0 && func != NULL)
+	{
+	  (void) func(arg);
+	}
+    }
 }
 
 void
-_pthread_do_cancellation(int tindex)
+_pthread_handler_pop_all(_pthread_handler_node_t ** stacktop, 
+			 int execute)
 {
-  _pthread_cleanup_stack_t * stack;
-
-  stack = _pthread_threads_table[tindex]->cleanupstack;
-
-  /* Run all the cleanup handlers */
-  while (stack->first != NULL) {
-    _pthread_cleanup_pop(1);
-  }
+  /* Pop and run all handlers on the given stack. */
+  while (*stacktop != NULL)
+    {
+      _pthread_handler_pop(stacktop, execute);
+    }
 }

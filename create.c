@@ -11,18 +11,34 @@
 #include "pthread.h"
 #include "implement.h"
 
-int
-pthread_create(pthread_t *thread, const pthread_attr_t *attr,
-	       void * (*start_routine) (void *), void * arg)
+unsigned
+_pthread_start_call(void *this)
 {
-  /* Call Win32 CreateThread.
-     Map attributes as correctly as possible.
-     The passed in attr structure will be modified by this routine
-     to reflect any default values used. This is POSIX semantics.
-  */
+  /* We're now in a running thread. Any local variables here are on
+     this threads private stack so we're safe to leave data in them
+     until we leave. */
+  unsigned (*func)(void *) = this->call.routine;
+  void * arg = this->call.arg;
+  unsigned ret;
+
+  ret = (*func)(arg);
+
+  /* If we get to here then we're returning naturally and haven't
+     been cancelled. We need to cleanup and remove the thread
+     from the threads table. */
+  _pthread_vacuum();
+
+  return ret;
+}
+
+int
+pthread_create(pthread_t *thread, 
+	       const pthread_attr_t *attr,
+	       void * (*start_routine) (void *), 
+	       void * arg)
+{
   HANDLE   handle = NULL;
   unsigned flags;
-  unsigned stack;
   void *   security = NULL;
 
   /* FIXME: This needs to be moved into process space. 
@@ -33,109 +49,68 @@ pthread_create(pthread_t *thread, const pthread_attr_t *attr,
    */
   SECURITY_ATTRIBUTES security_attr;
   DWORD  threadID;
-  int t;
-  int ret = 0; /* Success unless otherwise set */
-  char * privmem;
+  /* Success unless otherwise set. */
+  int ret = 0;
   pthread_attr_t * attr_copy;
-  _pthread_cleanup_stack_t * cleanup_stack;
-
-  /* Use and modify attr_copy. Only after we've succeeded in creating the
-     new thread can we modify any passed-in structures.
-
-     To save time we use one malloc() to get all of our heap space and
-     then allocate it further.
-   */
-
-  if (NULL == 
-      (privmem = (char) malloc(RND_SIZEOF(pthread_attr_t) +
-			       RND_SIZEOF(_pthread_cleanup_stack_t)))) {
-    return EAGAIN;
-  }
-
-  attr_copy = (pthread_attr_t *) privmem;
-
-  /* Force cleanup_stack to start at a DWORD boundary within privmem.
-   */
-  cleanup_stack = 
-    (_pthread_cleanup_stack_t *) &privmem[RND_SIZEOF(pthread_attr_t)];
-
-  (void) memcpy(attr_copy, attr);
+  _pthread_threads_thread_t * this;
 
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_count_mutex);
 
-  if (_pthread_threads_count < PTHREAD_THREADS_MAX) {
-    switch (attr)
-      {
-      case NULL:
-	/* Use POSIX default attributes */
-	stack = attr_copy->stacksize = PTHREAD_STACK_MIN;
-	break;
-      default:
-	/* Map attributes */
-	if (attr_copy.stacksize != NULL)
-	  stack = (DWORD) attr_copy->stacksize;
-	else
-	  stack = attr_copy->stacksize = PTHREAD_STACK_MIN;
-	break;
-      }
+  if (_pthread_new_thread_entry((pthread_t) handle, &this) == 0)
+    {
+      attr_copy = &(this->attr);
 
-    flags = 1; /* Start suspended and resume at the last moment to avoid
-		  race conditions, ie. where a thread may enquire it's
-		  attributes before we finish storing them away.
-		*/
+      if (attr != NULL) 
+	{
+	  /* Map attributes */
+	  if (attr_copy->stacksize == 0)
+	    {
+	      attr_copy->stacksize = PTHREAD_STACK_MIN;
+	    }
 
-    handle = (HANDLE) _beginthreadex(security,
-				   stack,
-				   (unsigned (_stdcall *)(void *)) start_routine,
-				   arg,
-				   flags,
-				   &threadID);
+	  attr_copy->cancelability = attr->cancelability;
+	}
 
-    if (handle != NULL) {
-      _pthread_threads_count++;
+      /* Start suspended and resume at the last moment to avoid
+	 race conditions, ie. where a thread may enquire it's
+	 attributes before we finish storing them away. */
+      flags = 1;
 
-      /* The hash table works as follows:
-	 hash into the table,
-	 if the slot is occupied then start single stepping from there
-	 until we find an available slot.
-       */
-      t = _PTHREAD_HASH_INDEX(handle);
-      while ((_pthread_threads_table[t])->thread != NULL) {
-	t++;
+      handle = (HANDLE) _beginthreadex(security,
+				       attr_copy->stacksize,
+				       _pthread_start_call,
+				       (void *) this,
+				       flags,
+				       &threadID);
 
-	if (t == PTHREAD_THREADS_MAX)
-	  t = 0; /* Wrap to the top of the table. */
-      }
-
-      if ((_pthread_threads_table[t])->thread != NULL) {
-	/* INTERNAL ERROR */
-      } else {
-	(_pthread_threads_table[t])->thread = handle;
-	(_pthread_threads_table[t])->attr = attr_copy;
-	(_pthread_threads_table[t])->cleanupstack = cleanup_stack;
-      }
-    } else {
+      if (handle == NULL)
+	{
+	  ret = EAGAIN;
+	}
+    }
+  else
+    {
       ret = EAGAIN;
     }
-  } else {
-    ret = EAGAIN;
-  }
 
   /* Let others in as soon as possible. */
   pthread_mutex_unlock(&_pthread_count_mutex);
   /* END CRITICAL SECTION */
 
-  if (ret == 0) {
-    *thread = (pthread_t) handle;
-    (void) memcpy(attr, attr_copy);
+  if (ret == 0)
+    {
+      /* Let the caller know the thread handle. */
+      *thread = (pthread_t) handle;
 
-    /* POSIX threads are always running after creation.
-     */
-    ResumeThread(handle);
-  } else {
-    free(privmem);
-  }
+      /* POSIX threads are always running after creation. */
+      ResumeThread(handle);
+    }
+  else
+    {
+      /* Undo everything. */
+      _pthread_delete_thread_entry(this);
+    }
 
   return ret;
 }
