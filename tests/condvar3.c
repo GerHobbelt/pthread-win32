@@ -96,7 +96,7 @@ main()
 
   abstime.tv_sec += 5;
 
-  while (! shared > 0)
+  while (! (shared > 0))
     assert(pthread_cond_timedwait(&cv, &mutex, &abstime) == 0);
 
   assert(shared > 0);

@@ -328,7 +328,7 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
                * Thread started with pthread_create
                */
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 
               DWORD exceptionInformation[3];
 

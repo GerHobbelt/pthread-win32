@@ -93,7 +93,7 @@ mythread(void * arg)
 
   assert(pthread_mutex_lock(&cvthing.lock) == 0);
 
-  while (! cvthing.shared > 0)
+  while (! (cvthing.shared > 0))
     assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == 0);
 
   assert(cvthing.shared > 0);

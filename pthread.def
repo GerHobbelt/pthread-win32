@@ -3,7 +3,7 @@
 
 ; Currently unimplemented functions are commented out.
 
-LIBRARY pthread
+;LIBRARY pthread
 
 EXPORTS
 _pthread_processInitialize

@@ -95,7 +95,7 @@ mythread(void * arg)
 
   pthread_cleanup_push(pthread_mutex_unlock, (void *) &cvthing.lock);
 
-  while (! cvthing.shared > 0)
+  while (! (cvthing.shared > 0))
     assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == 0);
 
   pthread_cleanup_pop(0);

@@ -1,9 +1,9 @@
 /***
-*errno.h - system wide error numbers (set by system calls)
+* errno.h - system wide error numbers (set by system calls)
 *
 *       Copyright (c) 1985-1997, Microsoft Corporation. All rights reserved.
 *
-*Purpose:
+* Purpose:
 *       This file defines the system-wide error numbers (set by
 *       system calls).  Conforms to the XENIX standard.  Extended
 *       for compatibility with Uniforum standard.
@@ -62,12 +62,12 @@ extern "C" {
 
 /* declare reference to errno */
 
-#if     (defined(_MT) || defined(_DLL)) && !defined(_MAC)
+#if     (defined(_MT) || defined(_MD) || defined(_DLL)) && !defined(_MAC)
 _CRTIMP extern int * __cdecl _errno(void);
 #define errno   (*_errno())
-#else   /* ndef _MT && ndef _DLL */
+#else   /* ndef _MT && ndef _MD && ndef _DLL */
 _CRTIMP extern int errno;
-#endif  /* _MT || _DLL */
+#endif  /* _MT || _MD || _DLL */
 
 /* Error Codes */
 

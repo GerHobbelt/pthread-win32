@@ -5,6 +5,211 @@ Pthreads-win32 is free software, distributed under the GNU Library
 General Public License (LGPL). See the file 'COPYING.LIB' for terms
 and conditions.
 
+
+What is it?
+-----------
+
+Pthreads-win32 is an Open Source Software (OSS) implementation of the
+Threads component of the POSIX 1003.1c 1995 Standard for Microsoft's
+Win32 environment. Some functions from POSIX 1003.1b are also
+supported including semaphores. Other related functions include
+the set of read-write lock functions.
+
+See the file "ANNOUNCE" for more information including standards
+conformance details and list of supported routines.
+
+
+Library naming
+--------------
+
+Because the library is being built using various exception
+handling schemes and compilers - and because the library
+will not work reliably if these are mixed in an application,
+each different version of the library has it's own name.
+
+In general:
+	pthread[VG][SC]E.dll
+	pthread[VG][SC]E.lib
+
+where:
+	[VG] indicates the compiler
+	V	- MS VC++
+	G	- GNU G++
+
+	[SC] indicates the exception handling scheme
+	S	- Structured EH
+	C	- C++ EH
+
+For example:
+	pthreadVSE.dll	(VC++/SEH)
+	pthreadGCE.dll	(G++/C++ EH)
+
+The GNU library archive file name has changed to:
+
+	libpthreadw32.a	(the "32" is now "w32")
+
+
+Known bugs in this snapshot
+---------------------------
+
+1. Running the test "join1.c" with the library built with Mingw32
+and the GNUmakefile included, the test fails with a segmentation (invalid
+page access) exception. The fault appears to be in the assembler code
+emmitted by the compiler [to handle exception contexts] at the
+end of the try block in _pthread_threadStart().
+
+2. There are problems using the libpthreadw32.a stub archive derived
+from either of pthreadVSE.dll or pthreadVCE.dll. The cleanup1.c test
+fails.
+
+
+Caveats
+-------
+
+1. Due to what is believed to be C++ compliance error in VC++,
+if your application contains catch(...) blocks in your POSIX threads
+then you will need to replace the "catch(...)" with the macro
+"PtW32Catch", eg.
+
+	#ifdef PtW32Catch
+		PtW32Catch {
+			...
+		}
+	#else
+		catch(...) {
+			...
+		}
+	#endif
+
+Otherwise neither pthreads cancelation nor pthread_exit() will work
+reliably.
+
+
+Building under VC++ using either C++ EH or Structured EH
+--------------------------------------------------------
+
+From the source directory run one of the following:
+
+nmake clean VCE	(builds the VC++ C++ EH version pthreadVCE.dll)
+
+or:
+
+nmake clean VSE	(builds the VC++ structured EH version pthreadVSE.dll)
+
+You can run the testsuite by changing to the "tests" directory and
+running the target corresponding to the DLL version you built:
+
+nmake clean VCE
+
+or:
+
+nmake clean VSE
+
+
+Building under Mingw32
+----------------------
+
+pthread.dll can be built with the current development version of mingw32.
+Run "make" in the soruce directory (uses GNUmakefile). This builds
+pthreadGCE.dll and libpthreadw32.a.
+
+To generate the libpthreadw32.a file from pthreadVCE.dll rather than
+building the library with G++, run "make fake.a". (You must have
+pthreadVCE.dll already built - see above.)
+Please note that VC++ and GNU exception handling is implemented
+completely differently and so automatic cleanup of objects and
+the propagation of exceptions themselves between the two schemes is not
+going to happen.
+
+You can run the testsuite by changing to the "tests" directory and
+running "make clean" and then "make". See the "Known bugs" section above.
+
+
+Building the library under Cygwin
+---------------------------------
+
+Not tested by me although I think some people have done this.
+Not sure how successfully though.
+
+Cygwin is implementing it's own POSIX threads routines and these
+will be the ones to use if you develop using Cygwin.
+
+
+Ready to run binaries
+---------------------
+
+For convenience, the following ready-to-run files can be downloaded
+from the FTP site (see under "Availability" below):
+
+	pthread.h
+	semaphore.h
+	sched.h
+	pthread.def
+	pthreadVCE.dll	- built with MSVC++ compiler using C++ EH
+	pthreadVCE.lib
+	pthreadVSE.dll	- built with MSVC++ compiler using SEH
+	pthreadVSE.lib
+	pthreadGCE.dll	- currently a copy of pthreadVCE.dll
+	libpthreadw32.a	- derived from pthreadGCE.dll
+
+
+Building applications with the library
+--------------------------------------
+
+Use the appropriate DLL and LIB files to match the exception handing
+that you use in your application, or specifically, in your POSIX
+threads. Don't mix them or neither thread cancelation nor
+pthread_exit() will work reliably if at all.
+
+
+Building applications with GNU compilers
+----------------------------------------
+
+[Please see the section on Known Bugs above and the section
+dealing with building the library with Mingw32 before
+you build applications using the GNU compilers. Please also
+note that the pre-built pthreadGCE.dll is currently only
+a copy of the dll built by MSVC++. Note that VC++ and
+GNU exception handling is implemented completely differently
+and so automatic cleanup of objects and the propagation of
+exceptions themselves between the two schemes is not
+going to happen. You'll need to wait for the version of
+pthreadGCE.dll built be G++ itself which still has problems.]
+
+Use gcc-2.95.2 or later.
+
+With pthreadGCE.dll and libpthreadw32.a in the same directory as your
+application myapp.c, you could compile, link and run myapp.c under
+Mingw32 as follows:
+
+	gcc -x c++ -o myapp.exe myapp.c -I. -L. -lpthreadw32
+	myapp
+
+Or put pthreadGCE.dll in an appropriate directory in your PATH,
+put libpthread32.a in MINGW_ROOT\i386-mingw32\lib, and
+put pthread.h in MINGW_ROOT\i386-mingw32\include, then use:
+
+	gcc -x c++ -o myapp.exe myapp.c -lpthreadw32
+	myapp
+
+
+Availability
+------------
+
+The complete source code in either unbundled, self-extracting
+Zip file, or tar/gzipped format can be found at:
+
+	ftp://sources.redhat.com/pub/pthreads-win32
+
+The pre-built DLL, export libraries and matching pthread.h can be found at:
+
+	ftp://sources.redhat.com/pub/pthreads-win32/dll-latest
+
+Home page:
+
+	http://sources.redhat.com/pthreads-win32/
+
+
 Mailing list
 ------------
 
@@ -26,116 +231,6 @@ contributed by John E. Bossom <jebossom@cognos.com>. Many others
 have contributed important new code and bug fixes.
 
 See the 'CONTRIBUTORS' file for the list of contributors.
-
-
-Known bugs in this snapshot
----------------------------
-
-1. Running the test "join1.c" with the library built with Mingw32
-and the GNUmakefile included, the test fails with a segmentation (invalid
-page access) exception. The fault appears to be in the assembler code
-emmitted by the compiler [to handle exception contexts] at the
-end of the try block in _pthread_threadStart().
-
-2. There are problems with using the libpthread32.a file derived
-from the VC++ SEH version of pthread.dll. You may have to wait until
-bug(1.) is fixed.
-
-3. I have not been able to build with VC++ using C++ EH. This is a
-maintainer problem who doesn't know how to do it. Consequently
-there may also be basic parser errors and warnings to be cleaned
-up in the code.
-
-4. Due to what is believed to be C++ compliance error in VC++,
-if your application contains catch(...) blocks in your POSIX threads
-then you will need to replace the "catch(...)" with the macro
-"PtW32Catch", eg.
-
-	#ifdef PtW32Catch
-		PtW32Catch {
-			...
-		}
-	#else
-		catch(...) {
-			...
-		}
-	#endif
-
-Otherwise neither pthreads cancelation nor pthread_exit() will work
-reliably.
-
-
-Building under Mingw32
-----------------------
-
-pthread.dll can be built with the current development version of mingw32.
-Run "make" in the soruce directory (uses GNUmakefile). This builds
-pthread.dll and libpthread32.a.
-
-You can run the testsuite by changing to the "tests" directory and
-running "make clean" and then "make". See the "Known bugs" section above.
-
-
-Building under VC++ using SEH
------------------------------
-
-From the source directory run "nmake". This builds pthread.dll and
-pthread.lib.
-
-You can run the testsuite by changing to the "tests" directory and
-running "nmake clean" and then "nmake".
-
-
-Why you cannot build the library with Cygwin yet
-------------------------------------------------
-
-The DLL pthread.dll still cannot be built using g++ due to non thread-safe
-exception handling in g++.  Thanks to Kevin Ruland for researching this
-one. See the FAQ Question 2 for more information.
-
-However, you can use the export library libpthread32.a built under
-Mingw32 (not tested under Cygwin) together with the pthread.dll built
-with MSVC. Thanks to Anders Norlander for pointing this out.
-
-For convenience, the following pre-built files can be downloaded from
-the FTP site (see under "Availability" below):
-
-	pthread.h
-	semaphore.h
-	sched.h
-	pthread.dll	- built with MSVC cl compiler
-	pthread.lib	- built with MSVC cl compiler
-	libpthread32.a	- built with Mingw32 (use with MSVC pthread.dll)
-
-With these files in the same directory as your application myapp.c,
-you could compile, link and run myapp.c under Mingw32 as follows:
-
-	gcc -o myapp.exe myapp.c -I. -L. -lpthread32
-	myapp
-
-Or put pthread.dll in an appropriate directory in your PATH,
-put libpthread32.a in MINGW_ROOT\i386-mingw32\lib, and
-put pthread.h in MINGW_ROOT\i386-mingw32\include, then use:
-
-	gcc -o myapp.exe myapp.c -lpthread32
-	myapp
-
-
-Availability
-------------
-
-The complete source code in either unbundled, self-extracting
-Zip file, or tar/gzipped format can be found at:
-
-	ftp://sources.redhat.com/pub/pthreads-win32
-
-The pre-built DLL, export libraries and matching pthread.h can be found at:
-
-	ftp://sources.redhat.com/pub/pthreads-win32/dll-latest
-
-Home page:
-
-	http://sources.redhat.com/pthreads-win32/
 
 ----
 Ross Johnson

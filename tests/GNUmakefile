@@ -13,14 +13,14 @@ ECHO	= @echo
 #
 GLANG   = c++
 CC	= gcc
-CFLAGS	= -g -O2 -mthreads -UNDEBUG -Wall -x $(GLANG)
+CFLAGS	= -g -O0 -mthreads -UNDEBUG -Wall -x $(GLANG)
 BUILD_DIR	= ..
 INCLUDES	= -I.
-LIBS	= -L. -lpthread32
+LIBS	= -L. -lpthreadw32
 
 HDR	= pthread.h semaphore.h sched.h
-LIB	= libpthread32.a
-DLL	= pthread.dll
+LIB	= libpthreadw32.a
+DLL	= pthreadGCE.dll
 
 COPYFILES	= $(HDR) $(LIB) $(DLL)
 
@@ -35,7 +35,8 @@ TESTS	= loadfree \
 	  condvar3 condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 \
-	  context1 cancel3 cancel4 cleanup1 cleanup2 cleanup3 \
+	  context1 cancel3 cancel4 \
+	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  exception1
 
 PASSES	= $(TESTS:%=%.pass)
@@ -43,7 +44,7 @@ PASSES	= $(TESTS:%=%.pass)
 all:	$(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
-loadfree.pass:
+loadfree.pass: pthread.dll
 mutex1.pass:
 mutex2.pass:
 exit1.pass:
@@ -82,7 +83,8 @@ rwlock6.pass: rwlock5.pass
 context1.pass: cancel2.pass
 cancel3.pass: context1.pass
 cancel4.pass: cancel3.pass
-cleanup1.pass: cancel4.pass
+cleanup0.pass: cancel4.pass
+cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
 cleanup3.pass: cleanup2.pass
 exception1.pass: cancel4.pass
@@ -105,13 +107,19 @@ $(COPYFILES):
 	@ $(ECHO) Copying $@
 	@ $(CP) $(BUILD_DIR)\$@ .
 
+pthread.dll:
+	@ $(CP) $(DLL) $@
+
 clean:
 	- $(RM) *.dll
+	- $(RM) *.lib
 	- $(RM) pthread.h
 	- $(RM) semaphore.h
 	- $(RM) sched.h
 	- $(RM) *.a
 	- $(RM) *.e
+	- $(RM) *.obj
+	- $(RM) *.pdb
 	- $(RM) *.exe
 	- $(RM) *.pass
 

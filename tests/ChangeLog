@@ -1,3 +1,46 @@
+2000-08-13  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* condvar3.c: Minor change to eliminate compiler
+	warning.
+
+	* condvar4.c: ditto.
+
+	* condvar5.c: ditto.
+
+	* condvar6.c: ditto.
+
+	* condvar7.c: ditto.
+
+	* condvar8.c: ditto.
+
+	* condvar9.c: ditto.
+
+	* exit1.c: Function needed return statement.
+
+	* cleanup1.c: Remove unnecessary printf arg.
+
+	* cleanup2.c: Fix cast.
+
+	* rwlock6.c: Fix casts.
+
+	* exception1.c (PtW32CatchAll): Had the wrong name;
+	fix casts.
+
+	* cancel3.c: Remove unused waitLock variable.
+
+	* GNUmakefile: Change library/dll naming; add new tests;
+	general minor changes.
+
+	* Makefile: Change library/dll naming; add targets for
+	testing each of the two VC++ EH scheme versions;
+	default target now issues help message; compile warnings
+	now interpreted as errors to stop the make; add new
+	tests; restructure to remove prerequisites needed
+	otherwise.
+
+	* README: Updated.
+
+
 2000-08-10  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* eyal1.c (main): Change implicit cast to explicit

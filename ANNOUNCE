@@ -1,5 +1,5 @@
 
-                 PTHREADS-WIN32 SNAPSHOT 2000-08-10
+                 PTHREADS-WIN32 SNAPSHOT 2000-08-13
                  ----------------------------------
        Web Site: http://sources.redhat.com/pthreads-win32/
       FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -26,19 +26,19 @@ Change Summary (since the last snapshot)
 (See the ChangeLog file for details.)
 
 New:
--	asynchronous cancelation on X86 (Jason Nye)
--	Makefile compatible with MS nmake to replace
-	buildlib.bat
--	GNUmakefile for Mingw32
--	tests/Makefile for MS nmake replaces runall.bat
--	tests/GNUmakefile for Mingw32
+-	Renamed DLL and LIB files:
+		pthreadVSE.dll	(MS VC++/Structured EH)
+		pthreadVSE.lib
+		pthreadVCE.dll	(MS VC++/C++ EH)
+		pthreadVCE.lib
+		pthreadGCE.dll	(GNU G++/C++ EH)
+		libpthreadw32.a
+
+	Both your application and the pthread dll should use the
+	same exception handling scheme.
 
 Bugs fixed:
--	kernel32 load/free problem
--	attempt to hide internel exceptions from application
-	exception handlers (__try/__except and try/catch blocks)
--	Win32 thread handle leakage bug
-	(David Baggett/Paul Redondo/Eyal Lebedinsky)
+-	MSVC++ C++ exception handling.
 
 Some new tests have been added.
 
@@ -52,16 +52,15 @@ page access) exception. The fault appears to be in the assembler code
 emmitted by the compiler [to handle exception contexts] at the
 end of the try block in _pthread_threadStart().
 
-2. There are problems with using the libpthread32.a file with the
-VC++ SEH version of pthread.dll. The cleanup1.c test fails and the
-eyal1.c test gives suspect results.
+2. There are problems using the libpthreadw32.a stub archive derived
+from either of pthreadVSE.dll or pthreadVCE.dll. The cleanup1.c test
+fails.
 
-3. I have not been able to build with VC++ using C++ EH. This is a
-maintainer problem who doesn't think he's doing it right. Consequently
-there may also be basic parser errors and warnings to be cleaned
-up in the code.
 
-4. Due to what is believed to be a C++ compliance error in VC++,
+Caveats
+-------
+
+1. Due to what is believed to be a C++ compliance error in VC++,
 if your application contains catch(...) blocks in your POSIX threads
 then you will need to replace the "catch(...)" with the macro
 "PtW32Catch", eg.

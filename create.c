@@ -161,7 +161,7 @@ pthread_create (pthread_t * tid,
 
   thread->threadH = threadH = (HANDLE)
     _beginthread (
-		   (void (*) (void *)) _pthread_threadStart,
+		   (void (PT_STDCALL *) (void *)) _pthread_threadStart,
 		   (unsigned) stackSize,	/* default stack size   */
 		   parms);
 

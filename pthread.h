@@ -267,6 +267,16 @@ struct timespec {
 #define ETIMEDOUT 10060     /* This is the value in winsock.h. */
 #endif
 
+#ifdef __MINGW32__
+#define PT_STDCALL
+#else
+#ifdef __cplusplus
+#define PT_STDCALL __stdcall
+#else
+#define PT_STDCALL __stdcall
+#endif
+#endif
+
 #ifdef _MSC_VER
 /*
  * Re-enable all but 4127, 4514
@@ -278,16 +288,6 @@ struct timespec {
 #define TRUE	!FALSE
 #define FALSE	0
 #endif /* !TRUE */
-
-#ifdef __MINGW32__
-#define PT_STDCALL
-#else
-#ifdef __cplusplus
-#define PT_STDCALL __cdecl
-#else
-#define PT_STDCALL __stdcall
-#endif
-#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -655,7 +655,7 @@ struct _pthread_cleanup_t
 	   *      of how the code exits the scope
 	   *      (i.e. such as by an exception)
 	   */
-	  void            (*cleanUpRout)( void * );
+	  void            (PT_STDCALL *cleanUpRout)( void * );
 	  void    *       obj;
 	  int             executeIt;
 
@@ -671,7 +671,7 @@ struct _pthread_cleanup_t
 	    }
 
 	  PThreadCleanup(
-			 void            (*routine)( void * ),
+			 void            (PT_STDCALL *routine)( void * ),
 			 void    *       arg ) :
 	    cleanUpRout( routine ),
 	    obj( arg ),
@@ -684,9 +684,9 @@ struct _pthread_cleanup_t
 
 	  ~PThreadCleanup()
 	    {
-	      if ( executeIt && cleanUpRout != NULL )
+	      if ( executeIt && ((void *) cleanUpRout != NULL) )
 		{
-		  (*cleanUpRout)( obj );
+          (void) (*cleanUpRout)( obj );
 		}
 	    }
 
@@ -928,7 +928,7 @@ int pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
 /*
  * Thread-Safe C Runtime Library Mappings.
  */
-#if (! defined(NEED_ERRNO)) || (! defined( _REENTRANT ) && ! defined( _MT ))
+#if (! defined(NEED_ERRNO)) || (! defined( _REENTRANT ) && (! defined( _MT ) || ! defined( _MD )))
 int * _errno( void );
 #endif
 
@@ -1002,9 +1002,14 @@ class Pthread_exception_exit   : public Pthread_exception {};
          * WARNING: Replace any 'catch( ... )' with 'PtW32CatchAll'
          * if you want Pthread-Win32 cancelation and pthread_exit to work.
          */
+#ifndef PtW32NoCatchWarn
+#pragma message("When compiling applications with MSVC++ and C++ exception handling:")
+#pragma message("  Replace any 'catch( ... )' with 'PtW32CatchAll' in POSIX threads")
+#pragma message("  if you want POSIX thread cancelation and pthread_exit to work.")
+#endif
 #define PtW32CatchAll \
         catch( Pthread_exception & ) { throw; } \
-        catch( ... )      
+        catch( ... )
 #else
 #define catch( E ) \
         catch( Pthread_exception & ) { throw; } \

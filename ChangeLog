@@ -1,3 +1,61 @@
+2000-08-13  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* errno.c: Add _MD precompile condition; thus far
+	had no effect when using /MD compile option but I
+	thnk it should be there.
+
+	* exit.c: Add __cplusplus to various #if lines;
+	was compiling SEH code even when VC++ had
+	C++ compile options.
+
+	* private.c: ditto.
+
+	* create.c (pthread_create): Add PT_STDCALL macro to
+	function pointer arg in _beginthread().
+
+	* pthread.h: PT_STDCALL really does need to be defined
+	in both this and impliment.h; don't set it to __cdecl
+	- this macro is only used to extend function pointer
+	casting for functions that will be passed as parameters.
+	(~PThreadCleanup): add cast and group expression.
+	(_errno): Add _MD compile conditional.
+	(PtW32NoCatchWarn): Change pragma message.
+
+	* implement.h: Move and change PT_STDCALL define.
+
+	* need_errno.h: Add _MD to compilation conditional.
+
+	* GNUmakefile: Substantial rewrite for new naming
+	convention; set for nil optimisation (turn it up
+	when we have a working library build; add target
+	"fake.a" to build a libpthreadw32.a from the VC++
+	built DLL pthreadVCE.dll.
+
+	* pthread.def (LIBRARY): Don't specify in the .def
+	file - it is specified on the linker command line
+	since we now use the same .def file for variously
+	named .dlls.
+
+	* Makefile: Substantial rewrite for new naming
+	convention; default nmake target only issues a
+	help message; run nmake with specific target
+	corresponding to the EH scheme being used.
+
+	* README: Update information; add naming convention
+	explanation.
+
+	* ANNOUNCE: Update information.
+
+2000-08-12  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* pthread.h: Add compile-time message when using
+	MSC_VER compiler and C++ EH to warn application
+	programmers to use PtW32Catch instead of catch(...)
+	if they want cancelation and pthread_exit to work.
+
+	* implement.h: Remove #include <semaphore.h>; we
+	use our own local semaphore.h.
+
 2000-08-10  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* cleanup.c (pthread_pop_cleanup): Remove _pthread

@@ -214,7 +214,7 @@ _pthread_threadStart (ThreadParms * threadParms)
 
   pthread_setspecific (_pthread_selfThreadKey, self);
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 
   __try
   {
@@ -253,7 +253,7 @@ _pthread_threadStart (ThreadParms * threadParms)
       }
   }
 
-#else /* _MSC_VER */
+#else /* _MSC_VER && !__cplusplus */
 
 #ifdef __cplusplus
 
@@ -539,7 +539,7 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 		  if (value != NULL && k->destructor != NULL)
 		    {
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 
 		      __try
 		      {
@@ -557,7 +557,7 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 			 */
 		      }
 
-#else  /* _MSC_VER */
+#else  /* _MSC_VER && !__cplusplus */
 #ifdef __cplusplus
 
 		      try
@@ -798,7 +798,7 @@ _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
 DWORD
 _pthread_get_exception_services_code(void)
 {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 
   return EXCEPTION_PTHREAD_SERVICES;
 

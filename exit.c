@@ -53,7 +53,7 @@ pthread_exit (void *value_ptr)
 {
   pthread_t self;
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 
   DWORD exceptionInformation[3];
 
@@ -83,7 +83,7 @@ pthread_exit (void *value_ptr)
 
   self->exitStatus = value_ptr;
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 
   exceptionInformation[0] = (DWORD) (_PTHREAD_EPS_EXIT);
   exceptionInformation[1] = (DWORD) (value_ptr);

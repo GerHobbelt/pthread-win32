@@ -136,8 +136,8 @@ canceledThread(void * arg)
     for (count = 0; count < 100; count++)
       Sleep(100);
   }
-#if defined(_MSC_VER)
-  AltCatchAll
+#if defined(PtW32CatchAll)
+  PtW32CatchAll
 #else
   catch (...)
 #endif
@@ -192,13 +192,13 @@ main()
       int result = 0;
 
 	/* Canceled thread */
-      assert(pthread_join(ct[i], (void *) &result) == 0);
+      assert(pthread_join(ct[i], (void **) &result) == 0);
       fail = (result != (int) PTHREAD_CANCELED);
 
       failed = (failed || fail);
 
       /* Exception thread */
-      assert(pthread_join(et[i], (void *) &result) == 0);
+      assert(pthread_join(et[i], (void **) &result) == 0);
       fail = (result != ((int) PTHREAD_CANCELED + 2));
 
       failed = (failed || fail);
