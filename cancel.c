@@ -106,7 +106,7 @@ pthread_setcancelstate (int state, int *oldstate)
       */
 {
   int result = 0;
-  pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
+  pthread_t self = pthread_self();
 
   if (self == NULL
       || (state != PTHREAD_CANCEL_ENABLE
@@ -190,7 +190,7 @@ pthread_setcanceltype (int type, int *oldtype)
       */
 {
   int result = 0;
-  pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
+  pthread_t self = pthread_self();
 
   if (self == NULL
       || (type != PTHREAD_CANCEL_DEFERRED
@@ -261,7 +261,7 @@ pthread_testcancel (void)
       * ------------------------------------------------------
       */
 {
-  pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
+  pthread_t self = pthread_self();
 
   if (self != NULL
       && self->cancelState == PTHREAD_CANCEL_ENABLE
@@ -295,7 +295,7 @@ pthread_cancel (pthread_t thread)
       * RESULTS
       *              0               successfully requested cancellation,
       *              ESRCH           no thread found corresponding to 'thread',
-      *
+      *              ENOMEM          implicit self thread create failed.
       * ------------------------------------------------------
       */
 {
@@ -309,7 +309,10 @@ pthread_cancel (pthread_t thread)
     }
 
   result = 0;
-  self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
+  if ((self = pthread_self()) == NULL)
+    {
+      return ENOMEM;
+    };
 
   /*
    * FIXME!!

@@ -47,7 +47,7 @@ PASSES= loadfree.pass \
 	  errno1.pass  \
 	  rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  rwlock5.pass  rwlock6.pass  \
 	  context1.pass  \
-	  cancel3.pass  cancel4.pass  \
+	  cancel3.pass  cancel4.pass  cancel5.pass  \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  exception1.pass 
 
@@ -140,7 +140,8 @@ rwlock6.pass: rwlock5.pass
 context1.pass: cancel2.pass
 cancel3.pass: context1.pass
 cancel4.pass: cancel3.pass
-cleanup0.pass: cancel4.pass
+cancel5.pass: cancel3.pass
+cleanup0.pass: cancel5.pass
 cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
 cleanup3.pass: cleanup2.pass
