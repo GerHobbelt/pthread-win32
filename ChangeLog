@@ -1,3 +1,9 @@
+Thu Feb 11 13:34:14 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* misc.c (CancelableWait): Change C++ exception throw.
+
+	* sync.c (pthread_join): Change FIXME comment - issue resolved.
+
 Wed Feb 10 12:49:11 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* configure: Various temporary changes.

@@ -237,7 +237,7 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
 
 #ifdef __cplusplus
 
-	      throw pthread_exception;
+	      throw Pthread_exception();
 
 #endif /* __cplusplus */
 
