@@ -274,6 +274,7 @@ enum {
 #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
 #ifndef HAVE_STRUCT_TIMESPEC
+#define HAVE_STRUCT_TIMESPEC 1
 struct timespec {
         long tv_sec;
         long tv_nsec;

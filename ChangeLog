@@ -1,4 +1,10 @@
-2004-06-21  Ross Johnson  <rpj@callisto.canberra.edu.au>
+2004-06-26  Jason Bard  <BardJA at Npt.NUWC.Navy.Mil>
+
+	* pthread.h (HAVE_STRUCT_TIMESPEC): If undefined, define it
+	to avoid timespec struct redefined errors elsewhere in an
+	application.
+
+2004-06-21  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* pthread.h (PTHREAD_RECURSIVE_MUTEX_INITIALIZER): Mutex
 	initialiser added for compatibility with Linux threads and
@@ -17,17 +23,17 @@
 	* pthread_mutex_unlock.c (pthread_mutex_unlock): Likewise.
 	* pthread_mutex_destroy.c (pthread_mutex_destroy): Likewise.
 
-2004-05-20  Ross Johnson  <rpj@callisto.canberra.edu.au>
+2004-05-20  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* README.NONPORTABLE: Document pthread_win32_test_features_np().
 	* FAQ: Update various answers.
 
-2004-05-19  Ross Johnson  <rpj@callisto.canberra.edu.au>
+2004-05-19  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* Makefile: Don't define _WIN32_WINNT on compiler command line.
 	* GNUmakefile: Likewise.
 
-2004-05-16  Ross Johnson  <rpj@callisto.canberra.edu.au>
+2004-05-16  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* pthread_cancel.c (pthread_cancel): Adapted to use auto-detected
 	QueueUserAPCEx features at run-time.
