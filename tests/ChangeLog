@@ -1,3 +1,7 @@
+2004-05-21  Ross Johnson  <ross@special.ise.canberra.edu.au>
+
+	* join3.c: New test.
+
 2004-05-16  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* condvar2.c (WIN32_WINNT): Define to avoid redefinition warning

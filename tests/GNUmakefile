@@ -75,7 +75,7 @@ TESTS	= sizes loadfree \
 	  create1 create2 reuse1 reuse2 equal1 \
 	  kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
-	  join0 join1 join2 \
+	  join0 join1 join2 join3 \
 	  mutex2 mutex3 mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
 	  count1 once1 tsd1 self2 cancel1 cancel2 \
@@ -195,6 +195,7 @@ inherit1.pass: join1.pass priority1.pass
 join0.pass: create1.pass
 join1.pass: create1.pass
 join2.pass: create1.pass
+join3.pass: join2.pass
 kill1.pass:
 loadfree.pass: pthread.dll
 mutex1.pass: self1.pass
