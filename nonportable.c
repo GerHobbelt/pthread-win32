@@ -194,13 +194,15 @@ pthread_win32_process_attach_np ()
   pthread_count++;
 #endif
 
+#ifndef TEST_ICE
+
   /*
    * Load KERNEL32 and try to get address of InterlockedCompareExchange
    */
   ptw32_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
 
   ptw32_interlocked_compare_exchange =
-    (PTW32_INTERLOCKED_LONG (PT_STDCALL *)(PTW32_INTERLOCKED_LPLONG, PTW32_INTERLOCKED_LONG, PTW32_INTERLOCKED_LONG))
+    (PTW32_INTERLOCKED_LONG (WINAPI *)(PTW32_INTERLOCKED_LPLONG, PTW32_INTERLOCKED_LONG, PTW32_INTERLOCKED_LONG))
 #if defined(NEED_UNICODE_CONSTS)
     GetProcAddress(ptw32_h_kernel32,
                    (const TCHAR *)TEXT("InterlockedCompareExchange"));
@@ -211,7 +213,7 @@ pthread_win32_process_attach_np ()
 
   if (ptw32_interlocked_compare_exchange == NULL)
     {
-      ptw32_interlocked_compare_exchange = &ptw32_InterlockedCompareExchange;
+      ptw32_interlocked_compare_exchange = ptw32_InterlockedCompareExchange;
 
       /*
        * If InterlockedCompareExchange is not being used, then free
@@ -230,6 +232,12 @@ pthread_win32_process_attach_np ()
       (void) FreeLibrary(ptw32_h_kernel32);
       ptw32_h_kernel32 = 0;
     }
+
+#else /* TEST_ICE */
+
+  ptw32_interlocked_compare_exchange = ptw32_InterlockedCompareExchange;
+
+#endif /* TEST_ICE */
 
   return result;
 }

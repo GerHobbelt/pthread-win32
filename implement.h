@@ -380,7 +380,16 @@ enum {
 };
 
 
+/* Useful macros */
+#define PTW32_MAX(a,b)  ((a)<(b)?(b):(a))
+#define PTW32_MIN(a,b)  ((a)>(b)?(b):(a))
+
+
 /* Declared in global.c */
+extern PTW32_INTERLOCKED_LONG (WINAPI *ptw32_interlocked_compare_exchange)(PTW32_INTERLOCKED_LPLONG,
+                                                                           PTW32_INTERLOCKED_LONG,
+                                                                           PTW32_INTERLOCKED_LONG);
+
 extern int ptw32_processInitialized;
 extern pthread_key_t ptw32_selfThreadKey;
 extern pthread_key_t ptw32_cleanupKey;
@@ -418,13 +427,8 @@ extern "C" {
  * =====================
  * =====================
  */
-PTW32_INTERLOCKED_LONG
-(WINAPI *ptw32_interlocked_compare_exchange)(PTW32_INTERLOCKED_LPLONG,
-                                             PTW32_INTERLOCKED_LONG,
-                                             PTW32_INTERLOCKED_LONG);
-
-PTW32_INTERLOCKED_LONG
-ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG ptr,
+PTW32_INTERLOCKED_LONG WINAPI
+ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG location,
                                  PTW32_INTERLOCKED_LONG   value,
                                  PTW32_INTERLOCKED_LONG   comparand);
 

@@ -110,6 +110,7 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
 #endif /* _POSIX_THREAD_PROCESS_SHARED */
 
         }
+    }
 
   s = (pthread_spinlock_t) calloc(1, sizeof(*s));
 

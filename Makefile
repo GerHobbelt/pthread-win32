@@ -20,6 +20,7 @@ VSEFLAGS	= /D__CLEANUP_SEH
 #C cleanup code
 VCFLAGS	= /D__CLEANUP_C
 
+#CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DPTW32_BUILD /DTEST_ICE
 CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DPTW32_BUILD
 
 OBJ=  attr.obj \
@@ -84,7 +85,7 @@ install: $(DLLS)
 $(DLLS): $(OBJ) pthread.def
 	cl /LD /Zi /nologo $(OBJ) \
 		/link /nodefaultlib:libcmt /implib:$*.lib \
-		msvcrt.lib /def:pthread.def /out:$@
+		msvcrt.lib wsock32.lib /def:pthread.def /out:$@
 
 .c.obj:
 	cl $(EHFLAGS) $(CFLAGS) -c $<

@@ -41,6 +41,14 @@
 
 #include "test.h"
 
+enum {
+  PTW32TEST_THREAD_INIT_PRIO = 0,
+  PTW32TEST_MAXPRIORITIES = 512
+};
+
+int minPrio;
+int maxPrio;
+int validPriorities[PTW32TEST_MAXPRIORITIES];
 pthread_mutex_t startMx = PTHREAD_MUTEX_INITIALIZER;
 
 void * func(void * arg)
@@ -54,15 +62,52 @@ void * func(void * arg)
   assert(policy == SCHED_OTHER);
   return (void *) param.sched_priority;
 }
+
  
+void *
+getValidPriorities(void * arg)
+{
+  int prioSet;
+  pthread_t threadID = pthread_self();
+  HANDLE threadH = pthread_getw32threadhandle_np(threadID);
+
+  for (prioSet = minPrio;
+       prioSet <= maxPrio;
+       prioSet++)
+    {
+	/*
+       * If prioSet is invalid then the threads priority is unchanged
+       * from the previous value. Make the previous value a known
+       * one so that we can check later.
+       */
+	SetThreadPriority(threadH, PTW32TEST_THREAD_INIT_PRIO);
+	SetThreadPriority(threadH, prioSet);
+	validPriorities[prioSet+(PTW32TEST_MAXPRIORITIES/2)] = GetThreadPriority(threadH);
+    }
+
+  return (void *) 0;
+}
+
+
 int
 main()
 {
   pthread_t t;
   void * result = NULL;
   struct sched_param param;
-  int maxPrio = sched_get_priority_max(SCHED_OTHER);
-  int minPrio = sched_get_priority_min(SCHED_OTHER);
+
+  assert((maxPrio = sched_get_priority_max(SCHED_OTHER)) != -1);
+  assert((minPrio = sched_get_priority_min(SCHED_OTHER)) != -1);
+
+  assert(pthread_create(&t, NULL, getValidPriorities, NULL) == 0);
+  assert(pthread_join(t, &result) == 0);
+
+  /* Set the thread's priority to a known initial value.
+   * If the new priority is invalid then the threads priority
+   * is unchanged from the previous value.
+   */
+  SetThreadPriority(pthread_getw32threadhandle_np(pthread_self()),
+                    PTW32TEST_THREAD_INIT_PRIO);
 
   for (param.sched_priority = minPrio;
        param.sched_priority <= maxPrio;
@@ -73,7 +118,8 @@ main()
       assert(pthread_setschedparam(t, SCHED_OTHER, &param) == 0);
       assert(pthread_mutex_unlock(&startMx) == 0);
       pthread_join(t, &result);
-      assert((int) result == param.sched_priority);
+      assert((int) result ==
+	  validPriorities[param.sched_priority+(PTW32TEST_MAXPRIORITIES/2)]);
     }
 
   return 0;

@@ -1,3 +1,15 @@
+2001-10-25  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* condvar2.c: Remove reference to cv->nWaitersUnblocked.
+	* condvar2_1.c: Likewise; lower NUMTHREADS from 60 to 30.
+	* condvar3_1.c: Likewise.
+	* condvar3_2.c: Likewise.
+	* count1.c: lower NUMTHREADS from 60 to 30.
+	* inherit1.c: Determine valid priority values and then
+	assert values returned by POSIX routines are the same.
+	* priority1.c: Likewise.
+	* priority2.c: Likewise.
+	
 2001-07-12  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* barrier5.c: Assert that precisely one thread receives
