@@ -12,7 +12,7 @@ Bug fixes
 
 * Condition variables no longer deadlock (bug introduced in
 snapshot-2004-11-03).
-- Alexander Kotliarov and 'qybupt'
+- Alexander Kotliarov and Nicolas at saintmac
 
 * DLL naming extended to avoid 'DLL hell' in the future, and to
 accommodate the ABI change introduced in snapshot-2004-11-03. Snapshot
