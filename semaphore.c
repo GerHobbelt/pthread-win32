@@ -90,14 +90,16 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
     }
   else
     {
-      s = (sem_t) calloc (1, sizeof (*s));
 
-#ifdef NEED_SEM
+      s = (sem_t) calloc (1, sizeof (*s));
 
       if (NULL == s)
         {
           result = ENOMEM;
         }
+
+#ifdef NEED_SEM
+
       else
         {
           s->value = value;
@@ -184,7 +186,7 @@ sem_destroy (sem_t * sem)
     }
   else
     {
-	s = *sem;
+      s = *sem;
       *sem = NULL;
 
 #ifdef NEED_SEM
@@ -197,7 +199,6 @@ sem_destroy (sem_t * sem)
       else
         {
           DeleteCriticalSection(&s->sem_lock_cs);
-          free(s);
         }
 
 #else /* NEED_SEM */
@@ -217,6 +218,8 @@ sem_destroy (sem_t * sem)
       errno = result;
       return -1;
     }
+
+  free(s);
 
   return 0;
 
