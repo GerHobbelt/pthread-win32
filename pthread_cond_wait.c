@@ -9,7 +9,7 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2003 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2004 Pthreads-win32 contributors
  * 
  *      Contact Email: rpj@callisto.canberra.edu.au
  * 
@@ -284,17 +284,6 @@ ptw32_cond_wait_cleanup (void *args)
   int result;
 
   /*
-   * XSH: Upon successful return, the mutex has been locked and is owned
-   * by the calling thread. This must be done before any cancelation
-   * cleanup handlers are run.
-   */
-  if ((result = pthread_mutex_lock (cleanup_args->mutexPtr)) != 0)
-    {
-      *resultPtr = result;
-      return;
-    }
-
-  /*
    * Whether we got here as a result of signal/broadcast or because of
    * timeout on wait or thread cancellation we indicate that we are no
    * longer waiting. The waiter is responsible for adjusting waiters
@@ -350,6 +339,16 @@ ptw32_cond_wait_cleanup (void *args)
 	  *resultPtr = errno;
 	  return;
 	}
+    }
+
+  /*
+   * XSH: Upon successful return, the mutex has been locked and is owned
+   * by the calling thread.
+   */
+  if ((result = pthread_mutex_lock (cleanup_args->mutexPtr)) != 0)
+    {
+      *resultPtr = result;
+      return;
     }
 }				/* ptw32_cond_wait_cleanup */
 
