@@ -65,9 +65,14 @@ pthread_key_create(pthread_key_t *key, void (*destructor)(void *))
   if (_pthread_tsd_key_next >= PTHREAD_KEYS_MAX)
     ret = EAGAIN;
 
+  /* FIXME: This needs to be implemented as a list plus a re-use stack as for
+     thread IDs. _pthread_destructor_run_all() then needs to be changed
+     to push keys onto the re-use stack.
+   */
   k = _pthread_tsd_key_next++;
 
-  _pthread_tsd_key_table[k].in_use = _PTHREAD_TSD_KEY_INUSE;
+  _pthread_tsd_key_table[k].in_use = 0;
+  _pthread_tsd_key_table[k].status = _PTHREAD_TSD_KEY_INUSE;
   _pthread_tsd_key_table[k].destructor = destructor;
 
   pthread_mutex_unlock(&_pthread_tsd_mutex);
@@ -87,7 +92,7 @@ pthread_setspecific(pthread_key_t key, void *value)
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_tsd_mutex);
 
-  inuse = (_pthread_tsd_key_table[key].in_use == _PTHREAD_TSD_KEY_INUSE);
+  inuse = (_pthread_tsd_key_table[key].status == _PTHREAD_TSD_KEY_INUSE);
 
   pthread_mutex_unlock(&_pthread_tsd_mutex);
   /* END CRITICAL SECTION */
@@ -96,6 +101,24 @@ pthread_setspecific(pthread_key_t key, void *value)
     return EINVAL;
 
   keys = (void **) TlsGetValue(_pthread_TSD_keys_TlsIndex);
+
+  if (keys[key] != NULL)
+    {
+      if (value == NULL)
+	{
+	  /* Key is no longer in use by this thread. */
+	  _pthread_tsd_key_table[key].in_use--;
+	}
+    }
+  else
+    {
+      if (value != NULL)
+	{
+	  /* Key is now in use by this thread. */
+	  _pthread_tsd_key_table[key].in_use++;
+	}
+    }
+
   keys[key] = value;
 
   return 0;
@@ -110,7 +133,7 @@ pthread_getspecific(pthread_key_t key)
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_tsd_mutex);
 
-  inuse = (_pthread_tsd_key_table[key].in_use == _PTHREAD_TSD_KEY_INUSE);
+  inuse = (_pthread_tsd_key_table[key].status == _PTHREAD_TSD_KEY_INUSE);
 
   pthread_mutex_unlock(&_pthread_tsd_mutex);
   /* END CRITICAL SECTION */
@@ -153,13 +176,13 @@ pthread_key_delete(pthread_key_t key)
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_tsd_mutex);
 
-  if (_pthread_tsd_key_table[key].in_use != _PTHREAD_TSD_KEY_INUSE)
+  if (_pthread_tsd_key_table[key].status != _PTHREAD_TSD_KEY_INUSE)
     {
       ret = EINVAL;
     }
   else
     {
-      _pthread_tsd_key_table[key].in_use = _PTHREAD_TSD_KEY_DELETED;
+      _pthread_tsd_key_table[key].status = _PTHREAD_TSD_KEY_DELETED;
       _pthread_tsd_key_table[key].destructor = NULL;
     }
 

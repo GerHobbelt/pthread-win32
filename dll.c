@@ -26,6 +26,12 @@ DWORD _pthread_threadID_TlsIndex;
 DWORD _pthread_TSD_keys_TlsIndex;
 
 
+/* Function pointer to TryEnterCriticalSection if it exists; otherwise NULL */
+BOOL (WINAPI *_pthread_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
+
+/* Handle to kernel32.dll */
+static HINSTANCE _pthread_h_kernel32;
+
 BOOL WINAPI PthreadsEntryPoint(HINSTANCE dllHandle,
 			  DWORD reason,
 			  LPVOID situation)
@@ -54,11 +60,16 @@ BOOL WINAPI PthreadsEntryPoint(HINSTANCE dllHandle,
 	{
 	  return FALSE;
 	}
+
+      /* Load KERNEL32 and try to get address of TryEnterCriticalSection */
+      _pthread_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
+      _pthread_try_enter_critical_section = GetProcAddress(_pthread_h_kernel32, "TryEnterCriticalSection");
       break;
 
     case DLL_PROCESS_DETACH:
       (void) TlsFree(_pthread_TSD_keys_TlsIndex);
       (void) TlsFree(_pthread_threadID_TlsIndex);
+      (void) FreeLibrary(_pthread_h_kernel32);
       break;
 
     default:

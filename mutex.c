@@ -88,12 +88,9 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
 int
 pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
-  /* Typically evaluates to 31. */
-  int numbits = (sizeof(DWORD) * 8) - 1;
-
-  if ((GetVersion() >> numbits) != 1)
+  if (_pthread_try_enter_critical_section == NULL)
     {
-      /* We're not on Windows NT; return ENOSYS. */
+      /* TryEnterCriticalSection does not exist in the OS; return ENOSYS. */
       return ENOSYS;
     }
       
@@ -107,5 +104,5 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
       pthread_mutex_init(mutex, NULL);
     }
 
-  return (TryEnterCriticalSection(&mutex->cs) != TRUE) ? EBUSY : 0;
+  return ((*_pthread_try_enter_critical_section)(&mutex->cs) != TRUE) ? EBUSY : 0;
 }
