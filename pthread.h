@@ -942,7 +942,11 @@ int pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
  * Thread-Safe C Runtime Library Mappings.
  */
 #if (! defined(NEED_ERRNO)) || (! defined( _REENTRANT ) && (! defined( _MT ) || ! defined( _MD )))
+#if defined(PTW32_BUILD)
+__declspec( dllexport ) int * _errno( void );
+#else
 int * _errno( void );
+#endif
 #endif
 
 /*
