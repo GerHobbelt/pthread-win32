@@ -120,6 +120,10 @@ _pthread_delete_thread(_pthread_t * thread)
   /* We don't check that the thread has been properly cleaned up, so
      it had better be done already. */
 
+  /* Release any keys */
+
+  _pthread_destructor_run_all();
+
   /* Remove the thread entry if necessary. */
 
   if (thread != NULL

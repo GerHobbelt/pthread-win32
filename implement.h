@@ -22,7 +22,8 @@ enum {
 
 enum {
   _PTHREAD_TSD_KEY_DELETED,
-  _PTHREAD_TSD_KEY_INUSE
+  _PTHREAD_TSD_KEY_INUSE,
+  _PTHREAD_TSD_KEY_REUSE
 };
 
 #define _PTHREAD_VALID(T) \
@@ -51,6 +52,7 @@ typedef struct _pthread_tsd_key _pthread_tsd_key_t;
 
 struct _pthread_tsd_key {
   int in_use;
+  int status;
   void (* destructor)(void *);
 };
 
@@ -177,7 +179,19 @@ extern _pthread_tsd_key_t _pthread_tsd_key_table[];
 /* Mutex lock for TSD operations */
 extern pthread_mutex_t _pthread_tsd_mutex;
 
-/* Index to the next available TSD key. */
-extern int _pthread_tsd_key_next;
+/* Function pointer to TryEnterCriticalSection if it exists; otherwise NULL */
+extern BOOL (WINAPI *_pthread_try_enter_critical_section)(LPCRITICAL_SECTION);
+
+/* An array of pthread_key_t */
+extern pthread_key_t _pthread_key_virgins[];
+
+/* Index to the next available previously unused pthread_key_t */
+extern int _pthread_key_virgin_next;
+
+/* An array of pthread_key_t */
+extern pthread_key_t _pthread_key_reuse[];
+
+/* Index to the first available reusable pthread_key_t. */
+extern int _pthread_key_reuse_top;
 
 #endif /* _IMPLEMENT_H */

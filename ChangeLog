@@ -1,3 +1,21 @@
+1998-12-05  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* implement.h (_pthread_try_enter_critical_section): New extern
+	* dll.c (_pthread_try_enter_critical_section): New pointer to
+	TryEnterCriticalSection if it exists; otherwise NULL.
+	* dll.c (PthreadsEntryPoint):
+	Initialize _pthread_try_enter_critical_section at startup
+	and release kernel32 handle when DLL is being unloaded.
+	* mutex.c (pthread_mutex_trylock): Replaced check for NT with
+	a check if _pthread_try_enter_critical_section is valid
+	pointer to a function. Call _pthread_try_enter_critical_section
+	instead of TryEnterCriticalSection to avoid errors on Win95.
+
+Sun Nov 15 21:24:06 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* cleanup.c (_pthread_destructor_run_all): Declare missing void * arg.
+	Fixup CVS merge conflicts.
+
 1998-10-30  Ben Elliston  <bje@cygnus.com>
 
 	* condvar.c (cond_wait): Fix semantic error. Test for equality
@@ -11,7 +29,30 @@ Fri Oct 30 15:15:50 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 	(new_thread): Rename poorly named local variable to
 	"new_handler".
 
+Sat Oct 24 18:34:59 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* global.c: Add TSD key management array and index declarations.
+
+	* implement.h: Ditto for externs.
+
+Fri Oct 23 00:08:09 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h (_PTHREAD_TSD_KEY_REUSE): Add enum.
+
+	* private.c (_pthread_delete_thread): Add call to
+	_pthread_destructor_run_all() to clean up the threads keys.
+
+	* cleanup.c (_pthread_destructor_run_all): Check for no more dirty
+	keys to run destructors on. Assume that the destructor call always
+	succeeds and set the key value to NULL.
+
 Thu Oct 22 21:44:44 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* tsd.c (pthread_setspecific): Add key management code.
+	(pthread_key_create): Ditto.
+	(pthread_key_delete): Ditto.
+
+	* implement.h (struct _pthread_tsd_key): Add status member.
 
 	* tsd.c: Add description of pthread_key_delete() from the
 	standard as a comment.

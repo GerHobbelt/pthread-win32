@@ -127,6 +127,7 @@ _pthread_destructor_run_all()
 {
   _pthread_tsd_key_t * key;
   int count;
+  int dirty;
 
   /* This threads private keys */
   key = _pthread_tsd_key_table;
@@ -139,24 +140,76 @@ _pthread_destructor_run_all()
   for (count = 0; count < PTHREAD_DESTRUCTOR_ITERATIONS; count++)
     {
       int k;
+      void * arg;
+
+      dirty = 0;
 
       /* Loop through all keys. */
       for (k = 0; k < _POSIX_THREAD_KEYS_MAX; k++)
 	{
-	  /* If there's no destructor or the key isn't in use, skip it. */
-	  if (key->destructor != NULL && key->in_use == _PTHREAD_TSD_KEY_INUSE)
-	    {
-	      void * arg;
+	  /* CRITICAL SECTION */
+	  pthread_mutex_lock(&_pthread_tsd_mutex);
 
+	  switch (key->status)
+	    {
+	    case _PTHREAD_TSD_KEY_INUSE:
 	      arg = pthread_getspecific((pthread_key_t) k);
 
-	      if (arg != NULL)
+	      if (arg != NULL && key->destructor != NULL)
 		{
+		  /* The destructor must be called with the mutex off. */
+		  pthread_mutex_unlock(&_pthread_tsd_mutex);
+		  /* END CRITICAL SECTION */
+
+		  /* FIXME: Is the destructor supposed to set the key value
+		     to NULL? How is this done when arg is the key value, not
+		     a pointer to it? For now we assume that the destructor
+		     always succeeds.
+		     */
 		  (void) (key->destructor)(arg);
+
+		  /* CRITICAL SECTION */
+		  pthread_mutex_lock(&_pthread_tsd_mutex);
+
+		  pthread_setspecific((pthread_key_t) k, NULL);
+#if 0
+		  /* Only needed if we don't assume the destructor
+		     always succeeds.
+		     */
+		  dirty = 1;
+#endif
 		}
+	      break;
+
+	    case _PTHREAD_TSD_KEY_DELETED:
+	      key->status = _PTHREAD_TSD_KEY_INUSE;
+	      pthread_setspecific((pthread_key_t) k, NULL);
+
+	      if (key->in_use <= 0)
+		{
+		  /* This is the last thread to use this
+		     deleted key. It can now be made available
+		     for re-use.
+		   */
+		  key->status = _PTHREAD_TSD_KEY_REUSE;
+		}
+	      else
+		{
+		  key->status = _PTHREAD_TSD_KEY_DELETED;
+		}
+	      break;
+
+	    default:
+	      break;
 	    }
+
+	  pthread_mutex_unlock(&_pthread_tsd_mutex);
+	  /* END CRITICAL SECTION */
 
 	  key++;
 	}
+
+      if (!dirty)
+	break;
     }
 }
