@@ -6,6 +6,7 @@
  */
 
 #include "pthread.h"
+#include "implement.h"
 
 int
 pthread_setcancelstate(int state,
@@ -14,53 +15,53 @@ pthread_setcancelstate(int state,
   _pthread_threads_thread_t * this = *_PTHREAD_THIS;
 
   /* Validate the new cancellation state. */
-  if (state != PTHREAD_CANCEL_ENABLE || state != PTHREAD_CANCEL_DISABLE)
+  if (state != PTHREAD_CANCEL_ENABLE 
+      || state != PTHREAD_CANCEL_DISABLE)
     {
       return EINVAL;
     }
 
   if (oldstate != NULL)
     {
-      *oldstate = this->cancelability;
+      *oldstate = this->cancelstate;
     }
 
-  this->cancelability = state;
+  this->cancelstate = state;
   return 0;
 }
 
 int
 pthread_setcanceltype(int type, int *oldtype)
 {
-  _pthread_threads_thread_t * this = *_PTHREAD_THIS;
+  _pthread_threads_thread_t * us = _PTHREAD_THIS;
 
   /* Validate the new cancellation type. */
-  if (type != PTHREAD_CANCEL_DEFERRED || type != PTHREAD_CANCEL_ASYNCHRONOUS)
+  if (type != PTHREAD_CANCEL_DEFERRED 
+      || type != PTHREAD_CANCEL_ASYNCHRONOUS)
     {
       return EINVAL;
     }
 
   if (oldtype != NULL)
     {
-      *oldtype = this->canceltype;
+      *oldtype = us->canceltype;
     }
 
-  this->canceltype = type;
+  us->canceltype = type;
   return 0;
 }
 
 int
 pthread_cancel(pthread_t thread)
 {
-  _pthread_threads_thread_t * this;
+  _pthread_threads_thread_t * us = _PTHREAD_THIS;
 
-  this = _PTHREAD_THIS;
-
-  if (this == NULL)
+  if (us == NULL)
     {
       return ESRCH;
     }
 
-  this->cancelthread = _PTHREAD_YES;
+  us->cancel_pending = TRUE;
 
   return 0;
 }
@@ -68,17 +69,17 @@ pthread_cancel(pthread_t thread)
 void
 pthread_testcancel(void)
 {
-  _pthread_threads_thread_t * this;
+  _pthread_threads_thread_t * us;
 
-  this = _PTHREAD_THIS;
+  us = _PTHREAD_THIS;
 
-  if (this == NULL ||
-      this->attr.cancelstate == PTHREAD_CANCEL_DISABLE)
+  if (us == NULL
+      || us->cancelstate == PTHREAD_CANCEL_DISABLE)
     {
       return;
     }
 
-  if (this->cancelthread == _PTHREAD_YES)
+  if (us->cancel_pending == TRUE)
     {
       pthread_exit(PTHREAD_CANCELED);
 

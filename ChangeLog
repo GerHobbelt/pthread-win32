@@ -1,3 +1,25 @@
+Sun Jul 26 00:09:59 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* private.c (_pthread_delete_thread_entry): Mutex locks removed.
+	Mutexes must be applied at the caller level.
+	(_pthread_new_thread_entry): Ditto.
+	(_pthread_new_thread_entry): Init cancelstate, canceltype, and
+	cancel_pending to default values.
+	(_pthread_new_thread_entry): Rename "this" to "new".
+	(_pthread_find_thread_entry): Rename "this" to "entry".
+	(_pthread_delete_thread_entry): Rename "thread_entry" to "entry".
+
+	* create.c (_pthread_start_call): Mutexes changed to
+	_pthread_count_mutex. All access to the threads table entries is
+	under the one mutex. Otherwise chaos reigns.
+
+Sat Jul 25 23:16:51 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h (_pthread_threads_thread): Move cancelstate and
+ 	canceltype members out of pthread_attr_t into here.
+
+	* fork.c (fork): Add comment.
+
 1998-07-25  Ben Elliston  <bje@cygnus.com>
 
 	* fork.c (fork): Autoconfiscate.

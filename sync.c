@@ -76,20 +76,24 @@ pthread_join(pthread_t thread, void ** valueptr)
       target_thread_mutex = _PTHREAD_THREAD_MUTEX(target);
 
       /* CRITICAL SECTION */
-      pthread_mutex_lock(target_thread_mutex);
+      pthread_mutex_lock(&_pthread_count_mutex);
 
       /* If the thread is in DETACHED state, then join will return
 	 immediately. */
 
-      if (target->detach == TRUE)
+      if (pthread_attr_getdetachedstate(&(target->attr), &detachstate) != 0 
+	  || detachstate == PTHREAD_CREATE_DETACHED)
 	{
 	  return EINVAL;
 	}
 
       target->join_count++;
 
-      pthread_mutex_lock(target_thread_mutex);
+      pthread_mutex_lock(&_pthread_count_mutex);
       /* END CRITICAL SECTION */
+
+      /* CANCELATION POINT */
+      pthread_testcancel();
 
       /* Wait on the kernel thread object. */
       switch (WaitForSingleObject(thread, INFINITE))
@@ -152,26 +156,46 @@ pthread_join(pthread_t thread, void ** valueptr)
 int
 pthread_detach(pthread_t thread)
 {
-  _pthread_threads_thread_t * this;
+  _pthread_threads_thread_t * target;
   int detachstate;
+  int ret;
+  pthread_mutex_t * target_thread_mutex;
 
-  this = _pthread_find_thread_entry(thread);
+  /* CRITICAL SECTION */
+  pthread_mutex_lock(&_pthread_count_mutex);
 
-  if (this == NULL)
+  target = _pthread_find_thread_entry(thread);
+
+  if (target == NULL)
     {
-      return ESRCH;
+      ret = ESRCH;
+    }
+  else
+    {
+
+      target_thread_mutex = _PTHREAD_THREAD_MUTEX(target);
+
+      /* Check that we can detach this thread. */
+      if (pthread_attr_getdetachedstate(&(target->attr), &detachstate) != 0 
+	  || detachstate == PTHREAD_CREATE_DETACHED)
+	{
+	  ret = EINVAL;
+	}
+      else
+	{
+
+	  /* This is all we do here - the rest is done either when the
+	     thread exits or when pthread_join() exits. Once this is
+	     set it will never be unset. */
+	  pthread_attr_setdetachedstate(&(this->attr), 
+					PTHREAD_CREATE_DETACHED);
+
+	  ret = 0;
+	}
     }
 
-  /* Check that we can detach this thread. */
-  if (pthread_attr_getdetachedstate(&(this->attr), &detachstate) != 0 
-      || detachstate == PTHREAD_CREATE_DETACHED)
-    {
-      return EINVAL;
-    }
+  pthread_mutex_unlock(&_pthread_count_mutex);
+  /* END CRITICAL SECTION */
 
-  /* This is all we do here - the rest is done either when the thread
-     exits or when pthread_join() exits. */
-  this->detach = TRUE;
-
-  return 0;
+  return ret;
 }
