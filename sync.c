@@ -123,11 +123,9 @@ pthread_join (pthread_t thread, void **value_ptr)
 	    }
 	  else
 	    {
-	      /* 
-	       * FIXME: This call frees memory used to hold the 'thread'
-	       * object. 'thread' will be invalid after the first call.
-	       *
-	       * Only the last exiting join should free 'thread'.
+	      /*
+	       * The result of making multiple simultaneous calls to
+	       * pthread_join() specifying the same target is undefined.
 	       */
 	      _pthread_threadDestroy (thread);
 	    }
