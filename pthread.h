@@ -415,7 +415,7 @@ extern "C"
   typedef struct pthread_once_t_ pthread_once_t;
   typedef struct pthread_key_t_ *pthread_key_t;
   typedef struct pthread_mutex_t_ pthread_mutex_t;
-  typedef struct pthread_mutexattr_t_ pthread_mutexattr_t;
+  typedef struct pthread_mutexattr_t_ *pthread_mutexattr_t;
   typedef struct pthread_cond_t_ *pthread_cond_t;
   typedef struct pthread_condattr_t_ *pthread_condattr_t;
 
@@ -460,10 +460,10 @@ extern "C"
  * ====================
  */
 
-/* FIXME: Replace the NULL with a valid critical section initializer
- * and then also change the 0 (first element) to 1.
+/* 
+ * 
  */
-#define PTHREAD_MUTEX_INITIALIZER { 0, NULL }
+#define PTHREAD_MUTEX_INITIALIZER { 1, 1, 0, NULL }
 
 
 /*
@@ -569,13 +569,16 @@ struct pthread_attr_t_ {
 
 
 struct pthread_mutex_t_ {
-	int valid;
-	CRITICAL_SECTION cs;
-  };
+  int staticinit;
+  int valid;
+  HANDLE mutex;
+  CRITICAL_SECTION cs;
+};
 
 
 struct pthread_mutexattr_t_ {
   int pshared;
+  int forcecs;
 };
 
 
@@ -837,6 +840,9 @@ int pthread_mutexattr_getpshared (const pthread_mutexattr_t
 
 int pthread_mutexattr_setpshared (pthread_mutexattr_t * attr,
 				  int pshared);
+
+int pthread_mutexattr_setforcecs_np(pthread_mutexattr_t *attr,
+				    int forcecs);
 
 /*
  * Mutex Functions

@@ -10,85 +10,505 @@
 #include "pthread.h"
 #include "implement.h"
 
+
+static int
+_mutex_check_need_init(pthread_mutex_t *mutex)
+{
+  int result = 0;
+
+  /*
+   * The following guarded test is specifically for statically
+   * initialised mutexes (via PTHREAD_MUTEX_INITIALIZER).
+   *
+   * Note that by not providing this synchronisation we risk
+   * introducing race conditions into applications which are
+   * correctly written.
+   *
+   * Approach
+   * --------
+   * We know that static mutexes will not be PROCESS_SHARED
+   * so we can serialise access to internal state using
+   * Win32 Critical Sections rather than Win32 Mutexes.
+   *
+   * We still have a problem in that we would like a per-mutex
+   * lock, but attempting to create one will again lead
+   * to a race condition. We are forced to use a global
+   * lock in this instance.
+   *
+   * If using a single global lock slows applications down too much,
+   * multiple global locks could be created and hashed on some random
+   * value associated with each mutex, the pointer perhaps. At a guess,
+   * a good value for the optimal number of global locks might be
+   * the number of processors + 1.
+   *
+   * We need to maintain the following per-mutex state independently:
+   *   - mutex staticinit (true iff static mutex and still
+   *                        needs to be initialised)
+   *   - mutex valid (false iff mutex has been destroyed)
+   *
+   * For example, a mutex initialised by PTHREAD_MUTEX_INITIALIZER
+   * in this implementation will be valid but uninitialised until the thread
+   * attempts to lock it. It can also be destroyed (made invalid) before
+   * ever being locked.
+   */
+  EnterCriticalSection(&_pthread_mutex_test_init_lock);
+
+  /*
+   * We got here because staticinit tested true.
+   * Check staticinit again inside the critical section
+   * and only initialise if the mutex is valid (not been destroyed).
+   * If a static mutex has been destroyed, the application can
+   * re-initialise it only by calling pthread_mutex_init()
+   * explicitly.
+   */
+  if (mutex->staticinit && mutex->valid)
+    {
+      result = pthread_mutex_init(mutex, NULL);
+    }
+
+  LeaveCriticalSection(&_pthread_mutex_test_init_lock);
+
+  return(result);
+}
+
 int
 pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 {
+  int result = 0;
+
   if (mutex == NULL)
     {
       return EINVAL;
     }
 
-  /* Create a critical section. */
-  InitializeCriticalSection(&mutex->cs);
+  mutex->mutex = 0;
 
-  /* Mark as valid. */
-  mutex->valid = 1;
+  /* 
+   * Assuming any race condition here is harmless.
+   */
+  if (mutex->valid && !mutex->staticinit)
+    {
+      return EBUSY;
+    }
 
-  return 0;
+  if (attr != NULL
+      && *attr != NULL
+      && (*attr)->pshared == PTHREAD_PROCESS_SHARED
+      )
+    {
+      /*
+       * Creating mutex that can be shared between
+       * processes.
+       */
+#if _POSIX_THREAD_PROCESS_SHARED
+
+      /*
+       * Not implemented yet.
+       */
+
+#error ERROR [__FILE__, line __LINE__]: Process shared mutexes are not supported yet.
+
+      mutex->mutex = CreateMutex (
+				  NULL,
+				  FALSE,
+				  ????);
+      result = (mutex->mutex == 0) ? EAGAIN : 0;
+
+#else
+
+      result = ENOSYS;
+
+#endif /* _POSIX_THREAD_PROCESS_SHARED */
+    }
+  else
+    {
+      if (_pthread_try_enter_critical_section != NULL
+	  || (attr != NULL
+	      && *attr != NULL
+	      && (*attr)->forcecs == 1)
+	  )
+	{
+	  /* 
+	   * Create a critical section. 
+	   */
+	  InitializeCriticalSection(&mutex->cs);
+	}
+      else
+	{
+	  /*
+	   * Create a mutex that can only be used within the
+	   * current process
+	   */
+	  mutex->mutex = CreateMutex (NULL,
+				      FALSE,
+				      NULL);
+	  result = (mutex->mutex == 0) ? EAGAIN : 0;
+	}
+    }
+
+  if (result == 0)
+    {
+      mutex->staticinit = 0;
+
+      /* Mark as valid. */
+      mutex->valid = 1;
+    }
+
+  return(result);
 }
 
 int
 pthread_mutex_destroy(pthread_mutex_t *mutex)
 {
+  int result = 0;
+
   if (mutex == NULL)
     {
       return EINVAL;
     }
 
-  DeleteCriticalSection(&mutex->cs);
-  
-  /* Mark as invalid. */
-  mutex->valid = 0;
+  /*
+   * Check to see if we have something to delete.
+   */
+  if (!mutex->staticinit)
+    {
+      if (mutex->mutex == 0)
+	{
+	  DeleteCriticalSection(&mutex->cs);
+	}
+      else
+	{
+	  result = (CloseHandle (mutex->mutex) ? 0 : EINVAL);
+	}
+    }
 
-  return 0;
+  if (result == 0)
+    {
+      mutex->mutex = 0;
+
+      /* Mark as invalid. */
+      mutex->valid = 0;
+    }
+
+  return(result);
 }
 
 int
-pthread_mutexattr_init(pthread_mutexattr_t *attr)
+pthread_mutexattr_init (pthread_mutexattr_t * attr)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      Initializes a mutex attributes object with default
+      *      attributes.
+      *
+      * PARAMETERS
+      *      attr
+      *              pointer to an instance of pthread_mutexattr_t
+      *
+      *
+      * DESCRIPTION
+      *      Initializes a mutex attributes object with default
+      *      attributes.
+      *
+      *      NOTES:
+      *              1)      Used to define mutex types
+      *
+      * RESULTS
+      *              0               successfully initialized attr,
+      *              ENOMEM          insufficient memory for attr.
+      *
+      * ------------------------------------------------------
+      */
 {
-  if (attr == NULL)
+  pthread_mutexattr_t attr_result;
+  int result = 0;
+
+  attr_result = calloc (1, sizeof (*attr_result));
+
+  result = (attr_result == NULL)
+    ? ENOMEM
+    : 0;
+
+  *attr = attr_result;
+
+  return (result);
+
+}                               /* pthread_mutexattr_init */
+
+
+int
+pthread_mutexattr_destroy (pthread_mutexattr_t * attr)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      Destroys a mutex attributes object. The object can
+      *      no longer be used.
+      *
+      * PARAMETERS
+      *      attr
+      *              pointer to an instance of pthread_mutexattr_t
+      *
+      *
+      * DESCRIPTION
+      *      Destroys a mutex attributes object. The object can
+      *      no longer be used.
+      *
+      *      NOTES:
+      *              1)      Does not affect mutexes created using 'attr'
+      *
+      * RESULTS
+      *              0               successfully released attr,
+      *              EINVAL          'attr' is invalid.
+      *
+      * ------------------------------------------------------
+      */
+{
+  int result = 0;
+
+  if (attr == NULL || *attr == NULL)
+    {
+      result = EINVAL;
+
+    }
+  else
+    {
+      free (*attr);
+
+      *attr = NULL;
+      result = 0;
+    }
+
+  return (result);
+
+}                               /* pthread_mutexattr_destroy */
+
+
+int
+pthread_mutexattr_setforcecs_np(pthread_mutexattr_t *attr,
+				int forcecs)
+{
+  if (attr == NULL || *attr == NULL)
     {
       /* This is disallowed. */
       return EINVAL;
     }
 
-  /* None of the optional attributes are supported yet. */
+  (*attr)->forcecs = forcecs;
+
   return 0;
 }
 
+
 int
-pthread_mutexattr_destroy(pthread_mutexattr_t *attr)
+pthread_mutexattr_getpshared (const pthread_mutexattr_t * attr,
+			      int *pshared)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      Determine whether mutexes created with 'attr' can be
+      *      shared between processes.
+      *
+      * PARAMETERS
+      *      attr
+      *              pointer to an instance of pthread_mutexattr_t
+      *
+      *      pshared
+      *              will be set to one of:
+      *
+      *                      PTHREAD_PROCESS_SHARED
+      *                              May be shared if in shared memory
+      *
+      *                      PTHREAD_PROCESS_PRIVATE
+      *                              Cannot be shared.
+      *
+      *
+      * DESCRIPTION
+      *      Mutexes creatd with 'attr' can be shared between
+      *      processes if pthread_mutex_t variable is allocated
+      *      in memory shared by these processes.
+      *      NOTES:
+      *              1)      pshared mutexes MUST be allocated in shared
+      *                      memory.
+      *              2)      The following macro is defined if shared mutexes
+      *                      are supported:
+      *                              _POSIX_THREAD_PROCESS_SHARED
+      *
+      * RESULTS
+      *              0               successfully retrieved attribute,
+      *              EINVAL          'attr' is invalid,
+      *
+      * ------------------------------------------------------
+      */
 {
-  /* Nothing to do. */
-  return 0;
-}
+  int result;
+
+  if ((attr != NULL && *attr != NULL) &&
+      (pshared != NULL))
+    {
+      *pshared = (*attr)->pshared;
+      result = 0;
+    }
+  else
+    {
+      *pshared = PTHREAD_PROCESS_PRIVATE;
+      result = EINVAL;
+    }
+
+  return (result);
+
+}                               /* pthread_mutexattr_getpshared */
+
+
+int
+pthread_mutexattr_setpshared (pthread_mutexattr_t * attr,
+			      int pshared)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      Mutexes created with 'attr' can be shared between
+      *      processes if pthread_mutex_t variable is allocated
+      *      in memory shared by these processes.
+      *
+      * PARAMETERS
+      *      attr
+      *              pointer to an instance of pthread_mutexattr_t
+      *
+      *      pshared
+      *              must be one of:
+      *
+      *                      PTHREAD_PROCESS_SHARED
+      *                              May be shared if in shared memory
+      *
+      *                      PTHREAD_PROCESS_PRIVATE
+      *                              Cannot be shared.
+      *
+      * DESCRIPTION
+      *      Mutexes creatd with 'attr' can be shared between
+      *      processes if pthread_mutex_t variable is allocated
+      *      in memory shared by these processes.
+      *
+      *      NOTES:
+      *              1)      pshared mutexes MUST be allocated in shared
+      *                      memory.
+      *
+      *              2)      The following macro is defined if shared mutexes
+      *                      are supported:
+      *                              _POSIX_THREAD_PROCESS_SHARED
+      *
+      * RESULTS
+      *              0               successfully set attribute,
+      *              EINVAL          'attr' or pshared is invalid,
+      *              ENOSYS          PTHREAD_PROCESS_SHARED not supported,
+      *
+      * ------------------------------------------------------
+      */
+{
+  int result;
+
+  if ((attr != NULL && *attr != NULL) &&
+      ((pshared == PTHREAD_PROCESS_SHARED) ||
+       (pshared == PTHREAD_PROCESS_PRIVATE)))
+    {
+      if (pshared == PTHREAD_PROCESS_SHARED)
+        {
+
+#if !defined( _POSIX_THREAD_PROCESS_SHARED )
+
+          result = ENOSYS;
+          pshared = PTHREAD_PROCESS_PRIVATE;
+
+#else
+
+          result = 0;
+
+#endif /* _POSIX_THREAD_PROCESS_SHARED */
+
+        }
+      else
+        {
+          result = 0;
+        }
+      (*attr)->pshared = pshared;
+    }
+  else
+    {
+      result = EINVAL;
+    }
+
+  return (result);
+
+}                               /* pthread_mutexattr_setpshared */
+
 
 int
 pthread_mutex_lock(pthread_mutex_t *mutex)
 {
-  if (!mutex->valid)
+  int result = 0;
+
+  /*
+   * We do a quick check to see if we need to do more work
+   * to initialise a static mutex. We check 'staticinit'
+   * again inside the guarded section of _mutex_check_need_init()
+   * to avoid race conditions.
+   */
+  if (mutex->staticinit)
     {
-      pthread_mutex_init(mutex, NULL);
+      result = _mutex_check_need_init(mutex);
     }
-  EnterCriticalSection(&mutex->cs);
-  return 0;
+
+  if (result == 0)
+    {
+      if (mutex->mutex == 0)
+	{
+	  EnterCriticalSection(&mutex->cs);
+	}
+      else
+	{
+	  result = (WaitForSingleObject(mutex->mutex, INFINITE) 
+		    == WAIT_OBJECT_0)
+	    ? 0
+	    : EINVAL;
+	}
+    }
+
+  return(result);
 }
 
 int
 pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
-  if (!mutex->valid)
+  int result = 0;
+
+  /* 
+   * If the thread calling us holds the mutex then there is no
+   * race condition. If another thread holds the
+   * lock then we shouldn't be in here.
+   */
+  if (!mutex->staticinit && mutex->valid)
     {
-      return EINVAL;
+      if (mutex->mutex == 0)
+	{
+	  LeaveCriticalSection(&mutex->cs);
+	}
+      else
+	{
+	  result = (ReleaseMutex (mutex->mutex) ? 0 : EINVAL);
+	}
     }
-  LeaveCriticalSection(&mutex->cs);
-  return 0;
+  else
+    {
+      result = EINVAL;
+    }
+
+  return(result);
 }
 
 int
 pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
-  if (_pthread_try_enter_critical_section == NULL)
+  int result = 0;
+
+  if (mutex->mutex == 0 && _pthread_try_enter_critical_section == NULL)
     {
       /* TryEnterCriticalSection does not exist in the OS; return ENOSYS. */
       return ENOSYS;
@@ -99,10 +519,40 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
       return EINVAL;
     }
 
-  if (!mutex->valid)
+  /*
+   * We do a quick check to see if we need to do more work
+   * to initialise a static mutex. We check 'staticinit'
+   * again inside the guarded section of _mutex_check_need_init()
+   * to avoid race conditions.
+   */
+  if (mutex->staticinit)
     {
-      pthread_mutex_init(mutex, NULL);
+      result = _mutex_check_need_init(mutex);
     }
 
-  return ((*_pthread_try_enter_critical_section)(&mutex->cs) != TRUE) ? EBUSY : 0;
+  if (result == 0)
+    {
+      if (mutex->mutex == 0)
+	{
+	  if ((*_pthread_try_enter_critical_section)(&mutex->cs) != TRUE)
+	    {
+	      result = EBUSY;
+	    }
+	}
+      else
+	{
+	  DWORD status;
+
+	  status = WaitForSingleObject (mutex->mutex, 0);
+
+	  if (status != WAIT_OBJECT_0)
+	    {
+	      result = ((status == WAIT_TIMEOUT)
+			? EBUSY
+			: EINVAL);
+	    }
+	}
+    }
+
+  return(result);
 }

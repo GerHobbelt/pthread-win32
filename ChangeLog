@@ -1,3 +1,18 @@
+Wed Jan 20 09:31:28 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h (pthread_mutexattr_t): Changed to a pointer.
+
+	* mutex.c (pthread_mutex_init): Conditionally create Win32 mutex
+	- from John Bossom's implementation.
+	(pthread_mutex_destroy): Conditionally close Win32 mutex
+	- from John Bossom's implementation.
+	(pthread_mutexattr_init): Replaced by John Bossom's version.
+	(pthread_mutexattr_destroy): Ditto.
+	(pthread_mutexattr_getpshared): New function from John Bossom's
+	implementation.
+	(pthread_mutexattr_setpshared): New function from John Bossom's
+	implementation.
+
 Tue Jan 19 18:27:42 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* pthread.h (pthreadCancelableTimedWait): New prototype.
@@ -15,6 +30,78 @@ Tue Jan 19 18:27:42 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 	time before passing timeout to new routine 
 	pthreadCancelableTimedWait().
 	- Scott Lightner <scott@curriculum.com>
+
+Tue Jan 19 10:27:39 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h (pthread_mutexattr_setforcecs_np): New prototype.
+	
+	* mutex.c (pthread_mutexattr_init): Init 'pshared' and 'forcecs'
+	attributes to 0.
+	(pthread_mutexattr_setforcecs_np): New function (not portable).
+
+	* pthread.h (pthread_mutex_t): 
+	Add 'mutex' element. Set to NULL in PTHREAD_MUTEX_INITIALIZER.
+	The pthread_mutex_*() routines will try to optimise performance
+	by choosing either mutexes or critical sections as the basis
+	for pthread mutexes for each indevidual mutex.
+	(pthread_mutexattr_t_): Add 'forcecs' element.
+	Some applications may choose to force use of critical sections
+	if they know that:-
+	     the mutex is PROCESS_PRIVATE and, 
+	         either the OS supports TryEnterCriticalSection() or
+	         pthread_mutex_trylock() will never be called on the mutex.
+	This attribute will be setable via a non-portable routine.
+
+	Note: We don't yet support PROCESS_SHARED mutexes, so the
+	implementation as it stands will default to Win32 mutexes only if
+	the OS doesn't support TryEnterCriticalSection. On Win9x, and early
+	versions of NT 'forcecs' will need to be set in order to get
+	critical section based mutexes.
+
+Sun Jan 17 12:01:26 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h (PTHREAD_MUTEX_INITIALIZER): Init new 'staticinit'
+	value to '1' and existing 'valid' value to '1'.
+
+	* global.c (_pthread_mutex_test_init_lock): Add.
+
+	* implement.h (_pthread_mutex_test_init_lock.): Add extern.
+
+	* private.c (_pthread_processInitialize): Init critical section for
+	global lock used by _mutex_check_need_init().
+	(_pthread_processTerminate): Ditto (:s/Init/Destroy/).
+
+	* dll.c (dllMain): Move call to FreeLibrary() so that it is only
+	called once when the process detaches.
+
+	* mutex.c (_mutex_check_need_init): New static function to test
+	and init PTHREAD_MUTEX_INITIALIZER mutexes. Provides serialised
+	access to the internal state of the uninitialised static mutex. 
+	Called from pthread_mutex_trylock() and pthread_mutex_lock() which
+	do a quick unguarded test to check if _mutex_check_need_init()
+	needs to be called. This is safe as the test is conservative
+ 	and is repeated inside the guarded section of 
+	_mutex_check_need_init(). Thus in all calls except the first
+	calls to lock static mutexes, the additional overhead to lock any
+	mutex is a single memory fetch and test for zero.
+
+	* pthread.h (pthread_mutex_t_): Add 'staticinit' member. Mutexes
+	initialised by PTHREAD_MUTEX_INITIALIZER aren't really initialised
+	until the first attempt to lock it. Using the 'valid'
+	flag (which flags the mutex as destroyed or not) to record this
+	information would be messy. It is possible for a statically
+	initialised mutex such as this to be destroyed before ever being
+	used.
+
+	* mutex.c (pthread_mutex_trylock): Call _mutex_check_need_init()
+	to test/init PTHREAD_MUTEX_INITIALIZER mutexes.
+	(pthread_mutex_lock): Ditto.
+	(pthread_mutex_unlock): Add check to ensure we don't try to unlock
+	an unitialised static mutex.
+	(pthread_mutex_destroy): Add check to ensure we don't try to delete
+	a critical section that we never created. Allows us to destroy
+	a static mutex that has never been locked (and hence initialised).
+	(pthread_mutex_init): Set 'staticinit' flag to 0 for the new mutex.
 
 Sun Jan 17 12:01:26 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 

@@ -135,6 +135,7 @@ extern BOOL (WINAPI *_pthread_try_enter_critical_section)(LPCRITICAL_SECTION);
 extern int _pthread_processInitialized;
 extern pthread_key_t _pthread_selfThreadKey;
 extern pthread_key_t _pthread_cleanupKey;
+extern CRITICAL_SECTION _pthread_mutex_test_init_lock;
 
 
 #ifdef __cplusplus
@@ -183,7 +184,8 @@ int _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime);
  */
 #if defined(__CYGWIN32__) || defined(__CYGWIN__)
 
-/* Macro uses args so we can cast start_proc to LPTHREAD_START_ROUTINE
+/* 
+ * Macro uses args so we can cast start_proc to LPTHREAD_START_ROUTINE
  * in order to avoid warnings because of return type
  */
 
@@ -206,3 +208,4 @@ int _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime);
 
 
 #endif /* _IMPLEMENT_H */
+
