@@ -2,7 +2,7 @@
  * File: condvar1.c
  *
  * Test Synopsis:
- * - Test basic function of condition variable code.
+ * - Test initialisation and destruction of a CV.
  *
  * Test Method (Validation or Falsification):
  * - Validation
@@ -17,105 +17,43 @@
  * - 
  *
  * Description:
- * - 
+ * - Creates and then imediately destroys a CV. Does not
+ *   test the CV.
  *
  * Environment:
  * - 
  *
  * Input:
- * - 
+ * - None.
  *
  * Output:
- * - 
+ * - File name, Line number, and failed expression on failure.
+ * - No output on success.
  *
  * Assumptions:
  * - 
  *
  * Pass Criteria:
- * - 
+ * - pthread_cond_init returns 0, and
+ * - pthread_cond_destroy returns 0.
+ * - Process returns zero exit status.
  *
  * Fail Criteria:
- * - 
+ * - pthread_cond_init returns non-zero, or
+ * - pthread_cond_destroy returns non-zero.
+ * - Process returns non-zero exit status.
  */
 
 #include "test.h"
 
-typedef struct cvthing_t_ cvthing_t;
-
-struct cvthing_t_ {
-  pthread_cond_t notbusy;
-  pthread_mutex_t lock;
-  int busy;
-  int count;
-};
-
-static cvthing_t cvthing;
-
-static enum {
-  NUMTHREADS = 10
-};
-
-static pthread_key_t key;
-
-void *
-mythread(void * arg)
-{
-  assert(pthread_mutex_lock(&cvthing.lock) == 0);
-
-  cvthing.count++;
-
-  while (cvthing.busy)
-    {
-      assert(pthread_cond_wait(&cvthing.notbusy, &cvthing.lock) == 0);
-    }
-
-  assert(cvthing.busy == 0);
-
-  cvthing.count--;
-
-  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
-
-  return 0;
-}
+pthread_cond_t cv;
 
 int
 main()
 {
-  pthread_t t[NUMTHREADS];
-  int result[NUMTHREADS];
-  
-  assert((t[0] = pthread_self()) != NULL);
+  assert(pthread_cond_init(&cv, NULL) == 0);
 
-  assert(pthread_cond_init(&cvthing, NULL) == 0);
-
-  for (i = 1; i < NUMTHREADS; i++)
-    {
-      assert(pthread_create(&t[i], NULL, mythread, (void *) i) == 0);
-    }
-
-  while (cvthing.count < NUMTHREADS)
-    {}
-
-  assert(pthread_mutex_lock(&cvthing.lock) == 0);
-  cvthing.busy = 0;
-  assert(pthread_cond_signal(&cvthing.notbusy) == 0);
-  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
-
-  for (i = 1; i < NUMTHREADS; i++)
-    {
-      assert(pthread_join(t[i], (void *) &result[i]) == 0);
-    }
-
-  assert(cvthing.count == 0);
-
-  assert(pthread_cond_destroy(&cvthing) == 0);
+  assert(pthread_cond_destroy(&cv) == 0);
 
   return 0;
 }
-
-
-
-
-
-
-

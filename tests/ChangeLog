@@ -1,3 +1,19 @@
+Sun Mar  7 10:41:52 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* condvar4.c (General): Reduce to simple test case; prerequisite
+	is condvar3.c; add description.
+
+	* condvar3.c (General): Reduce to simple test case; prerequisite
+	is condvar2.c; add description.
+
+	* condvar2.c (General): Reduce to simple test case; prerequisite
+	is condvar1.c; add description.
+
+	* condvar1.c (General): Reduce to simple test case; add
+	description.
+
+	* Template.c (Comments): Add generic test detail.
+
 1999-02-23  Ross Johnson  <rpj@ise.canberra.edu.au>
 
         * Template.c: Revamp.
