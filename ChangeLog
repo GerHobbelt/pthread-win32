@@ -5,7 +5,10 @@
 	* semaphore.c (sem_init): Fix typo and missing bracket
 	in conditionally compiled code. Only older versions of
 	WinCE require this code, hence it doesn't normally get
-	tested.
+	tested; somehow when sem_t reverted to an opaque struct
+	the calloc NULL check was left in the conditionally included
+	section.
+	(sem_destroy): Likewise, the calloced sem_t wasn't being freed.
 
 2001-10-25  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
