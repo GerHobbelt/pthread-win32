@@ -1,3 +1,9 @@
+2003-03-04  Alexander Terekhov  <TEREKHOV@de.ibm.com>
+
+	* pthread_mutex_timedlock.c (pthread_mutex_timedlock): Fix failure to
+	set ownership of mutex on second grab after abstime timeout.
+	- bug reported by Robert Strycek <strycek@posam.sk>
+
 2002-12-17  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* pthread_mutex_lock.c (ptw32_semwait): New static routine to provide
