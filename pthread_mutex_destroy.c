@@ -63,35 +63,46 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
        * If trylock succeeded and the mutex is not recursively locked it
        * can be destroyed.
        */
-      if (result == 0 && 1 == mx->recursive_count)
+      if (result == 0)
 	{
-	  /*
-	   * FIXME!!!
-	   * The mutex isn't held by another thread but we could still
-	   * be too late invalidating the mutex below since another thread
-	   * may already have entered mutex_lock and the check for a valid
-	   * *mutex != NULL.
-           *
-           * Note that this would be an unusual situation because it is not
-           * common that mutexes are destroyed while they are still in
-           * use by other threads.
-	   */
-	  *mutex = NULL;
-
-	  result = pthread_mutex_unlock(&mx);
-
-	  if (result == 0)
-	    {
-	      (void) sem_destroy( &mx->wait_sema );
-	      DeleteCriticalSection( &mx->wait_cs );
-	      free(mx);
-	    }
-	  else
+	  if (1 == mx->recursive_count)
 	    {
 	      /*
-	       * Restore the mutex before we return the error.
+	       * FIXME!!!
+	       * The mutex isn't held by another thread but we could still
+	       * be too late invalidating the mutex below since another thread
+	       * may already have entered mutex_lock and the check for a valid
+	       * *mutex != NULL.
+	       *
+	       * Note that this would be an unusual situation because it is not
+	       * common that mutexes are destroyed while they are still in
+	       * use by other threads.
 	       */
-	      *mutex = mx;
+	      *mutex = NULL;
+
+	      result = pthread_mutex_unlock(&mx);
+
+	      if (result == 0)
+		{
+		  (void) sem_destroy( &mx->wait_sema );
+		  DeleteCriticalSection( &mx->wait_cs );
+		  free(mx);
+		}
+	      else
+		{
+		  /*
+		   * Restore the mutex before we return the error.
+		   */
+		  *mutex = mx;
+		}
+	    }
+	  else   /* mx->recursive_count > 1 */
+	    {
+	      /*
+	       * The mutex must be recursive and already locked by us (this thread).
+	       */
+	      mx->recursive_count--;  /* Undo effect of pthread_mutex_trylock() above */
+	      result = EBUSY;
 	    }
 	}
     }
