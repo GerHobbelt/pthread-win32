@@ -1,3 +1,9 @@
+Fri Mar 19 09:12:59 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* private.c (_pthread_threadStart): status returns PTHREAD_CANCELED.
+
+	* pthread.h (PTHREAD_CANCELED): defined.
+
 Tue Mar 16  1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* all: Add GNU LGPL and Copyright and Warranty.

@@ -1,3 +1,11 @@
+Fri Mar 19 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* *.bat: redirect unwanted output to nul:
+
+	* runall.bat: new.
+
+	* cancel1.c: new. Not part of suite yet.
+	
 Mon Mar 15 00:17:55 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* mutex1.c: only test mutex init and destroy; add assertions.
