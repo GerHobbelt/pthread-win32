@@ -189,7 +189,15 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 
 #else /* NEED_SEM */
 
-      result = (pthreadCancelableTimedWait ((*sem)->sem, milliseconds));
+      if (InterlockedDecrement((LPLONG) &(*sem)->value) < 0)
+        {
+          /* Must wait */
+	  result = pthreadCancelableTimedWait ((*sem)->sem, milliseconds);
+	  if (result != 0)
+	    {
+              (void) InterlockedIncrement((LPLONG) &(*sem)->value);
+	    }
+        }
 
 #endif
 

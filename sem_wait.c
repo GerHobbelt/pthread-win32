@@ -92,8 +92,14 @@ sem_wait (sem_t * sem)
 
 #else /* NEED_SEM */
 
-      result = pthreadCancelableWait ((*sem)->sem);
+      sem_t s = *sem;
 
+      if (InterlockedDecrement((LPLONG) &s->value) < 0)
+	{
+	  /* Must wait */
+	  result = pthreadCancelableWait (s->sem);
+	}
+     
 #endif /* NEED_SEM */
 
     }

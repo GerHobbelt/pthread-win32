@@ -76,6 +76,9 @@ sem_post_multiple (sem_t * sem, int count)
       */
 {
   int result = 0;
+#ifndef NEED_SEM
+  long waiters;
+#endif
 
   if (sem == NULL || *sem == NULL || count <= 0)
     {
@@ -88,7 +91,8 @@ sem_post_multiple (sem_t * sem, int count)
 
 #else /* NEED_SEM */
 
-  else if (!ReleaseSemaphore ((*sem)->sem, count, 0))
+    else if ((waiters = -InterlockedExchangeAdd((LPLONG) &(*sem)->value, (LONG) count)) > 0
+	     && !ReleaseSemaphore((*sem)->sem,  (waiters<=count)?waiters:count, 0))
 
 #endif /* NEED_SEM */
 

@@ -1,5 +1,5 @@
 /*
- * File: semaphore2.c
+ * File: semaphore3.c
  *
  *
  * --------------------------------------------------------------------------
@@ -33,7 +33,7 @@
  *
  * --------------------------------------------------------------------------
  *
- * Test Synopsis: Verify sem_getvalue returns the correct value.
+ * Test Synopsis: Verify sem_getvalue returns the correct number of waiters.
  * - 
  *
  * Test Method (Validation or Falsification):
@@ -75,32 +75,44 @@
 
 #define MAX_COUNT 100
 
+sem_t s;
+
+void *
+thr (void * arg)
+{
+  assert(pthread_detach(pthread_self()) == 0);
+  assert(sem_wait(&s) == 0);
+
+  return NULL;
+}
+
 int
 main()
 {
-  sem_t s;
 	int value = 0;
 	int i;
+	pthread_t t[MAX_COUNT];
 
-  assert(sem_init(&s, PTHREAD_PROCESS_PRIVATE, MAX_COUNT) == 0);
+  assert(sem_init(&s, PTHREAD_PROCESS_PRIVATE, 0) == 0);
 	assert(sem_getvalue(&s, &value) == 0);
-	assert(value == MAX_COUNT);
+	assert(value == 0);
 //	  printf("Value = %ld\n", value);
 
-	for (i = MAX_COUNT - 1; i >= 0; i--)
+	for (i = 1; i <= MAX_COUNT; i++)
 		{
-			assert(sem_wait(&s) == 0);
+			assert(pthread_create(&t[i-1], NULL, thr, NULL) == 0);
+			sched_yield();
 			assert(sem_getvalue(&s, &value) == 0);
 //			  printf("Value = %ld\n", value);
-			assert(value == i);
+			assert(-value == i);
 		}
 
-	for (i = 1; i <= MAX_COUNT; i++)
+	for (i = MAX_COUNT - 1; i >= 0; i--)
 		{
 			assert(sem_post(&s) == 0);
 			assert(sem_getvalue(&s, &value) == 0);
 //			  printf("Value = %ld\n", value);
-			assert(value == i);
+			assert(-value == i);
 		}
 
   return 0;

@@ -83,7 +83,15 @@ ptw32_semwait (sem_t * sem)
 
 #else /* NEED_SEM */
 
-      status = WaitForSingleObject ((*sem)->sem, INFINITE);
+      if (InterlockedDecrement((LPLONG) &(*sem)->value) < 0)
+        {
+          /* Must wait */
+          status = WaitForSingleObject ((*sem)->sem, INFINITE);
+        }
+      else
+	{
+	  return 0;
+	}
 
 #endif
 
@@ -100,6 +108,9 @@ ptw32_semwait (sem_t * sem)
 	}
       else
 	{
+#ifndef NEED_SEM
+	  (void) InterlockedIncrement((LPLONG) &(*sem)->value);
+#endif
 	  result = EINVAL;
 	}
     }

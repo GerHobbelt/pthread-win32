@@ -1,3 +1,7 @@
+2004-10-19  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* semaphore3.c: New test.
+
 2004-10-14  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* rwlock7.c (main): Tidy up statistics reporting; randomise

@@ -77,15 +77,14 @@ sem_getvalue (sem_t * sem, int *sval)
       *      pointed to by sem in the int pointed to by sval.
       */
 {
-  int result = 0;
-  long value;
-
   if (sem == NULL || *sem == NULL || sval == NULL)
     {
-      result = EINVAL;
+      errno = EINVAL;
+      return -1;
     }
   else
     {
+      long value;
       register sem_t s = *sem;
 
 #ifdef NEED_SEM
@@ -96,59 +95,12 @@ sem_getvalue (sem_t * sem, int *sval)
 
 #else
 
-      /*
-       * There appears to be NO atomic means of determining the
-       * value of the semaphore. Using only ReleaseSemaphore()
-       * with either a zero or oversized count parameter has been
-       * suggested but this trick doesn't produce consistent results
-       * across Windows versions (the technique uses values that are
-       * knowingly illegal but hopes to extract the current value
-       * anyway - the zero parameter appears to work for Win9x but
-       * neither work reliably for WinNT).
-       *
-       * The intrusive method below will give false results
-       * at times but it at least errs on the side of
-       * caution. Competing threads might occasionally believe
-       * the semaphore has a count of one less than it actually
-       * would have and possibly block momentarily unecessarily,
-       * but they will never see a higher semaphore value than
-       * there should be.
-       *
-       *
-       * Multiple threads calling sem_getvalue() at the same time
-       * may not all return the same value (assuming no calls to
-       * other semaphore routines). They will always return the
-       * correct value or a lesser value. This problem could be fixed
-       * with a global or a per-semaphore critical section here.
-       *
-       * An equally approximate but IMO slightly riskier approach
-       * would be to keep a separate per-semaphore counter and
-       * decrement/increment it inside of sem_wait() and sem_post()
-       * etc using the Interlocked* functions.
-       */
-      if (WaitForSingleObject (s->sem, 0) == WAIT_TIMEOUT)
-	{
-	  /* Failed - must be zero */
-	  value = 0;
-	}
-      else
-	{
-	  /* Decremented semaphore - release it and note the value */
-	  (void) ReleaseSemaphore (s->sem, 1L, &value);
-	  value++;
-	}
+      value = s->value;
 
 #endif
+
+      *sval = value;
+      return 0;
     }
-
-
-  if (result != 0)
-    {
-      errno = result;
-      return -1;
-    }
-
-  *sval = value;
-  return 0;
 
 }				/* sem_getvalue */

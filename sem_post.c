@@ -85,7 +85,8 @@ sem_post (sem_t * sem)
 
 #else /* NEED_SEM */
 
-  else if (!ReleaseSemaphore ((*sem)->sem, 1, 0))
+    else if (InterlockedExchangeAdd((LPLONG) &(*sem)->value, (LONG) 1) < 0
+	     && !ReleaseSemaphore((*sem)->sem, 1, NULL))
 
 #endif /* NEED_SEM */
 
