@@ -1,5 +1,5 @@
 
-                 PTHREADS-WIN32 SNAPSHOT 1999-11-02
+                 PTHREADS-WIN32 SNAPSHOT 2000-??-??
                  ----------------------------------
        Web Site: http://sourceware.cygnus.com/pthreads-win32/
       FTP Site: ftp://sourceware.cygnus.com/pub/pthreads-win32
@@ -24,19 +24,15 @@ Change Summary (since the last snapshot)
 
 (See the ChangeLog file for details.)
 
-Bugs fixed:
--	ctime_r macro had an incorrect argument (Erik Hensema),
--	threads were not being created 
-	PTHREAD_CANCEL_DEFERRED. This should have
-	had little effect as deferred is the only
-	supported type. (Ross Johnson).
+New:
+-	asynchronous cancelation (Jason Nye)
+-	Makefile compatible with MS nmake to replace
+	buildlib.bat
 
-Some compatibility improvements added, eg.
--	pthread_setcancelstate accepts NULL pointer
-	for the previous value argument. Ditto for
-	pthread_setcanceltype. This is compatible
-	with Solaris but should not affect
-	standard applications (Erik Hensema)
+Bugs fixed:
+-	kernel32 load/free problem,
+-	attempt to hide internel exceptions from application
+	exception handlers (__try/__except and try/catch blocks)
 
 Some new tests have been added.
 
