@@ -1,3 +1,8 @@
+1999-01-11  Ben Elliston  <bje@cygnus.com>
+
+	* condvar.c (pthread_cond_init): Invert logic when testing the
+	return value from calloc().
+
 Sat Jan  9 14:32:08 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* implement.h: Compile-time switch for CYGWIN derived environments
