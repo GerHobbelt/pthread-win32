@@ -1,5 +1,5 @@
 
-CFLAGS	= -I.
+CFLAGS	= -I. -DHAVE_CONFIG_H
 
 SRCS	= attr.c cancel.c cleanup.c condvar.c create.c dll.c \
 	  exit.c fork.c global.c misc.c mutex.c private.c sched.c \

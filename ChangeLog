@@ -1,3 +1,11 @@
+Sun Aug  2 19:03:42 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* config.h: Create. This is a temporary stand-in for autoconf yet
+	to be done.
+ 	(HAVE_SIGNAL_H): Add.
+
+	* pthread.h: Minor rearrangement for temporary config.h.
+
 Fri Jul 31 14:00:29 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* cleanup.c (_pthread_destructor_pop): Implement. Removes
