@@ -1,5 +1,5 @@
 
-                 PTHREADS-WIN32 SNAPSHOT 2000-09-08
+                 PTHREADS-WIN32 SNAPSHOT 2000-12-29
                  ----------------------------------
        Web Site: http://sources.redhat.com/pthreads-win32/
       FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -26,16 +26,37 @@ Change Summary (since the last snapshot)
 (See the ChangeLog file for details.)
 
 New:
--	New non-portable function (see the README file):
-		pthread_getw32threadhandle_np
+-	New non-portable functions for use when statically linking the library
+	(see the README file):
+		pthread_delay_np
+		pthread_win32_process_attach_np
+		pthread_win32_process_detach_np
+		pthread_win32_thread_attach_np
+		pthread_win32_thread_detach_np
+	Also, the start of support within the library for statically
+	linked applications, but this has not been tested by statically
+	linking yet.
+-	A fully working MinGW32 g++ compiled version of the library
+	is now supplied. To use with g++ compiled applications
+	please see the FAQ "How do I generate pthreadGCE.dll and
+	libpthreadw32.a for use with Mingw32", which you need to do
+	before compiling and linking applications as well.
+-	Unhandled exceptions, whether SEH or C++, are no longer
+	silently caught and ignored but are passed out of threads for
+	the system to deal with. C++ applications can override
+	the default termination handler via set_terminate().
+	set_terminate() works fine for MinGW32 g++ but not yet with MS VC++
+	(see known bugs (2)) even though it's the same code. See
+	tests/exception3.c for an example of using set_terminate().
 
 Bugs fixed:
--       Calling pthread_cancel from non-POSIX threads fixed.
--       Possible deadlock threat using pthread_cond_broadcast() reduced.
--	TSD key creation race condition;
--	Other potential race conditions
-	associated with initialising various
-	pthreads objects.
+-	Pthread_mutex_unlock() now returns EPERM if the unlocking
+	thread does not currently hold the thread.
+-	Args in the ctime_r macro in pthread.h are fixed.
+-	Made semaphore.h independent of config.h when building
+	applications. Don't know how this went unnoticed for so long
+	- the default defines must have been correct for my test
+	environment.
 
 Some new tests have been added.
 
@@ -45,17 +66,17 @@ Known bugs in this snapshot
 
 1. Asynchronous cancelation only works on Intel X86 machines.
 
-2. Running the test "join1.c" with the library built with Mingw32
-and the GNUmakefile included, the test fails with a segmentation (invalid
-page access) exception. The fault appears to be in the assembler code
-emmitted by the compiler [to handle exception contexts] at the
-end of the try block in ptw32_threadStart().
+2. Under MS VC++ (only tested with version 6.0), a term_func
+   set via the standard C++ set_terminate() function is not called
+   for some reason. The code - in private.c:ptw32_threadStart() -
+   makes an explicit call to terminate() which works as expected
+   under MinGW32 g++ doesn't appear to run the term_func under
+   MC VC++ 6.0.
 
-3. There are problems using the libpthreadw32.a stub archive derived
-from either of pthreadVSE.dll or pthreadVCE.dll. The cleanup1.c test
-fails. This is now an expected result of having different EH and cleanup
-handler schemes in the library and application.
-
+3. This is an interim snapshot as there are still some additional
+   patches to go in, eg. to fix problems with errno support under
+   some circumstances. Some people are seeing compile warnings
+   to do with _errno.
 
 Caveats
 -------
@@ -212,6 +233,11 @@ The following functions are implemented:
       ---------------------------
       pthread_mutexattr_setforcecs_np
       pthread_getw32threadhandle_np
+	pthread_delay_np
+	pthread_win32_process_attach_np
+	pthread_win32_process_detach_np
+	pthread_win32_thread_attach_np
+	pthread_win32_thread_detach_np
 
       ---------------------------
       Static Initializers (macros)
@@ -326,14 +352,13 @@ Application Development Environments
       
 MSVC:
 MSVC using SEH works.
-MSVC using C++ EH not tested.
+MSVC using C++ EH works.
 
-Mingw32: (ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/egcs-1.1.1/)
-Mingw32 must use the thread-safe MSVCRT library (see the FAQ). You can link
-against the export library libpthread32.a built under Mingw32
-but you must run your application with the version of pthread.dll built
-with MSVC. See the "Known bugs" section above.
-      
+Mingw32:
+You need gcc-2.95.2-1 modified as per pthreads-win32 FAQ answer (6), with
+binutils-19990818-1 and msvcrt runtime-2000-03-27. Mingw32 must use
+the thread-safe MSVCRT library (see the FAQ).
+
 Cygwin: (http://sourceware.cygnus.com/cygwin/)
 Cygwin aims to provide a complete POSIX environment on top of Win32, including
 threads. When this is complete, developers using Cygwin will not need
@@ -341,17 +366,24 @@ pthreads-win32. At this time, Cygwin has preliminary support for multithreaded
 development, however, this is not turned on by default. We have not tested
 pthreads-win32 against Cygwin.
 
+UWIN:
+UWIN is a complete Unix-like environment for Windows from AT&T. Pthreads-win32
+doesn't currently support UWIN (and vice versa), but that may change in the
+future.
+
 Generally:
 For convenience, the following pre-built files are available on the FTP site
 (see Availability above):
 
-        pthread.h       - for POSIX 1c threads
-        semaphore.h     - for POSIX 1b semaphores
-        sched.h         - for POSIX 1b scheduling
-        pthread.dll     - built with MSVC cl compiler on NT4.0
-        pthread.lib     - built with MSVC cl compiler on NT4.0
-        libpthread32.a  - built with Mingw32 on Win98 (use with
-                          MSVC pthread.dll for runtime)
+	pthread.h		- for POSIX 1c threads
+	semaphore.h		- for POSIX 1b semaphores
+	sched.h		- for POSIX 1b scheduling
+	pthreadVCE.dll	- built with MSVC++ compiler using C++ EH
+	pthreadVCE.lib
+	pthreadVSE.dll	- built with MSVC compiler using SEH
+	pthreadVSE.lib
+	pthreadGCE.dll	- built with Mingw32 G++
+	libpthreadw32.a	- derived from pthreadGCE.dll
 
 These are the only files you need in order to build POSIX threads
 applications for Win32 using either MSVC or Mingw32.
@@ -359,15 +391,32 @@ applications for Win32 using either MSVC or Mingw32.
 See the FAQ file in the source tree for additional information.
 
 
-Building the library with MSVC
-------------------------------
+Building the library with MSVC from source
+------------------------------------------
 
-A simple makefile for building the library with MSVC is available. The
-Makefile by default links the library to MSVCRT.DLL. If your application
-uses another C runtime library like LIBCMT.LIB, please edit the Makefile to
-avoid conflicts between C-libraries.
+A simple makefile for building the library with MSVC is available. Just
+run nmake in a command shell in the pthreads source directory for targets
+to make either the VSE or VCE version of the library. Eg:
 
-There is also a batch file "buildlib.bat" which will build the library.
+	cd <PTHREADS_ROOT>\pthreads
+	nmake clean VSE
+or
+	nmake clean VCE
+
+There are currently no nmake targets to make statically linked
+versions of the library.
+
+Building the library with MinGW32 from source
+---------------------------------------------
+
+Run make in the pthreads source directory. Ie:
+
+	cd <PTHREADS_ROOT>\pthreads
+	make clean
+	make
+
+The GNU make utility will find the GNUmakefile in the pthreads source
+directory.
 
 
 Documentation
