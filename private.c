@@ -92,12 +92,12 @@ _pthread_find_thread_entry(pthread_t thread)
 	  /* Wrap to top of table. */
 	  this = _pthread_threads_table;
 	}
+    }
 
-      if (this->thread == NULL || this == start)
-	{
-	  /* Failed to find the thread. */
-	  return -1;
-	}
+  if (this->thread == NULL || this == start)
+    {
+      /* Failed to find the thread. */
+      return -1;
     }
 
   return this;

@@ -11,7 +11,7 @@
 static int
 is_attr(pthread_attr_t *attr)
 {
-  /* Return 0 if the attr object is valid, 1 otherwise. */
+  /* Return 0 if the attr object is valid, non-zero otherwise. */
 
   return (attr == NULL || attr->valid != _PTHREAD_ATTR_VALID);
 }
@@ -107,6 +107,20 @@ pthread_attr_init(pthread_attr_t *attr)
 }
 
 int
+pthread_attr_destroy(pthread_attr_t *attr)
+{
+  if (is_attr(attr) != 0)
+    {
+      return EINVAL;
+    }
+
+  /* Set the attribute object to a specific invalid value. */
+  attr->valid = _PTHREAD_ATTR_INVALID;
+
+  return 0;
+}
+
+int
 pthread_attr_getdetachstate(const pthread_attr_t *attr,
 			    int *detachstate)
 {
@@ -135,19 +149,5 @@ pthread_attr_setdetachstate(pthread_attr_t *attr,
     }
   
   attr->detached = detachstate;
-  return 0;
-}
-
-int
-pthread_attr_destroy(pthread_attr_t *attr)
-{
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-
-  /* Set the attribute object to a specific invalid value. */
-  attr->valid = _PTHREAD_ATTR_INVALID;
-
   return 0;
 }

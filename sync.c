@@ -12,8 +12,7 @@ int
 pthread_join(pthread_t thread, void ** valueptr)
 {
   LPDWORD exitcode;
-  _pthread_threads_thread_t * target;
-
+  int detachstate;
   pthread_t us = pthread_self();
 
   /* First check if we are trying to join to ourselves. */
@@ -22,16 +21,20 @@ pthread_join(pthread_t thread, void ** valueptr)
       return EDEADLK;
     }
 
-  /* If the thread is detached, then join will return immediately. */
+  /* Find the thread. */
+  this = _pthread_find_thread_entry(thread);
 
-  target = _pthread_find_thread_entry(thread);
-  if (target < 0)
-    {
-      return EINVAL;
-    }
-  else if (target->detached == PTHREAD_CREATE_DETACHED)
+  if (this == -1)
     {
       return ESRCH;
+    }
+
+  /* If the thread is detached, then join will return immediately. */
+
+  if (pthread_attr_getdetachedstate(&(this->attr), &detachstate) != 0 
+      || detachstate == PTHREAD_CREATE_DETACHED)
+    {
+      return EINVAL;
     }
 
   /* Wait on the kernel thread object. */
@@ -60,3 +63,26 @@ pthread_join(pthread_t thread, void ** valueptr)
   return &exitcode;
 }
 
+int
+pthread_detach(pthread_t thread)
+{
+  _pthread_threads_thread_t * this;
+  int detachstate;
+
+  this = _pthread_find_thread_entry(thread);
+
+  if (this = -1)
+    {
+      return ESRCH;
+    }
+
+  /* Check that we can detach this thread. */
+  if (pthread_attr_getdetachedstate(&(this->attr), &detachstate) != 0 
+      || detachstate == PTHREAD_CREATE_DETACHED)
+    {
+      return EINVAL;
+    }
+
+  /* FIXME: As far as I can determine we just no-op. */
+  return 0;
+}

@@ -58,19 +58,22 @@ typedef DWORD pthread_key_t;
 /*                                      Related constants */
 typedef struct {
   long valid;
+
 #ifdef _POSIX_THREAD_ATTR_STACKSIZE
   size_t stacksize;                  /* PTHREAD_STACK_MIN */
 #endif
+
   int cancelability;                 /* PTHREAD_CANCEL_DISABLE
 					PTHREAD_CANCEL_ENABLE */
+
+  int detached;                      /* PTHREAD_CREATE_DETACHED
+					PTHREAD_CREATE_JOINABLE */
 
   int canceltype;                    /* PTHREAD_CANCEL_ASYNCHRONOUS
 					PTHREAD_CANCEL_DEFERRED */
 
-  int detached;                      /* PTHREAD_CREATE_JOINABLE
-                                        PTHREAD_CREATE_DETACHED */
-
   int priority;
+
 } pthread_attr_t;
 
 /* I don't know why this structure isn't in some kind of namespace.
@@ -121,6 +124,8 @@ pthread_t pthread_self(void);
 int pthread_equal(pthread_t t1, pthread_t t2);
 
 int pthread_join(pthread_t thread, void ** valueptr);
+
+int pthread_detach(pthread_t thread);
 
 int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
 
@@ -238,22 +243,6 @@ void *pthread_getspecific(pthread_key_t key);
 
 int pthread_key_delete(pthread_key_t key);
 
-
-/* Internal primitives that must be here. */
-
-/* Generic handler push and pop routines. */
-
-void _pthread_handler_push(_pthread_handler_node_t ** stacktop,
-			   int poporder,
-			   void (*routine)(void *),
-			   void *arg);
-
-void _pthread_handler_pop(_pthread_handler_node_t ** stacktop,
-			  int execute);
-
-void _pthread_handler_pop_all(_pthread_handler_node_t ** stacktop,
-			      int execute);
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
@@ -266,11 +255,19 @@ void _pthread_handler_pop_all(_pthread_handler_node_t ** stacktop,
 
    POSIX requires that applications observe scoping requirements, but
    doesn't say if the implemention must enforce them. The macros below
-   partially enforce scope but can lead to compile or runtime errors.
- */
+   partially enforce scope but can lead to compile or runtime errors. */
+
 enum {
   _PTHREAD_HANDLER_POP_LIFO,
   _PTHREAD_HANDLER_POP_FIFO
+};
+
+enum {
+  _PTHREAD_CLEANUP_STACK,
+  _PTHREAD_DESTRUCTOR_STACK,
+  _PTHREAD_FORKPREPARE_STACK,
+  _PTHREAD_FORKPARENT_STACK,
+  _PTHREAD_FORKCHILD_STACK
 };
 
 #ifdef pthread_cleanup_push
@@ -289,20 +286,5 @@ enum {
 #define pthread_cleanup_pop(execute) \
   _pthread_handler_pop(_PTHREAD_CLEANUP_STACK, execute);\
 }
-
-
-/* Global data needed by the application but which must not be static
-   in the DLL. */
-
-extern pthread_mutex_t _pthread_count_mutex;
-
-extern DWORD _pthread_threads_count;
-
-extern _pthread_threads_thread_t _pthread_threads_table[];
-
-extern unsigned short _pthread_once_flag;
-
-extern pthread_mutex_t _pthread_once_lock;
-
 
 #endif /* _PTHREADS_H */
