@@ -1,29 +1,63 @@
 /* This is the POSIX thread API (POSIX 1003).
+ *
+ * --------------------------------------------------------------------------
+ *
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2002 Pthreads-win32 contributors
  * 
- * Pthreads-win32 - POSIX Threads Library for Win32
- * Copyright (C) 1998 Ben Elliston and Ross Johnson
- * Copyright (C) 1999,2000,2001 Ross Johnson
- *
- * Contact Email: rpj@ise.canberra.edu.au
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA
+ *      Contact Email: rpj@ise.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
 #if !defined( PTHREAD_H )
 #define PTHREAD_H
+
+#undef PTW32_LEVEL
+
+#if defined(_POSIX_SOURCE)
+#define PTW32_LEVEL 0
+/* Early POSIX */
+#endif
+
+#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 199309
+#undef PTW32_LEVEL
+#define PTW32_LEVEL 1
+/* Include 1b, 1c and 1d */
+#endif
+
+#if defined(INCLUDE_NP)
+#undef PTW32_LEVEL
+#define PTW32_LEVEL 2
+/* Include Non-Portable extensions */
+#endif
+
+#define PTW32_LEVEL_MAX 3
+
+#if !defined(PTW32_LEVEL)
+#define PTW32_LEVEL PTW32_LEVEL_MAX
+/* Include everything */
+#endif
 
 #ifdef _UWIN
 #   define HAVE_STRUCT_TIMESPEC 1
@@ -131,6 +165,26 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#if PTW32_LEVEL >= PTW32_LEVEL_MAX
+
+/* Try to avoid including windows.h */
+#if defined(__MINGW32__) && defined(__cplusplus)
+/*
+ * FIXME: The pthreadGCE.dll build gets linker unresolved errors
+ * on pthread_key_create() unless windows.h is included here.
+ * It appears to have something to do with an argument type mismatch.
+ * Looking at tsd.o with 'nm' shows this line:
+ * 00000000 T _pthread_key_create__FPP14pthread_key_t_PFPv_v
+ * instead of
+ * 00000000 T _pthread_key_create
+ */
+#define PTW32_INCLUDE_WINDOWS_H
+#endif
+
+#ifdef PTW32_INCLUDE_WINDOWS_H
+#include <windows.h>
+#endif
+
 #ifndef NEED_FTIME
 #include <time.h>
 #else /* NEED_FTIME */
@@ -142,6 +196,44 @@
 #endif /* HAVE_SIGNAL_H */
 
 #include <setjmp.h>
+
+#ifdef NEED_ERRNO
+#  include "need_errno.h"
+#else
+#  include <errno.h>
+#endif
+
+/*
+ * Several systems don't define ENOTSUP. If not, we use
+ * the same value as Solaris.
+ */
+#ifndef ENOTSUP
+#  define ENOTSUP 48
+#endif
+
+#ifndef ETIMEDOUT
+#  define ETIMEDOUT 10060     /* This is the value in winsock.h. */
+#endif
+
+#include <sched.h>
+
+/*
+ * To avoid including windows.h we define only those things that we
+ * actually need from it. I don't like the potential incompatibility that
+ * this creates with future versions of windows.
+ */
+#ifndef PTW32_INCLUDE_WINDOWS_H
+#ifndef HANDLE
+# define PTW32__HANDLE_DEF
+# define HANDLE void *
+#endif
+#ifndef DWORD
+# define PTW32__DWORD_DEF
+# define DWORD unsigned long
+#endif
+#endif
+
+#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
 #ifndef HAVE_STRUCT_TIMESPEC
 struct timespec {
@@ -161,42 +253,6 @@ struct timespec {
 #ifndef SIG_SETMASK
 #define SIG_SETMASK 2
 #endif /* SIG_SETMASK */
-
-#ifdef NEED_ERRNO
-#  include "need_errno.h"
-#else
-#  include <errno.h>
-#endif
-
-#include <sched.h>
-
-/*
- * Several systems don't define ENOTSUP. If not, we use
- * the same value as Solaris.
- */
-#ifndef ENOTSUP
-#  define ENOTSUP 48
-#endif
-
-#ifndef ETIMEDOUT
-#  define ETIMEDOUT 10060     /* This is the value in winsock.h. */
-#endif
-
-/*
- * To avoid including windows.h we define only those things that we
- * actually need from it. I don't like the potential incompatibility that
- * this creates with future versions of windows.
- */
-#ifndef PTW32_INCLUDE_WINDOWS_H
-#ifndef HANDLE
-# define __HANDLE_DEF
-# define HANDLE void *
-#endif
-#ifndef DWORD
-# define __DWORD_DEF
-# define DWORD unsigned long
-#endif
-#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -381,7 +437,7 @@ extern "C"
 #define PTHREAD_THREADS_MAX				2019
 
 
-#ifdef _UWIN
+#if defined(_UWIN) && PTW32_LEVEL >= PTW32_LEVEL_MAX
 #   include	<sys/types.h>
 #else
 typedef struct pthread_t_ *pthread_t;
@@ -778,11 +834,13 @@ void pthread_testcancel (void);
 int pthread_once (pthread_once_t * once_control,
 		  void (*init_routine) (void));
 
+#if PTW32_LEVEL >= PTW32_LEVEL_MAX
 ptw32_cleanup_t *ptw32_pop_cleanup (int execute);
 
 void ptw32_push_cleanup (ptw32_cleanup_t * cleanup,
 			   void (*routine) (void *),
 			   void *arg);
+#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
 /*
  * Thread Specific Data Functions
@@ -945,6 +1003,8 @@ int pthread_rwlockattr_getpshared (const pthread_rwlockattr_t * attr,
 int pthread_rwlockattr_setpshared (pthread_rwlockattr_t * attr,
 				   int pshared);
 
+#if PTW32_LEVEL >= PTW32_LEVEL_MAX - 1
+
 /*
  * Non-portable functions
  */
@@ -961,11 +1021,6 @@ int pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr, int *kind);
 int pthread_delay_np (struct timespec * interval);
 
 /*
- * Returns the Win32 HANDLE for the POSIX thread.
- */
-HANDLE pthread_getw32threadhandle_np(pthread_t thread);
-
-/*
  * Returns the number of CPUs available to the process.
  */
 int pthread_getprocessors_np(int * count);
@@ -979,6 +1034,15 @@ int pthread_win32_process_attach_np(void);
 int pthread_win32_process_detach_np(void);
 int pthread_win32_thread_attach_np(void);
 int pthread_win32_thread_detach_np(void);
+
+#endif /*PTW32_LEVEL >= PTW32_LEVEL_MAX - 1 */
+
+#if PTW32_LEVEL >= PTW32_LEVEL_MAX
+
+/*
+ * Returns the Win32 HANDLE for the POSIX thread.
+ */
+HANDLE pthread_getw32threadhandle_np(pthread_t thread);
 
 
 /*
@@ -998,6 +1062,8 @@ int pthread_win32_thread_detach_np(void);
  */
 int pthreadCancelableWait (HANDLE waitHandle);
 int pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
+
+#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
 /*
  * Thread-Safe C Runtime Library Mappings.
@@ -1063,11 +1129,15 @@ class ptw32_exception_exit   : public ptw32_exception {};
 
 #endif
 
+#if PTW32_LEVEL >= PTW32_LEVEL_MAX
+
 /* FIXME: This is only required if the library was built using SEH */
 /*
  * Get internal SEH tag
  */
 DWORD ptw32_get_exception_services_code(void);
+
+#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
 #ifndef PTW32_BUILD
 
@@ -1097,15 +1167,31 @@ DWORD ptw32_get_exception_services_code(void);
 
 #ifndef PtW32NoCatchWarn
 
+#pragma message("Specify \"/DPtW32NoCatchWarn\" compiler flag to skip this message.")
+#pragma message("------------------------------------------------------------------")
 #pragma message("When compiling applications with MSVC++ and C++ exception handling:")
-#pragma message("  Replace any 'catch( ... )' with 'PtW32CatchAll' in POSIX threads")
-#pragma message("  if you want POSIX thread cancelation and pthread_exit to work.")
+#pragma message("  Replace any 'catch( ... )' in routines called from POSIX threads")
+#pragma message("  with 'PtW32CatchAll' or 'CATCHALL' if you want POSIX thread")
+#pragma message("  cancelation and pthread_exit to work. For example:")
+#pragma message("")
+#pragma message("    #ifdef PtW32CatchAll")
+#pragma message("      PtW32CatchAll")
+#pragma message("    #else")
+#pragma message("      catch(...)")
+#pragma message("    #endif")
+#pragma message("	 {")
+#pragma message("	   /* Catchall block processing */")
+#pragma message("	 }")
+#pragma message("------------------------------------------------------------------")
 
 #endif
 
 #define PtW32CatchAll \
 	catch( ptw32_exception & ) { throw; } \
 	catch( ... )
+
+/* I believe this is used by TRU64 POSIX threads implementation. */
+#define CATCHALL PtW32CatchAll
 
 #else /* _MSC_VER */
 
@@ -1123,11 +1209,14 @@ DWORD ptw32_get_exception_services_code(void);
 }				/* End of extern "C" */
 #endif				/* __cplusplus */
 
-#ifdef __HANDLE_DEF
+#ifdef PTW32__HANDLE_DEF
 # undef HANDLE
 #endif
-#ifdef __DWORD_DEF
+#ifdef PTW32__DWORD_DEF
 # undef DWORD
 #endif
+
+#undef PTW32_LEVEL
+#undef PTW32_LEVEL_MAX
 
 #endif /* PTHREAD_H */

@@ -5,26 +5,34 @@
  * This translation unit implements routines associated with spawning a new
  * thread.
  *
- * Pthreads-win32 - POSIX Threads Library for Win32
- * Copyright (C) 1998 Ben Elliston and Ross Johnson
- * Copyright (C) 1999,2000,2001 Ross Johnson
+ * --------------------------------------------------------------------------
  *
- * Contact Email: rpj@ise.canberra.edu.au
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA
+ *	Pthreads-win32 - POSIX Threads Library for Win32
+ *	Copyright(C) 1998 John E. Bossom
+ *	Copyright(C) 1999,2002 Pthreads-win32 contributors
+ * 
+ *	Contact Email: rpj@ise.canberra.edu.au
+ * 
+ *	The current list of contributors is contained
+ *	in the file CONTRIBUTORS included with the source
+ *	code distribution. The list can also be seen at the
+ *	following World Wide Web location:
+ *	http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *	This library is free software; you can redistribute it and/or
+ *	modify it under the terms of the GNU Lesser General Public
+ *	License as published by the Free Software Foundation; either
+ *	version 2 of the License, or (at your option) any later version.
+ * 
+ *	This library is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *	Lesser General Public License for more details.
+ * 
+ *	You should have received a copy of the GNU Lesser General Public
+ *	License along with this library in the file COPYING.LIB;
+ *	if not, write to the Free Software Foundation, Inc.,
+ *	59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
 #include "pthread.h"
@@ -46,16 +54,16 @@ pthread_create (pthread_t * tid,
       *
       * PARAMETERS
       *      tid
-      *              pointer to an instance of pthread_t
+      * 	     pointer to an instance of pthread_t
       *
       *      attr
-      *              optional pointer to an instance of pthread_attr_t
+      * 	     optional pointer to an instance of pthread_attr_t
       *
       *      start
-      *              pointer to the starting routine for the new thread
+      * 	     pointer to the starting routine for the new thread
       *
       *      arg
-      *              optional parameter passed to 'start'
+      * 	     optional parameter passed to 'start'
       *
       *
       * DESCRIPTION
@@ -66,9 +74,9 @@ pthread_create (pthread_t * tid,
       *      as 'tid'
       *
       * RESULTS
-      *              0               successfully created thread,
-      *              EINVAL          attr invalid,
-      *              EAGAIN          insufficient resources.
+      * 	     0		     successfully created thread,
+      * 	     EINVAL	     attr invalid,
+      * 	     EAGAIN	     insufficient resources.
       *
       * ------------------------------------------------------
       */
@@ -81,18 +89,6 @@ pthread_create (pthread_t * tid,
   long stackSize;
 
   if ((thread = ptw32_new()) == NULL)
-    {
-      goto FAIL0;
-    }
-
-  thread->cancelEvent =
-    CreateEvent (
-                 0,
-                 (int) TRUE,	/* manualReset  */
-                 (int) FALSE,	/* setSignaled  */
-                 NULL);
-
-  if (thread->cancelEvent == NULL)
     {
       goto FAIL0;
     }
@@ -145,12 +141,12 @@ pthread_create (pthread_t * tid,
 
   thread->threadH = threadH = (HANDLE)
     _beginthreadex (
-                    (void *) NULL,	/* No security info             */
-                    (unsigned) stackSize,	/* default stack size   */
-                    ptw32_threadStart,
-                    parms,
-                    (unsigned) CREATE_SUSPENDED,
-                    (unsigned *) &(thread->thread));
+		    (void *) NULL,	/* No security info		*/
+		    (unsigned) stackSize,	/* default stack size	*/
+		    ptw32_threadStart,
+		    parms,
+		    (unsigned) CREATE_SUSPENDED,
+		    (unsigned *) &(thread->thread));
 
   if (threadH != 0)
     {
@@ -162,17 +158,17 @@ pthread_create (pthread_t * tid,
        * PTHREAD_EXPLICIT_SCHED and priority THREAD_PRIORITY_NORMAL.
        */
       if (attr != NULL && *attr != NULL)
-        {
-          (void) SetThreadPriority(threadH,
-                                   PTHREAD_INHERIT_SCHED == (*attr)->inheritsched
-                                   ? GetThreadPriority(GetCurrentThread())
-                                   : (*attr)->param.sched_priority );
-        }
+	{
+	  (void) SetThreadPriority(threadH,
+				   PTHREAD_INHERIT_SCHED == (*attr)->inheritsched
+				   ? GetThreadPriority(GetCurrentThread())
+				   : (*attr)->param.sched_priority );
+	}
 
       if (run)
-        {
-          ResumeThread(threadH);
-        }
+	{
+	  ResumeThread(threadH);
+	}
     }
 
 #else /* __MINGW32__ && ! __MSVCRT__ */
@@ -185,9 +181,9 @@ pthread_create (pthread_t * tid,
 
   thread->threadH = threadH = (HANDLE)
     _beginthread (
-                  ptw32_threadStart,
-                  (unsigned) stackSize,	/* default stack size   */
-                  parms);
+		  ptw32_threadStart,
+		  (unsigned) stackSize, /* default stack size	*/
+		  parms);
 
   /*
    * Make the return code match _beginthreadex's.
@@ -199,14 +195,14 @@ pthread_create (pthread_t * tid,
   else
     {
       if (! run)
-        {
-          /* 
-           * beginthread does not allow for create flags, so we do it now.
-           * Note that beginthread itself creates the thread in SUSPENDED
-           * mode, and then calls ResumeThread to start it.
-           */
-          SuspendThread (threadH);
-        }
+	{
+	  /* 
+	   * beginthread does not allow for create flags, so we do it now.
+	   * Note that beginthread itself creates the thread in SUSPENDED
+	   * mode, and then calls ResumeThread to start it.
+	   */
+	  SuspendThread (threadH);
+	}
       
       /*
        * PTHREAD_EXPLICIT_SCHED is the default because Win32 threads
@@ -216,12 +212,12 @@ pthread_create (pthread_t * tid,
        * PTHREAD_EXPLICIT_SCHED and priority THREAD_PRIORITY_NORMAL.
        */
       if (attr != NULL && *attr != NULL)
-        {
-          (void) SetThreadPriority(threadH,
-                                   PTHREAD_INHERIT_SCHED == (*attr)->inheritsched
-                                   ? GetThreadPriority(GetCurrentThread())
-                                   : (*attr)->param.sched_priority );
-        }
+	{
+	  (void) SetThreadPriority(threadH,
+				   PTHREAD_INHERIT_SCHED == (*attr)->inheritsched
+				   ? GetThreadPriority(GetCurrentThread())
+				   : (*attr)->param.sched_priority );
+	}
     }
 
   (void) pthread_mutex_unlock(&thread->cancelLock);

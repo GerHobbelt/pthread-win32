@@ -1,7 +1,10 @@
-/* config.h.in  Generated automatically from configure.in by autoheader.  */
+/* config.h  */
 
 #ifndef PTW32_CONFIG_H
 #define PTW32_CONFIG_H
+
+/* We're building the pthreads-win32 library */
+#define PTW32_BUILD
 
 /* Do we know about the C type sigset_t? */
 #undef HAVE_SIGSET_T
@@ -39,8 +42,8 @@
 /* Define if you have the timespec struct */
 #undef HAVE_STRUCT_TIMESPEC
 
-/* 
- * Target specific groups 
+/*
+ * Target specific groups
  */
 #ifdef WINCE
 #define NEED_DUPLICATEHANDLE

@@ -1,6 +1,6 @@
 /* for running tests */
-CCFLAGS = -g 
-_MT	== 1
+CCFLAGS 	= -g 
+_MT		== 1
 _timeb	== timeb
 _ftime	== ftime 
 
@@ -46,9 +46,14 @@ mutex7::	mutex7.c
 mutex7e::	mutex7e.c
 mutex7n::	mutex7n.c
 mutex7r::	mutex7r.c
+mutex8::	mutex8.c
+mutex8e::	mutex8e.c
+mutex8n::	mutex8n.c
+mutex8r::	mutex8r.c
 equal1::	equal1.c
 exit2::		exit2.c
 exit3::		exit3.c
+exit4::		exit4.c
 join0::		join0.c
 join1::		join1.c
 join2::		join2.c
@@ -76,6 +81,8 @@ context1::	context1.c
 cancel3::	cancel3.c
 cancel4::	cancel4.c
 cancel5::	cancel5.c
+cancel6a::	cancel6a.c
+cancel6d::	cancel6d.c
 cleanup0::	cleanup0.c
 cleanup1::	cleanup1.c
 cleanup2::	cleanup2.c
@@ -123,6 +130,10 @@ mutex7		:test:	mutex6
 mutex7n		:test:	mutex6n
 mutex7e		:test:	mutex6e
 mutex7r		:test:	mutex6r
+mutex8		:test:	mutex7
+mutex8n		:test:	mutex7n
+mutex8e		:test:	mutex7e
+mutex8r		:test:	mutex7r
 equal1		:test:	create1
 exit2		:test:	create1
 exit3		:test:	create1
@@ -155,6 +166,8 @@ context1	:test:	cancel2
 cancel3		:test:	context1
 cancel4		:test:	cancel3
 cancel5		:test:	cancel3
+cancel6a		:test:	cancel3
+cancel6d		:test:	cancel3
 cleanup0	:test:	cancel5
 cleanup1	:test:	cleanup0
 cleanup2	:test:	cleanup1
@@ -179,4 +192,5 @@ benchtest5      :test:  benchtest4
 exception1	:test:	cancel4
 exception2	:test:	exception1
 exception3	:test:	exception2
+exit4		:test:	exit3
 

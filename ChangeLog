@@ -1,11 +1,112 @@
-2002-02-02  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+2002-02-07  Alexander Terekhov<TEREKHOV@de.ibm.com>
 
-	Contributed by - Alexander Terekhov<TEREKHOV@de.ibm.com>
-	
 	* nonportable.c (pthread_delay_np): Make a true
 	cancelation point. Deferred cancels will interrupt the
 	wait.
+
+2002-02-07  Ross Johnson  <rpj@setup1.ise.canberra.edu.au
+
+	* misc.c (ptw32_new): Add creation of cancelEvent so that
+	implicit POSIX threads (Win32 threads with a POSIX face)
+	are cancelable; mainly so that pthread_delay_np doesn't fail
+	if called from the main thread.
+	* create.c (pthread_create): Remove creation of cancelEvent
+	from here; now in ptw32_new().
+
+	Reduce executable size.
+	-----------------------
+	When linking with the static library, only those
+	routines actually called, either directly or indirectly
+	should be included.
+
+	[Gcc has the -ffunction-segments option to do this but MSVC
+	doesn't have this feature as far as I can determine. Other
+	compilers are undetermined as well. - rpj]
+
+	* barrier.c: All routines are now in separate compilation units;
+	This file is used to congregate the separate modules for
+	potential inline optimisation and backward build compatibility.
+	* cancel.c: Likewise.
+	* barrier_attr_destroy.c: Separated routine from cancel.c.
+	* barrier_attr_getpshared.c: Likewise.
+	* barrier_attr_init.c: Likewise.
+	* barrier_attr_setpshared.c: Likewise.
+	* barrier_destroy.c: Likewise.
+	* barrier_init.c: Likewise.
+	* barrier_wait.c: Likewise.
+	* cancel_cancel.c: Likewise.
+	* cancel_setcancelstate.c: Likewise.
+	* cancel_setcanceltype.c: Likewise.
+	* cancel_testcancel.c: Likewise.
+
+2002-02-04  Max Woodbury <mtew@cds.duke.edu>
+
+	Reduced name space pollution.
+	-----------------------------
+	When the appropriate symbols are defined, the headers
+	will restrict the definitions of new names. In particular,
+	it must be possible to NOT include the <windows.h>
+	header and related definitions with some combination
+	of symbol definitions. Secondly, it should be possible
+	that additional definitions should be limited to POSIX 
+	compliant symbols by the definition of appropriate symbols.
+
+	* pthread.h: POSIX conditionals.
+	* sched.h: POSIX conditionals.
+	* semaphore.h: POSIX conditionals.
+
+	* semaphore.c: Included <limits.h>.
+	(sem_init): Changed magic 0x7FFFFFFFL to INT_MAX.
+	(sem_getvalue): Trial version.
+
+	Reduce executable size.
+	-----------------------
+	When linking with the static library, only those
+	routines actually called, either directly or indirectly
+	should be included.
+
+	[Gcc has the -ffunction-segments option to do this but MSVC
+	doesn't have this feature as far as I can determine. Other
+	compilers are undetermined as well. - rpj]
+
+	* semaphore.c: All routines are now in separate compilation units;
+	This file is used to congregate the separate modules for
+	potential inline optimisation and backward build compatibility.
+	* semaphore_close.c: Separated routine from semaphore.c.
+	* semaphore_decrease.c: Likewise.
+	* semaphore_destroy.c: Likewise.
+	* semaphore_getvalue.c: Likewise.
+	* semaphore_increase.c: Likewise.
+	* semaphore_init.c: Likewise.
+	* semaphore_open.c: Likewise.
+	* semaphore_post.c: Likewise.
+	* semaphore_postmultiple.c: Likewise.
+	* semaphore_timedwait.c: Likewise.
+	* semaphore_trywait.c: Likewise.
+	* semaphore_unlink.c: Likewise.
+	* semaphore_wait.c: Likewise.
+
+2002-02-04  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	The following extends the idea above to the rest of pthreads-win32 - rpj
 	
+	* attr.c: All routines are now in separate compilation units;
+	This file is used to congregate the separate modules for
+	potential inline optimisation and backward build compatibility.
+	* attr_destroy.c: Separated routine from attr.c.
+	* attr_getdetachstate.c: Likewise.
+	* attr_getscope.c: Likewise.
+	* attr_getstackaddr.c: Likewise.
+	* attr_getstacksize.c: Likewise.
+	* attr_init.c: Likewise.
+	* attr_is_attr.c: Likewise.
+	* attr_setdetachstate.c: Likewise.
+	* attr_setscope.c: Likewise.
+	* attr_setstackaddr.c: Likewise.
+	* attr_setstacksize.c: Likewise.
+
+	* pthread.c: Agregation of agregate modules for super-inlineability.
+
 2002-02-02  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* cancel.c: Rearranged some code and introduced checks
@@ -114,10 +215,7 @@
 	OS version of InterlockedCompareExchange() if the
 	OS supports it (see ChangeLog entry of 2001-10-17).
 
-2002-01-07  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
-
-	Contributed by - Thomas Pfaff <tpfaff@gmx.net>
-	                 Alexander Terekhov <TEREKHOV@de.ibm.com>
+2002-01-07  Thomas Pfaff <tpfaff@gmx.net>, Alexander Terekhov <TEREKHOV@de.ibm.com>
 
 	* mutex.c (pthread_mutex_init): Remove critical
 	section calls.
@@ -144,17 +242,13 @@
 	* ANNOUNCE: Fix out of date comment next to
 	pthread_attr_setscope in conformance section.
 
-2001-12-21  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+2001-12-21  Alexander Terekhov <TEREKHOV@de.ibm.com>
 
-	Contributed by - Alexander Terekhov <TEREKHOV@de.ibm.com>
-	
 	* mutex.c (pthread_mutex_lock): Decrementing lock_idx was
 	not thread-safe.
 	(pthread_mutex_trylock): Likewise.
 
-2001-10-26  Ross Johnson  <rpj@special.ise.canberra.edu.au>
-
-	Reported by -  prionx@juno.com
+2001-10-26  prionx@juno.com
 
 	* semaphore.c (sem_init): Fix typo and missing bracket
 	in conditionally compiled code. Only older versions of
@@ -240,9 +334,7 @@
 	that is no longer used.
 	* implement.h: Likewise.
 
-2001-08-23  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
-
-	Contributed by - "Alexander Terekhov" <TEREKHOV@de.ibm.com>
+2001-08-23  Alexander Terekhov <TEREKHOV@de.ibm.com>
 
 	* condvar.c (pthread_cond_destroy): fix bug with
 	respect to deadlock in the case of concurrent
@@ -250,14 +342,12 @@
 	immediately after all the threads that are blocked on
 	it are awakened.
 
-	Contributed by - "Phil Frisbie, Jr." <phil@hawksoft.com>
+2001-08-23  Phil Frisbie, Jr. <phil@hawksoft.com>
 
 	* tsd.c (pthread_getspecific): Preserve the last
 	winsock error [from WSAGetLastError()].
 
-2001-07-18  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
-
-	Contributed by - "Scott McCaskill" <scott@magruder.org>
+2001-07-18  Scott McCaskill <scott@magruder.org>
 
 	* mutex.c (pthread_mutexattr_init): Return ENOMEM
 	immediately and don't dereference the NULL pointer
@@ -363,9 +453,7 @@
 	* pthread.h (_POSIX_READER_WRITER_LOCKS): Define it
 	if not already defined.
 
-2001-07-01  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
-
-	Contributed by  - Alexander Terekhov.
+2001-07-01  Alexander Terekhov <TEREKHOV@de.ibm.com>
 
 	* condvar.c: Fixed lost signal bug reported by Timur Aydin
 	(taydin@snet.net).
@@ -431,9 +519,7 @@
 	* pthread.def (sched_setscheduler): Exported.
 	(sched_getscheduler): Likewise.
 
-2001-06-23  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
-
-	Contributed by -  Ralf Brese <Ralf.Brese@pdb4.siemens.de>
+2001-06-23  Ralf Brese <Ralf.Brese@pdb4.siemens.de>
 
 	* create.c (pthread_create): Set thread priority from
 	thread attributes.
@@ -452,9 +538,7 @@
 	* private.c (pthread_count): Likewise.
 	* exit.c (pthread_count): Likewise.
 
-2001-06-18  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
-
-	Contributed by -  David Korn <dgk@research.att.com>
+2001-06-18  David Korn <dgk@research.att.com>
 
 	* dll.c: Added changes necessary to work with UWIN.
 	* create.c: Likewise.
@@ -526,10 +610,7 @@
 	developed by Terekhov and Thomas, plus reference to
 	README.CV.
 
-2001-06-03  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
-
-	Contributed by  - Alexander Terekhov <TEREKHOV@de.ibm.com>
-	                - Louis Thomas <lthomas@arbitrade.com>
+2001-06-03  Alexander Terekhov <TEREKHOV@de.ibm.com>, Louis Thomas <lthomas@arbitrade.com>
 
 	* condvar.c (pthread_cond_init): Completely revamped.
 	(pthread_cond_destroy): Likewise.
@@ -550,9 +631,7 @@
 	and increase optimisation level - for smaller faster prebuilt
 	dlls.
 	
-2001-05-29  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
-
-	Contributed by  - Milan Gardian <Milan.Gardian@LEIBINGER.com>
+2001-05-29  Milan Gardian <Milan.Gardian@LEIBINGER.com>
 
 	* Makefile: fix typo.
 	* pthreads.h: Fix problems with stdcall/cdecl conventions, in particular
@@ -569,9 +648,7 @@
 	* Remove unnecessary #includes from a number of modules -
 	[I had to #include malloc.h in implement.h for gcc - rpj].
 
-2001-05-29  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
-
-	Contributed by 	- Thomas Pfaff <tpfaff@gmx.net>
+2001-05-29  Thomas Pfaff <tpfaff@gmx.net>
 
 	* pthread.h (PTHREAD_MUTEX_DEFAULT): New; equivalent to
 	PTHREAD_MUTEX_DEFAULT_NP.
@@ -608,10 +685,8 @@
 	* Also fixed some of the same typos and eliminated PT_STDCALL as
 	Milan Gardian's patches above.
 
-2001-02-07  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+2001-02-07  Alexander Terekhov <TEREKHOV@de.ibm.com>
 
-	Contributed by  - Alexander Terekhov <TEREKHOV@de.ibm.com>
-	
 	* rwlock.c: Revamped.
 	* implement.h (pthread_rwlock_t_): Redefined.
 	This implementation does not have reader/writer starvation problem.
@@ -705,14 +780,13 @@
 	* FAQ: Update Answer 6 re getting a fully working
 	Mingw32 built library.
 
-2000-10-10  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+2000-10-10  Steven Reddie <smr@essemer.com.au>
  
         * misc.c (pthread_self): Restore Win32 "last error"
         cleared by TlsGetValue() call in
         pthread_getspecific()
-        - "Steven Reddie" <smr@essemer.com.au>
  
-2000-09-20  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+2000-09-20  Arthur Kantor <akantor@bexusa.com>
  
         * mutex.c (pthread_mutex_lock): Record the owner
         of the mutex. This requires also keeping count of
@@ -726,16 +800,14 @@
         EPERM if the mutex is owned by another thread.
         * implement.h (pthread_mutex_t_): Add ownerThread
         and lockCount members.
-        - reported by Arthur Kantor <akantor@bexusa.com>
 
-2000-09-13  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+2000-09-13  Jef Gearhart <jgearhart@tpssys.com>
 
 	* mutex.c (pthread_mutex_init): Call
 	TryEnterCriticalSection through the pointer
 	rather than directly so that the dll can load
 	on Windows versions that can't resolve the
 	function, eg. Windows 95
-	- "Jef Gearhart" <jgearhart@tpssys.com>
 
 2000-09-09  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
@@ -999,12 +1071,13 @@
 
 	* sync.c (pthread_join): Remove dead code.
 
-2000-07-25  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+2000-07-25  Tristan Savatier <tristan@mpegtv.com>
 
 	* sched.c (sched_get_priority_max): Handle different WinCE and
 	Win32 priority values together.
 	(sched_get_priority_min): Ditto.
-	- Tristan Savatier <tristan@mpegtv.com>
+
+2000-07-25  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* create.c (pthread_create): Force new threads to wait until
 	pthread_create has the new thread's handle; we also retain
@@ -1060,6 +1133,12 @@
 
 	* FAQ: Added Q5 and Q6.
 
+2000-07-21  David Baggett <dmb@itasoftware.com>
+
+	* dll.c: Include resource leakage work-around. This is a
+	partial FIXME which doesn't stop all leakage. The real
+	problem needs to be found and fixed.
+
 2000-07-21  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* create.c (pthread_create): Set threadH to 0 (zero)
@@ -1067,11 +1146,6 @@
 	it should be NULL everywhere - need to check. (I know
 	they are nearly always the same thing - but not by
 	definition.)
-
-	* dll.c: Include resource leakage work-around. This is a
-	partial FIXME which doesn't stop all leakage. The real
-	problem needs to be found and fixed.
-	- "David Baggett" <dmb@itasoftware.com>
 
 	* misc.c (pthread_self): Try to catch NULL thread handles
 	at the point where they might be generated, even though
@@ -1118,10 +1192,9 @@
 	(ptw32_cancel_self): Include SEH code only if MSC is not
 	compiling as C++.
 
-2000-01-06  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+2000-01-06  Erik Hensema <erik.hensema@group2000.nl>
 
 	* Makefile: Remove inconsistencies in 'cl' args
-	- Erik Hensema <erik.hensema@group2000.nl>
 
 2000-01-04  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
@@ -1176,6 +1249,8 @@
 	(struct pthread_t_): Add cancelLock mutex for async cancel
 	safety.
 
+1999-11-21  Jason Nye <jnye@nbnet.nb.ca>, Erik Hensema <erik.hensema@group2000.nl>
+
 	* cancel.c (ptw32_cancel_self): New; part of the async
 	cancellation implementation.
 	(ptw32_cancel_thread): Ditto; this function is X86
@@ -1184,21 +1259,19 @@
 	cancel request and cancel the calling thread if
 	required; add async-cancel safety lock.
 	(pthread_setcanceltype): Ditto.
-	- Jason Nye <jnye@nbnet.nb.ca>
-	- Erik Hensema <erik.hensema@group2000.nl>
 
-1999-11-13  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+1999-11-13  Erik Hensema <erik.hensema@group2000.nl>
 
 	* configure.in (AC_OUTPUT): Put generated output into GNUmakefile
 	rather than Makefile. Makefile will become the MSC nmake compatible
 	version
-	- Erik Hensema <erik.hensema@group2000.nl>
+
+1999-11-13  John Bossom (John.Bossom@cognos.com>
 
 	* misc.c (pthread_self): Add a note about GetCurrentThread
 	returning a pseudo-handle
-	- John Bossom (John.Bossom@cognos.com>
 
-1999-11-10  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+1999-11-10  Todd Owen <towen@lucidcalm.dropbear.id.au>
 
 	* dll.c (dllMain): Free kernel32 ASAP.
 	If TryEnterCriticalSection is not being used, then free
@@ -1213,14 +1286,15 @@
 	Since w95 just happens to be a platform which does not
 	provide TryEnterCriticalSection, the bug will be
 	effortlessly avoided.
-	- Todd Owen <towen@lucidcalm.dropbear.id.au>
+
+1999-11-10  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* sync.c (pthread_join): Make it a deferred cancelation point.
 
 	* misc.c (pthread_self): Explicitly initialise implicitly
 	created thread state to default values.
 
-1999-11-05  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+1999-11-05  Tristan Savatier <tristan@mpegtv.com>
 
 	* pthread.h (winsock.h): Include unconditionally.
 	(ETIMEDOUT): Change fallback value to that defined by winsock.h.
@@ -1228,9 +1302,8 @@
 	* general: Patched for portability to WinCE. The details are
 	described in the file WinCE-PORT. Follow the instructions
 	in README.WinCE to make the appropriate changes in config.h.
-	- Tristan Savatier <tristan@mpegtv.com>
 
-1999-10-30  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+1999-10-30  Erik Hensema <erik.hensema@group2000.nl>
 
 	* create.c (pthread_create): Explicitly initialise thread state to
 	default values.
@@ -1238,19 +1311,16 @@
 	* cancel.c (pthread_setcancelstate): Check for NULL 'oldstate'
 	for compatibility with Solaris pthreads;
 	(pthread_setcanceltype): ditto:
-	- Erik Hensema <erik.hensema@group2000.nl>
 
-1999-10-23  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+1999-10-23  Erik Hensema <erik.hensema@group2000.nl>
 
 	* pthread.h (ctime_r): Fix incorrect argument "_tm"
-	- Erik Hensema <erik.hensema@group2000.nl>
 
-1999-10-21  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+1999-10-21  Aurelio Medina <aureliom@crt.com>
 
 	* pthread.h (_POSIX_THREADS): Only define it if it isn't
 	already defined. Projects may need to define this on
 	the CC command line under Win32 as it doesn't have unistd.h
-	- Aurelio Medina <aureliom@crt.com>
 
 1999-10-17  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
@@ -1260,7 +1330,7 @@
 	* condvar.c (pthread_cond_broadcast): Only release semaphores
 	if there are waiting threads.
 
-1999-10-15  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+1999-10-15  Lorin Hochstein <lmh@xiphos.ca>, Peter Slacik <Peter.Slacik@tatramed.sk>
 
 	* condvar.c (cond_wait_cleanup): New static cleanup handler for
 	cond_timedwait;
@@ -1268,10 +1338,11 @@
 	canceling a thread while it's in pthread_cond_wait
 	will now decrement the waiters count and cleanup if it's the
 	last waiter.
-	- Lorin Hochstein <lmh@xiphos.ca> and 
-	  Peter Slacik <Peter.Slacik@tatramed.sk>;
-	the last waiter will now reset the CV's wasBroadcast flag
-	- Graham Dumpleton <Graham.Dumpleton@ra.pad.otc.telstra.com.au>.
+
+1999-10-15  Graham Dumpleton <Graham.Dumpleton@ra.pad.otc.telstra.com.au>
+
+	* condvar.c (cond_wait_cleanup): the last waiter will now reset the CV's
+	wasBroadcast flag
 
 Thu Sep 16 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
@@ -1288,10 +1359,7 @@ Thu Sep 16 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 	* mutex.c: Modify comments.
 	* condvar.c: Modify comments.
 
-Sat Sep 10 12:56:13 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
-
-	The following code for POSIX read/write locks was contributed
-	by Aurelio Medina.
+1999-08-10  Aurelio Medina  <aureliom@crt.com>
 
 	* implement.h (pthread_rwlock_t_): Add.
 	* pthread.h (pthread_rwlock_t): Add.
@@ -1307,10 +1375,9 @@ Sat Sep 10 12:56:13 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 	if mutex is PTHREAD_MUTEX_INITIALIZER and has not been
 	initialised yet.
 
-Wed Sep  8 12:56:13 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+1999-08-08 Milan Gardian <mg@tatramed.sk>
 
 	* mutex.c (pthread_mutex_destroy): Free mutex memory.
-	- Milan Gardian <mg@tatramed.sk>
 
 1999-08-22  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
@@ -1329,17 +1396,14 @@ Wed Sep  8 12:56:13 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 	the application thread startup routine.
 	- Milan Gardian <mg@tatramed.sk>
 
-1999-08-18  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+1999-08-18  John Bossom <john.Bossom@cognos.com>
 
 	* exit.c (pthread_exit): Put status into pthread_t->exitStatus
-	- John Bossom <john.Bossom@cognos.com>
 	* private.c (ptw32_threadStart): Set pthread->exitStatus
 	on exit of try{} block.
-	- John Bossom <john.Bossom@cognos.com>
 	* sync.c (pthread_join): use pthread_exitStatus value if the
 	thread exit doesn't return a value (for Mingw32 CRTDLL
 	which uses endthread instead of _endthreadex).
-	- John Bossom <john.Bossom@cognos.com>
 
 Tue Aug 17 20:17:58 CDT 1999  Mumit Khan  <khan@xraylith.wisc.edu>
 
@@ -1374,19 +1438,14 @@ Tue Aug 17 20:00:08 1999  Mumit Khan  <khan@xraylith.wisc.edu>
 	* exit.c (pthread_exit): Check for implicitly created threads
 	to avoid raising an unhandled exception.
 	
-1999-07-12  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+1999-07-12  Peter Slacik <Peter.Slacik@tatramed.sk>
 
 	* condvar.c (pthread_cond_destroy): Add critical section.
 	(cond_timedwait): Add critical section; check for timeout
 	waiting on semaphore.
 	(pthread_cond_broadcast): Add critical section.
-	- Peter Slacik <Peter.Slacik@tatramed.sk>
 
-1999-07-09  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
-
-	The following changes fix a bug identified by
-	Lorin Hochstein <lmh@xiphos.ca> and solved by
-	John Bossom <John.Bossom@Cognos.COM>.
+1999-07-09  Lorin Hochstein <lmh@xiphos.ca>, John Bossom <John.Bossom@Cognos.COM>
 
 	The problem was that cleanup handlers were not executed when
 	pthread_exit() was called.
@@ -1395,6 +1454,7 @@ Tue Aug 17 20:00:08 1999  Mumit Khan  <khan@xraylith.wisc.edu>
 	C++ per-thread exception information.
 	(general): Define and rename exceptions.
 
+1999-07-09  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* misc.c (CancelableWait):  PTW32_EPS_CANCEL (SEH) and
 	ptw32_exception_cancel (C++) used to identify the exception.
@@ -1413,22 +1473,21 @@ Sun May 30 00:25:02 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* semaphore.h (mode_t): Conditionally typedef it.
 
-Fri May 28 13:33:05 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+Fri May 28 13:33:05 1999  Mark E. Armstrong <avail@pacbell.net>
 
 	* condvar.c (pthread_cond_broadcast): Fix possible memory fault
-	- Mark E. Armstrong <avail@pacbell.net>
 	
-Thu May 27 13:08:46 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+Thu May 27 13:08:46 1999  Peter Slacik <Peter.Slacik@tatramed.sk>
 
 	* condvar.c (pthread_cond_broadcast): Fix logic bug
-	- Peter Slacik <Peter.Slacik@tatramed.sk>;
-	optimise sem_post loop
-	- Bossom, John <John.Bossom@Cognos.COM>.
 
-Fri May 14 12:13:18 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+Thu May 27 13:08:46 1999  Bossom, John <John.Bossom@Cognos.COM>
+
+	* condvar.c (pthread_cond_broadcast): optimise sem_post loop
+
+Fri May 14 12:13:18 1999  Mike Russo <miker@eai.com>
 
 	* attr.c (pthread_attr_setdetachstate): Fix logic bug
-	- Mike Russo <miker@eai.com>.
 
 Sat May  8 09:42:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
@@ -1490,41 +1549,37 @@ Fri Apr  2 11:08:50 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* semaphore.h: New file for POSIX 1b semaphores.
 
-	* pthread.h (ptw32_sem_t): Change to sem_t. 
+	* semaphore.c (ptw32_sem_timedwait): Moved to private.c.
 
-	* semaphore.c (ptw32_sem_*): Change to sem_*; these functions
-	will be exported from the library; set errno on error.
-	- John Bossom <jebossom@cognos.com>
-	(ptw32_sem_timedwait): Moved to private.c.
+	* pthread.h (ptw32_sem_t): Change to sem_t. 
 
 	* private.c (ptw32_sem_timedwait): Moved from semaphore.c;
 	set errno on error.
 
-	* errno.c (_errno): New file. New function.
-	- John Bossom
-
 	* pthread.h (pthread_t_): Add per-thread errno element.
 
-Fri Mar 26 14:11:45 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+Fri Apr  2 11:08:50 1999  John Bossom <jebossom@cognos.com>
+
+	* semaphore.c (ptw32_sem_*): Change to sem_*; these functions
+	will be exported from the library; set errno on error.
+
+	* errno.c (_errno): New file. New function.
+
+Fri Mar 26 14:11:45 1999  Tor Lillqvist <tml@iki.fi>
 
 	* semaphore.c (ptw32_sem_timedwait): Check for negative
 	milliseconds.
-	- Tor Lillqvist <tml@iki.fi>
 
-Wed Mar 24 11:32:07 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+Wed Mar 24 11:32:07 1999  John Bossom <jebossom@cognos.com>
 
 	* misc.c (CancelableWait): Initialise exceptionInformation[2].
 	(pthread_self): Get a real Win32 thread handle for implicit threads.
-	- John Bossom <jebossom@cognos.com>
 
 	* cancel.c (pthread_testcancel): Initialise exceptionInformation[2].
-	- John Bossom <jebossom@cognos.com>
 
 	* implement.h (SE_INFORMATION): Fix values.
-	- John Bossom <jebossom@cognos.com>
 
 	* private.c (ptw32_threadDestroy): Close the thread handle.
-	- John Bossom <jebossom@cognos.com>
 
 Fri Mar 19 12:57:27 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
@@ -1860,11 +1915,12 @@ Tue Jan 19 18:27:42 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 	(pthreadCancelableTimedWait): Just calls CancelableWait()
 	with passed in timeout.
 
+Tue Jan 19 18:27:42 1999  Scott Lightner <scott@curriculum.com>
+
 	* private.c (ptw32_sem_timedwait): 'abstime' arg really is
 	absolute time. Calculate relative time to wait from current
 	time before passing timeout to new routine 
 	pthreadCancelableTimedWait().
-	- Scott Lightner <scott@curriculum.com>
 
 Tue Jan 19 10:27:39 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
@@ -1998,31 +2054,29 @@ Wed Jan 13 09:34:52 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* build.bat: Delete old binaries before compiling/linking.
 
-Tue Jan 12 09:58:38 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+Tue Jan 12 09:58:38 1999  Tor Lillqvist <tml@iki.fi>
 
 	* dll.c: The Microsoft compiler pragmas probably are more
 	appropriately protected by _MSC_VER than by _WIN32.
-	- Tor Lillqvist <tml@iki.fi>.
-
-	* condvar.c (pthread_cond_timedwait): Fix function description
-	comments.
 
 	* pthread.h: Define ETIMEDOUT. This should be returned by
 	pthread_cond_timedwait which is not implemented yet as of
 	snapshot-1999-01-04-1305. It was implemented in the older version.
 	The Microsoft compiler pragmas probably are more appropriately
 	protected by _MSC_VER than by _WIN32.
-	- Tor Lillqvist <tml@iki.fi>.
 
 	* pthread.def: pthread_mutex_destroy was missing from the def file
-	- Tor Lillqvist <tml@iki.fi>.
 
 	* condvar.c (pthread_cond_broadcast): Ensure we only wait on threads
 	if there were any waiting on the condition.
 	I think pthread_cond_broadcast should do the WaitForSingleObject
 	only if cv->waiters > 0? Otherwise it seems to hang, at least in the
 	testg thread program from glib.
-	- Tor Lillqvist <tml@iki.fi>. 
+
+Tue Jan 12 09:58:38 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* condvar.c (pthread_cond_timedwait): Fix function description
+	comments.
 
 	* semaphore.c (sem_post): Correct typo in comment.
 
@@ -2034,11 +2088,10 @@ Mon Jan 11 20:33:19 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 	* cleanup.c (ptw32_push_cleanup): Provide conditional 
 	compile of cleanup->prev.
 
-1999-01-11  Ben Elliston  <bje@cygnus.com>
+1999-01-11  Tor Lillqvist <tml@iki.fi>
 
 	* condvar.c (pthread_cond_init): Invert logic when testing the
 	return value from calloc().
-	- Tor Lillqvist <tml@iki.fi>.
 
 Sat Jan  9 14:32:08 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
@@ -2116,25 +2169,29 @@ Tue Dec 29 13:11:16 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* attr.c: Rename "detachedstate" to "detachstate".
 
-Mon Dec 28 09:54:39 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+Mon Dec 28 09:54:39 1998  John Bossom
 
-	* semaphore.c: Initial version. From John Bossom's implementation.
-	* semaphore.h: Initial version. From John Bossom's implementation.
+	* semaphore.c: Initial version.
+	* semaphore.h: Initial version.
 
 Mon Dec 28 09:54:39 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* pthread.h (pthread_attr_t_): Change to *pthread_attr_t.
 
-	* attr.c (pthread_attr_setstacksize): Merge with John Bossom's version.
-	(pthread_attr_getstacksize): Merge with John Bossom's version.
-	(pthread_attr_setstackaddr): Merge with John Bossom's version.
-	(pthread_attr_getstackaddr): Merge with John Bossom's version.
-	(pthread_attr_init): Merge with John Bossom's version.
-	(pthread_attr_destroy): Merge with John Bossom's version.
-	(pthread_attr_getdetachstate): Merge with John Bossom's version.
-	(pthread_attr_setdetachstate): Merge with John Bossom's version.
+Mon Dec 28 09:54:39 1998  John Bossom, Ben Elliston
+
+	* attr.c (pthread_attr_setstacksize): Merge with John's version.
+	(pthread_attr_getstacksize): Merge with John's version.
+	(pthread_attr_setstackaddr): Merge with John's version.
+	(pthread_attr_getstackaddr): Merge with John's version.
+	(pthread_attr_init): Merge with John's version.
+	(pthread_attr_destroy): Merge with John's version.
+	(pthread_attr_getdetachstate): Merge with John's version.
+	(pthread_attr_setdetachstate): Merge with John's version.
 	(is_attr): attr is now **attr (was *attr), so add extra NULL pointer
 	test.
+
+Mon Dec 28 09:54:39 1998  Ross Johnson
 
 	* implement.h (pthread_attr_t_): Add and rename elements in JEB's
 	version to correspond to original, so that it can be used with
@@ -2173,39 +2230,38 @@ Thu Dec 17 19:10:46 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 	(pthread_setspecific): Replaced by John Bossom's version.
 	(pthread_getspecific): Replaced by John Bossom's version.
 
-Mon Dec  7 09:44:40 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+Mon Dec  7 09:44:40 1998  John Bossom
 
-	* cancel.c (pthread_setcancelstate): Replaced by John Bossom's version.
-	(pthread_setcanceltype): Replaced by John Bossom's version.
-	(pthread_testcancel): Replaced by John Bossom's version.
-	(pthread_cancel): Replaced by John Bossom's version.
+	* cancel.c (pthread_setcancelstate): Replaced.
+	(pthread_setcanceltype): Replaced.
+	(pthread_testcancel): Replaced.
+	(pthread_cancel): Replaced.
 	
-	* exit.c (pthread_exit): Replaced by John Bossom's version.
+	* exit.c (pthread_exit): Replaced.
 
-	* misc.c (pthread_self): Replaced by John Bossom's version.
-	(pthread_equal): Replaced by John Bossom's version.
+	* misc.c (pthread_self): Replaced.
+	(pthread_equal): Replaced.
 
-	* sync.c (pthread_detach): Replaced by John Bossom's version.
-	(pthread_join): Replaced by John Bossom's version.
+	* sync.c (pthread_detach): Replaced.
+	(pthread_join): Replaced.
 
-	* create.c (pthread_create): Replaced by John Bossom's version.
+	* create.c (pthread_create): Replaced.
 
-	* private.c (ptw32_processInitialize): New by John Bossom.
-	(ptw32_processTerminate): Non-public function by John Bossom.
-	(ptw32_threadStart): Non-public function by John Bossom.
- 	(ptw32_threadDestroy): Non-public function by John Bossom.
-	(ptw32_cleanupStack): Non-public function by John Bossom.
-	(ptw32_tkAssocCreate): Non-public function by John Bossom.
-	(ptw32_tkAssocDestroy): Non-public function by John Bossom.
-	(ptw32_callUserDestroyRoutines): Non-public function by John Bossom.
+	* private.c (ptw32_processInitialize): New.
+	(ptw32_processTerminate): New.
+	(ptw32_threadStart): New.
+ 	(ptw32_threadDestroy): New.
+	(ptw32_cleanupStack): New.
+	(ptw32_tkAssocCreate): New.
+	(ptw32_tkAssocDestroy): New.
+	(ptw32_callUserDestroyRoutines): New.
 
-	* implement.h: Added John Bossom's non-API structures and
-	declarations.
+	* implement.h: Added non-API structures and declarations.
 
 	* dll.c (PthreadsEntryPoint): Cast return value of GetProcAddress
 	to resolve compile warning from MSVC.
 
-	* dll.c (DLLmain): Replaced by John Bossom's version.
+	* dll.c (DLLmain): Replaced.
 	* dll.c (PthreadsEntryPoint):
 	Re-applied Anders Norlander's patch:-
 	Initialize ptw32_try_enter_critical_section at startup

@@ -1,5 +1,35 @@
 # Makefile for the pthreads test suite.
 # If all of the .pass files can be created, the test suite has passed.
+#
+# --------------------------------------------------------------------------
+#
+#      Pthreads-win32 - POSIX Threads Library for Win32
+#      Copyright(C) 1998 John E. Bossom
+#      Copyright(C) 1999,2002 Pthreads-win32 contributors
+# 
+#      Contact Email: rpj@ise.canberra.edu.au
+# 
+#      The current list of contributors is contained
+#      in the file CONTRIBUTORS included with the source
+#      code distribution. The list can also be seen at the
+#      following World Wide Web location:
+#      http://sources.redhat.com/pthreads-win32/contributors.html
+# 
+#      This library is free software; you can redistribute it and/or
+#      modify it under the terms of the GNU Lesser General Public
+#      License as published by the Free Software Foundation; either
+#      version 2 of the License, or (at your option) any later version.
+# 
+#      This library is distributed in the hope that it will be useful,
+#      but WITHOUT ANY WARRANTY; without even the implied warranty of
+#      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#      Lesser General Public License for more details.
+# 
+#      You should have received a copy of the GNU Lesser General Public
+#      License along with this library in the file COPYING.LIB;
+#      if not, write to the Free Software Foundation, Inc.,
+#      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+#
 
 
 CP	= copy
@@ -53,7 +83,7 @@ PASSES= loadfree.pass \
 	  count1.pass  once1.pass  tsd1.pass  \
 	  self2.pass  \
 	  cancel1.pass  cancel2.pass  \
-	  eyal1.pass  \
+	  delay1.pass  delay2.pass  eyal1.pass  \
 	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  \
 	  condvar4.pass  condvar5.pass  condvar6.pass  \
 	  condvar7.pass  condvar8.pass  condvar9.pass  \
@@ -65,7 +95,8 @@ PASSES= loadfree.pass \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  \
-	  exception1.pass  exception2.pass  exception3.pass
+	  exception1.pass  exception2.pass  exception3.pass  \
+	  exit4
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
@@ -197,6 +228,8 @@ condvar9.pass: condvar8.pass
 context1.pass: cancel2.pass
 count1.pass: join1.pass
 create1.pass: mutex2.pass
+delay1.pass:
+delay2.pass: delay1.pass
 equal1.pass: create1.pass
 errno1.pass: mutex3.pass
 exception1.pass: cancel4.pass
@@ -205,6 +238,7 @@ exception3.pass: exception2.pass
 exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass
+exit4.pass: exit3.pass
 eyal1.pass: tsd1.pass
 inherit1.pass: join1.pass
 join0.pass: create1.pass
