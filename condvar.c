@@ -937,14 +937,14 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
        *
        * Note: 
        *
-       *      ptw32_sem_timedwait is a cancellation point,
+       *      sem_timedwait is a cancellation point,
        *      hence providing the mechanism for making 
        *      pthread_cond_wait a cancellation point. 
        *      We use the cleanup mechanism to ensure we
        *      re-lock the mutex and adjust (to)unblock(ed) waiters 
        *      counts if we are cancelled, timed out or signalled.
        */
-      if (ptw32_sem_timedwait(&(cv->semBlockQueue), abstime) != 0)
+      if (sem_timedwait(&(cv->semBlockQueue), abstime) != 0)
         {
           result = errno;
         }

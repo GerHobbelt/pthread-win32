@@ -168,7 +168,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 	   */
 	  if (value_ptr != NULL)
 	    {
-	      *value_ptr = self->exitStatus;
+	      *value_ptr = thread->exitStatus;
 	    }
       
 	  /*

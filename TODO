@@ -1,20 +1,7 @@
-====
-Automate the build/test cycle so that I can
-expand to test both library and applications in different
-environments and cross-environments.
+                   Things that should be doable but aren't yet
+                   -------------------------------------------
 
-Eg.
-           Applications | SEH | C++ | G++ |  C  | GCC |
-        Library         |     |     |     |     |     |
-        ----------------+-----+-----+-----+-----+-----+
-        SEH             |  X  |  X  |  X  |  X  |  X  |
-        ----------------+-----+-----+-----+-----+-----+
-        C++ (MSC)       |  X  |  X  |  X  |  X  |  X  |
-        ----------------+-----+-----+-----+-----+-----+
-        G++ (GNU)       |  ?  |  ?  |  X  |  ?  |  X  |
-        ----------------+-----+-----+-----+-----+-----+
+1. Implement PTHREAD_PROCESS_SHARED for semaphores, mutexes,
+   condition variables, read/write locks, barriers.
 
-'?' indicates combinations that may not be doable.
-
-====
 

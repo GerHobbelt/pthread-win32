@@ -86,6 +86,9 @@ static bag_t threadbag[NUMTHREADS + 1];
 static int pop_count = 0;
 
 static void
+#ifdef __CLEANUP_C
+__cdecl
+#endif
 increment_pop_count(void * arg)
 {
   int * c = (int *) arg;
@@ -111,6 +114,8 @@ mythread(void * arg)
 
   pthread_cleanup_push(increment_pop_count, (void *) &pop_count);
   /*
+   * We don't have true async cancelation - it relies on the thread
+   * at least re-entering the run state at some point.
    * We wait up to 10 seconds, waking every 0.1 seconds,
    * for a cancelation to be applied to us.
    */
@@ -157,7 +162,7 @@ main()
    * Standard check that all threads started.
    */
   for (i = 1; i <= NUMTHREADS; i++)
-    { 
+    {
       if (!threadbag[i].started)
 	{
 	  failed |= !threadbag[i].started;

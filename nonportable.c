@@ -138,47 +138,21 @@ pthread_delay_np (struct timespec * interval)
 
 
 /*
- * pthread_getprocessors_np()
+ * pthread_num_processors_np()
  *
  * Get the number of CPUs available to the process.
- *
- * If the available number of CPUs is 1 then pthread_spin_lock()
- * will block rather than spin if the lock is already owned.
- *
- * pthread_spin_init() calls this routine when initialising
- * a spinlock. If the number of available processors changes
- * (after a call to SetProcessAffinityMask()) then only
- * newly initialised spinlocks will notice.
  */
 int
-pthread_getprocessors_np(int * count)
+pthread_num_processors_np(void)
 {
-  DWORD vProcessCPUs;
-  DWORD vSystemCPUs;
-  int result = 0;
+  int count;
 
-  if (GetProcessAffinityMask(GetCurrentProcess(),
-                             &vProcessCPUs,
-                             &vSystemCPUs))
+  if ( ptw32_getprocessors(& count) != 0 )
     {
-      DWORD bit;
-      int CPUs = 0;
-
-      for (bit = 1; bit != 0; bit <<= 1)
-        {
-          if (vProcessCPUs & bit)
-            {
-              CPUs++;
-            }
-        }
-      *count = CPUs;
-    }
-  else
-    {
-      result = EAGAIN;
+      count = 1;
     }
 
-  return(result);
+  return (count);
 }
 
 

@@ -24,8 +24,10 @@ conformance details and list of supported routines.
 
 Which of the several dll versions to use?
 -----------------------------------------
-or, What are all these pthread*.dll files?
-------------------------------------------
+or,
+---
+What are all these pthread*.dll and pthread*.lib files?
+-------------------------------------------------------
 
 Simply, you only use one of them, but you need to choose carefully.
 
@@ -40,24 +42,30 @@ to how POSIX threads cancelation and exit should work
 with languages that include exceptions and handlers, e.g.
 C++ and even C (Microsoft's Structured Exceptions).
 
-The issue is: should cancelation of a thread in a, say,
-C++ application cause object destructors and C++ exception
+The issue is: should cancelation of a thread in, say,
+a C++ application cause object destructors and C++ exception
 handlers to be invoked as the stack unwinds during thread
 exit, or not?
 
-Your choice will depend primarily on whether your application
-is intended to be cross-platform or not, and how the POSIX threads
-implementations on the target platforms handle this issue. That is,
-you'll want consistent behaviour.
+There seems to be more opinion in favour of using the
+standard C version of the library (no EH) with C++ applications
+since this appears to be the assumption commercial pthreads
+implementations make. Therefore, if you use an EH version
+of pthreads-win32 then you may be under the illusion that
+your application will be portable, when in fact it is likely to
+behave very differently linked with other pthreads libraries.
 
-If you can't choose now, it's probably best to use the
-standard C version of the library, even if your application
-is being written in C++. You will need to handle the
-potentially adverse effects of thread cancelation in your
-code, but at least you will have the best chance of
-consistency of behaviour across platforms. If you later
-decide to use an exception handling version of the library
-then you will hopefully have fewer, if any, changes to make.
+Now you may be asking: why have you kept the EH versions of
+the library?
+
+There are a couple of reasons:
+- there is division amongst the experts and so the code may
+  be needed in the future. (Yes, it's in the repository and we
+  can get it out anytime in the future, but ...)
+- pthreads-win32 is one of the few implementations, and possibly
+  the only freely available one, that has EH versions. It may be
+  useful to people who want to play with or study application
+  behaviour under these conditions.
 
 
 Library naming
@@ -65,8 +73,25 @@ Library naming
 
 Because the library is being built using various exception
 handling schemes and compilers - and because the library
-will not work reliably if these are mixed in an application,
+may not work reliably if these are mixed in an application,
 each different version of the library has it's own name.
+
+Note 1: the incompatibility is really between EH implementations
+of the different compilers. It should be possible to use the
+standard C version from either compiler with C++ applications
+built with a different compiler. If you use an EH version of
+the library, then you must use the same compiler for the
+application. This is another complication and dependency that
+can be avoided by using only the standard C library version.
+
+Note 2: if you use a standard C pthread*.dll with a C++
+application, then any functions that you define that are
+intended to be called via pthread_cleanup_push() must be
+__cdecl.
+
+Note 3: the intention is to also name either the VC or GC
+version (it should be arbitrary) as pthread.dll, including
+pthread.lib and libpthread.a as appropriate.
 
 In general:
 	pthread[VG]{SE,CE,C}.dll
@@ -80,17 +105,17 @@ where:
 	{SE,CE,C} indicates the exception handling scheme
 	SE	- Structured EH
 	CE	- C++ EH
-        C       - no exceptions - uses setjmp/longjmp
+	C       - no exceptions - uses setjmp/longjmp
 
 For example:
 	pthreadVSE.dll	(MSVC/SEH)
 	pthreadGCE.dll	(GNUC/C++ EH)
-        pthreadGC.dll   (GNUC/not dependent on exceptions)
+	pthreadGC.dll   (GNUC/not dependent on exceptions)
 
 The GNU library archive file names have changed to:
 
 	libpthreadGCE.a
-        libpthreadGC.a
+	libpthreadGC.a
 
 
 Other name changes
@@ -108,6 +133,82 @@ If you have written any applications and you are linking
 statically with the pthreads-win32 library then you may have
 included a call to _pthread_processInitialize. You will
 now have to change that to ptw32_processInitialize.
+
+
+A note on Cleanup code default style
+------------------------------------
+
+Previously, if not defined, the cleanup style was determined automatically
+from the compiler used, and one of the following was defined accordingly:
+
+	__CLEANUP_SEH	MSVC only
+	__CLEANUP_CXX	C++, including MSVC++, GNU G++
+	__CLEANUP_C		C, including GNU GCC, not MSVC
+
+These defines determine the style of cleanup (see pthread.h) and,
+most importantly, the way that cancelation and thread exit (via
+pthread_exit) is performed (see the routine ptw32_throw() in private.c).
+
+In short, the exceptions versions of the library throw an exception
+when a thread is canceled or exits (via pthread_exit()), which is
+caught by a handler in the thread startup routine, so that the
+the correct stack unwinding occurs regardless of where the thread
+is when it's canceled or exits via pthread_exit().
+
+In this snapshot, unless the build explicitly defines (e.g. via a
+compiler option) __CLEANUP_SEH, __CLEANUP_CXX, or __CLEANUP_C, then
+the build NOW always defaults to __CLEANUP_C style cleanup. This style
+uses setjmp/longjmp in the cancelation and pthread_exit implementations,
+and therefore won't do stack unwinding even when linked to applications
+that have it (e.g. C++ apps). This is for consistency with most/all
+commercial Unix POSIX threads implementations.
+
+Although it was not clearly documented before, it is still necessary to
+build your application using the same __CLEANUP_* define as was
+used for the version of the library that you link with, so that the
+correct parts of pthread.h are included. That is, the possible
+defines require the following library versions:
+
+	__CLEANUP_SEH	pthreadVSE.dll
+	__CLEANUP_CXX	pthreadVCE.dll or pthreadGCE.dll
+	__CLEANUP_C		pthreadVC.dll or pthreadGC.dll
+
+THE POINT OF ALL THIS IS: if you have not been defining one of these
+explicitly, then the defaults as described at the top of this
+section were being used.
+
+THIS NOW CHANGES, as has been explained above, but to try to make this
+clearer here's an example:
+
+If you were building your application with MSVC++ i.e. using C++
+exceptions (rather than SEH) and not explicitly defining one of
+__CLEANUP_*, then __CLEANUP_C++ was defined for you in pthread.h.
+You should have been linking with pthreadVCE.dll, which does
+stack unwinding.
+
+If you now build your application as you had before, pthread.h will now
+set __CLEANUP_C as the default style, and you will need to link
+with pthreadVC.dll. Stack unwinding will now NOT occur when a thread
+is canceled, or the thread calls pthread_exit().
+
+Your application will now most likely behave differently to previous
+versions, and in non-obvious ways. Most likely is that locally
+instantiated objects may not be destroyed or cleaned up after a thread
+is canceled.
+
+If you want the same behaviour as before, then you must now define
+__CLEANUP_C++ explicitly using a compiler option and link with
+pthreadVCE.dll as you did before.
+
+
+WHY ARE WE MAKING THE DEFAULT STYLE LESS EXCEPTION-FRIENDLY?
+Because no commercial Unix POSIX threads implementation allows you to
+choose to have stack unwinding. Therefore, providing it in pthread-win32
+as a default is dangerous. We still provide the choice but unless
+you consciously choose to do otherwise, your pthreads applications will
+now run or crash in similar ways irrespective of the threads platform
+you use. Or at least this is the hope.
+
 
 
 Building under VC++ using C++ EH, Structured EH, or just C
@@ -138,6 +239,11 @@ or:
 
 nmake clean VC
 
+or:
+
+nmake clean VCX	(tests the VC version of the library with C++ (EH)
+			 applications)
+
 
 Building under Mingw32
 ----------------------
@@ -161,6 +267,11 @@ make clean GCE
 or:
 
 make clean GC
+
+or:
+
+make clean GCX	(tests the GC version of the library with C++ (EH)
+			 applications)
 
 
 Building the library under Cygwin
@@ -213,7 +324,7 @@ Building applications with GNU compilers
 
 If you're using pthreadGCE.dll:
 
-Use gcc-2.95.2-1 or later modified as per pthreads-win32 FAQ question 6.
+Use gcc-2.95.2-1 or later modified as per pthreads-win32 FAQ question 11.
 
 With the three header files, pthreadGCE.dll, gcc.dll and libpthreadGCE.a
 in the same directory as your application myapp.c, you could compile,

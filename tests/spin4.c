@@ -59,10 +59,9 @@ main()
   pthread_t t;
   int CPUs;
 
-  if (pthread_getprocessors_np(&CPUs) != 0 || CPUs == 1)
+  if ((CPUs = pthread_num_processors_np()) == 1)
     {
-      printf("This test is not applicable to this system.\n");
-      printf("Either there is only 1 CPU or the no. could not be determined.\n");
+      printf("Test not run - it requires multiple CPUs.\n");
 	exit(0);
     }
 

@@ -61,8 +61,9 @@ BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
 
 default:
 	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) nmake clean GCE   (to test using GNU C dll with C++ exception handling)
-	@ $(ECHO) nmake clean GC    (to test using GNU C dll with C cleanup code)
+	@ $(ECHO) nmake clean GCE   (to test using GCE dll with C++ (EH) applications)
+	@ $(ECHO) nmake clean GC    (to test using GC dll with C (no EH) applications)
+	@ $(ECHO) nmake clean GCX   (to test using GC dll with C++ (EH) applications)
 	@ $(ECHO) nmake clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)
 	@ $(ECHO) nmake clean GC-bench    (to benchtest using GNU C dll with C cleanup code)
 
@@ -71,16 +72,19 @@ auto:
 	@ $(MAKE) clean GC
 
 GC:
-	$(MAKE) GCX=GC XXCFLAGS="-x c" all-pass
+	$(MAKE) GCX=GC XXCFLAGS="-x c -D__CLEANUP_C" all-pass
 
 GCE:
-	$(MAKE) GCX=GCE XXCFLAGS="-mthreads -x c++" all-pass
+	$(MAKE) GCX=GCE XXCFLAGS="-mthreads -x c++ -D__CLEANUP_CXX" all-pass
+
+GCX:
+	$(MAKE) GCX=GC XXCFLAGS="-mthreads -x c++ -D__CLEANUP_C" all-pass
 
 GC-bench:
-	$(MAKE) GCX=GC XXCFLAGS="-x c" all-bench
+	$(MAKE) GCX=GC XXCFLAGS="-x c -D__CLEANUP_C" all-bench
 
 GCE-bench:
-	$(MAKE) GCX=GCE XXCFLAGS="-mthreads -x c++" all-bench
+	$(MAKE) GCX=GCE XXCFLAGS="-mthreads -x c++ -D__CLEANUP_CXX" all-bench
 
 all-pass: $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!

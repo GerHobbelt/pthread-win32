@@ -1,4 +1,4 @@
-                 PTHREADS-WIN32 SNAPSHOT 2001-??-??
+                 PTHREADS-WIN32 SNAPSHOT 2002-??-??
                  ----------------------------------
        Web Site: http://sources.redhat.com/pthreads-win32/
       FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -27,6 +27,100 @@ announcement for the list of contributors.
 Changes since the last snapshot
 -------------------------------
 
+Cleanup code default style. (IMPORTANT - with apologies for the length)
+----------------------------------------------------------------------
+Previously, if not defined, the cleanup style was determined automatically
+from the compiler used, and one of the following was defined accordingly:
+
+	__CLEANUP_SEH	MSVC only
+	__CLEANUP_CXX	C++, including MSVC++, GNU G++
+	__CLEANUP_C		C, including GNU GCC, not MSVC
+
+These defines determine the style of cleanup (see pthread.h) and,
+most importantly, the way that cancelation and thread exit (via
+pthread_exit) is performed (see the routine ptw32_throw() in private.c).
+
+In short, the exceptions versions of the library throw an exception
+when a thread is canceled or exits (via pthread_exit()), which is
+caught by a handler in the thread startup routine, so that the
+the correct stack unwinding occurs regardless of where the thread
+is when it's canceled or exits via pthread_exit().
+
+In this snapshot, unless the build explicitly defines (e.g. via a
+compiler option) __CLEANUP_SEH, __CLEANUP_CXX, or __CLEANUP_C, then
+the build NOW always defaults to __CLEANUP_C style cleanup. This style
+uses setjmp/longjmp in the cancelation and pthread_exit implementations,
+and therefore won't do stack unwinding even when linked to applications
+that have it (e.g. C++ apps). This is for consistency with most/all
+commercial Unix POSIX threads implementations.
+
+Although it was not clearly documented before, it is still necessary to
+build your application using the same __CLEANUP_* define as was
+used for the version of the library that you link with, so that the
+correct parts of pthread.h are included. That is, the possible
+defines require the following library versions:
+
+	__CLEANUP_SEH	pthreadVSE.dll
+	__CLEANUP_CXX	pthreadVCE.dll or pthreadGCE.dll
+	__CLEANUP_C		pthreadVC.dll or pthreadGC.dll
+
+THE POINT OF ALL THIS IS: if you have not been defining one of these
+explicitly, then the defaults as described at the top of this
+section were being used.
+
+THIS NOW CHANGES, as has been explained above, but to try to make this
+clearer here's an example:
+
+If you were building your application with MSVC++ i.e. using C++
+exceptions (rather than SEH) and not explicitly defining one of
+__CLEANUP_*, then __CLEANUP_C++ was defined for you in pthread.h.
+You should have been linking with pthreadVCE.dll, which does
+stack unwinding.
+
+If you now build your application as you had before, pthread.h will now
+set __CLEANUP_C as the default style, and you will need to link
+with pthreadVC.dll. Stack unwinding will now NOT occur when a thread
+is canceled, or the thread calls pthread_exit().
+
+Your application will now most likely behave differently to previous
+versions, and in non-obvious ways. Most likely is that locally
+instantiated objects may not be destroyed or cleaned up after a thread
+is canceled.
+
+If you want the same behaviour as before, then you must now define
+__CLEANUP_C++ explicitly using a compiler option and link with
+pthreadVCE.dll as you did before.
+
+
+WHY ARE WE MAKING THE DEFAULT STYLE LESS EXCEPTION-FRIENDLY?
+Because no commercial Unix POSIX threads implementation allows you to
+choose to have stack unwinding. Therefore, providing it in pthread-win32
+as a default is dangerous. We still provide the choice but unless
+you consciously choose to do otherwise, your pthreads applications will
+now run or crash in similar ways irrespective of the threads platform
+you use. Or at least this is the hope.
+
+
+WHY NOT REMOVE THE EXCEPTIONS VERSIONS OF THE LIBRARY ALTOGETHER?
+There are a few reasons:
+- because there are well respected POSIX threads people who believe
+  that POSIX threads implementations should be exceptions aware and
+  do the expected thing in that context. (There are equally respected
+  people who believe it should not be easily accessible, if it's there
+  at all, for unconditional conformity to other implementations.)
+- because pthreads-win32 is one of the few implementations that has
+  the choice, perhaps the only freely available one, and so offers
+  a laboratory to people who may want to explore the effects;
+- although the code will always be around somewhere for anyone who
+  wants it, once it's removed from the current version it will not be
+  nearly as visible to people who may have a use for it.
+
+New non-portable function
+-------------------------
+pthread_num_processors_np(): Returns the number of processors
+in the system that are available to the process, as determined
+from the processor affinity mask.
+
 platform dependence
 -------------------
 As Win95 doesn't provide one, the library now contains
@@ -40,8 +134,19 @@ processor platforms.
 
 rwlocks
 -------
+Rwlockattr functions have been added.
+
 Restored pthread_rwlock_wrlock() as a cancelation point as permitted
 by POSIX 1003.1j. (Was prematurely disabled in the last snapshot.)
+
+First attempt at removing inclusion of windows.h in pthread.h
+-------------------------------------------------------------
+This is done to prevent conflicts reported by some people.
+
+Succeeded for all MSVC and the GNU C builds, but not yet for
+GNU C++. One unresolved error from the linker prevents the later.
+Only HANDLE and DWORD need to be defined in pthread.h. Safeguards
+are used to avoid redefinition errors in application builds.
 
 Bug fixes
 ---------
@@ -232,6 +337,10 @@ The following functions are implemented:
       pthread_rwlock_rdlock
       pthread_rwlock_rwlock
       pthread_rwlock_unlock
+      pthread_rwlockattr_init
+      pthread_rwlockattr_destroy
+      pthread_rwlockattr_getpshared
+      pthread_rwlockattr_setpshared
 
       ---------------------------
       Spin Locks - POSIX 1j
@@ -302,10 +411,11 @@ The following functions are implemented:
       pthread_mutexattr_setkind_np      (types: PTHREAD_MUTEX_FAST_NP,
                                                 PTHREAD_MUTEX_ERRORCHECK_NP,
                                                 PTHREAD_MUTEX_RECURSIVE_NP)
-      pthread_win32_process_attach_np
-      pthread_win32_process_detach_np
-      pthread_win32_thread_attach_np
-      pthread_win32_thread_detach_np
+      pthread_num_processors_np
+      pthread_win32_process_attach_np   (Required when statically linking the library)
+      pthread_win32_process_detach_np   (Required when statically linking the library)
+      pthread_win32_thread_attach_np    (Required when statically linking the library)
+      pthread_win32_thread_detach_np    (Required when statically linking the library)
 
       ---------------------------
       Static Initializers

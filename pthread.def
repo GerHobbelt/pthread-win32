@@ -135,7 +135,7 @@ pthread_mutexattr_setkind_np
 ; Non-portable local implementation only
 ;
 pthread_getw32threadhandle_np
-pthread_getprocessors_np
+pthread_num_processors_np
 pthreadCancelableWait
 pthreadCancelableTimedWait
 ;

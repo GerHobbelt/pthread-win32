@@ -100,7 +100,8 @@ $(GCE_DLL): $(OBJS)
 
 clean:
 	-$(RM) *~
-	-$(RM) *.o 
+	-$(RM) *.pre
+	-$(RM) *.o
 	-$(RM) *.exe
 
 realclean: clean

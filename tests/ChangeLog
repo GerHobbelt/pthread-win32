@@ -1,3 +1,12 @@
+2002-01-30  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* cleanup1.c (): Must be declared __cdecl when compiled
+	as C++ AND testing the standard C library version.
+
+2002-01-16  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* spin4.c (main): Fix renamed function call.
+
 2002-01-14  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* exception3.c (main): Shorten wait time.

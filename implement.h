@@ -30,6 +30,19 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
+/*
+ * note: ETIMEDOUT is correctly defined in winsock.h
+ */
+#include <windows.h>
+#include <winsock.h>
+
+/*
+ * In case ETIMEDOUT hasn't been defined above somehow.
+ */
+#ifndef ETIMEDOUT
+#  define ETIMEDOUT 10060     /* This is the value in winsock.h. */
+#endif
+
 #if !defined(malloc)
 #include <malloc.h>
 #endif
@@ -165,8 +178,10 @@ struct pthread_mutex_t_ {
                                   mutexes only). */
   int kind;                    /* Mutex type. */
   pthread_t ownerThread;
-  HANDLE wait_sema;            /* Mutex release notification to waiting
+  sem_t wait_sema;             /* Mutex release notification to waiting
                                   threads. */
+  CRITICAL_SECTION wait_cs;    /* Serialise lock_idx decrement after mutex
+                                  timeout. */
 };
 
 struct pthread_mutexattr_t_ {
@@ -451,6 +466,8 @@ void ptw32_pop_cleanup_all (int execute);
 
 pthread_t ptw32_new (void);
 
+int ptw32_getprocessors(int * count);
+
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
 unsigned __stdcall
 #else
@@ -466,8 +483,6 @@ int ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
 
 void ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
-int ptw32_sem_timedwait (sem_t * sem,
-			    const struct timespec * abstime);
 
 #ifdef NEED_SEM
 void ptw32_decrease_semaphore(sem_t * sem);
