@@ -1,5 +1,5 @@
 
-                 PTHREADS-WIN32 SNAPSHOT 1999-04-07
+                 PTHREADS-WIN32 SNAPSHOT 1999-05-08
                  ----------------------------------
        Web Site: http://sourceware.cygnus.com/pthreads-win32/
       FTP Site: ftp://sourceware.cygnus.com/pub/pthreads-win32
@@ -133,6 +133,10 @@ The following functions are implemented:
       sem_post               (POSIX 1b)
       sem_wait               (POSIX 1b)
       sem_trywait            (POSIX 1b)
+      sem_open               (POSIX 1b - returns an error)
+      sem_close              (POSIX 1b - returns an error)
+      sem_unlink             (POSIX 1b - returns an error)
+      sem_getvalue           (POSIX 1b - returns an error)
 
       ---------------------------
       RealTime Scheduling

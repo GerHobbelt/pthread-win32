@@ -21,4 +21,6 @@ call runtest cl self2
 call runtest cl eyal1
 call runtest cl condvar3
 call runtest cl condvar4
+call runtest cl condvar5
+call runtest cl condvar6
 call runtest cl errno1

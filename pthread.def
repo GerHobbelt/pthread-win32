@@ -83,6 +83,10 @@ sem_destroy
 sem_trywait
 sem_wait
 sem_post
+sem_open
+sem_close
+sem_unlink
+sem_getvalue
 ;
 ; Non-portable but useful
 ;

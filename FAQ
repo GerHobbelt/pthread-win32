@@ -10,6 +10,8 @@ Q 1	Should I use Cygwin or Mingw32 as a development environment?
 Q 2	Now that pthreads-win32 builds under Mingw32, why do I get
 	memory access violations?
 
+Q 3	How do I use pthread.dll for Win32 (Visual C++ 5.0)
+
 =============================================================================
 
 Q 1	Should I use Cygwin or Mingw32 as a development environment?
@@ -137,3 +139,41 @@ able to tackle it myself.
 
 Kevin
 
+------------------------------------------------------------------------------
+
+Q 3	How do I use pthread.dll for Win32 (Visual C++ 5.0)
+---	
+
+A 3
+---
+>
+> I'm a "rookie" when it comes to your pthread implementation.  I'm currently
+> desperately trying to install the prebuilt .dll file into my MSVC compiler.
+> Could you please provide me with explicit instructions on how to do this (or
+> direct me to a resource(s) where I can acquire such information)?
+>
+> Thank you,
+>
+
+You should have a .dll, .lib, .def, and three .h files.
+
+The .dll can go in any directory listed in your PATH environment
+variable, so putting it into C:\WINDOWS should work.
+
+The .lib file can go in any directory listed in your LIB environment
+variable.
+
+The .h files can go in any directory listed in your INCLUDE
+environment variable.
+
+Or you might prefer to put the .lib and .h files into a new directory
+and add its path to LIB and INCLUDE. You can probably do this easiest
+by editing the file:-
+
+C:\Program Files\DevStudio\vc\bin\vcvars32.bat
+
+The .def file isn't used by anything in the pre-compiled version but 
+is included for information.
+
+Cheers.
+Ross

@@ -39,7 +39,8 @@ TESTS	= mutex1 condvar1 condvar2 exit1 create1 equal1 \
 	  exit2 exit3 \
 	  join1 mutex2 mutex3 \
 	  count1 once1 tsd1 self1 self2 eyal1 \
-	  condvar3 condvar4 errno1
+	  condvar3 condvar4 condvar5 condvar6 \
+	  errno1
 
 PASSES	= $(TESTS:%=%.pass)
 
@@ -65,6 +66,8 @@ self2.pass: create1.pass
 eyal1.pass: tsd1.pass
 condvar3.pass: create1.pass
 condvar4.pass: create1.pass
+condvar5.pass: condvar4.pass
+condvar6.pass: condvar5.pass
 errno1.pass: mutex3.pass
 
 %.pass: %.exe $(LIB) $(DLL) $(HDR)

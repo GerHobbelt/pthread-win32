@@ -817,7 +817,6 @@ pthread_cond_broadcast (pthread_cond_t * cond)
       */
 {
   int result = 0;
-  int i;
   pthread_cond_t cv;
 
   if (cond == NULL || *cond == NULL)
@@ -840,7 +839,7 @@ pthread_cond_broadcast (pthread_cond_t * cond)
   /*
    * Wake up all waiters
    */
-  result = (ReleaseSemaphore( cv->sema, cond->waiters, NULL )
+  result = (ReleaseSemaphore( cv->sema, cv->waiters, NULL )
 	    ? 0
 	    : EINVAL);
 
@@ -865,5 +864,3 @@ pthread_cond_broadcast (pthread_cond_t * cond)
   return (result);
 
 }
-
-
