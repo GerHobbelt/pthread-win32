@@ -1,5 +1,7 @@
 1998-10-03  Ben Elliston  <bje@cygnus.com>
 
+	* mutex.c (pthread_mutex_init): Correct function signature.
+
 	* attr.c (pthread_attr_init): Only zero out the `sigmask' member
 	if we have the sigset_t type.
 
