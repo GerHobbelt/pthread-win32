@@ -54,10 +54,10 @@ static int washere = 0;
 void * func(void * arg)
 {
   _ftime(&currSysTimeStart);
+  washere = 1;
   assert(pthread_spin_lock(&lock) == 0);
   assert(pthread_spin_unlock(&lock) == 0);
   _ftime(&currSysTimeStop);
-  washere = 1;
 
   return (void *) GetDurationMilliSecs(currSysTimeStart, currSysTimeStop);
 }
@@ -69,6 +69,7 @@ main()
   int i;
   pthread_t t;
   int CPUs;
+  struct _timeb sysTime;
 
   if ((CPUs = pthread_num_processors_np()) == 1)
     {
@@ -80,15 +81,17 @@ main()
 
   assert(pthread_create(&t, NULL, func, NULL) == 0);
 
-  /*
-   * This should relinqish the CPU to the func thread enough times
-   * to waste approximately 2000 millisecs only if the lock really
-   * is spinning in the func thread (assuming 10 millisec CPU quantum).
-   */
-  for (i = 0; i < 200; i++)
+  while (washere == 0)
     {
       sched_yield();
     }
+
+  do
+    {
+      sched_yield();
+      _ftime(&sysTime);
+    }
+  while (GetDurationMilliSecs(currSysTimeStart, sysTime) <= 1000);
 
   assert(pthread_spin_unlock(&lock) == 0);
 
