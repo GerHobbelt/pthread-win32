@@ -35,6 +35,12 @@
 
 #define WAIT_FAILED 1
 
+/* Priority levels */
+
+enum {
+  THREAD_PRIORITY_NORMAL
+};
+
 /* Error numbers */
 
 enum {
@@ -110,15 +116,6 @@ LPVOID TlsGetValue(DWORD index);
 BOOL SetThreadPriority(HANDLE threadHandle, int priority);
 
 int GetThreadPriority(HANDLE threadHandle);
-
-HANDLE _beginthreadex(LPSECURITY_ATTRIBUTES security,
-		      DWORD stack,
-		      unsigned (* start_routine)(void *),
-		      LPVOID param,
-		      DWORD flags,
-		      LPDWORD threadID);
-
-VOID _endthreadex(DWORD);
 
 DWORD GetVersion(VOID);
 

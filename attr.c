@@ -7,9 +7,10 @@
 
 #include "pthread.h"
 #include "implement.h"
+#include <string.h>
 
 static int
-is_attr(pthread_attr_t *attr)
+is_attr(const pthread_attr_t *attr)
 {
   /* Return 0 if the attr object is valid, non-zero otherwise. */
 
@@ -98,14 +99,11 @@ pthread_attr_init(pthread_attr_t *attr)
   attr->stacksize = PTHREAD_STACK_MIN;
 #endif
 
-  attr->cancelstate = PTHREAD_CANCEL_ENABLE;
-  attr->canceltype = PTHREAD_CANCEL_DEFERRED;
-  attr->cancel_pending = FALSE;
   attr->detachedstate = PTHREAD_CREATE_JOINABLE;
   memset(&(attr->sigmask), 0, sizeof(sigset_t));
 
   /* Priority uses Win32 priority values. */
-  int priority = THREAD_PRIORITY_NORMAL;
+  attr->priority = THREAD_PRIORITY_NORMAL;
 
   attr->valid = _PTHREAD_ATTR_VALID;
 

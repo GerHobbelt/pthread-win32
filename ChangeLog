@@ -1,3 +1,69 @@
+Tue Aug  4 00:09:30 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h(_pthread_virgins): Add extern.
+	(_pthread_virgin_next): Ditto.
+	(_pthread_reuse): Ditto.
+	(_pthread_reuse_top): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
+	* global.c (_pthread_virgins): Changed from array to pointer.
+	Storage allocation for the array moved into dll.c.
+	(_pthread_reuse): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
+	* dll.c (PthreadsEntryPoint): Set up thread admin storage when
+	DLL is loaded.
+
+	* fork.c (pthread_atfork): Fix function pointer arg to all
+	_pthread_handler_push() calls. Change "arg" arg to NULL in child push.
+
+	* exit.c: Add windows.h and process.h includes.
+	(_pthread_exit): Add local detachstate declaration.
+	(_pthread_exit): Fix incorrect name for pthread_attr_getdetachstate().
+
+	* pthread.h (_POSIX_THREAD_ATTR_STACKSIZE): Move from global.c
+	(_POSIX_THREAD_ATTR_STACKADDR): Ditto.
+
+	* create.c (pthread_create): Fix #if should be #ifdef.
+	(_pthread_start_call): Remove usused variables.
+
+	* process.h: Create.
+
+	* windows.h: Move _beginthreadex and _endthreadex into
+	process.h
+
+Mon Aug  3 21:19:57 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* condvar.c (pthread_cond_init): Add NULL attr to
+	pthread_mutex_init() call - default attributes will be used.
+	(cond_wait): Fix typo.
+	(cond_wait): Fix typo - cv was ev.
+	(pthread_cond_broadcast): Fix two identical typos.
+
+	* cleanup.c (_pthread_destructor_pop_all): Remove _ prefix from
+	PTHREAD_DESTRUCTOR_ITERATIONS.
+
+	* pthread.h: Move _POSIX_* values into posix.h
+
+	* pthread.h: Fix typo in pthread_mutex_init() prototype.
+
+	* attr.c (pthread_attr_init): Fix error in priority member init.
+
+	* windows.h (THREAD_PRIORITY_NORMAL): Add.
+
+	* pthread.h (sched_param): Add missing ';' to struct definition. 
+
+	* attr.c (pthread_attr_init): Remove obsolete pthread_attr_t
+	member initialisation - cancelstate, canceltype, cancel_pending.
+	(is_attr): Make arg "attr" a const.
+
+	* implement.h (_PTHREAD_HANDLER_POP_LIFO): Remove definition.
+	(_PTHREAD_HANDLER_POP_FIFO): Ditto.
+	(_PTHREAD_VALID): Add missing newline escape (\).
+	(_pthread_handler_node): Make element "next" a pointer.
+
 1998-08-02  Ben Elliston  <bje@cygnus.com>
 
 	* windows.h: Remove duplicate TlsSetValue() prototype.  Add 

@@ -20,11 +20,9 @@ _pthread_start_call(void * us_arg)
      this thread's private stack so we're safe to leave data in them
      until we leave. */
   pthread_t us;
-  _pthread_call_t * call;
   unsigned (*func)(void *);
   void * arg;
   unsigned ret;
-  int from;
 
   us = (pthread_t) us_arg;
 
@@ -45,6 +43,7 @@ _pthread_start_call(void * us_arg)
   _pthread_exit(us, NULL, ret);
 
   /* Never Reached */
+  return 0;
 }
 
 int
@@ -85,7 +84,7 @@ pthread_create(pthread_t *thread,
 	  attr_copy->detachedstate = attr->detachedstate;
 	  attr_copy->priority = attr->priority;
 
-#if HAVE_SIGSET_T
+#ifdef HAVE_SIGSET_T
 	  memcpy(&(attr_copy->sigmask), &(attr->sigmask), sizeof(sigset_t)); 
 #endif /* HAVE_SIGSET_T */
 	}

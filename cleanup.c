@@ -184,7 +184,7 @@ _pthread_destructor_pop_all()
   /* Stop destructor execution at a finite time. POSIX allows us
      to ignore this if we like, even at the risk of an infinite loop.
    */
-  for (count = 0; count < _PTHREAD_DESTRUCTOR_ITERATIONS; count++)
+  for (count = 0; count < PTHREAD_DESTRUCTOR_ITERATIONS; count++)
     {
       /* Loop through all destructors for this thread. */
       while (current != NULL)

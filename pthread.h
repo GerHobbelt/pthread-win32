@@ -22,6 +22,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef _PTHREADS_H
 #define _PTHREADS_H
 
+/* Convert these to defined when implemented. */
+#define _POSIX_THREAD_ATTR_STACKSIZE
+#ifdef _POSIX_THREAD_ATTR_STACKADDR
+#undef _POSIX_THREAD_ATTR_STACKADDR
+#endif
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
@@ -46,14 +52,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define SIG_SETMASK 2
 #endif /* SIG_SETMASK */
 
-#define PTHREAD_THREADS_MAX 128
 #define PTHREAD_STACK_MIN   65535
-
-/* Convert these to defined when implemented. */
-#define _POSIX_THREAD_ATTR_STACKSIZE
-#ifdef _POSIX_THREAD_ATTR_STACKADDR
-#undef _POSIX_THREAD_ATTR_STACKADDR
-#endif
 
 /* Thread scheduling policies */
 
@@ -98,7 +97,7 @@ typedef struct {
    called. */
 struct sched_param {
   int sched_priority;
-}
+};
 
 enum { SIGNAL, BROADCAST, NUM_EVENTS };
 
@@ -233,7 +232,7 @@ int pthread_cond_destroy(pthread_cond_t *cv);
 /* Primitives for mutexes. */
 
 int pthread_mutex_init(pthread_mutex_t *mutex,
-		       pthread_mutex_attr_t *attr);
+		       pthread_mutexattr_t *attr);
 
 int pthread_mutex_destroy(pthread_mutex_t *mutex);
 
@@ -270,15 +269,23 @@ int pthread_cancel(pthread_t thread);
 }
 #endif /* __cplusplus */
 
+/* Constants declared in global.c */
+extern const int _POSIX_THREAD_THREADS_MAX;
+extern const int _POSIX_THREAD_DESTRUCTOR_ITERATIONS;
+extern const int _POSIX_THREAD_KEYS_MAX;
+
 extern const int _pthread_create_joinable;
 extern const int _pthread_create_detached;
 
-/* Cancelability attributes */
 extern const int _pthread_cancel_enable;
 extern const int _pthread_cancel_disable;
 
 extern const int _pthread_cancel_asynchronous;
 extern const int _pthread_cancel_deferred;
+
+#define PTHREAD_DESTRUCTOR_ITERATIONS _POSIX_THREAD_DESTRUCTOR_ITERATIONS
+#define PTHREAD_KEYS_MAX _POSIX_THREAD_KEYS_MAX
+#define PTHREAD_THREADS_MAX _POSIX_THREAD_THREADS_MAX
 
 #define PTHREAD_CREATE_JOINABLE     _pthread_create_joinable
 #define PTHREAD_CREATE_DETACHED     _pthread_create_detached
