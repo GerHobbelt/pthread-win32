@@ -23,7 +23,7 @@ typedef struct {
 } _pthread_mutexattr_t;
 
 typedef struct {
-  int pshared;
+  /* Nothing needed yet. */
 } _pthread_condattr_t;
 
 #endif /* _IMPLEMENT_H */
