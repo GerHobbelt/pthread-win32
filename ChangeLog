@@ -1,3 +1,45 @@
+1998-07-24  Ben Elliston  <bje@cygnus.com>
+
+	* attr.c (pthread_attr_init): Initialise cancelability and
+	canceltype structure members.
+
+	* implement.h (_PTHREAD_CANCEL_DEFAULTS): Remove.  Bit fields
+	proved to be too cumbersome.  Set the defaults in attr.c using the
+	public PTHREAD_CANCEL_* constants.
+
+	* cancel.c: New file.
+
+	* pthread.h (sched_param): Define this type.
+	(pthread_attr_getschedparam): Add function prototype.
+	(pthread_attr_setschedparam): Likewise.
+	(pthread_setcancelstate): Likewise.
+	(pthread_setcanceltype): Likewise.
+	(sched_get_priority_min): Likewise.
+	(sched_get_priority_max): Likewise.
+	(pthread_mutexattr_setprotocol): Remove; not supported.
+	(pthread_mutexattr_getprotocol): Likewise.
+	(pthread_mutexattr_setprioceiling): Likewise.
+	(pthread_mutexattr_getprioceiling): Likewise.
+	(pthread_attr_t): Add canceltype member.  Update comments.
+	(SCHED_OTHER): Define this scheduling policy constant.
+	(SCHED_FIFO): Likewise.
+	(SCHED_RR): Likewise.
+	(SCHED_MIN): Define the lowest possible value for this constant.
+	(SCHED_MAX): Likewise, the maximum possible value.
+	(PTHREAD_CANCEL_ASYNCHRONOUS): Redefine.
+	(PTHREAD_CANCEL_DEFERRED): Likewise.
+	
+	* sched.c: New file.
+	(pthread_setschedparam): Implement.
+	(pthread_getschedparam): Implement.
+	(sched_get_priority_max): Validate policy argument.
+	(sched_get_priority_min): Likewise.
+
+	* mutex.c (pthread_mutexattr_setprotocol): Remove; not supported.
+	(pthread_mutexattr_getprotocol): Likewise.
+	(pthread_mutexattr_setprioceiling): Likewise.
+	(pthread_mutexattr_getprioceiling): Likewise.
+
 Fri Jul 24 00:21:21 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* create.c (pthread_create): Arg to _pthread_new_thread_entry()
