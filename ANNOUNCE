@@ -63,13 +63,11 @@ These are now documented in the BUGS file.
 Level of standards conformance
 ------------------------------
 
-The following POSIX 1003.1 2001 options are defined:
+The following POSIX 1003.1 2001 options are defined and set to 200112L:
 
       _POSIX_THREADS
       _POSIX_THREAD_SAFE_FUNCTIONS
       _POSIX_THREAD_ATTR_STACKSIZE
-      _POSIX_SEM_VALUE_MAX
-      _POSIX_SEM_NSEMS_MAX
       _POSIX_THREAD_PRIORITY_SCHEDULING
       _POSIX_SEMAPHORES
       _POSIX_READER_WRITER_LOCKS
@@ -77,13 +75,24 @@ The following POSIX 1003.1 2001 options are defined:
       _POSIX_BARRIERS
 
 
-The following POSIX 1003.1 2001 options are not defined:
+The following POSIX 1003.1 2001 options are defined and set to -1:
 
       _POSIX_THREAD_ATTR_STACKADDR
       _POSIX_THREAD_PRIO_INHERIT
       _POSIX_THREAD_PRIO_PROTECT
       _POSIX_THREAD_PROCESS_SHARED
 
+
+The following POSIX 1003.1 2001 options are defined and set:
+
+      _POSIX_THREAD_THREADS_MAX
+      _POSIX_SEM_VALUE_MAX
+      _POSIX_SEM_NSEMS_MAX
+      PTHREAD_DESTRUCTOR_ITERATIONS
+      PTHREAD_KEYS_MAX
+      PTHREAD_STACK_MIN
+      PTHREAD_THREADS_MAX
+      
 
 The following functions are implemented:
 
@@ -249,18 +258,24 @@ The following functions are implemented:
 						PTHREAD_MUTEX_ADAPTIVE_NP,
 						PTHREAD_MUTEX_TIMED_NP)
       pthread_num_processors_np
-      pthread_win32_process_attach_np	(Required when statically linking the library)
-      pthread_win32_process_detach_np	(Required when statically linking the library)
-      pthread_win32_thread_attach_np	(Required when statically linking the library)
-      pthread_win32_thread_detach_np	(Required when statically linking the library)
+      pthread_win32_process_attach_np	(Required when statically linking
+                                         the library)
+      pthread_win32_process_detach_np	(Required when statically linking
+                                         the library)
+      pthread_win32_thread_attach_np	(Required when statically linking
+                                         the library)
+      pthread_win32_thread_detach_np	(Required when statically linking
+                                         the library)
 
       ---------------------------
       Static Initializers
       ---------------------------
       PTHREAD_ONCE_INIT
       PTHREAD_MUTEX_INITIALIZER
-      PTHREAD_RECURSIVE_MUTEX_INITIALIZER	(also: PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP)
-      PTHREAD_ERRORCHECK_MUTEX_INITIALIZER	(also: PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP)
+      PTHREAD_RECURSIVE_MUTEX_INITIALIZER
+      PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+      PTHREAD_ERRORCHECK_MUTEX_INITIALIZER
+      PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP
       PTHREAD_COND_INITIALIZER
       PTHREAD_RWLOCK_INITIALIZER
       PTHREAD_SPINLOCK_INITIALIZER
@@ -319,8 +334,12 @@ The following functions are not implemented:
       sigtimedwait
       sigwait
       sigwaitinfo
-      
-      
+
+      ---------------------------
+      General
+      ---------------------------
+      sysconf      
+
 The library includes two non-API functions for creating cancellation
 points in applications and libraries:
       

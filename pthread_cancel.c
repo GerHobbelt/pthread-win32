@@ -123,8 +123,8 @@ pthread_cancel (pthread_t thread)
   pthread_t self;
   ptw32_thread_t * tp;
 
-  /* This is the proper way to test thread validity. */
   result = pthread_kill (thread, 0);
+
   if (0 != result)
     {
       return result;
