@@ -117,7 +117,7 @@ terminateFunction ()
    * through or to MSVC++ code, and vice versa.
    * Applications should probably not depend on this.
    */
-  pthread_exit((void *) 0));
+  pthread_exit((void *) 0);
 #else
   /*
    * Notes from the MSVC++ manual:

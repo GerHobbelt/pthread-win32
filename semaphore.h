@@ -102,7 +102,7 @@
  */
 
 #if PTW32_LEVEL >= PTW32_LEVEL_MAX
-#ifdef NEED_SEM
+#ifdef NEED_ERRNO
 #include "need_errno.h"
 #else
 #include <errno.h>

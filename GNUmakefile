@@ -432,30 +432,31 @@ tests:
 .c.o:;		 $(CC) -c -o $@ $(CFLAGS) $(CLEANUP_FLAGS) $<
 
 
-$(PTHREAD_DEF): $(OBJS)
-	dlltool -z pthread.def $(DLL_INLINED_OBJS)
-
-$(GC_DLL): $(DLL_OBJS) $(PTHREAD_DEF)
+$(GC_DLL): $(DLL_OBJS)
 	$(CC) $(OPT) -shared -o $(GC_DLL) $(DLL_OBJS) $(LFLAGS)
+	dlltool -z pthread.def $(DLL_OBJS)
 	dlltool -k --dllname $@ --output-lib $(GC_LIB) --def $(PTHREAD_DEF)
 
-$(GCE_DLL): $(DLL_OBJS) $(PTHREAD_DEF)
+$(GCE_DLL): $(DLL_OBJS)
 	$(CXX) $(OPT) -mthreads -shared -o $(GCE_DLL) $(DLL_OBJS) $(LFLAGS)
+	dlltool -z pthread.def $(DLL_OBJS)
 	dlltool -k --dllname $@ --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
 
-$(GC_INLINED_STAMP): $(DLL_INLINED_OBJS) $(PTHREAD_DEF)
+$(GC_INLINED_STAMP): $(DLL_INLINED_OBJS)
 	$(CC) $(OPT) -shared -o $(GC_DLL) $(DLL_INLINED_OBJS) $(LFLAGS)
+	dlltool -z pthread.def $(DLL_INLINED_OBJS)
 	dlltool -k --dllname $(GC_DLL) --output-lib $(GC_LIB) --def $(PTHREAD_DEF)
 	echo touched > $(GC_INLINED_STAMP)
 
-$(GCE_INLINED_STAMP): $(DLL_INLINED_OBJS) $(PTHREAD_DEF)
+$(GCE_INLINED_STAMP): $(DLL_INLINED_OBJS)
 	$(CXX) $(OPT) -mthreads -shared -o $(GCE_DLL) $(DLL_INLINED_OBJS)  $(LFLAGS)
+	dlltool -z pthread.def $(DLL_INLINED_OBJS)
 	dlltool -k --dllname $(GCE_DLL) --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
 	echo touched > $(GCE_INLINED_STAMP)
 
 clean:
 	-$(RM) *~
-	-$(RM) *.pre
+	-$(RM) *.i
 	-$(RM) *.o
 	-$(RM) *.exe
 	-$(RM) $(PTHREAD_DEF)

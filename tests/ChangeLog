@@ -1,5 +1,13 @@
 2002-02-28  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
+	* exception3.c: Correct recent change.
+
+	* semaphore1.c: New test.
+
+	* Makefile: Add rule to generate pre-processor output.
+
+2002-02-28  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
 	* exception3.c (terminateFunction): For MSVC++, call
 	exit() rather than pthread_exit(). Add comments to explain
 	why.

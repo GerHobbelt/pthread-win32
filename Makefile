@@ -388,6 +388,7 @@ clean:
 	if exist *.pdb del *.pdb
 	if exist *.exp del *.exp
 	if exist *.o del *.o
+	if exist *.i del *.i
 
 
 install: $(DLLS)
@@ -406,6 +407,9 @@ $(INLINED_STAMPS): $(DLL_INLINED_OBJS)
 
 .c.obj:
 	cl $(EHFLAGS) -c $<
+
+.c.i:
+	cl /P /O2 /Ob1 $(VCFLAGS) $<
 
 attr.obj:	attr.c $(ATTR_SRCS) $(INCL)
 barrier.obj:	barrier.c $(BARRIER_SRCS) $(INCL)

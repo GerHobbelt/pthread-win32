@@ -82,6 +82,32 @@
 # define PTW32_DLLPORT __declspec (dllimport)
 #endif
 
+/*
+ * This is a duplicate of what is in the autoconf config.h,
+ * which is only used when building the pthread-win32 libraries.
+ */
+
+#ifndef PTW32_CONFIG_H
+#  if defined(WINCE)
+#    define NEED_ERRNO
+#    define NEED_SEM
+#  endif
+#  if defined(_UWIN) || defined(__MINGW32__)
+#    define HAVE_MODE_T
+#  endif
+#endif
+
+/*
+ *
+ */
+
+#if PTW32_LEVEL >= PTW32_LEVEL_MAX
+#ifdef NEED_ERRNO
+#include "need_errno.h"
+#else
+#include <errno.h>
+#endif
+#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
 #if defined(__MINGW32__) || defined(_UWIN)
 #if PTW32_LEVEL >= PTW32_LEVEL_MAX

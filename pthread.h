@@ -197,11 +197,32 @@
 
 #include <setjmp.h>
 
-#ifdef NEED_ERRNO
-#  include "need_errno.h"
-#else
-#  include <errno.h>
+/*
+ * This is a duplicate of what is in the autoconf config.h,
+ * which is only used when building the pthread-win32 libraries.
+ */
+
+#ifndef PTW32_CONFIG_H
+#  if defined(WINCE)
+#    define NEED_ERRNO
+#    define NEED_SEM
+#  endif
+#  if defined(_UWIN) || defined(__MINGW32__)
+#    define HAVE_MODE_T
+#  endif
 #endif
+
+/*
+ *
+ */
+
+#if PTW32_LEVEL >= PTW32_LEVEL_MAX
+#ifdef NEED_ERRNO
+#include "need_errno.h"
+#else
+#include <errno.h>
+#endif
+#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
 /*
  * Several systems don't define ENOTSUP. If not, we use
@@ -447,12 +468,13 @@ extern "C"
  * do NOT define PTW32_BUILD, and then the variables/functions will
  * be imported correctly.
  */
-#ifdef PTW32_BUILD
-# define PTW32_DLLPORT __declspec (dllexport)
-#else
-# define PTW32_DLLPORT __declspec (dllimport)
+#ifdef _DLL
+#  ifdef PTW32_BUILD
+#    define PTW32_DLLPORT __declspec (dllexport)
+#  else
+#    define PTW32_DLLPORT __declspec (dllimport)
+#  endif
 #endif
-
 
 #if defined(_UWIN) && PTW32_LEVEL >= PTW32_LEVEL_MAX
 #   include	<sys/types.h>
@@ -1104,9 +1126,16 @@ PTW32_DLLPORT int pthreadCancelableTimedWait (HANDLE waitHandle,
  * Thread-Safe C Runtime Library Mappings.
  */
 #ifndef _UWIN
-#if (! defined(HAVE_ERRNO)) && (! defined(_REENTRANT)) && (! defined(_MT))
-PTW32_DLLPORT int * _errno( void );
-#endif
+#  if defined(NEED_ERRNO)
+     PTW32_DLLPORT int * _errno( void );
+#  else
+#    ifndef errno
+#      if (defined(_MT) || defined(_DLL))
+	 __declspec(dllimport) extern int * __cdecl _errno(void);
+#	 define errno	(*_errno())
+#      endif
+#    endif
+#  endif
 #endif
 
 /*
