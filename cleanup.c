@@ -117,6 +117,7 @@ _pthread_handler_pop_all(int stack, int execute)
     }
 }
 
+
 int
 _pthread_destructor_push(void (* routine)(void *), pthread_key_t key)
 {
@@ -126,6 +127,48 @@ _pthread_destructor_push(void (* routine)(void *), pthread_key_t key)
 			       key);
 }
 
+
+/* Remove all of the destructors associated with the key. */
+void
+_pthread_destructor_pop(pthread_key_t key)
+{
+  _pthread_handler_node_t ** head;
+  _pthread_handler_node_t * current;
+  _pthread_handler_node_t * next;
+
+  head = _PTHREAD_STACK(_PTHREAD_DESTRUCTOR_STACK);
+  current = *head;
+
+  while (current != NULL)
+    {
+      next = current->next;
+
+      /* The destructors associated key is in current->arg. */
+      if (current->arg == key)
+	{
+	  if (current == *head)
+	    {
+	      *head = next;
+	    }
+	  free(current);
+	}
+      current = next;
+    }
+}
+
+
+/* Run destructors for all non-NULL key values.
+
+   FIXME: Currently we only run the destructors on the calling
+   thread's key values. The way I interpret POSIX semantics is that,
+   for each key that the calling thread has a destructor for, we need
+   to look at the key values of every thread and run the destructor on
+   it if the key value is non-NULL.
+
+   The question is: how do we access the key associated values which
+   are private to other threads?
+
+ */
 void
 _pthread_destructor_pop_all()
 {
