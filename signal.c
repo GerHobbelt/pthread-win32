@@ -6,6 +6,7 @@
  */
 
 #include "pthread.h"
+#include "implement.h"
 
 int
 pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
@@ -32,7 +33,7 @@ pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
   /* Copy the old mask before modifying it. */
   if (oset != NULL)
     {
-      memcpy(oset, thread->attr.sigmask, sizeof(sigset_t));
+      memcpy(oset, &(thread->attr.sigmask), sizeof(sigset_t));
     }
 
   if (set != NULL)
@@ -42,8 +43,8 @@ pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
       /* FIXME: this code assumes that sigmask is an even multiple of
 	 the size of a long integer. */ 
          
-      unsigned long *src = set;
-      unsigned long *dest = thread->attr.sigmask;
+      unsigned long *src = (long *) set;
+      unsigned long *dest = &(thread->attr.sigmask);
 
       switch (how)
 	{
@@ -60,9 +61,9 @@ pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
 	      /* XOR the bitfield longword-wise. */
 	      *src++ ^= *dest++;
 	    }
-	case SIG_SET:
+	case SIG_SETMASK:
 	  /* Replace the whole sigmask. */
-	  memcpy(thread->attr.sigmask, set, sizeof(sigset_t));
+	  memcpy(&(thread->attr.sigmask), set, sizeof(sigset_t));
 	  break;
 	}
     }
