@@ -112,7 +112,7 @@
  *      The code base for this project is coordinated and
  *      eventually pre-tested, packaged, and made available by
  *
- *              Ross Johnson <rpj@ise.canberra.edu.au>
+ *              Ross Johnson <rpj@callisto.canberra.edu.au>
  *
  * QA Testers:
  *      Ultimately, the library is tested in the real world by
