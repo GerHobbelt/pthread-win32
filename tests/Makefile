@@ -60,7 +60,7 @@ PASSES= loadfree.pass \
 	  exception1.pass  exception2.pass  exception3.pass
 
 BENCHRESULTS = \
-	  benchtest1.pass benchtest2.pass
+	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench
 
 all:
 	@ $(ECHO) Run one of the following command lines:
@@ -144,6 +144,7 @@ clean:
 benchtest1.bench:
 benchtest2.bench:
 benchtest3.bench:
+benchtest4.bench:
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
 cancel3.pass: context1.pass

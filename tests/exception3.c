@@ -1,7 +1,7 @@
 /*
  * File: exception3.c
  *
- * Test Synopsis: Test running of user supplied teerminate() function.
+ * Test Synopsis: Test running of user supplied terminate() function.
  *
  * Test Method (Validation or Falsification):
  * - 
