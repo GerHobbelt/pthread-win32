@@ -1,15 +1,25 @@
 1998-07-13  Ben Elliston  <bje@cygnus.com>
 
+	* condvar.c (pthread_condattr_init): Implement.
+	(pthread_condattr_destroy): Likewise.
+	(pthread_condattr_setpshared): Likewise.
+	(pthread_condattr_getpshared): Likewise.
+	
 	* implement.h (PTHREAD_THREADS_MAX): Remove trailing semicolon.
 	(PTHREAD_STACK_MIN): Specify; needs confirming.
 	(_pthread_attr_t): Define this type.
 	(_pthread_condattr_t): Likewise.
 
 	* pthread.h (pthread_mutex_t): Define this type.
+	(pthread_condattr_t): Likewise.
 	(pthread_mutex_destroy): Add function prototype.
 	(pthread_lock): Likewise.
 	(pthread_trylock): Likewise.
 	(pthread_unlock): Likewise.
+	(pthread_condattr_init): Likewise.
+	(pthread_condattr_destroy): Likewise.
+	(pthread_condattr_setpshared): Likewise.
+	(pthread_condattr_getpshared): Likewise.
 
 	* mutex.c (pthread_mutex_init): Implement.
 	(pthread_mutex_destroy): Likewise.
