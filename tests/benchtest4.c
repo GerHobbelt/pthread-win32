@@ -98,7 +98,7 @@ runTest (char * testNameString, int mType)
 
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
 
-  printf( "%-40s %15ld %15.3f\n",
+  printf( "%-45s %15ld %15.3f\n",
 	    testNameString,
           durationMilliSecs,
           (float) durationMilliSecs * 1E3 / ITERATIONS);
@@ -110,14 +110,14 @@ main (int argc, char *argv[])
 {
   pthread_mutexattr_init(&ma);
 
-  printf( "========================================================================\n");
+  printf( "=============================================================================\n");
   printf( "Trylock plus unlock on an unlocked mutex.\n");
   printf( "%ld iterations.\n\n", ITERATIONS);
-  printf( "%-40s %15s %15s\n",
+  printf( "%-45s %15s %15s\n",
 	    "Test",
 	    "Total(msec)",
 	    "average(usec)");
-  printf( "------------------------------------------------------------------------\n");
+  printf( "-----------------------------------------------------------------------------\n");
 
   /*
    * Time the loop overhead so we can subtract it from the actual test times.
@@ -137,8 +137,8 @@ main (int argc, char *argv[])
   TESTSTOP
   assert(old_mutex_destroy(&ox) == 0);
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
-  printf( "%-40s %15ld %15.3f\n",
-	    "PT Mutex using a Critical Section (WNT)",
+  printf( "%-45s %15ld %15.3f\n",
+	    "Old PT Mutex using a Critical Section (WNT)",
           durationMilliSecs,
           (float) durationMilliSecs * 1E3 / ITERATIONS);
 
@@ -150,12 +150,12 @@ main (int argc, char *argv[])
   TESTSTOP
   assert(old_mutex_destroy(&ox) == 0);
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
-  printf( "%-40s %15ld %15.3f\n",
-	    "PT Mutex using a Win32 Mutex (W9x)",
+  printf( "%-45s %15ld %15.3f\n",
+	    "Old PT Mutex using a Win32 Mutex (W9x)",
           durationMilliSecs,
           (float) durationMilliSecs * 1E3 / ITERATIONS);
 
-  printf( "........................................................................\n");
+  printf( ".............................................................................\n");
 
   /*
    * Now we can start the actual tests
@@ -172,7 +172,7 @@ main (int argc, char *argv[])
   runTest("Non-blocking lock", 0);
 #endif
 
-  printf( "========================================================================\n");
+  printf( "=============================================================================\n");
 
   /*
    * End of tests.

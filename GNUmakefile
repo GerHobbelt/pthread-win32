@@ -34,16 +34,15 @@ DEVROOT	= C:\PTHREADS
 DLLDEST	= $(DEVROOT)\DLL
 LIBDEST	= $(DEVROOT)\DLL
 
-#RM	= rm
-#MV	= mv
-#CP	= cp
+# If Running MsysDTK
+RM	= rm -f
+MV	= mv -f
+CP	= cp -f
 
-RM	= erase
-MV	= rename
-CP	= copy
-
-CC	= gcc
-CXX	= g++
+# If not.
+#RM	= erase
+#MV	= rename
+#CP	= copy
 
 AR	= ar
 
@@ -54,7 +53,7 @@ OPT	= -O3 -finline-functions
 LFLAGS		= -lwsock32
 
 GC_CFLAGS	= -D__CLEANUP_C
-GCE_CFLAGS	= -D__CLEANUP_CXX -x c++ -mthreads
+GCE_CFLAGS	= -D__CLEANUP_CXX -mthreads
 
 ## Mingw32
 MAKE		= make
@@ -395,27 +394,27 @@ GC_INLINED_STAMP = pthreadGC.stamp
 PTHREAD_DEF	= pthread.def
 
 help:
-	@ echo Run one of the following command lines:
-	@ echo make clean GCE           (to build the GNU C dll with C++ exception handling)
-	@ echo make clean GC            (to build the GNU C dll with C cleanup code)
-	@ echo make clean GCE-inlined   (to build the GNU C inlined dll with C++ exception handling)
-	@ echo make clean GC-inlined    (to build the GNU C inlined dll with C cleanup code)
+	@ echo "Run one of the following command lines:"
+	@ echo "make clean GCE           (to build the GNU C dll with C++ exception handling)"
+	@ echo "make clean GC            (to build the GNU C dll with C cleanup code)"
+	@ echo "make clean GCE-inlined   (to build the GNU C inlined dll with C++ exception handling)"
+	@ echo "make clean GC-inlined    (to build the GNU C inlined dll with C cleanup code)"
 
 all:
 	@ $(MAKE) clean GCE
 	@ $(MAKE) clean GC
 
 GC:
-		$(MAKE) CLEANUP_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_DLL)
+		$(MAKE) CC=gcc CLEANUP_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_DLL)
 
 GCE:
-		$(MAKE) CLEANUP_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_DLL)
+		$(MAKE) CC=g++ CLEANUP_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_DLL)
 
 GC-inlined:
-		$(MAKE) CLEANUP_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_INLINED_STAMP)
+		$(MAKE) CC=gcc CLEANUP_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_INLINED_STAMP)
 
 GCE-inlined:
-		$(MAKE) CLEANUP_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
+		$(MAKE) CC=g++ CLEANUP_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
 
 tests:
 	@ cd tests
@@ -438,7 +437,7 @@ $(GC_DLL): $(DLL_OBJS)
 	dlltool -k --dllname $@ --output-lib $(GC_LIB) --def $(PTHREAD_DEF)
 
 $(GCE_DLL): $(DLL_OBJS)
-	$(CXX) $(OPT) -mthreads -shared -o $(GCE_DLL) $(DLL_OBJS) $(LFLAGS)
+	$(CC) $(OPT) -mthreads -shared -o $(GCE_DLL) $(DLL_OBJS) $(LFLAGS)
 	dlltool -z pthread.def $(DLL_OBJS)
 	dlltool -k --dllname $@ --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
 
@@ -449,7 +448,7 @@ $(GC_INLINED_STAMP): $(DLL_INLINED_OBJS)
 	echo touched > $(GC_INLINED_STAMP)
 
 $(GCE_INLINED_STAMP): $(DLL_INLINED_OBJS)
-	$(CXX) $(OPT) -mthreads -shared -o $(GCE_DLL) $(DLL_INLINED_OBJS)  $(LFLAGS)
+	$(CC) $(OPT) -mthreads -shared -o $(GCE_DLL) $(DLL_INLINED_OBJS)  $(LFLAGS)
 	dlltool -z pthread.def $(DLL_INLINED_OBJS)
 	dlltool -k --dllname $(GCE_DLL) --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
 	echo touched > $(GCE_INLINED_STAMP)

@@ -82,37 +82,32 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
 #elif defined(__CLEANUP_CXX)
 
 #if defined(_MSC_VER)
-#include <eh.h>
-static terminate_function ptw32_oldTerminate;
+# include <eh.h>
 #else
-#include <new.h>
-static terminate_handler ptw32_oldTerminate;
+# if defined(__GNUC__) && __GNUC__ < 3
+#   include <new.h>
+# else
+#   include <new>
+    using std::terminate_handler;
+    using std::terminate;
+    using std::set_terminate;
+# endif
+  typedef terminate_handler terminate_function;
 #endif
 
-#if 0
-#include <stdio.h>
-static pthread_mutex_t termLock = PTHREAD_MUTEX_INITIALIZER;
-#endif
+static terminate_function ptw32_oldTerminate;
 
 void
 ptw32_terminate ()
 {
   pthread_t self = pthread_self();
-#if 0
-  FILE * fp;
-  pthread_mutex_lock(&termLock);
-  fp = fopen("pthread.log", "a");
-  fprintf(fp, "Terminate\n");
-  fclose(fp);
-  pthread_mutex_unlock(&termLock);
-#endif
   set_terminate(ptw32_oldTerminate);
   (void) pthread_mutex_destroy(&self->cancelLock);
   ptw32_callUserDestroyRoutines(self);
   terminate();
 }
 
-#endif /* _MSC_VER */
+#endif
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
 unsigned __stdcall
@@ -263,12 +258,7 @@ ptw32_threadStart (void * vthreadParms)
 	* supplied function.
 	*/
 
-#if defined(_MSC_VER)
        terminate_function term_func = set_terminate(0);
-#else
-       terminate_handler term_func = set_terminate(0);
-#endif
-
        set_terminate(term_func);
 
        if (term_func != 0) {
@@ -323,7 +313,6 @@ ptw32_threadStart (void * vthreadParms)
 #endif /* __CLEANUP_C */
 #endif /* __CLEANUP_SEH */
 
-#if 1
   if (self->detachState == PTHREAD_CREATE_DETACHED)
     {
       /*
@@ -345,9 +334,6 @@ ptw32_threadStart (void * vthreadParms)
     {
       ptw32_callUserDestroyRoutines (self);
     }
-#else
-  ptw32_callUserDestroyRoutines (self);
-#endif
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
   _endthreadex ((unsigned) status);

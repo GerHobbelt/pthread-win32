@@ -73,7 +73,7 @@ sem_destroy (sem_t * sem)
       */
 {
   int result = 0;
-  sem_t s;
+  sem_t s = NULL;
 
   if (sem == NULL || *sem == NULL)
     {

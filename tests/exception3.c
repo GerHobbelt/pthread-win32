@@ -78,9 +78,14 @@
 #if defined(__cplusplus)
 
 #if defined(_MSC_VER)
-#include <eh.h>
+# include <eh.h>
 #else
-#include <new.h>
+# if defined(__GNUC__) && __GNUC__ < 3
+#   include <new.h>
+# else
+#   include <new>
+    using std::set_terminate;
+# endif
 #endif
 
 /*

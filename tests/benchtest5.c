@@ -78,7 +78,7 @@ reportTest (char * testNameString)
 {
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
 
-  printf( "%-40s %15ld %15.3f\n",
+  printf( "%-45s %15ld %15.3f\n",
 	    testNameString,
           durationMilliSecs,
           (float) durationMilliSecs * 1E3 / ITERATIONS);
@@ -88,14 +88,14 @@ reportTest (char * testNameString)
 int
 main (int argc, char *argv[])
 {
-  printf( "========================================================================\n");
+  printf( "=============================================================================\n");
   printf( "\nOperations on a semaphore.\n%ld iterations\n\n",
           ITERATIONS);
-  printf( "%-40s %15s %15s\n",
+  printf( "%-45s %15s %15s\n",
 	    "Test",
 	    "Total(msec)",
 	    "average(usec)");
-  printf( "------------------------------------------------------------------------\n");
+  printf( "-----------------------------------------------------------------------------\n");
 
   /*
    * Time the loop overhead so we can subtract it from the actual test times.
@@ -165,7 +165,7 @@ main (int argc, char *argv[])
 
   reportTest("Wait then Post without blocking");
 
-  printf( "========================================================================\n");
+  printf( "=============================================================================\n");
 
   /*
    * End of tests.

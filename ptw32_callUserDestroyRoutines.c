@@ -38,6 +38,11 @@
 #include "pthread.h"
 #include "implement.h"
 
+#ifdef __cplusplus
+# if ! defined (_MSC_VER) && ! (defined(__GNUC__) && __GNUC__ < 3)
+    using std::terminate;
+# endif
+#endif
 
 void
 ptw32_callUserDestroyRoutines (pthread_t thread)
