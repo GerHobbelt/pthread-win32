@@ -443,8 +443,8 @@ _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
-      *      This function  waits on a semaphore for at most
-      *      'abstime'.
+      *      This function waits on a semaphore possibly until
+      *      'abstime' time.
       *
       * PARAMETERS
       *      sem
@@ -476,7 +476,10 @@ _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
       * ------------------------------------------------------
       */
 {
-  DWORD msecs;
+  struct _timeb currSysTime;
+  const DWORD NANOSEC_PER_MILLISEC = 1000000;
+  const DWORD MILLISEC_PER_SEC = 1000;
+  DWORD milliseconds;
 
   if (abstime == NULL)
     {
@@ -484,14 +487,22 @@ _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
     }
   else
     {
-      /* Calculate the number of milliseconds in abstime. */
-      msecs = abstime->tv_sec * 1000;
-      msecs += abstime->tv_nsec / 1000000;
+      /* 
+       * Calculate timeout as milliseconds from current system time. 
+       */
+
+      /* get current system time */
+      _ftime(&currSysTime);
+
+      /* subtract current system time from abstime */
+      milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
+      milliseconds += (abstime->tv_nsec / NANOSEC_PER_MILLISEC) -
+	currSysTime.millitm;
     }
 
   return ((sem == NULL)
 	  ? EINVAL
-	  : pthreadCancelableWait (*sem, msecs)
+	  : pthreadCancelableTimedWait (*sem, milliseconds)
     );
 
 }				/* _pthread_sem_timedwait */

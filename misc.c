@@ -129,8 +129,8 @@ pthread_equal (pthread_t t1, pthread_t t2)
 }				/* pthread_equal */
 
 
-int
-pthreadCancelableWait (HANDLE waitHandle, DWORD abstime)
+static int
+CancelableWait (HANDLE waitHandle, DWORD timeout)
      /*
       * -------------------------------------------------------------------
       * This provides an extra hook into the pthread_cancel
@@ -150,7 +150,6 @@ pthreadCancelableWait (HANDLE waitHandle, DWORD abstime)
   HANDLE handles[2];
   DWORD nHandles = 1;
   DWORD status;
-
 
   handles[0] = waitHandle;
 
@@ -177,7 +176,7 @@ pthreadCancelableWait (HANDLE waitHandle, DWORD abstime)
                                     nHandles,
                                     handles,
                                     FALSE,
-                                    abstime);
+                                    timeout);
 
 
   if (status == WAIT_FAILED)
@@ -185,10 +184,13 @@ pthreadCancelableWait (HANDLE waitHandle, DWORD abstime)
       result = EINVAL;
 
     }
-  else if (status == WAIT_ABANDONED_0)
+  else if (status == WAIT_TIMEOUT)
     {
       result = ETIMEDOUT;
-
+    }
+  else if (status == WAIT_ABANDONED_0)
+    {
+      result = EINVAL;
     }
   else
     {
@@ -243,6 +245,17 @@ pthreadCancelableWait (HANDLE waitHandle, DWORD abstime)
 
 }                               /* pthreadCancelableWait */
 
+int
+pthreadCancelableWait (HANDLE waitHandle)
+{
+  return (CancelableWait(waitHandle, INFINITE));
+}
+
+int
+pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout)
+{
+  return (CancelableWait(waitHandle, timeout));
+}
 
 /* </JEB> */
 
