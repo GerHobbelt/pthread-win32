@@ -530,19 +530,23 @@ typedef struct {
   pthread_mutex_t * mutexPtr;
   pthread_cond_t cv;
   int * resultPtr;
-} cond_wait_cleanup_args_t;
+} ptw32_cond_wait_cleanup_args_t;
 
 static void
-cond_wait_cleanup(void * args)
+ptw32_cond_wait_cleanup(void * args)
 {
-  cond_wait_cleanup_args_t * cleanup_args = (cond_wait_cleanup_args_t *) args;
+  ptw32_cond_wait_cleanup_args_t * cleanup_args = (ptw32_cond_wait_cleanup_args_t *) args;
   pthread_mutex_t * mutexPtr = cleanup_args->mutexPtr;
   pthread_cond_t cv = cleanup_args->cv;
   int * resultPtr = cleanup_args->resultPtr;
-  int lock_result;
   int lastWaiter = FALSE;
 
-  if ((lock_result = pthread_mutex_lock (&(cv->waitersLock))) == 0)
+  /*
+   * Whether we got here legitimately or because of an error we
+   * indicate that we are no longer waiting. The alternative
+   * will result in never signaling the broadcasting thread.
+   */
+  if (pthread_mutex_lock (&(cv->waitersLock)) == 0)
     {
       /*
        * The waiter is responsible for decrementing
@@ -558,40 +562,42 @@ cond_wait_cleanup(void * args)
           cv->wasBroadcast = FALSE;
         }
 
-      lock_result = pthread_mutex_unlock (&(cv->waitersLock));
+      (void) pthread_mutex_unlock (&(cv->waitersLock));
     }
 
-  if ((*resultPtr == 0 || *resultPtr == ETIMEDOUT) && lock_result == 0)
+  /*
+   * If we are the last waiter on this broadcast
+   * let the thread doing the broadcast proceed
+   */
+  if (lastWaiter && !SetEvent (cv->waitersDone))
     {
-      if (lastWaiter)
-        {
-          /*
-           * If we are the last waiter on this broadcast
-           * let the thread doing the broadcast proceed
-           */
-          if (!SetEvent (cv->waitersDone))
-            {
-              *resultPtr = EINVAL;
-            }
-        }
+      *resultPtr = EINVAL;
     }
 
   /*
    * We must always regain the external mutex, even when
    * errors occur, because that's the guarantee that we give
-   * to our callers
+   * to our callers.
+   *
+   * Note that the broadcasting thread may already own the lock.
+   * The standard actually requires that the signaling thread hold
+   * the lock at the time that it signals if the developer wants
+   * predictable scheduling behaviour. It's up to the developer.
+   * In that case all waiting threads will block here until
+   * the broadcasting thread releases the lock, having been
+   * notified by the last waiting thread (SetEvent call above).
    */
   (void) pthread_mutex_lock (mutexPtr);
 }
 
 static int
 ptw32_cond_timedwait (pthread_cond_t * cond, 
-		pthread_mutex_t * mutex,
-		const struct timespec *abstime)
+                      pthread_mutex_t * mutex,
+                      const struct timespec *abstime)
 {
   int result = 0;
   pthread_cond_t cv;
-  cond_wait_cleanup_args_t cleanup_args;
+  ptw32_cond_wait_cleanup_args_t cleanup_args;
 
   if (cond == NULL || *cond == NULL)
     {
@@ -644,15 +650,15 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
   cleanup_args.cv = cv;
   cleanup_args.resultPtr = &result;
 
-  pthread_cleanup_push (cond_wait_cleanup, (void *) &cleanup_args);
+  pthread_cleanup_push (ptw32_cond_wait_cleanup, (void *) &cleanup_args);
 
   if ((result = pthread_mutex_unlock (mutex)) == 0)
     {
       /*
        * Wait to be awakened by
        *              pthread_cond_signal, or
-       *              pthread_cond_broadcast
-       *              timeout
+       *              pthread_cond_broadcast, or
+       *              a timeout
        *
        * Note: 
        *      ptw32_sem_timedwait is a cancelation point,
@@ -668,7 +674,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
 	}
     }
 
-  pthread_cleanup_pop (1);
+  pthread_cleanup_pop (1);  /* Always cleanup */
 
   /*
    * "result" can be modified by the cleanup handler.
@@ -737,8 +743,8 @@ pthread_cond_wait (pthread_cond_t * cond,
 
 int
 pthread_cond_timedwait (pthread_cond_t * cond, 
-		pthread_mutex_t * mutex,
-		const struct timespec *abstime)
+                        pthread_mutex_t * mutex,
+                        const struct timespec *abstime)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC

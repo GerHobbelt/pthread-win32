@@ -1,10 +1,24 @@
 2000-09-02  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
+	* condvar.c (ptw32_cond_wait_cleanup): Ensure that all
+	waking threads check if they are the last, and notify
+	the broadcaster if so - even if an error occurs in the
+	waiter.
+
+	* semaphore.c (_decrease_semaphore): Should be
+	a call to ptw32_decrease_semaphore.
+	(_increase_semaphore): Should be a call to
+	ptw32_increase_semaphore.
+
+	* misc.c (ptw32_cancelable_wait): Renamed from
+	CancelableWait.
 	* rwlock.c (_rwlock_check*): Renamed to
 	ptw32_rwlock_check*.
 	* mutex.c (_mutex_check*): Renamed to ptw32_mutex_check*.
 	* condvar.c (cond_timed*): Renamed to ptw32_cond_timed*.
 	(_cond_check*): Renamed to ptw32_cond_check*.
+	(cond_wait_cleanup*): Rename to ptw32_cond_wait_cleanup*.
+	(ptw32_cond_timedwait): Add comments.
 
 2000-08-22  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
