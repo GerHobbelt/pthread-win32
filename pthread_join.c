@@ -126,7 +126,7 @@ pthread_join (pthread_t thread, void **value_ptr)
    * thread struct). This option is similar to including a reuse counter with
    * the thread id but maintains the thread id as a simple pointer.
    *
-   * As at 27/08/2004, none of the above have been implemented.
+   * As at 03/11/2004, the reuse count option has been implemented.
    */
 
   EnterCriticalSection (&ptw32_thread_reuse_lock);

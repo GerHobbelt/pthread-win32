@@ -12,7 +12,7 @@ Bug fixes
 
 * Condition variables no longer deadlock (bug introduced in
 snapshot-2004-11-03).
-- 
+- Alexander Kotliarov and 'qybupt'
 
 * DLL naming extended to avoid 'DLL hell' in the future, and to
 accommodate the ABI change introduced in snapshot-2004-11-03. Snapshot
@@ -45,6 +45,44 @@ is built to effectively switch it off. This makes the library much more
 sensitive to applications that assume that POSIX thread IDs are unique, i.e.
 are not strictly compliant with POSIX. See the PTW32_THREAD_ID_REUSE_INCREMENT
 macro comments in config.h for details.
+
+Other changes
+-------------
+Certain POSIX macros have changed.
+
+These changes are intended to conform to the Single Unix Specification version 3,
+which states that, if set to 0 (zero) or not defined, then applications may use
+sysconf() to determine their values at runtime. Pthreads-win32 does not
+implement sysconf().
+
+The following macros are no longer undefined, but defined and set to -1
+(not implemented):
+
+      _POSIX_THREAD_ATTR_STACKADDR
+      _POSIX_THREAD_PRIO_INHERIT
+      _POSIX_THREAD_PRIO_PROTECT
+      _POSIX_THREAD_PROCESS_SHARED
+
+The following macros are defined and set to 200112L (implemented):
+
+      _POSIX_THREADS
+      _POSIX_THREAD_SAFE_FUNCTIONS
+      _POSIX_THREAD_ATTR_STACKSIZE
+      _POSIX_THREAD_PRIORITY_SCHEDULING
+      _POSIX_SEMAPHORES
+      _POSIX_READER_WRITER_LOCKS
+      _POSIX_SPIN_LOCKS
+      _POSIX_BARRIERS
+
+The following macros are defined and set to appropriate values:
+
+      _POSIX_THREAD_THREADS_MAX
+      _POSIX_SEM_VALUE_MAX
+      _POSIX_SEM_NSEMS_MAX
+      PTHREAD_DESTRUCTOR_ITERATIONS
+      PTHREAD_KEYS_MAX
+      PTHREAD_STACK_MIN
+      PTHREAD_THREADS_MAX
 
 
 SNAPSHOT 2004-11-03
