@@ -103,10 +103,8 @@ pthread_setcancelstate (int state, int *oldstate)
 
   /*
    * Check if there is a pending asynchronous cancel
-   * only if we don't have alertable async cancel.
    */
   if (state == PTHREAD_CANCEL_ENABLE
-      && (ptw32_features & PTW32_ALERTABLE_ASYNC_CANCEL) == 0
       && sp->cancelType == PTHREAD_CANCEL_ASYNCHRONOUS
       && WaitForSingleObject (sp->cancelEvent, 0) == WAIT_OBJECT_0)
     {
