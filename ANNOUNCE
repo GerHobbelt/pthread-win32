@@ -37,11 +37,11 @@ These are part of POSIX 1003.1j.
         pthread_spin_lock()
         pthread_spin_unlock()
         pthread_spin_trylock()
-        #define PTHREAD_SPINLOCK_INITIALIZER
+        PTHREAD_SPINLOCK_INITIALIZER
 
 Spin_lock spins (busy-waits) if more than one processor is available
-to the process, othewise it is equivalent to a POSIX_MUTEX_DEFAULT.
-The spinlock routines do minimal error checking.
+to the process, othewise it is equivalent to a POSIX_MUTEX_DEFAULT
+mutex. The spinlock routines do minimal error checking.
 
 --------------------------------
 New: Barriers (beta level code)
@@ -73,10 +73,10 @@ Known bugs in this snapshot
 
 1. Under MS VC++ (only tested with version 6.0), a term_func
    set via the standard C++ set_terminate() function is not called
-   for some reason. The code - in private.c:ptw32_threadStart() -
-   makes an explicit call to terminate() which works as expected
-   under MinGW32 g++ doesn't appear to run the term_func under
-   MC VC++ 6.0.
+   for some reason. The code in private.c ptw32_threadStart()
+   retrieves and calls the user supplied terminate routine, which
+   works as expected under MinGW32 g++, but doesn't run under
+   MS VC++ 6.0, presumably because set_terminate() returns NULL.
 
 2. Cancellation problems in optimised code
    - Milan Gardian
@@ -312,13 +312,14 @@ The following functions are implemented:
       pthread_win32_thread_detach_np
 
       ---------------------------
-      Static Initializers (macros)
+      Static Initializers
       ---------------------------
       PTHREAD_ONCE_INIT
       PTHREAD_MUTEX_INITIALIZER
       PTHREAD_COND_INITIALIZER
       PTHREAD_RWLOCK_INITIALIZER
-      
+      PTHREAD_SPINLOCK_INITIALIZER
+
       ---------------------------
       Thread-Safe C Runtime Library (macros)
       ---------------------------
