@@ -1,5 +1,12 @@
 1998-10-03  Ben Elliston  <bje@cygnus.com>
 
+	* configure.in: Test for the `_stdcall' keyword.  Define `STDCALL'
+	to `_stdcall' if we have it, null otherwise.
+
+	* configure: Regenerate.
+
+	* acconfig.h (STDCALL): New define.
+	
 	* mutex.c (pthread_mutex_init): Correct function signature.
 
 	* attr.c (pthread_attr_init): Only zero out the `sigmask' member
@@ -13,7 +20,7 @@
 	native compilation under Win32.
 
 	* pthread.h (pthread_mutex_init): Make `attr' argument const.
-	
+
 1998-10-02  Ben Elliston  <bje@cygnus.com>
 
 	* COPYING: Remove.
