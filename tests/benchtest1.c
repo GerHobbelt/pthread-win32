@@ -73,7 +73,7 @@ main (int argc, char *argv[])
   pthread_mutexattr_init(&ma);
 
   printf( "========================================================================\n");
-  printf( "\nNon-blocking mutex lock plus unlock.\n%ld iterations\n\n",
+  printf( "\nLock plus unlock on an unlocked mutex.\n%ld iterations\n\n",
           ITERATIONS);
   printf( "%-40s %15s %15s\n",
 	    "Test",

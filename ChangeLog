@@ -1,3 +1,8 @@
+2001-07-03  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* pthread.h (_POSIX_READER_WRITER_LOCKS): Define it
+	if not already defined.
+
 2001-07-01  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	Contributed by  - Alexander Terekhov.
