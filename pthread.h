@@ -157,7 +157,7 @@
 #include <windows.h>
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER < 1300
+#if defined(_MSC_VER) && _MSC_VER < 1300 || defined(__DMC__)
 /*
  * VC++6.0 or early compiler's header has no DWORD_PTR type.
  */

@@ -1,3 +1,7 @@
+2004-06-29  Anuj Goyal  <anuj.goyal at gmail.com>
+
+	* pthread.h (__DMC__): Initial support for Digital Mars compiler.
+
 2004-06-29  Will Bryant  <will.bryant at ecosm.com>
 
 	* README.Borland: New; description of Borland changes.
