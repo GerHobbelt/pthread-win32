@@ -414,6 +414,8 @@ FAIL2:
 
 FAIL1:
   (void) sem_destroy (&(cv->sema));
+  free(cv);
+  cv = NULL;
 
 FAIL0:
 DONE:
