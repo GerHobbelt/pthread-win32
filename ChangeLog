@@ -1,3 +1,21 @@
+Tue Jan 19 18:27:42 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* pthread.h (pthreadCancelableTimedWait): New prototype.
+	(pthreadCancelableWait): Remove second argument.
+
+	* misc.c (CancelableWait): New static function is 
+	pthreadCancelableWait() renamed.
+	(pthreadCancelableWait): Now just calls CancelableWait() with
+	INFINITE timeout.
+	(pthreadCancelableTimedWait): Just calls CancelableWait()
+	with passed in timeout.
+
+	* private.c (_pthread_sem_timedwait): 'abstime' arg really is
+	absolute time. Calculate relative time to wait from current
+	time before passing timeout to new routine 
+	pthreadCancelableTimedWait().
+	- Scott Lightner <scott@curriculum.com>
+
 Sun Jan 17 12:01:26 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* private.c (_pthread_sem_timedwait): Move from semaphore.c.
