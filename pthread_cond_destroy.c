@@ -126,10 +126,10 @@ pthread_cond_destroy (pthread_cond_t * cond)
       return EINVAL;
     }
 
-  EnterCriticalSection(&ptw32_cond_list_lock);
-
   if (*cond != PTHREAD_COND_INITIALIZER)
     {
+      EnterCriticalSection(&ptw32_cond_list_lock);
+
       cv = *cond;
 
       /*
@@ -207,6 +207,8 @@ pthread_cond_destroy (pthread_cond_t * cond)
 
           (void) free(cv);
         }
+
+      LeaveCriticalSection(&ptw32_cond_list_lock);
     }
   else
     {
@@ -239,8 +241,6 @@ pthread_cond_destroy (pthread_cond_t * cond)
 
       LeaveCriticalSection(&ptw32_cond_test_init_lock);
     }
-
-  LeaveCriticalSection(&ptw32_cond_list_lock);
 
   return ((result != 0) ? result : ((result1 != 0) ? result1 : result2));
 }
