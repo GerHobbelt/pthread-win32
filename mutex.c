@@ -130,7 +130,9 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 
   mx->lock_idx = PTW32_MUTEX_LOCK_IDX_INIT;
   mx->recursive_count = 0;
-  mx->kind = attr == NULL || *attr == NULL ? ptw32_mutex_default_kind : (*attr)->kind;
+  mx->kind = (attr == NULL || *attr == NULL
+              ? PTHREAD_MUTEX_DEFAULT
+              : (*attr)->kind);
   mx->ownerThread = NULL;
   InitializeCriticalSection( &mx->try_lock_cs );
   mx->wait_sema = CreateSemaphore( NULL, 0, 1, NULL );

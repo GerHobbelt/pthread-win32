@@ -103,10 +103,15 @@ pthread_rwlock_rdlock
 pthread_rwlock_wrlock
 pthread_rwlock_unlock
 ;
-; Non-portable but useful
+; Non-portable/compatibility with other implementations
+;
+pthread_delay_np
+pthread_mutexattr_getkind_np
+pthread_mutexattr_setkind_np
+;
+; Non-portable local implementation only
 ;
 pthread_getw32threadhandle_np
-pthread_delay_np
 pthreadCancelableWait
 pthreadCancelableTimedWait
 ; For use when linking statically

@@ -310,7 +310,10 @@ The following functions are implemented:
       ---------------------------
       pthread_getw32threadhandle_np
       pthread_delay_np
-      pthread_mutex_setdefaulttype_np
+      pthread_mutexattr_getkind_np
+      pthread_mutexattr_setkind_np      (types: PTHREAD_MUTEX_FAST_NP,
+                                                PTHREAD_MUTEX_ERRORCHECK_NP,
+                                                PTHREAD_MUTEX_RECURSIVE_NP)
       pthread_win32_process_attach_np
       pthread_win32_process_detach_np
       pthread_win32_thread_attach_np

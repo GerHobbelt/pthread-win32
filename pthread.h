@@ -806,20 +806,20 @@ int pthread_rwlock_unlock(pthread_rwlock_t *lock);
  * Non-portable functions
  */
 
+/*
+ * Compatibility with Linux.
+ */
 int pthread_mutexattr_setkind_np(pthread_mutexattr_t * attr, int kind);
 int pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr, int *kind);
 
 /*
- * Remaps the default mutex kind to any of the
- * other possible types. Returns the previous type.
+ * Possibly supported by other POSIX threads implementations
  */
-int pthread_mutex_setdefaultkind_np(int kind);
-int pthread_mutex_getdefaultkind_np(int *kind);
-
-
-/* Possibly supported by other POSIX threads implementations */
 int pthread_delay_np (struct timespec * interval);
 
+/*
+ * Returns the Win32 HANDLE for the POSIX thread.
+ */
 HANDLE pthread_getw32threadhandle_np(pthread_t thread);
 
 /*
