@@ -1,3 +1,18 @@
+Thu Sep 16 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* rwlock.c (pthread_rwlock_destroy): Add serialisation.
+	(_rwlock_check_need_init): Check for detroyed rwlock.
+	* rwlock.c: Check return codes from _rwlock_check_need_init();
+	modify comments; serialise access to rwlock objects during
+	operations; rename rw_mutex to rw_lock.
+	* implement.h: Rename rw_mutex to rw_lock.
+	* mutex.c (pthread_mutex_destroy): Add serialisation.
+	(_mutex_check_need_init): Check for detroyed mutex.
+	* condvar.c (pthread_cond_destroy): Add serialisation.
+	(_cond_check_need_init): Check for detroyed condvar.
+	* mutex.c: Modify comments.
+	* condvar.c: Modify comments.
+
 Sat Sep 10 12:56:13 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	The following code for POSIX read/write locks was contributed

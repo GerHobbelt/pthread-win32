@@ -164,7 +164,7 @@ struct pthread_condattr_t_ {
 #define RW_MAGIC    0x19283746
 
 struct pthread_rwlock_t_ {
-    pthread_mutex_t rw_mutex;        /* basic lock on this struct */
+    pthread_mutex_t rw_lock;         /* basic lock on this struct */
     pthread_cond_t  rw_condreaders;  /* for reader threads waiting */
     pthread_cond_t  rw_condwriters;  /* for writer threads waiting */
     int             rw_magic;        /* for error checking */

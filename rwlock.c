@@ -59,14 +59,23 @@ _rwlock_check_need_init(pthread_rwlock_t *rwlock)
   /*
    * We got here possibly under race
    * conditions. Check again inside the critical section
-   * and only initialise if the mutex is valid (not been destroyed).
-   * If a static mutex has been destroyed, the application can
-   * re-initialise it only by calling pthread_mutex_init()
+   * and only initialise if the rwlock is valid (not been destroyed).
+   * If a static rwlock has been destroyed, the application can
+   * re-initialise it only by calling pthread_rwlock_init()
    * explicitly.
    */
   if (*rwlock == (pthread_rwlock_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
       result = pthread_rwlock_init(rwlock, NULL);
+    }
+  else if (*rwlock == NULL)
+    {
+      /*
+       * The rwlock has been destroyed while we were waiting to
+       * initialise it, so the operation that caused the
+       * auto-initialisation should fail.
+       */
+      result = EINVAL;
     }
 
   LeaveCriticalSection(&_pthread_rwlock_test_init_lock);
@@ -74,7 +83,8 @@ _rwlock_check_need_init(pthread_rwlock_t *rwlock)
   return(result);
 }
 
-int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
+int
+pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
 {
     int result = 0;
     pthread_rwlock_t rw;
@@ -91,29 +101,29 @@ int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *at
     if (rw == NULL)
       {
         result = ENOMEM;
-        goto fail0;
+        goto FAIL0;
       }
 
     if (attr != NULL
         && *attr != NULL)
       {
         result = EINVAL; /* Not supported */
-        goto fail0;
+        goto FAIL0;
       }
 
-    if ((result = pthread_mutex_init(&rw->rw_mutex, NULL)) != 0)
+    if ((result = pthread_mutex_init(&(rw->rw_lock), NULL)) != 0)
       {
-        goto fail1;
+        goto FAIL1;
       }
 
-    if ((result = pthread_cond_init(&rw->rw_condreaders, NULL)) != 0)
+    if ((result = pthread_cond_init(&(rw->rw_condreaders), NULL)) != 0)
       {
-        goto fail2;
+        goto FAIL2;
       }
 
-    if ((result = pthread_cond_init(&rw->rw_condwriters, NULL)) != 0)
+    if ((result = pthread_cond_init(&(rw->rw_condwriters), NULL)) != 0)
       {
-        goto fail3;
+        goto FAIL3;
       }
 
     rw->rw_nwaitreaders = 0;
@@ -122,76 +132,120 @@ int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *at
     rw->rw_magic = RW_MAGIC;
 
     result = 0;
-    goto fail0;
+    goto FAIL0;
 
-fail3:
-    pthread_cond_destroy(&rw->rw_condreaders);
+FAIL3:
+    (void) pthread_cond_destroy(&(rw->rw_condreaders));
 
-fail2:
-    pthread_mutex_destroy(&rw->rw_mutex);
+FAIL2:
+    (void) pthread_mutex_destroy(&(rw->rw_lock));
 
-fail1:
-fail0:
+FAIL1:
+FAIL0:
     *rwlock = rw;
 
-    return(result); /* an errno value */
+    return(result);
 }
 
-int pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
+int
+pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
 {
     pthread_rwlock_t rw;
+    int result = 0;
 
-    if (rwlock == NULL || *rwlock == NULL || (*rwlock)->rw_magic != RW_MAGIC)
+    if (rwlock == NULL || *rwlock == NULL)
       {
         return(EINVAL);
       }
 
-    if (*rwlock == (pthread_rwlock_t) _PTHREAD_OBJECT_AUTO_INIT)
+    if (*rwlock != (pthread_rwlock_t) _PTHREAD_OBJECT_AUTO_INIT)
+      {
+        rw = *rwlock;
+
+        if (pthread_mutex_lock(&(rw->rw_lock)) != 0)
+          {
+            return(EINVAL);
+          }
+
+        if (rw->rw_magic != RW_MAGIC)
+          {
+            (void) pthread_mutex_unlock(&(rw->rw_lock));
+            return(EINVAL);
+          }
+
+        if (rw->rw_refcount != 0
+            || rw->rw_nwaitreaders != 0
+            || rw->rw_nwaitwriters != 0)
+          {
+            (void) pthread_mutex_unlock(&(rw->rw_lock));
+            result = EBUSY;
+          }
+        else
+          {
+            rw->rw_magic = NULL;
+            (void) pthread_mutex_unlock(&(rw->rw_lock));
+            (void) pthread_cond_destroy(&(rw->rw_condreaders));
+            (void) pthread_cond_destroy(&(rw->rw_condwriters));
+            (void) pthread_mutex_destroy(&(rw->rw_lock));
+ 
+            free(rw);
+            *rwlock = NULL;
+           }
+      }
+    else
       {
         /*
-         * Destroy a static declared R/W lock that has never been
-         * initialised.
+         * See notes in _rwlock_check_need_init() above also.
          */
-        *rwlock = NULL;
-        return(0);
+        EnterCriticalSection(&_pthread_rwlock_test_init_lock);
+
+        /*
+         * Check again.
+         */
+        if (*rwlock == (pthread_rwlock_t) _PTHREAD_OBJECT_AUTO_INIT)
+          {
+            /*
+             * This is all we need to do to destroy a statically
+             * initialised rwlock that has not yet been used (initialised).
+             * If we get to here, another thread
+             * waiting to initialise this rwlock will get an EINVAL.
+             */
+            *rwlock = NULL;
+          }
+        else
+          {
+            /*
+             * The rwlock has been initialised while we were waiting
+             * so assume it's in use.
+             */
+            result = EBUSY;
+          }
+
+        LeaveCriticalSection(&_pthread_rwlock_test_init_lock);
       }
 
-    rw = *rwlock;
-
-    if (rw->rw_refcount != 0
-        || rw->rw_nwaitreaders != 0
-        || rw->rw_nwaitwriters != 0)
-      {
-        return(EBUSY);
-      }
-
-    pthread_mutex_destroy(&rw->rw_mutex);
-    pthread_cond_destroy(&rw->rw_condreaders);
-    pthread_cond_destroy(&rw->rw_condwriters);
-    rw->rw_magic = 0;
-    free(rw);
-    *rwlock = NULL;
-
-    return(0);
+    return(result);
 }
 
-static void _rwlock_cancelrdwait(void *arg)
+static void
+_rwlock_cancelrdwait(void * arg)
 {
     pthread_rwlock_t rw;
 
-    rw = arg;
+    rw = (pthread_rwlock_t) arg;
     rw->rw_nwaitreaders--;
-    pthread_mutex_unlock(&rw->rw_mutex);
+    pthread_mutex_unlock(&(rw->rw_lock));
 }
 
-int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
+int
+pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
 {
     int result = 0;
     pthread_rwlock_t rw;
 
     if (rwlock == NULL || *rwlock == NULL)
       {
-        return EINVAL;
+        return(EINVAL);
       }
 
     /*
@@ -203,26 +257,34 @@ int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
     if (*rwlock == (pthread_rwlock_t) _PTHREAD_OBJECT_AUTO_INIT)
       {
         result = _rwlock_check_need_init(rwlock);
+
+        if (result != 0 && result != EBUSY)
+          {
+            return(result);
+          }
       }
 
     rw = *rwlock;
 
-    if (rw->rw_magic != RW_MAGIC)
-      {
-        return(EINVAL);
-      }
-
-    if ((result = pthread_mutex_lock(&rw->rw_mutex)) != 0)
+    if ((result = pthread_mutex_lock(&(rw->rw_lock))) != 0)
       {
         return(result);
       }
 
-    /* give preference to waiting writers */
+    if (rw->rw_magic != RW_MAGIC)
+      {
+        result = EINVAL;
+        goto FAIL1;
+      }
+
+    /*
+     * Give preference to waiting writers
+     */
     while (rw->rw_refcount < 0 || rw->rw_nwaitwriters > 0)
       {
         rw->rw_nwaitreaders++;
         pthread_cleanup_push(_rwlock_cancelrdwait, rw);
-        result = pthread_cond_wait(&rw->rw_condreaders, &rw->rw_mutex);
+        result = pthread_cond_wait(&(rw->rw_condreaders), &(rw->rw_lock));
         pthread_cleanup_pop(0);
         rw->rw_nwaitreaders--;
 
@@ -237,28 +299,31 @@ int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
         rw->rw_refcount++; /* another reader has a read lock */
       }
 
-    pthread_mutex_unlock(&rw->rw_mutex);
+FAIL1:
+    (void) pthread_mutex_unlock(&(rw->rw_lock));
 
     return(result);
 }
 
-static void _rwlock_cancelwrwait(void *arg)
+static void
+_rwlock_cancelwrwait(void * arg)
 {
     pthread_rwlock_t rw;
 
-    rw = arg;
+    rw = (pthread_rwlock_t) arg;
     rw->rw_nwaitwriters--;
-    pthread_mutex_unlock(&rw->rw_mutex);
+    (void) pthread_mutex_unlock(&(rw->rw_lock));
 }
 
-int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock)
+int
+pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
 {
     int result;
     pthread_rwlock_t rw;
 
     if (rwlock == NULL || *rwlock == NULL)
       {
-        return EINVAL;
+        return(EINVAL);
       }
 
     /*
@@ -270,33 +335,51 @@ int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock)
     if (*rwlock == (pthread_rwlock_t) _PTHREAD_OBJECT_AUTO_INIT)
       {
         result = _rwlock_check_need_init(rwlock);
+
+        if (result != 0 && result != EBUSY)
+          {
+            return(result);
+          }
       }
 
     rw = *rwlock;
 
     if (rw->rw_magic != RW_MAGIC)
+      {
         return(EINVAL);
+      }
 
-    if ( (result = pthread_mutex_lock(&rw->rw_mutex)) != 0)
+    if ((result = pthread_mutex_lock(&(rw->rw_lock))) != 0)
+      {
         return(result);
+      }
 
-    while (rw->rw_refcount != 0) {
+    while (rw->rw_refcount != 0)
+      {
         rw->rw_nwaitwriters++;
         pthread_cleanup_push(_rwlock_cancelwrwait, rw);
-        result = pthread_cond_wait(&rw->rw_condwriters, &rw->rw_mutex);
+        result = pthread_cond_wait(&(rw->rw_condwriters), &(rw->rw_lock));
         pthread_cleanup_pop(0);
         rw->rw_nwaitwriters--;
-        if (result != 0)
-            break;
-    }
-    if (result == 0)
-        rw->rw_refcount = -1;
 
-    pthread_mutex_unlock(&rw->rw_mutex);
+        if (result != 0)
+          {
+            break;
+          }
+      }
+
+    if (result == 0)
+      {
+        rw->rw_refcount = -1;
+      }
+
+    (void) pthread_mutex_unlock(&(rw->rw_lock));
+
     return(result);
 }
 
-int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
+int
+pthread_rwlock_unlock(pthread_rwlock_t * rwlock)
 {
     int result = 0;
     pthread_rwlock_t rw;
@@ -308,19 +391,23 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
 
     if (*rwlock == (pthread_rwlock_t) _PTHREAD_OBJECT_AUTO_INIT)
       {
+        /*
+         * Assume any race condition here is harmless.
+         */
         return(0);
       }
 
     rw = *rwlock;
 
-    if (rw->rw_magic != RW_MAGIC)
-      {
-        return(EINVAL);
-      }
-
-    if ( (result = pthread_mutex_lock(&rw->rw_mutex)) != 0)
+    if ((result = pthread_mutex_lock(&(rw->rw_lock))) != 0)
       {
         return(result);
+      }
+
+    if (rw->rw_magic != RW_MAGIC)
+      {
+        result = EINVAL;
+        goto FAIL1;
       }
 
     if (rw->rw_refcount > 0)
@@ -345,26 +432,29 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
       {
         if (rw->rw_refcount == 0)
           {
-            result = pthread_cond_signal(&rw->rw_condwriters);
+            result = pthread_cond_signal(&(rw->rw_condwriters));
           }
       }
     else if (rw->rw_nwaitreaders > 0)
       {
-         result = pthread_cond_broadcast(&rw->rw_condreaders);
+         result = pthread_cond_broadcast(&(rw->rw_condreaders));
       }
 
-    pthread_mutex_unlock(&rw->rw_mutex);
+FAIL1:
+    (void) pthread_mutex_unlock(&(rw->rw_lock));
+
     return(result);
 }
  
-int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock)
+int
+pthread_rwlock_tryrdlock(pthread_rwlock_t * rwlock)
 {
     int result = 0;
     pthread_rwlock_t rw;
 
     if (rwlock == NULL || *rwlock == NULL)
       {
-        return EINVAL;
+        return(EINVAL);
       }
 
     /*
@@ -376,18 +466,24 @@ int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock)
     if (*rwlock == (pthread_rwlock_t) _PTHREAD_OBJECT_AUTO_INIT)
       {
         result = _rwlock_check_need_init(rwlock);
+
+        if (result != 0 && result != EBUSY)
+          {
+            return(result);
+          }
       }
 
     rw = *rwlock;
 
-    if (rw->rw_magic != RW_MAGIC)
-      {
-        return(EINVAL);
-      }
-
-    if ( (result = pthread_mutex_lock(&rw->rw_mutex)) != 0)
+    if ((result = pthread_mutex_lock(&(rw->rw_lock))) != 0)
       {
         return(result);
+      }
+
+    if (rw->rw_magic != RW_MAGIC)
+      {
+        result = EINVAL;
+        goto FAIL1;
       }
 
     if (rw->rw_refcount == -1 || rw->rw_nwaitwriters > 0)
@@ -399,18 +495,21 @@ int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock)
         rw->rw_refcount++; /* increment count of reader locks */
       }
 
-    pthread_mutex_unlock(&rw->rw_mutex);
+FAIL1:
+    (void) pthread_mutex_unlock(&(rw->rw_lock));
+
     return(result);
 }
 
-int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock)
+int
+pthread_rwlock_trywrlock(pthread_rwlock_t * rwlock)
 {
     int result = 0;
     pthread_rwlock_t rw;
 
     if (rwlock == NULL || *rwlock == NULL)
       {
-        return EINVAL;
+        return(EINVAL);
       }
 
     /*
@@ -422,18 +521,24 @@ int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock)
     if (*rwlock == (pthread_rwlock_t) _PTHREAD_OBJECT_AUTO_INIT)
       {
         result = _rwlock_check_need_init(rwlock);
+
+        if (result != 0 && result != EBUSY)
+          {
+            return(result);
+          }
       }
 
     rw = *rwlock;
 
-    if (rw->rw_magic != RW_MAGIC)
-      {
-        return(EINVAL);
-      }
-
-    if ( (result = pthread_mutex_lock(&rw->rw_mutex)) != 0)
+    if ((result = pthread_mutex_lock(&(rw->rw_lock))) != 0)
       {
         return(result);
+      }
+
+    if (rw->rw_magic != RW_MAGIC)
+      {
+        result = EINVAL;
+        goto FAIL1;
       }
 
     if (rw->rw_refcount != 0)
@@ -445,6 +550,8 @@ int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock)
         rw->rw_refcount = -1; /* available, indicate a writer has it */
       }
 
-    pthread_mutex_unlock(&rw->rw_mutex);
+FAIL1:
+    (void) pthread_mutex_unlock(&(rw->rw_lock));
+
     return(result);
 }

@@ -65,6 +65,15 @@ _cond_check_need_init(pthread_cond_t *cond)
     {
       result = pthread_cond_init(cond, NULL);
     }
+  else if (*cond == NULL)
+    {
+      /*
+       * The cv has been destroyed while we were waiting to
+       * initialise it, so the operation that caused the
+       * auto-initialisation should fail.
+       */
+      result = EINVAL;
+    }
 
   LeaveCriticalSection(&_pthread_cond_test_init_lock);
 
@@ -455,10 +464,10 @@ pthread_cond_destroy (pthread_cond_t * cond)
       return EINVAL;
     }
 
-  cv = *cond;
-
-  if (cv != (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
+  if (*cond != (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
+      cv = *cond;
+
       if (pthread_mutex_lock(&(cv->waitersLock)) != 0)
 	{
 	  return EINVAL;
@@ -476,9 +485,39 @@ pthread_cond_destroy (pthread_cond_t * cond)
       (void) pthread_mutex_destroy (&(cv->waitersLock));
 
       free(cv);
+      *cond = NULL;
     }
+  else
+    {
+      /*
+       * See notes in _cond_check_need_init() above also.
+       */
+      EnterCriticalSection(&_pthread_cond_test_init_lock);
 
-  *cond = NULL;
+      /*
+       * Check again.
+       */
+      if (*cond == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
+        {
+          /*
+           * This is all we need to do to destroy a statically
+           * initialised cond that has not yet been used (initialised).
+           * If we get to here, another thread
+           * waiting to initialise this cond will get an EINVAL.
+           */
+          *cond = NULL;
+        }
+      else
+        {
+          /*
+           * The cv has been initialised while we were waiting
+           * so assume it's in use.
+           */
+          result = EBUSY;
+        }
+
+      LeaveCriticalSection(&_pthread_cond_test_init_lock);
+    }
 
   return (result);
 }
