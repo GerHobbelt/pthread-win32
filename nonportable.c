@@ -122,6 +122,7 @@ pthread_delay_np (struct timespec * interval)
       pthread_testcancel();
       Sleep(0);
       pthread_testcancel();
+      return (0);
     }
 
   /* convert secs to millisecs */
