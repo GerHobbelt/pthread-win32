@@ -1,3 +1,19 @@
+Thu Oct 15 11:53:21 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* global.c (_pthread_tsd_key_table): Fix declaration.
+
+	* implement.h(_pthread_TSD_keys_TlsIndex): Add missing extern.
+	(_pthread_tsd_mutex): Ditto.
+
+	* create.c (_pthread_start_call): Fix "keys" array declaration.
+	Add comment.
+
+	* tsd.c (pthread_setspecific): Fix type declaration and cast.
+	(pthread_getspecific): Ditto.
+
+	* cleanup.c (_pthread_destructor_run_all): Declare missing loop
+	counter.
+
 Wed Oct 14 21:09:24 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* private.c (_pthread_new_thread): Increment _pthread_threads_count.

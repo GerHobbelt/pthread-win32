@@ -82,6 +82,8 @@ typedef struct {
 	int valid;
 	CRITICAL_SECTION cs;
 } pthread_mutex_t;
+
+
 typedef DWORD pthread_key_t;
 
 

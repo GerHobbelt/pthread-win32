@@ -22,7 +22,12 @@ STDCALL _pthread_start_call(void * us_arg)
      this thread's private stack so we're safe to leave data in them
      until we leave. */
   pthread_t us;
-  void * keys[PTHREAD_KEYS_MAX];
+
+  /* FIXME: Needs to be a malloc(PTHREAD_KEYS_MAX) otherwise changing
+     _PTHREAD_MAX_KEYS in a later version of the DLL will break older apps.
+   */
+  void * keys[_PTHREAD_MAX_KEYS];
+
   unsigned (*func)(void *);
   void * arg;
   unsigned ret;
