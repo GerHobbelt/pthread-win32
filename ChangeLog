@@ -1,5 +1,12 @@
 Thu Aug  6 15:19:22 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* signal.c (pthread_sigmask): Rename SIG_SET to SIG_SETMASK.
+	Cast "set" to (long *) in assignment to passify compiler warning.
+	Add address-of operator & to thread->attr.sigmask in memcpy() call
+	and assignment.
+	(pthread_sigmask): Add address-of operator & to thread->attr.sigmask
+	in memcpy() call and assignment.
+
 	* windows.h (THREAD_PRIORITY_ERROR_RETURN): Add.
 	(THREAD_PRIORITY_LOWEST): Add.
 	(THREAD_PRIORITY_HIGHEST): Add.
