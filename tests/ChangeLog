@@ -1,3 +1,16 @@
+2002-01-14  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* exception3.c (main): Shorten wait time.
+
+2002-01-09  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* mutex7.c: New test.
+	* mutex7n.c: New test.
+	* mutex7e.c: New test.
+	* mutex7r.c: New test.
+	* mutex6.c: Modified to avoid leaving the locked mutex
+	around on exit.
+
 2001-10-25  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* condvar2.c: Remove reference to cv->nWaitersUnblocked.

@@ -49,9 +49,10 @@ void * locker(void * arg)
 {
   assert(pthread_mutex_lock(&mutex) == 0);
   lockCount++;
-  assert(pthread_mutex_lock(&mutex) != 0);
+
+  /* Should wait here (deadlocked) */
+  assert(pthread_mutex_lock(&mutex) == 0);
   lockCount++;
-  assert(pthread_mutex_unlock(&mutex) == 0);
   assert(pthread_mutex_unlock(&mutex) == 0);
 
   return (void *) 555;
@@ -75,6 +76,16 @@ main()
   Sleep(1000);
 
   assert(lockCount == 1);
+
+  /*
+   * Should succeed even though we don't own the lock
+   * because FAST mutexes don't check ownership.
+   */
+  assert(pthread_mutex_unlock(&mutex) == 0);
+
+  Sleep (1000);
+
+  assert(lockCount == 2);
 
   exit(0);
 
