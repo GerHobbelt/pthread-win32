@@ -38,7 +38,9 @@ extern "C"
 {
 #endif                          /* __cplusplus */
 
+#if defined(_MSC_VER)
 typedef unsigned int mode_t;
+#endif
 
 typedef HANDLE sem_t;
 
@@ -61,7 +63,8 @@ int sem_post (sem_t * sem
 
 int sem_open (const char * name,
 	      int oflag,
-	      ...
+	      mode_t mode,
+            unsigned int value
 	      );
 
 int sem_close (sem_t * sem
