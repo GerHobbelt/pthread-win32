@@ -1,6 +1,39 @@
 Non-portable functions included in pthreads-win32
 -------------------------------------------------
 
+void *
+pthread_timechange_handler_np(void *)
+
+        To improve tolerance against operator or time service
+        initiated system clock changes.
+
+        This routine can be called by an application when it
+        receives a WM_TIMECHANGE message from the system. At
+        present it broadcasts all condition variables so that
+        waiting threads can wake up and re-evaluate their
+        conditions and restart their timed waits if required.
+
+        It has the same return type and argument type as a
+        thread routine so that it may be called directly
+        through pthread_create() for asynchronicity.
+
+        Parameters
+
+        Although a parameter must be supplied, it is ignored.
+        The value NULL can be used.
+
+        Return values
+
+        It can return an error EAGAIN to indicate that not
+        all condition variables were broadcast for some reason.
+        Otherwise, 0 is returned.
+
+        If run as a thread, the return value is returned
+        through pthread_join(), otherwise directly.
+
+        The return value should be cast to an integer.
+
+
 HANDLE
 pthread_getw32threadhandle_np(pthread_t thread);
 
