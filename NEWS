@@ -1,3 +1,42 @@
+SNAPSHOT 2003-08-15
+-------------------
+
+Bug fixes
+---------
+
+* pthread.dsp now uses correct compile flags (/MD).
+- Viv  <vcotirlea@hotmail.com>
+
+* pthread_win32_process_detach_np() fixed memory leak.
+- Steven Reddie  <Steven.Reddie@ca.com>
+
+* pthread_mutex_destroy() fixed incorrect return code.
+- Nicolas Barry  <boozai@yahoo.com>
+
+* pthread_spin_destroy() fixed memory leak.
+- Piet van Bruggen  <pietvb@newbridges.nl>
+
+* Various changes to tighten arg checking, and to work with later versions of
+MinGW32 and MsysDTK.
+
+* pthread_getschedparam() etc, fixed dangerous thread validity checking.
+- Nicolas Barry  <boozai@yahoo.com>
+
+* POSIX thread handles are now reused and their memory is not freed on thread exit.
+This allows for stronger thread validity checking.
+
+New standard routine
+--------------------
+
+* pthread_kill() added to provide thread validity checking to applications.
+It does not accept any non zero values for the signal arg.
+
+New test cases
+--------------
+
+* New test cases to confirm validity checking, pthread_kill(), and thread reuse.
+
+
 SNAPSHOT 2003-05-10
 -------------------
 
