@@ -8,7 +8,8 @@
 
 #include "pthread.h"
 
-void pthread_exit(void * value)
+void
+pthread_exit(void * value)
 {
   /* The semantics are such that additional tasks must be done for
      strict POSIX conformance.  We must add code here later which 
