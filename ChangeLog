@@ -1,6 +1,17 @@
-2001-05-31  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+2001-06-03  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
-	* condvar.c (pthread_cond_init): free memory when init fails.
+	Contributed by  - Alexander Terekhov <TEREKHOV@de.ibm.com>
+	                - Louis Thomas <lthomas@arbitrade.com>
+
+	* condvar.c (pthread_cond_init): Completely revamped.
+	(pthread_cond_destroy): Likewise.
+	(ptw32_cond_wait_cleanup): Likewise.
+	(ptw32_cond_timedwait): Likewise.
+	(ptw32_cond_unblock): New general signaling routine.
+	(pthread_cond_signal): Now calls ptw32_cond_unblock.
+	(pthread_cond_broadcast): Likewise.
+	* implement.h (pthread_cond_t_): Revamped.
+	* README.CV: New; explanation of the above changes.
 
 2001-05-30  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 

@@ -39,7 +39,7 @@ EHFLAGS	=
 PASSES= loadfree.pass \
 	  self1.pass mutex5.pass  \
 	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  mutex2.pass  mutex3.pass  \
-	  condvar1.pass  condvar2.pass  \
+	  condvar1.pass  condvar2.pass  condvar2_1.pass  \
 	  exit1.pass  create1.pass  equal1.pass  \
 	  exit2.pass  exit3.pass  \
 	  join0.pass  join1.pass  join2.pass  \
@@ -48,7 +48,7 @@ PASSES= loadfree.pass \
 	  self2.pass  \
 	  cancel1.pass  cancel2.pass  \
 	  eyal1.pass  \
-	  condvar3.pass  condvar4.pass  condvar5.pass  condvar6.pass  \
+	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar4.pass  condvar5.pass  condvar6.pass  \
 	  condvar7.pass  condvar8.pass  condvar9.pass  \
 	  errno1.pass  \
 	  rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  rwlock5.pass  rwlock6.pass  rwlock7.pass  \
@@ -125,7 +125,10 @@ cleanup2.pass: cleanup1.pass
 cleanup3.pass: cleanup2.pass
 condvar1.pass:
 condvar2.pass: condvar1.pass
-condvar3.pass: create1.pass
+condvar2_1.pass: condvar2.pass join2.pass
+condvar3.pass: create1.pass condvar2.pass
+condvar3_1.pass: condvar3.pass join2.pass
+condvar3_2.pass: condvar3_1.pass
 condvar4.pass: create1.pass
 condvar5.pass: condvar4.pass
 condvar6.pass: condvar5.pass

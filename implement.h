@@ -27,8 +27,12 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
-#if defined(__MINGW32__)
+#if !defined(malloc)
 #include <malloc.h>
+#endif
+
+#if !defined(INT_MAX)
+#include <limits.h>
 #endif
 
 /* changed include from <semaphore.h> to use local file during development */
@@ -153,18 +157,18 @@ struct ThreadParms {
 
 
 struct pthread_cond_t_ {
-  long waiters;                       /* # waiting threads             */
-  pthread_mutex_t waitersLock;        /* Mutex that guards access to 
-					 waiter count                  */
-  sem_t sema;                         /* Queue up threads waiting for the 
-					 condition to become signaled  */
-  HANDLE waitersDone;                 /* An auto reset event used by the 
-					 broadcast/signal thread to wait 
-					 for the waiting thread(s) to wake
-					 up and get a chance at the  
-					 semaphore                     */
-  int wasBroadcast;                   /* keeps track if we are signaling 
-					 or broadcasting               */
+  long            nWaitersBlocked;   /* Number of threads blocked            */
+  long            nWaitersGone;      /* Number of threads timed out          */
+  long            nWaitersUnblocked; /* Number of threads unblocked          */
+  long            nWaitersToUnblock; /* Number of threads to unblock         */
+  sem_t           semBlockQueue;     /* Queue up threads waiting for the     */
+                                     /*   condition to become signalled      */
+  sem_t           semBlockLock;      /* Semaphore that guards access to      */
+                                     /* | waiters blocked count/block queue  */
+                                     /* +-> Mandatory Sync.LEVEL-1           */
+  pthread_mutex_t mtxUnblockLock;    /* Mutex that guards access to          */
+                                     /* | waiters (to)unblock(ed) counts     */
+                                     /* +-> Optional* Sync.LEVEL-2           */
 };
 
 

@@ -1,8 +1,8 @@
 /*
- * File: condvar2.c
+ * File: condvar2_1.c
  *
  * Test Synopsis:
- * - Test timed wait on a CV.
+ * - Test timeout of multiple waits on a CV with no signal/broadcast.
  *
  * Test Method (Validation or Falsification):
  * - Validation
@@ -17,7 +17,7 @@
  * - 
  *
  * Description:
- * - Because the CV is never signaled, we expect the wait to time out.
+ * - Because the CV is never signaled, we expect the waits to time out.
  *
  * Environment:
  * -
@@ -44,23 +44,40 @@
 #include "test.h"
 #include <sys/timeb.h>
 
-pthread_cond_t cv;
-pthread_mutex_t mutex;
+static pthread_cond_t cv;
+static pthread_mutex_t mutex;
+static struct timespec abstime = { 0, 0 };
+
+enum {
+  NUMTHREADS = 60
+};
+
+void *
+mythread(void * arg)
+{
+  assert(pthread_mutex_lock(&mutex) == 0);
+
+  assert(pthread_cond_timedwait(&cv, &mutex, &abstime) == ETIMEDOUT);
+
+  assert(pthread_mutex_unlock(&mutex) == 0);
+
+  return arg;
+}
 
 #include "../implement.h"
 
 int
 main()
 {
-  struct timespec abstime = { 0, 0 };
+  int i;
+  pthread_t t[NUMTHREADS + 1];
+  int result = 0;
   struct _timeb currSysTime;
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   assert(pthread_cond_init(&cv, NULL) == 0);
 
   assert(pthread_mutex_init(&mutex, NULL) == 0);
-
-  assert(pthread_mutex_lock(&mutex) == 0);
 
   /* get current system time */
   _ftime(&currSysTime);
@@ -70,9 +87,20 @@ main()
 
   abstime.tv_sec += 5;
 
-  assert(pthread_cond_timedwait(&cv, &mutex, &abstime) == ETIMEDOUT);
-  
+  assert(pthread_mutex_lock(&mutex) == 0);
+
+  for (i = 1; i <= NUMTHREADS; i++)
+    {
+      assert(pthread_create(&t[i], NULL, mythread, (void *) i) == 0);
+    }
+
   assert(pthread_mutex_unlock(&mutex) == 0);
+
+  for (i = 1; i <= NUMTHREADS; i++)
+    {
+      assert(pthread_join(t[i], (void **) &result) == 0);
+	assert(result == i);
+    }
 
   {
   int result = pthread_cond_destroy(&cv);
