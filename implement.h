@@ -319,6 +319,12 @@ struct pthread_rwlockattr_t_
 };
 
 
+typedef struct {
+  pthread_cond_t cond;
+  pthread_mutex_t mtx;
+} ptw32_once_control_t;
+
+
 struct ThreadKeyAssoc
 {
   /*
@@ -472,6 +478,7 @@ extern CRITICAL_SECTION ptw32_cond_list_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
 extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
 extern CRITICAL_SECTION ptw32_spinlock_test_init_lock;
+extern ptw32_once_control_t ptw32_once_control;
 
 #ifdef _UWIN
 extern int pthread_count;
