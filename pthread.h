@@ -40,6 +40,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <signal.h>
 #endif /* HAVE_SIGNAL_H */
 
+#ifndef HAVE_STRUCT_TIMESPEC
+struct timespec {
+	int tv_sec;
+	int tv_nsec;
+};
+#endif /* HAVE_STRUCT_TIMESPEC */
+
 #ifndef SIG_BLOCK
 #define SIG_BLOCK 0
 #endif /* SIG_BLOCK */
