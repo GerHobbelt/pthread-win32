@@ -1,3 +1,18 @@
+2004-10-19  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* sem_init.c (sem_init): New semaphore model based on the same idea
+	as mutexes, i.e. user space interlocked check to avoid 
+	unnecessarily entering kernel space. Wraps the Win32 semaphore and
+	keeps it's own counter.
+	* sem_wait.c (sem_wait): Implemented user space check model.
+	* sem_post.c (sem_post): Likewise.
+	* sem_trywait.c (sem_trywait): Likewise.
+	* sem_timedwait.c (sem_timedwait): Likewise.
+	* sem_post_multiple.c (sem_post_multiple): Likewise.
+	* sem_getvalue.c (sem_getvalue): Likewise.
+	* ptw32_semwait.c (ptw32_semwait): Likewise.
+	* implement.h (sem_t_): Add counter element.
+
 2004-10-15  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* implement.h (othread_mutex_t_): Use an event in place of

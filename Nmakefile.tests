@@ -93,6 +93,7 @@ rwlock4::	rwlock4.c
 rwlock5::	rwlock5.c
 rwlock6::	rwlock6.c
 rwlock7::	rwlock7.c
+rwlock8::	rwlock8.c
 rwlock2_t::	rwlock2_t.c
 rwlock3_t::	rwlock3_t.c
 rwlock4_t::	rwlock4_t.c
@@ -101,6 +102,7 @@ rwlock6_t::	rwlock6_t.c
 rwlock6_t2::	rwlock6_t2.c
 semaphore1::	semaphore1.c
 semaphore2::	semaphore2.c
+semaphore3::	semaphore3.c
 context1::	context1.c
 cancel3::	cancel3.c
 cancel4::	cancel4.c
@@ -138,10 +140,14 @@ cancel9::	cancel9.c
 
 sizes:		:test:	sizes
 loadfree:	:test:
-semaphore1	:test:	loadfree
-semaphore2	:test:	loadfree
 mutex5		:test:	loadfree
 mutex1		:test:	loadfree
+mutex1n		:test:	loadfree
+mutex1r		:test:	loadfree
+mutex1e		:test:	loadfree
+semaphore1	:test:	loadfree
+semaphore2	:test:	loadfree
+semaphore3	:test:	loadfree
 mutex2		:test:	loadfree
 mutex2r		:test:	loadfree
 mutex2e		:test:	loadfree
@@ -209,6 +215,8 @@ rwlock3		:test:	rwlock2
 rwlock4		:test:	rwlock3
 rwlock5		:test:	rwlock4
 rwlock6		:test:	rwlock5
+rwlock7		:test:	rwlock6
+rwlock8		:test:	rwlock7
 rwlock2_t	:test:	rwlock2
 rwlock3_t	:test:	rwlock2_t
 rwlock4_t	:test:	rwlock3_t

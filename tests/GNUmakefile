@@ -70,7 +70,8 @@ COPYFILES	= $(HDR) $(LIB) $(DLL) $(QAPC)
 # stop.
 
 TESTS	= sizes loadfree \
-	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r semaphore1 semaphore2 \
+	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
+	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
 	  create1 create2 reuse1 reuse2 equal1 \
 	  kill1 valid1 valid2 \
@@ -251,6 +252,7 @@ self1.pass:
 self2.pass: create1.pass
 semaphore1.pass:
 semaphore2.pass:
+semaphore3.pass: semaphore2.pass
 sizes.pass:
 spin1.pass:
 spin2.pass: spin1.pass

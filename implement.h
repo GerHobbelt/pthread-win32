@@ -172,6 +172,7 @@ struct sem_t_
   CRITICAL_SECTION sem_lock_cs;
   HANDLE event;
 #else				/* NEED_SEM */
+  int value;
   HANDLE sem;
 #endif				/* NEED_SEM */
 };

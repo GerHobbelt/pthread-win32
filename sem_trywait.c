@@ -92,8 +92,9 @@ sem_trywait (sem_t * sem)
     {
       result = EINVAL;
     }
-  else if (WaitForSingleObject ((*sem)->sem, 0) == WAIT_TIMEOUT)
+  else if (InterlockedDecrement((LPLONG) &(*sem)->value) < 0)
     {
+      (void) InterlockedIncrement((LPLONG) &(*sem)->value);
       result = EAGAIN;
     }
 

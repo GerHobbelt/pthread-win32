@@ -80,8 +80,10 @@ EHFLAGS	=
 # stop.
 
 PASSES= sizes.pass  loadfree.pass \
-	  semaphore1.pass  semaphore2.pass  self1.pass  mutex5.pass  \
-	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  mutex2.pass  mutex3.pass  \
+	  self1.pass  mutex5.pass  \
+	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
+	  semaphore1.pass  semaphore2.pass  semaphore3.pass  \
+	  mutex2.pass  mutex3.pass  \
 	  mutex2r.pass  mutex2e.pass  mutex3r.pass  mutex3e.pass  \
 	  condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
 	  exit1.pass  create1.pass  create2.pass  reuse1.pass  reuse2.pass  equal1.pass  \
