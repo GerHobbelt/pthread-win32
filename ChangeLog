@@ -30,6 +30,16 @@
 	* tests/equal1.c New file; test pthread_equal(). Passes.
 
 	* tests/once1.c: New file; test for pthread_once(). Passes.
+
+	* tests/self.c: Remove; rename to self1.c.
+
+	* tests/self1.c: This is the old self.c.
+
+	* tests/self2.c: New file. Test pthread_self() with a single
+	thread. Passes.
+
+	* tests/self3.c: New file. Test pthread_self() with a couple of
+	threads to ensure their thread IDs differ. Passes.
 	
 1998-10-04  Ben Elliston  <bje@cygnus.com>
 
