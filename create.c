@@ -56,7 +56,7 @@ pthread_create (pthread_t * tid,
   pthread_t thread;
   int result = EAGAIN;
   int run = TRUE;
-  ThreadParms *parms;
+  ThreadParms *parms = NULL;
   long stackSize;
 
   if ((thread = (pthread_t) calloc (1, sizeof (*thread))) ==

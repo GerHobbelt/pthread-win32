@@ -281,7 +281,7 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
       */
 {
   int result = EAGAIN;
-  pthread_cond_t cv;
+  pthread_cond_t cv = NULL;
 
   if ((attr != NULL && *attr != NULL) &&
       ((*attr)->pshared == PTHREAD_PROCESS_SHARED))
