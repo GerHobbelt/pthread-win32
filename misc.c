@@ -130,7 +130,7 @@ pthread_equal (pthread_t t1, pthread_t t2)
 
 
 int
-pthreadCancelableWait (HANDLE waitHandle)
+pthreadCancelableWait (HANDLE waitHandle, DWORD abstime)
      /*
       * -------------------------------------------------------------------
       * This provides an extra hook into the pthread_cancel
@@ -177,7 +177,7 @@ pthreadCancelableWait (HANDLE waitHandle)
                                     nHandles,
                                     handles,
                                     FALSE,
-                                    INFINITE);
+                                    abstime);
 
 
   if (status == WAIT_FAILED)
@@ -187,7 +187,7 @@ pthreadCancelableWait (HANDLE waitHandle)
     }
   else if (status == WAIT_ABANDONED_0)
     {
-      result = EINVAL;
+      result = ETIMEDOUT;
 
     }
   else

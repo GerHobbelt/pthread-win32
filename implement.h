@@ -166,6 +166,8 @@ int _pthread_tkAssocCreate (ThreadKeyAssoc ** assocP,
 
 void _pthread_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
+int _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

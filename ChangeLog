@@ -1,3 +1,29 @@
+Fri Jan 15 15:41:28 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* pthread.h: Add new 'abstime' arg to pthreadCancelableWait()
+	prototype.
+
+	* condvar.c (cond_timedwait): New generalised function called by
+	both pthread_cond_wait() and pthread_cond_timedwait(). This is
+	essentially pthread_cond_wait() renamed and modified to add the
+	'abstime' arg and call the new _pthread_sem_timedwait() instead of
+	sem_wait().
+	(pthread_cond_wait): Now just calls the internal static
+	function cond_timedwait() with an INFINITE wait.
+	(pthread_cond_timedwait): Now implemented. Calls the internal
+	static function cond_timedwait().
+
+	* implement.h (_pthread_sem_timedwait): New internal function
+	prototype.
+
+	* misc.c (pthreadCancelableWait): Added new 'abstime' argument
+	to allow shorter than INFINITE wait.
+
+	* semaphore.c (_pthread_sem_timedwait): New function for internal
+	use.  This is essentially sem_wait() modified to add the
+        'abstime' arg and call the modified (see above)
+        pthreadCancelableWait().
+
 Thu Jan 14 14:27:13 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* cleanup.c: Correct _cplusplus to __cplusplus wherever used.

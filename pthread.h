@@ -918,9 +918,10 @@ int pthread_attr_setschedparam (pthread_attr_t *attr,
  *              WaitForMultipleObjects
  *
  * on 'waitHandle' and a manually reset WIN32 Event
- * used to implement pthread_cancel.
+ * used to implement pthread_cancel. The 'abstime'
+ * argument is simply passed to WaitForMultipleObjects.
  */
-int pthreadCancelableWait (HANDLE waitHandle);
+int pthreadCancelableWait (HANDLE waitHandle, DWORD abstime);
 
 /*
  * Thread-Safe C Runtime Library Mappings

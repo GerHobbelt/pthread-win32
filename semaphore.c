@@ -203,7 +203,7 @@ sem_wait (sem_t * sem)
       *      a signal.
       *
       * RESULTS
-      *              0                       successfully destroyed semaphore,
+      *              0               successfully decreased semaphore,
       *              EINVAL          'sem' is not a valid semaphore,
       *              ENOSYS          semaphores are not supported,
       *              EINTR           the function was interrupted by a signal,
@@ -216,6 +216,65 @@ sem_wait (sem_t * sem)
   return ((sem == NULL)
 	  ? EINVAL
 	  : pthreadCancelableWait (*sem)
+    );
+
+}				/* sem_wait */
+
+
+int
+_pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      This function  waits on a semaphore for at most
+      *      'abstime'.
+      *
+      * PARAMETERS
+      *      sem
+      *              pointer to an instance of sem_t
+      *
+      *      abstime
+      *              pointer to an instance of struct timespec
+      *
+      * DESCRIPTION
+      *      This function waits on a semaphore. If the
+      *      semaphore value is greater than zero, it decreases
+      *      its value by one. If the semaphore value is zero, then
+      *      the calling thread (or process) is blocked until it can
+      *      successfully decrease the value or until interrupted by
+      *      a signal.
+      *
+      *      If 'abstime' is a NULL pointer then this function will
+      *      block until it can successfully decrease the value or
+      *      until interrupted by a signal.
+      *
+      * RESULTS
+      *              0               successfully decreased semaphore,
+      *              EINVAL          'sem' is not a valid semaphore,
+      *              ENOSYS          semaphores are not supported,
+      *              EINTR           the function was interrupted by a signal,
+      *              EDEADLK         a deadlock condition was detected.
+      *              ETIMEDOUT       abstime elapsed before success.
+      *
+      * ------------------------------------------------------
+      */
+{
+  DWORD msecs;
+
+  if (abstime == NULL)
+    {
+      msecs = INFINITE;
+    }
+  else
+    {
+      /* Calculate the number of milliseconds in abstime. */
+      msecs = abstime->tv_sec * 1000;
+      msecs += abstime->tv_nsec / 1000000;
+    }
+
+  return ((sem == NULL)
+	  ? EINVAL
+	  : pthreadCancelableWait (*sem, msecs)
     );
 
 }				/* sem_wait */
