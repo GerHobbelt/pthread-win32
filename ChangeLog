@@ -1,5 +1,9 @@
 2000-08-18  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
+	* implement.h (PTW32_EPS_CANCEL/PTW32_EPS_EXIT):
+	Must be defined for all compilers - used as generic
+	exception selectors by ptw32_throw().
+
 	* Several: Fix typos from scripted edit session
 	yesterday.
 
