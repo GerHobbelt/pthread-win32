@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef _PTHREADS_H
 #define _PTHREADS_H
 
+typedef HANDLE pthread_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -32,6 +34,8 @@ int pthread_create(pthread_t *thread,
 		   void * arg);
 
 void pthread_exit(void *value);
+
+pthread_t pthread_self(void);
 
 #ifdef __cplusplus
 }
