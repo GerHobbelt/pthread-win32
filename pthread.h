@@ -32,10 +32,10 @@ typedef struct {
   HANDLE events[NUM_EVENTS];
 
   /* Count of the number of waiters. */
-  u_int waiters_count;
+  unsigned waiters_count;
   
   /* Serialize access to waiters_count_. */
-  CRITICAL_SECTION waiters_count_lock;
+  pthread_mutex_t waiters_count_lock;
 } pthread_cond_t;
 
 typedef struct { void * ptr; } pthread_condattr_t;
