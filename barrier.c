@@ -27,61 +27,62 @@
 #include "implement.h"
 
 
+#ifdef __MINGW32__
+#define _LONG long
+#define _LPLONG long*
+#else
+#define _LONG PVOID
+#define _LPLONG PVOID*
+#endif
+
 int
 pthread_barrier_init(pthread_barrier_t * barrier,
                      const pthread_barrierattr_t * attr,
-                     int count)
+                     unsigned int count)
 {
-  int result = 0;
   int pshared = PTHREAD_PROCESS_PRIVATE;
   pthread_barrier_t b;
+  pthread_mutexattr_t ma;
 
-  if (barrier == NULL)
+  if (barrier == NULL || count == 0)
     {
       return EINVAL;
     }
 
-  b = (pthread_barrier_t) calloc(1, sizeof(*b));
-
-  if (b == NULL)
+  if (NULL != (b = (pthread_barrier_t) calloc(1, sizeof(*b))))
     {
-      result = ENOMEM;
-      goto FAIL0;
+      if (attr != NULL && *attr != NULL)
+        {
+          pshared = (*attr)->pshared;
+        }
+
+      b->nCurrentBarrierHeight = b->nInitialBarrierHeight = count;
+      b->iStep = 0;
+	b->nSerial = 0;
+
+      if (0 == pthread_mutexattr_init(&ma) &&
+          0 == pthread_mutexattr_setpshared(&ma, pshared))
+        {
+          if (0 == pthread_mutex_init(&(b->mtxExclusiveAccess), &ma))
+            {
+              pthread_mutexattr_destroy(&ma);
+              if (0 == sem_init(&(b->semBarrierBreeched[0]), pshared, 0))
+                {
+                  if (0 == sem_init(&(b->semBarrierBreeched[1]), pshared, 0))
+                    {
+                      *barrier = b;
+                      return 0;
+                    }
+                  (void) sem_destroy(&(b->semBarrierBreeched[0]));
+                }
+              (void) pthread_mutex_destroy(&(b->mtxExclusiveAccess));
+            }
+          pthread_mutexattr_destroy(&ma);
+        }
+      (void) free(b);
     }
 
-  if (attr != NULL && *attr != NULL)
-    {
-      pshared = (*attr)->pshared;
-    }
-
-  b->nCurrentBarrierHeight = b->nInitialBarrierHeight = count;
-
-  result = pthread_mutex_init(&(b->mtxExclusiveAccess), NULL);
-  if (0 != result)
-    {
-      goto FAIL1;
-    }
-
-  b->eventBarrierBreeched = CreateEvent(NULL,   /* Security attributes */
-                                        TRUE,   /* Manual reset        */
-                                        FALSE,  /* Initially signaled  */
-                                        NULL);  /* Name                */
-
-  if (NULL != b->eventBarrierBreeched)
-    {
-      goto DONE;
-    }
-  (void) pthread_mutex_destroy(&(b->mtxExclusiveAccess));
-  result = ENOMEM;
-
- FAIL1:
-  (void) free(b);
-  b = NULL;
-
- FAIL0:
- DONE:
-  *barrier = b;
-  return(result);
+  return ENOMEM;
 }
 
 int
@@ -109,20 +110,12 @@ pthread_barrier_destroy(pthread_barrier_t *barrier)
        * *barrier != NULL.
        */
       *barrier = NULL;
-
-      result = CloseHandle(b->eventBarrierBreeched);
       (void) pthread_mutex_unlock(&(b->mtxExclusiveAccess));
-      if (result == TRUE)
-        {
-          (void) pthread_mutex_destroy(&(b->mtxExclusiveAccess));
-          (void) free(b);
-          result = 0;
-        }
-      else
-        {
-          *barrier = b;
-          result = EINVAL;
-        }
+
+      (void) sem_destroy(&(b->semBarrierBreeched[1]));
+      (void) sem_destroy(&(b->semBarrierBreeched[0]));
+      (void) pthread_mutex_destroy(&(b->mtxExclusiveAccess));
+      (void) free(b);
     }
 
   return(result);
@@ -145,30 +138,27 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
 
   if (0 == result)
     {
+      int step = b->iStep;
+      unsigned int serial = b->nSerial;
+
       if (0 == --(b->nCurrentBarrierHeight))
         {
-          b->nCurrentBarrierHeight = b->nInitialBarrierHeight;
           (void) pthread_mutex_unlock(&(b->mtxExclusiveAccess));
           /*
-           * This is a work-around for the FIXME below. We
-           * give any threads that didn't quite get to register
-           * their wait another quantum. This is temporary
-           * - there is a better way to do this.
+           * All other threads in this barrier set have at least passed
+           * through the decrement and test above, so its safe to
+           * raise the barrier to its full height.
            */
-          Sleep(0);
-          (void) PulseEvent(b->eventBarrierBreeched);
-          /*
-           * Would be better if the first thread to return
-           * from this routine got this value. On a single
-           * processor machine that will be the last thread
-           * to reach the barrier (us), most of the time.
-           */
-          result = PTHREAD_BARRIER_SERIAL_THREAD;
+          b->iStep = 1 - step;
+          b->nCurrentBarrierHeight = b->nInitialBarrierHeight;
+          (void) sem_post_multiple(&(b->semBarrierBreeched[step]), b->nInitialBarrierHeight - 1);
         }
       else
         {
           pthread_t self;
           int oldCancelState;
+
+          (void) pthread_mutex_unlock(&(b->mtxExclusiveAccess));
 
           self = pthread_self();
  
@@ -181,20 +171,33 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
               pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldCancelState);
             }
 
-          (void) pthread_mutex_unlock(&(b->mtxExclusiveAccess));
-
-          /* FIXME!!! It's possible for a thread to be left behind at a
-           * barrier because of the time gap between the unlock
-           * and the registration that the thread is waiting on the
-           * event.
+          /*
+           * There is no race condition between the semaphore wait and post
+           * because we are using two alternating semas and all threads have
+           * entered barrier_wait and checked nCurrentBarrierHeight before this
+           * barrier's sema can be posted. Any threads that have not quite
+           * entered sem_wait below when the multiple_post above is called
+           * will nevertheless continue through the sema (and the barrier).
+           * We have fulfilled our synchronisation function.
            */
-          result = pthreadCancelableWait(b->eventBarrierBreeched);
+          result = sem_wait(&(b->semBarrierBreeched[step]));
 
           if (self->cancelType == PTHREAD_CANCEL_DEFERRED)
             {
               pthread_setcancelstate(oldCancelState, NULL);
             }
         }
+
+      /*
+       * The first thread to return from the wait will be the
+       * PTHREAD_BARRIER_SERIAL_THREAD.
+       */
+      result = ((_LONG) serial == InterlockedCompareExchange((_LPLONG) &(b->nSerial),
+                                                             (_LONG) ((serial + 1)
+                                                                      & 0x7FFFFFFF),
+                                                             (_LONG) serial)
+                ? PTHREAD_BARRIER_SERIAL_THREAD
+                : 0);
     }
 
   return(result);
