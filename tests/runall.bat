@@ -30,3 +30,4 @@ call runtest cl rwlock2
 call runtest cl rwlock3
 call runtest cl rwlock4
 call runtest cl rwlock5
+call runtest cl rwlock6
