@@ -1,3 +1,27 @@
+Wed Jul 22 00:16:22 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* cleanup.c (_pthread_cleanup_push): Implement.
+	(_pthread_cleanup_pop): Implement.
+	(_pthread_do_cancellation): Implement.
+	These are private to the implementation. The real cleanup functions
+	are macros. See below.
+
+	* pthread.h (pthread_cleanup_push): Implement as a macro.
+	(pthread_cleanup_pop): Implement as a macro.
+	Because these are macros which start and end a block, the POSIX scoping
+	requirement is observed. See the comment in the file.
+
+	* exit.c (pthread_exit): Refine the code.
+
+	* create.c (pthread_create): Code cleanup.
+
+	* implement.h (RND_SIZEOF): Add RND_SIZEOF(T) to round sizeof(T)
+	up to multiple of DWORD.
+	Add function prototypes.
+
+	* private.c (_pthread_getthreadindex): "*thread" should have been 
+	"thread". Detect empty slot fail condition.
+
 1998-07-20  Ben Elliston  <bje@cygnus.com>
 
 	* misc.c (pthread_once): Implement.  Don't use a per-application

@@ -170,6 +170,26 @@ int pthread_key_delete(pthread_key_t key);
 }
 #endif /* __cplusplus */
 
+/* The following #defines implement POSIX cleanup handlers.
+   The standard requires that these functions be used as statements and
+   be used pairwise in the same scope. The standard suggests that, in C, they
+   may be implemented as macros starting and ending the same block.
+ */
+#ifdef pthread_cleanup_push
+#undef pthread_cleanup_push
+#endif
+#define pthread_cleanup_push(routine, arg) \
+{ \
+  _pthread_cleanup_push(routine, arg);
+
+#ifdef pthread_cleanup_pop
+#undef pthread_cleanup_pop
+#endif
+#define pthread_cleanup_pop(execute) \
+  _pthread_cleanup_pop(execute);\
+}
+
+
 /* Below here goes all internal definitions required by this implementation
    of pthreads for Win32.
  */

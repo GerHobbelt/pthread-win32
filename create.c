@@ -42,26 +42,24 @@ pthread_create(pthread_t *thread, const pthread_attr_t *attr,
   /* Use and modify attr_copy. Only after we've succeeded in creating the
      new thread can we modify any passed-in structures.
 
-     We use one malloc() to get all of our heap space and then allocate
-     it further.
+     To save time we use one malloc() to get all of our heap space and
+     then allocate it further.
    */
-  if (NULL == (privmem = (char) malloc(sizeof(pthread_attr_t) + 
-				       sizeof(_pthread_cleanup_stack_t) +
-				       sizeof(DWORD)))) {
+
+  if (NULL == 
+      (privmem = (char) malloc(RND_SIZEOF(pthread_attr_t) +
+			       RND_SIZEOF(_pthread_cleanup_stack_t)))) {
     return EAGAIN;
   }
 
   attr_copy = (pthread_attr_t *) privmem;
-  /* Force the next to a DWORD boundary. 
-     This is all compile time arithmetic. 
+
+  /* Force cleanup_stack to start at a DWORD boundary within privmem.
    */
   cleanup_stack = 
-    (_pthread_cleanup_stack_t *) &privmem[((sizeof(pthread_attr_t) / 
-					    sizeof(DWORD)) + 1) 
-					 * sizeof(DWORD)];
+    (_pthread_cleanup_stack_t *) &privmem[RND_SIZEOF(pthread_attr_t)];
 
   (void) memcpy(attr_copy, attr);
-  
 
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_count_mutex);
@@ -82,7 +80,10 @@ pthread_create(pthread_t *thread, const pthread_attr_t *attr,
 	break;
       }
 
-    flags = 1; /* Start suspended and resume at the last moment */
+    flags = 1; /* Start suspended and resume at the last moment to avoid
+		  race conditions, ie. where a thread may enquire it's
+		  attributes before we finish storing them away.
+		*/
 
     handle = (HANDLE) _beginthreadex(security,
 				   stack,
@@ -92,22 +93,21 @@ pthread_create(pthread_t *thread, const pthread_attr_t *attr,
 				   &threadID);
 
     if (handle != NULL) {
-      /* We have a new thread */
       _pthread_threads_count++;
 
       /* The hash table works as follows:
 	 hash into the table,
 	 if the slot is occupied then start single stepping from there
 	 until we find an available slot.
-
-	 There is at least one slot available at this point.
        */
       t = _PTHREAD_HASH_INDEX(handle);
       while ((_pthread_threads_table[t])->thread != NULL) {
 	t++;
+
 	if (t == PTHREAD_THREADS_MAX)
-	  t = 0; /* Wrap around to the first slot */
+	  t = 0; /* Wrap to the top of the table. */
       }
+
       if ((_pthread_threads_table[t])->thread != NULL) {
 	/* INTERNAL ERROR */
       } else {
@@ -131,8 +131,6 @@ pthread_create(pthread_t *thread, const pthread_attr_t *attr,
     (void) memcpy(attr, attr_copy);
 
     /* POSIX threads are always running after creation.
-       Start the thread only after passed-in structures have been
-       modified to avoid race conditions.
      */
     ResumeThread(handle);
   } else {
