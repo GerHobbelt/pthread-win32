@@ -1,12 +1,11 @@
 ; pthread.def
-; Last updated: $Date: 2001/07/01 14:35:50 $
+; Last updated: $Date: 2001/07/05 11:57:32 $
 
 ; Currently unimplemented functions are commented out.
 
 ;LIBRARY pthread
 
 EXPORTS
-ptw32_processInitialize
 ;pthread_atfork
 pthread_attr_destroy
 pthread_attr_getdetachstate
@@ -109,6 +108,24 @@ pthread_rwlock_rdlock
 pthread_rwlock_wrlock
 pthread_rwlock_unlock
 ;
+; Spin locks
+;
+pthread_spin_init
+pthread_spin_destroy
+pthread_spin_lock
+pthread_spin_unlock
+pthread_spin_trylock
+;
+; Barriers
+;
+pthread_barrier_init
+pthread_barrier_destroy
+pthread_barrier_wait
+pthread_barrierattr_init
+pthread_barrierattr_destroy
+pthread_barrierattr_getpshared
+pthread_barrierattr_setpshared
+;
 ; Non-portable/compatibility with other implementations
 ;
 pthread_delay_np
@@ -118,9 +135,12 @@ pthread_mutexattr_setkind_np
 ; Non-portable local implementation only
 ;
 pthread_getw32threadhandle_np
+pthread_getprocessors_np
 pthreadCancelableWait
 pthreadCancelableTimedWait
+;
 ; For use when linking statically
+;
 pthread_win32_process_attach_np
 pthread_win32_process_detach_np
 pthread_win32_thread_attach_np

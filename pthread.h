@@ -265,6 +265,19 @@ extern "C"
  *                      Maximum number of threads supported per
  *                      process (must be at least 64).
  *
+ *
+ * POSIX 1003.1j/D10-1999 Options
+ * ==============================
+ *
+ * _POSIX_READER_WRITER_LOCKS (set)
+ *                      If set, you can use read/write locks
+ *
+ * _POSIX_SPIN_LOCKS (set)
+ *                      If set, you can use spin locks
+ *
+ * _POSIX_BARRIERS (set)
+ *                      If set, you can use barriers
+ *
  * -------------------------------------------------------------
  */
 
@@ -273,6 +286,18 @@ extern "C"
  */
 #ifndef _POSIX_THREADS
 #define _POSIX_THREADS
+#endif
+
+#ifndef _POSIX_READER_WRITER_LOCKS
+#define _POSIX_READER_WRITER_LOCKS
+#endif
+
+#ifndef _POSIX_SPIN_LOCKS
+#define _POSIX_SPIN_LOCKS
+#endif
+
+#ifndef _POSIX_BARRIERS
+#define _POSIX_BARRIERS
 #endif
 
 #define _POSIX_THREAD_SAFE_FUNCTIONS
@@ -336,7 +361,8 @@ typedef struct pthread_condattr_t_ *pthread_condattr_t;
 #endif
 typedef struct pthread_rwlock_t_ *pthread_rwlock_t;
 typedef struct pthread_rwlockattr_t_ *pthread_rwlockattr_t;
-
+typedef struct pthread_spinlock_t_ pthread_spinlock_t;
+typedef struct pthread_barrier_t_ *pthread_barrier_t;
 
 /*
  * ====================
@@ -382,7 +408,12 @@ enum {
  * pthread_condattr_{get,set}pshared
  */
   PTHREAD_PROCESS_PRIVATE	= 0,
-  PTHREAD_PROCESS_SHARED	= 1
+  PTHREAD_PROCESS_SHARED	= 1,
+
+/*
+ * pthread_barrier_wait
+ */
+  PTHREAD_BARRIER_SERIAL_THREAD = -1
 };
 
 /*
@@ -412,11 +443,22 @@ struct pthread_once_t_
 };
 
 
+/*
+ * ====================
+ * ====================
+ * Object initialisers
+ * ====================
+ * ====================
+ */
 #define PTHREAD_MUTEX_INITIALIZER ((pthread_mutex_t) -1)
 
 #define PTHREAD_COND_INITIALIZER ((pthread_cond_t) -1)
 
 #define PTHREAD_RWLOCK_INITIALIZER ((pthread_rwlock_t) -1)
+
+#define PTHREAD_SPINLOCK_INITIALIZER {1}
+
+#define PTHREAD_BARRIER_INITIALIZER ((pthread_barrier_t) -1)
 
 enum
 {
@@ -743,6 +785,20 @@ int pthread_mutexattr_settype (pthread_mutexattr_t * attr, int kind);
 int pthread_mutexattr_gettype (pthread_mutexattr_t * attr, int *kind);
 
 /*
+ * Barrier Attribute Functions
+ */
+int pthread_barrierattr_init (pthread_barrierattr_t * attr);
+
+int pthread_barrierattr_destroy (pthread_barrierattr_t * attr);
+
+int pthread_barrierattr_getpshared (const pthread_barrierattr_t
+				    * attr,
+				    int *pshared);
+
+int pthread_barrierattr_setpshared (pthread_barrierattr_t * attr,
+				    int pshared);
+
+/*
  * Mutex Functions
  */
 int pthread_mutex_init (pthread_mutex_t * mutex,
@@ -755,6 +811,30 @@ int pthread_mutex_lock (pthread_mutex_t * mutex);
 int pthread_mutex_trylock (pthread_mutex_t * mutex);
 
 int pthread_mutex_unlock (pthread_mutex_t * mutex);
+
+/*
+ * Spinlock Functions
+ */
+int pthread_spin_init (pthread_spinlock_t * lock);
+
+int pthread_spin_destroy (pthread_spinlock_t * lock);
+
+int pthread_spin_lock (pthread_spinlock_t * lock);
+
+int pthread_spin_trylock (pthread_spinlock_t * lock);
+
+int pthread_spin_unlock (pthread_spinlock_t * lock);
+
+/*
+ * Barrier Functions
+ */
+int pthread_barrier_init (pthread_barrier_t * barrier,
+			  const pthread_barrierattr_t * attr,
+                          int count);
+
+int pthread_barrier_destroy (pthread_barrier_t * barrier);
+
+int pthread_barrier_wait (pthread_barrier_t * barrier);
 
 /*
  * Condition Variable Attribute Functions
@@ -841,6 +921,11 @@ int pthread_delay_np (struct timespec * interval);
  * Returns the Win32 HANDLE for the POSIX thread.
  */
 HANDLE pthread_getw32threadhandle_np(pthread_t thread);
+
+/*
+ * Returns the number of CPUs available to the process.
+ */
+int pthread_getprocessors_np(int * count);
 
 /*
  * Useful if an application wants to statically link
