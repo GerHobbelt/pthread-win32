@@ -1,3 +1,8 @@
+2001-10-08  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* spin.c (pthread_spin_trylock): Was not returning
+	EBUSY for multi CPU machines.
+
 2001-08-24  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* condvar.c (pthread_cond_destroy): Remove cv element
