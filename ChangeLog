@@ -1,5 +1,14 @@
 Sat Feb 18 16:2s1703:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* Makefile.in: Use libpthread32.a as the name of the DLL export
+	library instead of pthread.lib.
+
+	* condvar.c (pthread_cond_init): cv could have been used unitialised;
+	initialise.
+
+	* create.c (pthread_create): parms could have been used unitialised;
+	initialise.
+
 	* pthread.h (struct pthread_once_t_): Remove redefinition.
 
 Sat Feb 13 03:03:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
