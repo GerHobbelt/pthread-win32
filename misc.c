@@ -49,15 +49,22 @@ pthread_self(void)
      that all of the Win32 functions we are going to use only need
      HANDLEs.  The morons. */
 
+  /* FIXME: Need a new lookup method with the new thread allocation
+     scheme.
+
+     We can use the Win32 handle though as a basis (perhaps
+     to look up a table) because pthread_self() will never be called
+     after the Win32 thread has terminated (unless we can raise
+     ourselves from the dead!), and therefore the Win32 handle cannot
+     have been reused yet. */
+
+#if 0
   return GetCurrentThread();
+#endif
 }
 
 int
 pthread_equal(pthread_t t1, pthread_t t2)
 {
-  /* For the time being, assume that HANDLEs can be directly compared.
-     If not, then use the appropriate Win32 function for
-     comparison. */
-
   return (t1 != t2);
 }

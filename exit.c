@@ -69,5 +69,5 @@ _pthread_exit(pthread_t thread, void * value, int return_code)
 void
 pthread_exit(void * value)
 {
-  _pthread_exit(pthread_this(), value, 0);
+  _pthread_exit(pthread_self(), value, 0);
 }

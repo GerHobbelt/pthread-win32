@@ -135,10 +135,10 @@ _pthread_new_thread(pthread_t * thread)
   return 0;
 }
 
-_pthread_threads_thread *
-_pthread_find_thread(pthread_t thread)
+pthread_t
+_pthread_find_thread((HANDLE) win32handle)
 {
-  /* Should no longer be needed */
+  /* FIXME: No-op at present */
 }
 
 int

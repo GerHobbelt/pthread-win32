@@ -1,5 +1,45 @@
 Tue Jul 28 14:04:29 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* implement.h: Add _PTHREAD_VALID macro.
+
+	* sync.c (pthread_join): Modify to use the new thread
+	type and _pthread_delete_thread(). Rename "target" to "thread".
+	Remove extra local variable "target".
+	(pthread_detach): Ditto.
+
+	* signal.c (pthread_sigmask): Move init of "us" out of inner block.
+	Fix instance of "this" should have been "us". Rename "us" to "thread".
+
+	* sched.c (pthread_setschedparam): Modify to use the new thread
+	type.
+	(pthread_getschedparam): Ditto.
+
+	* private.c (_pthread_find_thread): Fix return type and arg.
+
+	* implement.h: Remove _PTHREAD_YES and _PTHREAD_NO.
+	(_pthread_new_thread): Add prototype.
+	(_pthread_find_thread): Ditto.
+	(_pthread_delete_thread): Ditto.
+	(_pthread_new_thread_entry): Remove prototype.
+	(_pthread_find_thread_entry): Ditto.
+	(_pthread_delete_thread_entry): Ditto.
+	(  _PTHREAD_NEW, _PTHREAD_INUSE, _PTHREAD_EXITED, _PTHREAD_REUSE):
+	Add.
+
+
+	* create.c (pthread_create): Minor rename "us" to "new" (I need
+	these cues but it doesn't stop me coming out with some major bugs
+	at times).
+	Load start_routine and arg into the thread so the wrapper can
+	call it.
+
+	* exit.c (pthread_exit): Fix pthread_this should be pthread_self.
+
+	* cancel.c (pthread_setcancelstate): Change
+ 	_pthread_threads_thread_t * to pthread_t and init with
+ 	pthread_this().
+	(pthread_setcanceltype): Ditto.
+
 	* exit.c (_pthread_exit): Add new pthread_t arg.
 	Rename _pthread_delete_thread_entry to _pthread_delete_thread.
 	Rename "us" to "thread".
