@@ -6,6 +6,7 @@
  * threads.
  */
 
+#include <malloc.h>
 #include "pthread.h"
 #include "implement.h"
 
@@ -124,7 +125,7 @@ _pthread_destructor_push(void (* routine)(void *), pthread_key_t key)
   return _pthread_handler_push(_PTHREAD_DESTRUCTOR_STACK, 
 			       _PTHREAD_HANDLER_POP_LIFO,
 			       routine, 
-			       key);
+			       (void *) key);
 }
 
 
@@ -144,7 +145,7 @@ _pthread_destructor_pop(pthread_key_t key)
       next = current->next;
 
       /* The destructors associated key is in current->arg. */
-      if (current->arg == key)
+      if (current->arg == (void *) key)
 	{
 	  if (current == *head)
 	    {
@@ -192,7 +193,7 @@ _pthread_destructor_pop_all()
 	  func = current->routine;
 
 	  /* Get the key value using the key which is in current->arg. */
-	  arg = pthread_getspecific(current->arg);
+	  arg = pthread_getspecific((int) current->arg);
 
 	  next = current->next;
 

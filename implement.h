@@ -45,7 +45,7 @@ typedef struct {
 
 /* Macro to compute the address of a given handler stack. */
 #define _PTHREAD_STACK(stack) \
-  ((_pthread_handler_node_t *) &(pthread_self())->cleanupstack + stack);
+  ((_pthread_handler_node_t **) &(pthread_self()->cleanupstack) + stack);
 
 /* Macro to compute the table index of a thread entry from it's entry
    address. */
