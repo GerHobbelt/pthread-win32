@@ -33,9 +33,6 @@ const int _pthread_cancel_deferred     = 1;
 
 /* Declare variables which are global to all threads in the process. */
 
-/* FIXME: This is temporary. */
-#define PTHREAD_MUTEX_INITIALIZER {0}
-
 pthread_mutex_t _pthread_table_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 DWORD _pthread_threads_count = 0;

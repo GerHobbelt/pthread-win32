@@ -19,7 +19,10 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
     }
 
   /* Create a critical section. */
-  InitializeCriticalSection(mutex);
+  InitializeCriticalSection(&mutex->cs);
+
+  /* Mark as valid. */
+  mutex->valid = 1;
 
   return 0;
 }
@@ -32,7 +35,11 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
       return EINVAL;
     }
 
-  DeleteCriticalSection(mutex);
+  DeleteCriticalSection(&mutex->cs);
+  
+  /* Mark as invalid. */
+  mutex->valid = 0;
+
   return 0;
 }
 
@@ -59,14 +66,22 @@ pthread_mutexattr_destroy(pthread_mutexattr_t *attr)
 int
 pthread_mutex_lock(pthread_mutex_t *mutex)
 {
-  EnterCriticalSection(mutex);
+  if (!mutex->valid)
+    {
+      pthread_mutex_init(mutex, NULL);
+    }
+  EnterCriticalSection(&mutex->cs);
   return 0;
 }
 
 int
 pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
-  LeaveCriticalSection(mutex);
+  if (!mutex->valid)
+    {
+      return EINVAL;
+    }
+  LeaveCriticalSection(&mutex->cs);
   return 0;
 }
 
@@ -87,5 +102,10 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
       return EINVAL;
     }
 
-  return (TryEnterCriticalSection(mutex) != TRUE) ? EBUSY : 0;
+  if (!mutex->valid)
+    {
+      pthread_mutex_init(mutex, NULL);
+    }
+
+  return (TryEnterCriticalSection(&mutex->cs) != TRUE) ? EBUSY : 0;
 }

@@ -1,3 +1,23 @@
+1998-10-05  Ben Elliston  <bje@cygnus.com>
+
+	* global.c (PTHREAD_MUTEX_INITIALIZER): Move to pthread.h.
+
+	* pthread.h (PTHREAD_MUTEX_INITIALIZER): Define.
+	(pthread_mutex_t): Reimplement as a struct containing a valid
+	flag. If the flag is ever down upon entry to a mutex operation,
+	we call pthread_mutex_create() to initialise the object. This
+	fixes the problem of how to handle statically initialised objects
+	that can't call InitializeCriticalSection() due to their context.
+
+	* mutex.c (pthread_mutex_init): Set valid flag.
+	(pthread_mutex_destroy): Clear valid flag.
+	(pthread_mutex_lock): Check and handle the valid flag.
+	(pthread_mutex_unlock): Likewise.
+	(pthread_mutex_trylock): Likewise.
+
+	* tests/mutex3.c: New file; test for the static initialisation
+	macro. Passes.
+	
 1998-10-04  Ben Elliston  <bje@cygnus.com>
 
 	* tests/mutex2.c: Test pthread_mutex_trylock(). Passes.
