@@ -85,9 +85,9 @@ cond_wait(pthread_cond_t *cv, pthread_mutex_t *mutex, DWORD abstime)
   pthread_testcancel();
 
   /* Avoid race conditions. */
-  EnterCriticalSection (&cv->waiters_count_lock);
+  pthread_mutex_lock(&cv->waiters_count_lock);
   cv->waiters_count++;
-  LeaveCriticalSection (&cv->waiters_count_lock);
+  pthread_mutex_unlock(&cv->waiters_count_lock);
 
   /* It's okay to release the mutex here since Win32 manual-reset
      events maintain state when used with SetEvent().  This avoids the
@@ -101,10 +101,10 @@ cond_wait(pthread_cond_t *cv, pthread_mutex_t *mutex, DWORD abstime)
  
   result = WaitForMultipleObjects (2, cv->events, FALSE, abstime);
 
-  EnterCriticalSection (&cv->waiters_count_lock);
+  pthread_mutex_lock (&cv->waiters_count_lock);
   cv->waiters_count--;
   last_waiter = cv->waiters_count == 0;
-  LeaveCriticalSection (&cv->waiters_count_lock);
+  pthread_mutex_unlock (&cv->waiters_count_lock);
 
   /* Some thread called pthread_cond_broadcast(). */
   if ((result = WAIT_OBJECT_0 + BROADCAST) && last_waiter)
@@ -158,9 +158,9 @@ pthread_cond_broadcast (pthread_cond_t *cv)
     }
 
   /* Avoid race conditions. */
-  EnterCriticalSection (&cv->waiters_count_lock);
+  pthread_mutex_lock (&cv->waiters_count_lock);
   have_waiters = (cv->waiters_count > 0);
-  LeaveCriticalSection (&cv->waiters_count_lock);
+  pthread_mutex_unlock (&cv->waiters_count_lock);
 
   if (have_waiters) {
     SetEvent(cv->events[BROADCAST]);
@@ -181,9 +181,9 @@ pthread_cond_signal (pthread_cond_t *cv)
     }
 
   /* Avoid race conditions. */
-  EnterCriticalSection (&cv->waiters_count_lock);
+  pthread_mutex_lock (&cv->waiters_count_lock);
   have_waiters = (cv->waiters_count > 0);
-  LeaveCriticalSection (&cv->waiters_count_lock);
+  pthread_mutex_unlock (&cv->waiters_count_lock);
 
   if (have_waiters) {
     SetEvent(cv->events[SIGNAL]);
