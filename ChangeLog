@@ -1,7 +1,63 @@
-2000-07-25  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+2000-07-25  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* sched.c (sched_get_priority_max): Handle different WinCE and
+	Win32 priority values together.
+	(sched_get_priority_min): Ditto.
+	- Tristan Savatier <tristan@mpegtv.com>
+
+	* create.c (pthread_create): Force new threads to wait until
+	pthread_create has the new thread's handle; we also retain
+	a local copy of the handle for internal use until
+	pthread_create returns.
+
+	* private.c (_pthread_threadStart): Initialise ei[].
+	(_pthread_threadStart): When beginthread is used to start the
+	thread, force waiting until the creator thread had the 
+	thread handle.
+
+	* cancel.c (_pthread_cancel_thread): Include context switch
+	code for defined(_X86_) environments in addition to _M_IX86.
+
+	* rwlock.c (pthread_rwlock_destroy): Assignment changed
+	to avoid compiler warning.
+
+	* private.c (_pthread_get_exception_services_code): Cast
+	NULL return value to avoid compiler warning.
+
+	* cleanup.c (pthread_pop_cleanup): Initialise "cleanup" variable
+	to avoid compiler warnings.
+
+	* misc.c (_pthread_new): Change "new" variable to "t" to avoid
+	confusion with the C++ keyword of the same name.
+
+	* condvar.c (cond_wait_cleanup): Initialise lastWaiter variable.
+	(cond_timedwait): Remove unused local variables. to avoid
+	compiler warnings.
 
 	* dll.c (dllMain): Remove 2000-07-21 change - problem
 	appears to be in pthread_create().
+
+2000-07-22  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* tsd.c (pthread_key_create): If a destructor was given
+	and the pthread_mutex_init failed, then would try to
+	reference a NULL pointer (*key); eliminate this section of
+	code by using a dynamically initialised mutex
+	(PTHREAD_MUTEX_INITIALIZER).
+
+	* tsd.c (pthread_setspecific): Return an error if
+	unable to set the value; simplify cryptic conditional.
+
+	* tsd.c (pthread_key_delete): Locking threadsLock relied
+	on mutex_lock returning an error if the key has no destructor.
+	ThreadsLock is only initialised if the key has a destructor.
+	Making this mutex a static could reduce the number of mutexes
+	used by an application since it is actually created only at
+	first use and it's often destroyed soon after.
+	
+2000-07-22  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* FAQ: Added Q5 and Q6.
 
 2000-07-21  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
@@ -28,6 +84,38 @@
 
 	* signal.c (pthread_sigmask): return an error value if
 	pthread_self() returns NULL.
+
+2000-03-02  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* attr.c (pthread_attr_init): Set default stacksize to zero (0)
+	rather than PTHREAD_STACK_MIN even though these are now the same.
+
+	* pthread.h (PTHREAD_STACK_MIN): Lowered to 0.
+
+2000-01-28  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* mutex.c (pthread_mutex_init): Free mutex if it has been alloced;
+	if critical sections can be used instead of Win32 mutexes, test
+	that the critical section works and return an error if not.
+
+2000-01-07  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* cleanup.c (pthread_pop_cleanup): Include SEH code only if MSC is not
+	compiling as C++.
+	(pthread_push_cleanup): Include SEH code only if MSC is not
+	compiling as C++.
+
+	* pthread.h: Include SEH code only if MSC is not
+	compiling as C++.
+
+	* implement.h: Include SEH code only if MSC is not
+	compiling as C++.
+
+	* cancel.c (_pthread_cancel_thread): Add _M_IX86 check.
+	(pthread_testcancel): Include SEH code only if MSC is not
+	compiling as C++.
+	(_pthread_cancel_self): Include SEH code only if MSC is not
+	compiling as C++.
 
 2000-01-06  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 

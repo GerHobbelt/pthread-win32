@@ -71,9 +71,6 @@ pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
     }
   else if (((*key)->key = TlsAlloc ()) == TLS_OUT_OF_INDEXES)
     {
-      /*
-       * Create system key
-       */
       result = EAGAIN;
 
       free (*key);
@@ -86,6 +83,13 @@ pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
        * Therefore, need a lock that allows multiple threads
        * to gain exclusive access to the key->threads list
        */
+#if 1
+      /*
+       * The mutex will only be created when it is first locked.
+       */
+      (*key)->threadsLock = PTHREAD_MUTEX_INITIALIZER;
+      (*key)->destructor = destructor;
+#else
       result = pthread_mutex_init (&((*key)->threadsLock), NULL);
 
       if (result != 0)
@@ -95,7 +99,11 @@ pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
           free (*key);
           *key = NULL;
         }
-      (*key)->destructor = destructor;
+      else
+	{
+      	  (*key)->destructor = destructor;
+	}
+#endif
     }
 
   return (result);
@@ -134,6 +142,7 @@ pthread_key_delete (pthread_key_t key)
   if (key != NULL)
     {
       if (key->threads != NULL &&
+          key->destructor != NULL &&
           pthread_mutex_lock (&(key->threadsLock)) == 0)
         {
           /*
@@ -194,25 +203,24 @@ pthread_setspecific (pthread_key_t key, const void *value)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
-      *      This function initializes an unnamed semaphore. the
-      *      initial value of the semaphore is 'value'
+      *      This function sets the value of the thread specific
+      *	     key in the calling thread.
       *
       * PARAMETERS
-      *      sem
-      *              pointer to an instance of sem_t
+      *      key
+      *              an instance of pthread_key_t
+      *	     value
+      *		     the value to set key to
       *
       *
       * DESCRIPTION
-      *      This function  initializes an unnamed semaphore. The
-      *      initial value of the semaphore is set to 'value'.
+      *      This function sets the value of the thread specific
+      *      key in the calling thread.
       *
       * RESULTS
-      *              0               successfully created semaphore,
-      *              EINVAL          'sem' is not a valid semaphore,
-      *              ENOSPC          a required resource has been exhausted,
-      *              ENOSYS          semaphores are not supported,
-      *              EPERM           the process lacks appropriate privilege
-      *              ENOENT          the thread couldn't find it's own handle
+      *              0               successfully set value
+      *              EAGAIN          could not set value
+      *              ENOENT          SERIOUS!!
       *
       * ------------------------------------------------------
       */
@@ -229,9 +237,9 @@ pthread_setspecific (pthread_key_t key, const void *value)
        */
       self = pthread_self ();
       if (self == NULL)
-	{
-	  return ENOENT;
-	}
+        {
+          return ENOENT;
+        }
     }
   else
     {
@@ -284,20 +292,21 @@ pthread_setspecific (pthread_key_t key, const void *value)
           /*
            * create an association if not found
            */
-          result = (assoc == NULL)
-            ? _pthread_tkAssocCreate (&assoc, self, key)
-            : 0;
-        }
-      else
-        {
-          result = 0;
+	  if (assoc == NULL)
+	    {
+	      result = _pthread_tkAssocCreate (&assoc, self, key);
+	    }
         }
 
       if (result == 0)
         {
-          TlsSetValue (key->key, (LPVOID) value);
+          if ( ! TlsSetValue (key->key, (LPVOID) value))
+	    {
+	      result = EAGAIN;
+	    }
         }
     }
+
   return (result);
 }                               /* pthread_setspecific */
 

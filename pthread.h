@@ -282,7 +282,11 @@ struct timespec {
 #ifdef __MINGW32__
 #define PT_STDCALL
 #else
+#ifdef __cplusplus
+#define PT_STDCALL __cdecl
+#else
 #define PT_STDCALL __stdcall
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -420,8 +424,12 @@ extern "C"
  *              simply simulating keys.
  *
  *      PTHREADS_STACK_MIN
- *              artibrarily chose 1K. By default, WIN32
- *              selects 1Meg stacks.
+ *              POSIX specifies 0 which is also the value WIN32
+ *              interprets as allowing the system to
+ *              set the size to that of the main thread. The
+ *              maximum stack size in Win32 is 1Meg. WIN32
+ *              allocates more stack as required up to the 1Meg
+ *              limit.
  *
  *      PTHREAD_THREADS_MAX
  *              Not documented by WIN32. Wrote a test program
@@ -431,7 +439,7 @@ extern "C"
  */
 #define PTHREAD_DESTRUCTOR_ITERATIONS	                   4
 #define PTHREAD_KEYS_MAX				  64
-#define PTHREAD_STACK_MIN				1024
+#define PTHREAD_STACK_MIN				   0
 #define PTHREAD_THREADS_MAX				2019
 
 
@@ -584,7 +592,7 @@ struct _pthread_cleanup_t
 #endif /* !_MSC_VER && ! __cplusplus */
 };
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 	/*
 	 * WIN32 SEH version of cancel cleanup.
 	 */
@@ -609,7 +617,7 @@ struct _pthread_cleanup_t
 		} \
 	}
 
-#else /* _MSC_VER */
+#else /* _MSC_VER && ! __cplusplus */
 
 #ifndef __cplusplus
 
@@ -703,9 +711,9 @@ struct _pthread_cleanup_t
 	    cleanup.execute( _execute ); \
 	}
 
-#endif /* !__cplusplus */
+#endif /* !__cplusplus) */
 
-#endif /* _MSC_VER */
+#endif /* _MSC_VER && ! __cplusplus */
 
 /*
  * ===============
@@ -958,11 +966,13 @@ int * _errno( void );
 	rand()
 
 
-#ifdef _MSC_VER
+/* FIXME: This is only required if the library was built using SEH */
 /*
  * Get internal SEH tag
  */
 DWORD _pthread_get_exception_services_code(void);
+
+#if defined(_MSC_VER) && !defined(__cplusplus)
 
 /*
  * Redefine the SEH __except keyword to ensure that applications
@@ -972,9 +982,12 @@ DWORD _pthread_get_exception_services_code(void);
         __except((GetExceptionCode() == _pthread_get_exception_services_code()) \
 		 ? EXCEPTION_CONTINUE_SEARCH : (E))
 
-#endif
+#endif /* _MSC_VER && ! __cplusplus */
 
 #ifdef __cplusplus
+
+/* FIXME: This is only required if the library was built using C++EH */
+
 /*
  * Internal exceptions
  */

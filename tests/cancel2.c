@@ -48,7 +48,7 @@
  * Create NUMTHREADS threads in addition to the Main thread.
  */
 enum {
-  NUMTHREADS = 4
+  NUMTHREADS = 1
 };
 
 typedef struct bag_t_ bag_t;
@@ -113,7 +113,6 @@ mythread(void * arg)
       /*
        * Should not get into here.
        */
-      printf("SEH code=%x, MyCode=%x\n", GetExceptionCode(), _pthread_get_exception_services_code());
       result += 100;
     }
 

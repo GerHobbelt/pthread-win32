@@ -125,11 +125,12 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 
 #error ERROR [__FILE__, line __LINE__]: Process shared mutexes are not supported yet.
 
-      mx->mutex = CreateMutex (
-				  NULL,
-				  FALSE,
-				  ????);
-      result = (mx->mutex == 0) ? EAGAIN : 0;
+      mx->mutex = CreateMutex(NULL, FALSE, "FIXME FIXME FIXME");
+
+      if (mx->mutex == 0)
+	{
+	  result = EAGAIN;
+	}
 
 #else
 
@@ -149,6 +150,20 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 	   * Create a critical section. 
 	   */
 	  InitializeCriticalSection(&mx->cs);
+
+	  /*
+	   * Check that it works ok - since InitializeCriticalSection doesn't
+	   * return success or failure.
+	   */
+	  if (TryEnterCriticalSection(&mx->cs))
+	    {
+	      LeaveCriticalSection(&mx->cs);
+	    }
+	  else
+	    {
+	      DeleteCriticalSection(&mx->cs);
+	      result = EAGAIN;
+	    }
 	}
       else
 	{
@@ -163,10 +178,14 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 	  if (mx->mutex == 0)
 	    {
 	      result = EAGAIN;
-	      mx = NULL;
-	      goto FAIL0;
 	    }
 	}
+    }
+
+  if (result != 0 && mx != NULL)
+    {
+      free(mx);
+      mx = NULL;
     }
 
 FAIL0:

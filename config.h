@@ -23,3 +23,19 @@
 
 /* Define if you don't have Win32 semaphores. (eg. WinCE)  */
 #undef NEED_SEM
+
+/* Define if you need to convert string parameters to unicode. (eg. WinCE)  */
+#undef NEED_UNICODE_CONSTS
+
+/* 
+ * Target specific groups 
+ */
+#ifdef WINCE
+#define NEED_DUPLICATEHANDLE
+#define NEED_CREATETHREAD
+#define NEED_ERRNO
+#define NEED_CALLOC
+#define NEED_FTIME
+#define NEED_SEM
+#define NEED_UNICODE_CONSTS
+#endif

@@ -14,6 +14,10 @@ Q 3	How do I use pthread.dll for Win32 (Visual C++ 5.0)
 
 Q 4	Cancelation doesn't work for me, why?
 
+Q 5	Thread won't block after two calls to mutex_lock
+
+Q 6	How do I generate libpthread.a for use with Mingw32?
+
 =============================================================================
 
 Q 1	Should I use Cygwin or Mingw32 as a development environment?
@@ -252,4 +256,68 @@ a thread is going to block on a Win32 handle. These are:
 
 Regards.
 Ross
+
+------------------------------------------------------------------------------
+ 
+Q 5	Thread won't block after two calls to mutex_lock
+---
+ 
+A 5
+---
+
+> i was testing this pthread for win32 in my prog.
+> when i checked if it was blocking mutex_lock calls, i was surprised when it
+> didnt lock
+> 
+> pthread_mutex_t DBlock;
+> 
+> pthread_mutex_init( &DBlock, NULL );
+> pthread_mutex_lock( &DBlock );
+> pthread_mutex_lock( &DBlock );
+> 
+> ^^ these two calls didnt block
+
+POSIX leaves the result "undefined" for a thread that tries
+to recursively lock the same mutex (one that it owns already).
+That means the actual semantics are left up to the
+implementation, but should not be relied upon for code that
+will be ported to different POSIX threads implementations.
+
+In the pthreads-win32 implementation a thread won't deadlock
+itself by relocking the mutex. Subsequent calls to
+pthread_mutex_lock() as in your example above increment
+the lock count but the thread continues on. Consequently,
+the thread must ensure that it unlocks the mutex once for
+each lock operation. That is, pthreads-win32 mutexes are
+always recursive.
+
+You may want to look at the other synchronisation devices
+available in the library, such as condition variables or
+read-write locks.
+
+Ross
+
+------------------------------------------------------------------------------
+ 
+Q 6	How do I generate libpthread.a for use with Mingw32?
+---
+ 
+A 6
+---
+
+> I'm lacking the libpthread.a that
+> used to come with the pre-compiled package. The last time this
+> library appeared was in 1999-08-12. Without this library I cannot
+> use the pre-compiled dll.
+
+You can create libpthread.a from the .def file, should work along these
+lines:
+
+$(DLLTOOL) --as $(AS) -k --dllname libpthread.dll --output-lib
+libpthread.a --def $(srcdir)/libpthread.def
+
+Where DLLTOOL is i686-pc-cygwin-dlltool
+and AS i686-pc-cygwin-as.
+
+Thomas Sailer <sailer@ife.ee.ethz.ch>
 

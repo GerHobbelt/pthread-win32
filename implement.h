@@ -239,7 +239,7 @@ struct ThreadKeyAssoc {
 };
 
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 /*
  * --------------------------------------------------------------
  * MAKE_SOFTWARE_EXCEPTION

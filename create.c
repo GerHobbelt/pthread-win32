@@ -68,6 +68,7 @@ pthread_create (pthread_t * tid,
       */
 {
   pthread_t thread;
+  HANDLE threadH = 0;
   int result = EAGAIN;
   int run = TRUE;
   ThreadParms *parms = NULL;
@@ -90,8 +91,7 @@ pthread_create (pthread_t * tid,
       goto FAIL0;
     }
 
-  if ((parms = (ThreadParms *) malloc (sizeof (*parms))) ==
-      NULL)
+  if ((parms = (ThreadParms *) malloc (sizeof (*parms))) == NULL)
     {
       goto FAIL0;
     }
@@ -117,7 +117,7 @@ pthread_create (pthread_t * tid,
       /*
        * Default stackSize
        */
-      stackSize = 0;
+      stackSize = PTHREAD_STACK_MIN;
     }
 
   thread->state = run
@@ -126,20 +126,40 @@ pthread_create (pthread_t * tid,
 
   thread->keys = NULL;
 
+  /*
+   * Threads must be started in suspended mode and resumed if necessary
+   * after _beginthreadex returns us the handle. Otherwise we set up a
+   * race condition between the creating and the created threads.
+   * Note that we also retain a local copy of the handle for use
+   * by us in case thread->threadH gets NULLed later but before we've
+   * finished with it here.
+   */
+
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
 
-  thread->threadH = (HANDLE)
+  thread->threadH = threadH = (HANDLE)
     _beginthreadex (
 		     (void *) NULL,	/* No security info             */
 		     (unsigned) stackSize,	/* default stack size   */
 		     (unsigned (PT_STDCALL *) (void *)) _pthread_threadStart,
 		     parms,
-		     (unsigned) run ? 0 : CREATE_SUSPENDED,
+		     (unsigned) CREATE_SUSPENDED,
 		     (unsigned *) &(thread->thread));
+
+  if (threadH != 0 && run)
+    {
+      ResumeThread(threadH);
+    }
 
 #else /* __MINGW32__ && ! __MSVCRT__ */
 
-  thread->threadH = (HANDLE)
+  /*
+   * This lock will force pthread_threadStart() to wait until we have
+   * the thread handle.
+   */
+  (void) pthread_mutex_lock(&thread->cancelLock);
+
+  thread->threadH = threadH = (HANDLE)
     _beginthread (
 		   (void (*) (void *)) _pthread_threadStart,
 		   (unsigned) stackSize,	/* default stack size   */
@@ -148,23 +168,25 @@ pthread_create (pthread_t * tid,
   /*
    * Make the return code match _beginthreadex's.
    */
-  if (thread->threadH == (HANDLE)-1L)
+  if (threadH == (HANDLE) -1L)
     {
-      thread->threadH = 0;
+      thread->threadH = threadH = 0;
     }
   else if (! run)
     {
-      /*
+      /* 
        * beginthread does not allow for create flags, so we do it now.
        * Note that beginthread itself creates the thread in SUSPENDED
        * mode, and then calls ResumeThread to start it.
        */
-      SuspendThread (thread->threadH);
+      SuspendThread (threadH);
     }
+
+  (void) pthread_mutex_unlock(&thread->cancelLock);
 
 #endif /* __MINGW32__ && ! __MSVCRT__ */
 
-  result = (thread->threadH != 0) ? 0 : EAGAIN;
+  result = (threadH != 0) ? 0 : EAGAIN;
 
   /*
    * Fall Through Intentionally

@@ -30,7 +30,7 @@
 static void 
 _pthread_cancel_self(void)
 {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 
   DWORD exceptionInformation[3];
 
@@ -44,7 +44,7 @@ _pthread_cancel_self(void)
 		  3,
 		  exceptionInformation);
 
-#else /* _MSC_VER */
+#else /* _MSC_VER && ! __cplusplus */
 
 # ifdef __cplusplus
 
@@ -52,7 +52,7 @@ _pthread_cancel_self(void)
 
 # endif /* __cplusplus */
 
-#endif /* _MSC_VER */
+#endif /* _MSC_VER && ! __cplusplus */
 
   /* Never reached */
 }
@@ -72,11 +72,13 @@ _pthread_cancel_thread(pthread_t thread)
 
   if (WaitForSingleObject(threadH, 0) == WAIT_TIMEOUT)
     {
+#if defined(_M_IX86) || defined(_X86_)
       CONTEXT context;
       context.ContextFlags = CONTEXT_CONTROL;
       GetThreadContext(threadH, &context);
       context.Eip = (DWORD) _pthread_cancel_self;
       SetThreadContext(threadH, &context);
+#endif
       ResumeThread(threadH);
     }
 
@@ -292,7 +294,7 @@ pthread_testcancel (void)
        * Canceling!
        */
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 
       DWORD exceptionInformation[3];
 
@@ -306,7 +308,7 @@ pthread_testcancel (void)
 		      3,
 		      exceptionInformation);
 
-#else /* _MSC_VER */
+#else /* _MSC_VER && ! __cplusplus */
 
 #ifdef __cplusplus
 
@@ -314,7 +316,7 @@ pthread_testcancel (void)
 
 #endif /* __cplusplus */
 
-#endif /* _MSC_VER */
+#endif /* _MSC_VER && ! __cplusplus */
 
     }
 }				/* pthread_testcancel */

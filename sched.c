@@ -128,6 +128,22 @@ int pthread_getschedparam(pthread_t thread, int *policy,
   return 0;
 }
 
+
+/*
+ * On Windows98, THREAD_PRIORITY_LOWEST is (-2) and 
+ * THREAD_PRIORITY_HIGHEST is 2, and everything works just fine.
+ * 
+ * On WinCE 3.0, it so happen that THREAD_PRIORITY_LOWEST is 5
+ * and THREAD_PRIORITY_HIGHEST is 1 (yes, I know, it is funny:
+ * highest priority use smaller numbers) and the following happens:
+ * 
+ * sched_get_priority_min() returns 5
+ * sched_get_priority_max() returns 1
+ */
+
+#define sched_Max(a,b)  ((a)<(b)?(b):(a))
+#define sched_Min(a,b)  ((a)>(b)?(b):(a))
+
 int sched_get_priority_max(int policy)
 {
   if (policy < SCHED_MIN || policy > SCHED_MAX)
@@ -135,8 +151,13 @@ int sched_get_priority_max(int policy)
       return EINVAL;
     }
 
+#if (THREAD_PRIORITY_LOWEST > THREAD_PRIORITY_NORMAL)
+  /* WinCE? */
+  return sched_Max(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
+#else
   /* This is independent of scheduling policy in Win32. */
-  return THREAD_PRIORITY_HIGHEST;
+  return sched_Max(THREAD_PRIORITY_LOWEST, THREAD_PRIORITY_HIGHEST);
+#endif
 }
 
 int sched_get_priority_min(int policy)
@@ -146,8 +167,13 @@ int sched_get_priority_min(int policy)
       return EINVAL;
     }
 
+#if (THREAD_PRIORITY_LOWEST > THREAD_PRIORITY_NORMAL)
+  /* WinCE? */
+  return sched_Min(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
+#else
   /* This is independent of scheduling policy in Win32. */
-  return THREAD_PRIORITY_LOWEST;
+  return sched_Min(THREAD_PRIORITY_LOWEST, THREAD_PRIORITY_HIGHEST);
+#endif
 }
 
 int sched_yield(void)

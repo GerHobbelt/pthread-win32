@@ -383,19 +383,19 @@ pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout)
 pthread_t
 _pthread_new (void)
 {
-  pthread_t new;
+  pthread_t t;
 
-  new = (pthread_t) calloc (1, sizeof (*new));
+  t = (pthread_t) calloc (1, sizeof (*t));
 
-  if (new != NULL)
+  if (t != NULL)
     {
-      new->detachState = PTHREAD_CREATE_JOINABLE;
-      new->cancelState = PTHREAD_CANCEL_ENABLE;
-      new->cancelType  = PTHREAD_CANCEL_DEFERRED;
-      new->cancelLock  = PTHREAD_MUTEX_INITIALIZER;
+      t->detachState = PTHREAD_CREATE_JOINABLE;
+      t->cancelState = PTHREAD_CANCEL_ENABLE;
+      t->cancelType  = PTHREAD_CANCEL_DEFERRED;
+      t->cancelLock  = PTHREAD_MUTEX_INITIALIZER;
     }
 
-  return new;
+  return t;
 
 }
 
