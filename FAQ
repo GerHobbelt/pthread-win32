@@ -7,6 +7,8 @@ INDEX
 
 Q 1	How do I get pthreads-win32 to link under Cygwin32 or Mingw32?
 
+Q 2	Now that pthreads-win32 builds under Mingw32, why do I get
+	memory access violations?
 
 =============================================================================
 
@@ -69,4 +71,67 @@ not (yet) threadsafe.
 
 Regards,
 Anders
+
+------------------------------------------------------------------------------
+
+Q 2	Now that pthreads-win32 builds under Mingw32, why do I get
+---	memory access violations (segfaults)?
+
+A 2
+---
+The following email exchange describes the problem. Until this issue
+is resolved people without the Microsoft compiler can obtain the current
+MSVC prebuilt DLL (pthread.{dll,lib,h}) at:
+
+ftp://sourceware.cygnus.com/pub/pthreads-win32/dll-latest 
+
+Date: Wed, 10 Feb 1999 13:21:01 -0000
+From: "Ruland, Kevin" <Kevin.Ruland@anheuser-busch.com>
+Reply-To: POSIX threads on Win32 <pthreads-win32@air.net.au>
+To: 'POSIX threads on Win32' <pthreads-win32@air.net.au>
+Subject: Mingw32 exceptions not thread safe.
+
+Hello everyone.
+
+I asked Mumit Khan, maintainer of egcs for mingw and assorted guru, about
+the Known Problem listed below.  
+
+> Known problems
+> --------------
+> 
+> There is an unresolved bug which shows up as a segmentation fault
+> (memory access violation) when the library is built using g++. Build
+> the test program "eyal1.c" and run with an argument of "2" or
+> greater. The argument is the number of threads to run, excluding the
+> main thread, so the bug appears with 2 or more worker threads.
+> 
+> Kevin Ruland has traced the exception to the try/catch blocks in
+> _pthread_threadStart().
+> 
+
+The official word is:
+
+<Quote Mumit Khan [khan@xraylith.wisc.edu]>
+EGCS-1.1.1 for win32 (either cygwin or crtdll/msvc runtimes) do not have
+thread-safe exception support. 
+
+For Cygwin, it'll happen when Cygwin runtime has mature thread safety and
+pthread is fully integrated. Then it's just a matter of rebuilding GCC (or
+just libgcc in this) with thread safe EH support.
+
+For Mingw crtdll/msvc, someone needs to write the thread-wrapper for win32
+threads. Anyone who knows win32 threads should be able to do this without
+much trouble at all. It's low on my priority list, so unless someone else
+volunteers, it'll have to wait.
+
+Are you willing to take a look? If so, I can provide details.
+<\Quote>
+
+And there you have it!  To summarize, it's nice that pthreads compile but they
+aren't much use just yet.
+
+I'll respond to Mumit with 'Okay, what do I need to look at', but may not be
+able to tackle it myself.
+
+Kevin
 
