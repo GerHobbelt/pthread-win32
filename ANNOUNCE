@@ -242,14 +242,6 @@ points in applications and libraries:
       pthreadCancelableWait
       pthreadCancelableTimedWait
 
-The library includes a non-portable function to force using the much
-faster critical sections as the basis for POSIX mutexes when these are
-not the default for a particular version of Windows (eg. W9x).
-
-      pthread_mutexattr_setforcecs_np
-
-For example, if you don't ever use pthread_mutex_trylock() in your
-application.
       
 Availability
 ------------ 

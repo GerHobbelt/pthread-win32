@@ -104,6 +104,7 @@ pthread_join (pthread_t thread, void **value_ptr)
       *              0               'thread' has completed
       *              EINVAL          thread is not a joinable thread,
       *              ESRCH           no thread could be found with ID 'thread',
+      *              ENOENT          thread couldn't find it's own valid handle,
       *              EDEADLK         attempt to join thread with self
       *
       * ------------------------------------------------------
@@ -113,6 +114,10 @@ pthread_join (pthread_t thread, void **value_ptr)
   pthread_t self;
 
   self = pthread_self ();
+  if (self == NULL)
+    {
+       return ENOENT;
+    }
 
   if (pthread_equal (self, thread) != 0)
     {

@@ -212,6 +212,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
       *              ENOSPC          a required resource has been exhausted,
       *              ENOSYS          semaphores are not supported,
       *              EPERM           the process lacks appropriate privilege
+      *              ENOENT          the thread couldn't find it's own handle
       *
       * ------------------------------------------------------
       */
@@ -227,6 +228,10 @@ pthread_setspecific (pthread_key_t key, const void *value)
        * thread if one wasn't explicitly created
        */
       self = pthread_self ();
+      if (self == NULL)
+	{
+	  return ENOENT;
+	}
     }
   else
     {
