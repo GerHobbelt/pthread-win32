@@ -8,6 +8,8 @@
 
 #include <windows.h>
 #include <process.h>
+#include <string.h>
+
 #include "pthread.h"
 #include "implement.h"
 
@@ -84,6 +86,7 @@ pthread_create(pthread_t *thread,
 	  attr_copy->canceltype = attr->canceltype;
 	  attr_copy->detached = attr->detached;
 	  attr_copy->priority = attr->priority;
+	  memcpy(attr_copy.sigmask, attr.sigmask, sizeof(sigset_t)); 
 	}
 
       /* Start running, not suspended. */

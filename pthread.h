@@ -22,6 +22,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef _PTHREADS_H
 #define _PTHREADS_H
 
+#ifdef HAVE_SIGNAL_H
+#include <signal.h>
+#endif /* HAVE_SIGNAL_H */
+
+#ifndef SIG_BLOCK
+#define SIG_BLOCK 0
+#endif /* SIG_BLOCK */
+
+#ifndef SIG_UNBLOCK 
+#define SIG_BLOCK 1
+#endif /* SIG_UNBLOCK */
+
+#ifndef SIG_SETMASK
+#define SIG_SETMASK 2
+#endif /* SIG_SETMASK */
+
 #define PTHREAD_THREADS_MAX 128
 #define PTHREAD_STACK_MIN   65535
 
@@ -71,6 +87,10 @@ typedef struct {
 
   int canceltype;                    /* PTHREAD_CANCEL_ASYNCHRONOUS
 					PTHREAD_CANCEL_DEFERRED */
+
+#ifdef HAVE_SIGSET_T
+  sigset_t sigmask;
+#endif /* HAVE_SIGSET_T */
 
   int priority;
 
@@ -242,6 +262,12 @@ int pthread_setspecific(pthread_key_t key, void *value);
 void *pthread_getspecific(pthread_key_t key);
 
 int pthread_key_delete(pthread_key_t key);
+
+/* Signal handling. */
+
+int pthread_sigmask(int how,
+		    const sigset_t *set,
+		    sigset_t *oset);
 
 #ifdef __cplusplus
 }
