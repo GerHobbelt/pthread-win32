@@ -555,6 +555,12 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
 	}
     }
 
+  if (result == 0)
+    {
+      mx->ownerThread = pthread_self();
+      mx->lockCount++;
+    }
+
   return(result);
 }
 
@@ -578,13 +584,43 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
    */
   if (mx != (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
     {
-      if (mx->mutex == 0)
+      pthread_t self = pthread_self();
+
+      if (pthread_equal(mx->ownerThread, self) == 0)
 	{
-	  LeaveCriticalSection(&mx->cs);
+	  int oldCount = mx->lockCount;
+	  pthread_t oldOwner = mx->ownerThread;
+
+	  if (mx->lockCount > 0)
+	    {
+	      mx->lockCount--;
+	    }
+
+	  if (mx->lockCount == 0)
+	    {
+	      mx->ownerThread = NULL;
+	    }
+	      
+	  if (mx->mutex == 0)
+	    {
+	      LeaveCriticalSection(&mx->cs);
+	    }
+	  else
+	    {
+	      if (!ReleaseMutex(mx->mutex))
+		{
+		  result = EINVAL;
+		  /*
+		   * Put things back the way they were.
+		   */
+		  mx->lockCount = oldCount;
+		  mx->ownerThread = oldOwner;
+		}
+	    }
 	}
       else
 	{
-	  result = (ReleaseMutex (mx->mutex) ? 0 : EINVAL);
+	  result = EPERM;
 	}
     }
   else
@@ -641,6 +677,12 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
 			: EINVAL);
 	    }
 	}
+    }
+
+  if (result == 0)
+    {
+      mx->ownerThread = pthread_self();
+      mx->lockCount++;
     }
 
   return(result);

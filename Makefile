@@ -53,15 +53,21 @@ VSE:
 	@ nmake /nologo EHFLAGS="$(VSEFLAGS)" pthreadVSE.dll
 
 realclean: clean
-	del *.dll
-	del *.lib
+	@ for %%ext in (dll lib) do \
+		if exist *.%%ext del *.%%ext
+
+#	del *.dll
+#	del *.lib
 
 clean:
-	del *.obj
-	del *.ilk
-	del *.pdb
-	del *.exp
-	del *.o
+	@ for %%ext in (obj ilk pdb exp o) do \
+		if exist *.%%ext del *.%%ext
+
+#	if exist *.obj del *.obj
+#	if exist *.ilk del *.ilk
+#	if exist *.pdb del *.pdb
+#	if exist *.exp del *.exp
+#	if exist *.o del *.o
 
 
 install: $(DLLS)

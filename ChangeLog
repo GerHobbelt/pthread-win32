@@ -40,6 +40,29 @@
 	* FAQ: Update Answer 6 re getting a fully working
 	Mingw32 built library.
 
+2000-10-10  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+ 
+        * misc.c (pthread_self): Restore Win32 "last error"
+        cleared by TlsGetValue() call in
+        pthread_getspecific()
+        - "Steven Reddie" <smr@essemer.com.au>
+ 
+2000-09-20  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+ 
+        * mutex.c (pthread_mutex_lock): Record the owner
+        of the mutex. This requires also keeping count of
+        recursive locks ourselves rather than leaving it
+        to Win32 since we need to know when to NULL the
+        thread owner when the mutex is unlocked.
+        (pthread_mutex_trylock): Likewise.
+        (pthread_mutex_unlock): Check that the calling
+        thread owns the mutex, decrement the recursive
+        lock count, and NULL the owner if zero. Return
+        EPERM if the mutex is owned by another thread.
+        * implement.h (pthread_mutex_t_): Add ownerThread
+        and lockCount members.
+        - reported by Arthur Kantor <akantor@bexusa.com>
+
 2000-09-13  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* mutex.c (pthread_mutex_init): Call
