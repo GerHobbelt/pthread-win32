@@ -1,3 +1,11 @@
+2002-07-30  Alexander Terekhov  <TEREKHOV@de.ibm.com>
+
+	* pthread_cond_wait.c (ptw32_cond_wait_cleanup): 
+	Remove code designed to avoid/prevent spurious wakeup
+	problems. It is believed that the sem_timedwait() call
+	is consuming a CV signal that it shouldn't and this is
+	breaking the avoidance logic.
+
 2002-07-30  Ross Johnson  <rpj@ise.canberra.edu.au>
 
 	* sem_timedwait.c (sem_timedwait): Tighten checks for
@@ -6,6 +14,13 @@
 
 	* w32_CancelableWait.c (ptw32_cancelable_wait):
 	Tighten up return value checking and add comments.
+
+
+2002-06-08  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* sem_getvalue.c (sem_getvalue): Now returns a value for the
+	NEED_SEM version (i.e. earlier versions of WinCE).
+
 
 2002-06-04  Rob Fanner  <rfanner@stonethree.com>
 

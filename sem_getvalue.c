@@ -84,10 +84,13 @@ sem_getvalue(sem_t * sem, int * sval)
     }
   else
     {
-
+			register sem_t s = *sem;
+			
 #ifdef NEED_SEM
 
-      result = ENOSYS;
+			EnterCriticalSection(&s->sem_lock_cs);
+			value = s->value;
+			LeaveCriticalSection(&s->sem_lock_cs);
 
 #else
 
@@ -121,7 +124,7 @@ sem_getvalue(sem_t * sem, int * sval)
        * decrement/increment it inside of sem_wait() and sem_post()
        * etc using the Interlocked* functions.
        */
-      if ( WaitForSingleObject( (*sem)->sem, 0 ) == WAIT_TIMEOUT )
+      if ( WaitForSingleObject( s->sem, 0 ) == WAIT_TIMEOUT )
 				{
 					/* Failed - must be zero */
 					value = 0;
@@ -129,7 +132,7 @@ sem_getvalue(sem_t * sem, int * sval)
       else
 				{
 					/* Decremented semaphore - release it and note the value */
-					(void) ReleaseSemaphore( (*sem)->sem, 1L, &value);
+					(void) ReleaseSemaphore( s->sem, 1L, &value);
 					value++;
 				}
 
