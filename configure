@@ -945,7 +945,7 @@ else
 #include "confdefs.h"
 
 int main() {
-int _stdcall foo();
+int __stdcall foo();
 ; return 0; }
 EOF
 if { (eval echo configure:952: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
@@ -964,7 +964,7 @@ echo "$ac_t""$p32_cv_stdcall" 1>&6
 
 if test x$p32_cv_stdcall = xyes ; then
   cat >> confdefs.h <<\EOF
-#define STDCALL _stdcall
+#define STDCALL __stdcall
 EOF
 
 else
