@@ -130,6 +130,10 @@ main()
     {
       rc = pthread_create(&thread[t], NULL, mythread, (void *) (t + 1));
       printf("pthread_create returned %d\n", rc);
+      if (rc != 0)
+	{
+	  return 1;
+	}
     }
 
   (void) pthread_once(&key_once, make_key);
@@ -143,6 +147,10 @@ main()
     {
       rc = pthread_create(&thread[t], NULL, mythread, (void *) (t + 1));
       printf("pthread_create returned %d\n", rc);
+      if (rc != 0)
+	{
+	  return 1;
+	}
     }
 
   Sleep(2000);

@@ -12,9 +12,20 @@ pthread_mutex_t mutex1;
 int
 main()
 {
-  pthread_mutex_init(&mutex1, NULL);
-  pthread_mutex_lock(&mutex1);
-  pthread_mutex_unlock(&mutex1);
+  if (pthread_mutex_init(&mutex1, NULL) != 0)
+    {
+      return 1;
+    }
+
+  if (pthread_mutex_lock(&mutex1) != 0)
+    {
+      return 1;
+    }
+
+  if (pthread_mutex_unlock(&mutex1) != 0)
+    {
+      return 1;
+    }
 
   return 0;
 }

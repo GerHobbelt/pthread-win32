@@ -23,9 +23,13 @@ main()
   int rc;
   pthread_t t;
 
-  rc = pthread_create(&t, NULL, entry, NULL);
-  assert(rc == 0);
+  if (pthread_create(&t, NULL, entry, NULL) != 0)
+    {
+      return 1;
+    }
 
   Sleep(2000);
+
+  /* Success. */
   return 0;
 }

@@ -1,3 +1,9 @@
+/*
+ * Test for pthread_once().
+ *
+ * Depends on functions: pthread_create.
+ */
+
 #include <pthread.h>
 #include <stdio.h>
 
@@ -24,11 +30,15 @@ main()
   int rc;
   pthread_t t1, t2;
   
-  rc = pthread_create(&t1, NULL, mythread, NULL);
-  printf("pthread_create returned %d\n", rc);
+  if (pthread_create(&t1, NULL, mythread, NULL) != 0)
+    {
+      return 1;
+    }
 
-  rc = pthread_create(&t2, NULL, mythread, NULL);
-  printf("pthread_create returned %d\n", rc);
+  if (pthread_create(&t2, NULL, mythread, NULL) != 0)
+    {
+      return 1;
+    }
 
   Sleep(2000);
   return 0;

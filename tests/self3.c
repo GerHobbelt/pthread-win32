@@ -23,11 +23,15 @@ main()
   int rc;
   pthread_t t[2];
 
-  rc = pthread_create(&t[0], NULL, entry, (void *) 1);
-  assert(rc == 0);
+  if (pthread_create(&t[0], NULL, entry, (void *) 1) != 0)
+    {
+      return 1;
+    }
 
-  rc = pthread_create(&t[1], NULL, entry, (void *) 2);
-  assert(rc == 0);
+  if (pthread_create(&t[1], NULL, entry, (void *) 2) != 0)
+    {
+      return 1;
+    }
 
   Sleep(2000);
   return 0;

@@ -15,11 +15,15 @@ main()
 
   result = pthread_mutex_trylock(&mutex1);
   printf("pthread_mutex_trylock returned %s\n", error_string[result]);
+  if (result != 0)
+    {
+      return 1;
+    }
 
-  if (result == 0)
-  {
-    pthread_mutex_unlock(&mutex1);
-  }
+  if (pthread_mutex_unlock(&mutex1) != 0)
+    {
+      return 1;
+    }
 
   return 0;
 }
