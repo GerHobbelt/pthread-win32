@@ -1,5 +1,5 @@
 
-                 PTHREADS-WIN32 SNAPSHOT 1999-05-08
+                 PTHREADS-WIN32 SNAPSHOT 1999-05-30
                  ----------------------------------
        Web Site: http://sourceware.cygnus.com/pthreads-win32/
       FTP Site: ftp://sourceware.cygnus.com/pub/pthreads-win32
@@ -22,22 +22,18 @@ Please see the 'Acknowledgements' section at the end of this
 announcement for the list of contributors.
 
 
-Change Summary
---------------
-
-Some POSIX 1b functions which were internally supported are now
-available as exported functions:
-
-	sem_init
-	sem_destroy
-	sem_wait
-	sem_trywait
-	sem_post
-	sched_yield
-	sched_get_priority_min
-	sched_get_priority_max
+Change Summary (since the last snapshot)
+----------------------------------------
 
 Some minor bugs have been fixed. See the ChangeLog file for details.
+
+Some more POSIX 1b functions are now included but ony return an
+error (ENOSYS) if called. They are:
+
+	sem_open
+	sem_close
+	sem_unlink
+	sem_getvalue
 
 
 Level of standards conformance
@@ -58,6 +54,9 @@ The following POSIX 1003.1c 1995 options are not defined:
       _POSIX_THREAD_PRIO_PROTECT
       _POSIX_THREAD_PROCESS_SHARED
 
+The following POSIX 1003.1b option is defined:
+
+      _POSIX_SEMAPHORES
 
 The following functions are implemented:
 
@@ -133,10 +132,10 @@ The following functions are implemented:
       sem_post               (POSIX 1b)
       sem_wait               (POSIX 1b)
       sem_trywait            (POSIX 1b)
-      sem_open               (POSIX 1b - returns an error)
-      sem_close              (POSIX 1b - returns an error)
-      sem_unlink             (POSIX 1b - returns an error)
-      sem_getvalue           (POSIX 1b - returns an error)
+      sem_open               (POSIX 1b - returns an error ENOSYS)
+      sem_close              (POSIX 1b - returns an error ENOSYS)
+      sem_unlink             (POSIX 1b - returns an error ENOSYS)
+      sem_getvalue           (POSIX 1b - returns an error ENOSYS)
 
       ---------------------------
       RealTime Scheduling
@@ -236,9 +235,15 @@ Availability
 
 The prebuilt DLL, export libs (for both MSVC and Mingw32), and the header
 files (pthread.h, semaphore.h, sched.h) are available along with the
-complete source code at:
+complete source code.
+
+The source code can be found at:
 
 	ftp://sourceware.cygnus.com/pub/pthreads-win32
+
+and as individual source code files at
+
+	ftp://sourceware.cygnus.com/pub/pthreads-win32/source
 
 The pre-built DLL, export libraries and include files can be found at:
 
@@ -275,7 +280,8 @@ development, however, this is not turned on by default. We have not tested
 pthreads-win32 against Cygwin.
 
 Generally:
-For convenience, the following pre-built files are included in the package:
+For convenience, the following pre-built files are available on the FTP site
+(see above):
 
         pthread.h       - for POSIX 1c threads
         semaphore.h     - for POSIX 1b semaphores
@@ -345,7 +351,8 @@ Anders Norlander <anorland@hem2.passagen.se>
 Tor Lillqvist <tml@iki.fi>
 Kevin Ruland <Kevin.Ruland@anheuser-busch.com>
 
-      
+Others who have contributed patches are attributed in the ChangeLog file.
+
 Enjoy!
 
 Ross Johnson
