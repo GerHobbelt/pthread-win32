@@ -219,6 +219,10 @@ The following functions are implemented:
       pthread_attr_setschedparam  
       pthread_getschedparam
       pthread_setschedparam
+      pthread_getconcurrency
+      pthread_getconcurrency
+      pthread_attr_getscope
+      pthread_attr_setscope
       sched_get_priority_max (POSIX 1b)
       sched_get_priority_min (POSIX 1b)
       sched_yield            (POSIX 1b)
@@ -265,10 +269,8 @@ The following functions are not implemented:
       ---------------------------
       pthread_attr_getinheritsched
       pthread_attr_getschedpolicy
-      pthread_attr_getscope
       pthread_attr_setinheritsched
       pthread_attr_setschedpolicy
-      pthread_attr_setscope
       pthread_mutex_getprioceiling
       pthread_mutex_setprioceiling
       pthread_mutex_attr_getprioceiling

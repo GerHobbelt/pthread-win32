@@ -72,6 +72,32 @@ typedef enum {
 }
 PThreadDemise;
 
+
+/*
+ * ====================
+ * ====================
+ * Internal implementation of a critical section
+ * ====================
+ * ====================
+ */
+
+typedef struct ptw32_cs_t_ {
+  CRITICAL_SECTION cs;
+  LONG lock_idx;
+  int entered_count;
+  int valid;
+  pthread_t owner;
+} ptw32_cs_t;
+
+
+/*
+ * ====================
+ * ====================
+ * POSIX thread and attributes
+ * ====================
+ * ====================
+ */
+
 struct pthread_t_ {
   DWORD thread;
   HANDLE threadH;
@@ -122,8 +148,7 @@ struct pthread_attr_t_ {
 #define PTW32_OBJECT_INVALID   NULL
 
 struct pthread_mutex_t_ {
-  HANDLE mutex;
-  CRITICAL_SECTION cs;
+  ptw32_cs_t cs;
   int lockCount;
   pthread_t ownerThread;
 };
@@ -131,7 +156,7 @@ struct pthread_mutex_t_ {
 
 struct pthread_mutexattr_t_ {
   int pshared;
-  int forcecs;
+  int type;
 };
 
 
@@ -152,7 +177,7 @@ struct ThreadParms {
   void *arg;
 };
 
-
+#if 0
 struct pthread_cond_t_ {
   long waiters;                       /* # waiting threads             */
   pthread_mutex_t waitersLock;        /* Mutex that guards access to 
@@ -168,6 +193,22 @@ struct pthread_cond_t_ {
 					 or broadcasting               */
 };
 
+#else
+
+struct pthread_cond_t_ {
+  long            nWaitersBlocked;   /* Number of threads blocked */
+  long            nWaitersUnblocked; /* Number of threads unblocked */
+  long            nWaitersToUnblock; /* Number of threads to unblock */
+  sem_t           semBlockQueue;     /* Queue up threads waiting for the */
+                                     /*   condition to become signalled */
+  sem_t           semBlockLock;      /* Semaphore that guards access to */
+                                     /* waiters blocked count/block queue */
+                                     /* +-> Mandatory Sync.LEVEL-1 */
+  pthread_mutex_t mtxUnblockLock;    /* Mutex that guards access to */
+                                     /* waiters (to)unblock(ed) counts */
+                                     /* +-> Optional* Sync.LEVEL-2 */
+};                                   /* Opt*) for _timedwait and cancellation */
+#endif
 
 struct pthread_condattr_t_ {
   int pshared;

@@ -27,30 +27,6 @@
 #include "implement.h"
 
 /*
- * pthread_mutexattr_setforcecs_np()
- *
- * Allows an application to force the library to use
- * critical sections rather than win32 mutexes as
- * the basis for any mutexes that use "attr".
- *
- * Values for "forcecs" are defined in pthread.h
- */
-int
-pthread_mutexattr_setforcecs_np(pthread_mutexattr_t *attr,
-				int forcecs)
-{
-  if (attr == NULL || *attr == NULL)
-    {
-      /* This is disallowed. */
-      return EINVAL;
-    }
-
-  (*attr)->forcecs = forcecs;
-
-  return 0;
-}
-
-/*
  * pthread_getw32threadhandle_np()
  *
  * Returns the win32 thread handle that the POSIX

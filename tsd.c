@@ -322,6 +322,12 @@ pthread_getspecific (pthread_key_t key)
       * ------------------------------------------------------
       */
 {
-  return (TlsGetValue (key->key));
+  int lasterror = GetLastError();
+
+  void *ptr = TlsGetValue(key->key);
+
+  SetLastError(lasterror);
+
+  return (ptr);
 }
 

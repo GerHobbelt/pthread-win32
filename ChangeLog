@@ -1,3 +1,33 @@
+2001-02-06  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* condvar.c (pthread_cond_init): Completely revamped.
+	(pthread_cond_destroy): Likewise.
+	(ptw32_cond_wait_cleanup): Likewise.
+	(ptw32_cond_timedwait): Likewise.
+	(ptw32_cond_unblock): New general signaling routine.
+	(pthread_cond_signal): Now calls ptw32_cond_unblock.
+	(pthread_cond_broadcast): Likewise.
+	implement.h (pthread_cond_t_): Revamped.
+	README.CV: New; explanation of the above changes.
+	- Alexander Terekhov <TEREKHOV@de.ibm.com>
+
+2001-02-05  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* sched.c (pthread_getconcurrency): New no-op function.
+	* sched.c (pthread_setconcurrency): New no-op function.
+	* sched.c (pthread_attr_getscope): New no-op function.
+	* sched.c (pthread_attr_setscope): New no-op function.
+	* sched.c (ENOSUP): Removed define and changed references
+	to use ENOTSUP.
+	* pthread.h (PTHREAD_SCOPE_SYSTEM): Defined.
+	* pthread.h (PTHREAD_SCOPE_PROCESS): Defined.
+	* pthread.h (ENOTSUP): Defined - not defined by Win32.
+
+2001-01-10  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* rwlock.c (ptw32_rwlock_cancelwrwait): Renamed.
+	(ptw32_rwlock_cancelrdwait): Renamed.
+
 2000-12-29  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* Makefile: Back-out "for" loops which don't work.

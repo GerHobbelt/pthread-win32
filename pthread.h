@@ -35,157 +35,7 @@
  *              POSIX 1003.1c-1995      (POSIX.1c)
  *
  * Authors:
- *      Contributors are listed in the file "MAINTAINERS".
- *
- * The following functions are implemented:
- *      ---------------------------
- *      PThreads
- *      ---------------------------
- *      pthread_attr_init
- *      pthread_attr_destroy
- *      pthread_attr_getdetachstate
- *      pthread_attr_getstackaddr
- *      pthread_attr_getstacksize
- *      pthread_attr_setdetachstate     
- *      pthread_attr_setstackaddr
- *      pthread_attr_setstacksize
- *
- *      pthread_create
- *      pthread_detach
- *      pthread_equal
- *      pthread_exit
- *      pthread_join
- *      pthread_self
- *      sched_yield
- *
- *      pthread_cancel
- *      pthread_cleanup_pop
- *      pthread_cleanup_push
- *      pthread_setcancelstate
- *      pthread_setcanceltype
- *      pthread_testcancel
- *
- *      ---------------------------
- *      Thread Specific Data
- *      ---------------------------
- *      pthread_key_create
- *      pthread_key_delete
- *      pthread_setspecific
- *      pthread_getspecific
- *
- *      ---------------------------
- *      Mutexes
- *      ---------------------------
- *      pthread_mutexattr_init
- *      pthread_mutexattr_destroy
- *      pthread_mutexattr_getpshared
- *      pthread_mutexattr_setpshared
- *
- *      pthread_mutex_init
- *      pthread_mutex_destroy
- *      pthread_mutex_lock
- *      pthread_mutex_trylock
- *      pthread_mutex_unlock
- *
- *      ---------------------------
- *      Condition Variables
- *      ---------------------------
- *      pthread_condattr_init
- *      pthread_condattr_destroy
- *      pthread_condattr_getpshared
- *      pthread_condattr_setpshared
- *
- *      pthread_cond_init
- *      pthread_cond_destroy
- *      pthread_cond_wait
- *      pthread_cond_timedwait
- *      pthread_cond_signal
- *      pthread_cond_broadcast
- *
- *      ---------------------------
- *      Protected Methods
- *      ---------------------------
- *      pthreadCancelableWait
- *
- *      ---------------------------
- *      RealTime Scheduling:
- *      ---------------------------
- *      pthread_attr_getschedparam
- *      pthread_attr_setschedparam
- *      pthread_getschedparam
- *      pthread_setschedparam
- *      sched_get_priority_max
- *      sched_get_priority_min
- *
- *      ---------------------------
- *      Signals:
- *      ---------------------------
- *      pthread_sigmask
- *
- *      ---------------------------
- *      Read/Write Locks:
- *      ---------------------------
- *      pthread_rwlock_init
- *      pthread_rwlock_destroy
- *      pthread_rwlock_tryrdlock
- *      pthread_rwlock_trywrlock
- *      pthread_rwlock_rdlock
- *      pthread_rwlock_rwlock
- *      pthread_rwlock_unlock
- *
- * Limitations
- * ===========
- *      The following functions are not implemented:
- *
- *      ---------------------------
- *      RealTime Scheduling:
- *      ---------------------------
- *      pthread_attr_getinheritsched
- *      pthread_attr_getschedpolicy
- *      pthread_attr_getscope
- *      pthread_attr_setinheritsched
- *      pthread_attr_setschedpolicy
- *      pthread_attr_setscope
- *      pthread_mutex_getprioceiling
- *      pthread_mutex_setprioceiling
- *      pthread_mutex_attr_getprioceiling
- *      pthread_mutex_attr_getprotocol
- *      pthread_mutex_attr_setprioceiling
- *      pthread_mutex_attr_setprotocol
- *
- *      ---------------------------
- *      Fork Handlers:
- *      ---------------------------
- *      pthread_atfork
- *
- *      ---------------------------
- *      Stdio:
- *      ---------------------------
- *      flockfile
- *      ftrylockfile
- *      funlockfile
- *      getc_unlocked
- *      getchar_unlocked
- *      putc_unlocked
- *      putchar_unlocked
- *
- *      ---------------------------
- *      Thread-Safe C Runtime Library:
- *      ---------------------------
- *      readdir_r
- *      getgrgid_r
- *      getgrnam_r
- *      getpwuid_r
- *      getpwnam_r
- *
- *      ---------------------------
- *      Signals:
- *      ---------------------------
- *      pthread_kill
- *      sigtimedwait
- *      sigwait
- *      sigwaitinfo
- *
+ *      Contributors are listed in the file "CONTRIBUTORS".
  *
  * -------------------------------------------------------------
  */
@@ -265,6 +115,14 @@ struct timespec {
  */
 #ifndef ETIMEDOUT
 #define ETIMEDOUT 10060     /* This is the value in winsock.h. */
+#endif
+
+/*
+ * If ENOTSUP is not defined, define it to a value that will never occur.
+ * This is the value used in the Win32 TCL port.
+ */
+#ifndef ENOTSUP
+#define ENOTSUP  -1030507
 #endif
 
 #ifdef __MINGW32__
@@ -495,10 +353,20 @@ typedef struct pthread_rwlockattr_t_ *pthread_rwlockattr_t;
 #define PTHREAD_PROCESS_SHARED		1
 
 /*
- * pthread_mutexattr_setforcecs_np
+ * pthread_mutexattr_(get,set}type
  */
-#define PTHREAD_MUTEX_AUTO_CS_NP        0
-#define PTHREAD_MUTEX_FORCE_CS_NP       1
+#define PTHREAD_MUTEX_DEFAULT           0
+#define PTHREAD_MUTEX_NORMAL            1
+#define PTHREAD_MUTEX_ERRORCHECK        2
+#define PTHREAD_MUTEX_RECURSIVE         3
+
+/*
+ * pthread_attr_(get,set}scope
+ *
+ * PTHREAD_SCOPE_PROCESS is the only scope supported.
+ */
+#define PTHREAD_SCOPE_SYSTEM  0
+#define PTHREAD_SCOPE_PROCESS 1
 
 /*
  * ====================
@@ -555,6 +423,14 @@ struct sched_param {
   int sched_priority;
 };
 
+
+/*
+ * ====================
+ * ====================
+ * Cancelation cleanup
+ * ====================
+ * ====================
+ */
 
 /* There are three implementations of cancel cleanup.
  * Note that pthread.h is included in both application
@@ -878,6 +754,19 @@ int pthread_attr_getschedparam (const pthread_attr_t *attr,
 int pthread_attr_setschedparam (pthread_attr_t *attr,
 				const struct sched_param *param);
 
+int
+pthread_setconcurrency (int);
+
+int
+pthread_getconcurrency (void);
+
+int
+pthread_attr_setscope (const pthread_attr_t *, int);
+
+int
+pthread_attr_getscope (const pthread_attr_t *,
+                       int *);
+
 /*
  * Read-Write Lock Functions
  */
@@ -904,10 +793,10 @@ int pthread_rwlock_unlock(pthread_rwlock_t *lock);
 /* Possibly supported by other POSIX threads implimentations */
 int pthread_delay_np (struct timespec * interval);
 
-/* Pthread Win32 specific */
-int pthread_mutexattr_setforcecs_np(pthread_mutexattr_t *attr,
-				    int forcecs);
-
+/*
+ * Returns the Win32 thread HANDLE associated
+ * with the given POSIX thread.
+ */
 HANDLE pthread_getw32threadhandle_np(pthread_t thread);
 
 /*

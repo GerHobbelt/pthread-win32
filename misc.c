@@ -142,36 +142,9 @@ pthread_self (void)
       * ------------------------------------------------------
       */
 {
-  pthread_t self = NULL;
-  DWORD lastErr;
+  pthread_t self;
 
-  /*
-   * Need to ensure there always is a self.
-   *
-   * The following call to pthread_getspecific uses TlsGetValue.
-   * Win32 functions that return indications of failure call SetLastError when
-   * they fail. They generally do not call SetLastError when they succeed. The
-   * TlsGetValue function is an exception to this general rule. The TlsGetValue
-   * function calls SetLastError to clear a thread's last error when it
-   * succeeds.
-   *
-   * We restore the last error if TlsGetValue succeeds.
-   */
-  lastErr = GetLastError();
   self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
-  if (GetLastError() == NO_ERROR)
-    {
-      SetLastError(lastErr);
-    }
-  else
-    {
-      /*
-       * What else can we do? GetLastError will tell the
-       * the caller more but this is not supposed to
-       * happen.
-       */
-      return(NULL);
-    }
 
   if (self == NULL)
     {

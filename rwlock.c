@@ -231,7 +231,7 @@ pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
 }
 
 static void
-_rwlock_cancelrdwait(void * arg)
+ptw32_rwlock_cancelrdwait(void * arg)
 {
     pthread_rwlock_t rw;
 
@@ -286,7 +286,7 @@ pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
     while (rw->rw_refcount < 0 || rw->rw_nwaitwriters > 0)
       {
         rw->rw_nwaitreaders++;
-        pthread_cleanup_push(_rwlock_cancelrdwait, rw);
+        pthread_cleanup_push(ptw32_rwlock_cancelrdwait, rw);
         result = pthread_cond_wait(&(rw->rw_condreaders), &(rw->rw_lock));
         pthread_cleanup_pop(0);
         rw->rw_nwaitreaders--;
@@ -309,7 +309,7 @@ FAIL1:
 }
 
 static void
-_rwlock_cancelwrwait(void * arg)
+ptw32_rwlock_cancelwrwait(void * arg)
 {
     pthread_rwlock_t rw;
 
@@ -360,7 +360,7 @@ pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
     while (rw->rw_refcount != 0)
       {
         rw->rw_nwaitwriters++;
-        pthread_cleanup_push(_rwlock_cancelwrwait, rw);
+        pthread_cleanup_push(ptw32_rwlock_cancelwrwait, rw);
         result = pthread_cond_wait(&(rw->rw_condwriters), &(rw->rw_lock));
         pthread_cleanup_pop(0);
         rw->rw_nwaitwriters--;

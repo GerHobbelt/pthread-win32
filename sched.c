@@ -23,7 +23,10 @@
  * MA 02111-1307, USA
  */
 
-#define ENOSUP 0
+/*
+ * If ENOTSUP is not defined, define it to a value that will never occur.
+ * This is the value used in the Win32 TCL port.
+ */
 
 #include "pthread.h"
 #include "implement.h"
@@ -63,7 +66,8 @@ pthread_attr_getschedparam(const pthread_attr_t *attr,
   return 0;
 }
 
-int pthread_setschedparam(pthread_t thread, int policy,
+int
+pthread_setschedparam(pthread_t thread, int policy,
 			  const struct sched_param *param)
 {
   /* Validate the thread id. */
@@ -81,7 +85,7 @@ int pthread_setschedparam(pthread_t thread, int policy,
   /* Ensure the policy is SCHED_OTHER. */
   if (policy != SCHED_OTHER)
     {
-      return ENOSUP;
+      return ENOTSUP;
     }
 
   /* Validate priority level. */
@@ -97,7 +101,8 @@ int pthread_setschedparam(pthread_t thread, int policy,
   return 0;
 }
 
-int pthread_getschedparam(pthread_t thread, int *policy,
+int
+pthread_getschedparam(pthread_t thread, int *policy,
 			  struct sched_param *param)
 {
   int prio;
@@ -129,6 +134,51 @@ int pthread_getschedparam(pthread_t thread, int *policy,
 }
 
 
+int
+pthread_setconcurrency(int level)
+{
+  if (level < 0)
+    {
+      return EINVAL;
+    }
+  else
+    {
+      return 0;
+    }
+}
+
+int
+pthread_getconcurrency(void)
+{
+  return 0;
+}
+
+int
+pthread_attr_setscope(pthread_attr_t *attr, int contentionscope)
+{
+#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
+  if (contentionscope != PTHREAD_SCOPE_SYSTEM)
+    {
+      return ENOTSUP;
+    }
+
+  return 0;
+#else
+  return ENOSYS;
+#endif
+}
+
+int
+pthread_attr_getscope(const pthread_attr_t *attr, int *contentionscope)
+{
+#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
+  *contentionscope = PTHREAD_SCOPE_SYSTEM;
+  return 0;
+#else
+  return ENOSYS;
+#endif
+}
+
 /*
  * On Windows98, THREAD_PRIORITY_LOWEST is (-2) and 
  * THREAD_PRIORITY_HIGHEST is 2, and everything works just fine.
@@ -144,7 +194,8 @@ int pthread_getschedparam(pthread_t thread, int *policy,
 #define sched_Max(a,b)  ((a)<(b)?(b):(a))
 #define sched_Min(a,b)  ((a)>(b)?(b):(a))
 
-int sched_get_priority_max(int policy)
+int
+sched_get_priority_max(int policy)
 {
   if (policy < SCHED_MIN || policy > SCHED_MAX)
     {
@@ -160,7 +211,8 @@ int sched_get_priority_max(int policy)
 #endif
 }
 
-int sched_get_priority_min(int policy)
+int
+sched_get_priority_min(int policy)
 {
   if (policy < SCHED_MIN || policy > SCHED_MAX)
     {
@@ -176,7 +228,8 @@ int sched_get_priority_min(int policy)
 #endif
 }
 
-int sched_yield(void)
+int
+sched_yield(void)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
