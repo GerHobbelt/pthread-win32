@@ -20,13 +20,8 @@ pthread_create(pthread_t *thread, const pthread_attr_t *attr,
      Map attributes as correctly as possible.
   */
   HANDLE handle;
-
-  /* FIXME: I don't have doco on attributes so these aren't
-     included yet. Threads will be started with Win32 defaults:
-     unsuspended and with default stack size.
-   */
-  DWORD  flags = 0;
-  DWORD  stack = 0;
+  DWORD  flags = 0; /* Always 0 for POSIX threads */
+  DWORD  stack = PTHREAD_STACK_MIN;
   LPSECURITY_ATTRIBUTES  security = NULL;
 
   /* FIXME: This needs to be moved into process space. 
@@ -48,6 +43,8 @@ pthread_create(pthread_t *thread, const pthread_attr_t *attr,
       break;
     default:
       /* Map attributes */
+      if (attr->stacksize != NULL)
+	stack = (DWORD) attr->stacksize;
       break;
     }
 
@@ -65,3 +62,4 @@ pthread_create(pthread_t *thread, const pthread_attr_t *attr,
   pthread_threads_count++;
   return 0;
 }
+

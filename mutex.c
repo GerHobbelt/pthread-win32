@@ -6,6 +6,7 @@
  */
 
 #include "pthread.h"
+#include "implement.h"
 
 static int
 insert_attr(pthread_mutexattr_t *attr)

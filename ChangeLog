@@ -1,3 +1,11 @@
+Mon Jul 13 01:09:55 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Wrap in #ifndef _IMPLEMENT_H
+
+	* create.c (pthread_create): Map stacksize attr to Win32.
+
+	* mutex.c: Include implement.h
+
 1998-07-13  Ben Elliston  <bje@cygnus.com>
 
 	* condvar.c (pthread_condattr_init): Implement.

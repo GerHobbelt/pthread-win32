@@ -16,7 +16,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 /* FIXME: do not include function prototypes for functions which are
-   not yet implemented.  This will allows us to keep a better handle on
+   not yet implemented.  This will allow us to keep a better handle on
    where we're at. */
 
 #ifndef _PTHREADS_H
@@ -106,9 +106,3 @@ int pthread_mutexattr_getprioceiling(const pthread_mutexattr_t *attr,
 #endif /* __cplusplus */
 
 #endif /* _PTHREADS_H */
-
-
-
-
-
-
