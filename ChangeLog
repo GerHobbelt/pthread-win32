@@ -1,5 +1,12 @@
 Thu Aug  6 15:19:22 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* sync.c (pthread_join): Remove target_thread_mutex and it's
+	initialisation. Rename getdetachedstate to getdetachstate.
+	Remove unused variable "exitcode".
+	(pthread_detach): Remove target_thread_mutex and it's
+	initialisation. Rename getdetachedstate to getdetachstate.
+	Rename setdetachedstate to setdetachstate.
+
 	* signal.c (pthread_sigmask): Rename SIG_SET to SIG_SETMASK.
 	Cast "set" to (long *) in assignment to passify compiler warning.
 	Add address-of operator & to thread->attr.sigmask in memcpy() call
