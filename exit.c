@@ -13,7 +13,7 @@
  * Code contributed by John E. Bossom <JEB>.
  */
 
-int
+void
 pthread_exit (void *value_ptr)
      /*
       * ------------------------------------------------------
@@ -40,10 +40,4 @@ pthread_exit (void *value_ptr)
   _pthread_callUserDestroyRoutines((pthread_t) pthread_getspecific(_pthread_selfThreadKey));
 
   _endthreadex ((unsigned) value_ptr);
-
-  return (0);
-
-}				/* pthread_exit */
-
-/* </JEB> */
-
+}

@@ -1,3 +1,10 @@
+1999-02-21  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.h (pthread_exit): The return type of this function is
+	void, not int.
+
+	* exit.c (pthread_exit): Do not return 0.
+
 Sat Feb 20 16:03:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* dll.c (DLLMain): Expand TryEnterCriticalSection support test.
