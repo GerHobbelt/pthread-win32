@@ -277,8 +277,8 @@ pthread_mutexattr_init (pthread_mutexattr_t * attr)
       * ------------------------------------------------------
       */
 {
-  pthread_mutexattr_t ma;
   int result = 0;
+  pthread_mutexattr_t ma;
 
   ma = (pthread_mutexattr_t) calloc (1, sizeof (*ma));
 
@@ -286,14 +286,15 @@ pthread_mutexattr_init (pthread_mutexattr_t * attr)
     {
       result = ENOMEM;
     }
+  else
+    {
+      ma->pshared = PTHREAD_PROCESS_PRIVATE;
+      ma->kind = PTHREAD_MUTEX_DEFAULT;
 
-  ma->pshared = PTHREAD_PROCESS_PRIVATE;
-  ma->kind = PTHREAD_MUTEX_DEFAULT;
+      *attr = ma;
+    }
 
-  *attr = ma;
-
-  return (result);
-
+  return(result);
 }                               /* pthread_mutexattr_init */
 
 
@@ -336,12 +337,9 @@ pthread_mutexattr_destroy (pthread_mutexattr_t * attr)
 
       *attr = NULL;
       free (ma);
-
-      result = 0;
     }
 
-  return (result);
-
+  return(result);
 }                               /* pthread_mutexattr_destroy */
 
 
@@ -386,13 +384,12 @@ pthread_mutexattr_getpshared (const pthread_mutexattr_t * attr,
       * ------------------------------------------------------
       */
 {
-  int result;
+  int result = 0;
 
   if ((attr != NULL && *attr != NULL) &&
       (pshared != NULL))
     {
       *pshared = (*attr)->pshared;
-      result = 0;
     }
   else
     {
