@@ -8,7 +8,7 @@
 #include "pthread.h"
 
 int
-pthread_cond_init(pthread_condattr_t *attr)
+pthread_condattr_init(pthread_condattr_t *attr)
 {
   if (attr == NULL)
     {
