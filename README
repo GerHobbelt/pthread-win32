@@ -67,6 +67,38 @@ There are a couple of reasons:
   useful to people who want to play with or study application
   behaviour under these conditions.
 
+Finally, for a proper version of the library with no internal
+exceptions to be usable with C++ applications, the C version
+should compiled as C++ so that it knows about and can propagate
+exceptions even if it doesn't use C++ features.
+
+
+Notes:
+
+[If you use either pthreadVCE or pthreadGCE]
+
+1. [See also the discussion in the FAQ file - Q2, Q4, and Q5]
+
+Due to what is believed to be a C++ compliance error in VC++ whereby
+you may not have multiple handlers for the same exception in the same
+try/catch block, if your application contains catch(...) blocks in your POSIX
+threads then you will need to replace the "catch(...)" with the macro
+"PtW32Catch", eg.
+
+	#ifdef PtW32Catch
+		PtW32Catch {
+			...
+		}
+	#else
+		catch(...) {
+			...
+		}
+	#endif
+
+Otherwise neither pthreads cancelation nor pthread_exit() will work
+reliably when using versions of the library that use C++ exceptions
+for cancelation and thread exit.
+
 
 Library naming
 --------------
@@ -105,12 +137,12 @@ where:
 	{SE,CE,C} indicates the exception handling scheme
 	SE	- Structured EH
 	CE	- C++ EH
-	C       - no exceptions - uses setjmp/longjmp
+	C	- no exceptions - uses setjmp/longjmp
 
 For example:
 	pthreadVSE.dll	(MSVC/SEH)
 	pthreadGCE.dll	(GNUC/C++ EH)
-	pthreadGC.dll   (GNUC/not dependent on exceptions)
+	pthreadGC.dll	(GNUC/not dependent on exceptions)
 
 The GNU library archive file names have changed to:
 
@@ -216,11 +248,11 @@ Building under VC++ using C++ EH, Structured EH, or just C
 
 From the source directory run one of the following:
 
-nmake clean VCE	(builds the VC++ C++ EH version pthreadVCE.dll)
+nmake clean VCE (builds the VC++ C++ EH version pthreadVCE.dll)
 
 or:
 
-nmake clean VSE	(builds the VC++ structured EH version pthreadVSE.dll)
+nmake clean VSE (builds the VC++ structured EH version pthreadVSE.dll)
 
 or:
 
@@ -241,7 +273,7 @@ nmake clean VC
 
 or:
 
-nmake clean VCX	(tests the VC version of the library with C++ (EH)
+nmake clean VCX (tests the VC version of the library with C++ (EH)
 			 applications)
 
 
@@ -304,8 +336,8 @@ from the FTP site (see under "Availability" below):
 	pthreadGCE.a	- derived from pthreadGCE.dll
 	pthreadGC.dll	- built with Mingw32 GCC
 	pthreadGC.a	- derived from pthreadGC.dll
-        gcc.dll         - needed to build and run applications that use
-                          pthreadGCE.dll.
+	gcc.dll 	- needed to build and run applications that use
+			  pthreadGCE.dll.
 
 
 Building applications with the library

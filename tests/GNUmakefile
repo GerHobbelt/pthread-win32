@@ -83,8 +83,7 @@ TESTS	= loadfree \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
 	  barrier1 barrier2 barrier3 barrier4 barrier5 \
-	  exception1 exception2 exception3 \
-	  exit4
+	  exception1 exception2 exception3
 
 BENCHTESTS = \
 	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
@@ -177,7 +176,6 @@ exception3.pass: exception2.pass
 exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass
-exit4.pass: exit3.pass
 eyal1.pass: tsd1.pass
 inherit1.pass: join1.pass
 join0.pass: create1.pass

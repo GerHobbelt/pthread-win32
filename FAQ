@@ -1,6 +1,6 @@
-                  =========================================
-                  PTHREADS-WIN32 Frequently Asked Questions
-                  =========================================
+		  =========================================
+		  PTHREADS-WIN32 Frequently Asked Questions
+		  =========================================
 
 INDEX
 -----
@@ -27,9 +27,8 @@ Q 8	How do I use pthread.dll for Win32 (Visual C++ 5.0)
 
 Q 9	Cancelation doesn't work for me, why?
 
-Q 10	Thread won't block after two calls to mutex_lock
-
-Q 11	How do I generate pthreadGCE.dll and libpthreadw32.a for use with Mingw32?
+Q 10	How do I generate pthreadGCE.dll and libpthreadw32.a for use
+	with Mingw32?
 
 =============================================================================
 
@@ -132,12 +131,12 @@ where:
 	{SE,CE,C} indicates the exception handling scheme
 	SE	- Structured EH
 	CE	- C++ EH
-	C       - no exceptions - uses setjmp/longjmp
+	C	- no exceptions - uses setjmp/longjmp
 
 For example:
 	pthreadVSE.dll	(MSVC/SEH)
 	pthreadGCE.dll	(GNUC/C++ EH)
-	pthreadGC.dll   (GNUC/not dependent on exceptions)
+	pthreadGC.dll	(GNUC/not dependent on exceptions)
 
 The GNU library archive file names have changed to:
 
@@ -267,7 +266,7 @@ Q 8	How do I use pthread.dll for Win32 (Visual C++ 5.0)
 ---	
 
 >
-> I'm a "rookie" when it comes to your pthread implementation.  I'm currently
+> I'm a "rookie" when it comes to your pthread implementation.	I'm currently
 > desperately trying to install the prebuilt .dll file into my MSVC compiler.
 > Could you please provide me with explicit instructions on how to do this (or
 > direct me to a resource(s) where I can acquire such information)?
@@ -309,10 +308,10 @@ Q 9	Cancelation doesn't work for me, why?
 > to cancel has PTHREAD_CANCEL_ASYNCHRONOUS, however, this piece of code
 > blocks on the join():
 >
->               if ((retv = Pthread_cancel( recvThread )) == 0)
->               {
->                       retv = Pthread_join( recvThread, 0 );
->               }
+>		if ((retv = Pthread_cancel( recvThread )) == 0)
+>		{
+>			retv = Pthread_join( recvThread, 0 );
+>		}
 >
 > Pthread_* are just macro's; they call pthread_*.
 >
@@ -361,21 +360,21 @@ Butenhof) it isn't part of POSIX.
 
 Effectively, the only cancelation points that pthreads-win32 can
 recognise are those the library implements itself, ie.
-        
-        pthread_testcancel
-        pthread_cond_wait
-        pthread_cond_timedwait
+	
+	pthread_testcancel
+	pthread_cond_wait
+	pthread_cond_timedwait
 	pthread_join
-        sem_wait
-        pthread_delay_np
+	sem_wait
+	pthread_delay_np
 
 Pthreads-win32 also provides two functions that allow you to create
 cancelation points within your application, but only for cases where
 a thread is going to block on a Win32 handle. These are:
 
-        pthreadCancelableWait(HANDLE waitHandle) /* Infinite wait */
+	pthreadCancelableWait(HANDLE waitHandle) /* Infinite wait */
  
-        pthreadCancelableTimedWait(HANDLE waitHandle, DWORD timeout)
+	pthreadCancelableTimedWait(HANDLE waitHandle, DWORD timeout)
 
 Regards.
 Ross
@@ -384,7 +383,7 @@ Ross
  
 
 Q 10	How do I create thread-safe applications using
-----    pthreadGCE.dll, libpthreadw32.a and Mingw32?
+----	pthreadGCE.dll, libpthreadw32.a and Mingw32?
 
 See Thomas Pfaff's email at:
 http://sources.redhat.com/ml/pthreads-win32/2002/msg00000.html
