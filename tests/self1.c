@@ -54,9 +54,16 @@ main(int argc, char * argv[])
 	 */
 	pthread_t self;
 
+#ifdef PTW32_STATIC_LIB
+	pthread_win32_process_attach_np();
+#endif
+
 	self = pthread_self();
 
 	assert(self.p != NULL);
 
+#ifdef PTW32_STATIC_LIB
+	pthread_win32_process_detach_np();
+#endif
 	return 0;
 }

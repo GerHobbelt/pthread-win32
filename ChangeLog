@@ -1,3 +1,9 @@
+2005-04-01  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* GNUmakefile: Add target to build libpthreadGC1.a as a static link
+	library.
+	* Makefile: Likewise for pthreadGC1.lib.
+
 2005-04-01  Kevin Lussier <Kevin at codegreennetworks.com>
 
 	* sem_timedwait.c (sem_timedwait): Increase size of temp variables to
@@ -14,12 +20,12 @@
 
 2005-03-16  Ross Johnson  <ross at callisto.canberra.edu.au>^M
 
-        * pthread_setcancelstate.c: Undo the last change.
+	* pthread_setcancelstate.c: Undo the last change.
 
 2005-03-16  Ross Johnson  <ross at callisto.canberra.edu.au>^M
 
-        * pthread_setcancelstate.c: Don't check for an async cancel event
-        if the library is using alertable async cancel..
+	* pthread_setcancelstate.c: Don't check for an async cancel event
+	if the library is using alertable async cancel..
 
 2005-03-14  Ross Johnson  <ross at callisto.canberra.edu.au>
 

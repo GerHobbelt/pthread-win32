@@ -74,7 +74,6 @@ COPYFILES	= $(HDR) $(LIB) $(DLL) $(QAPC)
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
-XTESTS	= once3 
 TESTS	= sizes loadfree \
 	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  semaphore1 semaphore2 semaphore3 \
@@ -108,8 +107,12 @@ TESTS	= sizes loadfree \
 BENCHTESTS = \
 	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
 
+STATICTESTS = \
+	self1
+
 PASSES		= $(TESTS:%=%.pass)
 BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
+STATICRESULTS	= $(STATICTESTS:%=%.pass)
 
 help:
 	@ $(ECHO) "Run one of the following command lines:"
@@ -118,6 +121,7 @@ help:
 	@ $(ECHO) "make clean GCE   (to test using GCE dll with C++ (EH) applications)"
 	@ $(ECHO) "make clean GC-bench	  (to benchtest using GNU C dll with C cleanup code)"
 	@ $(ECHO) "make clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "make clean GC-static   (to test using GC static lib with C (no EH) applications)"
 
 all:
 	@ $(MAKE) clean GC
@@ -139,11 +143,19 @@ GC-bench:
 GCE-bench:
 	$(MAKE) TEST=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
 
+GC-static:
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
+
 all-pass: $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
 all-bench: $(BENCHRESULTS)
 	@ $(ECHO) BENCH TESTS COMPLETED.
+
+all-static: $(STATICRESULTS)
+	@ $(ECHO) ALL STATIC TESTS PASSED! Congratulations!
+	@ $(ECHO) Build and test the DLL to run all tests.
+	@ $(ECHO) This test only confirms that the static lib links correctly.
 
 benchtest1.bench:
 benchtest2.bench:
@@ -332,4 +344,5 @@ clean:
 	- $(RM) *.exe
 	- $(RM) *.pass
 	- $(RM) *.bench
+	- $(RM) *.static
 	- $(RM) *.log
