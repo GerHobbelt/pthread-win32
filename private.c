@@ -73,46 +73,6 @@
    Once taken from _pthread_virgins[], used and freed threads are only
    ever pushed back onto _pthread_reuse[].
 
-   The code for choosing a new (pthread_t) thread from the pool of
-   free thread structs looks like:
-
-   if (_pthread_reuse_top >= 0)
-     {
-       new_thread = _pthread_reuse[_pthread_reuse_top--];
-     }
-   else
-     {
-       if (_pthread_virgin_next < PTHREAD_THREADS_MAX)
-	 {
-	   new_thread = _pthread_virgin[_pthread_virgin_next++];
-	 }
-       else
-	 {
-	   return EAGAIN;
-	 }
-     }
-
-
-   The code to free a thread is:
-
-   _pthread_reuse[++_pthread_reuse_top] = thread;
-
-
-   We still need a means for pthread_self() to return its own thread
-   ID.
-
-   We use the Win32 Thread Local Storage mechanism. A single call to
-   TlsAlloc() will make available a single 32 bit location to every
-   thread in the process, including those created after the call is
-   made.
-
-   Provided we don't need to call pthread_self() after the Win32
-   thread has terminated we can use the DLL entry point routine to
-   initialise TLS for each thread. Or we can use pthread_once() in
-   pthread_create() to do it.
-
-   We can use either option. We'll use the DLL entry point routine.
-
  */
 
 int
@@ -150,6 +110,7 @@ _pthread_new_thread(pthread_t * thread)
   new_thread->forkchildstack = NULL;
 
   *thread = new_thread;
+  _pthread_threads_count++;
 
   return 0;
 }
@@ -170,10 +131,10 @@ _pthread_delete_thread(_pthread_t * thread)
       thread->ptstatus = _PTHREAD_REUSE;
 
       _pthread_reuse[++_pthread_reuse_top] = thread;
+      _pthread_threads_count--;
+
+      return 0;
     }
-  else
-    {
-      return EINVAL;
-    }
-  return 0;
+
+  return EINVAL;
 }

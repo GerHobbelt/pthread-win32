@@ -60,5 +60,8 @@ pthread_mutex_t _pthread_threads_mutex_table[_PTHREAD_MAX_THREADS];
 /* Global TSD key array. */
 _pthread_tsd_key_t _pthread_tsd_key_table[_POSIX_THREAD_KEYS_MAX];
 
+/* Mutex lock for TSD operations */
+pthread_mutex_t _pthread_tsd_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 /* Index to the next available TSD key. */
 int _pthread_tsd_key_next = 0;

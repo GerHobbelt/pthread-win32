@@ -83,7 +83,7 @@ pthread_join(pthread_t thread, void ** valueptr)
 
       thread->join_count++;
 
-      pthread_mutex_lock(&_pthread_table_mutex);
+      pthread_mutex_unlock(&_pthread_table_mutex);
       /* END CRITICAL SECTION */
 
       /* CANCELATION POINT */
@@ -138,7 +138,7 @@ pthread_join(pthread_t thread, void ** valueptr)
 	  ret = _pthread_delete_thread(thread);
 	}
 
-      pthread_mutex_lock(&_pthread_table_mutex);
+      pthread_mutex_unlock(&_pthread_table_mutex);
       /* END CRITICAL SECTION */
 
       return ret;

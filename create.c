@@ -72,7 +72,7 @@ pthread_create(pthread_t *thread,
 
   ret = _pthread_new_thread(&new_thread);
 
-  pthread_mutex_lock(&_pthread_table_mutex);
+  pthread_mutex_unlock(&_pthread_table_mutex);
   /* END CRITICAL SECTION */
 
   if (ret == 0)
@@ -134,7 +134,7 @@ pthread_create(pthread_t *thread,
       /* Remove the failed thread entry. */
       _pthread_delete_thread(new_thread);
 
-      pthread_mutex_lock(&_pthread_table_mutex);
+      pthread_mutex_unlock(&_pthread_table_mutex);
       /* END CRITICAL SECTION */
     }
 

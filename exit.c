@@ -18,9 +18,6 @@ _pthread_vacuum(void)
   _pthread_handler_pop_all(_PTHREAD_CLEANUP_STACK, 
 			   _PTHREAD_HANDLER_EXECUTE);
 
-  /* Run all TSD key destructors. */
-  _pthread_destructor_pop_all();
-
   /* Pop any atfork handlers without executing them. */
   _pthread_handler_pop_all(_PTHREAD_FORKPREPARE_STACK, 
 			   _PTHREAD_HANDLER_NOEXECUTE);
@@ -44,7 +41,7 @@ _pthread_exit(pthread_t thread, void * value, int return_code)
      to any joining threads. */
   thread->joinvalueptr = value;
 
-  pthread_mutex_lock(&_pthread_table_mutex);
+  pthread_mutex_unlock(&_pthread_table_mutex);
   /* END CRITICAL SECTION */
 
   _pthread_vacuum();
@@ -64,7 +61,7 @@ _pthread_exit(pthread_t thread, void * value, int return_code)
       (void) _pthread_delete_thread(thread);
     }
 
-  pthread_mutex_lock(&_pthread_table_mutex);
+  pthread_mutex_unlock(&_pthread_table_mutex);
   /* END CRITICAL SECTION */
 
   _endthreadex(return_code);

@@ -1,3 +1,26 @@
+Wed Oct 14 21:09:24 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* private.c (_pthread_new_thread): Increment _pthread_threads_count.
+	(_pthread_delete_thread): Decrement _pthread_threads_count.
+	Remove some comments.
+
+	* exit.c (_pthread_exit): : Fix two pthread_mutex_lock() calls that
+ 	should have been pthread_mutex_unlock() calls.
+	(_pthread_vacuum): Remove call to _pthread_destructor_pop_all().
+
+	* create.c (pthread_create): Fix two pthread_mutex_lock() calls that
+ 	should have been pthread_mutex_unlock() calls.
+
+	* global.c (_pthread_tsd_mutex): Add mutex for TSD operations.
+
+	* tsd.c (pthread_key_create): Add critical section.
+	(pthread_setspecific): Ditto.
+	(pthread_getspecific): Ditto.
+	(pthread_key_delete): Ditto.
+
+	* sync.c (pthread_join): Fix two pthread_mutex_lock() calls that
+ 	should have been pthread_mutex_unlock() calls.
+
 Mon Oct 12 00:00:44 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* implement.h (_pthread_tsd_key_table): New.
