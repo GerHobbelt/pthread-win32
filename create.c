@@ -6,6 +6,8 @@
  * thread.
  */
 
+#include <errno.h>
+
 #include <windows.h>
 #include <process.h>
 #include <string.h>

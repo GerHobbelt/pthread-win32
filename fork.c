@@ -5,6 +5,9 @@
  * Implementation of fork() for POSIX threads.
  */
 
+/* FIXME! */
+#define ENOMEM 0
+
 #include "pthread.h"
 #include "implement.h"
 

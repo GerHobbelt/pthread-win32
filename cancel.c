@@ -5,6 +5,8 @@
  * POSIX thread functions related to thread cancellation.
  */
 
+#include <errno.h>
+
 #include "pthread.h"
 #include "implement.h"
 

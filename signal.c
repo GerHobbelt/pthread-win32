@@ -5,8 +5,12 @@
  * POSIX thread-aware signal functions.
  */
 
+#include <errno.h>
+
 #include "pthread.h"
 #include "implement.h"
+
+#ifdef HAVE_SIGSET_T
 
 int
 pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
@@ -70,3 +74,5 @@ pthread_sigmask(int how, const sigset_t *set, sigset_t *oset)
 
   return 0;
 }
+
+#endif /* HAVE_SIGSET_T */

@@ -5,6 +5,10 @@
  * POSIX thread functions that deal with thread scheduling.
  */
 
+#define ENOSUP 0
+
+#include <errno.h>
+
 #include "pthread.h"
 #include "implement.h"
 

@@ -6,6 +6,8 @@
  * the implementation and may be used throughout it.
  */
 
+#include <errno.h>
+
 #include "pthread.h"
 #include "implement.h"
 
