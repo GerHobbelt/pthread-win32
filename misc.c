@@ -172,19 +172,19 @@ pthread_equal (pthread_t t1, pthread_t t2)
       *
       *
       * DESCRIPTION
-      *      This function returns zero if t1 and t2 are equal, else
-      *      returns nonzero.
+      *      This function returns nonzero if t1 and t2 are equal, else
+      *      returns zero.
       *
       * RESULTS
-      *              0               if t1 and t2 refer to the same thread,
-      *              non-zero        t1 and t2 do not refer to the same thread
+      *              non-zero        if t1 and t2 refer to the same thread,
+      *              0               t1 and t2 do not refer to the same thread
       *
       * ------------------------------------------------------
       */
 {
   int result;
 
-  result = !((t1 == t2) || (t1->thread == t2->thread));
+  result = ((t1 == t2) && (t1->thread == t2->thread));
 
   return (result);
 

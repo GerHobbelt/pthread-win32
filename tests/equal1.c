@@ -14,7 +14,7 @@ main()
         int rc;
         pthread_t t1, t2;
         rc = pthread_create(&t1, NULL, func, (void *) 1);
-        rc = pthread_create(&t1, NULL, func, (void *) 2);
+        rc = pthread_create(&t2, NULL, func, (void *) 2);
 
 	puts("testing t1 and t2: ");
         if (pthread_equal(t1, t2))

@@ -1,5 +1,7 @@
 Sat Feb 18 16:2s1703:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* misc.c (pthread_equal): Fix inverted result.
+
 	* Makefile.in: Use libpthread32.a as the name of the DLL export
 	library instead of pthread.lib.
 
