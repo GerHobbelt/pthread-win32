@@ -12,10 +12,11 @@
 /* Thread ID management.
    ---------------------
 
-   We started by simply mapping the Win32 thread handle to directly to
-   pthread_t. Then, is order to process pthread_join()'s, needed to be
-   able to keep our POSIX thread ID (pthread_t) around after the Win32
-   thread has terminated and possibly reused the Win32 handle.
+   We started by simply mapping the Win32 thread handle directly to
+   pthread_t. However, in order to process pthread_join()'s, we need
+   to be able to keep our POSIX thread ID (pthread_t) around after the
+   Win32 thread has terminated. Win32 may reuse the Win32 handle during that
+   time, which will conflict.
 
    The pthread_t value is now actually the pointer to a thread struct:
 
@@ -47,7 +48,7 @@
 
    Having the thread ID as a pointer to the thread struct itself
    avoids the need to search the threads table in all but the initial
-   occation where we create the thread.
+   occasion where we create the thread.
 
    Initially we used a hash function to select a free thread struct
    from the table, possibly needing a walk through the table if the
@@ -73,20 +74,20 @@
    The code for choosing a new (pthread_t) thread from the pool of
    free thread structs looks like:
 
-   if (_pthread_reuse_top == -1)
+   if (_pthread_reuse_top >= 0)
      {
-       if (_pthread_virgin_next >= PTHREAD_THREADS_MAX)
-         {
-	   return EAGAIN;
-	 }
-       else
-         {
-	   thread = _pthread_virgin[_pthread_virgin_next++];
-	 }
+       new_thread = _pthread_reuse[_pthread_reuse_top--];
      }
    else
      {
-       thread = _pthread_reuse[_pthread_reuse_top--];
+       if (_pthread_virgin_next < PTHREAD_THREADS_MAX)
+	 {
+	   new_thread = _pthread_virgin[_pthread_virgin_next++];
+	 }
+       else
+	 {
+	   return EAGAIN;
+	 }
      }
 
 
@@ -101,20 +102,20 @@ _pthread_new_thread(pthread_t * thread)
 {
   pthread_t new_thread;
 
-  if (_pthread_reuse_top == -1)
+  if (_pthread_reuse_top >= 0)
     {
-      if (_pthread_virgin_next >= PTHREAD_THREADS_MAX)
-	{
-	  return EAGAIN;
-	}
-      else
-	{
-	  new_thread = _pthread_virgin[_pthread_virgin_next++];
-	}
+      new_thread = _pthread_reuse[_pthread_reuse_top--];
     }
   else
     {
-      new_thread = _pthread_reuse[_pthread_reuse_top--];
+      if (_pthread_virgin_next < PTHREAD_THREADS_MAX)
+	{
+	  new_thread = _pthread_virgin[_pthread_virgin_next++];
+	}
+      else
+	{
+	  return EAGAIN;
+	}
     }
 
   new_thread->win32handle = NULL;
