@@ -318,6 +318,11 @@ struct pthread_rwlockattr_t_
   int pshared;
 };
 
+enum ptw32_once_state {
+  PTW32_ONCE_CLEAR     = 0x0,
+  PTW32_ONCE_DONE      = 0x1,
+  PTW32_ONCE_CANCELLED = 0x2
+};
 
 typedef struct {
   pthread_cond_t cond;
@@ -478,7 +483,7 @@ extern CRITICAL_SECTION ptw32_cond_list_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
 extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
 extern CRITICAL_SECTION ptw32_spinlock_test_init_lock;
-extern ptw32_once_control_t ptw32_once_control;
+extern CRITICAL_SECTION ptw32_once_event_lock;
 
 #ifdef _UWIN
 extern int pthread_count;

@@ -37,8 +37,8 @@
  * See the README file for an explanation of the pthreads-win32 version
  * numbering scheme and how the DLL is named etc.
  */
-#define PTW32_VERSION 1,3,0,0
-#define PTW32_VERSION_STRING "1, 3, 0, 0\0"
+#define PTW32_VERSION 2,0,0,0
+#define PTW32_VERSION_STRING "2, 0, 0, 0\0"
 
 /* There are three implementations of cancel cleanup.
  * Note that pthread.h is included in both application
@@ -673,12 +673,14 @@ enum {
  * ====================
  * ====================
  */
-#define PTHREAD_ONCE_INIT       { PTW32_FALSE, -1 }
+#define PTHREAD_ONCE_INIT       { 0, PTW32_FALSE, 0, 0}
 
 struct pthread_once_t_
 {
-  volatile int done;        /* indicates if user function has been executed  */
+  int          state;        /* indicates if user function has been executed, or cancelled  */
   int          started;
+  int          eventUsers;
+  HANDLE       event;
 };
 
 

@@ -101,8 +101,7 @@ ptw32_processTerminate (void)
       /* 
        * Destroy the global locks and other objects.
        */
-      (void) pthread_cond_destroy(&ptw32_once_control.cond);
-      (void) pthread_mutex_destroy(&ptw32_once_control.mtx);
+      DeleteCriticalSection (&ptw32_once_event_lock);
       DeleteCriticalSection (&ptw32_spinlock_test_init_lock);
       DeleteCriticalSection (&ptw32_rwlock_test_init_lock);
       DeleteCriticalSection (&ptw32_cond_test_init_lock);

@@ -29,7 +29,7 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
-DLL_VER	= 1
+DLL_VER	= 2
 
 DEVROOT	= C:\PTHREADS
 
