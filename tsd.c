@@ -323,10 +323,12 @@ pthread_getspecific (pthread_key_t key)
       */
 {
   int lasterror = GetLastError();
+  int lastWSAerror = WSAGetLastError();
 
   void *ptr = TlsGetValue (key->key);
 
   SetLastError( lasterror );
+  WSASetLastError( lastWSAerror );
 
   return ptr;
 }

@@ -1,3 +1,10 @@
+2001-08-23  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	Contributed by - "Phil Frisbie, Jr." <phil@hawksoft.com>
+
+	* tsd.c (pthread_getspecific): Preserve the last
+	winsock error [from WSAGetLastError()].
+
 2001-07-18  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	Contributed by - "Scott McCaskill" <scott@magruder.org>
