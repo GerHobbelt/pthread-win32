@@ -95,6 +95,22 @@
 
    _pthread_reuse[++_pthread_reuse_top] = thread;
 
+
+   We still need a means for pthread_self() to return its own thread
+   ID.
+
+   We use the Win32 Thread Local Storage mechanism. A single call to
+   TlsAlloc() will make available a single 32 bit location to every
+   thread in the process, including those created after the call is
+   made.
+
+   Provided we don't need to call pthread_self() after the Win32
+   thread has terminated we can use the DLL entry point routine to
+   initialise TLS for each thread. Or we can use pthread_once() in
+   pthread_create() to do it.
+
+   We can use either option. We'll use the DLL entry point routine.
+
  */
 
 int
@@ -134,12 +150,6 @@ _pthread_new_thread(pthread_t * thread)
   *thread = new_thread;
 
   return 0;
-}
-
-pthread_t
-_pthread_find_thread((HANDLE) win32handle)
-{
-  /* FIXME: No-op at present */
 }
 
 int

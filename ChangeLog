@@ -1,3 +1,23 @@
+Thu Jul 30 23:12:45 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Remove _pthread_find_entry() prototype.
+
+	* private.c: Extend comments.
+	Remove _pthread_find_entry() - no longer needed.
+
+	* create.c (_pthread_start_call): Add call to TlsSetValue() to
+	store the thread ID.
+
+	* dll.c (PthreadsEntryPoint): Implement. This is called
+	whenever a process loads the DLL. Used to initialise thread
+	local storage.
+
+	* implement.h: Add _pthread_threadID_TlsIndex.
+	Add ()s around _PTHREAD_VALID expression.
+
+	* misc.c (pthread_self): Re-implement using Win32 TLS to store
+	the threads own ID.
+
 Wed Jul 29 11:39:03 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* private.c: Corrections in comments.

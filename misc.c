@@ -44,23 +44,16 @@ pthread_once(pthread_once_t *once_control,
 pthread_t
 pthread_self(void)
 {
-  /* It looks like a pthread_t needs to be a HANDLE, but Win32 also has
-     another way of identifying threads: their thread id.  We hope
-     that all of the Win32 functions we are going to use only need
-     HANDLEs.  The morons. */
+  pthread_t ret;
+ 
+  ret = (pthread_t) TlsGetValue(_pthread_threadID_TlsIndex);
 
-  /* FIXME: Need a new lookup method with the new thread allocation
-     scheme.
+  if (ret == 0)
+    {
+      /* FIXME: Oh no! This can't happen. */
+    }
 
-     We can use the Win32 handle though as a basis (perhaps
-     to look up a table) because pthread_self() will never be called
-     after the Win32 thread has terminated (unless we can raise
-     ourselves from the dead!), and therefore the Win32 handle cannot
-     have been reused yet. */
-
-#if 0
-  return GetCurrentThread();
-#endif
+  return ret;
 }
 
 int
