@@ -1,3 +1,8 @@
+2002-02-20  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* pthread_cond_destroy.c (pthread_cond_destroy):
+	Enter the time change critical section earlier.
+
 2002-02-17  Ross Johnson  <rpj@setup1.ise.canberra.edu.au
 
 	* Testsuite passed.
