@@ -97,11 +97,9 @@ pthread_mutexattr_destroy(pthread_mutexattr_t *attr)
     {
       return EINVAL;
     }
-  else
-    {
-      free(attr->ptr);
-      return 0;
-    }
+
+  free(attr->ptr);
+  return 0;
 }
 
 int
