@@ -104,7 +104,6 @@ _pthread_new_thread(pthread_t * thread)
   new_thread->canceltype = PTHREAD_CANCEL_DEFERRED;
   new_thread->cancel_pending = FALSE;
   new_thread->cleanupstack = NULL;
-  new_thread->destructorstack = NULL;
   new_thread->forkpreparestack = NULL;
   new_thread->forkparentstack = NULL;
   new_thread->forkchildstack = NULL;

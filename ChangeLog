@@ -1,5 +1,8 @@
 Thu Oct 15 14:05:01 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* private.c (_pthread_new_thread): Remove init of destructorstack.
+	No longer an element of pthread_t.
+
 	* tsd.c (pthread_setspecific): Fix type declaration and cast.
 	(pthread_getspecific): Ditto.
 	(pthread_getspecific): Change error return value to NULL if key
