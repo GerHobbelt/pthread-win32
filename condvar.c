@@ -495,7 +495,6 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
     }
 
   cv->nWaitersBlocked   = 0;
-  cv->nWaitersUnblocked = 0;
   cv->nWaitersToUnblock = 0;
   cv->nWaitersGone      = 0;
 
@@ -658,7 +657,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
       /*
        * Check whether cv is still busy (still has waiters)
        */
-      if (cv->nWaitersBlocked - cv->nWaitersGone - cv->nWaitersUnblocked > 0)
+      if (cv->nWaitersBlocked > cv->nWaitersGone)
         {
           if (sem_post(&(cv->semBlockLock)) != 0)
             {
