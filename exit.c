@@ -61,12 +61,17 @@ pthread_exit (void *value_ptr)
    */
 
   self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
+  self->exitStatus = value_ptr;
 
   if (self == NULL || self->implicit)
     {
       _pthread_callUserDestroyRoutines(self);
 
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
       _endthreadex ((unsigned) value_ptr);
+#else
+      _endthread ();
+#endif
       
       /* Never reached */
     }
@@ -90,7 +95,6 @@ pthread_exit (void *value_ptr)
 
 #ifdef __cplusplus
 
-      self->exceptionInformation = value_ptr;
       throw Pthread_exception_exit();
 
 #else /* ! __cplusplus */
@@ -99,7 +103,11 @@ pthread_exit (void *value_ptr)
 
       _pthread_callUserDestroyRoutines(self);
 
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
       _endthreadex ((unsigned) value_ptr);
+#else
+      _endthread ();
+#endif
 
 #endif /* __cplusplus */
 

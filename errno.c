@@ -59,7 +59,7 @@ static int reallyBad    = ENOMEM;
 
 int * _errno( void )
 {
-  pthread_t       *self;
+  pthread_t       self;
   int             *result;
         
   if( ( self = pthread_self() ) == NULL )

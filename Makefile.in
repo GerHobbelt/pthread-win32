@@ -24,7 +24,7 @@ CC	= g++
 
 AR	= ar
 
-LD	= gcc -mdll -e _DllMain@12
+LD	= gcc -mdll
 
 OPT	= -g -O2
 

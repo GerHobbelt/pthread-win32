@@ -38,7 +38,7 @@ COPYFILES	= $(HDR) $(LIB) $(DLL)
 
 TESTS	= mutex1 condvar1 condvar2 exit1 create1 equal1 \
 	  exit2 exit3 \
-	  join1 mutex2 mutex3 \
+	  join1 join2 mutex2 mutex3 \
 	  count1 once1 tsd1 self1 self2 eyal1 \
 	  condvar3 condvar4 condvar5 condvar6 \
 	  errno1
@@ -60,6 +60,7 @@ equal1.pass: create1.pass
 exit2.pass: create1.pass
 exit3.pass: create1.pass
 join1.pass: create1.pass
+join2.pass: create1.pass
 count1.pass: join1.pass
 once1.pass: create1.pass
 tsd1.pass: join1.pass

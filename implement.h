@@ -27,6 +27,8 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
+#define PT_STDCALL __stdcall
+
 #include <semaphore.h>
 
 typedef enum {
@@ -77,9 +79,6 @@ struct pthread_t_ {
   sigset_t sigmask;
 #endif /* HAVE_SIGSET_T */
   int implicit:1;
-#ifdef __cplusplus
-  void * exceptionInformation;
-#endif
   void *keys;
 };
 
@@ -319,7 +318,12 @@ void _pthread_threadDestroy (pthread_t tid);
 
 void _pthread_cleanupStack (void);
 
-void *_pthread_threadStart (ThreadParms * threadParms);
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+unsigned PT_STDCALL
+#else
+void
+#endif
+_pthread_threadStart (ThreadParms * threadParms);
 
 void _pthread_callUserDestroyRoutines (pthread_t thread);
 
