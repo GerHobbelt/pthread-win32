@@ -1,5 +1,12 @@
 Thu Aug  6 15:19:22 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* cleanup.c (_pthread_destructor_pop_all): Add (int) cast to 
+	pthread_getspecific() arg.
+	(_pthread_destructor_pop): Add (void *) cast to "if" conditional.
+	(_pthread_destructor_push): Add (void *) cast to
+	_pthread_handler_push() "key" arg.
+	(malloc.h): Add include.
+
 	* implement.h (_pthread_destructor_pop): Add prototype.
 
 	* tsd.c (implement.h): Add include.
