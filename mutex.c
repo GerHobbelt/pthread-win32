@@ -197,6 +197,7 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
   if (result == 0)
     {
       mx->mutex = 0;
+      free(mx);
       *mutex = NULL;
     }
 
