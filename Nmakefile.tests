@@ -86,6 +86,7 @@ rwlock5_t::	rwlock5_t.c
 rwlock6_t::	rwlock6_t.c
 rwlock6_t2::	rwlock6_t2.c
 semaphore1::	semaphore1.c
+semaphore2::	semaphore2.c
 context1::	context1.c
 cancel3::	cancel3.c
 cancel4::	cancel4.c
@@ -119,6 +120,7 @@ benchtest5::    benchtest5.c
 
 loadfree:	:test:
 semaphore1	:test:	loadfree
+semaphore2	:test:	loadfree
 mutex5		:test:	loadfree
 mutex1		:test:	loadfree
 mutex2		:test:	loadfree

@@ -65,7 +65,7 @@ COPYFILES	= $(HDR) $(LIB) $(DLL)
 # stop.
 
 TESTS	= loadfree \
-	  semaphore1 self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
+	  semaphore1 semaphore2 self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 create1 equal1 \
 	  exit2 exit3 \
 	  join0 join1 join2 \
@@ -221,6 +221,7 @@ rwlock6_t2.pass: rwlock6_t.pass
 self1.pass:
 self2.pass: create1.pass
 semaphore1.pass:
+semaphore2.pass:
 spin1.pass:
 spin2.pass: spin1.pass
 spin3.pass: spin2.pass

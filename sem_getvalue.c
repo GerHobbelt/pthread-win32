@@ -4,14 +4,12 @@
  * Module: sem_getvalue.c
  *
  * Purpose:
- *	Semaphores aren't actually part of the PThreads standard.
+ *	Semaphores aren't actually part of PThreads.
  *	They are defined by the POSIX Standard:
  *
- *		POSIX 1003.1b-1993	(POSIX.1b)
+ *		POSIX 1003.1-2001
  *
  * -------------------------------------------------------------
- *
- * --------------------------------------------------------------------------
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
@@ -93,19 +91,24 @@ sem_getvalue(sem_t * sem, int * sval)
 #else
       long value = *sval;
  
-      /* Note:
-       *  The windows NT documentation says that the increment must be
-       *  greater than zero, but it is set to zero here. If this works,
-       *  the function will return true. If not, we can't do it this way
-       *  so flag it as not implemented.
-       */
+			/* From "Win32 System Programming - Second Edition"
+			 * by Johnson M Hart, chapter 9, page 256 :
+			 *
+			 * "The release count must be greater than zero, but if it
+			 * would cause the semaphore count to exceed the maximum,
+			 * the call will fail, returning FALSE, and the count will
+			 * remain unchanged. Releasing a semaphore with a large count
+			 * is a method used to obtain the current count atomically
+			 * (of course, another thread might change the value immediately)."
+			 */
 
-      if ( ReleaseSemaphore( (*sem)->sem, 0L, &value) )
+      if ( ! ReleaseSemaphore( (*sem)->sem, _POSIX_SEM_VALUE_MAX + 1, &value) )
         {
           *sval = value;
         }
       else
         {
+					/* This should NEVER occur. */
           result = ENOSYS;
         }
  

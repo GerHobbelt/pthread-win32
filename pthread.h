@@ -1,4 +1,4 @@
-/* This is the POSIX thread API (POSIX 1003).
+/* This is an implementation of the threads API of POSIX 1003.1-2001.
  *
  * --------------------------------------------------------------------------
  *
@@ -76,12 +76,14 @@
  *	Provides an implementation of PThreads based upon the
  *	standard:
  *
- *		POSIX 1003.1c-1995	(POSIX.1c)
+ *		POSIX 1003.1-2001
+ *  and
+ *    The Single Unix Specification version 3
  *
- *	Parts of the implementation also comply with the
- *	Open Group Unix 98 specification in order to enhance
- *	code portability between Windows, various commercial
- *	Unix implementations, and Linux.
+ *    (these two are equivalent)
+ *
+ *	in order to enhance code portability between Windows,
+ *  various commercial Unix implementations, and Linux.
  *
  *	See the ANNOUNCE file for a full list of conforming
  *	routines and defined constants, and a list of missing
@@ -283,8 +285,8 @@ extern "C"
 /*
  * -------------------------------------------------------------
  *
- * POSIX 1003.1c-1995 Options
- * ===========================
+ * POSIX 1003.1-2001 Options
+ * =========================
  *
  * _POSIX_THREADS (set)
  *			If set, you can use threads
@@ -350,11 +352,20 @@ extern "C"
  *			If set you can use the special *_r library
  *			functions that provide thread-safe behaviour
  *
+ * _POSIX_READER_WRITER_LOCKS (set)
+ *			If set, you can use read/write locks
+ *
+ * _POSIX_SPIN_LOCKS (set)
+ *			If set, you can use spin locks
+ *
+ * _POSIX_BARRIERS (set)
+ *			If set, you can use barriers
+ *
  *	+ These functions provide both 'inherit' and/or
  *	  'protect' protocol, based upon these macro
  *	  settings.
  *
- * POSIX 1003.1c-1995 Limits
+ * POSIX 1003.1-2001 Limits
  * ===========================
  *
  * PTHREAD_DESTRUCTOR_ITERATIONS
@@ -373,18 +384,13 @@ extern "C"
  *			Maximum number of threads supported per
  *			process (must be at least 64).
  *
+ * _POSIX_SEM_NSEMS_MAX
+ *      The maximum number of semaphores a process can have.
+ *      (only defined if not already defined)
  *
- * POSIX 1003.1j/D10-1999 Options
- * ==============================
- *
- * _POSIX_READER_WRITER_LOCKS (set)
- *			If set, you can use read/write locks
- *
- * _POSIX_SPIN_LOCKS (set)
- *			If set, you can use spin locks
- *
- * _POSIX_BARRIERS (set)
- *			If set, you can use barriers
+ * _POSIX_SEM_VALUE_MAX
+ *      The maximum value a semaphore can have.
+ *      (only defined if not already defined)
  *
  * -------------------------------------------------------------
  */
@@ -452,11 +458,16 @@ extern "C"
  *		constant should be set at DLL load time.
  *
  */
-#define PTHREAD_DESTRUCTOR_ITERATIONS			   4
-#define PTHREAD_KEYS_MAX				  64
-#define PTHREAD_STACK_MIN				   0
-#define PTHREAD_THREADS_MAX				2019
-
+#define PTHREAD_DESTRUCTOR_ITERATIONS			       4
+#define PTHREAD_KEYS_MAX                        64
+#define PTHREAD_STACK_MIN                        0
+#define PTHREAD_THREADS_MAX                   2019
+#ifndef _POSIX_SEM_NSEMS_MAX
+#  define _POSIX_SEM_NSEMS_MAX           (INT_MAX)
+#endif
+#ifndef _POSIX_SEM_VALUE_MAX
+#  define _POSIX_SEM_VALUE_MAX       (INT_MAX - 1)
+#endif
 
 #if __GNUC__ && ! defined (__declspec)
 # error Please upgrade your GNU compiler to one that supports __declspec.
