@@ -111,7 +111,14 @@ Known bugs in this snapshot
 3. This is an interim snapshot as there are still some additional
    patches to go in, eg. to fix problems with errno support under
    some circumstances. Some people are seeing compile warnings
-   to do with _errno.
+   to do with _errno. Sorry if this affects you but applying
+   people's suggested patches is causing compiles to fail for me. As
+   I believe this affects ports such as WinCE that I don't have
+   the tools for, I'd appreciate it if someone could give me
+   a definitive patch that works everywhere.
+
+4. Turning on /Ox optimisation in the VC++ compiler causes an
+   "invalid page fault" to be generated in the test condvar2.c.
 
 Caveats
 -------
@@ -206,7 +213,6 @@ The following functions are implemented:
                                         PTHREAD_MUTEX_NORMAL
                                         PTHREAD_MUTEX_ERRORCHECK
                                         PTHREAD_MUTEX_RECURSIVE  )
-
       pthread_mutex_init
       pthread_mutex_destroy
       pthread_mutex_lock
@@ -275,9 +281,9 @@ The following functions are implemented:
       ---------------------------
       Non-portable routines (see the README.NONPORTABLE file for usage)
       ---------------------------
-      pthread_mutexattr_setforcecs_np
       pthread_getw32threadhandle_np
       pthread_delay_np
+      pthread_mutex_setdefaulttype_np
       pthread_win32_process_attach_np
       pthread_win32_process_detach_np
       pthread_win32_thread_attach_np
@@ -393,13 +399,15 @@ Application Development Environments
 ------------------------------------
       
 MSVC:
-MSVC using SEH works.
-MSVC using C++ EH works.
+MSVC using SEH works. Distribute pthreadVSE.dll with your application.
+MSVC using C++ EH works. Distribute pthreadVCE.dll with your application.
 
 Mingw32:
 You need gcc-2.95.2-1 modified as per pthreads-win32 FAQ answer (6), with
 binutils-19990818-1 and msvcrt runtime-2000-03-27. Mingw32 must use
-the thread-safe MSVCRT library (see the FAQ).
+the thread-safe MSVCRT library (see the FAQ). You need to distribute
+the gcc.dll DLL from Mingw32 with your application (as well as
+pthreadGCE.dll of course).
 
 Cygwin: (http://sourceware.cygnus.com/cygwin/)
 Cygwin aims to provide a complete POSIX environment on top of Win32, including
@@ -424,7 +432,7 @@ For convenience, the following pre-built files are available on the FTP site
 	pthreadVCE.lib
 	pthreadVSE.dll	- built with MSVC compiler using SEH
 	pthreadVSE.lib
-	pthreadGCE.dll	- built with Mingw32 G++
+	pthreadGCE.dll	- built with Mingw32 G++ 2.95.2-1 
 	libpthreadw32.a	- derived from pthreadGCE.dll
 
 These are the only files you need in order to build POSIX threads

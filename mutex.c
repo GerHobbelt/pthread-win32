@@ -87,6 +87,32 @@ ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
 
 int
 pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      Initializes a mutex object with supplied or
+      *      default attributes.
+      *
+      * PARAMETERS
+      *      mutex
+      *              pointer to an instance of pthread_mutex_t
+      *      attr
+      *              pointer to an instance of pthread_mutexattr_t
+      *
+      *
+      * DESCRIPTION
+      *      Initializes a mutex object with supplied or
+      *      default attributes.
+      *
+      * RESULTS
+      *              0               successfully initialized attr,
+      *              EINVAL          not a valid mutex pointer,
+      *              ENOMEM          insufficient memory for attr,
+      *              ENOSYS          one or more requested attributes
+      *                              are not supported.
+      *
+      * ------------------------------------------------------
+      */
 {
   int result = 0;
   pthread_mutex_t mx;
@@ -104,8 +130,11 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
     }
 
   mx->lock_idx = -1;
-  mx->owner = NULL;
   mx->try_lock = 0;
+  mx->owner = NULL;
+  mx->waiters = 0;
+  mx->lastOwner = NULL;
+  mx->lastWaiter = NULL;
 
   if (attr != NULL && *attr != NULL)
     {
@@ -159,6 +188,27 @@ FAIL0:
 
 int
 pthread_mutex_destroy(pthread_mutex_t *mutex)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      Destroys a mutex object and returns any resources
+      *      to the system.
+      *
+      * PARAMETERS
+      *      mutex
+      *              pointer to an instance of pthread_mutex_t
+      *
+      * DESCRIPTION
+      *      Destroys a mutex object and returns any resources
+      *      to the system.
+      *
+      * RESULTS
+      *              0               successfully initialized attr,
+      *              EINVAL          not a valid mutex pointer,
+      *              EBUSY           the mutex is currently locked.
+      *
+      * ------------------------------------------------------
+      */
 {
   int result = 0;
   pthread_mutex_t mx;
@@ -497,6 +547,12 @@ pthread_mutexattr_settype (pthread_mutexattr_t * attr,
      /*
       * ------------------------------------------------------
       *
+      * DOCPUBLIC
+      * The pthread_mutexattr_settype() and
+      * pthread_mutexattr_gettype() functions  respectively set and
+      * get the mutex type  attribute. This attribute is set in  the
+      * type parameter to these functions.
+      *
       * PARAMETERS
       *      attr
       *              pointer to an instance of pthread_mutexattr_t
@@ -513,9 +569,9 @@ pthread_mutexattr_settype (pthread_mutexattr_t * attr,
       *                      PTHREAD_MUTEX_RECURSIVE
       *
       * DESCRIPTION
-      * The pthread_mutexattr_gettype() and
-      * pthread_mutexattr_settype() functions  respectively get and
-      * set the mutex type  attribute. This attribute is set in  the
+      * The pthread_mutexattr_settype() and
+      * pthread_mutexattr_gettype() functions  respectively set and
+      * get the mutex type  attribute. This attribute is set in  the
       * type  parameter to these functions. The default value of the
       * type  attribute is  PTHREAD_MUTEX_DEFAULT.
       * 
@@ -614,6 +670,38 @@ pthread_mutexattr_gettype (pthread_mutexattr_t * attr,
 
 int
 pthread_mutex_lock(pthread_mutex_t *mutex)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      Locks an unlocked mutex. If the mutex is already
+      *      locked, the calling thread usually blocks, but
+      *      depending on the current owner and type of the mutex
+      *      may recursively lock the mutex or return an error.
+      *
+      * PARAMETERS
+      *      mutex
+      *              pointer to an instance of pthread_mutex_t
+      *
+      * DESCRIPTION
+      *      Locks an unlocked mutex. If the mutex is already
+      *      locked, the calling thread usually blocks, but
+      *      depending on the current owner and type of the mutex
+      *      may recursively lock the mutex or return an error.
+      *
+      *      See the description under pthread_mutexattr_settype()
+      *      for details.
+      *
+      * RESULTS
+      *              0               successfully locked mutex,
+      *              EINVAL          not a valid mutex pointer,
+      *              ENOMEM          insufficient memory to initialise
+      *                              the statically declared mutex object,
+      *              EDEADLK         the mutex is of type
+      *                              PTHREAD_MUTEX_ERRORCHECK and the
+      *                              calling thread already owns the mutex.
+      *
+      * ------------------------------------------------------
+      */
 {
   int result = 0;
   pthread_mutex_t mx;
@@ -644,57 +732,196 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
         {
         case PTHREAD_MUTEX_DEFAULT:
         case PTHREAD_MUTEX_RECURSIVE:
-          if (InterlockedIncrement(&mx->lock_idx) > 0)
+          while (TRUE)
             {
-              while (mx->try_lock)
+              if (0 == InterlockedIncrement(&mx->lock_idx))
                 {
-                  Sleep(0);
+                  /*
+                   * Ensure that we give other waiting threads a
+                   * chance to take the mutex if we held it last time.
+                   */
+                  if (InterlockedIncrement(&mx->waiters) > 0
+                      && mx->lastOwner == self)
+                    {
+                      /*
+                       * Check to see if other waiting threads
+                       * have stopped waiting but haven't decremented
+                       * the 'waiters' counter - ie. they may have been
+                       * canceled. If we're wrong then waiting threads will
+                       * increment the value again.
+                       */
+                      if (mx->lastWaiter == self)
+                        {
+                          (void) InterlockedExchange(&mx->waiters, 0L);
+                        }
+                      else
+                        {
+                          goto WAIT_RECURSIVE;
+                        }
+                    }
+LOCK_RECURSIVE:
+                  /*
+                   * Take the lock.
+                   */
+                  mx->owner = self;
+                  mx->lastOwner = self;
+                  mx->lastWaiter = NULL;
+                  break;
                 }
-
-              while (mx->lock_idx > 0 && mx->owner != self)
+              else
                 {
+                  while (mx->try_lock)
+                    {
+                      Sleep(0);
+                    }
+
+                  if (mx->owner == self)
+                    {
+                      goto LOCK_RECURSIVE;
+                    }
+WAIT_RECURSIVE:
+                  InterlockedIncrement(&mx->waiters);
+                  mx->lastWaiter = self;
+                  InterlockedDecrement(&mx->lock_idx);
                   Sleep(0);
+                  /*
+                   * Thread priorities may have tricked another
+                   * thread into thinking we weren't waiting anymore.
+                   * If so, waiters will equal 0 so set it to 1
+                   * before we decrement it.
+                   */
+                  if (InterlockedDecrement(&mx->waiters) < 0)
+                    {
+                      InterlockedExchange(&mx->waiters, 0);
+                    }
                 }
             }
-          mx->owner = self;
           break;
         case PTHREAD_MUTEX_NORMAL:
           /*
            * If the thread already owns the mutex
            * then the thread will become deadlocked.
            */
-          while (InterlockedIncrement(&mx->lock_idx) > 0)
+          while (TRUE)
             {
-              InterlockedDecrement(&mx->lock_idx);
-              Sleep(0);
-            }
-          mx->owner = self;
-          break;
-        case PTHREAD_MUTEX_ERRORCHECK:
-          if (0 == InterlockedIncrement(&mx->lock_idx))
-            {
-              mx-owner = self;
-            }
-          else
-            {
-              while (mx->try_lock)
+              if (0 == InterlockedIncrement(&mx->lock_idx))
                 {
-                  Sleep(0);
-                }
-
-              while (mx->lock_idx > 0 && mx->owner != self)
-                {
-                  Sleep(0);
-                }
-
-              if (mx->owner == self)
-                {
-                  InterlockedDecrement(&mx->lock_idx);
-                  result = EDEADLK;
+                  /*
+                   * Ensure that we give other waiting threads a
+                   * chance to take the mutex if we held it last time.
+                   */
+                  if (InterlockedIncrement(&mx->waiters) > 0
+                      && mx->lastOwner == self)
+                    {
+                      /*
+                       * Check to see if other waiting threads
+                       * have stopped waiting but haven't decremented
+                       * the 'waiters' counter - ie. they may have been
+                       * canceled.
+                       */
+                      if (mx->lastWaiter == self)
+                        {
+                          InterlockedExchange(&mx->waiters, 0L);
+                        }
+                      else
+                        {
+                          goto WAIT_NORMAL;
+                        }
+                    }
+                  /*
+                   * Take the lock.
+                   */
+                  mx->owner = self;
+                  mx->lastOwner = self;
+                  mx->lastWaiter = NULL;
+                  break;
                 }
               else
                 {
+                  while (mx->try_lock)
+                    {
+                      Sleep(0);
+                    }
+WAIT_NORMAL:
+                  InterlockedIncrement(&mx->waiters);
+                  mx->lastWaiter = self;
+                  InterlockedDecrement(&mx->lock_idx);
+                  Sleep(0);
+                  /*
+                   * Thread priorities may have tricked another
+                   * thread into thinking we weren't waiting anymore.
+                   * If so, waiters will equal 0 so set it to 1
+                   * before we decrement it.
+                   */
+                  if (InterlockedDecrement(&mx->waiters) < 0)
+                    {
+                      InterlockedExchange(&mx->waiters, 0);
+                    }
+                }
+            }
+          break;
+        case PTHREAD_MUTEX_ERRORCHECK:
+          while (TRUE)
+            {
+              if (0 == InterlockedIncrement(&mx->lock_idx))
+                {
+                  /*
+                   * Ensure that we give other waiting threads a
+                   * chance to take the mutex if we held it last time.
+                   */
+                  if (InterlockedIncrement(&mx->waiters) > 0
+                      && mx->lastOwner == self)
+                    {
+                      /*
+                       * Check to see if other waiting threads
+                       * have stopped waiting but haven't decremented
+                       * the 'waiters' counter - ie. they may have been
+                       * canceled.
+                       */
+                      if (mx->lastWaiter == self)
+                        {
+                          InterlockedExchange(&mx->waiters, 0L);
+                        }
+                      else
+                        {
+                          goto WAIT_ERRORCHECK;
+                        }
+                    }
+                  /*
+                   * Take the lock.
+                   */
                   mx->owner = self;
+                  mx->lastOwner = self;
+                  mx->lastWaiter = NULL;
+                  break;
+                }
+              else
+                {
+                  while (mx->try_lock)
+                    {
+                      Sleep(0);
+                    }
+
+                  if (mx->owner == self)
+                    {
+                      result = EDEADLK;
+                      break;
+                    }
+WAIT_ERRORCHECK:
+                  InterlockedIncrement(&mx->waiters);
+                  mx->lastWaiter = self;
+                  InterlockedDecrement(&mx->lock_idx);
+                  Sleep(0);
+                  /*
+                   * Thread priorities may have tricked another
+                   * thread into thinking we weren't waiting anymore.
+                   * If so, waiters will equal 0 so set it to 1
+                   * before we decrement it.
+                   */
+                  if (InterlockedDecrement(&mx->waiters) < 0)
+                    {
+                      InterlockedExchange(&mx->waiters, 0);
+                    }
                 }
             }
           break;
@@ -709,6 +936,32 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
 
 int
 pthread_mutex_unlock(pthread_mutex_t *mutex)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      Decrements the lock count of the currently locked mutex.
+      *
+      * PARAMETERS
+      *      mutex
+      *              pointer to an instance of pthread_mutex_t
+      *
+      * DESCRIPTION
+      *      Decrements the lock count of the currently locked mutex.
+      *
+      *      If the count reaches it's 'unlocked' value then it
+      *      is available to be locked by another waiting thread.
+      *      The implementation ensures that other waiting threads
+      *      get a chance to take the unlocked mutex before the unlocking
+      *      thread can re-lock it.
+      *
+      * RESULTS
+      *              0               successfully locked mutex,
+      *              EINVAL          not a valid mutex pointer,
+      *              EPERM           the current thread does not own
+      *                              the mutex.
+      *
+      * ------------------------------------------------------
+      */
 {
   int result = 0;
   pthread_mutex_t mx;
@@ -725,35 +978,29 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
    * race condition. If another thread holds the
    * lock then we shouldn't be in here.
    */
-  if (mx != (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
+  if (mx != (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT
+      && mx->owner == pthread_self())
     {
-      if (mx->owner == pthread_self())
-	{
-          switch (mx->type)
+      switch (mx->type)
+        {
+        case PTHREAD_MUTEX_NORMAL:
+        case PTHREAD_MUTEX_ERRORCHECK:
+          mx->owner = NULL;
+          break;
+        case PTHREAD_MUTEX_RECURSIVE:
+        default:
+          if (mx->lock_idx == 0)
             {
-            case PTHREAD_MUTEX_NORMAL:
-            case PTHREAD_MUTEX_ERRORCHECK:
               mx->owner = NULL;
-              break;
-            case PTHREAD_MUTEX_RECURSIVE:
-            default:
-              if (mx->lock_idx == 0)
-                {
-                  mx->owner = NULL;
-                }
-              break;
             }
-	      
-          InterlockedDecrement(&mx->lock_idx);
+          break;
         }
-      else
-	{
-	  result = EPERM;
-	}
+
+      InterlockedDecrement(&mx->lock_idx);
     }
   else
     {
-      result = EINVAL;
+      result = EPERM;
     }
 
   return result;
@@ -761,6 +1008,35 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
 
 int
 pthread_mutex_trylock(pthread_mutex_t *mutex)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      Tries to lock a mutex. If the mutex is already
+      *      locked (by any thread, including the calling thread),
+      *      the calling thread returns without waiting
+      *      for the mutex to be freed (nor recursively locking
+      *      the mutex if the calling thread currently owns it).
+      *
+      * PARAMETERS
+      *      mutex
+      *              pointer to an instance of pthread_mutex_t
+      *
+      * DESCRIPTION
+      *      Tries to lock a mutex. If the mutex is already
+      *      locked (by any thread, including the calling thread),
+      *      the calling thread returns without waiting
+      *      for the mutex to be freed (nor recursively locking
+      *      the mutex if the calling thread currently owns it).
+      *
+      * RESULTS
+      *              0               successfully locked the mutex,
+      *              EINVAL          not a valid mutex pointer,
+      *              EBUSY           the mutex is currently locked,
+      *              ENOMEM          insufficient memory to initialise
+      *                              the statically declared mutex object.
+      *
+      * ------------------------------------------------------
+      */
 {
   int result = 0;
   pthread_mutex_t mx;
@@ -800,14 +1076,13 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
           if (0 == InterlockedIncrement(&mx->lock_idx))
             {
               mx->owner = self;
+              mx->lastOwner = self;
+              mx->lastWaiter = NULL;
             }
           else
             {
               InterlockedDecrement(&mx->lock_idx);
-              if (mx->owner == self)
-                {
-                  result = EBUSY;
-                }
+              result = EBUSY;
             }
 
           mx->try_lock--;

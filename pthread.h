@@ -887,8 +887,9 @@ int * _errno( void );
 	( *(_result) = *localtime( (_clock) ), \
 	  (_result) )
 
+/* The redundant test avoids unused variable warnings */
 #define rand_r( _seed ) \
-	rand()
+      ((seed == seed) ? rand() : rand())
 
 
 #ifdef __cplusplus

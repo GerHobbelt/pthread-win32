@@ -127,11 +127,14 @@ struct pthread_mutexattr_t_ {
 };
 
 struct pthread_mutex_t_ {
-  int lock_idx;
-  int try_lock;
+  long lock_idx;
+  long try_lock;
   int pshared;
   int type;
   pthread_t owner;
+  long waiters;                      /* These last elements ensure fairness */
+  pthread_t lastOwner;               /* and guard against canceled threads. */
+  pthread_t lastWaiter;
 };
 
 struct pthread_key_t_ {

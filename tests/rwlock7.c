@@ -10,7 +10,7 @@
 
 #define THREADS         5
 #define DATASIZE        15
-#define ITERATIONS      10000
+#define ITERATIONS      1000000
 
 /*
  * Keep statistics for each thread.
@@ -162,7 +162,7 @@ main (int argc, char *argv[])
 
   _ftime(&currSysTime2);
 
-  printf( "\nstart: %d/%d, stop: %d/%d, duration:%d\n",
+  printf( "\nstart: %ld/%d, stop: %ld/%d, duration:%ld\n",
           currSysTime1.time,currSysTime1.millitm,
           currSysTime2.time,currSysTime2.millitm,
           (currSysTime2.time*1000+currSysTime2.millitm) -

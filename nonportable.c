@@ -287,7 +287,7 @@ pthread_mutex_setdefaulttype_np (int newtype, int * oldtype)
 
   if (oldtype != NULL)
     {
-      *oldType = ptw32_mutex_mapped_default;
+      *oldtype = ptw32_mutex_mapped_default;
     }
 
   switch (newtype)

@@ -9,13 +9,24 @@
 	(ptw32_InitializeCriticalSection): Removed.
 	(ptw32_InitializeCriticalSection): Removed.
 	(pthread_mutex_init): Apply Thomas Pfaff's original
-	patches but altered slightly to avoid using
-	critical sections and retain/adapt for different
-	mutex types (see log entry for 2001-01-10).
+	patches; remove use of critical sections and adapt
+	for different mutex types (see log entry for 2001-01-10).
+	The disadvantage of using critical sections is that
+	they don't appear to be sharable between processes.
+	This implementation provides the opportunity to place
+	mutex objects in shared memory. Thread priority
+	determines the order in which waiting threads acquire
+	the mutex although the implementation includes a
+	mechanism to prevent threads hogging the mutex through
+	successive unlock/lock operations.
 	(pthread_mutex_destroy): Likewise.
 	(pthread_mutex_lock): Likewise.
 	(pthread_mutex_unlock): Likewise.
 	(pthread_mutex_trylock): Likewise.
+
+	* pthread.h (rand_r): Add redundant test of '_seed' arg
+	to avoid "unused variable" warnings. Any good compiler
+	will optimise the test away anyway.
 
 	* Tagged repository 'exp-2001-02-09-passed'.
 	

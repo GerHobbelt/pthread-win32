@@ -138,6 +138,7 @@ main()
 {
   int failed = 0;
   int i;
+  int ret;
   pthread_t t[NUMTHREADS + 1];
 
   assert((t[0] = pthread_self()) != NULL);
@@ -155,7 +156,9 @@ main()
    */
   Sleep(500);
 
-  assert(pthread_mutex_unlock(&waitLock) == 0);
+  ret = pthread_mutex_unlock(&waitLock);
+  assert(ret != EPERM);
+  assert(ret == 0);
 
   Sleep(500);
 
