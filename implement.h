@@ -19,7 +19,7 @@ typedef struct {
 } _pthread_attr_t;
 
 typedef struct {
-  int pshared;
+  /* Nothing needed yet. */
 } _pthread_mutexattr_t;
 
 typedef struct {
