@@ -12,26 +12,38 @@
 #include "implement.h"
 
 unsigned
-_pthread_start_call(void * call)
+_pthread_start_call(void * thisarg)
 {
   /* We're now in a running thread. Any local variables here are on
      this threads private stack so we're safe to leave data in them
      until we leave. */
-  _pthread_call_t * this;
+  _pthread_threads_thread__t * this = thisarg;
+  _pthread_call_t * call;
   unsigned (*func)(void *);
   void * arg;
   unsigned ret;
+  int from;
 
-  this = (_pthread_call_t *) call;
-  func = call->routine;
-  arg = call->arg;
+  func = this->call.routine;
+  arg = this->call.arg;
 
-  ret = (*func)(arg);
+  /* FIXME: Should we be using sigsetjmp() here instead. */
+  from = setjmp(this->call.env);
 
-  /* If we get to here then we're returning naturally and haven't
-     been cancelled. We need to cleanup and remove the thread
-     from the threads table. */
-  _pthread_vacuum();
+  if (from == 0)
+    {
+      ret = (*func)(arg);
+
+      _pthread_vacuum();
+    }
+  else
+    {
+      /* func() called pthread_exit() which called longjmp(). */
+      _pthread_vacuum();
+
+      /* Never returns. */
+      _endthreadex(0);
+    }
 
   return ret;
 }
@@ -75,7 +87,7 @@ pthread_create(pthread_t *thread,
       handle = (HANDLE) _beginthreadex(security,
 				       attr_copy->stacksize,
 				       _pthread_start_call,
-				       (void *) &(this->call),
+				       (void *) this,
 				       flags,
 				       &threadID);
 
