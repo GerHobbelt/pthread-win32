@@ -1,3 +1,15 @@
+2001-02-07  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* rwlock.c: Revamped.
+	This implementation does not have reader/writer starvation problem.
+	I've tried to make rwlock to behaive more like a normal mutex with
+	races and scheduling policy determining who is more important;
+	It also supports recursive locking,
+	has less synchronization overhead (no broadcasts at all,
+	readers are not blocked on any condition variable) and seem to
+	be faster than the current implementation.
+	- Alexander Terekhov <TEREKHOV@de.ibm.com>
+
 2001-02-06  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* condvar.c (pthread_cond_init): Completely revamped.

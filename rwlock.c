@@ -24,6 +24,7 @@
  */
 
 #include <errno.h>
+#include <limits.h>
 
 #include "pthread.h"
 #include "implement.h"
@@ -80,120 +81,140 @@ ptw32_rwlock_check_need_init(pthread_rwlock_t *rwlock)
 
   LeaveCriticalSection(&ptw32_rwlock_test_init_lock);
 
-  return(result);
+  return result;
 }
 
 int
 pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
 {
-    int result = 0;
-    pthread_rwlock_t rw;
+    int result;
+    pthread_rwlock_t rwl = 0;
 
     if (rwlock == NULL)
       {
         return EINVAL;
       }
 
-    rw = (pthread_rwlock_t) calloc(1, sizeof(*rw));
-
-    if (rw == NULL)
-      {
-        result = ENOMEM;
-        goto FAIL0;
-      }
-
-    if (attr != NULL
-        && *attr != NULL)
+    if (attr != NULL && *attr != NULL)
       {
         result = EINVAL; /* Not supported */
+        goto DONE;
+      }
+
+    rwl = (pthread_rwlock_t) calloc(1, sizeof(*rwl));
+
+    if (rwl == NULL)
+      {
+        result = ENOMEM;
+        goto DONE;
+      }
+
+    rwl->nSharedAccessCount = 0;
+    rwl->nExclusiveAccessCount = 0;
+    rwl->nCompletedSharedAccessCount = 0;
+
+    result = pthread_mutex_init(&rwl->mtxExclusiveAccess, NULL);
+    if (result != 0)
+      {
         goto FAIL0;
       }
 
-    if ((result = pthread_mutex_init(&(rw->rw_lock), NULL)) != 0)
+    result = pthread_mutex_init(&rwl->mtxSharedAccessCompleted, NULL);
+    if (result != 0)
       {
         goto FAIL1;
       }
 
-    if ((result = pthread_cond_init(&(rw->rw_condreaders), NULL)) != 0)
+    result = pthread_cond_init(&rwl->cndSharedAccessCompleted, NULL);
+    if (result != 0)
       {
         goto FAIL2;
       }
 
-    if ((result = pthread_cond_init(&(rw->rw_condwriters), NULL)) != 0)
-      {
-        goto FAIL3;
-      }
-
-    rw->rw_nwaitreaders = 0;
-    rw->rw_nwaitwriters = 0;
-    rw->rw_refcount = 0;
-    rw->rw_magic = RW_MAGIC;
+    rwl->nMagic = PTW32_RWLOCK_MAGIC;
 
     result = 0;
-    goto FAIL0;
-
-FAIL3:
-    (void) pthread_cond_destroy(&(rw->rw_condreaders));
+    goto DONE;
 
 FAIL2:
-    (void) pthread_mutex_destroy(&(rw->rw_lock));
+    (void) pthread_mutex_destroy(&(rwl->mtxSharedAccessCompleted));
 
 FAIL1:
-FAIL0:
-    *rwlock = rw;
+    (void) pthread_mutex_destroy(&(rwl->mtxExclusiveAccess));
 
-    return(result);
+FAIL0:
+    (void) free(rwl);
+    rwl = NULL;
+
+DONE:
+    *rwlock = rwl;
+
+    return result;
 }
 
 int
 pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
 {
-    pthread_rwlock_t rw;
-    int result = 0;
+    pthread_rwlock_t rwl;
+    int result = 0, result1 = 0, result2 = 0;
 
     if (rwlock == NULL || *rwlock == NULL)
       {
-        return(EINVAL);
+        return EINVAL;
       }
 
     if (*rwlock != (pthread_rwlock_t) PTW32_OBJECT_AUTO_INIT)
       {
-        rw = *rwlock;
+        rwl = *rwlock;
 
-        if (pthread_mutex_lock(&(rw->rw_lock)) != 0)
+        if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
           {
-            return(EINVAL);
+            return EINVAL;
           }
 
-        if (rw->rw_magic != RW_MAGIC)
+        if ((result = pthread_mutex_lock(&(rwl->mtxExclusiveAccess))) != 0)
           {
-            (void) pthread_mutex_unlock(&(rw->rw_lock));
-            return(EINVAL);
+            return result;
           }
 
-        if (rw->rw_refcount != 0
-            || rw->rw_nwaitreaders != 0
-            || rw->rw_nwaitwriters != 0)
+        if ((result = pthread_mutex_lock(&(rwl->mtxSharedAccessCompleted))) != 0)
           {
-            (void) pthread_mutex_unlock(&(rw->rw_lock));
-            result = EBUSY;
+            (void) pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
+            return result;
           }
-        else
+
+        /*
+         * Check whether any threads own/wait for the lock (wait for ex.access);
+         * report "BUSY" if so.
+         */
+        if (rwl->nExclusiveAccessCount > 0
+            || rwl->nSharedAccessCount > rwl->nCompletedSharedAccessCount)
           {
-            /*
-             * Need to NULL this before we start freeing up
-             * and destroying it's components.
-             */
-            *rwlock = NULL;
-            rw->rw_magic = 0;
+            result = pthread_mutex_unlock(&(rwl->mtxSharedAccessCompleted));
+            result1 = pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
+            result2 = EBUSY;
+          }
+        else 
+          {
+            rwl->nMagic = 0;
 
-            (void) pthread_mutex_unlock(&(rw->rw_lock));
+            if ((result = pthread_mutex_unlock(&(rwl->mtxSharedAccessCompleted))) != 0)
+              {
+                pthread_mutex_unlock(&rwl->mtxExclusiveAccess);
+                return result;
+              }
 
-            (void) pthread_cond_destroy(&(rw->rw_condreaders));
-            (void) pthread_cond_destroy(&(rw->rw_condwriters));
-            (void) pthread_mutex_destroy(&(rw->rw_lock));
-            free(rw);
-           }
+            if ((result = pthread_mutex_unlock(&(rwl->mtxExclusiveAccess))) != 0)
+              {
+                return result;
+              }
+
+            *rwlock = NULL; /* Invalidate rwlock before anything else */
+            result = pthread_cond_destroy(&(rwl->cndSharedAccessCompleted));
+            result1 = pthread_mutex_destroy(&(rwl->mtxSharedAccessCompleted));
+            result2 = pthread_mutex_destroy(&(rwl->mtxExclusiveAccess));
+            (void) free(rwl);
+          }
       }
     else
       {
@@ -227,28 +248,18 @@ pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
         LeaveCriticalSection(&ptw32_rwlock_test_init_lock);
       }
 
-    return(result);
-}
-
-static void
-ptw32_rwlock_cancelrdwait(void * arg)
-{
-    pthread_rwlock_t rw;
-
-    rw = (pthread_rwlock_t) arg;
-    rw->rw_nwaitreaders--;
-    pthread_mutex_unlock(&(rw->rw_lock));
+    return ((result != 0) ? result : ((result1 != 0) ? result1 : result2));
 }
 
 int
 pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
 {
-    int result = 0;
-    pthread_rwlock_t rw;
+    int result;
+    pthread_rwlock_t rwl;
 
     if (rwlock == NULL || *rwlock == NULL)
       {
-        return(EINVAL);
+        return EINVAL;
       }
 
     /*
@@ -263,70 +274,64 @@ pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
 
         if (result != 0 && result != EBUSY)
           {
-            return(result);
+            return result;
           }
       }
 
-    rw = *rwlock;
+    rwl = *rwlock;
 
-    if ((result = pthread_mutex_lock(&(rw->rw_lock))) != 0)
+    if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
       {
-        return(result);
+        return EINVAL;
       }
 
-    if (rw->rw_magic != RW_MAGIC)
+    if ((result = pthread_mutex_lock(&(rwl->mtxExclusiveAccess))) != 0)
       {
-        result = EINVAL;
-        goto FAIL1;
+        return result;
       }
 
-    /*
-     * Give preference to waiting writers
-     */
-    while (rw->rw_refcount < 0 || rw->rw_nwaitwriters > 0)
+    if (++rwl->nSharedAccessCount == INT_MAX)
       {
-        rw->rw_nwaitreaders++;
-        pthread_cleanup_push(ptw32_rwlock_cancelrdwait, rw);
-        result = pthread_cond_wait(&(rw->rw_condreaders), &(rw->rw_lock));
-        pthread_cleanup_pop(0);
-        rw->rw_nwaitreaders--;
-
-        if (result != 0)
+        if ((result = pthread_mutex_lock(&(rwl->mtxSharedAccessCompleted))) != 0)
           {
-            break;
+            (void) pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
+            return result;
+          }
+
+        rwl->nSharedAccessCount -= rwl->nCompletedSharedAccessCount;
+        rwl->nCompletedSharedAccessCount = 0;
+
+        if ((result = pthread_mutex_unlock(&(rwl->mtxSharedAccessCompleted))) != 0)
+          {
+            (void) pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
+            return result;
           }
       }
 
-    if (result == 0)
-      {
-        rw->rw_refcount++; /* another reader has a read lock */
-      }
-
-FAIL1:
-    (void) pthread_mutex_unlock(&(rw->rw_lock));
-
-    return(result);
+    return (pthread_mutex_unlock(&(rwl->mtxExclusiveAccess)));
 }
 
 static void
 ptw32_rwlock_cancelwrwait(void * arg)
 {
-    pthread_rwlock_t rw;
+    pthread_rwlock_t rwl = (pthread_rwlock_t) arg;
 
-    rw = (pthread_rwlock_t) arg;
-    rw->rw_nwaitwriters--;
-    (void) pthread_mutex_unlock(&(rw->rw_lock));
+    rwl->nSharedAccessCount = -rwl->nCompletedSharedAccessCount;
+    rwl->nCompletedSharedAccessCount = 0;
+
+    (void) pthread_mutex_unlock(&(rwl->mtxSharedAccessCompleted));
+    (void) pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
 }
 
 int
 pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
 {
     int result;
-    pthread_rwlock_t rw;
+    pthread_rwlock_t rwl;
 
     if (rwlock == NULL || *rwlock == NULL)
       {
-        return(EINVAL);
+        return EINVAL;
       }
 
     /*
@@ -341,51 +346,71 @@ pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
 
         if (result != 0 && result != EBUSY)
           {
-            return(result);
+            return result;
           }
       }
 
-    rw = *rwlock;
+    rwl = *rwlock;
 
-    if (rw->rw_magic != RW_MAGIC)
+    if (rwl->nMagic != RWLOCK_MAGIC)
       {
-        return(EINVAL);
+        return EINVAL;
       }
 
-    if ((result = pthread_mutex_lock(&(rw->rw_lock))) != 0)
+    if ((result = pthread_mutex_lock(&(rwl->mtxExclusiveAccess))) != 0)
       {
-        return(result);
+        return result;
       }
 
-    while (rw->rw_refcount != 0)
+    if ((result = pthread_mutex_lock(&(rwl->mtxSharedAccessCompleted))) != 0)
       {
-        rw->rw_nwaitwriters++;
-        pthread_cleanup_push(ptw32_rwlock_cancelwrwait, rw);
-        result = pthread_cond_wait(&(rw->rw_condwriters), &(rw->rw_lock));
-        pthread_cleanup_pop(0);
-        rw->rw_nwaitwriters--;
+        (void) pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
+        return result;
+      }
 
-        if (result != 0)
+    if (rwl->nExclusiveAccessCount == 0) 
+      {
+        if (rwl->nCompletedSharedAccessCount > 0) 
           {
-            break;
+            rwl->nSharedAccessCount -= rwl->nCompletedSharedAccessCount;
+            rwl->nCompletedSharedAccessCount = 0;
+          }
+
+        if (rwl->nSharedAccessCount > 0) 
+          {
+            rwl->nCompletedSharedAccessCount = -rwl->nSharedAccessCount;
+
+            pthread_cleanup_push(ptw32_rwlock_cancelwrwait, (void*)rwl);
+
+            do 
+              {
+                result = pthread_cond_wait(&(rwl->cndSharedAccessCompleted), 
+                                           &(rwl->mtxSharedAccessCompleted));
+              }
+            while (result == 0 && rwl->nCompletedSharedAccessCount < 0);
+
+            pthread_cleanup_pop ((result != 0) ? 1 : 0);
+
+            if (result == 0)
+              {
+                rwl->nSharedAccessCount = 0;
+              }
           }
       }
 
     if (result == 0)
       {
-        rw->rw_refcount = -1;
+        rwl->nExclusiveAccessCount++;
       }
 
-    (void) pthread_mutex_unlock(&(rw->rw_lock));
-
-    return(result);
+    return result;
 }
 
 int
 pthread_rwlock_unlock(pthread_rwlock_t * rwlock)
 {
-    int result = 0;
-    pthread_rwlock_t rw;
+    int result, result1;
+    pthread_rwlock_t rwl;
 
     if (rwlock == NULL || *rwlock == NULL)
       {
@@ -397,67 +422,51 @@ pthread_rwlock_unlock(pthread_rwlock_t * rwlock)
         /*
          * Assume any race condition here is harmless.
          */
-        return(0);
+        return 0;
       }
 
-    rw = *rwlock;
+    rwl = *rwlock;
 
-    if ((result = pthread_mutex_lock(&(rw->rw_lock))) != 0)
+    if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
       {
-        return(result);
+        return EINVAL;
       }
 
-    if (rw->rw_magic != RW_MAGIC)
+    if (rwl->nExclusiveAccessCount == 0) 
       {
-        result = EINVAL;
-        goto FAIL1;
-      }
+        if ((result = pthread_mutex_lock(&(rwl->mtxSharedAccessCompleted))) != 0)
+          {
+            return result;
+          }
 
-    if (rw->rw_refcount > 0)
-      {
-        rw->rw_refcount--;             /* releasing a reader */
-      }
-    else if (rw->rw_refcount == -1)
-      {
-        rw->rw_refcount = 0;           /* releasing a writer */
+        if (++rwl->nCompletedSharedAccessCount == 0)
+          {
+            result = pthread_cond_signal(&(rwl->cndSharedAccessCompleted));
+          }
+
+        result1 = pthread_mutex_unlock(&(rwl->mtxSharedAccessCompleted));
       }
     else 
       {
-        return(EINVAL);
+        rwl->nExclusiveAccessCount--;
+
+        result = pthread_mutex_unlock(&(rwl->mtxSharedAccessCompleted));
+        result1 = pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
+
       }
-
-    result = 0;
-
-    /*
-     * Give preference to waiting writers over waiting readers
-     */
-    if (rw->rw_nwaitwriters > 0)
-      {
-        if (rw->rw_refcount == 0)
-          {
-            result = pthread_cond_signal(&(rw->rw_condwriters));
-          }
-      }
-    else if (rw->rw_nwaitreaders > 0)
-      {
-         result = pthread_cond_broadcast(&(rw->rw_condreaders));
-      }
-
-FAIL1:
-    (void) pthread_mutex_unlock(&(rw->rw_lock));
-
-    return(result);
-}
  
+    return ((result != 0) ? result : result1);
+}
+
 int
 pthread_rwlock_tryrdlock(pthread_rwlock_t * rwlock)
 {
-    int result = 0;
-    pthread_rwlock_t rw;
+    int result;
+    pthread_rwlock_t rwl;
 
     if (rwlock == NULL || *rwlock == NULL)
       {
-        return(EINVAL);
+        return EINVAL;
       }
 
     /*
@@ -472,47 +481,52 @@ pthread_rwlock_tryrdlock(pthread_rwlock_t * rwlock)
 
         if (result != 0 && result != EBUSY)
           {
-            return(result);
+            return result;
           }
       }
 
-    rw = *rwlock;
+    rwl = *rwlock;
 
-    if ((result = pthread_mutex_lock(&(rw->rw_lock))) != 0)
+    if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
       {
-        return(result);
+        return EINVAL;
       }
 
-    if (rw->rw_magic != RW_MAGIC)
+    if ((result = pthread_mutex_trylock(&(rwl->mtxExclusiveAccess))) != 0)
       {
-        result = EINVAL;
-        goto FAIL1;
+        return result;
       }
 
-    if (rw->rw_refcount == -1 || rw->rw_nwaitwriters > 0)
+    if (++rwl->nSharedAccessCount == INT_MAX) 
       {
-        result = EBUSY;    /* held by a writer or waiting writers */
-      }
-    else
-      {
-        rw->rw_refcount++; /* increment count of reader locks */
+        if ((result = pthread_mutex_lock(&(rwl->mtxSharedAccessCompleted))) != 0)
+          {
+            (void) pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
+            return result;
+          }
+
+        rwl->nSharedAccessCount -= rwl->nCompletedSharedAccessCount;
+        rwl->nCompletedSharedAccessCount = 0;
+
+        if ((result = pthread_mutex_unlock(&(rwl->mtxSharedAccessCompleted))) != 0)
+          {
+            (void) pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
+            return result;
+          }
       }
 
-FAIL1:
-    (void) pthread_mutex_unlock(&(rw->rw_lock));
-
-    return(result);
+    return (pthread_mutex_unlock(&rwl->mtxExclusiveAccess));
 }
 
 int
 pthread_rwlock_trywrlock(pthread_rwlock_t * rwlock)
 {
-    int result = 0;
-    pthread_rwlock_t rw;
+    int result, result1;
+    pthread_rwlock_t rwl;
 
     if (rwlock == NULL || *rwlock == NULL)
       {
-        return(EINVAL);
+        return EINVAL;
       }
 
     /*
@@ -527,34 +541,58 @@ pthread_rwlock_trywrlock(pthread_rwlock_t * rwlock)
 
         if (result != 0 && result != EBUSY)
           {
-            return(result);
+            return result;
           }
       }
 
-    rw = *rwlock;
+    rwl = *rwlock;
 
-    if ((result = pthread_mutex_lock(&(rw->rw_lock))) != 0)
+    if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
       {
-        return(result);
+        return EINVAL;
       }
 
-    if (rw->rw_magic != RW_MAGIC)
+    if ((result = pthread_mutex_trylock(&(rwl->mtxExclusiveAccess))) != 0)
       {
-        result = EINVAL;
-        goto FAIL1;
+        return result;
       }
 
-    if (rw->rw_refcount != 0)
+    if ((result = pthread_mutex_trylock(&(rwl->mtxSharedAccessCompleted))) != 0)
       {
-        result = EBUSY;       /* held by either writer or reader(s) */
-      }
-    else
-      {
-        rw->rw_refcount = -1; /* available, indicate a writer has it */
+        result1 = pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
+        return ((result1 != 0) ? result1 : result);
       }
 
-FAIL1:
-    (void) pthread_mutex_unlock(&(rw->rw_lock));
+    if (rwl->nExclusiveAccessCount == 0) 
+      {
+        if (rwl->nCompletedSharedAccessCount > 0) 
+          {
+            rwl->nSharedAccessCount -= rwl->nCompletedSharedAccessCount;
+            rwl->nCompletedSharedAccessCount = 0;
+          }
 
-    return(result);
+        if (rwl->nSharedAccessCount > 0) 
+          {
+            if ((result = pthread_mutex_unlock(&(rwl->mtxSharedAccessCompleted))) != 0)
+              {
+                (void) pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
+                return result;
+              }
+
+            if ((result = pthread_mutex_unlock(&(rwl->mtxExclusiveAccess))) == 0)
+              {
+                result = EBUSY;
+              }
+          }
+        else
+          {
+            rwl->nExclusiveAccessCount = 1;
+          }
+      }
+    else 
+      {
+        result = EBUSY;
+      }
+
+    return result;
 }

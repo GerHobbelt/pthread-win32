@@ -4,9 +4,9 @@
  * Check that writer locks have priority.
  *
  * Depends on API functions: 
- *	pthread_rwlock_rdlock()
- *	pthread_rwlock_wrlock()
- *	pthread_rwlock_unlock()
+ *      pthread_rwlock_rdlock()
+ *      pthread_rwlock_wrlock()
+ *      pthread_rwlock_unlock()
  */
 
 #include "test.h"
@@ -59,7 +59,7 @@ main()
 
   assert(wr1Result == 10);
   assert(wr2Result == 20);
-  assert(rdResult == 30);
+  assert(rdResult == 20);
 
   return 0;
 }

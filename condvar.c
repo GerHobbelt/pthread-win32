@@ -27,7 +27,7 @@
 #include "implement.h"
 
 static int
-ptw32_cond_check_need_init(pthread_cond_t *cond)
+ptw32_cond_check_need_init (pthread_cond_t *cond)
 {
   int result = 0;
 
@@ -77,7 +77,7 @@ ptw32_cond_check_need_init(pthread_cond_t *cond)
 
   LeaveCriticalSection(&ptw32_cond_test_init_lock);
 
-  return(result);
+  return result;
 }
 
 
@@ -124,7 +124,7 @@ pthread_condattr_init (pthread_condattr_t * attr)
 
   *attr = attr_result;
 
-  return (result);
+  return result;
 
 }                               /* pthread_condattr_init */
 
@@ -162,17 +162,16 @@ pthread_condattr_destroy (pthread_condattr_t * attr)
   if (attr == NULL || *attr == NULL)
     {
       result = EINVAL;
-
     }
   else
     {
-      free (*attr);
+      (void) free (*attr);
 
       *attr = NULL;
       result = 0;
     }
 
-  return (result);
+  return result;
 
 }                               /* pthread_condattr_destroy */
 
@@ -220,13 +219,10 @@ pthread_condattr_getpshared (const pthread_condattr_t * attr, int *pshared)
 {
   int result;
 
-  if ((attr != NULL && *attr != NULL) &&
-      (pshared != NULL))
+  if ((attr != NULL && *attr != NULL) && (pshared != NULL))
     {
-
       *pshared = (*attr)->pshared;
       result = 0;
-
     }
   else
     {
@@ -234,7 +230,7 @@ pthread_condattr_getpshared (const pthread_condattr_t * attr, int *pshared)
       result = EINVAL;
     }
 
-  return (result);
+  return result;
 
 }                               /* pthread_condattr_getpshared */
 
@@ -284,12 +280,10 @@ pthread_condattr_setpshared (pthread_condattr_t * attr, int pshared)
 {
   int result;
 
-  if ((attr != NULL && *attr != NULL) &&
-      ((pshared == PTHREAD_PROCESS_SHARED) ||
-       (pshared == PTHREAD_PROCESS_PRIVATE)))
+  if ((attr != NULL && *attr != NULL)
+      && ((pshared == PTHREAD_PROCESS_SHARED)
+          || (pshared == PTHREAD_PROCESS_PRIVATE)))
     {
-
-
       if (pshared == PTHREAD_PROCESS_SHARED)
         {
 
@@ -306,18 +300,18 @@ pthread_condattr_setpshared (pthread_condattr_t * attr, int pshared)
         {
           result = 0;
         }
-      (*attr)->pshared = pshared;
 
+      (*attr)->pshared = pshared;
     }
   else
     {
       result = EINVAL;
-
     }
 
-  return (result);
+  return result;
 
 }                               /* pthread_condattr_setpshared */
+
 
 int
 pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
@@ -348,7 +342,7 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
       * ------------------------------------------------------
       */
 {
-  int result = EAGAIN;
+  int result;
   pthread_cond_t cv = NULL;
 
   if (cond == NULL)
@@ -364,16 +358,15 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
        * processes.
        */
       result = ENOSYS;
-
-      goto FAIL0;
+      goto DONE;
     }
 
-  cv = (pthread_cond_t) calloc (1, sizeof (*cv));
+  cv = (pthread_cond_t) calloc(1, sizeof (*cv));
 
   if (cv == NULL)
     {
       result = ENOMEM;
-      goto FAIL0;
+      goto DONE;
     }
 
   cv->nWaitersBlocked   = 0;
@@ -382,19 +375,20 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
 
   if (sem_init(&(cv->semBlockLock), 0, 1) != 0)
     {
+      result = errno;
       goto FAIL0;
     }
 
   if (sem_init(&(cv->semBlockQueue), 0, 0) != 0)
     {
+      result = errno;
       goto FAIL1;
     }
 
-  if (pthread_mutex_init(&(cv->mtxUnblockLock), 0) != 0)
+  if ((result = pthread_mutex_init(&(cv->mtxUnblockLock), 0)) != 0)
     {
       goto FAIL2;
     }
-
 
   result = 0;
 
@@ -412,12 +406,16 @@ FAIL1:
   (void) sem_destroy(&(cv->semBlockLock));
 
 FAIL0:
+  (void) free(cv);
+  cv = NULL;
+
 DONE:
   *cond = cv;
 
-  return (result);
+  return result;
 
 }                               /* pthread_cond_init */
+
 
 int
 pthread_cond_destroy (pthread_cond_t * cond)
@@ -447,13 +445,13 @@ pthread_cond_destroy (pthread_cond_t * cond)
       * ------------------------------------------------------
       */
 {
-  int result = 0;
   pthread_cond_t cv;
+  int result = 0, result1 = 0, result2 = 0;
 
   /*
    * Assuming any race condition here is harmless.
    */
-  if (cond == NULL
+  if (cond == NULL 
       || *cond == NULL)
     {
       return EINVAL;
@@ -485,20 +483,34 @@ pthread_cond_destroy (pthread_cond_t * cond)
        */
       if (cv->nWaitersBlocked - cv->nWaitersUnblocked > 0)
         {
-          (void) sem_post(&(cv->semBlockLock));
-          (void) pthread_mutex_unlock(&(cv->mtxUnblockLock));
-          return EBUSY;
+          if (sem_post(&(cv->semBlockLock)) != 0)
+            {
+              result = errno;
+            }
+          result1 = pthread_mutex_unlock(&(cv->mtxUnblockLock));
+          result2 = EBUSY;
         }
+      else
+        {
+          /*
+           * Now it is safe to destroy
+           */
+          *cond = NULL;
+          if (sem_destroy(&(cv->semBlockLock)) != 0)
+            {
+              result = errno;
+            }
+          if (sem_destroy(&(cv->semBlockQueue)) != 0)
+            {
+              result1 = errno;
+            }
+          if ((result2 = pthread_mutex_unlock(&(cv->mtxUnblockLock))) == 0)
+            {
+              result2 = pthread_mutex_destroy(&(cv->mtxUnblockLock));
+            }
 
-      /*
-       * Now it is safe to destroy
-       */
-      *cond = NULL; /* Invalidate it before anything else */
-      (void) sem_destroy(&(cv->semBlockLock));
-      (void) sem_destroy(&(cv->semBlockQueue));
-      (void) pthread_mutex_unlock(&(cv->mtxUnblockLock));
-      (void) pthread_mutex_destroy(&(cv->mtxUnblockLock));
-      free(cv);
+          (void) free(cv);
+        }
     }
   else
     {
@@ -532,7 +544,8 @@ pthread_cond_destroy (pthread_cond_t * cond)
       LeaveCriticalSection(&ptw32_cond_test_init_lock);
     }
 
-  return (result);
+    return ((result != 0) ? result : ((result1 != 0) ? result1 : result2));
+
 }
 
 /*
@@ -548,17 +561,16 @@ typedef struct {
 static void
 ptw32_cond_wait_cleanup(void * args)
 {
-  ptw32_cond_wait_cleanup_args_t * cleanup_args =
-    (ptw32_cond_wait_cleanup_args_t *) args;
+  ptw32_cond_wait_cleanup_args_t * cleanup_args = (ptw32_cond_wait_cleanup_args_t *) args;
   pthread_cond_t cv = cleanup_args->cv;
   int * resultPtr = cleanup_args->resultPtr;
   int eLastSignal; /* enum: 1=yes 0=no -1=cancelled/timedout w/o signal(s) */
   int result;
 
   /*
-   * Whether we got here as a result of signal/broadcast or because of
-   * timeout on wait or thread cancellation we indicate that we are no
-   * longer waiting. The waiter is responsible for adjusting waiters
+   * Whether we got here as a result of signal/broadcast or because of 
+   * timeout on wait or thread cancellation we indicate that we are no 
+   * longer waiting. The waiter is responsible for adjusting waiters 
    * (to)unblock(ed) counts (protected by unblock lock).
    * Unblock lock/Sync.LEVEL-2 supports _timedwait and cancellation.
    */
@@ -575,7 +587,7 @@ ptw32_cond_wait_cleanup(void * args)
   /*
    * No more LEVEL-2 access to waiters (to)unblock(ed) counts needed
    */
-  if ((result = pthread_mutex_unlock(&(cv->mtxUnblockLock))) != 0)
+  if ((result = pthread_mutex_unlock(&(cv->mtxUnblockLock))) != 0) 
     {
       *resultPtr = result;
       return;
@@ -611,14 +623,15 @@ ptw32_cond_wait_cleanup(void * args)
     }
 
   /*
-   * XSH: Upon successful return, the mutex has been locked and is owned
+   * XSH: Upon successful return, the mutex has been locked and is owned 
    * by the calling thread
    */
   if ((result = pthread_mutex_lock(cleanup_args->mutexPtr)) != 0)
     {
       *resultPtr = result;
     }
-}
+
+}                               /* ptw32_cond_wait_cleanup */
 
 static int
 ptw32_cond_timedwait (pthread_cond_t * cond, 
@@ -692,13 +705,13 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
        *              timeout, or
        *              thread cancellation
        *
-       * Note:
+       * Note: 
        *
        *      ptw32_sem_timedwait is a cancellation point,
-       *      hence providing the mechanism for making
-       *      pthread_cond_wait a cancellation point.
+       *      hence providing the mechanism for making 
+       *      pthread_cond_wait a cancellation point. 
        *      We use the cleanup mechanism to ensure we
-       *      re-lock the mutex and adjust (to)unblock(ed) waiters
+       *      re-lock the mutex and adjust (to)unblock(ed) waiters 
        *      counts if we are cancelled, timed out or signalled.
        */
       if (ptw32_sem_timedwait(&(cv->semBlockQueue), abstime) != 0)
@@ -712,139 +725,16 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
    */
   pthread_cleanup_pop(1);
 
-
   /*
    * "result" can be modified by the cleanup handler.
    */
-  return (result);
+  return result;
 
 }                               /* ptw32_cond_timedwait */
 
 
-int
-pthread_cond_wait (pthread_cond_t * cond,
-		   pthread_mutex_t * mutex)
-     /*
-      * ------------------------------------------------------
-      * DOCPUBLIC
-      *      This function waits on a condition variable until
-      *      awakened by a signal or broadcast.
-      *
-      *      Caller MUST be holding the mutex lock; the
-      *      lock is released and the caller is blocked waiting
-      *      on 'cond'. When 'cond' is signaled, the mutex
-      *      is re-acquired before returning to the caller.
-      *
-      * PARAMETERS
-      *      cond
-      *              pointer to an instance of pthread_cond_t
-      *
-      *      mutex
-      *              pointer to an instance of pthread_mutex_t
-      *
-      *
-      * DESCRIPTION
-      *      This function waits on a condition variable until
-      *      awakened by a signal or broadcast.
-      *
-      *      NOTES:
-      *      1)      The function must be called with 'mutex' LOCKED
-      *               by the calling thread, or undefined behaviour
-      *              will result.
-      *
-      *      2)      This routine atomically releases 'mutex' and causes
-      *              the calling thread to block on the condition variable.
-      *              The blocked thread may be awakened by 
-      *                      pthread_cond_signal or 
-      *                      pthread_cond_broadcast.
-      *
-      * Upon successful completion, the 'mutex' has been locked and 
-      * is owned by the calling thread.
-      *
-      *
-      * RESULTS
-      *              0               caught condition; mutex released,
-      *              EINVAL          'cond' or 'mutex' is invalid,
-      *              EINVAL          different mutexes for concurrent waits,
-      *              EINVAL          mutex is not held by the calling thread,
-      *
-      * ------------------------------------------------------
-      */
-{
-  /*
-   * The NULL abstime arg means INFINITE waiting.
-   */
-  return(ptw32_cond_timedwait(cond, mutex, NULL));
-
-}                               /* pthread_cond_wait */
-
-
-int
-pthread_cond_timedwait (pthread_cond_t * cond, 
-                        pthread_mutex_t * mutex,
-                        const struct timespec *abstime)
-     /*
-      * ------------------------------------------------------
-      * DOCPUBLIC
-      *      This function waits on a condition variable either until
-      *      awakened by a signal or broadcast; or until the time
-      *      specified by abstime passes.
-      *
-      * PARAMETERS
-      *      cond
-      *              pointer to an instance of pthread_cond_t
-      *
-      *      mutex
-      *              pointer to an instance of pthread_mutex_t
-      *
-      *      abstime
-      *              pointer to an instance of (const struct timespec)
-      *
-      *
-      * DESCRIPTION
-      *      This function waits on a condition variable either until
-      *      awakened by a signal or broadcast; or until the time
-      *      specified by abstime passes.
-      *
-      *      NOTES:
-      *      1)      The function must be called with 'mutex' LOCKED
-      *               by the calling thread, or undefined behaviour
-      *              will result.
-      *
-      *      2)      This routine atomically releases 'mutex' and causes
-      *              the calling thread to block on the condition variable.
-      *              The blocked thread may be awakened by 
-      *                      pthread_cond_signal or 
-      *                      pthread_cond_broadcast.
-      *
-      *
-      * RESULTS
-      *              0               caught condition; mutex released,
-      *              EINVAL          'cond', 'mutex', or abstime is invalid,
-      *              EINVAL          different mutexes for concurrent waits,
-      *              EINVAL          mutex is not held by the calling thread,
-      *              ETIMEDOUT       abstime ellapsed before cond was signaled.
-      *
-      * ------------------------------------------------------
-      */
-{
-  int result = 0;
-
-  if (abstime == NULL)
-    {
-      result = EINVAL;
-    }
-  else
-    {
-      result = ptw32_cond_timedwait(cond, mutex, abstime);
-    }
-
-  return(result);
-}                               /* pthread_cond_timedwait */
-
-
 static int
-ptw32_cond_unblock (pthread_cond_t * cond,
+ptw32_cond_unblock (pthread_cond_t * cond, 
                     int unblockAll)
 {
   int result;
@@ -933,13 +823,130 @@ ptw32_cond_unblock (pthread_cond_t * cond,
    * This sync.level supports _timedwait and cancellation
    */
   else
-    {
+    {  
       result = pthread_mutex_unlock(&(cv->mtxUnblockLock));
     }
 
-  return(result);
+  return result;
 
 }                               /* ptw32_cond_unblock */
+
+int
+pthread_cond_wait (pthread_cond_t * cond,
+                   pthread_mutex_t * mutex)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      This function waits on a condition variable until
+      *      awakened by a signal or broadcast.
+      *
+      *      Caller MUST be holding the mutex lock; the
+      *      lock is released and the caller is blocked waiting
+      *      on 'cond'. When 'cond' is signaled, the mutex
+      *      is re-acquired before returning to the caller.
+      *
+      * PARAMETERS
+      *      cond
+      *              pointer to an instance of pthread_cond_t
+      *
+      *      mutex
+      *              pointer to an instance of pthread_mutex_t
+      *
+      *
+      * DESCRIPTION
+      *      This function waits on a condition variable until
+      *      awakened by a signal or broadcast.
+      *
+      *      NOTES:
+      *
+      *      1)      The function must be called with 'mutex' LOCKED
+      *              by the calling thread, or undefined behaviour
+      *              will result.
+      *
+      *      2)      This routine atomically releases 'mutex' and causes
+      *              the calling thread to block on the condition variable.
+      *              The blocked thread may be awakened by 
+      *                      pthread_cond_signal or 
+      *                      pthread_cond_broadcast.
+      *
+      * Upon successful completion, the 'mutex' has been locked and 
+      * is owned by the calling thread.
+      *
+      *
+      * RESULTS
+      *              0               caught condition; mutex released,
+      *              EINVAL          'cond' or 'mutex' is invalid,
+      *              EINVAL          different mutexes for concurrent waits,
+      *              EINVAL          mutex is not held by the calling thread,
+      *
+      * ------------------------------------------------------
+      */
+{
+  /*
+   * The NULL abstime arg means INFINITE waiting.
+   */
+  return (ptw32_cond_timedwait(cond, mutex, NULL));
+
+}                               /* pthread_cond_wait */
+
+
+int
+pthread_cond_timedwait (pthread_cond_t * cond, 
+                        pthread_mutex_t * mutex,
+                        const struct timespec *abstime)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      This function waits on a condition variable either until
+      *      awakened by a signal or broadcast; or until the time
+      *      specified by abstime passes.
+      *
+      * PARAMETERS
+      *      cond
+      *              pointer to an instance of pthread_cond_t
+      *
+      *      mutex
+      *              pointer to an instance of pthread_mutex_t
+      *
+      *      abstime
+      *              pointer to an instance of (const struct timespec)
+      *
+      *
+      * DESCRIPTION
+      *      This function waits on a condition variable either until
+      *      awakened by a signal or broadcast; or until the time
+      *      specified by abstime passes.
+      *
+      *      NOTES:
+      *      1)      The function must be called with 'mutex' LOCKED
+      *              by the calling thread, or undefined behaviour
+      *              will result.
+      *
+      *      2)      This routine atomically releases 'mutex' and causes
+      *              the calling thread to block on the condition variable.
+      *              The blocked thread may be awakened by 
+      *                      pthread_cond_signal or 
+      *                      pthread_cond_broadcast.
+      *
+      *
+      * RESULTS
+      *              0               caught condition; mutex released,
+      *              EINVAL          'cond', 'mutex', or abstime is invalid,
+      *              EINVAL          different mutexes for concurrent waits,
+      *              EINVAL          mutex is not held by the calling thread,
+      *              ETIMEDOUT       abstime ellapsed before cond was signaled.
+      *
+      * ------------------------------------------------------
+      */
+{
+  if (abstime == NULL)
+    {
+      return EINVAL;
+    }
+
+  return (ptw32_cond_timedwait(cond, mutex, abstime));
+
+}                               /* pthread_cond_timedwait */
 
 
 int
@@ -966,16 +973,9 @@ pthread_cond_signal (pthread_cond_t * cond)
       *      an unspecified waiter is awakened.
       *
       *      NOTES:
+      *
       *      1)      Use when any waiter can respond and only one need
       *              respond (all waiters being equal).
-      *
-      *      2)      This function MUST be called under the protection 
-      *              of the SAME mutex that is used with the condition
-      *              variable being signaled; OTHERWISE, the condition
-      *              variable may be signaled between the test of the
-      *              associated condition and the blocking
-      *              pthread_cond_signal.
-      *              This can cause an infinite wait.
       *
       * RESULTS
       *              0               successfully signaled condition,
@@ -984,10 +984,10 @@ pthread_cond_signal (pthread_cond_t * cond)
       * ------------------------------------------------------
       */
 {
-  /* 
+  /*
    * The '0'(FALSE) unblockAll arg means unblock ONE waiter.
    */
-  return(ptw32_cond_unblock(cond, 0));
+  return (ptw32_cond_unblock(cond, 0));
 
 }                               /* pthread_cond_signal */
 
@@ -1009,14 +1009,8 @@ pthread_cond_broadcast (pthread_cond_t * cond)
       *      all waiting threads.
       *
       *      NOTES:
-      *      1)      This function MUST be called under the protection
-      *              of the SAME mutex that is used with the condition
-      *              variable being signaled; OTHERWISE, the condition
-      *              variable may be signaled between the test of the
-      *              associated condition and the blocking pthread_cond_wait.
-      *              This can cause an infinite wait.
       *
-      *      2)      Use when more than one waiter may respond to
+      *      1)      Use when more than one waiter may respond to
       *              predicate change or if any waiting thread may
       *              not be able to respond
       *
@@ -1029,10 +1023,9 @@ pthread_cond_broadcast (pthread_cond_t * cond)
       * ------------------------------------------------------
       */
 {
-  /* 
+  /*
    * The '1'(TRUE) unblockAll arg means unblock ALL waiters.
    */
-  return(ptw32_cond_unblock(cond, 1));
+  return (ptw32_cond_unblock(cond, 1));
 
-}
-
+}                               /* pthread_cond_broadcast */

@@ -46,13 +46,13 @@ typedef enum {
    * The thread is still "alive" if the numeric value of the
    * state is greater or equal "PThreadStateRunning".
    */
-  PThreadStateInitial = 0,	/* Thread not running                   */
-  PThreadStateRunning,	        /* Thread alive & kicking               */
-  PThreadStateSuspended,	/* Thread alive but suspended           */
-  PThreadStateCanceling,	/* Thread alive but and is              */
+  PThreadStateInitial = 0,      /* Thread not running                   */
+  PThreadStateRunning,          /* Thread alive & kicking               */
+  PThreadStateSuspended,        /* Thread alive but suspended           */
+  PThreadStateCanceling,        /* Thread alive but and is              */
                                 /* in the process of terminating        */
                                 /* due to a cancellation request        */
-  PThreadStateException,	/* Thread alive but exiting             */
+  PThreadStateException,        /* Thread alive but exiting             */
                                 /* due to an exception                  */
   PThreadStateLast
 }
@@ -64,39 +64,13 @@ typedef enum {
    * This enumeration represents the reason why a thread has
    * terminated/is terminating.
    */
-  PThreadDemisePeaceful = 0,	/* Death due natural causes     */
-  PThreadDemiseCancelled,	/* Death due to user cancel     */
-  PThreadDemiseException,	/* Death due to unhandled       */
+  PThreadDemisePeaceful = 0,    /* Death due natural causes     */
+  PThreadDemiseCancelled,       /* Death due to user cancel     */
+  PThreadDemiseException,       /* Death due to unhandled       */
                                 /* exception                    */
-  PThreadDemiseNotDead	/* I'm not dead!                */
+  PThreadDemiseNotDead  /* I'm not dead!                */
 }
 PThreadDemise;
-
-
-/*
- * ====================
- * ====================
- * Internal implementation of a critical section
- * ====================
- * ====================
- */
-
-typedef struct ptw32_cs_t_ {
-  CRITICAL_SECTION cs;
-  LONG lock_idx;
-  int entered_count;
-  int valid;
-  pthread_t owner;
-} ptw32_cs_t;
-
-
-/*
- * ====================
- * ====================
- * POSIX thread and attributes
- * ====================
- * ====================
- */
 
 struct pthread_t_ {
   DWORD thread;
@@ -148,7 +122,8 @@ struct pthread_attr_t_ {
 #define PTW32_OBJECT_INVALID   NULL
 
 struct pthread_mutex_t_ {
-  ptw32_cs_t cs;
+  HANDLE mutex;
+  CRITICAL_SECTION cs;
   int lockCount;
   pthread_t ownerThread;
 };
@@ -156,7 +131,7 @@ struct pthread_mutex_t_ {
 
 struct pthread_mutexattr_t_ {
   int pshared;
-  int type;
+  int forcecs;
 };
 
 
@@ -177,54 +152,36 @@ struct ThreadParms {
   void *arg;
 };
 
-#if 0
-struct pthread_cond_t_ {
-  long waiters;                       /* # waiting threads             */
-  pthread_mutex_t waitersLock;        /* Mutex that guards access to 
-					 waiter count                  */
-  sem_t sema;                         /* Queue up threads waiting for the 
-					 condition to become signaled  */
-  HANDLE waitersDone;                 /* An auto reset event used by the 
-					 broadcast/signal thread to wait 
-					 for the waiting thread(s) to wake
-					 up and get a chance at the  
-					 semaphore                     */
-  int wasBroadcast;                   /* keeps track if we are signaling 
-					 or broadcasting               */
-};
-
-#else
 
 struct pthread_cond_t_ {
-  long            nWaitersBlocked;   /* Number of threads blocked */
-  long            nWaitersUnblocked; /* Number of threads unblocked */
-  long            nWaitersToUnblock; /* Number of threads to unblock */
-  sem_t           semBlockQueue;     /* Queue up threads waiting for the */
-                                     /*   condition to become signalled */
-  sem_t           semBlockLock;      /* Semaphore that guards access to */
-                                     /* waiters blocked count/block queue */
-                                     /* +-> Mandatory Sync.LEVEL-1 */
-  pthread_mutex_t mtxUnblockLock;    /* Mutex that guards access to */
-                                     /* waiters (to)unblock(ed) counts */
-                                     /* +-> Optional* Sync.LEVEL-2 */
-};                                   /* Opt*) for _timedwait and cancellation */
-#endif
+  long            nWaitersBlocked;   /* Number of threads blocked            */
+  long            nWaitersUnblocked; /* Number of threads unblocked          */
+  long            nWaitersToUnblock; /* Number of threads to unblock         */
+  sem_t           semBlockQueue;     /* Queue up threads waiting for the     */
+                                     /*   condition to become signalled      */
+  sem_t           semBlockLock;      /* Semaphore that guards access to      */
+                                     /* | waiters blocked count/block queue  */
+                                     /* +-> Mandatory Sync.LEVEL-1           */
+  pthread_mutex_t mtxUnblockLock;    /* Mutex that guards access to          */
+                                     /* | waiters (to)unblock(ed) counts     */
+                                     /* +-> Optional* Sync.LEVEL-2           */
+};                                   /* Opt*) for _timedwait and cancellation*/
+
 
 struct pthread_condattr_t_ {
   int pshared;
 };
 
-#define RW_MAGIC    0x19283746
+#define PTW32_RWLOCK_MAGIC 0xfacade2
 
 struct pthread_rwlock_t_ {
-    pthread_mutex_t rw_lock;         /* basic lock on this struct */
-    pthread_cond_t  rw_condreaders;  /* for reader threads waiting */
-    pthread_cond_t  rw_condwriters;  /* for writer threads waiting */
-    int             rw_magic;        /* for error checking */
-    int             rw_nwaitreaders; /* the number waiting */
-    int             rw_nwaitwriters; /* the number waiting */
-    int             rw_refcount;     /* -1 if writer has the lock,
-                                        else # readers holding the lock */
+  pthread_mutex_t mtxExclusiveAccess;
+  pthread_mutex_t mtxSharedAccessCompleted;
+  pthread_cond_t  cndSharedAccessCompleted;
+  int             nSharedAccessCount;
+  int             nExclusiveAccessCount;
+  int             nCompletedSharedAccessCount;
+  int             nMagic;
 };
 
 struct pthread_rwlockattr_t_ {
@@ -307,17 +264,17 @@ struct ThreadKeyAssoc {
  * Severity Values:
  */
 #define SE_SUCCESS              0x00
-#define SE_INFORMATION	        0x01
+#define SE_INFORMATION          0x01
 #define SE_WARNING              0x02
 #define SE_ERROR                0x03
 
 #define MAKE_SOFTWARE_EXCEPTION( _severity, _facility, _exception ) \
-( (DWORD) ( ( (_severity) << 30 ) |	/* Severity code	*/ \
-	    ( 1 << 29 )	|		/* MS=0, User=1		*/ \
-	    ( 0 << 28 )	|		/* Reserved		*/ \
-	    ( (_facility) << 16 ) |	/* Facility Code	*/ \
-	    ( (_exception) <<  0 )	/* Exception Code	*/ \
-	    ) )
+( (DWORD) ( ( (_severity) << 30 ) |     /* Severity code        */ \
+            ( 1 << 29 ) |               /* MS=0, User=1         */ \
+            ( 0 << 28 ) |               /* Reserved             */ \
+            ( (_facility) << 16 ) |     /* Facility Code        */ \
+            ( (_exception) <<  0 )      /* Exception Code       */ \
+            ) )
 
 /*
  * We choose one specific Facility/Error code combination to
@@ -325,13 +282,13 @@ struct ThreadKeyAssoc {
  * We store our actual component and error code within
  * the optional information array.
  */
-#define EXCEPTION_PTW32_SERVICES	\
+#define EXCEPTION_PTW32_SERVICES        \
      MAKE_SOFTWARE_EXCEPTION( SE_ERROR, \
-			      PTW32_SERVICES_FACILITY, \
-			      PTW32_SERVICES_ERROR )
+                              PTW32_SERVICES_FACILITY, \
+                              PTW32_SERVICES_ERROR )
 
-#define PTW32_SERVICES_FACILITY		0xBAD
-#define PTW32_SERVICES_ERROR	       	0xDEED
+#define PTW32_SERVICES_FACILITY         0xBAD
+#define PTW32_SERVICES_ERROR            0xDEED
 
 #endif /* _MSC_VER */
 
@@ -394,13 +351,13 @@ ptw32_threadStart (ThreadParms * threadParms);
 void ptw32_callUserDestroyRoutines (pthread_t thread);
 
 int ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
-			    pthread_t thread,
-			    pthread_key_t key);
+                            pthread_t thread,
+                            pthread_key_t key);
 
 void ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
 int ptw32_sem_timedwait (sem_t * sem,
-			    const struct timespec * abstime);
+                            const struct timespec * abstime);
 
 #ifdef NEED_SEM
 void ptw32_decrease_semaphore(sem_t * sem);
@@ -428,17 +385,17 @@ BOOL ptw32_increase_semaphore(sem_t * sem,
  */
 
 #define _beginthreadex(security, \
-		       stack_size, \
-		       start_proc, \
-		       arg, \
-		       flags, \
-		       pid) \
+                       stack_size, \
+                       start_proc, \
+                       arg, \
+                       flags, \
+                       pid) \
         CreateThread(security, \
-		     stack_size, \
-		     (LPTHREAD_START_ROUTINE) start_proc, \
-		     arg, \
-		     flags, \
-		     pid)
+                     stack_size, \
+                     (LPTHREAD_START_ROUTINE) start_proc, \
+                     arg, \
+                     flags, \
+                     pid)
 
 #define _endthreadex ExitThread
 
