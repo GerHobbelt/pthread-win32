@@ -50,10 +50,10 @@ _pthread_exit(void * value, int return_code)
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_table_mutex);
 
-  /* Remove the thread entry on exit only if pthread_detach() was
-     called AND there are no waiting joins. Otherwise the thread entry
-     will be deleted by the last waiting pthread_join() after this
-     thread has terminated. */
+  /* Remove the thread entry on exit only if the thread is detached
+     AND there are no waiting joins. Otherwise the thread entry will
+     be deleted by the last waiting pthread_join() after this thread
+     has terminated. */
 
   if (us->detach == TRUE
       && us->join_count == 0)

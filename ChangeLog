@@ -5,6 +5,7 @@ Sun Jul 26 13:06:12 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 	argument which is the return code passed to _endthreadex().
 	(_pthread_exit): Move thread entry delete call from _pthread_vacuum()
 	into here. Add more explanation of thread entry deletion.
+	(_pthread_exit): Clarify comment.
 
 	* create.c (_pthread_start_call): Change pthread_exit() call to
 	_pthread_exit() call.
