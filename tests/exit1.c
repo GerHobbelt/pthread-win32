@@ -4,14 +4,14 @@
  * Depends on API functions: None.
  */
 
-#include <pthread.h>
+#include "test.h"
 
 int
 main(int argc, char * argv[])
 {
-	/* A simple test firstly. */
+	/* A simple test first. */
 	pthread_exit((void *) 0);
 
 	/* Not reached */
-	return 1;
+	assert(0);
 }

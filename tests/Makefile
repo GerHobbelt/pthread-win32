@@ -13,7 +13,7 @@ ECHO	= @echo
 #
 CC	= gcc
 CFLAGS	= -g -O2 -UNDEBUG -Wall -o $@ $^
-BUILD_DIR	= ..\build
+BUILD_DIR	= ..
 INCLUDES	= -I./include
 LIBS	= ./lib/libpthread32.a
 
@@ -35,7 +35,7 @@ DLL	= pthread.dll
 
 TESTS	= count1 create1 equal1 exit1 exit2 exit3 \
 	 join1 eyal1 mutex1 mutex2 mutex3 \
-	 once1 self1 self2 tsd1
+	 once1 self1 self2 condvar1 condvar2 tsd1
 
 PASSES	= $(TESTS:%=%.pass)
 

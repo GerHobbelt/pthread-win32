@@ -38,31 +38,84 @@
  * - 
  */
 
-#include <pthread.h>
-#include <stdio.h>
+#include "test.h"
 
-pthread_key_t key;
-pthread_once_t key_once = PTHREAD_ONCE_INIT;
+/*
+ * Create NUMTHREADS threads in addition to the Main thread.
+ */
+static enum {
+  NUMTHREADS = 2
+};
+
+typedef struct bag_t_ bag_t;
+struct bag_t_ {
+  int threadnum;
+  int washere;
+  /* Add more pre-thread state variables here */
+};
+
+static bag_t threadbag[NUMTHREADS];
 
 void *
 mythread(void * arg)
 {
+  bag_t * bag = (bag_t *) arg;
+
+  assert(bag == &threadbag[bag->threadnum]);
+  assert(bag->washere == 0);
+  bag->washere = 1;
+
+  /* ... */
+
   return 0;
 }
 
 int
 main()
 {
-  int rc;
-  pthread_t t1, t2;
-  
-  rc = pthread_create(&t1, NULL, mythread, (void *) 1);
-  printf("pthread_create returned %d\n", rc);
+  int failed = 0;
+  pthread_t t[NUMTHREADS + 1];
 
-  rc = pthread_create(&t2, NULL, mythread, (void *) 2);
-  printf("pthread_create returned %d\n", rc);
+  assert((t[0] = pthread_self()) != NULL);
 
-  /* Give threads time to run. */
-  Sleep(2000);
+  for (i = 1; i <= NUMTHREADS; i++)
+    { 
+      threadbag[i].washere = 0;
+      threadbag[i].threadnum = i;
+      assert(pthread_create(&t[i], NULL, mythread, (void *) &threadbag[i]) == 0);
+    }
+
+  /*
+   * Give threads time to run.
+   */
+  Sleep(NUMTHREADS * 1000);
+
+  /*
+   * Standard check that all threads started.
+   */
+  for (i = 1; i <= NUMTHREADS; i++)
+    { 
+      if (threadbag[i].washere != 1)
+	{
+	  failed = 1;
+	  fprintf(stderr, "Thread %d: washere %d\n", i, threadbag[i].washere);
+	}
+    }
+
+  assert(failed == 0);
+
+  /*
+   * Check any results here. Only print ouput and set "failed" on failure.
+   */
+  for (i = 1; i <= NUMTHREADS; i++)
+    { 
+      /* ... */
+    }
+
+  assert(failed == 0);
+
+  /*
+   * Success.
+   */
   return 0;
 }
