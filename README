@@ -67,33 +67,100 @@ application, then any functions that you define that are
 intended to be called via pthread_cleanup_push() must be
 __cdecl.
 
-Note 3: the intention is to also name either the VC or GC
+Note 3: the intention was to also name either the VC or GC
 version (it should be arbitrary) as pthread.dll, including
-pthread.lib and libpthread.a as appropriate.
+pthread.lib and libpthread.a as appropriate. This is no longer
+likely to happen.
+
+Note 4: the compatibility number was added so that applications
+can differentiate between binary incompatible versions of the
+libs and dlls.
 
 In general:
-	pthread[VG]{SE,CE,C}.dll
-	pthread[VG]{SE,CE,C}.lib
+	pthread[VG]{SE,CE,C}c.dll
+	pthread[VG]{SE,CE,C}c.lib
 
 where:
 	[VG] indicates the compiler
-	V	- MS VC
+	V	- MS VC, or
 	G	- GNU C
 
 	{SE,CE,C} indicates the exception handling scheme
-	SE	- Structured EH
-	CE	- C++ EH
+	SE	- Structured EH, or
+	CE	- C++ EH, or
 	C	- no exceptions - uses setjmp/longjmp
+
+	c	- DLL compatibility number indicating ABI and API
+		  compatibility with applications built against
+		  any snapshot with the same compatibility number.
+		  See 'Version numbering' below.
 
 For example:
 	pthreadVSE.dll	(MSVC/SEH)
 	pthreadGCE.dll	(GNUC/C++ EH)
 	pthreadGC.dll	(GNUC/not dependent on exceptions)
+	pthreadVC1.dll	(MSVC/not dependent on exceptions - not binary
+			compatible with pthreadVC.dll)
 
-The GNU library archive file names have changed to:
+The GNU library archive file names have correspondingly changed to:
 
-	libpthreadGCE.a
-	libpthreadGC.a
+	libpthreadGCEc.a
+	libpthreadGCc.a
+
+
+Versioning numbering
+--------------------
+
+Version numbering is separate from the snapshot dating system, and
+is the canonical version identification system embedded within the
+DLL using the Microsoft version resource system. The versioning
+system chosen follows the GNU Libtool system. See
+http://www.gnu.org/software/libtool/manual.html section 6.2.
+
+See the resource file 'version.rc'.
+
+Microsoft version numbers use 4 integers:
+
+	0.0.0.0
+
+Pthreads-win32 uses the first 3 following the Libtool convention.
+The fourth is commonly used for the build number, but will be reserved
+for future use.
+
+	current.revision.age.0
+
+The numbers are changed as follows:
+
+1. Start with version information of '0.0.0.0'.
+2. If the library source code has changed at all since the last update,
+   then increment revision (`c:r:a' becomes `c:r+1:a').
+3. If any interfaces have been added, removed, or changed since the last
+   update, increment current, and set revision to 0.
+4. If any interfaces have been added since the last public release, then
+   increment age.
+5. If any interfaces have been removed since the last public release, then
+   set age to 0.
+
+
+DLL compatibility numbering is an attempt to ensure that applications
+always load a compatible pthreads-win32 DLL by using a DLL naming system
+that is consistent with the version numbering system. It also allows
+older and newer DLLs to coexist in the same filesystem so that older
+applications can continue to be used. For pre .NET Windows systems,
+this inevitably requires incompatible versions of the same DLLs to have
+different names.
+
+Pthreads-win32 has adopted the Cygwin convention of appending a single
+integer number to the DLL name. The number used is based on the library
+version number and is computed as 'current' - 'age'.
+
+(See http://home.att.net/~perlspinr/libversioning.html for a nicely
+detailed explanation.)
+
+Using this method, DLL name/s will only change when the DLL's
+backwards compatibility changes. Note that the addition of new
+'interfaces' will not change the DLL's compatibility for older
+applications.
 
 
 Which of the several dll versions to use?
@@ -103,8 +170,8 @@ or,
 What are all these pthread*.dll and pthread*.lib files?
 -------------------------------------------------------
 
-Simple, use either pthreadGC.* if you use GCC, or pthreadVC.* if you
-use MSVC.
+Simple, use either pthreadGCv.* if you use GCC, or pthreadVCv.* if you
+use MSVC - where 'v' is the DLL versioning (compatibility) number.
 
 Otherwise, you need to choose carefully and know WHY.
 

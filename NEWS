@@ -1,3 +1,52 @@
+SNAPSHOT 2004-11-22
+-------------------
+
+This snapshot primarily fixes the condvar bug introduced in
+snapshot-2004-11-03. DLL versioning has also been included to allow
+applications to runtime check the Microsoft compatible DLL version
+information, and to extend the DLL naming system for ABI and major
+(non-backward compatible) API changes. See the README file for details.
+
+Bug fixes
+---------
+
+* Condition variables no longer deadlock (bug introduced in
+snapshot-2004-11-03).
+- 
+
+* DLL naming extended to avoid 'DLL hell' in the future, and to
+accommodate the ABI change introduced in snapshot-2004-11-03. Snapshot
+2004-11-03 will be removed from FTP sites.
+
+New features
+------------
+
+* A Microsoft-style version resource has been added to the DLL for
+applications that wish to check DLL compatibility at runtime.
+
+* Pthreads-win32 DLL naming has been extended to allow incompatible DLL
+versions to co-exist in the same filesystem. See the README file for details,
+but briefly: while the version information inside the DLL will change with
+each release from now on, the DLL version names will only change if the new
+DLL is not backward compatible with older applications.
+
+The versioning scheme has been borrowed from GNU Libtool, and the DLL
+naming scheme is from Cygwin. Provided the Libtool-style numbering rules are
+honoured, the Cygwin DLL naming scheme automatcally ensures that DLL name
+changes are minimal and that applications will not load an incompatible
+pthreads-win32 DLL.
+
+Those who use the pre-built DLLs will find that the DLL/LIB names have a new
+suffix (1) in this snapshot. E.g. pthreadVC1.dll etc.
+
+* The POSIX thread ID reuse uniqueness feature introduced in the last snapshot
+has been kept as default, but the behaviour can now be controlled when the DLL
+is built to effectively switch it off. This makes the library much more
+sensitive to applications that assume that POSIX thread IDs are unique, i.e.
+are not strictly compliant with POSIX. See the PTW32_THREAD_ID_REUSE_INCREMENT
+macro comments in config.h for details.
+
+
 SNAPSHOT 2004-11-03
 -------------------
 

@@ -8,7 +8,7 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2003 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2004 Pthreads-win32 contributors
  * 
  *      Contact Email: rpj@callisto.canberra.edu.au
  * 
@@ -124,7 +124,11 @@ ptw32_threadReusePush (pthread_t thread)
   tp->ptHandle = t;
 
   /* Bump the reuse counter now */
+#ifdef PTW32_THREAD_ID_REUSE_INCREMENT
+  tp->ptHandle.x += PTW32_THREAD_ID_REUSE_INCREMENT;
+#else
   tp->ptHandle.x++;
+#endif
 
   tp->prevReuse = PTW32_THREAD_REUSE_EMPTY;
 

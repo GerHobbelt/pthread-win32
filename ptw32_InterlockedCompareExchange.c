@@ -9,7 +9,7 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2003 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2004 Pthreads-win32 contributors
  * 
  *      Contact Email: rpj@callisto.canberra.edu.au
  * 
@@ -73,7 +73,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 
 #if defined(_M_IX86) || defined(_X86_)
 
-#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(__BORLAND__)
+#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(X__BORLANDC__)
 #define HAVE_INLINABLE_INTERLOCKED_CMPXCHG
 
     {
@@ -184,7 +184,7 @@ ptw32_InterlockedExchange (LPLONG location,
 
 #if defined(_M_IX86) || defined(_X86_)
 
-#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(__BORLAND__)
+#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(X__BORLANDC__)
 #define HAVE_INLINABLE_INTERLOCKED_XCHG
 
     {

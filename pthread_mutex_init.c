@@ -8,7 +8,7 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2003 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2004 Pthreads-win32 contributors
  * 
  *      Contact Email: rpj@callisto.canberra.edu.au
  * 
@@ -56,7 +56,7 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
        * Creating mutex that can be shared between
        * processes.
        */
-#if _POSIX_THREAD_PROCESS_SHARED
+#if _POSIX_THREAD_PROCESS_SHARED >= 0
 
       /*
        * Not implemented yet.

@@ -49,6 +49,41 @@
 /* Define if you don't have the GetProcessAffinityMask() */
 #undef NEED_PROCESS_AFFINITY_MASK
 
+/*
+# ----------------------------------------------------------------------
+# The library can be built with some alternative behaviour to better
+# facilitate development of applications on Win32 that will be ported
+# to other POSIX systems.
+#
+# Nothing described here will make the library non-compliant and strictly
+# compliant applications will not be affected in any way, but
+# applications that make assumptions that POSIX does not guarantee are
+# not strictly compliant and may fail or misbehave with some settings.
+#
+# PTW32_THREAD_ID_REUSE_INCREMENT
+# Purpose:
+# POSIX says that applications should assume that thread IDs can be
+# recycled. However, Solaris (and some other systems) use a [very large]
+# sequence number as the thread ID, which provides virtual uniqueness.
+# This provides a very high but finite level of safety for applications
+# that are not meticulous in tracking thread lifecycles e.g. applications
+# that call functions which target detached threads without some form of
+# thread exit synchronisation.
+#
+# Usage:
+# Set to any value in the range: 0 <= value < 2^wordsize.
+# Set to 0 to emulate reusable thread ID behaviour like Linux or *BSD.
+# Set to 1 for unique thread IDs like Solaris (this is the default).
+# Set to some factor of 2^wordsize to emulate smaller word size types
+# (i.e. will wrap sooner). This might be useful to emulate some embedded
+# systems.
+#
+# define PTW32_THREAD_ID_REUSE_INCREMENT 0
+#
+# ----------------------------------------------------------------------
+ */
+#undef PTW32_THREAD_ID_REUSE_INCREMENT
+
 
 /*********************************************************************
  * Target specific groups

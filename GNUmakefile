@@ -3,7 +3,7 @@
 #
 #      Pthreads-win32 - POSIX Threads Library for Win32
 #      Copyright(C) 1998 John E. Bossom
-#      Copyright(C) 1999,2003 Pthreads-win32 contributors
+#      Copyright(C) 1999,2004 Pthreads-win32 contributors
 # 
 #      Contact Email: rpj@callisto.canberra.edu.au
 # 
@@ -29,6 +29,8 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
+DLL_VER	= 1
+
 DEVROOT	= C:\PTHREADS
 
 DLLDEST	= $(DEVROOT)\DLL
@@ -38,6 +40,7 @@ LIBDEST	= $(DEVROOT)\DLL
 RM	= rm -f
 MV	= mv -f
 CP	= cp -f
+RC	= windres
 
 # If not.
 #RM	= erase
@@ -51,17 +54,45 @@ AR	= ar
 OPT	= -O3 -finline-functions
 XOPT	=
 
+RCFLAGS		= --include-dir=.
 LFLAGS		= -lwsock32
 
-GC_CFLAGS	= -D__CLEANUP_C
-GCE_CFLAGS	= -D__CLEANUP_CXX -mthreads
+# ----------------------------------------------------------------------
+# The library can be built with some alternative behaviour to
+# facilitate development of applications on Win32 that will be ported
+# to other POSIX systems. Nothing definable here will make the library
+# non-compliant, but applications that make assumptions that POSIX
+# does not garrantee may fail or misbehave under some settings.
+#
+# PTW32_THREAD_ID_REUSE_INCREMENT
+# Purpose:
+# POSIX says that applications should assume that thread IDs can be
+# recycled. However, Solaris and some other systems use a [very large]
+# sequence number as the thread ID, which provides virtual uniqueness.
+#
+# Usage:
+# Set to any value in the range: 0 <= value <= 2^wordsize
+#
+# Examples:
+# Set to 0 to emulate non recycle-unique behaviour like Linux or *BSD.
+# Set to 1 for recycle-unique thread IDs like Solaris (this is the default).
+# Set to some other +ve value to emulate smaller word size types (i.e. will
+# wrap sooner). This might be useful to emulate some embedded systems.
+#
+#PTW32_FLAGS	= "-DPTW32_THREAD_ID_REUSE_INCREMENT=0"
+#
+# ----------------------------------------------------------------------
+
+GC_CFLAGS	= $(PTW32_FLAGS) -D__CLEANUP_C
+GCE_CFLAGS	= $(PTW32_FLAGS) -D__CLEANUP_CXX -mthreads
 
 ## Mingw32
 MAKE		= make
 CFLAGS	= $(OPT) $(XOPT) -I. -DHAVE_CONFIG_H -Wall
 
 DLL_INLINED_OBJS	= \
-		pthread.o
+		pthread.o \
+		version.o
 
 # Agregate modules for inlinability
 DLL_OBJS	= \
@@ -86,7 +117,8 @@ DLL_OBJS	= \
 		signal.o \
 		spin.o \
 		sync.o \
-		tsd.o
+		tsd.o \
+		version.o
 
 # Separate modules for minimum size statically linked images
 SMALL_STATIC_OBJS	= \
@@ -220,7 +252,8 @@ SMALL_STATIC_OBJS	= \
 		pthread_key_delete.o \
 		pthread_setspecific.o \
 		pthread_getspecific.o \
-		w32_CancelableWait.o
+		w32_CancelableWait.o \
+		version.o
 
 INCL	= \
 		config.h \
@@ -387,13 +420,13 @@ TSD_SRCS	= \
 		pthread_getspecific.c
 
 
-GCE_DLL	= pthreadGCE.dll
-GCE_LIB	= libpthreadGCE.a
-GCE_INLINED_STAMP = pthreadGCE.stamp
+GCE_DLL	= pthreadGCE$(DLL_VER).dll
+GCE_LIB	= libpthreadGCE$(DLL_VER).a
+GCE_INLINED_STAMP = pthreadGCE$(DLL_VER).stamp
 
-GC_DLL 	= pthreadGC.dll
-GC_LIB	= libpthreadGC.a
-GC_INLINED_STAMP = pthreadGC.stamp
+GC_DLL 	= pthreadGC$(DLL_VER).dll
+GC_LIB	= libpthreadGC$(DLL_VER).a
+GC_INLINED_STAMP = pthreadGC$(DLL_VER).stamp
 
 PTHREAD_DEF	= pthread.def
 
@@ -430,7 +463,10 @@ tests:
 %.s: %.c
 	$(CC) -c $(CFLAGS) -Wa,-ahl $^ > $@
 
-.SUFFIXES: .dll .c .o
+%.o: %.rc
+	$(RC) $(RCFLAGS) -o $@ $<
+
+.SUFFIXES: .dll .rc .c .o
 
 .c.o:;		 $(CC) -c -o $@ $(CFLAGS) $(CLEANUP_FLAGS) $<
 
@@ -488,3 +524,4 @@ semaphore.o:	semaphore.c $(SEMAPHORE_SRCS) $(INCL)
 spin.o:		spin.c $(SPIN_SRCS) $(INCL)
 sync.o:		sync.c $(SYNC_SRCS) $(INCL)
 tsd.o:		tsd.c $(TSD_SRCS) $(INCL)
+version.o:	version.rc $(INCL)

@@ -5,29 +5,39 @@
 # The variables $DLLDEST and $LIBDEST hold the destination directories for the
 # dll and the lib, respectively. Probably all that needs to change is $DEVROOT.
 
-DEVROOT=c:\pthreads
 
-DLLDEST=$(DEVROOT)\DLL
-LIBDEST=$(DEVROOT)\DLL
+# DLL_VER:
+# See pthread.h and README - This number is computed as 'current - age'
+DLL_VER	= 1
 
-DLLS	= pthreadVCE.dll pthreadVSE.dll pthreadVC.dll
-INLINED_STAMPS	= pthreadVCE.stamp pthreadVSE.stamp pthreadVC.stamp
+DEVROOT	= c:\pthreads
 
-OPTIM	= /O2
+DLLDEST	= $(DEVROOT)\DLL
+LIBDEST	= $(DEVROOT)\DLL
+
+DLLS	= pthreadVCE$(DLL_VER).dll pthreadVSE$(DLL_VER).dll pthreadVC$(DLL_VER).dll
+INLINED_STAMPS	= pthreadVCE$(DLL_VER).stamp pthreadVSE$(DLL_VER).stamp pthreadVC$(DLL_VER).stamp
+
+OPTIM	= /O2 /Ob2
 #OPTIM	=
 
 CFLAGS	= /W3 /MD /nologo /Yd /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
 #CFLAGS	= /W3 /MD /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
 
+
+# Default cleanup style
+CLEANUP	= __CLEANUP_C
+
 # C++ Exceptions
-VCEFLAGS	= /GX /TP /D__CLEANUP_CXX $(CFLAGS)
+VCEFLAGS	= /GX /TP $(CFLAGS)
 #Structured Exceptions
-VSEFLAGS	= /D__CLEANUP_SEH $(CFLAGS)
+VSEFLAGS	= $(CFLAGS)
 #C cleanup code
-VCFLAGS	= /D__CLEANUP_C $(CFLAGS)
+VCFLAGS	= $(CFLAGS)
 
 DLL_INLINED_OBJS = \
-		pthread.obj
+		pthread.obj \
+		version.res
 
 # Aggregate modules for inlinability
 DLL_OBJS	= \
@@ -52,7 +62,8 @@ DLL_OBJS	= \
 		signal.obj \
 		spin.obj \
 		sync.obj \
-		tsd.obj
+		tsd.obj \
+		version.res
 
 # Separate modules for minimising the size of statically linked images
 SMALL_STATIC_OBJS	= \
@@ -186,7 +197,8 @@ SMALL_STATIC_OBJS	= \
 		pthread_key_delete.obj \
 		pthread_setspecific.obj \
 		pthread_getspecific.obj \
-		w32_CancelableWait.obj
+		w32_CancelableWait.obj \
+		version.res
 
 INCL	= config.h implement.h semaphore.h pthread.h need_errno.h
 
@@ -363,26 +375,26 @@ all:
 	@ nmake clean VC-inlined
 
 VCE:
-	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCEFLAGS)" pthreadVCE.dll
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCEFLAGS)" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).dll
 
 VSE:
-	@ nmake /nologo EHFLAGS="$(OPTIM) $(VSEFLAGS)" pthreadVSE.dll
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VSEFLAGS)" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).dll
 
 VC:
-	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS)" pthreadVC.dll
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS)" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).dll
 
 #
 # The so-called inlined DLL is just a single translation unit with
 # inlining optimisation turned on.
 #
 VCE-inlined:
-	@ nmake /nologo EHFLAGS="/O2 /Ob2 $(VCEFLAGS) /DPTW32_BUILD_INLINED" pthreadVCE.stamp
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).stamp
 
 VSE-inlined:
-	@ nmake /nologo EHFLAGS="/O2 /Ob2 $(VSEFLAGS) /DPTW32_BUILD_INLINED" pthreadVSE.stamp
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VSEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).stamp
 
 VC-inlined:
-	@ nmake /nologo EHFLAGS="/O2 /Ob2 $(VCFLAGS) /DPTW32_BUILD_INLINED" pthreadVC.stamp
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).stamp
 
 realclean: clean
 	if exist *.dll del *.dll
@@ -394,8 +406,10 @@ clean:
 	if exist *.ilk del *.ilk
 	if exist *.pdb del *.pdb
 	if exist *.exp del *.exp
+	if exist *.map del *.map
 	if exist *.o del *.o
 	if exist *.i del *.i
+	if exist *.res del *.res
 
 
 install: $(DLLS)
@@ -413,7 +427,10 @@ $(INLINED_STAMPS): $(DLL_INLINED_OBJS)
 		msvcrt.lib wsock32.lib /out:$*.dll
 
 .c.obj:
-	cl $(EHFLAGS) -c $<
+	cl $(EHFLAGS) /D$(CLEANUP) -c $<
+
+.rc.res:
+	rc /dPTW32_RC_MSC /d$(CLEANUP) $<
 
 .c.i:
 	cl /P /O2 /Ob1 $(VCFLAGS) $<
@@ -433,3 +450,4 @@ semaphore.obj:	semaphore.c $(SEMAPHORE_SRCS) $(INCL)
 spin.obj:	spin.c $(SPIN_SRCS) $(INCL)
 sync.obj:	sync.c $(SYNC_SRCS) $(INCL)
 tsd.obj:	tsd.c $(TSD_SRCS) $(INCL)
+version.res:	version.rc $(INCL)

@@ -2,26 +2,30 @@
 # 
 # The variables $DLLDEST and $LIBDEST hold the destination directories for the
 # dll and the lib, respectively. Probably all that needs to change is $DEVROOT.
+#
+# Currently only the recommended pthreadBC.dll is built by this makefile.
+#
 
-DEVROOT=H:\libraries\pthreads-win32\pthreads
 
-DLLDEST=$(DEVROOT)\DLL
-LIBDEST=$(DEVROOT)\DLL
+DLL_VER	= 1
 
-DLLS	= pthreadBC.dll
+DEVROOT	= .
+
+DLLDEST	= $(DEVROOT)\DLL
+LIBDEST	= $(DEVROOT)\DLL
+
+DLLS	= pthreadBC$(DLL_VER).dll
 
 OPTIM	= /O2
 
-# most of the below flags are to provide compatibility with the MSC-orientated source:
-# borland uses EDEADLOCK, timeb, and ftime instead of EDEADLK, _timeb, and _ftime.
-# borland doesn't define ENOSYS in errno.h, so we define an arbitrary value for it here (we don't use ENOSYS in our client apps; if someone wants this, we could add a seperate case to the config & need_errno header files for it).
+RC	= brcc32
+RCFLAGS	= -i.
 
-CFLAGS	= /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H=1 /4 /tWM \
-	/DEDEADLK=EDEADLOCK /D_timeb=timeb /D_ftime=ftime \
-	/DENOSYS=140
+CFLAGS	= /q /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H=1 /4 /tWD /tWM \
+	  /w-aus /w-asc /w-par
 
 #C cleanup code
-BCFLAGS	= /D__CLEANUP_C $(CFLAGS)
+BCFLAGS	= $(PTW32_FLAGS) $(CFLAGS)
 
 # Agregate modules for inlinability
 DLL_OBJS	= \
@@ -215,23 +219,34 @@ realclean: clean
 clean:
 	if exist *.obj del *.obj
 	if exist *.ilk del *.ilk
+	if exist *.ilc del *.ilc
+	if exist *.ild del *.ild
+	if exist *.ilf del *.ilf
+	if exist *.ils del *.ils
+	if exist *.tds del *.tds
 	if exist *.pdb del *.pdb
 	if exist *.exp del *.exp
+	if exist *.map del *.map
 	if exist *.o del *.o
 	if exist *.i del *.i
+	if exist *.res del *.res
 
 
 install: $(DLLS)
 	copy pthread*.dll $(DLLDEST)
 	copy pthread*.lib $(LIBDEST)
 
-$(DLLS): $(DLL_OBJS)
-	ilink32 /Tpd /Gi $(DLL_OBJS), \
+$(DLLS): $(DLL_OBJS) version.res
+	ilink32 /Tpd /Gi c0d32x.obj $(DLL_OBJS), \
 		$@, ,\
-		import32.lib cw32mt.lib c0d32x.obj
+		cw32mt.lib import32.lib, ,\
+		version.res
 
 .c.obj:
-	bcc32 $(OPTIM) $(BCFLAGS) -c $<
+	$(CC) $(OPTIM) $(BCFLAGS) -c $<
+
+.rc.res:
+	$(RC) $(RCFLAGS) $<
 
 attr.obj:	attr.c $(ATTR_SRCS) $(INCL)
 barrier.obj:	barrier.c $(BARRIER_SRCS) $(INCL)
@@ -248,3 +263,4 @@ semaphore.obj:	semaphore.c $(SEMAPHORE_SRCS) $(INCL)
 spin.obj:	spin.c $(SPIN_SRCS) $(INCL)
 sync.obj:	sync.c $(SYNC_SRCS) $(INCL)
 tsd.obj:	tsd.c $(TSD_SRCS) $(INCL)
+version.res:	version.rc $(INCL)
