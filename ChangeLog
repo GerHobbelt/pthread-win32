@@ -1,3 +1,49 @@
+Mon Mar  8 11:18:59 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* misc.c (CancelableWait): Ensure cancelEvent handle is the lowest
+	indexed element in the handles array. Enhance test for abandoned
+	objects.
+
+	* pthread.h (PTHREAD_MUTEX_INITIALIZER): Trailing elements not
+	initialised are set to zero by the compiler. This avoids the
+	problem of initialising the opaque critical section element in it.
+	(PTHREAD_COND_INITIALIZER): Ditto.
+
+	* semaphore.c (_pthread_sem_timedwait): Check sem == NULL earlier.
+
+Sun Mar  7 12:31:14 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* condvar.c (pthread_cond_init): set semaphore initial value
+	to 0, not 1. cond_timedwait was returning signaled immediately.
+
+	* misc.c (CancelableWait): Place the cancel event handle first
+	in the handle table for WaitForMultipleObjects. This ensures that
+	the cancel event is recognised and acted apon if both objects
+	happen to be signaled together.
+
+	* private.c (_pthread_cond_test_init_lock): Initialise and destroy.
+
+	* implement.h (_pthread_cond_test_init_lock): Add extern.
+
+	* global.c (_pthread_cond_test_init_lock): Add declaration. 
+
+	* condvar.c (pthread_cond_destroy): check for valid initialised CV;
+	flag destroyed CVs as invalid.
+	(pthread_cond_init): pthread_cond_t is no longer just a pointer.
+	This is because PTHREAD_COND_INITIALIZER needs state info to reside
+	in pthread_cond_t so that it can initialise on first use. Will work on
+	making pthread_cond_t (and other objects like it) opaque again, if
+	possible, later.
+	(cond_timedwait): add check for statically initialisation of
+	CV; initialise on first use.
+	(pthread_cond_signal): check for valid CV.
+	(pthread_cond_broadcast): check for valid CV.
+	(_cond_check_need_init): Add.
+
+	* pthread.h (PTHREAD_COND_INITIALIZER): Fix.
+	(pthread_cond_t): no longer a pointer to pthread_cond_t_.
+	(pthread_cond_t_): add 'staticinit' and 'valid' elements.
+
 Sun Feb 21 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* pthread.h (PTHREAD_MUTEX_INITIALIZER): missing braces around

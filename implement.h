@@ -150,6 +150,7 @@ extern int _pthread_processInitialized;
 extern pthread_key_t _pthread_selfThreadKey;
 extern pthread_key_t _pthread_cleanupKey;
 extern CRITICAL_SECTION _pthread_mutex_test_init_lock;
+extern CRITICAL_SECTION _pthread_cond_test_init_lock;
 
 
 #include <pthread.h>

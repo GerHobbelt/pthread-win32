@@ -451,7 +451,7 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
    * again inside the guarded section of _mutex_check_need_init()
    * to avoid race conditions.
    */
-  if (mutex->staticinit)
+  if (mutex->staticinit == 1)
     {
       result = _mutex_check_need_init(mutex);
     }

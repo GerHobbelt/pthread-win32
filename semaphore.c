@@ -267,6 +267,11 @@ _pthread_sem_timedwait (_pthread_sem_t * sem, const struct timespec * abstime)
   const DWORD MILLISEC_PER_SEC = 1000;
   DWORD milliseconds;
 
+  if (sem == NULL)
+    {
+      return EINVAL;
+    }
+
   if (abstime == NULL)
     {
       milliseconds = INFINITE;
@@ -286,10 +291,7 @@ _pthread_sem_timedwait (_pthread_sem_t * sem, const struct timespec * abstime)
 	currSysTime.millitm;
     }
 
-  return ((sem == NULL)
-	  ? EINVAL
-	  : pthreadCancelableTimedWait (*sem, milliseconds)
-    );
+  return (pthreadCancelableTimedWait (*sem, milliseconds));
 
 }				/* _pthread_sem_timedwait */
 

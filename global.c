@@ -20,5 +20,11 @@ pthread_key_t _pthread_cleanupKey = NULL;
  */
 CRITICAL_SECTION _pthread_mutex_test_init_lock;
 
+/*
+ * Global lock for testing internal state of PTHREAD_COND_INITIALIZER
+ * created condition variables.
+ */
+CRITICAL_SECTION _pthread_cond_test_init_lock;
+
 
 

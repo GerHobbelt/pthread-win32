@@ -213,8 +213,12 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
   DWORD nHandles = 1;
   DWORD status;
 
-  handles[0] = waitHandle;
-
+  /*
+   * If both objects are signaled, then (status - WAIT_OBJECT_0)
+   * will be the lowest index value of all the signaled objects.
+   * We must ensure that a cancelation is recognised if this occurs by
+   * placing the cancelEvent handle first in the handle table.
+   */
   if ((self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey)) 
       != NULL)
     {
@@ -224,16 +228,14 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
       if (self->cancelState == PTHREAD_CANCEL_ENABLE)
         {
 
-          if ((handles[1] = self->cancelEvent) != NULL)
+          if ((handles[0] = self->cancelEvent) != NULL)
             {
               nHandles++;
             }
         }
     }
-  else
-    {
-      handles[1] = NULL;
-    }
+
+  handles[nHandles - 1] = waitHandle;
 
   status = WaitForMultipleObjects (
                                     nHandles,
@@ -241,41 +243,36 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
                                     FALSE,
                                     timeout);
 
-
   if (status == WAIT_FAILED)
     {
       result = EINVAL;
-
     }
   else if (status == WAIT_TIMEOUT)
     {
       result = ETIMEDOUT;
     }
-  else if (status == WAIT_ABANDONED_0)
+  else if (status >= WAIT_ABANDONED_0 && status <= WAIT_ABANDONED_0 + nHandles - 1)
     {
+      /*
+       * The waitHandle was a mutex object that was abandoned.
+       */
       result = EINVAL;
     }
   else
     {
       /*
-       * Either got the mutex or the cancel event
-       * was signaled
+       * Either got the object or the cancel event
+       * was signaled, or both in which case the cancel
+       * event will be acted on.
        */
-      switch (status - WAIT_OBJECT_0)
+      switch (status - WAIT_OBJECT_0 + 2 - nHandles)
         {
 
         case 0:
           /*
-           * Got the mutex
+           * Got cancel request.
            */
-          result = 0;
-          break;
-
-        case 1:
-          /*
-           * Got cancel request
-           */
-          ResetEvent (handles[1]);
+          ResetEvent (handles[0]);
 
           if (self != NULL && !self->implicit)
             {
@@ -307,8 +304,15 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
 #endif /* _MSC_VER */
             }
 
-	  /* Should never get to here. */
-	  result = EINVAL;
+          /* Should never get to here. */
+          result = EINVAL;
+          break;
+
+        case 1:
+          /*
+           * Got the object.
+           */
+          result = 0;
           break;
 
         default:

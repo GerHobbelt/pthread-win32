@@ -14,8 +14,8 @@ ECHO	= @echo
 CC	= gcc
 CFLAGS	= -g -O2 -UNDEBUG -Wall -o $@ $^
 BUILD_DIR	= ..
-INCLUDES	= -I./include
-LIBS	= ./lib/libpthread32.a
+INCLUDES	= -I.
+LIBS	= ./libpthread32.a
 
 ##
 ## MSVC
@@ -23,18 +23,18 @@ LIBS	= ./lib/libpthread32.a
 #CC	= cl
 #CFLAGS	= /W3 /MT /nologo /Yd /Zi /Fe$@ $^
 #BUILD_DIR	= ..
-#INCLUDES	= -I.\include
-#LIBS	= .\lib\pthread.lib
+#INCLUDES	= -I.
+#LIBS	= pthread.lib
 
-HDR	= .\include\pthread.h
-LIB	= .\lib\libpthread32.a
+HDR	= pthread.h
+LIB	= libpthread32.a
 DLL	= pthread.dll
 
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
 TESTS	= count1 create1 equal1 exit1 exit2 exit3 \
-	 join1 eyal1 mutex1 mutex2 mutex3 \
+	 join1 mutex1 mutex2 mutex3 \
 	 once1 self1 self2 condvar1 condvar2 condvar3 condvar4 tsd1
 
 PASSES	= $(TESTS:%=%.pass)
@@ -51,15 +51,16 @@ all:	$(PASSES)
 	@ $(CC) $(CFLAGS) $(INCLUDES) $(LIBS)
 
 $(LIB):
-	@- $(MKDIR) .\lib
-	@ $(CP) $(BUILD_DIR)\$@ .\$@
+	@ $(ECHO) Copying the library
+	@ $(CP) $(BUILD_DIR)\$@ .
 
 $(HDR):
-	@- $(MKDIR) .\include
-	@ $(CP) $(BUILD_DIR)\$@ .\$@
+	@ $(ECHO) Copying the header file
+	@ $(CP) $(BUILD_DIR)\$@ .
 
 $(DLL):
-	@ $(CP) $(BUILD_DIR)\$@ .\$@
+	@ $(ECHO) Copying the DLL
+	@ $(CP) $(BUILD_DIR)\$@ .
 
 clean:
 	- $(RM) *.dll
