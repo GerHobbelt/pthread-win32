@@ -16,11 +16,11 @@ then
   fi
 fi
 AC_CACHE_CHECK(for _stdcall keyword, p32_cv_stdcall,
-  AC_TRY_COMPILE( ,[int _stdcall foo();],
+  AC_TRY_COMPILE( ,[int __stdcall foo();],
     p32_cv_stdcall=yes, p32_cv_stdcall=no))
 
 if test x$p32_cv_stdcall = xyes ; then
-  AC_DEFINE(STDCALL, _stdcall)
+  AC_DEFINE(STDCALL, __stdcall)
 else
   AC_DEFINE(STDCALL,)
 fi
