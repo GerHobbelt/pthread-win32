@@ -98,7 +98,8 @@ pthread_attr_init(pthread_attr_t *attr)
   attr->stacksize = PTHREAD_STACK_MIN;
 #endif
 
-  attr->cancelability = _PTHREAD_CANCEL_DEFAULTS;
+  attr->cancelability = PTHREAD_CANCEL_ENABLE;
+  attr->canceltype = PTHREAD_CANCEL_DEFERRED;
   attr->valid = 0;
 
   return 0;
