@@ -61,6 +61,13 @@ pthread_delay_np (const struct timespec *interval);
         0          Successful completion. 
         [EINVAL]   The value specified by interval is invalid. 
 
+int
+pthread_num_processors_np
+
+        This routine (found on HPUX systems) returns the number of processors
+        in the system. This implementations actually returns the number of
+        processors available to the process, which can be a different (lower)
+        value depending on the process's affinity mask.
 
 BOOL
 pthread_win32_process_attach_np (void);

@@ -85,7 +85,7 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
       return EINVAL;
     }
 
-  if (0 != pthread_getprocessors_np(&cpus))
+  if (0 != ptw32_getprocessors(&cpus))
     {
       cpus = 1;
     }

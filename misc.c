@@ -333,7 +333,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
   else
     {
       /*
-       * Either got the mutex or the cancel event
+       * Either got the handle or the cancel event
        * was signaled
        */
       switch (status - WAIT_OBJECT_0)
@@ -341,7 +341,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 
         case 0:
           /*
-           * Got the mutex
+           * Got the handle
            */
           result = 0;
           break;

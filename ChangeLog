@@ -1,3 +1,60 @@
+2002-01-27  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* mutex.c (pthread_mutex_timedlock): New function suggested by
+	Alexander Terekhov. The logic required to implement this
+	properly came from Alexander, with some collaboration
+	with Thomas Pfaff.
+	(pthread_mutex_unlock): Wrap the waiters check and sema
+	post in a critical section to prevent a race with
+	pthread_mutex_timedlock.
+	(ptw32_timed_semwait): New function;
+	returns a special result if the absolute timeout parameter
+	represents a time already passed when called; used by
+	pthread_mutex_timedwait(). Have deliberately not reused
+	the name "ptw32_sem_timedwait" because they are not the same
+	routine.
+	* condvar.c (ptw32_cond_timedwait): Use the new sem_timedwait()
+	instead of ptw32_sem_timedwait(), which now has a different
+	function. See previous.
+	* implement.h: Remove prototype for ptw32_sem_timedwait.
+	See next.
+	(pthread_mutex_t_): Add critical section element for access
+	to lock_idx during mutex post-timeout processing.
+	* semaphore.h (sem_timedwait): See next.
+	* semaphore.c (sem_timedwait): See next.
+	* private.c (ptw32_sem_timedwait): Move to semaphore.c
+	and rename as sem_timedwait().
+
+2002-01-18  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* sync.c (pthread_join): Was getting the exit code from the
+	calling thread rather than the joined thread if
+	defined(__MINGW32__) && !defined(__MSVCRT__).
+
+2002-01-15  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* pthread.h: Unless the build explicitly defines __CLEANUP_SEH,
+	__CLEANUP_CXX, or __CLEANUP_C, then the build defaults to
+	__CLEANUP_C style cleanup. This style uses setjmp/longjmp
+	in the cancelation and thread exit implementations and therefore
+	won't do stack unwinding if linked to applications that have it
+	(e.g. C++ apps). This is currently consistent with most/all
+	commercial Unix POSIX threads implementations.
+
+	* spin.c (pthread_spin_init): Edit renamed function call.
+	* nonportable.c (pthread_num_processors_np): New.
+	(pthread_getprocessors_np): Renamed to ptw32_getprocessors
+	and moved to private.c.
+	* private.c (pthread_getprocessors): Moved here from
+	nonportable.c.
+	* pthread.def (pthread_getprocessors_np): Removed
+	from export list.
+
+	* rwlock.c (pthread_rwlockattr_init): New.
+	(pthread_rwlockattr_destroy): New.
+	(pthread_rwlockattr_getpshared): New.
+	(pthread_rwlockattr_setpshared): New.
+
 2002-01-14  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* attr.c (pthread_attr_setscope): Fix struct pointer

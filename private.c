@@ -27,12 +27,6 @@
  * MA 02111-1307, USA
  */
 
-#ifndef _UWIN
-#   include <process.h>
-#endif
-#ifndef NEED_FTIME
-#include <sys/timeb.h>
-#endif
 #include "pthread.h"
 #include "semaphore.h"
 #include "implement.h"
@@ -56,8 +50,8 @@ ptw32_processInitialize (void)
       *      ptw32_processInitialized to TRUE.
       *
       * RESULTS
-      *              TRUE    if successful,
-      *              FALSE   otherwise
+      * 	     TRUE    if successful,
+      * 	     FALSE   otherwise
       *
       * ------------------------------------------------------
       */
@@ -115,7 +109,7 @@ ptw32_processTerminate (void)
       *      ptw32_processInitialized to FALSE
       *
       * RESULTS
-      *              N/A
+      * 	     N/A
       *
       * ------------------------------------------------------
       */
@@ -164,35 +158,35 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
   switch (ep->ExceptionRecord->ExceptionCode)
     {
       case EXCEPTION_PTW32_SERVICES:
-        {
-          DWORD param;
-          DWORD numParams = ep->ExceptionRecord->NumberParameters;
+	{
+	  DWORD param;
+	  DWORD numParams = ep->ExceptionRecord->NumberParameters;
 
-          numParams = (numParams > 3) ? 3 : numParams;
+	  numParams = (numParams > 3) ? 3 : numParams;
 
-          for (param = 0; param < numParams; param++)
-            {
-              ei[param] = ep->ExceptionRecord->ExceptionInformation[param];
-            }
+	  for (param = 0; param < numParams; param++)
+	    {
+	      ei[param] = ep->ExceptionRecord->ExceptionInformation[param];
+	    }
 
-          return EXCEPTION_EXECUTE_HANDLER;
-          break;
-        }
+	  return EXCEPTION_EXECUTE_HANDLER;
+	  break;
+	}
       default:
-        {
-          /*
-           * A system unexpected exception has occurred running the user's
-           * routine. We need to cleanup before letting the exception
-           * out of thread scope.
-           */
-          pthread_t self = pthread_self();
+	{
+	  /*
+	   * A system unexpected exception has occurred running the user's
+	   * routine. We need to cleanup before letting the exception
+	   * out of thread scope.
+	   */
+	  pthread_t self = pthread_self();
 
-          (void) pthread_mutex_destroy(&self->cancelLock);
-          ptw32_callUserDestroyRoutines(self);
+	  (void) pthread_mutex_destroy(&self->cancelLock);
+	  ptw32_callUserDestroyRoutines(self);
 
-          return EXCEPTION_CONTINUE_SEARCH;
-          break;
-        }
+	  return EXCEPTION_CONTINUE_SEARCH;
+	  break;
+	}
     }
 }
 
@@ -265,12 +259,13 @@ ptw32_threadStart (void * vthreadParms)
    * before it returns us the thread handle, and so we do it here.
    */
   self->thread = GetCurrentThreadId ();
+  /*
+   * Here we're using cancelLock as a general-purpose lock
+   * to make the new thread wait until the creating thread
+   * has the new handle.
+   */
   if (pthread_mutex_lock(&self->cancelLock) == 0)
     {
-      /* 
-       * We got the lock which means that our creator has
-       * our thread handle. Unlock and continue on.
-       */
       (void) pthread_mutex_unlock(&self->cancelLock);
     }
 #endif
@@ -295,19 +290,19 @@ ptw32_threadStart (void * vthreadParms)
   {
      switch (ei[0])
        {
-        case PTW32_EPS_CANCEL:
-          status = PTHREAD_CANCELED;
+	case PTW32_EPS_CANCEL:
+	  status = PTHREAD_CANCELED;
 #ifdef _UWIN
 		if (--pthread_count <= 0)
 			exit(0);
 #endif
-          break;
-        case PTW32_EPS_EXIT:
-          status = self->exitStatus;
-          break;
-        default:
-          status = PTHREAD_CANCELED;
-          break;
+	  break;
+	case PTW32_EPS_EXIT:
+	  status = self->exitStatus;
+	  break;
+	default:
+	  status = PTHREAD_CANCELED;
+	  break;
        }
   }
 
@@ -329,15 +324,15 @@ ptw32_threadStart (void * vthreadParms)
 
      switch (setjmp_rc)
        {
-        case PTW32_EPS_CANCEL:
-          status = PTHREAD_CANCELED;
-          break;
-        case PTW32_EPS_EXIT:
-          status = self->exitStatus;
-          break;
-        default:
-          status = PTHREAD_CANCELED;
-          break;
+	case PTW32_EPS_CANCEL:
+	  status = PTHREAD_CANCELED;
+	  break;
+	case PTW32_EPS_EXIT:
+	  status = self->exitStatus;
+	  break;
+	default:
+	  status = PTHREAD_CANCELED;
+	  break;
        }
   }
 
@@ -356,25 +351,25 @@ ptw32_threadStart (void * vthreadParms)
      */
     try
       {
-        status = self->exitStatus = (*start) (arg);
+	status = self->exitStatus = (*start) (arg);
       }
     catch (ptw32_exception &)
       {
-        /*
-         * Pass these through to the outer block.
-         */
-        throw;
+	/*
+	 * Pass these through to the outer block.
+	 */
+	throw;
       }
     catch(...)
      {
        /*
-        * We want to run the user's terminate function if supplied.
-        * That function may call pthread_exit() or be canceled, which will
-        * be handled by the outer try block.
-        * 
-        * ptw32_terminate() will be called if there is no user
-        * supplied function.
-        */
+	* We want to run the user's terminate function if supplied.
+	* That function may call pthread_exit() or be canceled, which will
+	* be handled by the outer try block.
+	* 
+	* ptw32_terminate() will be called if there is no user
+	* supplied function.
+	*/
 
 #if defined(_MSC_VER)
        terminate_function term_func = set_terminate(0);
@@ -385,7 +380,7 @@ ptw32_threadStart (void * vthreadParms)
        set_terminate(term_func);
 
        if (term_func != 0) {
-           term_func();
+	   term_func();
        }
 
        throw;
@@ -394,7 +389,7 @@ ptw32_threadStart (void * vthreadParms)
   catch (ptw32_exception_cancel &)
     {
       /*
-       * Thread was cancelled.
+       * Thread was canceled.
        */
       status = self->exitStatus = PTHREAD_CANCELED;
     }
@@ -520,23 +515,23 @@ ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
       *
       * Notes:
       *      1)      New associations are pushed to the beginning of the
-      *              chain so that the internal ptw32_selfThreadKey association
-      *              is always last, thus allowing selfThreadExit to
-      *              be implicitly called by pthread_exit last.
+      * 	     chain so that the internal ptw32_selfThreadKey association
+      * 	     is always last, thus allowing selfThreadExit to
+      * 	     be implicitly called by pthread_exit last.
       *
       * Parameters:
-      *              assocP
-      *                      address into which the association is returned.
-      *              thread
-      *                      current running thread. If NULL, then association
-      *                      is only added to the key. A NULL thread indicates
-      *                      that the user called pthread_setspecific prior
-      *                      to starting a thread. That's ok.
-      *              key
-      *                      key on which to create an association.
+      * 	     assocP
+      * 		     address into which the association is returned.
+      * 	     thread
+      * 		     current running thread. If NULL, then association
+      * 		     is only added to the key. A NULL thread indicates
+      * 		     that the user called pthread_setspecific prior
+      * 		     to starting a thread. That's ok.
+      * 	     key
+      * 		     key on which to create an association.
       * Returns:
-      *       0              - if successful,
-      *       ENOMEM         - not enough memory to create assoc or other object
+      *       0 	     - if successful,
+      *       ENOMEM	     - not enough memory to create assoc or other object
       *       EINVAL	     - an internal error occurred
       *       ENOSYS	     - an internal error occurred
       * -------------------------------------------------------------------
@@ -615,8 +610,8 @@ ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
       * ie) both the key and thread have stopped referencing it.
       *
       * Parameters:
-      *              assoc
-      *                      an instance of ThreadKeyAssoc.
+      * 	     assoc
+      * 		     an instance of ThreadKeyAssoc.
       * Returns:
       *      N/A
       * -------------------------------------------------------------------
@@ -646,11 +641,11 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
       * It simulates the behaviour of POSIX Threads.
       *
       * PARAMETERS
-      *              thread
-      *                      an instance of pthread_t
+      * 	     thread
+      * 		     an instance of pthread_t
       *
       * RETURNS
-      *              N/A
+      * 	     N/A
       * -------------------------------------------------------------------
       */
 {
@@ -758,7 +753,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
  * time between jan 1, 1601 and jan 1, 1970 in units of 100 nanoseconds
  */
 #define TIMESPEC_TO_FILETIME_OFFSET \
-          ( ((LONGLONG) 27111902 << 32) + (LONGLONG) 3577643008 )
+	  ( ((LONGLONG) 27111902 << 32) + (LONGLONG) 3577643008 )
 
 static INLINE void
 timespec_to_filetime(const struct timespec *ts, FILETIME *ft)
@@ -790,149 +785,6 @@ filetime_to_timespec(const FILETIME *ft, struct timespec *ts)
 }
 
 #endif /* NEED_FTIME */
-
-int
-ptw32_sem_timedwait (sem_t * sem, const struct timespec * abstime)
-     /*
-      * ------------------------------------------------------
-      * DOCPUBLIC
-      *      This function waits on a semaphore possibly until
-      *      'abstime' time.
-      *
-      * PARAMETERS
-      *      sem
-      *              pointer to an instance of sem_t
-      *
-      *      abstime
-      *              pointer to an instance of struct timespec
-      *
-      * DESCRIPTION
-      *      This function waits on a semaphore. If the
-      *      semaphore value is greater than zero, it decreases
-      *      its value by one. If the semaphore value is zero, then
-      *      the calling thread (or process) is blocked until it can
-      *      successfully decrease the value or until interrupted by
-      *      a signal.
-      *
-      *      If 'abstime' is a NULL pointer then this function will
-      *      block until it can successfully decrease the value or
-      *      until interrupted by a signal.
-      *
-      * RESULTS
-      *              0               successfully decreased semaphore,
-      *              -1              failed, error in errno
-      * ERRNO
-      *              EINVAL          'sem' is not a valid semaphore,
-      *              ENOSYS          semaphores are not supported,
-      *              EINTR           the function was interrupted by a signal,
-      *              EDEADLK         a deadlock condition was detected.
-      *              ETIMEDOUT       abstime elapsed before success.
-      *
-      * ------------------------------------------------------
-      */
-{
-  int result = 0;
-
-#ifdef NEED_FTIME
-
-  struct timespec currSysTime;
-
-#else /* NEED_FTIME */
-
-  struct _timeb currSysTime;
-
-#endif /* NEED_FTIME */
-
-  const DWORD NANOSEC_PER_MILLISEC = 1000000;
-  const DWORD MILLISEC_PER_SEC = 1000;
-  DWORD milliseconds;
-
-  if (sem == NULL)
-    {
-      result = EINVAL;
-    }
-  else
-    {
-      if (abstime == NULL)
-	{
-	  milliseconds = INFINITE;
-	}
-      else
-	{
-	  /* 
-	   * Calculate timeout as milliseconds from current system time. 
-	   */
-
-	  /* get current system time */
-
-#ifdef NEED_FTIME
-
-	  {
-	    FILETIME ft;
-	    SYSTEMTIME st;
-
-	    GetSystemTime(&st);
-            SystemTimeToFileTime(&st, &ft);
-	    /*
-             * GetSystemTimeAsFileTime(&ft); would be faster,
-             * but it does not exist on WinCE
-             */
-
-	    filetime_to_timespec(&ft, &currSysTime);
-	  }
-
-	  /*
-           * subtract current system time from abstime
-           */
-	  milliseconds = (abstime->tv_sec - currSysTime.tv_sec) * MILLISEC_PER_SEC;
-	  milliseconds += ((abstime->tv_nsec - currSysTime.tv_nsec) + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
-
-#else /* NEED_FTIME */
-	  _ftime(&currSysTime);
-
-	  /*
-           * subtract current system time from abstime
-           */
-	  milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
-	  milliseconds += ((abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC) -
-	    currSysTime.millitm;
-
-#endif /* NEED_FTIME */
-
-
-	  if (((int) milliseconds) < 0)
-	    milliseconds = 0;
-	}
-
-#ifdef NEED_SEM
-
-      result = (pthreadCancelableTimedWait ((*sem)->event, milliseconds));
-
-#else /* NEED_SEM */
-
-      result = (pthreadCancelableTimedWait ((*sem)->sem, milliseconds));
-
-#endif
-
-    }
-
-  if (result != 0)
-    {
-
-      errno = result;
-      return -1;
-
-    }
-
-#ifdef NEED_SEM
-
-  ptw32_decrease_semaphore(sem);
-
-#endif /* NEED_SEM */
-
-  return 0;
-
-}				/* ptw32_sem_timedwait */
 
 
 DWORD
@@ -1038,8 +890,8 @@ ptw32_pop_cleanup_all(int execute)
  */
 PTW32_INTERLOCKED_LONG WINAPI
 ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG location,
-                                 PTW32_INTERLOCKED_LONG   value,
-                                 PTW32_INTERLOCKED_LONG   comparand)
+				 PTW32_INTERLOCKED_LONG   value,
+				 PTW32_INTERLOCKED_LONG   comparand)
 {
   PTW32_INTERLOCKED_LONG result;
 
@@ -1048,18 +900,18 @@ ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG location,
 #if defined(_MSC_VER)
 
   _asm {
-    PUSH         ecx
-    PUSH         edx
-    MOV          ecx,dword ptr [location]
-    MOV          edx,dword ptr [value]
-    MOV          eax,dword ptr [comparand]
-    LOCK CMPXCHG dword ptr [ecx],edx        ; if (EAX == [ECX]), 
-                                            ;   [ECX] = EDX
-                                            ; else
-                                            ;   EAX = [ECX]
-    MOV          dword ptr [result], eax
-    POP          edx
-    POP          ecx
+    PUSH	 ecx
+    PUSH	 edx
+    MOV 	 ecx,dword ptr [location]
+    MOV 	 edx,dword ptr [value]
+    MOV 	 eax,dword ptr [comparand]
+    LOCK CMPXCHG dword ptr [ecx],edx	    ; if (EAX == [ECX]), 
+					    ;	[ECX] = EDX
+					    ; else
+					    ;	EAX = [ECX]
+    MOV 	 dword ptr [result], eax
+    POP 	 edx
+    POP 	 ecx
   }
 
 #elif defined(__GNUC__)
@@ -1067,10 +919,10 @@ ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG location,
   __asm__
     (
      "lock\n\t"
-     "cmpxchgl       %3,(%0)"    /* if (EAX == [location]), */
-                                 /*   [location] = value    */
-                                 /* else                    */
-                                 /*   EAX = [location]           */
+     "cmpxchgl	     %3,(%0)"	 /* if (EAX == [location]), */
+				 /*   [location] = value    */
+				 /* else		    */
+				 /*   EAX = [location]		 */
      :"=r" (location), "=a" (result)
      :"0"  (location), "q" (value), "a" (comparand)
      : "memory" );
@@ -1091,4 +943,49 @@ ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG location,
 #endif
 
   return result;
+}
+
+
+/*
+ * ptw32_getprocessors()
+ *
+ * Get the number of CPUs available to the process.
+ *
+ * If the available number of CPUs is 1 then pthread_spin_lock()
+ * will block rather than spin if the lock is already owned.
+ *
+ * pthread_spin_init() calls this routine when initialising
+ * a spinlock. If the number of available processors changes
+ * (after a call to SetProcessAffinityMask()) then only
+ * newly initialised spinlocks will notice.
+ */
+int
+ptw32_getprocessors(int * count)
+{
+  DWORD vProcessCPUs;
+  DWORD vSystemCPUs;
+  int result = 0;
+
+  if (GetProcessAffinityMask(GetCurrentProcess(),
+			     &vProcessCPUs,
+			     &vSystemCPUs))
+    {
+      DWORD bit;
+      int CPUs = 0;
+
+      for (bit = 1; bit != 0; bit <<= 1)
+	{
+	  if (vProcessCPUs & bit)
+	    {
+	      CPUs++;
+	    }
+	}
+      *count = CPUs;
+    }
+  else
+    {
+      result = EAGAIN;
+    }
+
+  return(result);
 }

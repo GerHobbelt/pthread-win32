@@ -18,10 +18,12 @@ VCEDLL	= pthreadVCE.dll
 VSEFLAGS	= /D__CLEANUP_SEH
 VSELIB	= pthreadVSE.lib
 VSEDLL	= pthreadVSE.dll
-#C cleanup code
+# C cleanup code
 VCFLAGS	= /D__CLEANUP_C
 VCLIB	= pthreadVC.lib
 VCDLL	= pthreadVC.dll
+# C++ Exceptions in application - using VC version of pthreads dll
+VCXFLAGS	= /GX /TP /D__CLEANUP_C
 
 CFLAGS= /W3 /WX /MT /nologo /Yd /Zi -D_WIN32_WINNT=0x400
 LFLAGS= /INCREMENTAL:NO
@@ -67,17 +69,21 @@ BENCHRESULTS = \
 
 all:
 	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) nmake clean VCE   (to test using MSVC dll with C++ exception handling)
-	@ $(ECHO) nmake clean VSE   (to test using MSVC dll with structured exception handling)
-	@ $(ECHO) nmake clean VC    (to test using MSVC dll with C cleanup code)
-	@ $(ECHO) nmake clean VCE-bench   (to benchtest using MSVC dll with C++ exception handling)
-	@ $(ECHO) nmake clean VSE-bench   (to benchtest using MSVC dll with structured exception handling)
-	@ $(ECHO) nmake clean VC-bench    (to benchtest using MSVC dll with C cleanup code)
+	@ $(ECHO) nmake clean VCE   (to test using the VCE dll with VC++ EH applications)
+	@ $(ECHO) nmake clean VSE   (to test using VSE dll with VC (SEH) applications)
+	@ $(ECHO) nmake clean VC    (to test using VC dll with VC (no EH) applications)
+	@ $(ECHO) nmake clean VCX   (to test using VC dll with VC++ (EH) applications)
+	@ $(ECHO) nmake clean VCE-bench   (to benchtest using VCE dll with C++ bench app)
+	@ $(ECHO) nmake clean VSE-bench   (to benchtest using VSE dll with SEH bench app)
+	@ $(ECHO) nmake clean VC-bench    (to benchtest using VC dll with C bench app)
+	@ $(ECHO) nmake clean VCX-bench   (to benchtest using VC dll with C++ bench app)
 
 auto:
 	@ nmake clean VCE
 	@ nmake clean VSE
 	@ nmake clean VC
+	@ nmake clean VCX
+	@ nmake clean VC-bench
 
 tests: $(CPLIB) $(CPDLL) $(CPHDR) $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
@@ -106,6 +112,9 @@ VSE:
 VC:
 	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
 
+VCX:
+	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
+
 VCE-bench:
 	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" benchtests
 
@@ -115,8 +124,11 @@ VSE-bench:
 VC-bench:
 	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" benchtests
 
+VCX-bench:
+	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" benchtests
+
 .c.exe:
-	@ $(ECHO) Compiling $@
+	@ $(ECHO) $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB)
 	@ $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB)
 
 .c.pre:
