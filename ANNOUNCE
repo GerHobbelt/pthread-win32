@@ -242,6 +242,14 @@ points in applications and libraries:
       pthreadCancelableWait
       pthreadCancelableTimedWait
 
+The library includes a non-portable function to force using the much
+faster critical sections as the basis for POSIX mutexes when these are
+not the default for a particular version of Windows (eg. W9x).
+
+      pthread_mutexattr_setforcecs_np
+
+For example, if you don't ever use pthread_mutex_trylock() in your
+application.
       
 Availability
 ------------ 
@@ -325,10 +333,12 @@ pthreads-win32, using Mingw32's gcc or g++.
 Building the library with MSVC
 ------------------------------
 
-There is currently no Makefile for building the library under MSVC.
-This is partly because my access to MSVC is via telnet to a remote NT
-machine. There is a batch file "buildlib.bat" which will build the
-library.
+A simple makefile for building the library with MSVC is available. The
+Makefile by default links the library to MSVCRT.DLL. If your application
+uses another C runtime library like LIBCMT.LIB, please edit the Makefile to
+avoid conflicts between C-libraries.
+
+There is also a batch file "buildlib.bat" which will build the library.
 
 
 Documentation
