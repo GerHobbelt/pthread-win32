@@ -1,3 +1,7 @@
+2002-06-03  Ross Johnson  <rpj@digit.ise.canberra.edu.au>
+
+	* semaphore2.c: New test.
+
 2002-03-02  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* Makefile (CFLAGS): Changed /MT to /MD to link with

@@ -4,14 +4,12 @@
  * Module: sem_init.c
  *
  * Purpose:
- *	Semaphores aren't actually part of the PThreads standard.
+ *	Semaphores aren't actually part of PThreads.
  *	They are defined by the POSIX Standard:
  *
- *		POSIX 1003.1b-1993	(POSIX.1b)
+ *		POSIX 1003.1-2001
  *
  * -------------------------------------------------------------
- *
- * --------------------------------------------------------------------------
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
@@ -49,14 +47,12 @@
 #include "semaphore.h"
 #include "implement.h"
 
-#include <limits.h>
-
 int
 sem_init (sem_t * sem, int pshared, unsigned int value)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
-      *      This function initializes an unnamed semaphore. the
+      *      This function initializes a semaphore. The
       *      initial value of the semaphore is 'value'
       *
       * PARAMETERS
@@ -73,7 +69,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
       * 	     initial value of the semaphore counter
       *
       * DESCRIPTION
-      *      This function initializes an unnamed semaphore. The
+      *      This function initializes a semaphore. The
       *      initial value of the semaphore is set to 'value'.
       *
       * RESULTS
@@ -106,45 +102,46 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
       s = (sem_t) calloc (1, sizeof (*s));
 
       if (NULL == s)
-	{
-	  result = ENOMEM;
-	}
+				{
+					result = ENOMEM;
+				}
 
 #ifdef NEED_SEM
 
       else
-	{
-	  s->value = value;
-	  s->event = CreateEvent (NULL,
-				  FALSE,	/* manual reset */
-				  FALSE,	/* initial state */
-				  NULL);
-	  if (0 == s->event)
-	    {
-	      result = ENOSPC;
-	    }
-	  else
-	    {
-	      if (value != 0)
-		{
-		  SetEvent(s->event);
-		}
+				{
+					s->value = value;
+					s->event = CreateEvent (NULL,
+						FALSE,	/* manual reset */
+						FALSE,	/* initial state */
+						NULL);
 
-	      InitializeCriticalSection(&s->sem_lock_cs);
-	    }
-	}
-
+					if (0 == s->event)
+						{
+							result = ENOSPC;
+						}
+					else
+						{
+							if (value != 0)
+								{
+									SetEvent(s->event);
+								}
+							
+							InitializeCriticalSection(&s->sem_lock_cs);
+						}
+				}
+			
 #else /* NEED_SEM */
 
       s->sem = CreateSemaphore (NULL,	     /* Always NULL */
-				value,	     /* Initial value */
-				INT_MAX,     /* Maximum value */
-				NULL);	     /* Name */
-
+				value,	              /* Initial value */
+				_POSIX_SEM_VALUE_MAX, /* Maximum value */
+				NULL);	              /* Name */
+			
       if (0 == s->sem)
-	{
-	  result = ENOSPC;
-	}
+				{
+					result = ENOSPC;
+				}
 
 #endif /* NEED_SEM */
 

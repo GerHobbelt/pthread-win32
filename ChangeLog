@@ -1,3 +1,19 @@
+2002-06-03  Ross Johnson  <rpj@digit.ise.canberra.edu.au>
+
+	* sem_init.c (sem_init): Initialise Win32 semaphores
+	to _POSIX_SEM_VALUE_MAX (which this implementation
+	defines in pthread.h) so that sem_getvalue() can use
+	the trick described in the comments in sem_getvalue().
+	* pthread.h (_POSIX_SEM_VALUE_MAX): Defined.
+	(_POSIX_SEM_NSEMS_MAX): Defined - not used but may be
+	useful for source code portability.
+
+2002-06-03  Rob Fanner  <rfanner@stonethree.com>
+
+	* sem_getvalue.c (sem_getvalue): Did not work on NT.
+	Use approach suggested by Johnson M. Hart in his book
+	"Win32 System Programming".
+
 2002-02-28  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* errno.c: Compiler directive was incorrectly including code.
