@@ -64,6 +64,9 @@ pthread_create(pthread_t *thread,
 	    }
 
 	  attr_copy->cancelability = attr->cancelability;
+	  attr_copy->canceltype = attr->canceltype;
+	  attr_copy->detached = attr->detached;
+	  attr_copy->priority = attr->priority;
 	}
 
       /* Start running, not suspended. */
