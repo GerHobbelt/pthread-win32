@@ -14,6 +14,10 @@
 
 #define _PTHREAD_HASH_INDEX(x) (((ULONG) x) % PTHREAD_THREADS_MAX)
 
+/* This is all compile time arithmetic */
+#define RND_SIZEOF(T) (((sizeof(T) / sizeof(DWORD)) + 1) * sizeof(DWORD))
+
+
 typedef struct _pthread_cleanup_stack _pthread_cleanup_stack_t;
 struct _pthread_cleanup_stck {
   _pthread_cleanup_stack_t first;
@@ -38,6 +42,18 @@ typedef struct {
 typedef struct {
   /* Nothing needed yet. */
 } _pthread_condattr_t;
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+void _pthread_cleanup_push(void (*routine)(void *), void *arg);
+void _pthread_cleanup_pop(int execute);
+void _pthread_do_cancellation(int tindex);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* _IMPLEMENT_H */
 
