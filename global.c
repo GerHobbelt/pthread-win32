@@ -34,7 +34,7 @@ const int _pthread_cancel_asynchronous = 0;
 const int _pthread_cancel_deferred     = 1;
 
 
-pthread_mutex_t _pthread_count_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t _pthread_table_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 DWORD _pthread_threads_count = 0;
 

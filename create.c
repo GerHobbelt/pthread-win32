@@ -52,7 +52,7 @@ _pthread_start_call(void * us_arg)
 	 was called and there are no waiting joins. */
 
       /* CRITICAL SECTION */
-      pthread_mutex_lock(&_pthread_count_mutex);
+      pthread_mutex_lock(&_pthread_table_mutex);
 
       if (us->detach == TRUE
 	  && us->join_count == 0)
@@ -60,7 +60,7 @@ _pthread_start_call(void * us_arg)
 	  _pthread_delete_thread_entry(us);
 	}
 
-      pthread_mutex_lock(&_pthread_count_mutex);
+      pthread_mutex_lock(&_pthread_table_mutex);
       /* END CRITICAL SECTION */
     }
   else
@@ -73,7 +73,7 @@ _pthread_start_call(void * us_arg)
 	 was called and there are no waiting joins. */
 
       /* CRITICAL SECTION */
-      pthread_mutex_lock(&_pthread_count_mutex);
+      pthread_mutex_lock(&_pthread_table_mutex);
 
       if (us->detach == TRUE
 	  && us->join_count == 0)
@@ -81,7 +81,7 @@ _pthread_start_call(void * us_arg)
 	  _pthread_delete_thread_entry(us);
 	}
 
-      pthread_mutex_lock(&_pthread_count_mutex);
+      pthread_mutex_lock(&_pthread_table_mutex);
       /* END CRITICAL SECTION */
 
       ret = 0;
@@ -105,9 +105,17 @@ pthread_create(pthread_t *thread,
   pthread_attr_t * attr_copy;
   _pthread_threads_thread_t * us;
   /* Success unless otherwise set. */
-  int ret = 0;
+  int ret;
 
-  if (_pthread_new_thread_entry((pthread_t) handle, us) == 0)
+  /* CRITICAL SECTION */
+  pthread_mutex_lock(&_pthread_table_mutex);
+
+  ret = _pthread_new_thread_entry((pthread_t) handle, us);
+
+  pthread_mutex_lock(&_pthread_table_mutex);
+  /* END CRITICAL SECTION */
+
+  if (ret == 0)
     {
       attr_copy = &(us->attr);
 
@@ -154,9 +162,18 @@ pthread_create(pthread_t *thread,
     }
   else
     {
+      /* CRITICAL SECTION */
+      pthread_mutex_lock(&_pthread_table_mutex);
+
       /* Remove the failed thread entry. */
       _pthread_delete_thread_entry(us);
+
+      pthread_mutex_lock(&_pthread_table_mutex);
+      /* END CRITICAL SECTION */
     }
 
   return ret;
 }
+
+
+
