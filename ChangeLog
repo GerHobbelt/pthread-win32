@@ -1,5 +1,8 @@
 Sun Jul 26 00:09:59 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* cancel.c (pthread_setcancelstate): Fix indirection bug and rename
+	"this" to "us".
+
 	* signal.c (pthread_sigmask): Rename "this" to "us" and fix some
 	minor syntax errors. Declare "us" and initialise it.
 
