@@ -1,5 +1,13 @@
 2001-08-23  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
+	Contributed by - "Alexander Terekhov" <TEREKHOV@de.ibm.com>
+
+	* condvar.c (pthread_cond_destroy): fix bug with
+	respect to deadlock in the case of concurrent
+	_destroy/_unblock; a condition variable can be destroyed
+	immediately after all the threads that are blocked on
+	it are awakened.
+
 	Contributed by - "Phil Frisbie, Jr." <phil@hawksoft.com>
 
 	* tsd.c (pthread_getspecific): Preserve the last
