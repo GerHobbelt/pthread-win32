@@ -48,5 +48,6 @@ pthread_exit(void * value)
   /* FIXME: More to do here. IE, if pthread_detach() was called
      and value != NULL, do we free(value)? */
 
+  /* Teleport back to _pthread_start_call() to cleanup and exit. */
   longjmp(this->call.env, 1);
 }
