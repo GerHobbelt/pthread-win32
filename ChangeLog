@@ -1,3 +1,9 @@
+1998-10-06  Ben Elliston  <bje@cygnus.com>
+
+	* condvar.c (cond_wait): Use POSIX, not Win32 mutex calls.
+	(pthread_cond_broadcast): Likewise.
+	(pthread_cond_signal): Likewise.
+
 1998-10-05  Ben Elliston  <bje@cygnus.com>
 
 	* pthread.def: Update. Some functions aren't available yet, others
