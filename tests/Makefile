@@ -55,7 +55,9 @@ PASSES= loadfree.pass \
 	  context1.pass  \
 	  cancel3.pass  cancel4.pass  cancel5.pass  \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
-	  exception1.pass  exception2.pass  exception3.pass
+	  priority1.pass priority2.pass inherit1.pass  \
+	  exception1.pass  exception2.pass  \
+	  benchtest1.pass benchtest2.pass exception3.pass  \
 
 all:
 	@ $(ECHO) Run one of the following command lines:
@@ -114,6 +116,8 @@ clean:
 	- $(RM) *.exe
 	- $(RM) *.pass
 
+benchtest1.pass: mutex3.pass
+benchtest2.pass: benchtest1.pass
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
 cancel3.pass: context1.pass
@@ -147,6 +151,7 @@ exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass
 eyal1.pass: tsd1.pass
+inherit1.pass: join1.pass
 join0.pass: create1.pass
 join1.pass: create1.pass
 join2.pass: create1.pass
@@ -160,6 +165,8 @@ mutex3.pass: create1.pass
 mutex4.pass: mutex3.pass
 mutex5.pass:
 once1.pass: create1.pass
+priority1.pass: join1.pass
+priority2.pass: priority1.pass
 rwlock1.pass: condvar6.pass
 rwlock2.pass: rwlock1.pass
 rwlock3.pass: rwlock2.pass

@@ -346,8 +346,13 @@ pthread_attr_init(pthread_attr_t *attr)
   memset(&(attr_result->sigmask), 0, sizeof(sigset_t));
 #endif /* HAVE_SIGSET_T */
 
-  /* Priority uses Win32 priority values. */
-  attr_result->priority = THREAD_PRIORITY_NORMAL;
+  /*
+   * Win32 sets new threads to THREAD_PRIORITY_NORMAL and
+   * not to that of the parent thread. We choose to default to
+   * this arrangement.
+   */
+  attr_result->param.sched_priority = THREAD_PRIORITY_NORMAL;
+  attr_result->inheritsched = PTHREAD_EXPLICIT_SCHED;
 
   attr_result->valid = PTW32_ATTR_VALID;
 
@@ -497,6 +502,7 @@ pthread_attr_setdetachstate(pthread_attr_t *attr,
   (*attr)->detachstate = detachstate;
   return 0;
 }
+
 
 int
 pthread_attr_setscope(pthread_attr_t *attr, int contentionscope)

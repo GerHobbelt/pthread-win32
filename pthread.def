@@ -10,23 +10,23 @@ ptw32_processInitialize
 ;pthread_atfork
 pthread_attr_destroy
 pthread_attr_getdetachstate
-;pthread_attr_getinheritsched
+pthread_attr_getinheritsched
 pthread_attr_getschedparam
-;pthread_attr_getschedpolicy
+pthread_attr_getschedpolicy
 pthread_attr_getscope
 pthread_attr_getstackaddr
 pthread_attr_getstacksize
 pthread_attr_init
 pthread_attr_setdetachstate
-;pthread_attr_setinheritsched
+pthread_attr_setinheritsched
 pthread_attr_setschedparam
-;pthread_attr_setschedpolicy
+pthread_attr_setschedpolicy
 pthread_attr_setscope
 pthread_attr_setstackaddr
 pthread_attr_setstacksize
 pthread_cancel
 ;
-; These two are implemented as macros
+; These two are implemented as macros in pthread.h
 ;
 ;pthread_cleanup_pop
 ;pthread_cleanup_push
@@ -82,6 +82,9 @@ pthread_testcancel
 ;
 sched_get_priority_min
 sched_get_priority_max
+sched_rr_set_interval
+sched_getscheduler
+sched_setscheduler
 sched_yield
 sem_init
 sem_destroy

@@ -1,3 +1,12 @@
+2001-06-25  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	priority1.c: New test.
+	priority2.c: New test.
+	inherit1.c: New test.
+	benchtest1.c: New; timing mutexes.
+	benchtest2.c: New; timing mutexes.
+	mutex4.c: Modified to test all mutex types.
+
 2001-06-8  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* mutex5.c: Insert inert change to quell compiler warnings.

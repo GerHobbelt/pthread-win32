@@ -3,7 +3,7 @@
  */
 
 VERSION = -
-CCFLAGS = -g $(CC.DLL)
+CCFLAGS = -V -g $(CC.DLL)
 PTW32_BUILD	== 1
 _MT		== 1
 _timeb		== timeb

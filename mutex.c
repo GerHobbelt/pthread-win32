@@ -180,8 +180,14 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
        * The mutex type may not be RECURSIVE therefore trylock may return EBUSY if
        * we already own the mutex. Here we are assuming that it's OK to destroy
        * a mutex that we own and have locked recursively. Is this correct?
+       *
+       * For FAST mutexes we record the owner as ANONYMOUS for speed. In this
+       * case we assume that the thread calling pthread_mutex_destroy() is the
+       * owner, if the mutex is owned at all.
        */
-      if (result == 0 || pthread_equal( mx->ownerThread, pthread_self() ) )
+      if (result == 0
+          || mx->ownerThread == (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS
+          || pthread_equal( mx->ownerThread, pthread_self() ) )
         {
           /*
            * FIXME!!!
@@ -634,7 +640,9 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
   if( 0 == InterlockedIncrement( &mx->lock_idx ) )
     {
       mx->recursive_count = 1;
-      mx->ownerThread = pthread_self();
+      mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
+                         ? pthread_self()
+                         : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
     }
   else
     {
@@ -656,7 +664,9 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
         {
           WaitForSingleObject( mx->wait_sema, INFINITE );
           mx->recursive_count = 1;
-          mx->ownerThread = pthread_self();
+          mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
+                             ? pthread_self()
+                             : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
         }
     }
 
@@ -683,10 +693,11 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
    */
   if (mx != (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
     {
-      if (pthread_equal(mx->ownerThread, pthread_self()))
+      if (mx->ownerThread == (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS
+          || pthread_equal(mx->ownerThread, pthread_self()))
 	{
-          if( mx->kind != PTHREAD_MUTEX_RECURSIVE_NP ||
-              0 == --mx->recursive_count )
+          if( mx->kind != PTHREAD_MUTEX_RECURSIVE_NP
+              || 0 == --mx->recursive_count )
 	    {
 	      mx->ownerThread = NULL;
 	      
@@ -748,7 +759,9 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
           if( 0 == InterlockedIncrement( &mx->lock_idx ) )
 	    {
               mx->recursive_count = 1;
-              mx->ownerThread = pthread_self();
+              mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
+                                 ? pthread_self()
+                                 : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
 	    }
           else
             {

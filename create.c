@@ -84,10 +84,10 @@ pthread_create (pthread_t * tid,
 
   thread->cancelEvent =
     CreateEvent (
-		  0,
-		  (int) TRUE,	/* manualReset  */
-		  (int) FALSE,	/* setSignaled  */
-		  NULL);
+                 0,
+                 (int) TRUE,	/* manualReset  */
+                 (int) FALSE,	/* setSignaled  */
+                 NULL);
 
   if (thread->cancelEvent == NULL)
     {
@@ -142,16 +142,34 @@ pthread_create (pthread_t * tid,
 
   thread->threadH = threadH = (HANDLE)
     _beginthreadex (
-		     (void *) NULL,	/* No security info             */
-		     (unsigned) stackSize,	/* default stack size   */
-		     ptw32_threadStart,
-		     parms,
-		     (unsigned) CREATE_SUSPENDED,
-		     (unsigned *) &(thread->thread));
+                    (void *) NULL,	/* No security info             */
+                    (unsigned) stackSize,	/* default stack size   */
+                    ptw32_threadStart,
+                    parms,
+                    (unsigned) CREATE_SUSPENDED,
+                    (unsigned *) &(thread->thread));
 
-  if (threadH != 0 && run)
+  if (threadH != 0)
     {
-      ResumeThread(threadH);
+      /*
+       * PTHREAD_EXPLICIT_SCHED is the default because Win32 threads
+       * don't inherit their creator's priority. They are started with
+       * THREAD_PRIORITY_NORMAL (win32 value). The result of not supplying
+       * an 'attr' arg to pthread_create() is equivalent to defaulting to
+       * PTHREAD_EXPLICIT_SCHED and priority THREAD_PRIORITY_NORMAL.
+       */
+      if (attr != NULL && *attr != NULL)
+        {
+          (void) SetThreadPriority(thread->threadH,
+                                   PTHREAD_INHERIT_SCHED == (*attr)->inheritsched
+                                   ? GetThreadPriority(GetCurrentThread())
+                                   : (*attr)->param.sched_priority );
+        }
+
+      if (run)
+        {
+          ResumeThread(threadH);
+        }
     }
 
 #else /* __MINGW32__ && ! __MSVCRT__ */
@@ -164,9 +182,9 @@ pthread_create (pthread_t * tid,
 
   thread->threadH = threadH = (HANDLE)
     _beginthread (
-		   ptw32_threadStart,
-		   (unsigned) stackSize,	/* default stack size   */
-		   parms);
+                  ptw32_threadStart,
+                  (unsigned) stackSize,	/* default stack size   */
+                  parms);
 
   /*
    * Make the return code match _beginthreadex's.
@@ -175,14 +193,32 @@ pthread_create (pthread_t * tid,
     {
       thread->threadH = threadH = 0;
     }
-  else if (! run)
+  else
     {
-      /* 
-       * beginthread does not allow for create flags, so we do it now.
-       * Note that beginthread itself creates the thread in SUSPENDED
-       * mode, and then calls ResumeThread to start it.
+      if (! run)
+        {
+          /* 
+           * beginthread does not allow for create flags, so we do it now.
+           * Note that beginthread itself creates the thread in SUSPENDED
+           * mode, and then calls ResumeThread to start it.
+           */
+          SuspendThread (threadH);
+        }
+      
+      /*
+       * PTHREAD_EXPLICIT_SCHED is the default because Win32 threads
+       * don't inherit their creator's priority. They are started with
+       * THREAD_PRIORITY_NORMAL (win32 value). The result of not supplying
+       * an 'attr' arg to pthread_create() is equivalent to defaulting to
+       * PTHREAD_EXPLICIT_SCHED and priority THREAD_PRIORITY_NORMAL.
        */
-      SuspendThread (threadH);
+      if (attr != NULL && *attr != NULL)
+        {
+          (void) SetThreadPriority(thread->threadH,
+                                   PTHREAD_INHERIT_SCHED == (*attr)->inheritsched
+                                   ? GetThreadPriority(GetCurrentThread())
+                                   : (*attr)->param.sched_priority );
+        }
     }
 
   (void) pthread_mutex_unlock(&thread->cancelLock);

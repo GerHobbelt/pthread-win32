@@ -1,3 +1,66 @@
+2001-06-25  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* create.c (pthread_create): Add priority inheritance
+	attributes.
+	* mutex.c (pthread_mutex_lock): Remove some overhead for
+	PTHREAD_MUTEX_NORMAL mutex types. Specifically, avoid
+	calling pthread_self() and pthread_equal() to check/set
+	the mutex owner. Introduce a new pseudo owner for this
+	type. Test results suggest increases in speed of up to
+	90% for non-blocking locks.
+	This is the default type of mutex used internally by other
+	synchronising objects, ie. condition variables and
+	read-write locks. The test rwlock7.c shows about a
+	30-35% speed increase over snapshot 2001-06-06. The
+	price of this is that the application developer
+	must ensure correct behaviour, or explicitly set the
+	mutex to a safer type such as PTHREAD_MUTEX_ERRORCHECK.
+	For example, PTHREAD_MUTEX_NORMAL (or PTHREAD_MUTEX_DEFAULT)
+	type mutexes will not return an error if a thread which is not
+	the owner calls pthread_mutex_unlock. The call will succeed
+	in unlocking the mutex if it is currently locked, but a
+	subsequent unlock by the true owner will then fail with EPERM.
+	This is however consistent with some other implementations.
+	(pthread_mutex_unlock): Likewise.
+	(pthread_mutex_trylock): Likewise.
+	(pthread_mutex_destroy): Likewise.
+	* attr.c (pthread_attr_init): PTHREAD_EXPLICIT_SCHED is the
+	default inheritance attribute; THREAD_PRIORITY_NORMAL is
+	the default priority for new threads.
+	* sched.c (pthread_attr_setschedpolicy): Added routine.
+	(pthread_attr_getschedpolicy): Added routine.
+	(pthread_attr_setinheritsched): Added routine.
+	(pthread_attr_getinheritsched): Added routine.
+	* pthread.h (sched_rr_set_interval): Added as a macro;
+	returns -1 with errno set to ENOSYS.
+
+2001-06-23  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	*sched.c (pthread_attr_setschedparam): Add priority range
+	check.
+	(sched_setscheduler): New function; checks for a valid
+	pid and policy; checks for permission to set information
+	in the target process; expects pid to be a Win32 process ID,
+	not a process handle; the only scheduler policy allowed is
+	SCHED_OTHER.
+	(sched_getscheduler): Likewise, but checks for permission
+	to query.
+	* pthread.h (SCHED_*): Moved to sched.h as defined in the
+	POSIX standard.
+	* sched.h (SCHED_*): Moved from pthread.h.
+	(pid_t): Defined if necessary.
+	(sched_setscheduler): Defined.
+	(sched_getscheduler): Defined.
+	* pthread.def (sched_setscheduler): Exported.
+	(sched_getscheduler): Likewise.
+
+2001-06-23  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	Contributed by -  Ralf Brese <Ralf.Brese@pdb4.siemens.de>
+
+	* create.c (pthread_create): Set thread priority from
+	thread attributes.
+
 2001-06-18  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* Made organisational-only changes to UWIN additions.

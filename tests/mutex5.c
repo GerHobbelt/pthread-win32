@@ -13,18 +13,18 @@ int
 main()
 {
   int mxType = -1;
-  int bool = 0;   /* Use to quell GNU compiler warnings. */
+  int success = 0;   /* Use to quell GNU compiler warnings. */
 
-  assert(bool = PTHREAD_MUTEX_DEFAULT == PTHREAD_MUTEX_NORMAL);
-  assert(bool = PTHREAD_MUTEX_DEFAULT != PTHREAD_MUTEX_ERRORCHECK);
-  assert(bool = PTHREAD_MUTEX_DEFAULT != PTHREAD_MUTEX_RECURSIVE);
-  assert(bool = PTHREAD_MUTEX_RECURSIVE != PTHREAD_MUTEX_ERRORCHECK);
+  assert(success = PTHREAD_MUTEX_DEFAULT == PTHREAD_MUTEX_NORMAL);
+  assert(success = PTHREAD_MUTEX_DEFAULT != PTHREAD_MUTEX_ERRORCHECK);
+  assert(success = PTHREAD_MUTEX_DEFAULT != PTHREAD_MUTEX_RECURSIVE);
+  assert(success = PTHREAD_MUTEX_RECURSIVE != PTHREAD_MUTEX_ERRORCHECK);
 
-  assert(bool = PTHREAD_MUTEX_NORMAL == PTHREAD_MUTEX_FAST_NP);
-  assert(bool = PTHREAD_MUTEX_RECURSIVE == PTHREAD_MUTEX_RECURSIVE_NP);
-  assert(bool = PTHREAD_MUTEX_ERRORCHECK == PTHREAD_MUTEX_ERRORCHECK_NP);
+  assert(success = PTHREAD_MUTEX_NORMAL == PTHREAD_MUTEX_FAST_NP);
+  assert(success = PTHREAD_MUTEX_RECURSIVE == PTHREAD_MUTEX_RECURSIVE_NP);
+  assert(success = PTHREAD_MUTEX_ERRORCHECK == PTHREAD_MUTEX_ERRORCHECK_NP);
 
-  if (bool == bool)
+  if (success == success)
     {
       assert(pthread_mutexattr_init(&mxAttr) == 0);
       assert(pthread_mutexattr_gettype(&mxAttr, &mxType) == 0);

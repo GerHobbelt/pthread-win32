@@ -33,8 +33,7 @@ main()
   assert(pthread_mutex_lock(&mutex1) == 0);
 
   assert(pthread_create(&t, NULL, func, NULL) == 0);
-
-  Sleep(2000);
+  assert(pthread_join(t, NULL) == 0);
 
   assert(pthread_mutex_unlock(&mutex1) == 0);
 

@@ -78,15 +78,21 @@ cleanup3::	cleanup3.c
 exception1::	exception1.c
 exception2::	exception2.c
 exception3::	exception3.c
+priority1::	priority1.c
+priority2::	priority2.c
+inherit1::	inherit1.c
+benchtest1::	benchtest1.c
+benchtest2::	benchtest2.c
 
 loadfree:	:test:
+mutex5		:test: loadfree
 mutex1		:test: loadfree
 mutex2		:test: loadfree
 exit1		:test: loadfree
 condvar1	:test: loadfree
 self1		:test: loadfree
 condvar2	:test:	condvar1
-create1.	:test:	mutex2
+create1 	:test:	mutex2
 cancel1		:test:	create1
 cancel2		:test:	cancel1
 mutex3		:test:	create1
@@ -124,8 +130,12 @@ cleanup0	:test:	cancel5
 cleanup1	:test:	cleanup0
 cleanup2	:test:	cleanup1
 cleanup3	:test:	cleanup2
+priority1	:test:  join1
+priority2	:test:  priority1
+inherit1	:test:  join1
 exception1	:test:	cancel4
 exception2	:test:	exception1
+benchtest1	:test:  mutex3
+benchtest2	:test:  benchtest1
 exception3	:test:	exception2
-tryentercs	:test:
-tryentercs2	:test:
+
