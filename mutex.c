@@ -29,7 +29,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-
 static int
 ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
 {
@@ -82,7 +81,7 @@ ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
 
   LeaveCriticalSection(&ptw32_mutex_test_init_lock);
 
-  return(result);
+  return result;
 }
 
 
@@ -91,7 +90,7 @@ ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
  * include an implementation of TryEnterCriticalSection
  * for platforms on which that function has not been
  * provided by Microsoft (eg. W95/98). This allows us
- * to use critical sections exclusively as the basis
+ * to avoid using Win32 mutexes as the basis
  * of our implementation of POSIX mutex locks.
  *
  * Where TryEnterCriticalSection() is provided by the
@@ -99,44 +98,67 @@ ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
  * minimal additional overhead. Otherwise, these
  * routines manage additional state in order to
  * properly emulate TryEnterCriticalSection().
- *
- * In any case, using of critical sections exclusively
- * should still be much faster than using Win32 mutex
- * locks as our POSIX mutex locks.
  */
 
-static void
-ptw32_InitializeCriticalSection (ptw32_cs_t * csect)
+int
+ptw32_InitializeCriticalSection (ptw32_cs_u_t * csect)
      /*
       * ------------------------------------------------------
       *
       * PARAMETERS
       *      csect
-      *              pointer to an instance of ptw32_cs_t
+      *              pointer to an instance of ptw32_cs_u_t
+      *              csect->csFake must be NULL on entry.
       *
       * DESCRIPTION
       *      Internal implementation of InitializeCriticalSection.
+      *
+      * RETURN
+      *      0       Initialisation successful
+      *      EINVAL  csFake already initialised
       * 
       * ------------------------------------------------------
       */
 {
-  ptw32_cs_t cs = *csect;
+  int result = 0;
 
-  cs->owner = NULL;
-  cs->lock_idx = -1;
-  cs->entered_count = 0;
-  InitializeCriticalSection(&cs->cs);
-  cs->valid = 1;
+  if (NULL != ptw32_try_enter_critical_section)
+    {
+      InitializeCriticalSection(&csect->cs);
+    }
+  else
+    {
+      while (InterlockedIncrement(&csect->csFake.lock_idx) > 0)
+        {
+          InterlockedDecrement(&csect->csFake.lock_idx);
+          Sleep(0);
+        }
+
+	if (csect->csFake.valid)
+        {
+          result = EINVAL;
+        }
+      else
+        {
+           csect->csFake.owner = NULL;
+           csect->csFake.entered_count = 0;
+           csect->csFake.valid = 1;
+        }
+
+      InterlockedDecrement(&csect->csFake.lock_idx);
+    }
+
+  return result;
 }
 
-static void
-ptw32_DeleteCriticalSection (ptw32_cs_t * csect)
+void
+ptw32_DeleteCriticalSection (ptw32_cs_u_t * csect)
      /*
       * ------------------------------------------------------
       *
       * PARAMETERS
       *      csect
-      *              pointer to an instance of ptw32_cs_t
+      *              pointer to an instance of ptw32_cs_u_t
       *
       * DESCRIPTION
       *      Internal implementation of DeleteCriticalSection.
@@ -144,20 +166,36 @@ ptw32_DeleteCriticalSection (ptw32_cs_t * csect)
       * ------------------------------------------------------
       */
 {
-  ptw32_cs_t cs = *csect;
+  if (NULL != ptw32_try_enter_critical_section)
+    {
+      DeleteCriticalSection(&csect->cs);
+    }
+  else
+    {
+      while (InterlockedIncrement(&csect->csFake.lock_idx) > 0)
+        {
+          InterlockedDecrement(&csect->csFake.lock_idx);
+          Sleep(0);
+        }
 
-  cs->valid = 0;
-  DeleteCriticalSection(&cs->cs);
+      if (csect->csFake.valid
+          && csect->csFake.entered_count == 0)
+        {
+          csect->csFake.valid = 0;
+        }
+
+      InterlockedDecrement(&csect->csFake.lock_idx);
+    }
 }
 
-static void
-ptw32_EnterCriticalSection(ptw32_cs_t * csect)
+void
+ptw32_EnterCriticalSection(ptw32_cs_u_t * csect)
      /*
       * ------------------------------------------------------
       *
       * PARAMETERS
       *      csect
-      *              pointer to an instance of ptw32_cs_t
+      *              pointer to an instance of ptw32_cs_u_t
       *
       * DESCRIPTION
       *      Internal implementation of EnterCriticalSection.
@@ -165,39 +203,41 @@ ptw32_EnterCriticalSection(ptw32_cs_t * csect)
       * ------------------------------------------------------
       */
 {
-  ptw32_cs_t cs = *csect;
-
-  if (!cs->valid)
-    {
-      return;
-    }
-
   if (NULL != ptw32_try_enter_critical_section)
     {
-      EnterCriticalSection(&cs->cs);
+      EnterCriticalSection(&csect->cs);
     }
   else
     {
-      while (InterlockedIncrement(&cs->lock_idx) > 0)
+      pthread_t self = pthread_self();
+
+      while (InterlockedIncrement(&csect->csFake.lock_idx) >= 0
+             && csect->csFake.valid
+             && csect->csFake.owner != NULL
+             && csect->csFake.owner != self)
         {
-          InterlockedDecrement(&cs->lock_idx);
+          InterlockedDecrement(&csect->csFake.lock_idx);
           Sleep(0);
         }
-      EnterCriticalSection(&cs->cs);
-      cs->entered_count++;
-      cs->owner = pthread_self();
-      InterlockedDecrement(&cs->lock_idx);
+
+      if (csect->csFake.valid)
+        {
+          csect->csFake.entered_count++;
+          csect->csFake.owner = self;
+        }
+
+      InterlockedDecrement(&csect->csFake.lock_idx);
     }
 }
 
-static void
-ptw32_LeaveCriticalSection (ptw32_cs_t * csect)
+void
+ptw32_LeaveCriticalSection (ptw32_cs_u_t * csect)
      /*
       * ------------------------------------------------------
       *
       * PARAMETERS
       *      csect
-      *              pointer to an instance of ptw32_cs_t
+      *              pointer to an instance of ptw32_cs_u_t
       *
       * DESCRIPTION
       *      Internal implementation of LeaveCriticalSection.
@@ -205,46 +245,39 @@ ptw32_LeaveCriticalSection (ptw32_cs_t * csect)
       * ------------------------------------------------------
       */
 {
-  ptw32_cs_t cs = *csect;
-
-  if (!cs->valid)
-    {
-      return;
-    }
-
   if (NULL != ptw32_try_enter_critical_section)
     {
-      LeaveCriticalSection(&cs->cs);
+      LeaveCriticalSection(&csect->cs);
     }
   else
     {
-      while (InterlockedIncrement(&cs->lock_idx) > 0)
+      while (InterlockedIncrement(&csect->csFake.lock_idx) > 0)
         {
-          InterlockedDecrement(&cs->lock_idx);
+          InterlockedDecrement(&csect->csFake.lock_idx);
           Sleep(0);
         }
 
-      LeaveCriticalSection(&cs->cs);
-
-      cs->entered_count--;
-
-      if (cs->entered_count == 0)
+      if (csect->csFake.valid)
         {
-          cs->owner = NULL;
+          csect->csFake.entered_count--;
+          if (csect->csFake.entered_count == 0)
+            {
+              csect->csFake.owner = NULL;
+            }
         }
 
-      InterlockedDecrement(&cs->lock_idx);
+      InterlockedDecrement(&csect->csFake.lock_idx);
     }
 }
 
-static BOOL
-ptw32_TryEnterCriticalSection (ptw32_cs_t * csect)
+BOOL
+ptw32_TryEnterCriticalSection (ptw32_cs_u_t * csect)
      /*
       * ------------------------------------------------------
       *
       * PARAMETERS
       *      csect
-      *              pointer to an instance of ptw32_cs_t
+      *              pointer to an instance of ptw32_cs_u_t
       *
       * DESCRIPTION
       *      Internal implementation of TryEnterCriticalSection.
@@ -259,45 +292,42 @@ ptw32_TryEnterCriticalSection (ptw32_cs_t * csect)
       * ------------------------------------------------------
       */
 {
-  ptw32_cs_t cs = *csect;
   BOOL result = FALSE;
-
-  if (!cs->valid)
-    {
-      return (FALSE);
-    }
 
   if (NULL != ptw32_try_enter_critical_section)
     {
-      result = (*ptw32_try_enter_critical_section)(&cs->cs);
+      result = (*ptw32_try_enter_critical_section)(&csect->cs);
     }
   else
     {
-      pthread_t self = pthread_self();
+      pthread_t self;
 
-      while (InterlockedIncrement(&cs->lock_idx) > 0)
+      while (InterlockedIncrement(&csect->csFake.lock_idx) > 0)
         {
-          InterlockedDecrement(&cs->lock_idx);
+          InterlockedDecrement(&csect->csFake.lock_idx);
           Sleep(0);
         }
 
-      if (cs->owner == NULL || pthread_equal(cs->owner, self))
+      self = pthread_self();
+
+      if (csect->csFake.valid
+          && (csect->csFake.owner == NULL || csect->csFake.owner == self))
         {
-          /* The semantics of TryEnterCriticalSection
+          /* 
+           * The semantics of TryEnterCriticalSection
            * (according to the documentation at MS)
            * are that the CS is entered recursively
            * if the thread is the current owner.
            */
-          EnterCriticalSection(&cs->cs);
-          cs->entered_count++;
-          cs->owner = self;
+          csect->csFake.entered_count++;
+          csect->csFake.owner = self;
           result = TRUE;
         }
 
-      InterlockedDecrement(&cs->lock_idx);
+      InterlockedDecrement(&csect->csFake.lock_idx);
     }
 
-  return (result);
+  return result;
 }
 
 
@@ -313,28 +343,35 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
     }
 
   mx = (pthread_mutex_t) calloc(1, sizeof(*mx));
-
   if (mx == NULL)
     {
       result = ENOMEM;
       goto FAIL0;
     }
 
-  ptw32_InitializeCriticalSection(&mx->cs);
+  mx->cs.csFake.lock_idx = -1;
+
+  result = ptw32_InitializeCriticalSection(&mx->cs);
+  if (result != 0)
+    {
+      goto FAIL1;
+    }
+
   mx->lockCount = 0;
   mx->ownerThread = NULL;
 
   if (attr != NULL && *attr != NULL)
     {
-
       mx->type = (*attr)->type;
+      mx->pshared = (*attr)->pshared;
 
-      if ((*attr)->pshared == PTHREAD_PROCESS_SHARED)
+      if (mx->pshared == PTHREAD_PROCESS_SHARED)
         {
           /*
            * Creating mutex that can be shared between
            * processes.
            */
+
 #if _POSIX_THREAD_PROCESS_SHARED
 
           /*
@@ -350,7 +387,13 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 #endif /* _POSIX_THREAD_PROCESS_SHARED */
         }
     }
+  else
+    {
+      mx->type = PTHREAD_MUTEX_DEFAULT;
+      mx->pshared = PTHREAD_PROCESS_PRIVATE;
+    }
 
+FAIL1:
   if (result != 0 && mx != NULL)
     {
       free(mx);
@@ -381,9 +424,15 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
     {
       mx = *mutex;
 
+      /*
+       * Check to see if the mutex is held by any thread. We
+       * can't destroy it if it is. Pthread_mutex_trylock is
+       * not recursive and will return EBUSY even if the current
+       * thread (us) holds the lock.
+       */
       result = pthread_mutex_trylock(&mx);
 
-      if (result == 0 || result == EDEADLK)
+      if (result == 0)
         {
           /*
            * FIXME!!!
@@ -432,17 +481,27 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
         }
       else
         {
-          /*
-           * The mutex has been initialised while we were waiting
-           * so assume it's in use.
-           */
-          result = EBUSY;
+          if (*mutex == NULL)
+            {
+              /*
+               * The mutex has been destroyed while we were waiting
+               * so we just ignore it.
+               */
+            }
+          else
+            {
+              /*
+               * The mutex has been initialised while we were waiting
+               * so assume it's in use.
+               */
+              result = EBUSY;
+            }
         }
 
       LeaveCriticalSection(&ptw32_mutex_test_init_lock);
     }
 
-  return(result);
+  return result;
 }
 
 int
@@ -786,13 +845,13 @@ pthread_mutexattr_settype (pthread_mutexattr_t * attr,
 
 int
 pthread_mutexattr_gettype (pthread_mutexattr_t * attr,
-                           int type)
+                           int * type)
 {
   int result = 0;
 
   if ((attr != NULL && *attr != NULL))
     {
-      result = (*attr)->type;
+      *type = (*attr)->type;
     }
   else
     {
@@ -808,8 +867,6 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   int result = 0;
   pthread_mutex_t mx;
-  pthread_t self;
-
 
   if (mutex == NULL || *mutex == NULL)
     {
@@ -827,56 +884,64 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
       result = ptw32_mutex_check_need_init(mutex);
     }
 
-  mx = *mutex;
-  self = pthread_self();
-
-  switch (mx->type)
-    {
-    case PTHREAD_MUTEX_NORMAL:
-      if (pthread_equal(mx->ownerThread, self))
-        {
-          /*
-           * Pretend to be deadlocked but release the
-           * mutex if we are [asynchronously] canceled.
-           */
-          pthread_cleanup_push(pthread_mutex_unlock, (void *) mutex);
-          while (TRUE)
-            {
-              Sleep(0);
-            }
-          pthread_cleanup_pop(1);
-        }
-      else
-        {
-          ptw32_EnterCriticalSection(&mx->cs);
-        }
-      break;
-    case PTHREAD_MUTEX_ERRORCHECK:
-      if (pthread_equal(mx->ownerThread, self))
-        {
-          result = EDEADLK;
-        }
-      else
-        {
-          ptw32_EnterCriticalSection(&mx->cs);
-        }
-      break;
-    case PTHREAD_MUTEX_DEFAULT:
-    case PTHREAD_MUTEX_RECURSIVE:
-      ptw32_EnterCriticalSection(&mx->cs);
-      break;
-    default:
-      result = EINVAL;
-      break;
-    }
-
   if (result == 0)
     {
-      mx->ownerThread = self;
-      mx->lockCount++;
+      pthread_t self = pthread_self();
+
+      mx = *mutex;
+
+      switch (mx->type)
+        {
+        case PTHREAD_MUTEX_NORMAL:
+          if (pthread_equal(mx->ownerThread, self))
+            {
+              /*
+               * Pretend to be deadlocked but release the
+               * mutex if we are [asynchronously] canceled.
+               */
+              pthread_cleanup_push(pthread_mutex_unlock, (void *) mutex);
+              while (TRUE)
+                {
+                  Sleep(0);
+                }
+              pthread_cleanup_pop(1);
+
+              /*
+               * Never gets beyond here.
+               */
+            }
+          else
+            {
+              ptw32_EnterCriticalSection(&mx->cs);
+            }
+          break;
+        case PTHREAD_MUTEX_ERRORCHECK:
+          if (pthread_equal(mx->ownerThread, self))
+            {
+              result = EDEADLK;
+            }
+          else
+            {
+              ptw32_EnterCriticalSection(&mx->cs);
+            }
+          break;
+        case PTHREAD_MUTEX_DEFAULT:
+        case PTHREAD_MUTEX_RECURSIVE:
+          ptw32_EnterCriticalSection(&mx->cs);
+          break;
+        default:
+          result = EINVAL;
+          break;
+        }
+
+      if (result == 0)
+        {
+          mx->ownerThread = self;
+          mx->lockCount++;
+        }
     }
 
-  return(result);
+  return result;
 }
 
 int
@@ -901,14 +966,14 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
     {
       if (pthread_equal(mx->ownerThread, pthread_self()))
 	{
-          mx->lockCount--;
+        mx->lockCount--;
 
 	  if (mx->lockCount == 0)
 	    {
 	      mx->ownerThread = NULL;
 	    }
 	      
-          ptw32_LeaveCriticalSection(&mx->cs);
+        ptw32_LeaveCriticalSection(&mx->cs);
 	}
       else
 	{
@@ -920,7 +985,7 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
       result = EINVAL;
     }
 
-  return(result);
+  return result;
 }
 
 int
@@ -982,6 +1047,6 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
       mx->lockCount++;
     }
 
-  return (result);
+  return result;
 }
 

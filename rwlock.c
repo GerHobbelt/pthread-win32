@@ -352,7 +352,7 @@ pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
 
     rwl = *rwlock;
 
-    if (rwl->nMagic != RWLOCK_MAGIC)
+    if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
       {
         return EINVAL;
       }

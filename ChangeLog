@@ -1,3 +1,28 @@
+2001-02-09  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* sched.c (pthread_setconcurrency): Moved to misc.c.
+	(pthread_getconcurrency): Likewise.
+	(pthread_mutexattr_setscope): Moved to attr.c.
+	(pthread_mutexattr_getscope): Likewise.
+
+2001-02-08  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* mutex.c (pthread_mutexattr_gettype): Fix arg and return
+	mutex type in arg.
+	* mutex.c (ptw32_*CriticalSection): Fix lockup problem
+	in new functions (when TryEnter is not supported) - a
+	thread waiting to enter the CS would not decrement the
+	lock_idx counter and thereby block other threads;
+	POSIX mutexes no longer use critical sections or
+	Win32 mutexes when TryEnterCriticalSection is not supported
+	- uses only InterlockedIncrement/Decrement and some
+	additional data to emulate Win32 critical sections. This
+	was necessary to retain control when blocking on a
+	mutex held by another thread (see the first problem at the
+	start of this log entry). It remains to be seen if this
+	could be a better solution when TryEnterCriticalSection is
+	supported as well.
+
 2001-02-07  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* mutex.c (pthread_mutex_lock): Map default type

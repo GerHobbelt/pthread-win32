@@ -134,51 +134,6 @@ pthread_getschedparam(pthread_t thread, int *policy,
 }
 
 
-int
-pthread_setconcurrency(int level)
-{
-  if (level < 0)
-    {
-      return EINVAL;
-    }
-  else
-    {
-      return 0;
-    }
-}
-
-int
-pthread_getconcurrency(void)
-{
-  return 0;
-}
-
-int
-pthread_attr_setscope(pthread_attr_t *attr, int contentionscope)
-{
-#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
-  if (contentionscope != PTHREAD_SCOPE_SYSTEM)
-    {
-      return ENOTSUP;
-    }
-
-  return 0;
-#else
-  return ENOSYS;
-#endif
-}
-
-int
-pthread_attr_getscope(const pthread_attr_t *attr, int *contentionscope)
-{
-#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
-  *contentionscope = PTHREAD_SCOPE_SYSTEM;
-  return 0;
-#else
-  return ENOSYS;
-#endif
-}
-
 /*
  * On Windows98, THREAD_PRIORITY_LOWEST is (-2) and 
  * THREAD_PRIORITY_HIGHEST is 2, and everything works just fine.

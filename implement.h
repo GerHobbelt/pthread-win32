@@ -121,19 +121,34 @@ struct pthread_attr_t_ {
 #define PTW32_OBJECT_AUTO_INIT ((void *) -1)
 #define PTW32_OBJECT_INVALID   NULL
 
-struct pthread_mutex_t_ {
-  HANDLE mutex;
-  CRITICAL_SECTION cs;
-  int lockCount;
-  pthread_t ownerThread;
-};
+/*
+ * Our own critical section type, used
+ * when the system doesn't support TryEnterCriticalSection()
+ */
+typedef struct ptw32_cs_t_ {
+  int valid;
+  pthread_t owner;
+  long lock_idx;
+  long entered_count;
+} ptw32_cs_t;
 
+typedef union ptw32_cs_u_t_ {
+  CRITICAL_SECTION cs;
+  ptw32_cs_t csFake;
+} ptw32_cs_u_t;
 
 struct pthread_mutexattr_t_ {
   int pshared;
-  int forcecs;
+  int type;
 };
 
+struct pthread_mutex_t_ {
+  ptw32_cs_u_t cs;
+  int lockCount;
+  int pshared;
+  int type;
+  pthread_t ownerThread;
+};
 
 struct pthread_key_t_ {
   DWORD key;
@@ -364,6 +379,16 @@ void ptw32_decrease_semaphore(sem_t * sem);
 BOOL ptw32_increase_semaphore(sem_t * sem,
                                  unsigned int n);
 #endif /* NEED_SEM */
+
+int ptw32_InitializeCriticalSection (ptw32_cs_u_t *);
+
+void ptw32_DeleteCriticalSection (ptw32_cs_u_t *);
+
+void ptw32_EnterCriticalSection (ptw32_cs_u_t *);
+
+void ptw32_LeaveCriticalSection (ptw32_cs_u_t *);
+
+BOOL ptw32_TryEnterCriticalSection (ptw32_cs_u_t *);
 
 #ifdef __cplusplus
 }

@@ -238,6 +238,27 @@ pthread_equal (pthread_t t1, pthread_t t2)
 }				/* pthread_equal */
 
 
+int
+pthread_setconcurrency(int level)
+{
+  if (level < 0)
+    {
+      return EINVAL;
+    }
+  else
+    {
+      return 0;
+    }
+}
+
+
+int
+pthread_getconcurrency(void)
+{
+  return 0;
+}
+
+
 static int
 ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
      /*

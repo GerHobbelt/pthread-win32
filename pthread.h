@@ -624,6 +624,18 @@ int pthread_attr_setstackaddr (pthread_attr_t * attr,
 int pthread_attr_setstacksize (pthread_attr_t * attr,
 			       size_t stacksize);
 
+int pthread_attr_getschedparam (const pthread_attr_t *attr,
+				struct sched_param *param);
+
+int pthread_attr_setschedparam (pthread_attr_t *attr,
+				const struct sched_param *param);
+
+int pthread_attr_setscope (pthread_attr_t *,
+                       int);
+
+int pthread_attr_getscope (const pthread_attr_t *,
+                       int *);
+
 /*
  * PThread Functions
  */
@@ -691,6 +703,12 @@ int pthread_mutexattr_getpshared (const pthread_mutexattr_t
 int pthread_mutexattr_setpshared (pthread_mutexattr_t * attr,
 				  int pshared);
 
+int pthread_mutexattr_settype (pthread_mutexattr_t * attr,
+					 int type);
+
+int pthread_mutexattr_gettype (pthread_mutexattr_t * attr,
+					 int * type);
+
 /*
  * Mutex Functions
  */
@@ -748,30 +766,15 @@ int pthread_getschedparam (pthread_t thread,
 			   int *policy,
 			   struct sched_param *param);
 
-int pthread_attr_getschedparam (const pthread_attr_t *attr,
-				struct sched_param *param);
+int pthread_setconcurrency (int);
 
-int pthread_attr_setschedparam (pthread_attr_t *attr,
-				const struct sched_param *param);
-
-int
-pthread_setconcurrency (int);
-
-int
-pthread_getconcurrency (void);
-
-int
-pthread_attr_setscope (const pthread_attr_t *, int);
-
-int
-pthread_attr_getscope (const pthread_attr_t *,
-                       int *);
+int pthread_getconcurrency (void);
 
 /*
  * Read-Write Lock Functions
  */
 int pthread_rwlock_init(pthread_rwlock_t *lock,
-                               const pthread_rwlockattr_t *attr);
+                        const pthread_rwlockattr_t *attr);
 
 int pthread_rwlock_destroy(pthread_rwlock_t *lock);
 

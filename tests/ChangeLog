@@ -1,3 +1,8 @@
+2001-02-09  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* eyal1.c (main): Unlock each mutex_start lock before destroying
+	it.
+
 2001-02-08  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* Makefile (rwlock7): Add new test.

@@ -48,7 +48,7 @@
  * Create NUMTHREADS threads in addition to the Main thread.
  */
 enum {
-  NUMTHREADS = 1
+  NUMTHREADS = 4
 };
 
 typedef struct bag_t_ bag_t;
@@ -76,6 +76,7 @@ mythread(void * arg)
 
   assert(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == 0);
 
+#if 0
   switch (bag->threadnum % 2)
     {
     case 0:
@@ -87,6 +88,10 @@ mythread(void * arg)
       result = 1;
       break;
     }
+#else
+  assert(pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL) == 0);
+  result = 1;
+#endif
 
 #if defined(_MSC_VER) && !defined(__cplusplus)
   __try

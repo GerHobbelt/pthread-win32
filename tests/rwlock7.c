@@ -27,9 +27,9 @@ typedef struct thread_tag {
  * Read-write lock and shared data
  */
 typedef struct data_tag {
-  rwlock_t    lock;
-  int         data;
-  int         updates;
+  pthread_rwlock_t    lock;
+  int                 data;
+  int                 updates;
 } data_t;
 
 static thread_t threads[THREADS];
@@ -99,10 +99,9 @@ main (int argc, char *argv[])
 {
   int count;
   int data_count;
-  int status;
-  unsigned int seed = 1;
   int thread_updates = 0;
   int data_updates = 0;
+  int seed = 1;
 
   struct _timeb currSysTime1;
   struct _timeb currSysTime2;
@@ -115,7 +114,7 @@ main (int argc, char *argv[])
       data[data_count].data = 0;
       data[data_count].updates = 0;
 
-      assert(pthread_rwlock_init (&data[data_count].lock) == 0);
+      assert(pthread_rwlock_init (&data[data_count].lock, NULL) == 0);
     }
 
   _ftime(&currSysTime1);

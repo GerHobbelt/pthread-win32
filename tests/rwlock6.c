@@ -11,14 +11,17 @@
 
 #include "test.h"
 
+#define PRTDEBUG(M, F, L) {FILE * fp; fp = fopen("debug.log", "a"); fprintf(fp, "%s: %s: %d\n", M, F, L); fclose(fp);}
+
 static pthread_rwlock_t rwlock1 = PTHREAD_RWLOCK_INITIALIZER;
 
-static int bankAccount;
+static int bankAccount = 0;
 
 void * wrfunc(void * arg)
 {
   assert(pthread_rwlock_wrlock(&rwlock1) == 0);
-  Sleep(1000);
+//PRTDEBUG("wr", __FILE__, __LINE__);
+  Sleep(2000);
   bankAccount += 10;
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
@@ -30,6 +33,7 @@ void * rdfunc(void * arg)
   int ba = 0;
 
   assert(pthread_rwlock_rdlock(&rwlock1) == 0);
+//PRTDEBUG("rd", __FILE__, __LINE__);
   ba = bankAccount;
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
@@ -47,10 +51,12 @@ main()
   int wr2Result = 0;
   int rdResult = 0;
 
+  bankAccount = 0;
+
   assert(pthread_create(&wrt1, NULL, wrfunc, NULL) == 0);
-  Sleep(200);
+  Sleep(500);
   assert(pthread_create(&rdt, NULL, rdfunc, NULL) == 0);
-  Sleep(200);
+  Sleep(500);
   assert(pthread_create(&wrt2, NULL, wrfunc, NULL) == 0);
 
   assert(pthread_join(wrt1, (void **) &wr1Result) == 0);
@@ -59,7 +65,9 @@ main()
 
   assert(wr1Result == 10);
   assert(wr2Result == 20);
-  assert(rdResult == 20);
+printf("rdResult = %d\n", rdResult);
+fflush(stdout);
+  assert(rdResult == 30);
 
   return 0;
 }
