@@ -285,16 +285,6 @@ struct timespec {
 #define PT_STDCALL __stdcall
 #endif
 
-
-/* 
- * This should perhaps be in autoconf or 
- * possibly fixed in Mingw32 to
- * correspond to the Windows headers.
- */
-#ifdef __MINGW32__
-#define _timeb timeb
-#endif
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -967,6 +957,46 @@ int * _errno( void );
 #define rand_r( _seed ) \
 	rand()
 
+
+#ifdef _MSC_VER
+/*
+ * Get internal SEH tag
+ */
+DWORD _pthread_get_exception_services_code(void);
+
+/*
+ * Redefine the SEH __except keyword to ensure that applications
+ * propagate our internal exceptions up to the library's internal handlers.
+ */
+#define __except(E) \
+        __except((GetExceptionCode() == _pthread_get_exception_services_code()) \
+		 ? EXCEPTION_CONTINUE_SEARCH : (E))
+
+#endif
+
+#ifdef __cplusplus
+/*
+ * Internal exceptions
+ */
+class Pthread_exception_cancel {};
+class Pthread_exception_exit {};
+
+/*
+ * Redefine the C++ catch keyword to ensure that applications
+ * propagate our internal exceptions up to the library's internal handlers.
+ */
+#define catch(E) \
+         catch(Pthread_exception_cancel) \
+         { \
+            throw; \
+         } \
+         catch(Pthread_exception_exit) \
+         { \
+            throw; \
+         } \
+         catch(E)
+
+#endif
 
 #ifdef __cplusplus
 }				/* End of extern "C" */

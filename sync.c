@@ -124,14 +124,32 @@ pthread_join (pthread_t thread, void **value_ptr)
     }
   else
     {
+#if 0
       DWORD stat;
 
       stat = WaitForSingleObject (thread->threadH, INFINITE);
+#else
+      /*
+       * Pthread_join is a cancelation point.
+       * If we are cancelled then our target thread must not be
+       * detached (destroyed). This is guarranteed because
+       * pthreadCancelableWait will not return if we
+       * are cancelled.
+       */
+      result = pthreadCancelableWait(thread->threadH);
+#endif
+
+      if (
+#if 0
+	  stat == WAIT_OBJECT_0
+#else
+	  result == 0
+#endif
+	  )
+	{
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
 
-      if (stat == WAIT_OBJECT_0)
-	{
 	  if (value_ptr != NULL
 	      && !GetExitCodeThread (thread->threadH, (LPDWORD) value_ptr))
 	    {
@@ -145,31 +163,33 @@ pthread_join (pthread_t thread, void **value_ptr)
 	       */
 	      _pthread_threadDestroy (thread);
 	    }
+
+#else /* __MINGW32__ && ! __MSVCRT__ */
+
+	  /*
+	   * If using CRTDLL, the thread may have exited, and endthread
+	   * will have closed the handle.
+	   */
+	  if (value_ptr != NULL)
+	    {
+	      *value_ptr = self->exitStatus;
+	    }
+      
+	  /*
+	   * The result of making multiple simultaneous calls to
+	   * pthread_join() specifying the same target is undefined.
+	   */
+	  _pthread_threadDestroy (thread);
+
+#endif /* __MINGW32__ && ! __MSVCRT__ */
+
 	}
       else
 	{
 	  result = ESRCH;
 	}
-
-#else /* __MINGW32__ && ! __MSVCRT__ */
-
-      /*
-       * If using CRTDLL, the thread may have exited, and endthread
-       * will have closed the handle.
-       */
-      if (value_ptr != NULL)
-	*value_ptr = self->exitStatus;
-      
-      /*
-       * The result of making multiple simultaneous calls to
-       * pthread_join() specifying the same target is undefined.
-       */
-      _pthread_threadDestroy (thread);
-
-#endif /* __MINGW32__ && ! __MSVCRT__ */
     }
 
   return (result);
 
 }				/* pthread_join */
-

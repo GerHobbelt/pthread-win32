@@ -116,11 +116,7 @@ main()
   int i;
   pthread_t t[NUMTHREADS + 1];
 
-#if defined(__MINGW32__)
-  struct timeb currSysTime;
-#else
   struct _timeb currSysTime;
-#endif
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   cvthing.shared = 0;

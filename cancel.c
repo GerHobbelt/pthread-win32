@@ -26,6 +26,64 @@
 #include "pthread.h"
 #include "implement.h"
 
+
+static void 
+_pthread_cancel_self(void)
+{
+#ifdef _MSC_VER
+
+  DWORD exceptionInformation[3];
+
+  exceptionInformation[0] = (DWORD) (_PTHREAD_EPS_CANCEL);
+  exceptionInformation[1] = (DWORD) (0);
+  exceptionInformation[2] = (DWORD) (0);
+
+  RaiseException (
+		  EXCEPTION_PTHREAD_SERVICES,
+		  0,
+		  3,
+		  exceptionInformation);
+
+#else /* _MSC_VER */
+
+# ifdef __cplusplus
+
+  throw Pthread_exception_cancel();
+
+# endif /* __cplusplus */
+
+#endif /* _MSC_VER */
+
+  /* Never reached */
+}
+
+
+/*
+ * _pthread_cancel_thread implements asynchronous cancellation.
+ */
+static void 
+_pthread_cancel_thread(pthread_t thread)
+{
+  HANDLE threadH = thread->threadH;
+
+  (void) pthread_mutex_lock(&thread->cancelLock);
+
+  SuspendThread(threadH);
+
+  if (WaitForSingleObject(threadH, 0) == WAIT_TIMEOUT)
+    {
+      CONTEXT context;
+      context.ContextFlags = CONTEXT_CONTROL;
+      GetThreadContext(threadH, &context);
+      context.Eip = (DWORD) _pthread_cancel_self;
+      SetThreadContext(threadH, &context);
+      ResumeThread(threadH);
+    }
+
+  (void) pthread_mutex_unlock(&thread->cancelLock);
+}
+
+
 int
 pthread_setcancelstate (int state, int *oldstate)
      /*
@@ -37,8 +95,8 @@ pthread_setcancelstate (int state, int *oldstate)
       *      'oldstate'
       *
       * PARAMETERS
-      *      type,
-      *      oldtype
+      *      state,
+      *      oldstate
       *              PTHREAD_CANCEL_ENABLE
       *                      cancellation is enabled,
       *
@@ -67,27 +125,43 @@ pthread_setcancelstate (int state, int *oldstate)
       * ------------------------------------------------------
       */
 {
-  pthread_t self;
-  int result;
+  int result = 0;
+  pthread_t self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
 
-  if (((self = pthread_self ()) != NULL) &&
-      (state == PTHREAD_CANCEL_ENABLE ||
-       state == PTHREAD_CANCEL_DISABLE))
+  if (self == NULL
+      || (state != PTHREAD_CANCEL_ENABLE
+	  && state != PTHREAD_CANCEL_DISABLE))
     {
-
-      if (oldstate != NULL)
-	{
-	  *oldstate = self->cancelState;
-	}
-
-      self->cancelState = state;
-      result = 0;
-
+      return EINVAL;
     }
-  else
+
+  /*
+   * Lock for async-cancel safety.
+   */
+  (void) pthread_mutex_lock(&self->cancelLock);
+
+  if (oldstate != NULL)
     {
-      result = EINVAL;
+      *oldstate = self->cancelState;
     }
+
+  self->cancelState = state;
+
+  /*
+   * Check if there is a pending asynchronous cancel
+   */
+  if (self->cancelState == PTHREAD_CANCEL_ENABLE
+      && self->cancelType == PTHREAD_CANCEL_ASYNCHRONOUS
+      && WaitForSingleObject(self->cancelEvent, 0) == WAIT_OBJECT_0)
+    {
+      ResetEvent(self->cancelEvent);
+      (void) pthread_mutex_unlock(&self->cancelLock);
+      _pthread_cancel_self();
+
+      /* Never reached */
+    }
+
+  (void) pthread_mutex_unlock(&self->cancelLock);
 
   return (result);
 
@@ -135,27 +209,43 @@ pthread_setcanceltype (int type, int *oldtype)
       * ------------------------------------------------------
       */
 {
-  pthread_t self;
-  int result;
+  int result = 0;
+  pthread_t self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
 
-  if (((self = pthread_self ()) != NULL) &&
-      (type == PTHREAD_CANCEL_DEFERRED ||
-       type == PTHREAD_CANCEL_ASYNCHRONOUS))
+  if (self == NULL
+      || (type != PTHREAD_CANCEL_DEFERRED
+	  && type != PTHREAD_CANCEL_ASYNCHRONOUS))
     {
-
-      if (oldtype != NULL)
-	{
-	  *oldtype = self->cancelType;
-	}
-
-      self->cancelType = type;
-      result = 0;
-
+      return EINVAL;
     }
-  else
+
+  /*
+   * Lock for async-cancel safety.
+   */
+  (void) pthread_mutex_lock(&self->cancelLock);
+
+  if (oldtype != NULL)
     {
-      result = EINVAL;
+      *oldtype = self->cancelType;
     }
+
+  self->cancelType = type;
+
+  /*
+   * Check if there is a pending asynchronous cancel
+   */
+  if (self->cancelState == PTHREAD_CANCEL_ENABLE
+      && self->cancelType == PTHREAD_CANCEL_ASYNCHRONOUS
+      && WaitForSingleObject(self->cancelEvent, 0) == WAIT_OBJECT_0)
+    {
+      ResetEvent(self->cancelEvent);
+      (void) pthread_mutex_unlock(&self->cancelLock);
+      _pthread_cancel_self();
+
+      /* Never reached */
+    }
+
+  (void) pthread_mutex_unlock(&self->cancelLock);
 
   return (result);
 
@@ -191,50 +281,42 @@ pthread_testcancel (void)
       * ------------------------------------------------------
       */
 {
-  pthread_t self;
+  pthread_t self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
 
-  if ((self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey)) 
-      != NULL)
+  if (self != NULL
+      && self->cancelState == PTHREAD_CANCEL_ENABLE
+      && WaitForSingleObject (self->cancelEvent, 0) == WAIT_OBJECT_0
+      )
     {
-
-      if (self->cancelState == PTHREAD_CANCEL_ENABLE)
-	{
-
-	  if (WaitForSingleObject (self->cancelEvent, 0) ==
-	      WAIT_OBJECT_0)
-	    {
-	      /*
-	       * Canceling!
-	       */
+      /*
+       * Canceling!
+       */
 
 #ifdef _MSC_VER
 
-	      DWORD exceptionInformation[3];
+      DWORD exceptionInformation[3];
 
-	      exceptionInformation[0] = (DWORD) (_PTHREAD_EPS_CANCEL);
-	      exceptionInformation[1] = (DWORD) (0);
-	      exceptionInformation[2] = (DWORD) (0);
+      exceptionInformation[0] = (DWORD) (_PTHREAD_EPS_CANCEL);
+      exceptionInformation[1] = (DWORD) (0);
+      exceptionInformation[2] = (DWORD) (0);
 
-	      RaiseException (
-			       EXCEPTION_PTHREAD_SERVICES,
-			       0,
-			       3,
-			       exceptionInformation);
+      RaiseException (
+		      EXCEPTION_PTHREAD_SERVICES,
+		      0,
+		      3,
+		      exceptionInformation);
 
 #else /* _MSC_VER */
 
 #ifdef __cplusplus
 
-	      throw Pthread_exception_cancel();
+      throw Pthread_exception_cancel();
 
 #endif /* __cplusplus */
 
 #endif /* _MSC_VER */
 
-	    }
-	}
     }
-
 }				/* pthread_testcancel */
 
 int
@@ -262,8 +344,52 @@ pthread_cancel (pthread_t thread)
       */
 {
   int result;
+  int cancel_self;
+  pthread_t self;
 
-  if (thread != NULL)
+  if (thread == NULL )
+    {
+      return ESRCH;
+    }
+
+  result = 0;
+  self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
+
+  /*
+   * FIXME!!
+   *
+   * Can a thread cancel itself?
+   *
+   * The standard doesn't
+   * specify an error to be returned if the target
+   * thread is itself.
+   *
+   * If it may, then we need to ensure that a thread can't
+   * deadlock itself trying to cancel itself asyncronously
+   * (pthread_cancel is required to be an async-cancel
+   * safe function).
+   */
+  cancel_self = pthread_equal(thread, self);
+
+  /*
+   * Lock for async-cancel safety.
+   */
+  (void) pthread_mutex_lock(&self->cancelLock);
+
+  if (thread->cancelType == PTHREAD_CANCEL_ASYNCHRONOUS
+      && thread->cancelState == PTHREAD_CANCEL_ENABLE )
+    {
+      if (cancel_self)
+	{
+	  (void) pthread_mutex_unlock(&self->cancelLock);
+	  _pthread_cancel_self();
+
+	  /* Never reached */
+	}
+
+      _pthread_cancel_thread(thread);
+    }
+  else
     {
       /*
        * Set for deferred cancellation.
@@ -272,17 +398,13 @@ pthread_cancel (pthread_t thread)
 	{
 	  result = ESRCH;
 	}
-      else
-	{
-	  result = 0;
-	}
+    }
 
-    }
-  else
-    {
-      result = ESRCH;
-    }
+  (void) pthread_mutex_unlock(&self->cancelLock);
 
   return (result);
+
 }
+
+
 

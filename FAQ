@@ -12,6 +12,8 @@ Q 2	Now that pthreads-win32 builds under Mingw32, why do I get
 
 Q 3	How do I use pthread.dll for Win32 (Visual C++ 5.0)
 
+Q 4	Cancelation doesn't work for me, why?
+
 =============================================================================
 
 Q 1	Should I use Cygwin or Mingw32 as a development environment?
@@ -177,3 +179,77 @@ is included for information.
 
 Cheers.
 Ross
+
+------------------------------------------------------------------------------
+
+Q 4	Cancelation doesn't work for me, why?
+---
+
+A 4
+---
+
+> I'm investigating a problem regarding thread cancelation. The thread I want
+> to cancel has PTHREAD_CANCEL_ASYNCHRONOUS, however, this piece of code
+> blocks on the join():
+>
+>               if ((retv = Pthread_cancel( recvThread )) == 0)
+>               {
+>                       retv = Pthread_join( recvThread, 0 );
+>               }
+>
+> Pthread_* are just macro's; they call pthread_*.
+>
+> The thread recvThread seems to block on a select() call. It doesn't get
+> cancelled.
+>
+> Two questions:
+>
+> 1) is this normal behaviour?
+>
+> 2) if not, how does the cancel mechanism work? I'm not very familliar to
+> win32 programming, so I don't really understand how the *Event() family of
+> calls work.
+
+The answer to your first question is, normal POSIX behaviour would  
+be to asynchronously cancel the thread.
+
+However ...
+
+Pthreads-win32 doesn't support asynchronous cancelation, only
+deferred, which is also very limited. The reason there is no async
+cancelation is that it's too hard, if not impossible, to implement  
+on top of Win32. Incidently, Butenhof "Programming with POSIX
+Threads"  recommends not using async cancelation because the
+possible side effects are unpredictable, especially if you're   
+trying to write portable code.
+
+Using deferred cancelation would normally be the way to go, however,
+even though the POSIX threads standard lists a number of C library
+functions that are defined as deferred cancelation points, there is
+no hookup between those which are provided by Windows and the
+pthreads-win32 library.
+
+Incidently, it's worth noting for code portability that the POSIX
+threads standard list doesn't include "select" because (as I read in
+Butenhof) it isn't recognised by POSIX.
+
+Effectively, the only cancelation points that pthreads-win32 can
+recognise are those the library implements itself, ie.
+        
+        pthread_testcancel
+        pthread_cond_wait
+        pthread_cond_timedwait
+	pthread_join
+        sem_wait
+
+Pthreads-win32 also provides two functions that allow you to create
+cancelation points within your application, but only for cases where
+a thread is going to block on a Win32 handle. These are:
+
+        pthreadCancelableWait(HANDLE waitHandle) /* Infinite wait */
+ 
+        pthreadCancelableTimedWait(HANDLE waitHandle, DWORD timeout)
+
+Regards.
+Ross
+

@@ -78,7 +78,7 @@ pthread_pop_cleanup (int execute)
 	       */
 	      (*cleanup->routine) (cleanup->arg);
 	    }
-          __except (EXCEPTION_EXECUTE_HANDLER)
+          _pthread__except (EXCEPTION_EXECUTE_HANDLER)
 	    {
 	      /*
 	       * A system unexpected exception had occurred
@@ -98,7 +98,7 @@ pthread_pop_cleanup (int execute)
 	       */
 	      (*cleanup->routine) (cleanup->arg);
 	    }
-	  catch(...)
+	  _pthread_catch(...)
 	    {
 	      /*
 	       * A system unexpected exception had occurred

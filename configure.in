@@ -20,4 +20,4 @@ then
   fi
 fi
 
-AC_OUTPUT(Makefile)
+AC_OUTPUT(GNUmakefile)

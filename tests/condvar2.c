@@ -51,11 +51,7 @@ int
 main()
 {
   struct timespec abstime = { 0, 0 };
-#if defined(__MINGW32__)
-  struct timeb currSysTime;
-#else
   struct _timeb currSysTime;
-#endif
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   assert(pthread_cond_init(&cv, NULL) == 0);

@@ -24,6 +24,7 @@ call runtest cl once1 create1
 call runtest cl tsd1 join1
 call runtest cl self2 create1
 call runtest cl cancel1 self2
+call runtest cl cancel2 cancel1
 call runtest cl eyal1 tsd1
 call runtest cl condvar3 create1
 call runtest cl condvar4 create1
@@ -39,6 +40,10 @@ call runtest cl rwlock3 rwlock2
 call runtest cl rwlock4 rwlock3
 call runtest cl rwlock5 rwlock4
 call runtest cl rwlock6 rwlock5
+call runtest cl context1 cancel2
+call runtest cl cancel3 context1
+call runtest cl cancel4 cancel3
+call runtest cl loadfree _
 
 if NOT EXIST *.notrun goto skip1
 echo The following tests did not run (because prerequisite didn't pass?):

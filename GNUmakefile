@@ -24,12 +24,12 @@ CC	= g++
 
 AR	= ar
 
-LD	= gcc -mdll -mthreads
+LD	= gcc -mdll
 
 OPT	= -g -O2
 
 ## Mingw32
-CFLAGS	= $(OPT) -I. -DHAVE_CONFIG_H -Wall -mthreads
+CFLAGS	= $(OPT) -I. -DHAVE_CONFIG_H -Wall
 
 ## Cygwin G++
 #CFLAGS	= $(OPT) -fhandle-exceptions -I. -DHAVE_CONFIG_H -Wall
