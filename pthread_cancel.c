@@ -54,6 +54,10 @@
 #define PTW32_PROGCTR(Context)  ((Context).Iar)
 #endif
 
+#if defined(_AMD64_)
+#define PTW32_PROGCTR(Context)  ((Context).Rip)
+#endif
+
 #if !defined(PTW32_PROGCTR)
 #error Module contains CPU-specific code; modify and recompile.
 #endif
@@ -155,7 +159,7 @@ pthread_cancel (pthread_t thread)
               thread->cancelState = PTHREAD_CANCEL_DISABLE;
               context.ContextFlags = CONTEXT_CONTROL;
               GetThreadContext(threadH, &context);
-              PTW32_PROGCTR(context) = (DWORD) ptw32_cancel_self;
+              PTW32_PROGCTR(context) = (DWORD_PTR) ptw32_cancel_self;
               SetThreadContext(threadH, &context);
               (void) pthread_mutex_unlock(&thread->cancelLock);
               ResumeThread(threadH);

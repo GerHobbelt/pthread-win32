@@ -1,4 +1,4 @@
-2004-05-06  Makato Kato  <raven@oldskool.jp>
+2004-05-06  Makoto Kato  <raven@oldskool.jp>
 
 	* pthread.h (DWORD_PTR): Define typedef for older MSVC.
 	* pthread_cancel.c (AMD64): Add architecture specific Context register.
