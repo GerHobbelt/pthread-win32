@@ -1,3 +1,8 @@
+1998-07-24  Ben Elliston  <bje@cygnus.com>
+
+	* sync.c (pthread_detach): Close the Win32 thread handle to
+	emulate detached (or daemon) threads.
+
 Fri Jul 24 03:00:25 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* sync.c (pthread_join): Save valueptr arg in joinvalueptr for
