@@ -1,3 +1,16 @@
+1998-07-12  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.h (pthread_mutexattr_t): Define this type.
+	(pthread_mutexattr_setprotocol): Add function prototype.
+	(pthread_mutexattr_getprotocol): Likewise.
+	(pthread_mutexattr_setprioceiling): Likewise.
+	(pthread_mutexattr_getprioceiling): Likewise.
+
+	* mutex.c (pthread_mutexattr_setprotocol): Implement.
+	(pthread_mutexattr_getprotocol): Likewise.
+	(pthread_mutexattr_setprioceiling): Likewise.
+	(pthread_mutexattr_getprioceiling): Likewise.
+	
 Sat Jul 11 14:48:54 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* implement.h: Preliminary implementation specific defines.
