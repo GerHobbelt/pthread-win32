@@ -38,8 +38,16 @@ pthread_mutex_t _pthread_table_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 DWORD _pthread_threads_count = 0;
 
-/* Per thread management storage. */
-_pthread_threads_thread_t _pthread_threads_table[PTHREAD_THREADS_MAX];
+/* Per thread management storage. See comments in private.c */
+_pthread_t _pthread_virgins[PTHREAD_THREADS_MAX];
+
+int _pthread_virgin_next = 0;
+
+pthread_t _pthread_reuse[PTHREAD_THREADS_MAX];
+
+int _pthread_reuse_top = -1;
+
+pthread_t _pthread_win32handle_map[PTHREAD_THREADS_MAX];
 
 /* Per thread mutex locks. */
 pthread_mutex_t _pthread_threads_mutex_table[PTHREAD_THREADS_MAX];

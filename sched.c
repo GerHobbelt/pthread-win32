@@ -36,7 +36,7 @@ int pthread_setschedparam(pthread_t thread, int policy,
 			  const struct sched_param *param)
 {
   /* Validate the thread id. */
-  if (_pthread_find_thread_entry(thread) < 0)
+  if (_PTHREAD_VALID(thread) < 0)
     {
       return EINVAL;
     }
@@ -61,7 +61,7 @@ int pthread_setschedparam(pthread_t thread, int policy,
     }
 
   /* This is practically guaranteed to return TRUE. */
-  (void) SetThreadPriority(thread, param->sched_policy);
+  (void) SetThreadPriority(thread->win32handle, param->sched_policy);
   return 0;
 }
 
@@ -71,7 +71,7 @@ int pthread_getschedparam(pthread_t thread, int *policy,
   int prio;
 
   /* Validate the thread id. */
-  if (_pthread_find_thread_entry(thread) < 0)
+  if (_PTHREAD_VALID(thread) != 0)
     {
       return EINVAL;
     }
@@ -86,7 +86,7 @@ int pthread_getschedparam(pthread_t thread, int *policy,
   *policy = SCHED_OTHER;
 
   /* Fill out the sched_param structure. */
-  prio = GetThreadPriority(thread);
+  prio = GetThreadPriority(thread->win32handle);
   if (prio == THREAD_PRIORITY_ERROR_RETURN)
     {
       return EINVAL;

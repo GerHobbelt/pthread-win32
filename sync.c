@@ -57,7 +57,6 @@ pthread_join(pthread_t thread, void ** valueptr)
 {
   LPDWORD exitcode;
   int detachstate;
-  _pthread_threads_thread_t * target;
 
   /* First check if we are trying to join to ourselves. */
   if (thread == pthread_self())
@@ -65,15 +64,12 @@ pthread_join(pthread_t thread, void ** valueptr)
       return EDEADLK;
     }
 
-  /* Find the thread. */
-  target = _pthread_find_thread_entry(thread);
-
-  if (target != NULL)
+  if (thread != NULL)
     {
       pthread_mutex_t * target_thread_mutex;
       int ret;
 
-      target_thread_mutex = _PTHREAD_THREAD_MUTEX(target);
+      target_thread_mutex = _PTHREAD_THREAD_MUTEX(thread);
 
       /* CRITICAL SECTION */
       pthread_mutex_lock(&_pthread_table_mutex);
@@ -81,13 +77,13 @@ pthread_join(pthread_t thread, void ** valueptr)
       /* If the thread is in DETACHED state, then join will return
 	 immediately. */
 
-      if (pthread_attr_getdetachedstate(&(target->attr), &detachstate) != 0 
+      if (pthread_attr_getdetachedstate(&(thread->attr), &detachstate) != 0 
 	  || detachstate == PTHREAD_CREATE_DETACHED)
 	{
 	  return EINVAL;
 	}
 
-      target->join_count++;
+      thread->join_count++;
 
       pthread_mutex_lock(&_pthread_table_mutex);
       /* END CRITICAL SECTION */
@@ -96,7 +92,7 @@ pthread_join(pthread_t thread, void ** valueptr)
       pthread_testcancel();
 
       /* Wait on the kernel thread object. */
-      switch (WaitForSingleObject(thread, INFINITE))
+      switch (WaitForSingleObject(thread->win32handle, INFINITE))
 	{
 	case WAIT_FAILED:
 	  /* The thread does not exist. */
@@ -121,27 +117,27 @@ pthread_join(pthread_t thread, void ** valueptr)
       /* Collect the value pointer passed to pthread_exit().  If
 	 another thread detaches our target thread while we're
 	 waiting, then we report a deadlock as it likely that storage
-	 pointed to by target->joinvalueptr has been freed or
+	 pointed to by thread->joinvalueptr has been freed or
 	 otherwise no longer valid. */
 
-      if (pthread_attr_getdetachedstate(&(target->attr), &detachstate) != 0 
+      if (pthread_attr_getdetachedstate(&(thread->attr), &detachstate) != 0 
 	  || detachstate == PTHREAD_CREATE_DETACHED)
 	{
 	  ret = EDEADLK;
 	}
       else
 	{
-	  *value_ptr = target->joinvalueptr;
+	  *value_ptr = thread->joinvalueptr;
 	  ret = 0;
 	}
 
-      target->join_count--;
+      thread->join_count--;
 
       /* If we're the last join to return then we are responsible for
 	 removing the target thread's table entry. */
-      if (target->join_count == 0)
+      if (thread->join_count == 0)
 	{
-	  _pthread_delete_thread_entry(target);
+	  ret = _pthread_delete_thread(thread);
 	}
 
       pthread_mutex_lock(&_pthread_table_mutex);
@@ -157,7 +153,6 @@ pthread_join(pthread_t thread, void ** valueptr)
 int
 pthread_detach(pthread_t thread)
 {
-  _pthread_threads_thread_t * target;
   int detachstate;
   int ret;
   pthread_mutex_t * target_thread_mutex;
@@ -165,19 +160,17 @@ pthread_detach(pthread_t thread)
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_table_mutex);
 
-  target = _pthread_find_thread_entry(thread);
-
-  if (target == NULL)
+  if (thread == NULL)
     {
       ret = ESRCH;
     }
   else
     {
 
-      target_thread_mutex = _PTHREAD_THREAD_MUTEX(target);
+      target_thread_mutex = _PTHREAD_THREAD_MUTEX(thread);
 
       /* Check that we can detach this thread. */
-      if (pthread_attr_getdetachedstate(&(target->attr), &detachstate) != 0 
+      if (pthread_attr_getdetachedstate(&(thread->attr), &detachstate) != 0 
 	  || detachstate == PTHREAD_CREATE_DETACHED)
 	{
 	  ret = EINVAL;
@@ -188,7 +181,7 @@ pthread_detach(pthread_t thread)
 	  /* This is all we do here - the rest is done either when the
 	     thread exits or when pthread_join() exits. Once this is
 	     set it will never be unset. */
-	  pthread_attr_setdetachedstate(&(target->attr), 
+	  pthread_attr_setdetachedstate(&(thread->attr), 
 					PTHREAD_CREATE_DETACHED);
 
 	  ret = 0;

@@ -12,7 +12,7 @@ int
 pthread_setcancelstate(int state,
 		       int *oldstate)
 {
-  _pthread_threads_thread_t * us = _PTHREAD_THIS;
+  pthread_t us = pthread_self();
 
   /* Validate the new cancellation state. */
   if (state != PTHREAD_CANCEL_ENABLE 
@@ -33,7 +33,7 @@ pthread_setcancelstate(int state,
 int
 pthread_setcanceltype(int type, int *oldtype)
 {
-  _pthread_threads_thread_t * us = _PTHREAD_THIS;
+  pthread_t us = pthread_self();
 
   /* Validate the new cancellation type. */
   if (type != PTHREAD_CANCEL_DEFERRED 
@@ -54,32 +54,29 @@ pthread_setcanceltype(int type, int *oldtype)
 int
 pthread_cancel(pthread_t thread)
 {
-  _pthread_threads_thread_t * us = _PTHREAD_THIS;
-
-  if (us == NULL)
+  if (_PTHREAD_VALID(thread)
+      && thread->ptstatus != _PTHREAD_REUSE)
     {
-      return ESRCH;
+      thread->cancel_pending = TRUE;
+      return 0;
     }
 
-  us->cancel_pending = TRUE;
-
-  return 0;
+  return ESRCH;
 }
 
 void
 pthread_testcancel(void)
 {
-  _pthread_threads_thread_t * us;
+  pthread_t thread;
 
-  us = _PTHREAD_THIS;
+  thread = pthread_self();
 
-  if (us == NULL
-      || us->cancelstate == PTHREAD_CANCEL_DISABLE)
+  if (thread->cancelstate == PTHREAD_CANCEL_DISABLE)
     {
       return;
     }
 
-  if (us->cancel_pending == TRUE)
+  if (thread->cancel_pending == TRUE)
     {
       pthread_exit(PTHREAD_CANCELED);
 

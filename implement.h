@@ -9,8 +9,17 @@
 
 #define _PTHREAD_HASH_INDEX(x) (((ULONG) x) % PTHREAD_THREADS_MAX)
 
-#define _PTHREAD_YES 1
-#define _PTHREAD_NO  0
+enum {
+  _PTHREAD_NEW,
+  _PTHREAD_INUSE,
+  _PTHREAD_EXITED,
+  _PTHREAD_REUSE
+};
+
+#define _PTHREAD_VALID(T) \
+  (T) != NULL \
+  && ((T)->ptstatus == _PTHREAD_NEW
+      || (T)->ptstatus == _PTHREAD_INUSE)
 
 /* Handler execution flags. */
 #define _PTHREAD_HANDLER_NOEXECUTE 0
@@ -103,18 +112,17 @@ void _pthread_handler_pop_all(int stack,
 
 /* Primitives to manage threads table entries. */
 
-int _pthread_new_thread_entry(pthread_t thread,
-			      _pthread_threads_thread_t * entry);
+int _pthread_new_thread(pthread_t * thread);
 
-_pthread_threads_thread_t * _pthread_find_thread_entry(pthread_t thread);
+pthread_t _pthread_find_thread(HANDLE win32handle);
 
-void _pthread_delete_thread_entry(_pthread_threads_thread_t * this);
+int _pthread_delete_thread(pthread_t thread);
 
 /* Thread cleanup. */
 
 void _pthread_vacuum(void);
 
-void _pthread_exit(void * value, int return_code);
+void _pthread_exit(pthread_t thread, void * value, int return_code);
 
 #ifdef __cplusplus
 }

@@ -17,7 +17,7 @@ unsigned
 _pthread_start_call(void * us_arg)
 {
   /* We're now in a running thread. Any local variables here are on
-     this threads private stack so we're safe to leave data in them
+     this thread's private stack so we're safe to leave data in them
      until we leave. */
   pthread_t us;
   _pthread_call_t * call;
@@ -56,21 +56,21 @@ pthread_create(pthread_t *thread,
   void *   security = NULL;
   DWORD  threadID;
   pthread_attr_t * attr_copy;
-  pthread_t us;
+  pthread_t new;
   /* Success unless otherwise set. */
   int ret;
 
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_table_mutex);
 
-  ret = _pthread_new_thread(&us);
+  ret = _pthread_new_thread(&new);
 
   pthread_mutex_lock(&_pthread_table_mutex);
   /* END CRITICAL SECTION */
 
   if (ret == 0)
     {
-      attr_copy = &(us->attr);
+      attr_copy = &(new->attr);
 
       /* Map given attributes otherwise just use default values. */
       if (attr != NULL) 
@@ -88,13 +88,17 @@ pthread_create(pthread_t *thread,
 #endif /* HAVE_SIGSET_T */
 	}
 
+      /* We call a generic wrapper which then calls the start routine. */
+      new->call.routine = start_routine;
+      new->call.arg = arg;
+
       /* Start running, not suspended. */
       flags = 0;
 
       handle = (HANDLE) _beginthreadex(security,
 				       attr_copy->stacksize,
 				       _pthread_start_call,
-				       (void *) us,
+				       (void *) new,
 				       flags,
 				       &threadID);
 
@@ -111,9 +115,9 @@ pthread_create(pthread_t *thread,
   if (ret == 0)
     {
       /* Let the caller know the thread handle. */
-      us->win32handle = handle;
-      us->ptstatus = _PTHREAD_INUSE;
-      *thread = (pthread_t) us;
+      new->win32handle = handle;
+      new->ptstatus = _PTHREAD_INUSE;
+      *thread = new;
     }
   else
     {
@@ -121,7 +125,7 @@ pthread_create(pthread_t *thread,
       pthread_mutex_lock(&_pthread_table_mutex);
 
       /* Remove the failed thread entry. */
-      _pthread_delete_thread(us);
+      _pthread_delete_thread(new);
 
       pthread_mutex_lock(&_pthread_table_mutex);
       /* END CRITICAL SECTION */
