@@ -61,29 +61,25 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 	{
 	  LONG idx;
 
-	  idx = (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE ((PTW32_INTERLOCKED_LPLONG)
-	  					           &mx->lock_idx,
-						           (PTW32_INTERLOCKED_LONG) -1,
-						           (PTW32_INTERLOCKED_LONG) 0);
-
+	  idx = (LONG) PTW32_INTERLOCKED_EXCHANGE ((LPLONG) &mx->lock_idx,
+						   (LONG) 0);
 	  if (idx != 0)
 	    {
-	      if (idx > 0)
+	      if (idx < 0)
 		{
-		  mx->lock_idx = -1;
 		  /* Someone may be waiting on that mutex */
-		  if (sem_post (&mx->wait_sema) != 0)
+		  if (SetEvent (mx->event) == 0)
 		    {
-		      result = errno;
+		      result = EINVAL;
 		    }
-	        }
-	      else
-		{
-		  /*
-		   * Was not locked (so can't be owned by us).
-		   */
-		  result = EPERM;
 		}
+	    }
+	  else
+	    {
+	      /*
+	       * Was not locked (so can't be owned by us).
+	       */
+	      result = EPERM;
 	    }
 	}
       else
@@ -95,13 +91,13 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 		{
 		  mx->ownerThread = NULL;
 
-		  if (InterlockedDecrement (&mx->lock_idx) >= 0)
+		  if ((LONG) PTW32_INTERLOCKED_EXCHANGE ((LPLONG) &mx->lock_idx,
+							 (LONG) 0) < 0)
 		    {
 		      /* Someone may be waiting on that mutex */
-		      mx->lock_idx = -1;
-		      if (sem_post (&mx->wait_sema) != 0)
+		      if (SetEvent (mx->event) == 0)
 			{
-			  result = errno;
+			  result = EINVAL;
 			}
 		    }
 		}

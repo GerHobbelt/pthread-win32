@@ -1,8 +1,11 @@
 /*
- * rwlock7.c
+ * rwlock8.c
  *
  * Hammer on a bunch of rwlocks to test robustness and fairness.
  * Printed stats should be roughly even for each thread.
+ *
+ * Yield during each access to exercise lock contention code paths
+ * more than rwlock7.c does (particularly on uni-processor systems).
  */
 
 #include "test.h"
@@ -14,7 +17,7 @@
 
 #define THREADS         5
 #define DATASIZE        7
-#define ITERATIONS      1000000
+#define ITERATIONS      100000
 
 /*
  * Keep statistics for each thread.
@@ -72,6 +75,7 @@ void *thread_routine (void *arg)
           data[element].updates++;
           self->updates++;
 	  interval = 1 + rand_r (&seed) % 71;
+	  sched_yield();
           assert(pthread_rwlock_unlock (&data[element].lock) == 0);
         } else {
           /*
@@ -88,6 +92,8 @@ void *thread_routine (void *arg)
               self->changed++;
 	      interval = 1 + self->changed % 71;
             }
+
+	  sched_yield();
 
           assert(pthread_rwlock_unlock (&data[element].lock) == 0);
         }

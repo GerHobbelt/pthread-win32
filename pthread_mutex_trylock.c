@@ -64,11 +64,10 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
 
   mx = *mutex;
 
-  if ((PTW32_INTERLOCKED_LONG) -1 ==
-      PTW32_INTERLOCKED_COMPARE_EXCHANGE ((PTW32_INTERLOCKED_LPLONG) &
-					  mx->lock_idx,
-					  (PTW32_INTERLOCKED_LONG) 0,
-					  (PTW32_INTERLOCKED_LONG) -1))
+  if (0 == (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE (
+		     (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+		     (PTW32_INTERLOCKED_LONG) 1,
+		     (PTW32_INTERLOCKED_LONG) 0))
     {
       if (mx->kind != PTHREAD_MUTEX_NORMAL)
 	{

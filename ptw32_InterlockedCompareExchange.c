@@ -42,13 +42,8 @@
 /*
  * ptw32_InterlockedCompareExchange --
  *
- * Needed because W95 doesn't support InterlockedCompareExchange.
- * It is only used when running the dll on W95. Other versions of
- * Windows use the Win32 supported version, which may be running on
- * different processor types.
- *
- * This can't be inlined because we need to know it's address so that
- * we can call it through a pointer.
+ * Originally needed because W9x doesn't support InterlockedCompareExchange.
+ * We now use this version wherever possible so we can inline it.
  */
 
 INLINE PTW32_INTERLOCKED_LONG WINAPI
@@ -64,69 +59,84 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 
   PTW32_INTERLOCKED_LONG result;
 
+  /*
+   * Using the LOCK prefix on uni-processor machines is significantly slower
+   * and it is not necessary. The overhead of the conditional below is
+   * negligible in comparison. Since an optimised DLL will inline this
+   * routine, this will be faster than calling the system supplied
+   * Interlocked routine, which appears to avoid the LOCK prefix on
+   * uniprocessor systems. So one DLL works for all systems.
+   */
+  if (ptw32_smp_system)
+
 /* *INDENT-OFF* */
 
 #if defined(_M_IX86) || defined(_X86_)
 
-#if defined(_MSC_VER) || defined(__WATCOMC__)
+#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(__BORLAND__)
 #define HAVE_INLINABLE_INTERLOCKED_CMPXCHG
 
-  _asm {
-    PUSH         ecx
-    PUSH         edx
-    MOV          ecx,dword ptr [location]
-    MOV          edx,dword ptr [value]
-    MOV          eax,dword ptr [comparand]
-    LOCK CMPXCHG dword ptr [ecx],edx        ; if (EAX == [ECX]), 
-                                            ;   [ECX] = EDX
-                                            ; else
-                                            ;   EAX = [ECX]
-    MOV          dword ptr [result], eax
-    POP          edx
-    POP          ecx
-  }
-
-#elif defined(__BORLANDC__)
-#define HAVE_INLINABLE_INTERLOCKED_CMPXCHG
-
-  _asm {
-    PUSH	 ecx
-    PUSH	 edx
-    MOV 	 ecx,dword ptr [location]
-    MOV 	 edx,dword ptr [value]
-    MOV 	 eax,dword ptr [comparand]
-    LOCK CMPXCHG dword ptr [ecx],edx	    /* if (EAX == [ECX]) */
-                                            /*  [ECX] = EDX      */
-					    /* else              */
-					    /*  EAX = [ECX]      */
-    MOV 	 dword ptr [result], eax
-    POP 	 edx
-    POP 	 ecx
-  }
+    {
+      _asm {
+	PUSH         ecx
+	PUSH         edx
+	MOV          ecx,dword ptr [location]
+	MOV          edx,dword ptr [value]
+	MOV          eax,dword ptr [comparand]
+	LOCK CMPXCHG dword ptr [ecx],edx
+	MOV          dword ptr [result], eax
+	POP          edx
+        POP          ecx
+      }
+    }
+  else
+    {
+      _asm {
+	PUSH         ecx
+	PUSH         edx
+	MOV          ecx,dword ptr [location]
+	MOV          edx,dword ptr [value]
+	MOV          eax,dword ptr [comparand]
+	CMPXCHG      dword ptr [ecx],edx
+	MOV          dword ptr [result], eax
+	POP          edx
+        POP          ecx
+      }
+    }
 
 #elif defined(__GNUC__)
 #define HAVE_INLINABLE_INTERLOCKED_CMPXCHG
 
-  __asm__
-    (
-     "lock\n\t"
-     "cmpxchgl       %3,(%0)"    /* if (EAX == [location])  */
-                                 /*   [location] = value    */
-                                 /* else                    */
-                                 /*   EAX = [location]      */
-     :"=r" (location), "=a" (result)
-     :"0"  (location), "q" (value), "a" (comparand)
-     : "memory" );
+    {
+      __asm__ __volatile__
+	(
+	 "lock\n\t"
+	 "cmpxchgl       %2,%1"      /* if (EAX == [location])  */
+	                             /*   [location] = value    */
+                                     /* else                    */
+                                     /*   EAX = [location]      */
+	 :"=a" (result)
+	 :"m"  (*location), "r" (value), "a" (comparand));
+    }
+  else
+    {
+      __asm__ __volatile__
+	(
+	 "cmpxchgl       %2,%1"      /* if (EAX == [location])  */
+	                             /*   [location] = value    */
+                                     /* else                    */
+                                     /*   EAX = [location]      */
+	 :"=a" (result)
+	 :"m"  (*location), "r" (value), "a" (comparand));
+    }
 
 #endif
 
 #else
 
   /*
-   * If execution gets to here then we should be running on a Win95 system
-   * but either running on something other than an X86 processor, or a
-   * compiler other than MSVC or GCC. Pthreads-win32 doesn't support that
-   * platform (yet).
+   * If execution gets to here then we're running on a currently
+   * unsupported processor or compiler.
    */
 
   result = 0;
@@ -143,9 +153,150 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 
 }
 
-#if 0
+/*
+ * ptw32_InterlockedExchange --
+ *
+ * We now use this version wherever possible so we can inline it.
+ */
+
+INLINE LONG WINAPI
+ptw32_InterlockedExchange (LPLONG location,
+			   LONG value)
+{
+
+#if defined(__WATCOMC__)
+/* Don't report that result is not assigned a value before being referenced */
+#pragma disable_message (200)
+#endif
+
+  LONG result;
+
+  /*
+   * The XCHG instruction always locks the bus with or without the
+   * LOCKED prefix. This makes it significantly slower than CMPXCHG on
+   * uni-processor machines. The Windows InterlockedExchange function
+   * is nearly 3 times faster than the XCHG instruction, so this routine
+   * is not yet very useful for speeding up pthreads.
+   */
+  if (ptw32_smp_system)
+
+/* *INDENT-OFF* */
+
+#if defined(_M_IX86) || defined(_X86_)
+
+#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(__BORLAND__)
+#define HAVE_INLINABLE_INTERLOCKED_XCHG
+
+    {
+      _asm {
+	PUSH         ecx
+	MOV          ecx,dword ptr [location]
+	MOV          eax,dword ptr [value]
+	XCHG         dword ptr [ecx],eax
+	MOV          dword ptr [result], eax
+        POP          ecx
+      }
+    }
+  else
+    {
+      /*
+       * Faster version of XCHG for uni-processor systems because
+       * it doesn't lock the bus. If an interrupt or context switch
+       * occurs between the MOV and the CMPXCHG then the value in
+       * 'location' may have changed, in which case we will loop
+       * back to do the MOV again. Because both instructions
+       * reference the same location, they will not be re-ordered
+       * in the pipeline.
+       * Tests show that this routine has almost identical timing
+       * to Win32's InterlockedExchange(), which is much faster than
+       * using the an inlined 'xchg' instruction, so it's probably
+       * doing something similar to this (on UP systems).
+       *
+       * Can we do without the PUSH/POP instructions?
+       */
+      _asm {
+	PUSH         ecx
+	PUSH         edx
+	MOV          ecx,dword ptr [location]
+	MOV          edx,dword ptr [value]
+L1:	MOV          eax,dword ptr [ecx]
+	CMPXCHG      dword ptr [ecx],edx
+	JNZ          L1
+	MOV          dword ptr [result], eax
+	POP          edx
+        POP          ecx
+      }
+    }
+
+#elif defined(__GNUC__)
+#define HAVE_INLINABLE_INTERLOCKED_XCHG
+
+    {
+      __asm__ __volatile__
+	(
+	 "xchgl          %2,%1"
+	 :"=r" (result)
+	 :"m"  (*location), "0" (value));
+    }
+  else
+    {
+      /*
+       * Faster version of XCHG for uni-processor systems because
+       * it doesn't lock the bus. If an interrupt or context switch
+       * occurs between the movl and the cmpxchgl then the value in
+       * 'location' may have changed, in which case we will loop
+       * back to do the movl again. Because both instructions
+       * reference the same location, they will not be re-ordered
+       * in the pipeline.
+       * Tests show that this routine has almost identical timing
+       * to Win32's InterlockedExchange(), which is much faster than
+       * using the an inlined 'xchg' instruction, so it's probably
+       * doing something similar to this (on UP systems).
+       */
+      __asm__ __volatile__
+	(
+	 "0:\n\t"
+	 "movl           %1,%%eax\n\t"
+	 "cmpxchgl       %2,%1\n\t"
+	 "jnz            0b"
+	 :"=&a" (result)
+	 :"m"  (*location), "r" (value));
+    }
+
+#endif
+
+#else
+
+  /*
+   * If execution gets to here then we're running on a currently
+   * unsupported processor or compiler.
+   */
+
+  result = 0;
+
+#endif
+
+/* *INDENT-ON* */
+
+  return result;
+
+#if defined(__WATCOMC__)
+#pragma enable_message (200)
+#endif
+
+}
+
+
+#if 1
+
 #if defined(PTW32_BUILD_INLINED) && defined(HAVE_INLINABLE_INTERLOCKED_CMPXCHG)
 #undef PTW32_INTERLOCKED_COMPARE_EXCHANGE
 #define PTW32_INTERLOCKED_COMPARE_EXCHANGE ptw32_InterlockedCompareExchange
 #endif
+
+#if defined(PTW32_BUILD_INLINED) && defined(HAVE_INLINABLE_INTERLOCKED_XCHG)
+#undef PTW32_INTERLOCKED_EXCHANGE
+#define PTW32_INTERLOCKED_EXCHANGE ptw32_InterlockedExchange
+#endif
+
 #endif

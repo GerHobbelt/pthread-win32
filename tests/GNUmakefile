@@ -70,7 +70,7 @@ COPYFILES	= $(HDR) $(LIB) $(DLL) $(QAPC)
 # stop.
 
 TESTS	= sizes loadfree \
-	  semaphore1 semaphore2 self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
+	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r semaphore1 semaphore2 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
 	  create1 create2 reuse1 reuse2 equal1 \
 	  kill1 valid1 valid2 \
@@ -85,7 +85,7 @@ TESTS	= sizes loadfree \
 	  condvar3 condvar3_1 condvar3_2 condvar3_3 \
 	  condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
-	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 rwlock7 \
+	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 rwlock7 rwlock8 \
 	  rwlock2_t rwlock3_t rwlock4_t rwlock5_t rwlock6_t rwlock6_t2 \
 	  context1 cancel3 cancel4 cancel5 cancel6a cancel6d \
 	  cancel7 cancel8 \
@@ -240,6 +240,7 @@ rwlock4.pass: rwlock3.pass
 rwlock5.pass: rwlock4.pass
 rwlock6.pass: rwlock5.pass
 rwlock7.pass: rwlock6.pass
+rwlock8.pass: rwlock7.pass
 rwlock2_t.pass: rwlock2.pass
 rwlock3_t.pass: rwlock2_t.pass
 rwlock4_t.pass: rwlock3_t.pass

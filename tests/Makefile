@@ -100,7 +100,8 @@ PASSES= sizes.pass  loadfree.pass \
 	  condvar4.pass  condvar5.pass  condvar6.pass  \
 	  condvar7.pass  condvar8.pass  condvar9.pass  \
 	  errno1.pass  \
-	  rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  rwlock5.pass  rwlock6.pass  rwlock7.pass  \
+	  rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  \
+	  rwlock5.pass  rwlock6.pass  rwlock7.pass  rwlock8.pass  \
 	  rwlock2_t.pass  rwlock3_t.pass  rwlock4_t.pass  rwlock5_t.pass  rwlock6_t.pass  rwlock6_t2.pass  \
 	  context1.pass  \
 	  cancel3.pass  cancel4.pass  cancel5.pass  cancel6a.pass  cancel6d.pass  \
@@ -324,6 +325,7 @@ rwlock4.pass: rwlock3.pass
 rwlock5.pass: rwlock4.pass
 rwlock6.pass: rwlock5.pass
 rwlock7.pass: rwlock6.pass
+rwlock8.pass: rwlock7.pass
 rwlock2_t.pass: rwlock2.pass
 rwlock3_t.pass: rwlock2_t.pass
 rwlock4_t.pass: rwlock3_t.pass

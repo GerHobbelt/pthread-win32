@@ -1,3 +1,9 @@
+2004-10-14  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* rwlock7.c (main): Tidy up statistics reporting; randomise
+	update accesses.
+	* rwlock8.c: New test.
+
 2004-09-08  Alexandre Girao  <alexgirao@gmail.com>
 
 	* cancel7.c (main): Win98 wants a valid (non-NULL) location

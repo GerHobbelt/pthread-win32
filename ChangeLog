@@ -1,45 +1,88 @@
+2004-10-15  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* implement.h (othread_mutex_t_): Use an event in place of
+	the POSIX semaphore.
+	* pthread_mutex_init.c: Create the event; remove semaphore init.
+	* pthread_mutex_destroy.c: Delete the event.
+	* pthread_mutex_lock.c: Replace the semaphore wait with the event wait.
+	* pthread_mutex_trylock.c: Likewise.
+	* pthread_mutex_timedlock.c: Likewise.
+	* pthread_mutex_unlock.c: Set the event.
+	
+2004-10-14  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* pthread_mutex_lock.c (pthread_mutex_lock): New algorithm using
+	Terekhov's xchg based variation of Drepper's cmpxchg model.
+	Theoretically, xchg uses fewer clock cycles than cmpxchg (using IA-32
+	as a reference), however, in my opinion bus locking dominates the
+	equation on smp systems, so the model with the least number of bus
+	lock operations in the execution path should win, which is Terekhov's
+	variant. On IA-32 uni-processor systems, it's faster to use the
+	CMPXCHG instruction without locking the bus than to use the XCHG
+	instruction, which always locks the bus. This makes the two variants
+	equal for the non-contended lock (fast lane) execution path on up
+	IA-32. Testing shows that the xchg variant is faster on up IA-32 as
+	well if the test forces higher lock contention frequency, even though
+	kernel calls should be dominating the times (on up IA-32, both
+	variants used CMPXCHG instructions and neither locked the bus).
+	* pthread_mutex_timedlock.c pthread_mutex_timedlock(): Similarly.
+	* pthread_mutex_trylock.c (pthread_mutex_trylock): Similarly.
+	* pthread_mutex_unlock.c (pthread_mutex_unlock): Similarly.
+	* ptw32_InterlockedCompareExchange.c (ptw32_InterlockExchange): New
+	function.
+	(PTW32_INTERLOCKED_EXCHANGE): Sets up macro to use inlined
+	ptw32_InterlockedExchange.
+	* implement.h (PTW32_INTERLOCKED_EXCHANGE): Set default to
+	InterlockedExchange().
+	* Makefile: Building using /Ob2 so that asm sections within inline
+	functions are inlined.
+
 2004-10-08  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* pthread_mutex_destroy.c (pthread_mutex_destroy): Critical Section
 	element is no longer required.
 	* pthread_mutex_init.c (pthread_mutex_init): Likewise.
-	* pthread_mutex_lock.c (pthread_mutex_lock): New algorithm following Drepper's
-	paper at http://people.redhat.com/drepper/futex.pdf, but using the existing
-	semaphore in place of the futex described in the paper. Idea suggested by
-	Alexander Terekhov - see:
+	* pthread_mutex_lock.c (pthread_mutex_lock): New algorithm following
+	Drepper's paper at http://people.redhat.com/drepper/futex.pdf, but
+	using the existing semaphore in place of the futex described in the
+	paper. Idea suggested by Alexander Terekhov - see:
 	http://sources.redhat.com/ml/pthreads-win32/2003/msg00108.html
 	* pthread_mutex_timedlock.c pthread_mutex_timedlock(): Similarly.
 	* pthread_mutex_trylock.c (pthread_mutex_trylock): Similarly.
 	* pthread_mutex_unlock.c (pthread_mutex_unlock): Similarly.
-	* pthread_barrier_wait.c (pthread_barrier_wait): Use inlined version of
-	InterlockedCompareExchange() if possible - determined at build-time.
+	* pthread_barrier_wait.c (pthread_barrier_wait): Use inlined version
+	of InterlockedCompareExchange() if possible - determined at
+	build-time.
 	* pthread_spin_destroy.c pthread_spin_destroy(): Likewise.
 	* pthread_spin_lock.c pthread_spin_lock():Likewise.
 	* pthread_spin_trylock.c (pthread_spin_trylock):Likewise.
 	* pthread_spin_unlock.c (pthread_spin_unlock):Likewise.
 	* ptw32_InterlockedCompareExchange.c: Sets up macro for inlined use.
 	* implement.h (pthread_mutex_t_): Remove Critical Section element.
-	(PTW32_INTERLOCKED_COMPARE_EXCHANGE): Set to default non-inlined version of
+	(PTW32_INTERLOCKED_COMPARE_EXCHANGE): Set to default non-inlined
+	version of InterlockedCompareExchange().
+	* private.c: Include ptw32_InterlockedCompareExchange.c first for
+	inlining.
+	* GNUmakefile: Add commandline option to use inlined
 	InterlockedCompareExchange().
-	* private.c: Include ptw32_InterlockedCompareExchange.c first for inlining.
-	* GNUmakefile: Add commandline option to use inlined InterlockedCompareExchange().
 	* Makefile: Likewise.
 
 2004-09-27  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
-	* pthread_mutex_lock.c (pthread_mutex_lock): Separate PTHREAD_MUTEX_NORMAL
-	logic since we do not need to keep or check some state required by other
-	mutex types; do not check mutex pointer arg for validity - leave this to
-	the system since we are only checking for NULL pointers. This should improve
-	speed of NORMAL mutexes and marginally improve speed of other type.
+	* pthread_mutex_lock.c (pthread_mutex_lock): Separate
+	PTHREAD_MUTEX_NORMAL logic since we do not need to keep or check some
+	state required by other mutex types; do not check mutex pointer arg
+	for validity - leave this to the system since we are only checking
+	for NULL pointers. This should improve speed of NORMAL mutexes and
+	marginally improve speed of other type.
 	* pthread_mutex_trylock.c (pthread_mutex_trylock): Likewise.
 	* pthread_mutex_unlock.c (pthread_mutex_unlock): Likewise; also avoid
-	entering the critical section for the no-waiters case, with approx. 30%
-	reduction in lock/unlock overhead for this case..
+	entering the critical section for the no-waiters case, with approx.
+	30% reduction in lock/unlock overhead for this case.
 	* pthread_mutex_timedlock.c (pthread_mutex_timedlock): Likewise; also
-	no longer keeps mutex if post-timeout second attempt succeeds - this will
-	assist applications that wish to impose strict lock deadlines, rather than
-	simply to escape from frozen locks.
+	no longer keeps mutex if post-timeout second attempt succeeds - this
+	will assist applications that wish to impose strict lock deadlines,
+	rather than simply to escape from frozen locks.
 
 2004-09-09  Tristan Savatier  <tristan at mpegtv.com>
 	* pthread.h (struct pthread_once_t_): Qualify the 'done' element
@@ -49,8 +92,8 @@
 	[Maintainer's note: the race condition is harmless on SPU systems
 	and only a problem on MPU systems if concurrent access results in an
 	exception (presumably generated by a hardware interrupt). There are
-	other instances of similar harmless race conditions that have not been
-	identified as issues.]
+	other instances of similar harmless race conditions that have not
+	been identified as issues.]
 
 2004-09-09  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
