@@ -1,13 +1,23 @@
+Fri Mar 26 14:11:45 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* semaphore.c (_pthread_sem_timedwait): Check for negative
+	milliseconds.
+	- Tor Lillqvist <tml@iki.fi>
+
 Wed Mar 24 11:32:07 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* misc.c (CancelableWait): Initialise exceptionInformation[2].
 	(pthread_self): Get a real Win32 thread handle for implicit threads.
+	- John Bossom <jebossom@cognos.com>
 
 	* cancel.c (pthread_testcancel): Initialise exceptionInformation[2].
+	- John Bossom <jebossom@cognos.com>
 
 	* implement.h (SE_INFORMATION): Fix values.
+	- John Bossom <jebossom@cognos.com>
 
 	* private.c (_pthread_threadDestroy): Close the thread handle.
+	- John Bossom <jebossom@cognos.com>
 
 Fri Mar 19 12:57:27 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
