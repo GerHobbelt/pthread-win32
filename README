@@ -1,8 +1,14 @@
 This directory contains an implementation of pthreads for Win32. 
 
+Mailing list
+------------
+Dec 10 1998
+
 There is a mailing list for discussing pthreads on Win32 which is
-manually operated at present.  Send mail to postmaster@air.net.au to
-request that you be subscribed.
+managed by Majordomo. To subscribe, send mail to majordomo@air.net.au
+and place the fllowing text in the message body:
+
+	subscribe pthreads-win32
 
 
 Building the library with Cygwin32 or Mingw32
