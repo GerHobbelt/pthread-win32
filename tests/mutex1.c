@@ -13,18 +13,20 @@
 
 #include "test.h"
 
-pthread_mutex_t mutex1;
+pthread_mutex_t mutex = NULL;
 
 int
 main()
 {
-  assert(pthread_mutex_init(&mutex1, NULL) == 0);
+  assert(mutex == NULL);
 
-  assert(pthread_mutex_lock(&mutex1) == 0);
+  assert(pthread_mutex_init(&mutex, NULL) == 0);
 
-  assert(pthread_mutex_unlock(&mutex1) == 0);
+  assert(mutex != NULL);
 
-  assert(pthread_mutex_destroy(&mutex1) == 0);
+  assert(pthread_mutex_destroy(&mutex) == 0);
+
+  assert(mutex == NULL);
 
   return 0;
 }

@@ -1,4 +1,26 @@
+Mon Mar 15 00:17:55 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* mutex1.c: only test mutex init and destroy; add assertions.
+
+	* count1.c: raise number of spawned threads to 60 (appears to
+	be the limit under Win98).
+
+Sun Mar 14 21:31:02 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* test.h (assert): add assertion trace option.
+	Use:
+	"#define ASSERT_TRACE 1" to turn it on,
+	"#define ASSERT_TRACE 0" to turn it off (default).
+
+	* condvar3.c (main): add more assertions.
+
+	* condvar4.c (main): add more assertions.
+
+	* condvar1.c (main): add more assertions.
+
 Fri Mar 12 08:34:15 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* condvar4.c (cvthing): switch the order of the INITIALIZERs.
 
 	* eyal1.c (main): Fix trylock loop; was not waiting for thread to lock
 	the "started" mutex.

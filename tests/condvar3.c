@@ -48,8 +48,9 @@
 #include "test.h"
 #include <sys/timeb.h>
 
-pthread_cond_t cv;
-pthread_mutex_t mutex;
+static pthread_cond_t cv;
+static pthread_mutex_t mutex;
+static int shared = 0;
 
 enum {
   NUMTHREADS = 2         /* Including the primary thread. */
@@ -62,9 +63,11 @@ mythread(void * arg)
 
   assert(pthread_mutex_lock(&mutex) == 0);
 
-  assert(pthread_cond_signal(&cv) == 0);
+  shared++;
 
   assert(pthread_mutex_unlock(&mutex) == 0);
+
+  assert(pthread_cond_signal(&cv) == 0);
 
   return 0;
 }
@@ -99,7 +102,10 @@ main()
 
   abstime.tv_sec += 5;
 
-  assert(pthread_cond_timedwait(&cv, &mutex, &abstime) == 0);
+  while (! shared > 0)
+    assert(pthread_cond_timedwait(&cv, &mutex, &abstime) == 0);
+
+  assert(shared > 0);
 
   assert(pthread_mutex_unlock(&mutex) == 0);
 

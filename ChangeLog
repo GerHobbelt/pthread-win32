@@ -1,3 +1,14 @@
+Mon Mar 15 00:20:13 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* condvar.c (pthread_cond_init): fix possible uninitialised use
+	of cv.
+
+Sun Mar 14 21:01:59 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* condvar.c (pthread_cond_destroy): don't do full cleanup if
+	static initialised cv has never been used.
+	(cond_timedwait): check result of auto-initialisation.
+
 Thu Mar 11 09:01:48 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* pthread.h (pthread_mutex_t): revert to (pthread_mutex_t *);
