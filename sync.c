@@ -188,7 +188,7 @@ pthread_detach(pthread_t thread)
 	  /* This is all we do here - the rest is done either when the
 	     thread exits or when pthread_join() exits. Once this is
 	     set it will never be unset. */
-	  pthread_attr_setdetachedstate(&(this->attr), 
+	  pthread_attr_setdetachedstate(&(target->attr), 
 					PTHREAD_CREATE_DETACHED);
 
 	  ret = 0;
