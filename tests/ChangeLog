@@ -1,3 +1,9 @@
+2002-03-02  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* Makefile (CFLAGS): Changed /MT to /MD to link with
+	the correct library MSVCRT.LIB. Otherwise errno doesn't
+	work.
+
 2002-02-28  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* exception3.c: Correct recent change.
