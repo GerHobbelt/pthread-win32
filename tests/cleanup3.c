@@ -91,7 +91,7 @@ mythread(void * arg)
 
   pthread_cleanup_pop(0);
 
-  return result;
+  return (void *) result;
 }
 
 int

@@ -230,7 +230,7 @@ main (int argc, char *argv[])
 {
   int		i;
 
-  assert(NULL != (tcs = calloc (nthreads, sizeof (*tcs))));
+  assert(NULL != (tcs = (TC *) calloc (nthreads, sizeof (*tcs))));
 
   /* 
    * Launch threads
@@ -250,7 +250,8 @@ main (int argc, char *argv[])
       assert((tcs[i].stat = 
 	      pthread_create (&tcs[i].thread,
 			      NULL,
-			      (void*)&print_server, (void *)&tcs[i])
+			      (void*)&print_server,
+				(void *)&tcs[i])
 	      ) == 0);
 
       /* 

@@ -88,7 +88,7 @@ mythread(void * arg)
   for (bag->count = 0; bag->count < 100; bag->count++)
     Sleep(100);
 
-  return result;
+  return (void *) result;
 }
 
 int

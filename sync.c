@@ -129,11 +129,6 @@ pthread_join (pthread_t thread, void **value_ptr)
     }
   else
     {
-#if 0
-      DWORD stat;
-
-      stat = WaitForSingleObject (thread->threadH, INFINITE);
-#else
       /*
        * Pthread_join is a cancelation point.
        * If we are cancelled then our target thread must not be
@@ -142,15 +137,8 @@ pthread_join (pthread_t thread, void **value_ptr)
        * are cancelled.
        */
       result = pthreadCancelableWait(thread->threadH);
-#endif
 
-      if (
-#if 0
-	  stat == WAIT_OBJECT_0
-#else
-	  result == 0
-#endif
-	  )
+      if (result == 0)
 	{
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)

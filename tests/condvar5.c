@@ -73,7 +73,7 @@ mythread(void * arg)
 
   assert(pthread_cond_broadcast(&cvthing.notbusy) == 0);
 
-  return 0;
+  return (void *) 0;
 }
 
 int

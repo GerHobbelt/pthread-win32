@@ -31,7 +31,7 @@ LD	= gcc -mdll
 OPT	= -g -O2 -x $(GLANG)
 
 ## Mingw32
-CFLAGS	= $(OPT) -I. -DHAVE_CONFIG_H -Wall
+CFLAGS	= $(OPT) -I. -mthreads -DHAVE_CONFIG_H -Wall
 
 ## Cygwin G++
 #CFLAGS	= $(OPT) -fhandle-exceptions -I. -DHAVE_CONFIG_H -Wall
@@ -51,6 +51,12 @@ all:	$(LIB)
 
 $(LIB): $(DLL)
 	dlltool --def $(DLL:.dll=.def) --output-lib $@ --dllname $(DLL)
+
+%.pre: %.c
+	$(CC) -E -o $@ $(CFLAGS) $^
+
+%.s: %.c
+	$(CC) -c $(CFLAGS) -Wa,-ahl $^ > $@
 
 .SUFFIXES: .dll
 

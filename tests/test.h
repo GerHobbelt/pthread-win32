@@ -85,9 +85,9 @@ char * error_string[] = {
                                     "Assertion succeeded: (%s), file %s, line %d\n", \
 			            #e, __FILE__, (int) __LINE__), \
 	                            fflush(stderr) : \
-                             (void) 0) : \
+                             0) : \
           (fprintf(stderr, "Assertion failed: (%s), file %s, line %d\n", \
-                   #e, __FILE__, (int) __LINE__), exit(1)))
+                   #e, __FILE__, (int) __LINE__), exit(1), 0))
 
 #endif /* NDEBUG */
 

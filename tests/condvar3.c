@@ -67,7 +67,7 @@ mythread(void * arg)
 
   assert(pthread_cond_signal(&cv) == 0);
 
-  return 0;
+  return (void *) 0;
 }
 
 int

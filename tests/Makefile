@@ -11,21 +11,12 @@ ECHO	= @echo
 #
 # Mingw32
 #
-GLANG	= c
+GLANG   = c++
 CC	= gcc
-CFLAGS	= -g -O2 -UNDEBUG -Wall -x $(GLANG) -o $@ $^
+CFLAGS	= -g -O2 -UNDEBUG -Wall -x $(GLANG)
 BUILD_DIR	= ..
 INCLUDES	= -I.
 LIBS	= -L. -lpthread32
-
-##
-## MSVC
-##
-#CC	= cl
-#CFLAGS	= /W3 /MT /nologo /Yd /Zi /Fe$@ $^
-#BUILD_DIR	= ..
-#INCLUDES	= -I.
-#LIBS	= pthread.lib
 
 HDR	= pthread.h semaphore.h sched.h
 LIB	= libpthread32.a
@@ -100,7 +91,10 @@ exception1.pass: cancel4.pass
 	@ $(TOUCH) $@
 
 %.exe: %.c
-	@ $(CC) $(CFLAGS) $(INCLUDES) $(LIBS)
+	@ $(CC) $(CFLAGS) -o $@ $^ $(INCLUDES) $(LIBS)
+
+%.pre: %.c
+	@ $(CC) -E $(CFLAGS) -o $@ $^ $(INCLUDES)
 
 $(COPYFILES):
 	@ $(ECHO) Copying $@

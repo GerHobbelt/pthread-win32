@@ -26,7 +26,7 @@ main(int argc, char * argv[])
   /* Create a single thread and wait for it to exit. */
   assert(pthread_create(&id, NULL, func, (void *) 123) == 0);
 
-  assert(pthread_join(id, (void *) &result) == 0);
+  assert(pthread_join(id, (void **) &result) == 0);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
   assert(result == 123);

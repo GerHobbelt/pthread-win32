@@ -978,36 +978,38 @@ DWORD _pthread_get_exception_services_code(void);
  * Redefine the SEH __except keyword to ensure that applications
  * propagate our internal exceptions up to the library's internal handlers.
  */
-#define __except(E) \
-        __except((GetExceptionCode() == _pthread_get_exception_services_code()) \
-		 ? EXCEPTION_CONTINUE_SEARCH : (E))
+#define __except( E ) \
+        __except( ( GetExceptionCode() == _pthread_get_exception_services_code() ) \
+		 ? EXCEPTION_CONTINUE_SEARCH : ( E ) )
 
 #endif /* _MSC_VER && ! __cplusplus */
 
 #ifdef __cplusplus
 
-/* FIXME: This is only required if the library was built using C++EH */
-
 /*
  * Internal exceptions
  */
-class Pthread_exception_cancel {};
-class Pthread_exception_exit {};
+class Pthread_exception {};
+class Pthread_exception_cancel : public Pthread_exception {};
+class Pthread_exception_exit   : public Pthread_exception {};
 
 /*
  * Redefine the C++ catch keyword to ensure that applications
  * propagate our internal exceptions up to the library's internal handlers.
  */
-#define catch(E) \
-         catch(Pthread_exception_cancel) \
-         { \
-            throw; \
-         } \
-         catch(Pthread_exception_exit) \
-         { \
-            throw; \
-         } \
-         catch(E)
+#ifdef _MSC_VER
+        /*
+         * WARNING: Replace any 'catch( ... )' with 'PtW32CatchAll'
+         * if you want Pthread-Win32 cancelation and pthread_exit to work.
+         */
+#define PtW32CatchAll \
+        catch( Pthread_exception & ) { throw; } \
+        catch( ... )      
+#else
+#define catch( E ) \
+        catch( Pthread_exception & ) { throw; } \
+        catch( E )
+#endif
 
 #endif
 
