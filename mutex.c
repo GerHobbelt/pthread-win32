@@ -132,29 +132,28 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
   if (mx == NULL)
     {
       result = ENOMEM;
-      goto FAIL0;
     }
-
-  mx->lock_idx = PTW32_MUTEX_LOCK_IDX_INIT;
-  mx->recursive_count = 0;
-  mx->kind = (attr == NULL || *attr == NULL
-	      ? PTHREAD_MUTEX_DEFAULT
-	      : (*attr)->kind);
-  mx->ownerThread = NULL;
-
-  if( 0 != sem_init( &mx->wait_sema, 0, 0 ))
+  else
     {
-      result = EAGAIN;
+      mx->lock_idx = PTW32_MUTEX_LOCK_IDX_INIT;
+      mx->recursive_count = 0;
+      mx->kind = (attr == NULL || *attr == NULL
+                  ? PTHREAD_MUTEX_DEFAULT
+                  : (*attr)->kind);
+      mx->ownerThread = NULL;
+
+      if ( 0 != sem_init( &mx->wait_sema, 0, 0 ))
+        {
+          result = EAGAIN;
+          free(mx);
+          mx = NULL;
+        }
+      else
+        {
+          InitializeCriticalSection( &mx->wait_cs );
+        }
     }
 
-  if (result != 0 && mx != NULL)
-    {
-      free(mx);
-      mx = NULL;
-    }
-
-FAIL0:
-  InitializeCriticalSection( &mx->wait_cs );
   *mutex = mx;
 
   return(result);
