@@ -51,7 +51,6 @@ static pthread_mutex_t mutex;
 static struct timespec abstime = { 0, 0 };
 static struct timespec abstime2 = { 0, 0 };
 static int timedout = 0;
-static int signaled = 0;
 static int awoken = 0;
 
 enum {

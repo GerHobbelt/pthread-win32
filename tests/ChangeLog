@@ -1,3 +1,8 @@
+2001-06-8  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* mutex5.c: Insert inert change to quell compiler warnings.
+	* condvar3_2.c: Remove unused variable.
+	
 2001-06-3  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* condvar2_1.c: New test.

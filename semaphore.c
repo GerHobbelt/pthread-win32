@@ -37,6 +37,7 @@
 
 #include "pthread.h"
 #include "semaphore.h"
+#include "implement.h"
 
 int
 sem_init (sem_t * sem, int pshared, unsigned int value)
@@ -76,7 +77,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
       */
 {
   int result = 0;
-
+  sem_t s;
 
   if (pshared != 0)
     {
@@ -89,12 +90,11 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
     }
   else
     {
+      s = (sem_t) calloc (1, sizeof (*s));
 
 #ifdef NEED_SEM
 
-      sem_t s = (sem_t) calloc (1, sizeof (*sem_t));
-
-      if (s == NULL)
+      if (NULL == s)
         {
           result = ENOMEM;
         }
@@ -105,7 +105,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
                                   FALSE,	/* manual reset */
                                   FALSE,	/* initial state */
                                   NULL);
-          if (s->Event == 0)
+          if (0 == s->Event)
             {
               result = ENOSPC;
             }
@@ -115,25 +115,18 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
                 {
                   SetEvent(s->event);
                 }
-              InitializeCriticalSection(&s->sem_lock_cs);
 
-              *sem = s;
+              InitializeCriticalSection(&s->sem_lock_cs);
             }
 
 #else /* NEED_SEM */
 
-      /*
-       * NOTE: Taking advantage of the fact that
-       * sem_t is a simple structure with one entry;
-       * We don't have to allocate it...
-       */
-      *sem = CreateSemaphore (
-                              0,
-                              value,
-                              0x7FFFFFF,
-                              NULL);
+      s->sem = CreateSemaphore (0,
+                                value,
+                                0x7FFFFFF,
+                                NULL);
 
-      if (*sem == 0)
+      if (0 == s->sem)
 	{
 	  result = ENOSPC;
 	}
@@ -147,6 +140,8 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
       errno = result;
       return -1;
     }
+
+  *sem = s;
 
   return 0;
 
@@ -180,7 +175,7 @@ sem_destroy (sem_t * sem)
       */
 {
   int result = 0;
-  sem_t s = *sem;
+  sem_t s;
 
   if (sem == NULL || *sem == NULL)
     {
@@ -188,12 +183,14 @@ sem_destroy (sem_t * sem)
     }
   else
     {
+	s = *sem;
       *sem = NULL;
 
 #ifdef NEED_SEM
 
       if (! CloseHandle(s->event))
         {
+          *sem = s;
           result = EINVAL;
         }
       else
@@ -204,8 +201,9 @@ sem_destroy (sem_t * sem)
 
 #else /* NEED_SEM */
 
-      if (! CloseHandle (s))
+      if (! CloseHandle (s->sem))
         {
+          *sem = s;
           result = EINVAL;
         }
 
@@ -215,7 +213,6 @@ sem_destroy (sem_t * sem)
 
   if (result != 0)
     {
-      *sem = s;
       errno = result;
       return -1;
     }
@@ -271,7 +268,7 @@ sem_trywait (sem_t * sem)
     {
       result = EINVAL;
     }
-  else if (WaitForSingleObject (*sem, 0) == WAIT_TIMEOUT)
+  else if (WaitForSingleObject ((*sem)->sem, 0) == WAIT_TIMEOUT)
     {
       result = EAGAIN;
     }
@@ -385,7 +382,7 @@ sem_wait (sem_t * sem)
 
 #else /* NEED_SEM */
 
-	result = pthreadCancelableWait (*sem);
+	result = pthreadCancelableWait ((*sem)->sem);
 
 #endif /* NEED_SEM */
 
@@ -447,7 +444,7 @@ sem_post (sem_t * sem)
 
 #else /* NEED_SEM */
 
-  else if (! ReleaseSemaphore (*sem, 1, 0))
+  else if (! ReleaseSemaphore ((*sem)->sem, 1, 0))
 
 #endif /* NEED_SEM */
 

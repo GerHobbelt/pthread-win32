@@ -899,11 +899,11 @@ ptw32_sem_timedwait (sem_t * sem, const struct timespec * abstime)
 
 #ifdef NEED_SEM
 
-      result = (pthreadCancelableTimedWait (sem->event, milliseconds));
+      result = (pthreadCancelableTimedWait ((*sem)->event, milliseconds));
 
 #else /* NEED_SEM */
 
-      result = (pthreadCancelableTimedWait (*sem, milliseconds));
+      result = (pthreadCancelableTimedWait ((*sem)->sem, milliseconds));
 
 #endif
 
