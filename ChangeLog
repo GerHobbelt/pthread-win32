@@ -1,3 +1,9 @@
+2003-08-12  Ross Johnson  <rpj@ise.canberra.edu.au>
+
+	* pthread_getschedparam.c (pthread_getschedparam): An invalid thread ID
+	parameter was returning an incorrect error value.
+	* pthread_setschedparam.c (pthread_setschedparam): Likewise.
+
 2003-06-24  Piet van Bruggen  <pietvb@newbridges.nl>
 
 	* pthread_spin_destroy.c (pthread_spin_destroy): Was not freeing the

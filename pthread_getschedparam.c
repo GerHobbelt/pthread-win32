@@ -47,7 +47,7 @@ pthread_getschedparam(pthread_t thread, int *policy,
   /* Validate the thread id. */
   if (thread == NULL || thread->threadH == 0)
     {
-      return EINVAL;
+      return ESRCH;
     }
 
   /*
