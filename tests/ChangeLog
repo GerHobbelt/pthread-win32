@@ -1,3 +1,7 @@
+1998-07-22  Ben Elliston  <bje@cygnus.com>
+
+	* exit2.c (main): Fix size of pthread_t array.
+
 1998-07-10  Ben Elliston  <bje@cygnus.com>
 
 	* exit2.c: New file; test pthread_exit() harder.
