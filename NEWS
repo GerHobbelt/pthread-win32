@@ -1,3 +1,19 @@
+SNAPSHOT 2003-05-10
+-------------------
+
+Bug fixes
+---------
+
+* pthread_mutex_trylock() now returns correct error values.
+pthread_mutex_destroy() will no longer destroy a recursively locked mutex.
+pthread_mutex_lock() is no longer inadvertantly behaving as a cancelation point.
+- Thomas Pfaff  <tpfaff@gmx.net>
+
+* pthread_mutex_timedlock() no longer occasionally sets incorrect mutex
+ownership, causing deadlocks in some applications.
+- Robert Strycek <strycek@posam.sk> and Alexander Terekhov  <TEREKHOV@de.ibm.com>
+
+
 SNAPSHOT 2002-11-04
 -------------------
 
