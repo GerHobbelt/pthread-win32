@@ -55,7 +55,6 @@
 int
 pthread_join(pthread_t thread, void ** valueptr)
 {
-  LPDWORD exitcode;
   int detachstate;
 
   /* First check if we are trying to join to ourselves. */
@@ -66,10 +65,7 @@ pthread_join(pthread_t thread, void ** valueptr)
 
   if (thread != NULL)
     {
-      pthread_mutex_t * target_thread_mutex;
       int ret;
-
-      target_thread_mutex = _PTHREAD_THREAD_MUTEX(thread);
 
       /* CRITICAL SECTION */
       pthread_mutex_lock(&_pthread_table_mutex);
@@ -77,7 +73,7 @@ pthread_join(pthread_t thread, void ** valueptr)
       /* If the thread is in DETACHED state, then join will return
 	 immediately. */
 
-      if (pthread_attr_getdetachedstate(&(thread->attr), &detachstate) != 0 
+      if (pthread_attr_getdetachstate(&(thread->attr), &detachstate) != 0 
 	  || detachstate == PTHREAD_CREATE_DETACHED)
 	{
 	  return EINVAL;
@@ -120,14 +116,14 @@ pthread_join(pthread_t thread, void ** valueptr)
 	 pointed to by thread->joinvalueptr has been freed or
 	 otherwise no longer valid. */
 
-      if (pthread_attr_getdetachedstate(&(thread->attr), &detachstate) != 0 
+      if (pthread_attr_getdetachstate(&(thread->attr), &detachstate) != 0 
 	  || detachstate == PTHREAD_CREATE_DETACHED)
 	{
 	  ret = EDEADLK;
 	}
       else
 	{
-	  *value_ptr = thread->joinvalueptr;
+	  *valueptr = thread->joinvalueptr;
 	  ret = 0;
 	}
 
@@ -155,7 +151,6 @@ pthread_detach(pthread_t thread)
 {
   int detachstate;
   int ret;
-  pthread_mutex_t * target_thread_mutex;
 
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_table_mutex);
@@ -166,22 +161,18 @@ pthread_detach(pthread_t thread)
     }
   else
     {
-
-      target_thread_mutex = _PTHREAD_THREAD_MUTEX(thread);
-
       /* Check that we can detach this thread. */
-      if (pthread_attr_getdetachedstate(&(thread->attr), &detachstate) != 0 
+      if (pthread_attr_getdetachstate(&(thread->attr), &detachstate) != 0 
 	  || detachstate == PTHREAD_CREATE_DETACHED)
 	{
 	  ret = EINVAL;
 	}
       else
 	{
-
 	  /* This is all we do here - the rest is done either when the
 	     thread exits or when pthread_join() exits. Once this is
 	     set it will never be unset. */
-	  pthread_attr_setdetachedstate(&(thread->attr), 
+	  pthread_attr_setdetachstate(&(thread->attr), 
 					PTHREAD_CREATE_DETACHED);
 
 	  ret = 0;
