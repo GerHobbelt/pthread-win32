@@ -161,6 +161,7 @@ print_server (void *ptr)
 */
 			if (pthread_mutex_lock (&mutex_todo))
 				return (-6);
+
 			mywork = todo;
 			if (todo >= 0) {
 				++todo;

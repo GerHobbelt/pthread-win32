@@ -9,6 +9,8 @@
 #include "pthread.h"
 #include "implement.h"
 
+#include <sys/timeb.h>
+
 /*
  * Code contributed by John E. Bossom <JEB>.
  */
@@ -48,6 +50,11 @@ _pthread_processInitialize (void)
 
       _pthread_processTerminate ();
     }
+
+  /* 
+   * Set up the global mutex test and init check lock.
+   */
+  InitializeCriticalSection(&_pthread_mutex_test_init_lock);
 
   return (_pthread_processInitialized);
 
@@ -98,6 +105,11 @@ _pthread_processTerminate (void)
 
 	  _pthread_cleanupKey = NULL;
 	}
+
+      /* 
+       * Destroy up the global mutex test and init check lock.
+       */
+      DeleteCriticalSection(&_pthread_mutex_test_init_lock);
 
       _pthread_processInitialized = FALSE;
     }
@@ -483,7 +495,7 @@ _pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
 
   if (abstime == NULL)
     {
-      msecs = INFINITE;
+      milliseconds = INFINITE;
     }
   else
     {

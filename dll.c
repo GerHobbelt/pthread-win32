@@ -10,11 +10,16 @@
 #include "implement.h"
 
 
-/* Function pointer to TryEnterCriticalSection if it exists; otherwise NULL */
+/* 
+ * Function pointer to TryEnterCriticalSection if it exists; otherwise NULL 
+ */
 BOOL (WINAPI *_pthread_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
 
-/* Handle to kernel32.dll */
+/*
+ * Handle to kernel32.dll 
+ */
 static HINSTANCE _pthread_h_kernel32;
+
 
 #ifdef _MSC_VER
 /* 
@@ -89,10 +94,10 @@ DllMain (
 		 * The DLL is being unmapped into the process's address space
 		 */
 		_pthread_processTerminate ();
+
+		(void) FreeLibrary(_pthread_h_kernel32);
 	      }
 	  }
-
-	(void) FreeLibrary(_pthread_h_kernel32);
 
 	result = TRUE;
       }
