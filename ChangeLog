@@ -1,3 +1,10 @@
+1998-07-22  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.h (pthread_atfork): Add function prototype.
+
+	* fork.c (pthread_atfork): Preliminary implementation.
+	(_pthread_fork): Likewise.
+
 Wed Jul 22 00:16:22 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* cleanup.c (_pthread_cleanup_push): Implement.

@@ -51,6 +51,10 @@ typedef struct {
 extern "C" {
 #endif /* __cplusplus */
 
+int pthread_atfork (void (*prepare)(void),
+		    void (*parent)(void),
+		    void (*child)(void));
+
 int pthread_create(pthread_t *thread,
 		   const pthread_attr_t *attr,
 		   void * (*start_routine) (void *),
