@@ -1,3 +1,14 @@
+2001-07-09  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* barrier3.c: Fixed.
+	* barrier4.c: Fixed.
+	* barrier5.c: New; proves that all threads in the group
+	reaching the barrier wait and then resume together. Repeats the test
+	using groups of 1 to 16 threads. Each group of threads must negotiate
+	a large number of barriers (10000).
+	* spin4.c: Fixed.
+	* test.h (error_string): Modified the success (0) value.
+
 2001-07-07  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* spin3.c: Changed test and fixed.

@@ -79,6 +79,15 @@ cleanup3::	cleanup3.c
 priority1::     priority1.c
 priority2::     priority2.c
 inherit1::      inherit1.c
+spin1::         spin1.c
+spin2::         spin2.c
+spin3::         spin3.c
+spin4::         spin4.c
+barrier1::      barrier1.c
+barrier2::      barrier2.c
+barrier3::      barrier3.c
+barrier4::      barrier4.c
+barrier5::      barrier5.c
 exception1::	exception1.c
 exception2::	exception2.c
 exception3::	exception3.c
@@ -139,6 +148,15 @@ cleanup3	:test:	cleanup2
 priority1       :test:  join1
 priority2       :test:  priority1
 inherit1        :test:  join1
+spin1           :test:
+spin2           :test:  spin1.c
+spin3           :test:  spin2.c
+spin4           :test:  spin3.c
+barrier1        :test:
+barrier2        :test:  barrier1.c
+barrier3        :test:  barrier2.c
+barrier4        :test:  barrier3.c
+barrier5        :test:  barrier4.c
 benchtest1      :test:  mutex3
 benchtest2      :test:  benchtest1
 benchtest3      :test:  benchtest2

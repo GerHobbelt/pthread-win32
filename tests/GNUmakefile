@@ -49,7 +49,7 @@ TESTS	= loadfree \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
-	  barrier1 barrier2 barrier3 barrier4 \
+	  barrier1 barrier2 barrier3 barrier4 barrier5 \
 	  exception1 exception2 exception3
 
 BENCHTESTS = \
@@ -96,6 +96,7 @@ barrier1.pass:
 barrier2.pass: barrier1.pass
 barrier3.pass: barrier2.pass
 barrier4.pass: barrier3.pass
+barrier5.pass: barrier4.pass
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
 cancel2_1.pass: cancel2.pass

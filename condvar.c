@@ -807,7 +807,7 @@ ptw32_cond_wait_cleanup(void * args)
 
 }                               /* ptw32_cond_wait_cleanup */
 
-static int
+static INLINE int
 ptw32_cond_timedwait (pthread_cond_t * cond, 
                       pthread_mutex_t * mutex,
                       const struct timespec *abstime)
@@ -912,7 +912,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
 }                               /* ptw32_cond_timedwait */
 
 
-static int
+static INLINE int
 ptw32_cond_unblock (pthread_cond_t * cond, 
                     int unblockAll)
      /*

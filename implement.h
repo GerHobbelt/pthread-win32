@@ -189,8 +189,8 @@ struct pthread_spinlock_t_ {
 struct pthread_barrier_t_ {
   LONG nCurrentBarrierHeight;
   LONG nInitialBarrierHeight;
-  sem_t semBarrierBreeched;
   pthread_mutex_t mtxExclusiveAccess;
+  HANDLE eventBarrierBreeched;
 };
 
 struct pthread_barrierattr_t_ {

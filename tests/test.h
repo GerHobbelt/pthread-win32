@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 char * error_string[] = {
-  "ZERO",
+  "ZERO_or_EOK",
   "EPERM",
   "ENOFILE_or_ENOENT",
   "ESRCH",

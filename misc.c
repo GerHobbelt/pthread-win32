@@ -265,7 +265,7 @@ pthread_getconcurrency(void)
 }                                                                               
 
 
-static int
+static INLINE int
 ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
      /*
       * -------------------------------------------------------------------

@@ -766,7 +766,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 #define TIMESPEC_TO_FILETIME_OFFSET \
           ( ((LONGLONG) 27111902 << 32) + (LONGLONG) 3577643008 )
 
-static void
+static INLINE void
 timespec_to_filetime(const struct timespec *ts, FILETIME *ft)
      /*
       * -------------------------------------------------------------------
@@ -780,7 +780,7 @@ timespec_to_filetime(const struct timespec *ts, FILETIME *ft)
 	*(LONGLONG *)ft = ts->tv_sec * 10000000 + (ts->tv_nsec + 50) / 100 + TIMESPEC_TO_FILETIME_OFFSET;
 }
 
-static void
+static INLINE void
 filetime_to_timespec(const FILETIME *ft, struct timespec *ts)
      /*
       * -------------------------------------------------------------------
