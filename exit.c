@@ -51,7 +51,7 @@ pthread_exit (void *value_ptr)
       * ------------------------------------------------------
       */
 {
-  pthread_t self = pthread_self();
+  pthread_t self;
 
   /* If the current thread is implicit it was not started through
      pthread_create(), therefore we cleanup and end the thread
@@ -60,7 +60,9 @@ pthread_exit (void *value_ptr)
      which will cleanup and end the thread for us.
    */
 
-  if (self->implicit)
+  self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
+
+  if (self == NULL || self->implicit)
     {
       _pthread_callUserDestroyRoutines(self);
 
