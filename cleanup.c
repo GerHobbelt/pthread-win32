@@ -10,7 +10,7 @@
 #include "implement.h"
 
 void
-_pthread_handler_push(_pthread_handler_node_t ** stacktop,
+_pthread_handler_push(int stack,
 		      int poporder,
 		      void (*routine)(void *), 
 		      void *arg)
@@ -19,6 +19,9 @@ _pthread_handler_push(_pthread_handler_node_t ** stacktop,
      popped off in the order given by poporder. */
   _pthread_handler_node_t * new;
   _pthread_handler_node_t * next;
+  _pthread_handler_node_t ** stacktop;
+
+  stacktop = _PTHREAD_STACK(stack);
 
   new = (_pthread_handler_node_t *) malloc(sizeof(_pthread_handler_node_t));
 
@@ -34,7 +37,7 @@ _pthread_handler_push(_pthread_handler_node_t ** stacktop,
     {
       /* Add the new node to the start of the list. */
       new->next = *stacktop;
-      stacktop = next;
+      *stacktop = next;
     }
   else
     {
@@ -48,29 +51,35 @@ _pthread_handler_push(_pthread_handler_node_t ** stacktop,
       else
 	{
 	  next = *stacktop;
+
 	  while (next != NULL)
 	    {
 	      next = next->next;
 	    }
+
 	  next = new;
 	}
     }
 }
 
 void
-_pthread_handler_pop(_pthread_handler_node_t ** stacktop,
-		     int execute)
+_pthread_handler_pop(int stack, int execute)
 {
-  _pthread_handler_node_t * handler = *stacktop;
+  _pthread_handler_node_t ** stacktop;
+  _pthread_handler_node_t * next;
+  void (* func)(void *);
+  void * arg;
 
-  if (handler != NULL)
+  stacktop = _PTHREAD_STACK(stack);
+
+  if (*stacktop != NULL)
     {
-      void (* func)(void *) = handler->routine;
-      void * arg = handler->arg;
+      func = (*stacktop)->routine;
+      arg = (*stacktop)->arg;
+      next = (*stacktop)->next;
 
-      *stacktop = handler->next;
-
-      free(handler);
+      free(*stacktop);
+      *stacktop = next;
 
       if (execute != 0 && func != NULL)
 	{
@@ -80,12 +89,28 @@ _pthread_handler_pop(_pthread_handler_node_t ** stacktop,
 }
 
 void
-_pthread_handler_pop_all(_pthread_handler_node_t ** stacktop, 
-			 int execute)
+_pthread_handler_pop_all(int stack, int execute)
 {
-  /* Pop and run all handlers on the given stack. */
+  /* Pop and possibly run all handlers on the given stack. */
+  _pthread_handler_node_t ** stacktop;
+  _pthread_handler_node_t * next;
+  void (* func)(void *);
+  void * arg;
+
+  stacktop = _PTHREAD_STACK(stack);
+
   while (*stacktop != NULL)
     {
-      _pthread_handler_pop(stacktop, execute);
+      func = (*stacktop)->routine;
+      arg = (*stacktop)->arg;
+      next = (*stacktop)->next;
+
+      free(*stacktop);
+      *stacktop = next;
+
+      if (execute != 0 && func != NULL)
+	{
+	  (void) func(arg);
+	}
     }
 }
