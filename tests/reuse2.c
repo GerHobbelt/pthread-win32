@@ -7,8 +7,8 @@
  * --------------------------------------------------------------------------
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
- *      Copyright(C) 998 John E. Bossom
- *      Copyright(C) 999,22 Pthreads-win32 contributors
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2002 Pthreads-win32 contributors
  * 
  *      Contact Email: rpj@ise.canberra.edu.au
  * 
@@ -31,7 +31,7 @@
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
- *      9 Temple Place - Suite 33, Boston, MA 2-37, USA
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  *
  * --------------------------------------------------------------------------
  *
@@ -77,7 +77,7 @@
 #include "test.h"
 
 enum {
-	NUMTHREADS = 
+	NUMTHREADS = 10000
 };
 
 
@@ -89,7 +89,7 @@ void * func(void * arg)
 
   InterlockedIncrement((void *) &done);
 
-  return (void *) ; 
+  return (void *) 0; 
 }
  
 int
@@ -99,33 +99,35 @@ main()
   pthread_attr_t attr;
   int i, j;
   int reuse,
-      reuseMax = ,
+      reuseMax = 0,
       reuseMin = NUMTHREADS,
-      idTotal = ;
+      idTotal = 0;
 
-  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+  assert(pthread_attr_init(&attr) == 0);
+  assert(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) == 0);
 
-  for (i = ; i < NUMTHREADS; i++)
+  for (i = 0; i < NUMTHREADS; i++)
     {
-      assert(pthread_create(&t[i], &attr, func, NULL) == );
+      assert(pthread_create(&t[i], &attr, func, NULL) == 0);
     }
 
   while (NUMTHREADS > done)
-    Sleep();
+    Sleep(100);
+
+  Sleep(100);
 
   /*
-   * Analyse reuse by computing min and max times pthread_create()
+   * Analyse reuse by computing min and max number of times pthread_create()
    * returned the same pthread_t value.
    */
-  for (i = ; i < NUMTHREADS; i++)
+  for (i = 0; i < NUMTHREADS; i++)
     {
-      reuse = ;
+      reuse = 0;
 
       if (t[i] == NULL)
         continue;
 
-      for (j = ; j < i; j++)
+      for (j = 0; j < i; j++)
         {
           if (t[j] == t[i])
             {
@@ -133,7 +135,7 @@ main()
               t[j] = NULL;
             }
         }
-      for (j = i + ; j < NUMTHREADS; j++)
+      for (j = i + 1; j < NUMTHREADS; j++)
         {
           if (t[j] == t[i])
             {
@@ -147,7 +149,7 @@ main()
         reuseMin = reuse;
     }
 
-  for (i = ; i < NUMTHREADS; i++)
+  for (i = 0; i < NUMTHREADS; i++)
     {
       if (t[i] != NULL)
         idTotal++;
@@ -158,5 +160,5 @@ main()
   printf("Reuse minimum = %d\n", reuseMin);
   printf("Total thread IDs allocated = %d\n", idTotal);
 
-  return ;
+  return 0;
 }

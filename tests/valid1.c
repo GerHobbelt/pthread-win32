@@ -1,5 +1,5 @@
 /*
- * File: valid.c
+ * File: valid1.c
  *
  *
  * --------------------------------------------------------------------------
@@ -7,8 +7,8 @@
  * --------------------------------------------------------------------------
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
- *      Copyright(C) 998 John E. Bossom
- *      Copyright(C) 999,22 Pthreads-win32 contributors
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2002 Pthreads-win32 contributors
  * 
  *      Contact Email: rpj@ise.canberra.edu.au
  * 
@@ -31,7 +31,7 @@
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
- *      9 Temple Place - Suite 33, Boston, MA 2-37, USA
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  *
  * --------------------------------------------------------------------------
  *
@@ -76,15 +76,15 @@
 #include "test.h"
 
 enum {
-	NUMTHREADS = 
+	NUMTHREADS = 1
 };
 
-static int washere = ;
+static int washere = 0;
 
 void * func(void * arg)
 {
-  washere = ;
-  return (void *) ; 
+  washere = 1;
+  return (void *) 0; 
 }
  
 int
@@ -93,12 +93,13 @@ main()
   pthread_t t;
   void * result = NULL;
 
-  washere = ;
-  assert(pthread_create(&t, NULL, func, NULL) == );
-  pthread_join(t, &result);
-  assert(washere == );
+  washere = 0;
+  assert(pthread_create(&t, NULL, func, NULL) == 0);
+  assert(pthread_join(t, &result) == 0);
+  assert(result == 0);
+  assert(washere == 1);
   sched_yield();
-  assert(pthread_kill(t, ) == ESRCH);
+  assert(pthread_kill(t, 0) == ESRCH);
 
-  return ;
+  return 0;
 }

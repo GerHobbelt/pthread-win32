@@ -1,5 +1,5 @@
 /*
- * File: reuse.c
+ * File: reuse1.c
  *
  *
  * --------------------------------------------------------------------------
@@ -7,8 +7,8 @@
  * --------------------------------------------------------------------------
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
- *      Copyright(C) 998 John E. Bossom
- *      Copyright(C) 999,22 Pthreads-win32 contributors
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2002 Pthreads-win32 contributors
  * 
  *      Contact Email: rpj@ise.canberra.edu.au
  * 
@@ -31,7 +31,7 @@
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
- *      9 Temple Place - Suite 33, Boston, MA 2-37, USA
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  *
  * --------------------------------------------------------------------------
  *
@@ -76,15 +76,15 @@
 #include "test.h"
 
 enum {
-	NUMTHREADS = 
+	NUMTHREADS = 100
 };
 
-static int washere = ;
+static int washere = 0;
 
 void * func(void * arg)
 {
-  washere = ;
-  return (void *) ; 
+  washere = 1;
+  return (void *) 0; 
 }
  
 int
@@ -96,24 +96,26 @@ main()
   void * result = NULL;
   int i;
 
-  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+  assert(pthread_attr_init(&attr) == 0);;
+  assert(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE) == 0);
 
-  washere = ;
-  assert(pthread_create(&t, &attr, func, NULL) == );
-  pthread_join(t, &result);
-  assert(washere == );
+  washere = 0;
+  assert(pthread_create(&t, &attr, func, NULL) == 0);
+  assert(pthread_join(t, &result) == 0);;
+  assert(result == 0);
+  assert(washere == 1);
   last_t = t;
 
-  for (i = ; i < NUMTHREADS; i++)
+  for (i = 1; i < NUMTHREADS; i++)
     {
-      washere = ;
-      assert(pthread_create(&t, &attr, func, NULL) == );
+      washere = 0;
+      assert(pthread_create(&t, &attr, func, NULL) == 0);
       pthread_join(t, &result);
-      assert(washere == );
+      assert(result == 0);
+      assert(washere == 1);
       assert(t == last_t);
       last_t = t;
     }
 
-  return ;
+  return 0;
 }
