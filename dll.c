@@ -16,6 +16,11 @@
 BOOL (WINAPI *_pthread_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
 
 /*
+ * We use this to double-check that TryEnterCriticalSection works.
+ */
+CRITICAL_SECTION cs;
+
+/*
  * Handle to kernel32.dll 
  */
 static HINSTANCE _pthread_h_kernel32;
@@ -67,6 +72,23 @@ DllMain (
 	(BOOL (PT_STDCALL *)(LPCRITICAL_SECTION))
 	GetProcAddress(_pthread_h_kernel32,
 		       (LPCSTR) "TryEnterCriticalSection");
+
+      if (_pthread_try_enter_critical_section != NULL)
+        {
+          InitializeCriticalSection(&cs);
+          if ((*_pthread_try_enter_critical_section)(&cs))
+            {
+              LeaveCriticalSection(&cs);
+            }
+          else
+            {
+              /*
+               * Not really supported (Win98?).
+               */
+              _pthread_try_enter_critical_section = NULL;
+            }
+          DeleteCriticalSection(&cs);
+        }
       break;
 
     case DLL_THREAD_ATTACH:

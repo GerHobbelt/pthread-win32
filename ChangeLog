@@ -1,11 +1,19 @@
-Fri Feb 19 16:2s1703:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+Sat Feb 20 16:03:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* dll.c (DLLMain): Expand TryEnterCriticalSection support test.
+
+	* mutex.c (pthread_mutex_trylock): The check for
+	_pthread_try_enter_critical_section == NULL should have been
+	removed long ago.
+
+Fri Feb 19 16:03:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* sync.c (pthread_join): Fix pthread_equal() test.
 
 	* mutex.c (pthread_mutex_trylock): Check mutex != NULL before
 	using it.
 
-Thu Feb 18 16:2s1703:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+Thu Feb 18 16:17:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* misc.c (pthread_equal): Fix inverted result.
 
