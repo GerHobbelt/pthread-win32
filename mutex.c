@@ -69,6 +69,15 @@ _mutex_check_need_init(pthread_mutex_t *mutex)
     {
       result = pthread_mutex_init(mutex, NULL);
     }
+  else if (*mutex == NULL)
+    {
+      /*
+       * The mutex has been destroyed while we were waiting to
+       * initialise it, so the operation that caused the
+       * auto-initialisation should fail.
+       */
+      result = EINVAL;
+    }
 
   LeaveCriticalSection(&_pthread_mutex_test_init_lock);
 
@@ -177,13 +186,13 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
       return EINVAL;
     }
 
-  mx = *mutex;
-
   /*
    * Check to see if we have something to delete.
    */
-  if (mx != (pthread_mutex_t) _PTHREAD_OBJECT_AUTO_INIT)
+  if (*mutex != (pthread_mutex_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
+      mx = *mutex;
+
       if (mx->mutex == 0)
 	{
 	  DeleteCriticalSection(&mx->cs);
@@ -203,10 +212,33 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
   else
     {
       /*
-       * This is all we need to do to destroy a statically
-       * initialised mutex that has not yet been used (initialised).
+       * See notes in _mutex_check_need_init() above also.
        */
-      *mutex = NULL;
+      EnterCriticalSection(&_pthread_mutex_test_init_lock);
+
+      /*
+       * Check again.
+       */
+      if (*mutex == (pthread_mutex_t) _PTHREAD_OBJECT_AUTO_INIT)
+        {
+          /*
+           * This is all we need to do to destroy a statically
+           * initialised mutex that has not yet been used (initialised).
+           * If we get to here, another thread
+           * waiting to initialise this mutex will get an EINVAL.
+           */
+          *mutex = NULL;
+        }
+      else
+        {
+          /*
+           * The mutex has been initialised while we were waiting
+           * so assume it's in use.
+           */
+          result = EBUSY;
+        }
+
+      LeaveCriticalSection(&_pthread_mutex_test_init_lock);
     }
 
   return(result);
