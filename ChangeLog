@@ -1,7 +1,20 @@
+Fri Oct 30 15:15:50 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* cleanup.c (_pthread_handler_push): Fixed bug appending new
+	handler to list reported by Peter Slacik
+	<Peter.Slacik@leibinger.freinet.de>.
+	(new_thread): Rename poorly named local variable to
+	"new_handler".
+
 Thu Oct 22 21:44:44 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* tsd.c: Add description of pthread_key_delete() from the
 	standard as a comment.
+
+Fri Oct 16 17:38:47 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* cleanup.c (_pthread_destructor_run_all): Fix and improve
+	stepping through the key table.
 
 Thu Oct 15 14:05:01 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
