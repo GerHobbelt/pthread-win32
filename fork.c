@@ -78,6 +78,8 @@ pthread_atfork(void (*prepare)(void),
    fork() over a version provided in more primitive libraries further down
    the linker command line. */
 
+#if HAVE_PID_T && HAVE_FORK
+
 pid_t
 fork()
 {
@@ -87,7 +89,7 @@ fork()
   _pthread_handler_pop_all(_PTHREAD_FORKPREPARE_STACK,
 			   _PTHREAD_HANDLER_EXECUTE);
 
-  /* Now call Cygwin32's fork(). */
+  /* Now call the real fork(). */
 
   if ((pid = _fork()) > 0)
     {
@@ -126,3 +128,5 @@ fork()
 
   /* Not reached. */
 }
+
+#endif /* HAVE_PID_T && HAVE_FORK */
