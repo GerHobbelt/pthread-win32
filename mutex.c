@@ -174,15 +174,19 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
 
       result = pthread_mutex_trylock(&mx);
 
+      /*
+       * The mutex type may not be RECURSIVE therefore trylock may return EBUSY if
+       * we already own the mutex. Here we are assuming that it's OK to destroy
+       * a mutex that we own and have locked recursively. Is this correct?
+       */
       if (result == 0 || pthread_equal( mx->ownerThread, pthread_self() ) )
         {
-
           /*
            * FIXME!!!
            * The mutex isn't held by another thread but we could still
-           * be too late invalidating the mutex below. Yet we can't do it
-           * earlier in case another thread needs to unlock the mutex
-           * that it's holding.
+           * be too late invalidating the mutex below since another thread
+           * may alredy have entered mutex_lock and the check for a valid
+           * *mutex != NULL.
            */
           *mutex = NULL;
 
