@@ -307,6 +307,9 @@ _pthread_sem_timedwait (_pthread_sem_t * sem, const struct timespec * abstime)
       milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
       milliseconds += (abstime->tv_nsec / NANOSEC_PER_MILLISEC) -
 	currSysTime.millitm;
+
+      if (((int) milliseconds) < 0)
+	milliseconds = 0;
     }
 
   return (pthreadCancelableTimedWait (*sem, milliseconds));
