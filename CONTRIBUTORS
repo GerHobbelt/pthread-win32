@@ -73,6 +73,7 @@ Alexander Terekhov	TEREKHOV at de dot ibm dot com
 					(with Louis Thomas) re-implemented and improved
 					condition variables;
 					enhancements to semaphores;
+					enhancements to mutexes;
 					system clock change handling re CV timeouts;
 					bug fixes.
 Thomas Pfaff		tpfaff at gmx dot net
@@ -111,6 +112,7 @@ Makoto Kato		raven at oldskool dot jp
 Panagiotis E. Hadjidoukas	peh at hpclab dot ceid dot upatras dot gr
 					Contributed the QueueUserAPCEx package which
 					makes preemptive async cancelation possible.
-
-Will Bryant			will dot bryant at ecosm dot com
+Will Bryant		will dot bryant at ecosm dot com
 					Borland compiler patch and makefile.
+Anuj Goyal		anuj dot goyal at gmail dot com
+					Port to Digital Mars compiler.
