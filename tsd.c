@@ -57,26 +57,42 @@ int
 pthread_key_create(pthread_key_t *key, void (*destructor)(void *))
 {
   pthread_key_t k;
+  int ret = 0;
+
+  /* CRITICAL SECTION */
+  pthread_mutex_lock(&_pthread_tsd_mutex);
 
   if (_pthread_tsd_key_next >= PTHREAD_KEYS_MAX)
-    return EAGAIN;
+    ret = EAGAIN;
 
   k = _pthread_tsd_key_next++;
 
   _pthread_tsd_key_table[k].in_use = _PTHREAD_TSD_KEY_INUSE;
   _pthread_tsd_key_table[k].destructor = destructor;
 
+  pthread_mutex_unlock(&_pthread_tsd_mutex);
+  /* END CRITICAL SECTION */
+
   *key = k;
 
-  return 0;
+  return ret;
 }
 
 int
 pthread_setspecific(pthread_key_t key, void *value)
 {
   void ** keys;
+  int inuse;
 
-  if (_pthread_tsd_key_table[key].in_use != _PTHREAD_TSD_KEY_INUSE)
+  /* CRITICAL SECTION */
+  pthread_mutex_lock(&_pthread_tsd_mutex);
+
+  inuse = (_pthread_tsd_key_table[key].in_use == _PTHREAD_TSD_KEY_INUSE);
+
+  pthread_mutex_unlock(&_pthread_tsd_mutex);
+  /* END CRITICAL SECTION */
+
+  if (! inuse)
     return EINVAL;
 
   keys = (void **) TlsGetValue(_pthread_TSD_keys_TlsIndex);
@@ -89,8 +105,17 @@ void *
 pthread_getspecific(pthread_key_t key)
 {
   void ** keys;
+  int inuse;
 
-  if (_pthread_tsd_key_table[key].in_use != _PTHREAD_TSD_KEY_INUSE)
+  /* CRITICAL SECTION */
+  pthread_mutex_lock(&_pthread_tsd_mutex);
+
+  inuse = (_pthread_tsd_key_table[key].in_use == _PTHREAD_TSD_KEY_INUSE);
+
+  pthread_mutex_unlock(&_pthread_tsd_mutex);
+  /* END CRITICAL SECTION */
+
+  if (! inuse)
     return EINVAL;
 
   keys = (void **) TlsGetValue(_pthread_TSD_keys_TlsIndex);
@@ -100,12 +125,23 @@ pthread_getspecific(pthread_key_t key)
 int
 pthread_key_delete(pthread_key_t key)
 {
+  int ret = 0;
+
+  /* CRITICAL SECTION */
+  pthread_mutex_lock(&_pthread_tsd_mutex);
+
   if (_pthread_tsd_key_table[key].in_use != _PTHREAD_TSD_KEY_INUSE)
-    return EINVAL;
+    {
+      ret = EINVAL;
+    }
+  else
+    {
+      _pthread_tsd_key_table[key].in_use = _PTHREAD_TSD_KEY_DELETED;
+      _pthread_tsd_key_table[key].destructor = NULL;
+    }
 
-  _pthread_tsd_key_table[key].in_use = _PTHREAD_TSD_KEY_DELETED;
-  _pthread_tsd_key_table[key].destructor = NULL;
+  pthread_mutex_unlock(&_pthread_tsd_mutex);
+  /* END CRITICAL SECTION */
 
-  return 0;
+  return ret;
 }
-
