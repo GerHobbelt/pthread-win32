@@ -134,8 +134,6 @@ struct ThreadKeyAssoc {
 
 class Pthread_exception {};
 
-extern Pthread_exception pthread_exception;
-
 #else /* __cplusplus */
 
 #warning File __FILE__, Line __LINE__: Cancellation not supported under C.
