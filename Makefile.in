@@ -1,3 +1,5 @@
+RM	= erase
+
 CC	= g++
 
 # Mingw32
@@ -18,6 +20,7 @@ DLL     = pthread.dll
 
 LIB	= libpthread32.a
 
+
 all:	$(DLL)
 
 $(LIB):	$(OBJS)
@@ -34,6 +37,11 @@ $(DLL): $(OBJS)
 	dlltool --def $*.def --output-lib $*.lib --dllname $@
 
 clean:
-	-rm *~
-	-rm $(LIB) *.o *.exe
-	-rm $(DLL) $(DLL:.dll=.base) $(DLL:.dll=.exp) $(DLL:.dll=.lib)
+	-$(RM) *~
+	-$(RM) $(LIB)
+	-$(RM) *.o 
+	-$(RM) *.exe
+	-$(RM) $(DLL) 
+	-$(RM) $(DLL:.dll=.base)
+	-$(RM) $(DLL:.dll=.exp)
+	-$(RM) $(DLL:.dll=.lib)

@@ -710,10 +710,10 @@ struct _pthread_cleanup_t
 	{ \
 	    _pthread_cleanup_t	_cleanup; \
             \
-	    _pthread_push_cleanup( &_cleanup, (_rout), (_arg) ); \
+	    pthread_push_cleanup( &_cleanup, (_rout), (_arg) ); \
 
 #define pthread_cleanup_pop( _execute ) \
-	    (void) _pthread_pop_cleanup( _execute ); \
+	    (void) pthread_pop_cleanup( _execute ); \
 	}
 
 #else /* !__cplusplus */
@@ -851,16 +851,6 @@ pthread_t pthread_self (void);
 
 int pthread_cancel (pthread_t thread);
 
-#if !defined(__cplusplus) && !defined(_MSC_VER)
-
-_pthread_cleanup_t *_pthread_pop_cleanup (int execute);
-
-void _pthread_push_cleanup (_pthread_cleanup_t * cleanup,
-			   void (*routine) (void *),
-			   void *arg);
-
-#endif /* !__cplusplus && ! _MSC_VER */
-
 int pthread_setcancelstate (int state,
 			    int *oldstate);
 
@@ -871,6 +861,12 @@ void pthread_testcancel (void);
 
 int pthread_once (pthread_once_t * once_control,
 		  void (*init_routine) (void));
+
+_pthread_cleanup_t *pthread_pop_cleanup (int execute);
+
+void pthread_push_cleanup (_pthread_cleanup_t * cleanup,
+			   void (*routine) (void *),
+			   void *arg);
 
 /*
  * Thread Specific Data Functions

@@ -24,8 +24,8 @@ pthread_attr_setschedparam
 ;pthread_attr_setstackaddr
 pthread_attr_setstacksize
 pthread_cancel
-pthread_cleanup_pop
-pthread_cleanup_push
+;pthread_cleanup_pop
+;pthread_cleanup_push
 pthread_condattr_destroy
 pthread_condattr_getpshared
 pthread_condattr_init
@@ -77,5 +77,5 @@ pthreadCancelableTimedWait
 ;
 ; Needed if !defined(_MSC_VER) && !defined(__cplusplus)
 ;
-_pthread_push_cleanup
-_pthread_pop_cleanup
+pthread_push_cleanup
+pthread_pop_cleanup

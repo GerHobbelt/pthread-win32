@@ -20,7 +20,7 @@
  */
 
 _pthread_cleanup_t *
-_pthread_pop_cleanup (int execute)
+pthread_pop_cleanup (int execute)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -120,7 +120,7 @@ _pthread_pop_cleanup (int execute)
 
 
 void
-_pthread_push_cleanup (_pthread_cleanup_t * cleanup,
+pthread_push_cleanup (_pthread_cleanup_t * cleanup,
 		      void (*routine) (void *),
 		      void *arg)
      /*
