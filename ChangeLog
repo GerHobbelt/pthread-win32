@@ -1,3 +1,8 @@
+Fri Jul 24 23:09:33 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h: (pthread_cancel): Add function prototype.
+	(pthread_testcancel): Ditto.
+
 1998-07-24  Ben Elliston  <bje@cygnus.com>
 
 	* pthread.h (pthread_condattr_t): Rename dummy structure member.
