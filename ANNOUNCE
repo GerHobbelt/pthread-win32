@@ -19,9 +19,6 @@ to pthreads-win32 for easier integration with Win32 applications.
 Pthreads-win32 is free software, distributed under the GNU Lesser
 General Public License (LGPL).
 
-Please see the 'Acknowledgements' section at the end of this
-announcement for the list of contributors.
-
 
 Acknowledgements
 ----------------
