@@ -1,3 +1,54 @@
+2002-02-10  Ross Johnson  <rpj@setup1.ise.canberra.edu.au
+
+	Reduce executable size.
+	-----------------------
+	When linking with the static library, only those
+	routines actually called, either directly or indirectly
+	should be included.
+
+	[Gcc has the -ffunction-segments option to do this but MSVC
+	doesn't have this feature as far as I can determine. Other
+	compilers are undetermined as well. - rpj]
+
+	* nonportable.c: Split file into function segments.
+	* np_delay.c: Separated routine from nonportable.c
+	* np_getw32threadhandle.c: Likewise.
+	* np_mutexattr_setkind.c: Likewise.
+	* np_num_processors.c: Likewise.
+	* np_win32_attach.c: Likewise.
+	* misc.c: Split file into function segments.
+	* pthread_equal.c: Separated routine from nonportable.c.
+	* pthread_getconcurrency.c: Likewise.
+	* pthread_once.c: Likewise.
+	* pthread_self.c: Likewise.
+	* pthread_setconcurrency.c: Likewise.
+	* ptw32_calloc.c: Likewise.
+	* ptw32_new.c: Likewise.
+	* w32_CancelableWait.c: Likewise.
+	
+2002-02-09  Ross Johnson  <rpj@setup1.ise.canberra.edu.au
+
+	Reduce executable size.
+	-----------------------
+	When linking with the static library, only those
+	routines actually called, either directly or indirectly
+	should be included.
+
+	[Gcc has the -ffunction-segments option to do this but MSVC
+	doesn't have this feature as far as I can determine. Other
+	compilers are undetermined as well. - rpj]
+
+	* condvar.c: Split file into function segments.
+	* condvar_attr_destroy.c: Separated routine from condvar.c.
+	* condvar_attr_getpshared.c: Likewise.
+	* condvar_attr_init.c: Likewise.
+	* condvar_attr_setpshared.c: Likewise.
+	* condvar_check_need_init.c: Likewise.
+	* condvar_destroy.c: Likewise.
+	* condvar_init.c: Likewise.
+	* condvar_signal.c: Likewise.
+	* condvar_wait.c: Likewise.
+	
 2002-02-07  Alexander Terekhov<TEREKHOV@de.ibm.com>
 
 	* nonportable.c (pthread_delay_np): Make a true

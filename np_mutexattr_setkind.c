@@ -1,5 +1,5 @@
 /*
- * nonportable.c
+ * np_mutexattr_setkind.c
  *
  * Description:
  * This translation unit implements non-portable thread functions.
@@ -37,9 +37,21 @@
 #include "pthread.h"
 #include "implement.h"
 
-#include "np_mutexattr_setkind.c"
-#include "np_mutexattr_getkind.c"
-#include "np_getw32threadhandle.c"
-#include "np_delay.c"
-#include "np_num_processors.c"
-#include "np_win32_attach.c"
+/*
+ * pthread_mutexattr_setkind_np()
+ */
+int
+pthread_mutexattr_setkind_np(pthread_mutexattr_t * attr, int kind)
+{
+  return pthread_mutexattr_settype( attr, kind );
+}
+
+
+/*
+ * pthread_mutexattr_getkind_np()
+ */
+int
+pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr, int *kind)
+{
+  return pthread_mutexattr_gettype( attr, kind );
+}

@@ -74,17 +74,36 @@ SMALL_STATIC_OBJS	= \
 		cancel_testcancel.obj \
 		cancel_cancel.obj \
 		cleanup.obj \
-		condvar.obj \
+		condvar_attr_destroy.obj \
+		condvar_attr_getpshared.obj \
+		condvar_attr_init.obj \
+		condvar_attr_setpshared.obj \
+		condvar_check_need_init.obj \
+		condvar_destroy.obj \
+		condvar_init.obj \
+		condvar_signal.obj \
+		condvar_wait.obj \
 		create.obj \
 		dll.obj \
 		errno.obj \
 		exit.obj \
 		fork.obj \
 		global.obj \
-		misc.obj \
 		mutex.obj \
-		nonportable.obj \
+		np_mutexattr_setkind.obj \
+		np_mutexattr_getkind.obj \
+		np_getw32threadhandle.obj \
+		np_delay.obj \
+		np_num_processors.obj \
+		np_win32_attach.obj \
 		private.obj \
+		pthread_equal.obj \
+		pthread_getconcurrency.obj \
+		pthread_once.obj \
+		pthread_self.obj \
+		pthread_setconcurrency.obj \
+		ptw32_calloc.obj \
+		ptw32_new.obj \
 		rwlock.obj \
 		sched.obj \
 		semaphore_init.obj \
@@ -103,7 +122,8 @@ SMALL_STATIC_OBJS	= \
 		signal.obj \
 		spin.obj \
 		sync.obj \
-		tsd.obj
+		tsd.obj \
+		w32_CancelableWait.obj
 
 INCL	= config.h implement.h semaphore.h pthread.h need_errno.h
 
@@ -134,6 +154,35 @@ CANCEL_SRCS	= \
 		cancel_setcanceltype.c \
 		cancel_testcancel.c \
 		cancel_cancel.c 
+
+CONDVAR_SRCS	= \
+		condvar_attr_destroy.c \
+		condvar_attr_getpshared.c \
+		condvar_attr_init.c \
+		condvar_attr_setpshared.c \
+		condvar_check_need_init.c \
+		condvar_destroy.c \
+		condvar_init.c \
+		condvar_signal.c \
+		condvar_wait.c
+
+MISC_SRCS	= \
+		pthread_equal.c \
+		pthread_getconcurrency.c \
+		pthread_once.c \
+		pthread_self.c \
+		pthread_setconcurrency.c \
+		ptw32_calloc.c \
+		ptw32_new.c \
+		w32_CancelableWait.c
+
+NONPORTABLE_SRCS = \
+		np_mutexattr_setkind.c \
+		np_mutexattr_getkind.c \
+		np_getw32threadhandle.c \
+		np_delay.c \
+		np_num_processors.c \
+		np_win32_attach.c
 
 SEMAPHORE_SRCS = \
 		semaphore_init.c \
@@ -194,8 +243,11 @@ $(DLLS): $(DLL_OBJS) pthread.def
 .c.obj:
 	cl $(EHFLAGS) $(CFLAGS) -c $<
 
-attr.obj:		attr.c $(ATTR_SRCS) $(INCL)
+attr.obj:	attr.c $(ATTR_SRCS) $(INCL)
 barrier.obj:	barrier.c $(BARRIER_SRCS) $(INCL)
-cancel.obj:		cancel.c $(CANCEL_SRCS) $(INCL)
+cancel.obj:	cancel.c $(CANCEL_SRCS) $(INCL)
+condvar.obj:	condvar.c $(CONDVAR_SRCS) $(INCL)
+misc.obj:	misc.c $(MISC_SRCS) $(INCL)
+nonportable.obj:	nonportable.c $(NONPORTABLE_SRCS) $(INCL)
 semaphore.obj:	semaphore.c $(SEMAPHORE_SRCS) $(INCL)
 

@@ -1,3 +1,9 @@
+2002-02-07  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* delay1.c: New test.
+	* delay2.c: New test.
+	* exit4.c: New test.
+
 2002-02-02  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* mutex8: New test.

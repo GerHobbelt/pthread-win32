@@ -1,5 +1,5 @@
 /*
- * nonportable.c
+ * np_getw32threadhandle.c
  *
  * Description:
  * This translation unit implements non-portable thread functions.
@@ -37,9 +37,17 @@
 #include "pthread.h"
 #include "implement.h"
 
-#include "np_mutexattr_setkind.c"
-#include "np_mutexattr_getkind.c"
-#include "np_getw32threadhandle.c"
-#include "np_delay.c"
-#include "np_num_processors.c"
-#include "np_win32_attach.c"
+/*
+ * pthread_getw32threadhandle_np()
+ *
+ * Returns the win32 thread handle that the POSIX
+ * thread "thread" is running as.
+ *
+ * Applications can use the win32 handle to set
+ * win32 specific attributes of the thread.
+ */
+HANDLE
+pthread_getw32threadhandle_np(pthread_t thread)
+{
+  return (thread != NULL) ? (thread->threadH) : 0;
+}

@@ -113,17 +113,36 @@ SMALL_STATIC_OBJS	= \
 		cancel_testcancel.o \
 		cancel_cancel.o \
 		cleanup.o \
-		condvar.o \
+		condvar_attr_destroy.o \
+		condvar_attr_getpshared.o \
+		condvar_attr_init.o \
+		condvar_attr_setpshared.o \
+		condvar_check_need_init.o \
+		condvar_destroy.o \
+		condvar_init.o \
+		condvar_signal.o \
+		condvar_wait.o \
 		create.o \
 		dll.o \
 		errno.o \
 		exit.o \
 		fork.o \
 		global.o \
-		misc.o \
 		mutex.o \
-		nonportable.o \
+		np_mutexattr_setkind.o \
+		np_mutexattr_getkind.o \
+		np_getw32threadhandle.o \
+		np_delay.o \
+		np_num_processors.o \
+		np_win32_attach.o \
 		private.o \
+		pthread_equal.o \
+		pthread_getconcurrency.o \
+		pthread_once.o \
+		pthread_self.o \
+		pthread_setconcurrency.o \
+		ptw32_calloc.o \
+		ptw32_new.o \
 		rwlock.o \
 		sched.o \
 		semaphore_init.o \
@@ -142,7 +161,8 @@ SMALL_STATIC_OBJS	= \
 		signal.o \
 		spin.o \
 		sync.o \
-		tsd.o
+		tsd.o \
+		w32_CancelableWait.o
 
 INCL	= \
 		config.h \
@@ -178,6 +198,35 @@ CANCEL_SRCS	= \
 		cancel_setcanceltype.c \
 		cancel_testcancel.c \
 		cancel_cancel.c 
+
+CONDVAR_SRCS	= \
+		condvar_attr_destroy.c \
+		condvar_attr_getpshared.c \
+		condvar_attr_init.c \
+		condvar_attr_setpshared.c \
+		condvar_check_need_init.c \
+		condvar_destroy.c \
+		condvar_init.c \
+		condvar_signal.c \
+		condvar_wait.c
+
+MISC_SRCS	= \
+		pthread_equal.c \
+		pthread_getconcurrency.c \
+		pthread_once.c \
+		pthread_self.c \
+		pthread_setconcurrency.c \
+		ptw32_calloc.c \
+		ptw32_new.c \
+		w32_CancelableWait.c
+
+NONPORTABLE_SRCS = \
+		np_mutexattr_setkind.c \
+		np_mutexattr_getkind.c \
+		np_getw32threadhandle.c \
+		np_delay.c \
+		np_num_processors.c \
+		np_win32_attach.c
 
 SEMAPHORE_SRCS = \
 		semaphore_init.c \
@@ -252,6 +301,9 @@ realclean: clean
 	-$(RM) $(GCE_DLL)
 
 attr.o:		attr.c $(ATTR_SRCS) $(INCL)
-barrier.o:		barrier.c $(BARRIER_SRCS) $(INCL)
-cancel.o:		cancel.c $(CANCEL_SRCS) $(INCL)
+barrier.o:	barrier.c $(BARRIER_SRCS) $(INCL)
+cancel.o:	cancel.c $(CANCEL_SRCS) $(INCL)
+condvar.o:	condvar.c $(CONDVAR_SRCS) $(INCL)
+misc.o:		misc.c $(MISC_SRCS) $(INCL)
+nonportable.o:	nonportable.c $(NONPORTABLE_SRCS) $(INCL)
 semaphore.o:	semaphore.c $(SEMAPHORE_SRCS) $(INCL)

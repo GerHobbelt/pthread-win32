@@ -1,5 +1,5 @@
 /*
- * condvar.c
+ * condvar_attr_init.c
  *
  * Description:
  * This translation unit implements condition variables and their primitives.
@@ -33,20 +33,55 @@
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
- *
  */
 
 #include "pthread.h"
 #include "implement.h"
 
-#include "condvar_check_need_init.c"
-#include "condvar_attr_init.c"
-#include "condvar_attr_destroy.c"
-#include "condvar_attr_getpshared.c"
-#include "condvar_attr_setpshared.c"
-#include "condvar_init.c"
-#include "condvar_destroy.c"
-#include "condvar_wait.c"
-#include "condvar_timedwait.c"
-#include "condvar_signal.c"
-#include "condvar_broadcast.c"
+
+int
+pthread_condattr_init (pthread_condattr_t * attr)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      Initializes a condition variable attributes object
+      *      with default attributes.
+      *
+      * PARAMETERS
+      *      attr
+      *              pointer to an instance of pthread_condattr_t
+      *
+      *
+      * DESCRIPTION
+      *      Initializes a condition variable attributes object
+      *      with default attributes.
+      *
+      *      NOTES:
+      *              1)      Use to define condition variable types
+      *              2)      It is up to the application to ensure
+      *                      that it doesn't re-init an attribute
+      *                      without destroying it first. Otherwise
+      *                      a memory leak is created.
+      *
+      * RESULTS
+      *              0               successfully initialized attr,
+      *              ENOMEM          insufficient memory for attr.
+      *
+      * ------------------------------------------------------
+      */
+{
+  pthread_condattr_t attr_result;
+  int result = 0;
+
+  attr_result = (pthread_condattr_t) calloc (1, sizeof (*attr_result));
+
+  if (attr_result == NULL)
+    {
+      result = ENOMEM;
+    }
+
+  *attr = attr_result;
+
+  return result;
+
+}                               /* pthread_condattr_init */
