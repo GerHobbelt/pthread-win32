@@ -38,14 +38,22 @@
 #include "pthread.h"
 #include "implement.h"
 
-
+/*
+ * ptw32_throw
+ *
+ * All canceled and explicitly exited POSIX threads go through
+ * here. This routine knows how to exit both POSIX initiated threads and
+ * 'implicit' POSIX threads for each of the possible language modes (C,
+ * C++, and SEH).
+ */
 void
 ptw32_throw(DWORD exception)
 {
-#ifdef __CLEANUP_C
-  pthread_t self = pthread_self();
-#endif
-
+  /*
+   * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
+   * unnecessarily.
+   */
+  pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
 
 #ifdef __CLEANUP_SEH
   DWORD exceptionInformation[3];
@@ -56,6 +64,36 @@ ptw32_throw(DWORD exception)
     {
       /* Should never enter here */
       exit(1);
+    }
+
+  if (NULL == self || self->implicit)
+    {
+      /*
+       * We're inside a non-POSIX initialised Win32 thread
+       * so there is no point to jump or throw back to. Just do an
+       * explicit thread exit here after cleaning up POSIX
+       * residue (i.e. cleanup handlers, POSIX thread handle etc).
+       */
+      unsigned exitCode = 0;
+
+      switch (exception)
+	{
+	case PTW32_EPS_CANCEL:
+	  exitCode = (unsigned) PTHREAD_CANCELED;
+	  break;
+	case PTW32_EPS_EXIT:
+	  exitCode = (unsigned) self->exitStatus;;
+	  break;
+	}
+
+      pthread_win32_thread_detach_np();
+
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+      _endthreadex (exitCode);
+#else
+      _endthread ();
+#endif
+
     }
 
 #ifdef __CLEANUP_SEH

@@ -67,7 +67,7 @@ TESTS	= loadfree \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
 	  create1 create2 reuse1 reuse2 equal1 \
 	  kill1 valid1 valid2 \
-	  exit2 exit3 \
+	  exit2 exit3 exit4 exit5 \
 	  join0 join1 join2 \
 	  mutex2 mutex3 mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
@@ -79,6 +79,7 @@ TESTS	= loadfree \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 rwlock7 \
 	  rwlock2_t rwlock3_t rwlock4_t rwlock5_t rwlock6_t rwlock6_t2 \
 	  context1 cancel3 cancel4 cancel5 cancel6a cancel6d \
+	  cancel7 \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
@@ -144,6 +145,7 @@ cancel4.pass: cancel3.pass
 cancel5.pass: cancel3.pass
 cancel6a.pass: cancel3.pass
 cancel6d.pass: cancel3.pass
+cancel7.pass: kill1.pass
 cleanup0.pass: cancel5.pass
 cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
@@ -177,6 +179,8 @@ exception3.pass: exception2.pass
 exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass
+exit4.pass:
+exit5.pass: exit4.pass kill1.pass
 eyal1.pass: tsd1.pass
 inherit1.pass: join1.pass
 join0.pass: create1.pass

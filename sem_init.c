@@ -114,8 +114,8 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 				{
 					s->value = value;
 					s->event = CreateEvent (NULL,
-						FALSE,	/* manual reset */
-						FALSE,	/* initial state */
+						PTW32_FALSE,	/* manual reset */
+						PTW32_FALSE,	/* initial state */
 						NULL);
 
 					if (0 == s->event)

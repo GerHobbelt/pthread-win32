@@ -40,13 +40,9 @@
 
 /*
  * The thread reuse stack is a simple LIFO stack managed through a singly
- * linked list element in the pthread_t struct.
+ * linked list element in the pthread_t_ struct.
  *
  * All thread structs on the stack are clean and ready for reuse.
- *
- * The pthread_t_ struct's prevReuse element can be tested to check for an invalid
- * thread ID. A NULL value indicates a valid thread. Applications should use the
- * pthread_kill() function with a zero signal value to test for a valid thread ID.
  */
 
 /*

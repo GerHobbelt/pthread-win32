@@ -59,11 +59,11 @@ ptw32_increase_semaphore(sem_t * sem, unsigned int n)
     {
        s->value += n;
        SetEvent(s->event);
-       result = TRUE;
+       result = PTW32_TRUE;
     }
   else
     {
-       result = FALSE;
+       result = PTW32_FALSE;
     }
 
   LeaveCriticalSection(&s->sem_lock_cs);
