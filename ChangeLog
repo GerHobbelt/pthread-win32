@@ -1,3 +1,11 @@
+Sat Feb 13 03:03:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h (struct pthread_once_t_): Replaced.
+
+	* misc.c (pthread_once): Replace with John Bossom's version;
+	has lighter weight serialisation; fixes problem of not holding
+	competing threads until after the init_routine completes.
+
 Thu Feb 11 13:34:14 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* misc.c (CancelableWait): Change C++ exception throw.
