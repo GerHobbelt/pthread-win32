@@ -3,6 +3,8 @@ Sun Jul 26 13:06:12 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 	* exit.c (_pthread_exit): New function. Called from pthread_exit()
 	and _pthread_start_call() to exit the thread. It allows an extra
 	argument which is the return code passed to _endthreadex().
+	(_pthread_exit): Move thread entry delete call from _pthread_vacuum()
+	into here. Add more explanation of thread entry deletion.
 
 	* create.c (_pthread_start_call): Change pthread_exit() call to
 	_pthread_exit() call.

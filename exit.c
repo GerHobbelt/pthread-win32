@@ -28,21 +28,6 @@ _pthread_vacuum(void)
 
   _pthread_handler_pop_all(_PTHREAD_FORKCHILD_STACK,
 			   _PTHREAD_HANDLER_NOEXECUTE);
-
-  /* CRITICAL SECTION */
-  pthread_mutex_lock(&_pthread_table_mutex);
-
-  /* Remove the thread entry on exit only if pthread_detach()
-     was called and there are no waiting joins. */
-
-  if (us->detach == TRUE
-      && us->join_count == 0)
-    {
-      _pthread_delete_thread_entry(us);
-    }
-
-  pthread_mutex_lock(&_pthread_table_mutex);
-  /* END CRITICAL SECTION */
 }
 
 void
@@ -61,6 +46,23 @@ _pthread_exit(void * value, int return_code)
   /* END CRITICAL SECTION */
 
   _pthread_vacuum();
+
+  /* CRITICAL SECTION */
+  pthread_mutex_lock(&_pthread_table_mutex);
+
+  /* Remove the thread entry on exit only if pthread_detach() was
+     called AND there are no waiting joins. Otherwise the thread entry
+     will be deleted by the last waiting pthread_join() after this
+     thread has terminated. */
+
+  if (us->detach == TRUE
+      && us->join_count == 0)
+    {
+      _pthread_delete_thread_entry(us);
+    }
+
+  pthread_mutex_lock(&_pthread_table_mutex);
+  /* END CRITICAL SECTION */
 
   _endthreadex(return_code);
 }
