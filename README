@@ -37,7 +37,9 @@ with MSVC. Thanks to Anders Norlander for pointing this out.
 For convenience, the following pre-built files can be downloaded from
 the FTP site (see under "Availability" below):
 
-	pthread.h	- the standard include file
+	pthread.h
+	semaphore.h
+	sched.h
 	pthread.dll	- built with MSVC cl compiler
 	pthread.lib	- built with MSVC cl compiler
 	libpthread32.a	- built with Mingw32 (use with MSVC pthread.dll)
@@ -72,3 +74,4 @@ Home page:
 ----
 Ross Johnson
 <rpj@ise.canberra.edu.au>
+

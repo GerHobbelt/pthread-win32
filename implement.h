@@ -288,8 +288,6 @@ extern CRITICAL_SECTION _pthread_mutex_test_init_lock;
 extern CRITICAL_SECTION _pthread_cond_test_init_lock;
 
 
-#include <pthread.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

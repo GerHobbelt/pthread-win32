@@ -1,14 +1,16 @@
 
-                PTHREADS-WIN32 SNAPSHOT 1999-04-04
-                ----------------------------------
+                 PTHREADS-WIN32 SNAPSHOT 1999-04-06
+                 ----------------------------------
        Web Site: http://sourceware.cygnus.com/pthreads-win32/
+      FTP Site: ftp://sourceware.cygnus.com/pub/pthreads-win32
         Coordinator: Ross Johnson <rpj@ise.canberra.edu.au>
 
 
 We are pleased to announce the availability of a new snapshot of
 Pthreads-win32, an Open Source Software (OSS) implementation of the
 Threads component of the POSIX 1003.1c 1995 Standard for Microsoft's
-Win32 environment. Some functions from POSIX 1003.1b are supported.
+Win32 environment. Some functions from POSIX 1003.1b are supported
+including semaphores.
 
 Pthreads-win32 is free software, distributed under the GNU Library
 General Public License (LGPL).
@@ -228,18 +230,16 @@ points in applications and libraries:
 Availability
 ------------ 
 
-For the prebuilt DLL, export libs (for both MSVC and Mingw32), and
-pthread.h:
+The prebuilt DLL, export libs (for both MSVC and Mingw32), and the header
+files (pthread.h, semaphore.h, sched.h) are available along with the
+complete source code at:
 
-ftp://sourceware.cygnus.com/pub/pthreads-win32/pthreads-dll-1999-03-16
+	ftp://sourceware.cygnus.com/pub/pthreads-win32
 
-Source tree:
-      
-ftp://sourceware.cygnus.com/pub/pthreads-win32/pthreads-snap-1999-03-16.tar.gz
-      
-Source files are available in unpacked form at:
-      
-ftp://sourceware.cygnus.com/pub/pthreads-win32/sources
+The pre-built DLL, export libraries and include files can be found at:
+
+	ftp://sourceware.cygnus.com/pub/pthreads-win32/dll-latest
+
 
       
 Mailing List 
@@ -255,26 +255,27 @@ Application Development Environments
 ------------------------------------
       
 MSVC:
-MSVC can be used of course.
+MSVC works.
       
 Mingw32: (ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/egcs-1.1.1/)
 Mingw32 must use the thread-safe MSVCRT library. You can link
 against the export library libpthread32.a built under Mingw32
-together with the version of pthread.dll built with MSVC.
+but you must run your application with the version of pthread.dll built
+with MSVC.
       
 Cygwin: (http://sourceware.cygnus.com/cygwin/)
 Cygwin aims to provide a complete POSIX environment on top of Win32, including
 threads. When this is complete, developers using Cygwin will not need
 pthreads-win32. At this time, Cygwin has preliminary support for multithreaded
-development, however, this is not turned on by default.
+development, however, this is not turned on by default. We have not tested
+pthreads-win32 against Cygwin.
 
 Generally:
-For convenience, the following pre-built files can be downloaded from
-the FTP site:
+For convenience, the following pre-built files are included in the package:
 
-        ftp://sourceware.cygnus.com/pub/pthreads-win32/dll-latest/
-
-        pthread.h       - the standard include file
+        pthread.h       - for POSIX 1c threads
+        semaphore.h     - for POSIX 1b semaphores
+        sched.h         - for POSIX 1b scheduling
         pthread.dll     - built with MSVC cl compiler
         pthread.lib     - built with MSVC cl compiler
         libpthread32.a  - built with Mingw32 (use with MSVC pthread.dll)

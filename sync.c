@@ -27,10 +27,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-/*
- * Code contributed by John E. Bossom <JEB>.
- */
-
 int
 pthread_detach (pthread_t tid)
      /*
@@ -157,8 +153,4 @@ pthread_join (pthread_t thread, void **value_ptr)
   return (result);
 
 }				/* pthread_join */
-
-/* </JEB> */
-
-
 
