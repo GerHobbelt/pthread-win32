@@ -6,6 +6,8 @@
 	* configure: Regenerate.
 
 	* acconfig.h (STDCALL): New define.
+
+	* config.h.in: Regenerate.
 	
 	* mutex.c (pthread_mutex_init): Correct function signature.
 
