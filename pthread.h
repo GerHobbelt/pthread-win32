@@ -22,8 +22,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef _PTHREADS_H
 #define _PTHREADS_H
 
+#define PTHREAD_PROCESS_PRIVATE 0
+#define PTHREAD_PROCESS_SHARED  1
+
 typedef HANDLE pthread_t;
-typedef void pthread_mutexattr_t;
+typedef struct { void * ptr; } pthread_mutexattr_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,6 +44,18 @@ pthread_t pthread_self(void);
 int pthread_equal(pthread_t t1, pthread_t t2);
 
 int pthread_join(pthread_t thread, void ** valueptr);
+
+/* Functions for manipulating mutex attribute objects. */
+
+int pthread_mutexattr_init(pthread_mutexattr_t *attr);
+
+int pthread_mutexattr_destroy(pthread_mutexattr_t *attr);
+
+int pthread_mutexattr_setpshared(pthread_mutexattr_t *attr,
+				 int pshared);
+
+int pthread_mutexattr_getpshared(pthread_mutexattr_t *attr,
+				 int *pshared);
 
 /* These functions cannot be implemented in terms of the Win32 API.
    Fortunately they are optional.  Their implementation just returns
