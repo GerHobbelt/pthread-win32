@@ -1,5 +1,7 @@
 1998-10-04  Ben Elliston  <bje@cygnus.com>
 
+	* tests/mutex1.c: New basic test for mutex functions (it passes).
+
 	* configure.in: Test for __stdcall, not _stdcall. Typo.
 
 	* configure: Regenerate.
