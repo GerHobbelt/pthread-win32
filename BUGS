@@ -32,8 +32,9 @@ Known bugs
    tests\semaphore4.c fails in that snapshot for the VCE version of the
    DLL. It is suspected to be a compiler bug in VC6.0, and also seen in
    VC7.0 and VS .NET 2003. The GNU C++ compiler does not have a problem
-   with this test, and it has been reported (2005-03-05) that the Intel
-   C++ 8.1 compiler is also fine with this test.]
+   with this test, and it has been reported (2005-03-05/08) that the Intel
+   C++ 8.1 compiler and Visual C++ 2005 Express Edition Beta2 are also
+   ok with this test.]
 
    The problem disappears when /Ob0 is used, i.e. /O2 /Ob0 works OK,
    but if you want to use inlining optimisation you can be much more
