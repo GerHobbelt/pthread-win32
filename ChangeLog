@@ -1,3 +1,8 @@
+2003-09-03  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* w32_cancelableWait.c (ptw32_cancelable_wait): Allow cancelation
+	of implicit POSIX threads as well.
+
 2003-09-02  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* pthread_win32_attach_detach_np.c (pthread_win32_thread_detach_np):

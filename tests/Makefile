@@ -93,7 +93,7 @@ PASSES= loadfree.pass \
 	  rwlock2_t.pass  rwlock3_t.pass  rwlock4_t.pass  rwlock5_t.pass  rwlock6_t.pass  rwlock6_t2.pass  \
 	  context1.pass  \
 	  cancel3.pass  cancel4.pass  cancel5.pass  cancel6a.pass  cancel6d.pass  \
-	  cancel7  \
+	  cancel7  cancel8  \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
@@ -213,6 +213,7 @@ cancel5.pass: cancel3.pass
 cancel6a.pass: cancel3.pass
 cancel6d.pass: cancel3.pass
 cancel7.pass: kill1.pass
+cancel8.pass: cancel7.pass
 cleanup0.pass: cancel5.pass
 cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
