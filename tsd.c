@@ -44,5 +44,7 @@ pthread_getspecific(pthread_key_t key)
 int
 pthread_key_delete(pthread_key_t key)
 {
+  /* FIXME: We must remove any associated destructors here. */
+
   return (TlsFree(key) == FALSE) ? EINVAL : 0;
 }

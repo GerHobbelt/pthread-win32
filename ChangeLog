@@ -2,6 +2,7 @@ Fri Jul 31 00:05:45 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* tsd.c (pthread_key_create): Update to properly associate
 	the destructor routine with the key.
+	(pthread_key_delete): Add FIXME comment.
 
 	* exit.c (_pthread_vacuum): Add call to
 	_pthread_destructor_pop_all().
