@@ -1,3 +1,9 @@
+2005-03-14  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* pthread_once.c (pthread_once): Downgrade interlocked operations to simple
+	memory operations where these are protected by the critical section; edit
+	comments.
+
 2005-03-13  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* pthread_once.c (pthread_once): Completely redesigned; a change was
