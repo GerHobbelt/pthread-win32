@@ -114,10 +114,20 @@ struct pthread_attr_t_ {
 /*
  * ====================
  * ====================
- * Mutexes and Condition Variables
+ * Semaphores, Mutexes and Condition Variables
  * ====================
  * ====================
  */
+
+#ifdef NEED_SEM
+typedef struct {
+  unsigned int	value;
+  CRITICAL_SECTION sem_lock_cs;
+  HANDLE	event;
+} sem_t_;
+#else /* NEED_SEM */
+typedef HANDLE sem_t_;
+#endif /* NEED_SEM */
 
 #define PTW32_OBJECT_AUTO_INIT ((void *) -1)
 #define PTW32_OBJECT_INVALID   NULL
