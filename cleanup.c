@@ -192,6 +192,7 @@ _pthread_destructor_run_all()
 		     for re-use.
 		   */
 		  key->status = _PTHREAD_TSD_KEY_REUSE;
+		  _pthread_key_reuse[_pthread_key_reuse_top++] = k;
 		}
 	      else
 		{
