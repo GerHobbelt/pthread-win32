@@ -318,12 +318,20 @@ struct pthread_rwlockattr_t_
   int pshared;
 };
 
-enum ptw32_once_state {
-  PTW32_ONCE_CLEAR     = 0x0,
-  PTW32_ONCE_DONE      = 0x1,
+/*
+ * Values stored in once_control->done.
+ * 'done' use to be just true or false, but we can add cancellability
+ * of the init_routine by re-using 'done' to store multiple flags
+ * without changing the ABI. Previously, the initial value of 'done'
+ * was FALSE (0), and the new initial value is still zero (0).
+ */
+enum {
+  PTW32_ONCE_CLEAR = 0x0,
+  PTW32_ONCE_DONE = 0x1,
   PTW32_ONCE_CANCELLED = 0x2
 };
 
+/* Global cond+mutex for once_control management */
 typedef struct {
   pthread_cond_t cond;
   pthread_mutex_t mtx;
@@ -483,7 +491,7 @@ extern CRITICAL_SECTION ptw32_cond_list_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
 extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
 extern CRITICAL_SECTION ptw32_spinlock_test_init_lock;
-extern CRITICAL_SECTION ptw32_once_event_lock;
+extern ptw32_once_control_t ptw32_once_control;
 
 #ifdef _UWIN
 extern int pthread_count;

@@ -1,65 +1,20 @@
 2005-03-14  Ross Johnson  <ross at callisto.canberra.edu.au>
 
-	* pthread_once.c (pthread_once): Downgrade interlocked operations to simple
-	memory operations where these are protected by the critical section; edit
-	comments.
-
-2005-03-13  Ross Johnson  <rpj at callisto.canberra.edu.au>
-
-	* pthread_once.c (pthread_once): Completely redesigned; a change was
-	required to the ABI (pthread_once_t_), and resulting in a version
-	compatibility index increment.
-
-	NOTES:
-	The design (based on pseudo code contributed by Gottlob Frege) avoids
-	creating a kernel object if there is no contention. See URL for details:-
-	http://sources.redhat.com/ml/pthreads-win32/2005/msg00029.html
-	This uses late initialisation similar to the technique already used for
-	pthreads-win32 mutexes and semaphores (from Alexander Terekhov).
-
-	The subsequent cancelation cleanup additions (by rpj) could not be implemented
-	without sacrificing some of the efficiency in Gottlob's design. In particular,
-	although each once_control uses it's own event to block on, a global CS is
-	required to manage it - since the event must be either re-usable or
-	re-creatable under cancelation. This is not needed in the non-cancelable
-	design because it is able to mark the event as closed (forever).
-
-	When uncontested, a CS operation is equivalent to an Interlocked operation
-	in speed. So, in the final design with cancelability, an uncontested
-	once_control operation involves a minimum of five interlocked operations
-	(including the LeaveCS operation).
+	* CVS (snapshot-2005-03-08-fixes): Created branch for
+	back-porting fixes to snapshot 2005-03-08.
 	
-	ALTERNATIVES:
-	An alternative design from Alexander Terekhov proposed using a named mutex,
-	as sketched below:-
+	* pthread_once.c (pthread_once): Add cancellability to the
+	init_routine; remove cancellability elsewhere (by disabling
+	cancellability around pthread_cond_wait in particular);
+	the meaning of the 'done' flag is changed but the ABI doesn't
+	change as a result.
 
-	  if (!once_control) { // May be in TLS
-	    named_mutex::guard guard(&once_control2);
-	      if (!once_control2) {
-	         <init>
-	         once_control2 = true;
-	      }
-	    once_control = true;
-	  }
-	
-	A more detailed description of this can be found here:-
-	http://groups.yahoo.com/group/boost/message/15442
+	* pthread.h (PTHREAD_ONCE_INIT): Change the 'done' flag value
+	representation (does not change the value - still zero (0)).
 
-	[Although the definition of a suitable PTHREAD_ONCE_INIT precludes use of the
-	TLS located flag, this is not critical.]
-	
-	There are three primary concerns though:-
-	1) The [named] mutex is 'created' even in the uncontended case.
-	2) A system wide unique name must be generated.
-	3) Win32 mutexes are VERY slow even in the uncontended 	case. An uncontested
-	Win32 mutex lock operation can be 50 (or more) times slower than an
-	uncontested EnterCS operation.
-
-	Ultimately, the named mutex trick is making use of the global locks maintained
-	by the kernel.
-
-	* pthread.h (pthread_once_t_): One flag and an event HANDLE added.
-	(PTHREAD_ONCE_INIT): Additional values included.
+	* implement.h (PTW32_ONCE_CLEAR): Defined.
+	(PTW32_ONCE_DONE): Defined.
+	(PTW32_ONCE_CANCELLED): Defined.
 
 2005-03-08  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
