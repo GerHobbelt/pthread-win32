@@ -348,7 +348,6 @@ ptw32_cond_wait_cleanup (void *args)
   if ((result = pthread_mutex_lock (cleanup_args->mutexPtr)) != 0)
     {
       *resultPtr = result;
-      return;
     }
 }				/* ptw32_cond_wait_cleanup */
 
