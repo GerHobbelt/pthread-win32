@@ -1,3 +1,124 @@
+2002-02-17  Ross Johnson  <rpj@setup1.ise.canberra.edu.au
+
+	* Testsuite passed.
+
+	* pthread_timechange_handler_np.c: New; following
+	a suggestion from Alexander Terekhov that CVs should
+	be broadcast so that they all re-evaluate their
+	condition variables and reset a new timeout if
+	required, whenever an application receives a
+	WM_TIMECHANGE message. This message indicates that
+	the system time has been changed. Therefore, CVs
+	waiting for a timeout set as an abs_time will possibly
+	not wake up at the expected time. Some applications
+	may not be tolerant of this.
+	* pthread_cond_init.c: Add CV to linked list.
+	* pthread_cond_destroy.c: Remove CV from linked list.
+	* global.c (ptw32_cond_list_head): New variable.
+	(ptw32_cond_list_tail): New variable.
+	(ptw32_cond_list_cs): New critical section.
+	* ptw32_processInitialize (ptw32_cond_list_cs): Initialize.
+	* ptw32_processTerminate (ptw32_cond_list_cs): Delete.
+
+
+	* Reduce executable size.
+	  -----------------------
+	When linking with the static library, only those
+	routines actually called, either directly or indirectly
+	should be included.
+
+	[Gcc has the -ffunction-segments option to do this but MSVC
+	doesn't have this feature as far as I can determine. Other
+	compilers are undetermined as well. - rpj]
+
+	* spin.c: Split file into function segments.
+	* ptw32_spinlock_check_need_init.c: Separated routine from spin.c.
+	* pthread_spin_init.c: Likewise.
+	* pthread_spin_destroy.c: Likewise.
+	* pthread_spin_lock.c: Likewise.
+	* pthread_spin_unlock.c: Likewise.
+	* pthread_spin_trylock.c: Likewise.
+
+	* sync.c: Split file into function segments.
+	* pthread_detach.c: Separated routine from sync.c.
+	* pthread_join.c: Likewise.
+
+	* tsd.c: Split file into function segments.
+	* pthread_key_create.c: Separated routine from tsd.c.
+	* pthread_key_delete.c: Likewise.
+	* pthread_setspecific.c: Likewise.
+	* pthread_getspecific.c: Likewise.
+
+	* sched.c: Split file into function segments.
+	* pthread_attr_setschedpolicy.c: Separated routine from sched.c.
+	* pthread_attr_getschedpolicy.c: Likewise.
+	* pthread_attr_setschedparam.c: Likewise.
+	* pthread_attr_getschedparam.c: Likewise.
+	* pthread_attr_setinheritsched.c: Likewise.
+	* pthread_attr_getinheritsched.c: Likewise.
+	* pthread_setschedparam.c: Likewise.
+	* pthread_getschedparam.c: Likewise.
+	* sched_get_priority_max.c: Likewise.
+	* sched_get_priority_min.c: Likewise.
+	* sched_setscheduler.c: Likewise.
+	* sched_getscheduler.c: Likewise.
+	* sched_yield.c: Likewise.
+
+
+2002-02-16  Ross Johnson  <rpj@setup1.ise.canberra.edu.au
+
+	Reduce executable size.
+	-----------------------
+	When linking with the static library, only those
+	routines actually called, either directly or indirectly
+	should be included.
+
+	[Gcc has the -ffunction-segments option to do this but MSVC
+	doesn't have this feature as far as I can determine. Other
+	compilers are undetermined as well. - rpj]
+
+	* mutex.c: Split file into function segments.
+	* pthread_mutexattr_destroy.c: Separated routine from mutex.c
+	* pthread_mutexattr_getpshared.c: Likewise.
+	* pthread_mutexattr_gettype.c: Likewise.
+	* pthread_mutexattr_init.c: Likewise.
+	* pthread_mutexattr_setpshared.c: Likewise.
+	* pthread_mutexattr_settype.c: Likewise.
+	* ptw32_mutex_check_need_init.c: Likewise.
+	* pthread_mutex_destroy.c: Likewise.
+	* pthread_mutex_init.c: Likewise.
+	* pthread_mutex_lock.c: Likewise.
+	* pthread_mutex_timedlock.c: Likewise.
+	* pthread_mutex_trylock.c: Likewise.
+	* pthread_mutex_unlock.c: Likewise.
+	
+	* private.c: Split file into function segments.
+	* ptw32_InterlockedCompareExchange.c: Separated routine from private.c
+	* ptw32_callUserDestroyRoutines.c: Likewise.
+	* ptw32_getprocessors.c: Likewise.
+	* ptw32_processInitialize.c: Likewise.
+	* ptw32_processTerminate.c: Likewise.
+	* ptw32_threadDestroy.c: Likewise.
+	* ptw32_threadStart.c: Likewise.
+	* ptw32_throw.c: Likewise.
+	* ptw32_timespec.c: Likewise.
+	* ptw32_tkAssocCreate.c: Likewise.
+	* ptw32_tkAssocDestroy.c: Likewise.
+
+	* rwlock.c: Split file into function segments.
+	* pthread_rwlockattr_destroy.c: Separated routine from rwlock.c
+	* pthread_rwlockattr_getpshared.c: Likewise.
+	* pthread_rwlockattr_init.c: Likewise.
+	* pthread_rwlockattr_setpshared.c: Likewise.
+	* ptw32_rwlock_check_need_init.c: Likewise.
+	* pthread_rwlock_destroy.c: Likewise.
+	* pthread_rwlock_init.c: Likewise.
+	* pthread_rwlock_rdlock.c: Likewise.
+	* pthread_rwlock_tryrdlock.c: Likewise.
+	* pthread_rwlock_trywrlock.c: Likewise.
+	* pthread_rwlock_unlock.c: Likewise.
+	* pthread_rwlock_wrlock.c: Likewise.
+
 2002-02-10  Ross Johnson  <rpj@setup1.ise.canberra.edu.au
 
 	Reduce executable size.
@@ -14,8 +135,10 @@
 	* np_delay.c: Separated routine from nonportable.c
 	* np_getw32threadhandle.c: Likewise.
 	* np_mutexattr_setkind.c: Likewise.
+	* np_mutexattr_getkind.c: Likewise.
 	* np_num_processors.c: Likewise.
-	* np_win32_attach.c: Likewise.
+	* np_win32_attach_detach.c: Likewise.
+
 	* misc.c: Split file into function segments.
 	* pthread_equal.c: Separated routine from nonportable.c.
 	* pthread_getconcurrency.c: Likewise.
@@ -39,15 +162,15 @@
 	compilers are undetermined as well. - rpj]
 
 	* condvar.c: Split file into function segments.
-	* condvar_attr_destroy.c: Separated routine from condvar.c.
-	* condvar_attr_getpshared.c: Likewise.
-	* condvar_attr_init.c: Likewise.
-	* condvar_attr_setpshared.c: Likewise.
-	* condvar_check_need_init.c: Likewise.
-	* condvar_destroy.c: Likewise.
-	* condvar_init.c: Likewise.
-	* condvar_signal.c: Likewise.
-	* condvar_wait.c: Likewise.
+	* pthread_condattr_destroy.c: Separated routine from condvar.c.
+	* pthread_condattr_getpshared.c: Likewise.
+	* pthread_condattr_init.c: Likewise.
+	* pthread_condattr_setpshared.c: Likewise.
+	* ptw32_cond_check_need_init.c: Likewise.
+	* pthread_cond_destroy.c: Likewise.
+	* pthread_cond_init.c: Likewise.
+	* pthread_cond_signal.c: Likewise.
+	* pthread_cond_wait.c: Likewise.
 	
 2002-02-07  Alexander Terekhov<TEREKHOV@de.ibm.com>
 
@@ -78,17 +201,17 @@
 	This file is used to congregate the separate modules for
 	potential inline optimisation and backward build compatibility.
 	* cancel.c: Likewise.
-	* barrier_attr_destroy.c: Separated routine from cancel.c.
-	* barrier_attr_getpshared.c: Likewise.
-	* barrier_attr_init.c: Likewise.
-	* barrier_attr_setpshared.c: Likewise.
-	* barrier_destroy.c: Likewise.
-	* barrier_init.c: Likewise.
-	* barrier_wait.c: Likewise.
-	* cancel_cancel.c: Likewise.
-	* cancel_setcancelstate.c: Likewise.
-	* cancel_setcanceltype.c: Likewise.
-	* cancel_testcancel.c: Likewise.
+	* pthread_barrierattr_destroy.c: Separated routine from cancel.c.
+	* pthread_barrierattr_getpshared.c: Likewise.
+	* pthread_barrierattr_init.c: Likewise.
+	* pthread_barrierattr_setpshared.c: Likewise.
+	* pthread_barrier_destroy.c: Likewise.
+	* pthread_barrier_init.c: Likewise.
+	* pthread_barrier_wait.c: Likewise.
+	* pthread_cancel.c: Likewise.
+	* pthread_setcancelstate.c: Likewise.
+	* pthread_setcanceltype.c: Likewise.
+	* pthread_testcancel.c: Likewise.
 
 2002-02-04  Max Woodbury <mtew@cds.duke.edu>
 
@@ -123,19 +246,19 @@
 	* semaphore.c: All routines are now in separate compilation units;
 	This file is used to congregate the separate modules for
 	potential inline optimisation and backward build compatibility.
-	* semaphore_close.c: Separated routine from semaphore.c.
-	* semaphore_decrease.c: Likewise.
-	* semaphore_destroy.c: Likewise.
-	* semaphore_getvalue.c: Likewise.
-	* semaphore_increase.c: Likewise.
-	* semaphore_init.c: Likewise.
-	* semaphore_open.c: Likewise.
-	* semaphore_post.c: Likewise.
-	* semaphore_postmultiple.c: Likewise.
-	* semaphore_timedwait.c: Likewise.
-	* semaphore_trywait.c: Likewise.
-	* semaphore_unlink.c: Likewise.
-	* semaphore_wait.c: Likewise.
+	* sem_close.c: Separated routine from semaphore.c.
+	* ptw32_decrease_semaphore.c: Likewise.
+	* sem_destroy.c: Likewise.
+	* sem_getvalue.c: Likewise.
+	* ptw32_increase_semaphore.c: Likewise.
+	* sem_init.c: Likewise.
+	* sem_open.c: Likewise.
+	* sem_post.c: Likewise.
+	* sem_post_multiple.c: Likewise.
+	* sem_timedwait.c: Likewise.
+	* sem_trywait.c: Likewise.
+	* sem_unlink.c: Likewise.
+	* sem_wait.c: Likewise.
 
 2002-02-04  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
@@ -144,17 +267,17 @@
 	* attr.c: All routines are now in separate compilation units;
 	This file is used to congregate the separate modules for
 	potential inline optimisation and backward build compatibility.
-	* attr_destroy.c: Separated routine from attr.c.
-	* attr_getdetachstate.c: Likewise.
-	* attr_getscope.c: Likewise.
-	* attr_getstackaddr.c: Likewise.
-	* attr_getstacksize.c: Likewise.
-	* attr_init.c: Likewise.
-	* attr_is_attr.c: Likewise.
-	* attr_setdetachstate.c: Likewise.
-	* attr_setscope.c: Likewise.
-	* attr_setstackaddr.c: Likewise.
-	* attr_setstacksize.c: Likewise.
+	* pthread_attr_destroy.c: Separated routine from attr.c.
+	* pthread_attr_getdetachstate.c: Likewise.
+	* pthread_attr_getscope.c: Likewise.
+	* pthread_attr_getstackaddr.c: Likewise.
+	* pthread_attr_getstacksize.c: Likewise.
+	* pthread_attr_init.c: Likewise.
+	* pthread_attr_is_attr.c: Likewise.
+	* pthread_attr_setdetachstate.c: Likewise.
+	* pthread_attr_setscope.c: Likewise.
+	* pthread_attr_setstackaddr.c: Likewise.
+	* pthread_attr_setstacksize.c: Likewise.
 
 	* pthread.c: Agregation of agregate modules for super-inlineability.
 

@@ -38,8 +38,8 @@
 #include "implement.h"
 
 
-#include "cancel_setcancelstate.c"
-#include "cancel_setcanceltype.c"
-#include "cancel_testcancel.c"
-#include "cancel_cancel.c"
+#include "pthread_setcancelstate.c"
+#include "pthread_setcanceltype.c"
+#include "pthread_testcancel.c"
+#include "pthread_cancel.c"
 

@@ -90,78 +90,133 @@ DLL_OBJS	= \
 
 # Separate modules for minimum size statically linked images
 SMALL_STATIC_OBJS	= \
-		attr_is_attr.o \
-		attr_init.o \
-		attr_destroy.o \
-		attr_getdetachstate.o \
-		attr_setdetachstate.o \
-		attr_getstackaddr.o \
-		attr_setstackaddr.o \
-		attr_getstacksize.o \
-		attr_setstacksize.o \
-		attr_getscope.o \
-		attr_setscope.o \
-		barrier_init.o \
-		barrier_destroy.o \
-		barrier_wait.o \
-		barrier_attr_init.o \
-		barrier_attr_destroy.o \
-		barrier_attr_setpshared.o \
-		barrier_attr_getpshared.o \
-		cancel_setcancelstate.o \
-		cancel_setcanceltype.o \
-		cancel_testcancel.o \
-		cancel_cancel.o \
+		pthread_attr_init.o \
+		pthread_attr_destroy.o \
+		pthread_attr_getdetachstate.o \
+		pthread_attr_setdetachstate.o \
+		pthread_attr_getstackaddr.o \
+		pthread_attr_setstackaddr.o \
+		pthread_attr_getstacksize.o \
+		pthread_attr_setstacksize.o \
+		pthread_attr_getscope.o \
+		pthread_attr_setscope.o \
+		pthread_attr_setschedpolicy.o \
+		pthread_attr_getschedpolicy.o \
+		pthread_attr_setschedparam.o \
+		pthread_attr_getschedparam.o \
+		pthread_attr_setinheritsched.o \
+		pthread_attr_getinheritsched.o \
+		pthread_barrier_init.o \
+		pthread_barrier_destroy.o \
+		pthread_barrier_wait.o \
+		pthread_barrierattr_init.o \
+		pthread_barrierattr_destroy.o \
+		pthread_barrierattr_setpshared.o \
+		pthread_barrierattr_getpshared.o \
+		pthread_setcancelstate.o \
+		pthread_setcanceltype.o \
+		pthread_testcancel.o \
+		pthread_cancel.o \
 		cleanup.o \
-		condvar_attr_destroy.o \
-		condvar_attr_getpshared.o \
-		condvar_attr_init.o \
-		condvar_attr_setpshared.o \
-		condvar_check_need_init.o \
-		condvar_destroy.o \
-		condvar_init.o \
-		condvar_signal.o \
-		condvar_wait.o \
+		pthread_condattr_destroy.o \
+		pthread_condattr_getpshared.o \
+		pthread_condattr_init.o \
+		pthread_condattr_setpshared.o \
+		pthread_cond_destroy.o \
+		pthread_cond_init.o \
+		pthread_cond_signal.o \
+		pthread_cond_wait.o \
 		create.o \
 		dll.o \
 		errno.o \
 		exit.o \
 		fork.o \
 		global.o \
-		mutex.o \
-		np_mutexattr_setkind.o \
-		np_mutexattr_getkind.o \
-		np_getw32threadhandle.o \
-		np_delay.o \
-		np_num_processors.o \
-		np_win32_attach.o \
-		private.o \
+		pthread_mutex_init.o \
+		pthread_mutex_destroy.o \
+		pthread_mutexattr_init.o \
+		pthread_mutexattr_destroy.o \
+		pthread_mutexattr_getpshared.o \
+		pthread_mutexattr_setpshared.o \
+		pthread_mutexattr_settype.o \
+		pthread_mutexattr_gettype.o \
+		pthread_mutex_lock.o \
+		pthread_mutex_timedlock.o \
+		pthread_mutex_unlock.o \
+		pthread_mutex_trylock.o \
+		pthread_mutexattr_setkind_np.o \
+		pthread_mutexattr_getkind_np.o \
+		pthread_getw32threadhandle_np.o \
+		pthread_delay_np.o \
+		pthread_num_processors_np.o \
+		pthread_win32_attach_detach_np.o \
 		pthread_equal.o \
 		pthread_getconcurrency.o \
 		pthread_once.o \
 		pthread_self.o \
 		pthread_setconcurrency.o \
+		pthread_rwlock_init.o \
+		pthread_rwlock_destroy.o \
+		pthread_rwlockattr_init.o \
+		pthread_rwlockattr_destroy.o \
+		pthread_rwlockattr_getpshared.o \
+		pthread_rwlockattr_setpshared.o \
+		pthread_rwlock_rdlock.o \
+		pthread_rwlock_wrlock.o \
+		pthread_rwlock_unlock.o \
+		pthread_rwlock_tryrdlock.o \
+		pthread_rwlock_trywrlock.o \
+		pthread_setschedparam.o \
+		pthread_getschedparam.o \
+		pthread_timechange_handler_np.o \
+		ptw32_is_attr.o \
+		ptw32_cond_check_need_init.o \
+		ptw32_mutex_check_need_init.o \
+		ptw32_processInitialize.o \
+		ptw32_processTerminate.o \
+		ptw32_threadStart.o \
+		ptw32_threadDestroy.o \
+		ptw32_tkAssocCreate.o \
+		ptw32_tkAssocDestroy.o \
+		ptw32_callUserDestroyRoutines.o \
+		ptw32_timespec.o \
+		ptw32_throw.o \
+		ptw32_InterlockedCompareExchange.o \
+		ptw32_getprocessors.o \
 		ptw32_calloc.o \
 		ptw32_new.o \
-		rwlock.o \
-		sched.o \
-		semaphore_init.o \
-		semaphore_destroy.o \
-		semaphore_trywait.o \
-		semaphore_timedwait.o \
-		semaphore_wait.o \
-		semaphore_post.o \
-		semaphore_postmultiple.o \
-		semaphore_getvalue.o \
-		semaphore_increase.o \
-		semaphore_decrease.o \
-		semaphore_open.o \
-		semaphore_close.o \
-		semaphore_unlink.o \
+		ptw32_rwlock_check_need_init.o \
+		sched_get_priority_max.o \
+		sched_get_priority_min.o \
+		sched_setscheduler.o \
+		sched_getscheduler.o \
+		sched_yield.o \
+		sem_init.o \
+		sem_destroy.o \
+		sem_trywait.o \
+		sem_timedwait.o \
+		sem_wait.o \
+		sem_post.o \
+		sem_post_multiple.o \
+		sem_getvalue.o \
+		sem_open.o \
+		sem_close.o \
+		sem_unlink.o \
+		ptw32_increase_semaphore.o \
+		ptw32_decrease_semaphore.o \
 		signal.o \
-		spin.o \
-		sync.o \
-		tsd.o \
+		ptw32_spinlock_check_need_init.o \
+		pthread_spin_init.o \
+		pthread_spin_destroy.o \
+		pthread_spin_lock.o \
+		pthread_spin_unlock.o \
+		pthread_spin_trylock.o \
+		pthread_detach.o \
+		pthread_join.o \
+		pthread_key_create.o \
+		pthread_key_delete.o \
+		pthread_setspecific.o \
+		pthread_getspecific.o \
 		w32_CancelableWait.o
 
 INCL	= \
@@ -172,43 +227,42 @@ INCL	= \
 		need_errno.h
 
 ATTR_SRCS	= \
-		attr_is_attr.c \
-		attr_init.c \
-		attr_destroy.c \
-		attr_getdetachstate.c \
-		attr_setdetachstate.c \
-		attr_getstackaddr.c \
-		attr_setstackaddr.c \
-		attr_getstacksize.c \
-		attr_setstacksize.c \
-		attr_getscope.c \
-		attr_setscope.c
+		pthread_attr_init.c \
+		pthread_attr_destroy.c \
+		pthread_attr_getdetachstate.c \
+		pthread_attr_setdetachstate.c \
+		pthread_attr_getstackaddr.c \
+		pthread_attr_setstackaddr.c \
+		pthread_attr_getstacksize.c \
+		pthread_attr_setstacksize.c \
+		pthread_attr_getscope.c \
+		pthread_attr_setscope.c
 
 BARRIER_SRCS = \
-		barrier_init.c \
-		barrier_destroy.c \
-		barrier_wait.c \
-		barrier_attr_init.c \
-		barrier_attr_destroy.c \
-		barrier_attr_setpshared.c \
-		barrier_attr_getpshared.c
+		pthread_barrier_init.c \
+		pthread_barrier_destroy.c \
+		pthread_barrier_wait.c \
+		pthread_barrierattr_init.c \
+		pthread_barrierattr_destroy.c \
+		pthread_barrierattr_setpshared.c \
+		pthread_barrierattr_getpshared.c
 
 CANCEL_SRCS	= \
-		cancel_setcancelstate.c \
-		cancel_setcanceltype.c \
-		cancel_testcancel.c \
-		cancel_cancel.c 
+		pthread_setcancelstate.c \
+		pthread_setcanceltype.c \
+		pthread_testcancel.c \
+		pthread_cancel.c 
 
 CONDVAR_SRCS	= \
-		condvar_attr_destroy.c \
-		condvar_attr_getpshared.c \
-		condvar_attr_init.c \
-		condvar_attr_setpshared.c \
-		condvar_check_need_init.c \
-		condvar_destroy.c \
-		condvar_init.c \
-		condvar_signal.c \
-		condvar_wait.c
+		ptw32_cond_check_need_init.c \
+		pthread_condattr_destroy.c \
+		pthread_condattr_getpshared.c \
+		pthread_condattr_init.c \
+		pthread_condattr_setpshared.c \
+		pthread_cond_destroy.c \
+		pthread_cond_init.c \
+		pthread_cond_signal.c \
+		pthread_cond_wait.c
 
 MISC_SRCS	= \
 		pthread_equal.c \
@@ -220,28 +274,106 @@ MISC_SRCS	= \
 		ptw32_new.c \
 		w32_CancelableWait.c
 
+MUTEX_SRCS	= \
+		ptw32_mutex_check_need_init.c \
+		pthread_mutex_init.c \
+		pthread_mutex_destroy.c \
+		pthread_mutexattr_init.c \
+		pthread_mutexattr_destroy.c \
+		pthread_mutexattr_getpshared.c \
+		pthread_mutexattr_setpshared.c \
+		pthread_mutexattr_settype.c \
+		pthread_mutexattr_gettype.c \
+		pthread_mutex_lock.c \
+		pthread_mutex_timedlock.c \
+		pthread_mutex_unlock.c \
+		pthread_mutex_trylock.c
+
 NONPORTABLE_SRCS = \
-		np_mutexattr_setkind.c \
-		np_mutexattr_getkind.c \
-		np_getw32threadhandle.c \
-		np_delay.c \
-		np_num_processors.c \
-		np_win32_attach.c
+		pthread_mutexattr_setkind_np.c \
+		pthread_mutexattr_getkind_np.c \
+		pthread_getw32threadhandle_np.c \
+		pthread_delay_np.c \
+		pthread_num_processors_np.c \
+		pthread_win32_attach_detach_np.c \
+		pthread_timechange_handler_np.c 
+
+PRIVATE_SRCS	= \
+		ptw32_is_attr.c \
+		ptw32_processInitialize.c \
+		ptw32_processTerminate.c \
+		ptw32_threadStart.c \
+		ptw32_threadDestroy.c \
+		ptw32_tkAssocCreate.c \
+		ptw32_tkAssocDestroy.c \
+		ptw32_callUserDestroyRoutines.c \
+		ptw32_timespec.c \
+		ptw32_throw.c \
+		ptw32_InterlockedCompareExchange.c \
+		ptw32_getprocessors.c
+
+RWLOCK_SRCS	= \
+		ptw32_rwlock_check_need_init.c \
+		pthread_rwlock_init.c \
+		pthread_rwlock_destroy.c \
+		pthread_rwlockattr_init.c \
+		pthread_rwlockattr_destroy.c \
+		pthread_rwlockattr_getpshared.c \
+		pthread_rwlockattr_setpshared.c \
+		pthread_rwlock_rdlock.c \
+		pthread_rwlock_wrlock.c \
+		pthread_rwlock_unlock.c \
+		pthread_rwlock_tryrdlock.c \
+		pthread_rwlock_trywrlock.c
+
+SCHED_SRCS	= \
+		pthread_attr_setschedpolicy.c \
+		pthread_attr_getschedpolicy.c \
+		pthread_attr_setschedparam.c \
+		pthread_attr_getschedparam.c \
+		pthread_attr_setinheritsched.c \
+		pthread_attr_getinheritsched.c \
+		pthread_setschedparam.c \
+		pthread_getschedparam.c \
+		sched_get_priority_max.c \
+		sched_get_priority_min.c \
+		sched_setscheduler.c \
+		sched_getscheduler.c \
+		sched_yield.c
 
 SEMAPHORE_SRCS = \
-		semaphore_init.c \
-		semaphore_destroy.c \
-		semaphore_trywait.c \
-		semaphore_timedwait.c \
-		semaphore_wait.c \
-		semaphore_post.c \
-		semaphore_postmultiple.c \
-		semaphore_getvalue.c \
-		semaphore_increase.c \
-		semaphore_decrease.c \
-		semaphore_open.c \
-		semaphore_close.c \
-		semaphore_unlink.c
+		sem_init.c \
+		sem_destroy.c \
+		sem_trywait.c \
+		sem_timedwait.c \
+		sem_wait.c \
+		sem_post.c \
+		sem_post_multiple.c \
+		sem_getvalue.c \
+		sem_open.c \
+		sem_close.c \
+		sem_unlink.c \
+		ptw32_increase_semaphore.c \
+		ptw32_decrease_semaphore.c
+
+SPIN_SRCS	= \
+		ptw32_spinlock_check_need_init.c \
+		pthread_spin_init.c \
+		pthread_spin_destroy.c \
+		pthread_spin_lock.c \
+		pthread_spin_unlock.c \
+		pthread_spin_trylock.c
+
+SYNC_SRCS	= \
+		pthread_detach.c \
+		pthread_join.c
+
+TSD_SRCS	= \
+		pthread_key_create.c \
+		pthread_key_delete.c \
+		pthread_setspecific.c \
+		pthread_getspecific.c
+
 
 GC_DLL 	= pthreadGC.dll
 GCE_DLL	= pthreadGCE.dll
@@ -305,5 +437,12 @@ barrier.o:	barrier.c $(BARRIER_SRCS) $(INCL)
 cancel.o:	cancel.c $(CANCEL_SRCS) $(INCL)
 condvar.o:	condvar.c $(CONDVAR_SRCS) $(INCL)
 misc.o:		misc.c $(MISC_SRCS) $(INCL)
+mutex.o:	mutex.c $(MUTEX_SRCS) $(INCL)
 nonportable.o:	nonportable.c $(NONPORTABLE_SRCS) $(INCL)
+private.o:	private.c $(PRIVATE_SRCS) $(INCL)
+rwlock.o:	rwlock.c $(RWLOCK_SRCS) $(INCL)
+sched.o:	sched.c $(SCHED_SRCS) $(INCL)
 semaphore.o:	semaphore.c $(SEMAPHORE_SRCS) $(INCL)
+spin.o:		spin.c $(SPIN_SRCS) $(INCL)
+sync.o:		sync.c $(SYNC_SRCS) $(INCL)
+tsd.o:		tsd.c $(TSD_SRCS) $(INCL)

@@ -43,7 +43,7 @@
 #include "pthread_equal.c"
 #include "pthread_setconcurrency.c"
 #include "pthread_getconcurrency.c"
-#include "w32_CancelableWait.c"
 #include "ptw32_new.c"
 #include "ptw32_calloc.c"
+#include "w32_CancelableWait.c"
 

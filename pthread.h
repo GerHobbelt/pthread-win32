@@ -2,32 +2,32 @@
  *
  * --------------------------------------------------------------------------
  *
- *      Pthreads-win32 - POSIX Threads Library for Win32
- *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2002 Pthreads-win32 contributors
+ *	Pthreads-win32 - POSIX Threads Library for Win32
+ *	Copyright(C) 1998 John E. Bossom
+ *	Copyright(C) 1999,2002 Pthreads-win32 contributors
  * 
- *      Contact Email: rpj@ise.canberra.edu.au
+ *	Contact Email: rpj@ise.canberra.edu.au
  * 
- *      The current list of contributors is contained
- *      in the file CONTRIBUTORS included with the source
- *      code distribution. The list can also be seen at the
- *      following World Wide Web location:
- *      http://sources.redhat.com/pthreads-win32/contributors.html
+ *	The current list of contributors is contained
+ *	in the file CONTRIBUTORS included with the source
+ *	code distribution. The list can also be seen at the
+ *	following World Wide Web location:
+ *	http://sources.redhat.com/pthreads-win32/contributors.html
  * 
- *      This library is free software; you can redistribute it and/or
- *      modify it under the terms of the GNU Lesser General Public
- *      License as published by the Free Software Foundation; either
- *      version 2 of the License, or (at your option) any later version.
+ *	This library is free software; you can redistribute it and/or
+ *	modify it under the terms of the GNU Lesser General Public
+ *	License as published by the Free Software Foundation; either
+ *	version 2 of the License, or (at your option) any later version.
  * 
- *      This library is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *      Lesser General Public License for more details.
+ *	This library is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *	Lesser General Public License for more details.
  * 
- *      You should have received a copy of the GNU Lesser General Public
- *      License along with this library in the file COPYING.LIB;
- *      if not, write to the Free Software Foundation, Inc.,
- *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *	You should have received a copy of the GNU Lesser General Public
+ *	License along with this library in the file COPYING.LIB;
+ *	if not, write to the Free Software Foundation, Inc.,
+ *	59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
 #if !defined( PTHREAD_H )
@@ -549,6 +549,10 @@ struct pthread_once_t_
 
 #define PTHREAD_SPINLOCK_INITIALIZER ((pthread_spinlock_t) -1)
 
+
+/*
+ * Mutex types.
+ */
 enum
 {
   /* Compatibility with LinuxThreads */
@@ -1019,11 +1023,6 @@ int pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr, int *kind);
  * Possibly supported by other POSIX threads implementations
  */
 int pthread_delay_np (struct timespec * interval);
-
-/*
- * Returns the number of CPUs available to the process.
- */
-int pthread_getprocessors_np(int * count);
 int pthread_num_processors_np(void);
 
 /*
@@ -1034,6 +1033,16 @@ int pthread_win32_process_attach_np(void);
 int pthread_win32_process_detach_np(void);
 int pthread_win32_thread_attach_np(void);
 int pthread_win32_thread_detach_np(void);
+
+/*
+ * Register a system time change with the library.
+ * Causes the library to perform various functions
+ * in response to the change. Should be called whenever
+ * the application's top level window receives a
+ * WM_TIMECHANGE message. It can be passed directly to
+ * pthread_create() as a new thread if desired.
+ */
+void * pthread_timechange_handler_np(void *);
 
 #endif /*PTW32_LEVEL >= PTW32_LEVEL_MAX - 1 */
 

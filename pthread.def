@@ -1,5 +1,5 @@
 ; pthread.def
-; Last updated: $Date: 2002/02/11 01:53:22 $
+; Last updated: $Date: 2002/02/18 03:16:55 $
 
 ; Currently unimplemented functions are commented out.
 
@@ -136,11 +136,12 @@ pthread_barrierattr_setpshared
 pthread_delay_np
 pthread_mutexattr_getkind_np
 pthread_mutexattr_setkind_np
+pthread_num_processors_np
 ;
 ; Non-portable local implementation only
 ;
 pthread_getw32threadhandle_np
-pthread_num_processors_np
+pthread_timechange_handler_np
 pthreadCancelableWait
 pthreadCancelableTimedWait
 ;

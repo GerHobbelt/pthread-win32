@@ -59,19 +59,19 @@
 #include "implement.h"
 
 
-#include "semaphore_init.c"
-#include "semaphore_destroy.c"
-#include "semaphore_trywait.c"
-#include "semaphore_wait.c"
-#include "semaphore_timedwait.c"
-#include "semaphore_post.c"
-#include "semaphore_postmultiple.c"
-#include "semaphore_getvalue.c"
-#include "semaphore_open.c"
-#include "semaphore_close.c"
-#include "semaphore_unlink.c"
+#include "sem_init.c"
+#include "sem_destroy.c"
+#include "sem_trywait.c"
+#include "sem_wait.c"
+#include "sem_timedwait.c"
+#include "sem_post.c"
+#include "sem_post_multiple.c"
+#include "sem_getvalue.c"
+#include "sem_open.c"
+#include "sem_close.c"
+#include "sem_unlink.c"
 #ifdef NEED_SEM
-#include "semaphore_decrease.c"
-#include "semaphore_increase.c"
+#include "ptw32_decrease_semaphore.c"
+#include "ptw32_increase_semaphore.c"
 #endif
 

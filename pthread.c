@@ -2,7 +2,7 @@
  * pthread.c
  *
  * Description:
- * This translation unit agregates operations on threads.
+ * This translation unit agregates pthreads-win32 translation units.
  * It is used for inline optimisation of the library,
  * maximising for speed at the expense of size.
  *
@@ -42,4 +42,9 @@
 #include "attr.c"
 #include "barrier.c"
 #include "cancel.c"
+#include "condvar.c"
+#include "misc.c"
+#include "mutex.c"
+#include "private.c"
+#include "rwlock.c"
 #include "semaphore.c"

@@ -42,6 +42,8 @@
 int ptw32_processInitialized = FALSE;
 pthread_key_t ptw32_selfThreadKey = NULL;
 pthread_key_t ptw32_cleanupKey = NULL;
+pthread_cond_t ptw32_cond_list_head = NULL;
+pthread_cond_t ptw32_cond_list_tail = NULL;
 
 int ptw32_concurrency = 0;
 
@@ -76,6 +78,13 @@ CRITICAL_SECTION ptw32_rwlock_test_init_lock;
  * created spin locks.
  */
 CRITICAL_SECTION ptw32_spinlock_test_init_lock;
+
+/*
+ * Global lock for condition variable linked list. The list exists
+ * to wake up CVs when a WM_TIMECHANGE message arrives. See
+ * w32_TimeChangeHandler.c.
+ */
+CRITICAL_SECTION ptw32_cond_list_lock;
 
 #ifdef _UWIN
 /*
