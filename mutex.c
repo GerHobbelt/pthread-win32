@@ -730,6 +730,9 @@ pthread_mutexattr_settype (pthread_mutexattr_t * attr,
       *          thread has locked will return  with  an  error.  A
       *          thread attempting to unlock an unlocked mutex will
       *          return with an error.
+      *
+      * PTHREAD_MUTEX_DEFAULT
+      *          Same as PTHREAD_MUTEX_ERRORCHECK.
       * 
       * PTHREAD_MUTEX_RECURSIVE
       *          A thread attempting to relock this  mutex  without
@@ -827,17 +830,14 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
   mx = *mutex;
   self = pthread_self();
 
-  ptw32_EnterCriticalSection(&mx->cs);
-
   switch (mx->type)
     {
     case PTHREAD_MUTEX_NORMAL:
       if (pthread_equal(mx->ownerThread, self))
         {
-          ptw32_LeaveCriticalSection(&mx->cs);
           /*
            * Pretend to be deadlocked but release the
-           * mutex if we are canceled.
+           * mutex if we are [asynchronously] canceled.
            */
           pthread_cleanup_push(pthread_mutex_unlock, (void *) mutex);
           while (TRUE)
@@ -846,19 +846,24 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
             }
           pthread_cleanup_pop(1);
         }
+      else
+        {
+          ptw32_EnterCriticalSection(&mx->cs);
+        }
       break;
     case PTHREAD_MUTEX_DEFAULT:
     case PTHREAD_MUTEX_ERRORCHECK:
       if (pthread_equal(mx->ownerThread, self))
         {
-          ptw32_LeaveCriticalSection(&mx->cs);
           result = EDEADLK;
+        }
+      else
+        {
+          ptw32_EnterCriticalSection(&mx->cs);
         }
       break;
     case PTHREAD_MUTEX_RECURSIVE:
-      /*
-       * Nothing more to do.
-       */
+      ptw32_EnterCriticalSection(&mx->cs);
       break;
     default:
       result = EINVAL;

@@ -25,6 +25,25 @@
 
 2001-01-10  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
+	* mutex.c (pthread_mutexattr_settype): New; allow
+	the following types of mutex:
+	  PTHREAD_MUTEX_DEFAULT
+	  PTHREAD_MUTEX_NORMAL
+	  PTHREAD_MUTEX_ERRORCHECK
+	  PTHREAD_MUTEX_RECURSIVE
+	(pthread_mutex_lock): Process the lock request
+	according to the mutex type.
+	
+	* mutex.c: No longer use Win32 mutexes as the
+	basis of POSIX mutexes when TryEnterCriticalSection
+	isn't supported; implement our own versions of
+	ptw32_{Initialize,Delete,TryEnter,Enter,Leave}CriticalSection
+	functions to emulate TryEnterCriticalSection when
+	it isn't supported by the system; don't allow recursive
+	mutex locks (similar to PTHREAD_MUTEX_ERRORCHECK
+	on other systems).
+	- Thomas Pfaff <tpfaff@gmx.net>
+
 	* rwlock.c (ptw32_rwlock_cancelwrwait): Renamed.
 	(ptw32_rwlock_cancelrdwait): Renamed.
 
