@@ -121,6 +121,8 @@ fork()
       /* Terminate all threads except pthread_self() using
 	 pthread_cancel(). */
       _pthread_cancel_all_not_self();
+
+      /* Wait for them to finish before we continue. */
       _pthread_join_all_not_self();
 
       return 0;
