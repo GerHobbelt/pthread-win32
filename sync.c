@@ -73,7 +73,7 @@ pthread_detach(pthread_t thread)
 
   this = _pthread_find_thread_entry(thread);
 
-  if (this = -1)
+  if (this == -1)
     {
       return ESRCH;
     }

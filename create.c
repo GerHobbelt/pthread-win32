@@ -24,6 +24,11 @@ _pthread_start_call(void * thisarg)
   unsigned ret;
   int from;
 
+  if (this->detached == PTHREAD_CREATE_DETACHED)
+    {
+      (void) CloseHandle(this->thread);
+    }
+
   func = this->call.routine;
   arg = this->call.arg;
 

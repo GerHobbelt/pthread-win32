@@ -1,3 +1,10 @@
+Fri Jul 24 16:33:17 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* sync.c (pthread_detach): Use equality test, not assignment.
+
+	* create.c (_pthread_start_call): Add call to Win32 CloseHandle()
+	if thread is detached.
+
 1998-07-24  Ben Elliston  <bje@cygnus.com>
 
 	* sync.c (pthread_detach): Close the Win32 thread handle to
