@@ -88,9 +88,10 @@ Q 2	Now that pthreads-win32 builds under Mingw32, why do I get
 
 A 2
 ---
-Note:
+Note: issue resolved.
 The latest Mingw32 package has thread-safe exception handling.
 Make sure you also read A 6 below to get a fully working build.
+
 
 The following email exchange describes the problem. Until this issue
 is resolved people without the Microsoft compiler can obtain the current
@@ -219,6 +220,12 @@ cancelled as soon as possible.
 However ...
 
 Snapshot 99-11-02 or earlier only partially supports asynchronous cancellation.
+Snapshots since then simulate async cancelation by poking the address of
+a cancelation routine into the PC of the threads context. This requires
+the thread to be resumed in some way for the cancelation to actually
+proceed. This is not true async cancelation, but it is as close as we've
+been able to get to it.
+
 If the thread you're trying to cancel is blocked (for instance, it could be
 waiting for data from the network), it will only get cancelled when it unblocks
 (when the data arrives). Unfortunately, there is no way to do so from
@@ -232,7 +239,7 @@ pthreads-win32 library.
 
 Incidently, it's worth noting for code portability that the POSIX
 threads standard list doesn't include "select" because (as I read in
-Butenhof) it isn't recognised by POSIX.
+Butenhof) it isn't part of POSIX.
 
 Effectively, the only cancelation points that pthreads-win32 can
 recognise are those the library implements itself, ie.
