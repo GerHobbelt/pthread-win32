@@ -1,15 +1,32 @@
 1998-07-12  Ben Elliston  <bje@cygnus.com>
 
-	* pthread.h (pthread_mutexattr_t): Define this type.
-	(pthread_mutexattr_setprotocol): Add function prototype.
-	(pthread_mutexattr_getprotocol): Likewise.
-	(pthread_mutexattr_setprioceiling): Likewise.
-	(pthread_mutexattr_getprioceiling): Likewise.
+	* implement.h (_pthread_mutex_attr_t): Define this implementation
+	internal type.  Application programmers only see a mutex attribute
+	object as a void pointer.
 
-	* mutex.c (pthread_mutexattr_setprotocol): Implement.
+	* pthread.h (pthread_mutexattr_t): Define this type.
+	(pthread_mutexattr_init): Add function prototype.
+	(pthread_mutexattr_destroy): Likewise.
+	(pthread_mutexattr_setpshared): Likewise.
+	(pthread_mutexattr_getpshared): Likewise.
+	(pthread_mutexattr_setprotocol): Likewise.
 	(pthread_mutexattr_getprotocol): Likewise.
 	(pthread_mutexattr_setprioceiling): Likewise.
 	(pthread_mutexattr_getprioceiling): Likewise.
+	(PTHREAD_PROCESS_PRIVATE): Define.
+	(PTHREAD_PROCESS_SHARED): Define.
+
+	* mutex.c (pthread_mutexattr_init): Implement.
+	(pthread_mutexattr_destroy): Implement.
+	(pthread_mutexattr_setprotocol): Implement.
+	(pthread_mutexattr_getprotocol): Likewise.
+	(pthread_mutexattr_setprioceiling): Likewise.
+	(pthread_mutexattr_getprioceiling): Likewise.
+	(pthread_mutexattr_setpshared): Likewise.
+	(pthread_mutexattr_getpshared): Likewise.
+	(insert_attr): New function; very preliminary implementation!
+	(is_attr): Likewise.
+	(remove_attr): Likewise.
 	
 Sat Jul 11 14:48:54 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
