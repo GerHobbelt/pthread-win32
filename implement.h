@@ -9,10 +9,23 @@
 
 /* FIXME: Arbitrary. Need values from Win32.
  */
-#define PTHREAD_THREADS_MAX 256
+#define PTHREAD_THREADS_MAX 128
 #define PTHREAD_STACK_MIN   65535
 
-extern DWORD pthreads_thread_count;
+#define _PTHREAD_HASH_INDEX(x) (((ULONG) x) % PTHREAD_THREADS_MAX)
+
+typedef struct _pthread_cleanup_stack _pthread_cleanup_stack_t;
+struct _pthread_cleanup_stck {
+  _pthread_cleanup_stack_t first;
+  int count;
+};
+
+typedef struct _pthread_cleanup_node _pthread_cleanup_node_t;
+struct _pthread_cleanup_node {
+  _pthread_cleanup_node_t next;
+  void (* routine)(void *);
+  void * arg;
+};
 
 typedef struct {
   size_t stacksize;
@@ -27,3 +40,5 @@ typedef struct {
 } _pthread_condattr_t;
 
 #endif /* _IMPLEMENT_H */
+
+

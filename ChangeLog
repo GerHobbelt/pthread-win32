@@ -1,3 +1,31 @@
+Mon Jul 20 02:31:05 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* private.c (_pthread_getthreadindex): Implement.
+
+	* pthread.h: Add application static data dependent on
+	_PTHREADS_BUILD_DLL define. This is needed to avoid allocating
+	non-sharable static data within the pthread DLL.
+
+	* implement.h: Add _pthread_cleanup_stack_t, _pthread_cleanup_node_t
+	and _PTHREAD_HASH_INDEX.
+
+	* exit.c (pthread_exit): Begin work on cleanup and de-allocate
+	thread-private storage.
+
+	* create.c (pthread_create): Add thread to thread table.
+	Keep a thread-private copy of the attributes with default values
+	filled in when necessary. Same for the cleanup stack. Make 
+	pthread_create C run-time library friendly by using _beginthreadex()
+	instead of CreateThread(). Fix error returns.
+
+Sun Jul 19 16:26:23 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Rename pthreads_thread_count to _pthread_threads_count.
+	Create _pthread_threads_thread_t struct to keep thread specific data.
+
+	* create.c: Rename pthreads_thread_count to _pthread_threads_count.
+	(pthread_create): Handle errors from CreateThread().
+
 1998-07-19  Ben Elliston  <bje@cygnus.com>
 
 	* condvar.c (pthread_cond_wait): Generalise.  Moved from here ..
