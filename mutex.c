@@ -55,21 +55,6 @@ pthread_mutexattr_destroy(pthread_mutexattr_t *attr)
 }
 
 int
-pthread_mutexattr_setpshared(pthread_mutexattr_t *attr, int process_shared)
-{
-  /* This function is not supported. */
-  return ENOSYS;
-}
-
-int
-pthread_mutexattr_getpshared(const pthread_mutexattr_t *attr,
-			     int *process_shared)
-{
-  /* This function is not supported. */
-  return ENOSYS;
-}
-  
-int
 pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   EnterCriticalSection(mutex);
