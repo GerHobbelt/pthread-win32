@@ -30,38 +30,24 @@ _mutex_check_need_init(pthread_mutex_t *mutex)
    * so we can serialise access to internal state using
    * Win32 Critical Sections rather than Win32 Mutexes.
    *
-   * We still have a problem in that we would like a per-mutex
-   * lock, but attempting to create one will again lead
-   * to a race condition. We are forced to use a global
-   * lock in this instance.
-   *
    * If using a single global lock slows applications down too much,
    * multiple global locks could be created and hashed on some random
    * value associated with each mutex, the pointer perhaps. At a guess,
    * a good value for the optimal number of global locks might be
    * the number of processors + 1.
    *
-   * We need to maintain the following per-mutex state independently:
-   *   - mutex staticinit (true iff mutex is static and still
-   *                        needs to be initialised)
-   *   - mutex valid (false iff mutex has been destroyed)
-   *
-   * For example, in this implementation a mutex initialised by
-   * PTHREAD_MUTEX_INITIALIZER will be 'valid' but uninitialised until
-   * the thread attempts to lock it. It can also be destroyed (made invalid)
-   * before ever being locked.
    */
   EnterCriticalSection(&_pthread_mutex_test_init_lock);
 
   /*
-   * We got here because staticinit tested true, possibly under race
-   * conditions. Check staticinit again inside the critical section
+   * We got here possibly under race
+   * conditions. Check again inside the critical section
    * and only initialise if the mutex is valid (not been destroyed).
    * If a static mutex has been destroyed, the application can
    * re-initialise it only by calling pthread_mutex_init()
    * explicitly.
    */
-  if (mutex->staticinit && mutex->valid)
+  if (*mutex == (pthread_mutex_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
       result = pthread_mutex_init(mutex, NULL);
     }
@@ -75,21 +61,24 @@ int
 pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 {
   int result = 0;
+  pthread_mutex_t mx;
 
   if (mutex == NULL)
     {
       return EINVAL;
     }
 
-  mutex->mutex = 0;
+  mx = *mutex;
 
-  /* 
-   * Assuming any race condition here is harmless.
-   */
-  if (mutex->valid && !mutex->staticinit)
+  mx = (pthread_mutex_t) calloc(1, sizeof(*mx));
+
+  if (mx == NULL)
     {
-      return EBUSY;
+      result = ENOMEM;
+      goto FAIL0;
     }
+
+  mx->mutex = 0;
 
   if (attr != NULL
       && *attr != NULL
@@ -108,11 +97,11 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 
 #error ERROR [__FILE__, line __LINE__]: Process shared mutexes are not supported yet.
 
-      mutex->mutex = CreateMutex (
+      mx->mutex = CreateMutex (
 				  NULL,
 				  FALSE,
 				  ????);
-      result = (mutex->mutex == 0) ? EAGAIN : 0;
+      result = (mx->mutex == 0) ? EAGAIN : 0;
 
 #else
 
@@ -131,7 +120,7 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 	  /* 
 	   * Create a critical section. 
 	   */
-	  InitializeCriticalSection(&mutex->cs);
+	  InitializeCriticalSection(&mx->cs);
 	}
       else
 	{
@@ -139,20 +128,21 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 	   * Create a mutex that can only be used within the
 	   * current process
 	   */
-	  mutex->mutex = CreateMutex (NULL,
-				      FALSE,
-				      NULL);
-	  result = (mutex->mutex == 0) ? EAGAIN : 0;
+	  mx->mutex = CreateMutex (NULL,
+				   FALSE,
+				   NULL);
+
+	  if (mx->mutex == 0)
+	    {
+	      result = EAGAIN;
+	      mx = NULL;
+	      goto FAIL0;
+	    }
 	}
     }
 
-  if (result == 0)
-    {
-      mutex->staticinit = 0;
-
-      /* Mark as valid. */
-      mutex->valid = 1;
-    }
+FAIL0:
+  *mutex = mx;
 
   return(result);
 }
@@ -161,33 +151,35 @@ int
 pthread_mutex_destroy(pthread_mutex_t *mutex)
 {
   int result = 0;
+  pthread_mutex_t mx;
 
-  if (mutex == NULL)
+  if (mutex == NULL
+      || *mutex == NULL)
     {
       return EINVAL;
     }
 
+  mx = *mutex;
+
   /*
    * Check to see if we have something to delete.
    */
-  if (!mutex->staticinit)
+  if (mx != (pthread_mutex_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
-      if (mutex->mutex == 0)
+      if (mx->mutex == 0)
 	{
-	  DeleteCriticalSection(&mutex->cs);
+	  DeleteCriticalSection(&mx->cs);
 	}
       else
 	{
-	  result = (CloseHandle (mutex->mutex) ? 0 : EINVAL);
+	  result = (CloseHandle (mx->mutex) ? 0 : EINVAL);
 	}
     }
 
   if (result == 0)
     {
-      mutex->mutex = 0;
-
-      /* Mark as invalid. */
-      mutex->valid = 0;
+      mx->mutex = 0;
+      *mutex = NULL;
     }
 
   return(result);
@@ -444,27 +436,35 @@ int
 pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   int result = 0;
+  pthread_mutex_t mx;
+
+  if (mutex == NULL || *mutex == NULL)
+    {
+      return EINVAL;
+    }
 
   /*
    * We do a quick check to see if we need to do more work
-   * to initialise a static mutex. We check 'staticinit'
+   * to initialise a static mutex. We check
    * again inside the guarded section of _mutex_check_need_init()
    * to avoid race conditions.
    */
-  if (mutex->staticinit == 1)
+  if (*mutex == (pthread_mutex_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
       result = _mutex_check_need_init(mutex);
     }
 
+  mx = *mutex;
+
   if (result == 0)
     {
-      if (mutex->mutex == 0)
+      if (mx->mutex == 0)
 	{
-	  EnterCriticalSection(&mutex->cs);
+	  EnterCriticalSection(&mx->cs);
 	}
       else
 	{
-	  result = (WaitForSingleObject(mutex->mutex, INFINITE) 
+	  result = (WaitForSingleObject(mx->mutex, INFINITE) 
 		    == WAIT_OBJECT_0)
 	    ? 0
 	    : EINVAL;
@@ -478,21 +478,29 @@ int
 pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   int result = 0;
+  pthread_mutex_t mx;
+
+  if (mutex == NULL || *mutex == NULL)
+    {
+      return EINVAL;
+    }
+
+  mx = *mutex;
 
   /* 
    * If the thread calling us holds the mutex then there is no
    * race condition. If another thread holds the
    * lock then we shouldn't be in here.
    */
-  if (!mutex->staticinit && mutex->valid)
+  if (mx != (pthread_mutex_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
-      if (mutex->mutex == 0)
+      if (mx->mutex == 0)
 	{
-	  LeaveCriticalSection(&mutex->cs);
+	  LeaveCriticalSection(&mx->cs);
 	}
       else
 	{
-	  result = (ReleaseMutex (mutex->mutex) ? 0 : EINVAL);
+	  result = (ReleaseMutex (mx->mutex) ? 0 : EINVAL);
 	}
     }
   else
@@ -507,28 +515,31 @@ int
 pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
   int result = 0;
+  pthread_mutex_t mx;
 
-  if (mutex == NULL)
+  if (mutex == NULL || *mutex == NULL)
     {
       return EINVAL;
     }
 
   /*
    * We do a quick check to see if we need to do more work
-   * to initialise a static mutex. We check 'staticinit'
+   * to initialise a static mutex. We check
    * again inside the guarded section of _mutex_check_need_init()
    * to avoid race conditions.
    */
-  if (mutex->staticinit)
+  if (*mutex == (pthread_mutex_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
       result = _mutex_check_need_init(mutex);
     }
 
+  mx = *mutex;
+
   if (result == 0)
     {
-      if (mutex->mutex == 0)
+      if (mx->mutex == 0)
 	{
-	  if ((*_pthread_try_enter_critical_section)(&mutex->cs) != TRUE)
+	  if ((*_pthread_try_enter_critical_section)(&mx->cs) != TRUE)
 	    {
 	      result = EBUSY;
 	    }
@@ -537,7 +548,7 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
 	{
 	  DWORD status;
 
-	  status = WaitForSingleObject (mutex->mutex, 0);
+	  status = WaitForSingleObject (mx->mutex, 0);
 
 	  if (status != WAIT_OBJECT_0)
 	    {

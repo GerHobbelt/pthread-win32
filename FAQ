@@ -5,22 +5,24 @@
 INDEX
 -----
 
-Q 1	How do I get pthreads-win32 to link under Cygwin or Mingw32?
+Q 1	Should I use Cygwin or Mingw32 as a development environment?
 
 Q 2	Now that pthreads-win32 builds under Mingw32, why do I get
 	memory access violations?
 
 =============================================================================
 
-Q 1	How do I get pthreads-win32 to link under Cygwin or Mingw32?
+Q 1	Should I use Cygwin or Mingw32 as a development environment?
 ---
 
 A 1
 ---
-The following email from Anders Norlander explains how to solve this
-problem. I think the proviso is that the DLL and your application should
-both be built with the same development environment (cygwin, mingw,
-or MSVC etc).
+Important: see Q2 also.
+
+I short, use Mingw32 with the MSVCRT library to build applications that use
+the DLL. You cannot build the library itself with either yet because the
+library uses C++ EH which is not thread-safe in egcs yet. Use MSVC or grab
+the pre-build DLL etc.
 
 Date: Mon, 07 Dec 1998 15:11:37 +0100
 From: Anders Norlander <anorland@hem2.passagen.se>

@@ -19,7 +19,7 @@ _cond_check_need_init(pthread_cond_t *cond)
 
   /*
    * The following guarded test is specifically for statically
-   * initialised condition variables (via PTHREAD_COND_INITIALIZER).
+   * initialised condition variables (via PTHREAD_OBJECT_INITIALIZER).
    *
    * Note that by not providing this synchronisation we risk
    * introducing race conditions into applications which are
@@ -31,38 +31,23 @@ _cond_check_need_init(pthread_cond_t *cond)
    * so we can serialise access to internal state using
    * Win32 Critical Sections rather than Win32 Mutexes.
    *
-   * We still have a problem in that we would like a per-mutex
-   * lock, but attempting to create one will again lead
-   * to a race condition. We are forced to use a global
-   * lock in this instance.
-   *
    * If using a single global lock slows applications down too much,
    * multiple global locks could be created and hashed on some random
    * value associated with each mutex, the pointer perhaps. At a guess,
    * a good value for the optimal number of global locks might be
    * the number of processors + 1.
    *
-   * We need to maintain the following per-cv state independently:
-   *   - cv staticinit (true iff cv is static and still
-   *                    needs to be initialised)
-   *   - cv valid (false iff cv has been destroyed)
-   *
-   * For example, in this implementation a cv initialised by
-   * PTHREAD_COND_INITIALIZER will be 'valid' but uninitialised until
-   * the thread attempts to use it. It can also be destroyed (made invalid)
-   * before ever being used.
    */
   EnterCriticalSection(&_pthread_cond_test_init_lock);
 
   /*
-   * We got here because staticinit tested true, possibly under race
-   * conditions. Check staticinit again inside the critical section
-   * and only initialise if the cv is valid (not been destroyed).
+   * We got here possibly under race
+   * conditions. Check again inside the critical section.
    * If a static cv has been destroyed, the application can
    * re-initialise it only by calling pthread_cond_init()
    * explicitly.
    */
-  if (cond->staticinit && cond->valid)
+  if (*cond == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
       result = pthread_cond_init(cond, NULL);
     }
@@ -342,18 +327,11 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
       */
 {
   int result = EAGAIN;
+  pthread_cond_t cv;
 
   if (cond == NULL)
     {
       return EINVAL;
-    }
-
-  /* 
-   * Assuming any race condition here is harmless.
-   */
-  if (cond->valid && !cond->staticinit)
-    {
-      return EBUSY;
     }
 
   if ((attr != NULL && *attr != NULL) &&
@@ -368,33 +346,36 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
       goto FAIL0;
     }
 
-  cond->waiters = 0;
-  cond->wasBroadcast = FALSE;
+  cv = (pthread_cond_t) calloc (1, sizeof (*cv));
 
-  if (_pthread_sem_init (&(cond->sema), 0, 0) != 0)
+  if (cv == NULL)
+    {
+      result = ENOMEM;
+      goto FAIL0;
+    }
+
+  cv->waiters = 0;
+  cv->wasBroadcast = FALSE;
+
+  if (_pthread_sem_init (&(cv->sema), 0, 0) != 0)
     {
       goto FAIL0;
     }
-  if (pthread_mutex_init (&(cond->waitersLock), NULL) != 0)
+  if (pthread_mutex_init (&(cv->waitersLock), NULL) != 0)
     {
       goto FAIL1;
     }
 
-  cond->waitersDone = CreateEvent (
-                                  0,
-                                  (int) FALSE,  /* manualReset  */
-                                  (int) FALSE,  /* setSignaled  */
-                                  NULL);
+  cv->waitersDone = CreateEvent (
+				 0,
+				 (int) FALSE,  /* manualReset  */
+				 (int) FALSE,  /* setSignaled  */
+				 NULL);
 
-  if (cond->waitersDone == NULL)
+  if (cv->waitersDone == NULL)
     {
       goto FAIL2;
     }
-
-  cond->staticinit = 0;
-
-  /* Mark as valid. */
-  cond->valid = 1;
 
   result = 0;
 
@@ -406,13 +387,15 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
    * -------------
    */
 FAIL2:
-  (void) pthread_mutex_destroy (&(cond->waitersLock));
+  (void) pthread_mutex_destroy (&(cv->waitersLock));
 
 FAIL1:
-  (void) _pthread_sem_destroy (&(cond->sema));
+  (void) _pthread_sem_destroy (&(cv->sema));
 
 FAIL0:
 DONE:
+  *cond = cv;
+
   return (result);
 
 }                               /* pthread_cond_init */
@@ -447,25 +430,30 @@ pthread_cond_destroy (pthread_cond_t * cond)
       */
 {
   int result = 0;
+  pthread_cond_t cv;
 
   /*
    * Assuming any race condition here is harmless.
    */
-  if (cond == NULL || cond->valid == 0 || cond->staticinit == 1)
+  if (cond == NULL 
+      || *cond == NULL)
     {
       return EINVAL;
     }
 
-  if (cond->waiters > 0)
+  cv = *cond;
+
+  if (cv->waiters > 0)
     {
       return EBUSY;
     }
 
-  (void) _pthread_sem_destroy (&(cond->sema));
-  (void) pthread_mutex_destroy (&(cond->waitersLock));
-  (void) CloseHandle (cond->waitersDone);
-      
-  cond->valid = 0;
+  (void) _pthread_sem_destroy (&(cv->sema));
+  (void) pthread_mutex_destroy (&(cv->waitersLock));
+  (void) CloseHandle (cv->waitersDone);
+
+  free(cv);
+  *cond = NULL;
 
   return (result);
 }
@@ -478,14 +466,22 @@ cond_timedwait (pthread_cond_t * cond,
   int result = 0;
   int internal_result = 0;
   int lastWaiter = FALSE;
+  pthread_cond_t cv;
+
+  if (cond == NULL || *cond == NULL)
+    {
+      return EINVAL;
+    }
+
+  cv = *cond;
 
   /*
    * We do a quick check to see if we need to do more work
-   * to initialise a static condition variable. We check 'staticinit'
+   * to initialise a static condition variable. We check
    * again inside the guarded section of _cond_check_need_init()
    * to avoid race conditions.
    */
-  if (cond->staticinit == 1)
+  if (cv == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
       result = _cond_check_need_init(cond);
     }
@@ -493,7 +489,7 @@ cond_timedwait (pthread_cond_t * cond,
   /*
    * OK to increment  cond->waiters because the caller locked 'mutex'
    */
-  cond->waiters++;
+  cv->waiters++;
 
   /*
    * We keep the lock held just long enough to increment the count of
@@ -518,23 +514,23 @@ cond_timedwait (pthread_cond_t * cond,
        */
       pthread_cleanup_push (pthread_mutex_lock, mutex);
 
-      result = _pthread_sem_timedwait (&(cond->sema), abstime);
+      result = _pthread_sem_timedwait (&(cv->sema), abstime);
 
       pthread_cleanup_pop (0);
     }
 
-  if ((internal_result = pthread_mutex_lock (&(cond->waitersLock))) == 0)
+  if ((internal_result = pthread_mutex_lock (&(cv->waitersLock))) == 0)
     {
       /*
        * By making the waiter responsible for decrementing
        * its count we don't have to worry about having an internal
        * mutex.
        */
-      cond->waiters--;
+      cv->waiters--;
 
-      lastWaiter = cond->wasBroadcast && (cond->waiters == 0);
+      lastWaiter = cv->wasBroadcast && (cv->waiters == 0);
 
-      internal_result = pthread_mutex_unlock (&(cond->waitersLock));
+      internal_result = pthread_mutex_unlock (&(cv->waitersLock));
     }
 
   if (result == 0 && internal_result == 0)
@@ -545,7 +541,7 @@ cond_timedwait (pthread_cond_t * cond,
            * If we are the last waiter on this broadcast
            * let the thread doing the broadcast proceed
            */
-          if (!SetEvent (cond->waitersDone))
+          if (!SetEvent (cv->waitersDone))
             {
               result = EINVAL;
             }
@@ -727,16 +723,19 @@ pthread_cond_signal (pthread_cond_t * cond)
       */
 {
   int result = 0;
+  pthread_cond_t cv;
 
-  if (cond == NULL || cond->valid == 0)
+  if (cond == NULL || *cond == NULL)
     {
       return EINVAL;
     }
 
+  cv = *cond;
+
   /*
    * No-op if the CV is static and hasn't been initialised yet.
    */
-  if (cond->staticinit == 1)
+  if (cv == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
       return 0;
     }
@@ -744,9 +743,9 @@ pthread_cond_signal (pthread_cond_t * cond)
   /*
    * If there aren't any waiters, then this is a no-op.
    */
-  if (cond->waiters > 0)
+  if (cv->waiters > 0)
     {
-      result = _pthread_sem_post (&(cond->sema));
+      result = _pthread_sem_post (&(cv->sema));
     }
 
   return (result);
@@ -793,18 +792,21 @@ pthread_cond_broadcast (pthread_cond_t * cond)
 {
   int result = 0;
   int i;
+  pthread_cond_t cv;
 
-  if (cond == NULL || cond->valid == 0)
+  if (cond == NULL || *cond == NULL)
     {
       return EINVAL;
     }
 
-  cond->wasBroadcast = TRUE;
+  cv = *cond;
+
+  cv->wasBroadcast = TRUE;
 
   /*
    * No-op if the CV is static and hasn't been initialised yet.
    */
-  if (cond->staticinit == 1)
+  if (cv == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
       return 0;
     }
@@ -812,24 +814,21 @@ pthread_cond_broadcast (pthread_cond_t * cond)
   /*
    * Wake up all waiters
    */
-  for (i = cond->waiters; i > 0 && result == 0; i--)
+  for (i = cv->waiters; i > 0 && result == 0; i--)
     {
-
-      result = _pthread_sem_post (&(cond->sema));
+      result = _pthread_sem_post (&(cv->sema));
     }
 
-  if (cond->waiters > 0 && result == 0)
+  if (cv->waiters > 0 && result == 0)
     {
       /*
        * Wait for all the awakened threads to acquire their part of
        * the counting semaphore
        */
-      if (WaitForSingleObject (cond->waitersDone, INFINITE) !=
+      if (WaitForSingleObject (cv->waitersDone, INFINITE) !=
           WAIT_OBJECT_0)
         {
-
           result = 0;
-
         }
       else
         {
@@ -839,6 +838,7 @@ pthread_cond_broadcast (pthread_cond_t * cond)
     }
 
   return (result);
+
 }
 
 /* </JEB> */

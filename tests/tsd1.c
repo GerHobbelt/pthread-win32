@@ -146,7 +146,7 @@ main()
 
   assert(pthread_key_delete(key) == 0);
 
-  for (i = 0; i < 10; i++)
+  for (i = 1; i < 10; i++)
     {
 	/*
 	 * The counter is incremented once when the key is set to
@@ -165,5 +165,5 @@ main()
 
   fflush(stderr);
 
-  return (fail) ? 1 : 0;
+  return (fail);
 }

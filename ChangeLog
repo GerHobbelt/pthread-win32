@@ -1,3 +1,24 @@
+Thu Mar 11 09:01:48 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h (pthread_mutex_t): revert to (pthread_mutex_t *);
+	define a value to serve as PTHREAD_MUTEX_INITIALIZER.
+	(pthread_mutex_t_): remove staticinit and valid elements.
+	(pthread_cond_t): revert to (pthread_cond_t_ *);
+	define a value to serve as PTHREAD_COND_INITIALIZER.
+	(pthread_cond_t_): remove staticinit and valid elements.
+
+	* mutex.c (pthread_mutex_t args): adjust indirection of references.
+	(all functions): check for PTHREAD_MUTEX_INITIALIZER value;
+	check for NULL (invalid).
+
+	* condvar.c (pthread_cond_t args): adjust indirection of references.
+	(all functions): check for PTHREAD_COND_INITIALIZER value;
+	check for NULL (invalid).
+
+Wed Mar 10 17:18:12 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* misc.c (CancelableWait): Undo changes from Mar 8 and 7.
+
 Mon Mar  8 11:18:59 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* misc.c (CancelableWait): Ensure cancelEvent handle is the lowest
