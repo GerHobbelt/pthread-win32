@@ -64,21 +64,29 @@ void *
 func(void * arg)
 {
     Guard g("func", counter);
+
 #ifdef USE_PTHREAD_EXIT
+
     pthread_exit(arg);
     assert(0); //Never reached with pthread_exit
+
 #endif //USE_PTHREAD_EXIT
+
     return ret_value;
 }
 
 
 #endif /*__CLEANUP_CXX */
 
-int main(int, char **)
+int
+main()
 {
 #ifndef __CLEANUP_CXX
+
     printf("Test requires C++ cleanup enabled. Skipped.\n");
+
 #else
+
     {
         void *ret = 0;
         Guard g("main", counter);
@@ -87,7 +95,10 @@ int main(int, char **)
         assert(0 == pthread_join(id, &ret));
         assert(ret == ret_value);
     }
+
     assert(counter == init_counter_value);
+
 #endif /*__CLEANUP_CXX */
+
     return 0;
 }

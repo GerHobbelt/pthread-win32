@@ -38,11 +38,11 @@
 #include "implement.h"
 
 
-#include "barrier_init.c"
-#include "barrier_destroy.c"
-#include "barrier_wait.c"
-#include "barrier_attr_init.c"
-#include "barrier_attr_destroy.c"
-#include "barrier_attr_getpshared.c"
-#include "barrier_attr_setpshared.c"
+#include "pthread_barrier_init.c"
+#include "pthread_barrier_destroy.c"
+#include "pthread_barrier_wait.c"
+#include "pthread_barrierattr_init.c"
+#include "pthread_barrierattr_destroy.c"
+#include "pthread_barrierattr_getpshared.c"
+#include "pthread_barrierattr_setpshared.c"
 

@@ -67,9 +67,10 @@ COPYFILES	= $(HDR) $(LIB) $(DLL)
 
 TESTS	= loadfree \
 	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
-	  condvar1 condvar2 condvar2_1 exit1 create1 equal1 \
+	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 create1 equal1 \
 	  exit2 exit3 \
-	  join0 join1 join2 mutex2 mutex3 mutex4 mutex6 mutex6n mutex6e mutex6r \
+	  join0 join1 join2 \
+	  mutex2 mutex3 mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
 	  count1 once1 tsd1 self2 cancel1 cancel2 \
 	  delay1 delay2 eyal1 \
@@ -148,6 +149,8 @@ cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
 cleanup3.pass: cleanup2.pass
 condvar1.pass:
+condvar1_1.pass: condvar1.pass
+condvar1_2.pass: join2.pass
 condvar2.pass: condvar1.pass
 condvar2_1.pass: condvar2.pass join2.pass
 condvar3.pass: create1.pass condvar2.pass

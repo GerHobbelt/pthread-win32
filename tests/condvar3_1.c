@@ -161,6 +161,8 @@ main()
       signaled++;
     }
 
+  assert(pthread_cond_destroy(&cv1) == 0);
+
   for (i = 1; i <= NUMTHREADS; i++)
     {
       assert(pthread_join(t[i], (void **) &result) == 0);

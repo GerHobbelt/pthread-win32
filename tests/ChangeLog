@@ -1,3 +1,8 @@
+2002-02-17  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* condvar1_1.c: New test.
+	* condvar1_2.c: New test.
+
 2002-02-07  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* delay1.c: New test.

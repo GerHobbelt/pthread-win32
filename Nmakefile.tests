@@ -26,6 +26,8 @@ mutex1r::	mutex1r.c
 mutex2::	mutex1.2
 exit1::		exit1.c
 condvar1::	condvar1.c
+condvar1_1::	condvar1_1.c
+condvar1_2::	condvar1_2.c
 self1::		self1.c
 condvar2::	condvar2.c
 condvar2_1::	condvar2_1.c
@@ -114,6 +116,8 @@ mutex1		:test:	loadfree
 mutex2		:test:	loadfree
 exit1		:test:	loadfree
 condvar1	:test:	loadfree
+condvar1_1	:test:	condvar1
+condvar1_2	:test:	join2
 self1		:test:	loadfree
 condvar2	:test:	condvar1
 condvar2_1	:test:	condvar2
