@@ -60,7 +60,7 @@ ptw32_cancel_self(void)
 /*
  * ptw32_cancel_thread implements asynchronous cancellation.
  */
-static void 
+static INLINE void 
 ptw32_cancel_thread(pthread_t thread)
 {
   HANDLE threadH = thread->threadH;

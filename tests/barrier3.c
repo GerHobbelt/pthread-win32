@@ -28,7 +28,7 @@ main()
 
   assert(pthread_create(&t, NULL, func, NULL) == 0);
 
-  assert(pthread_join(t, (void *) &result) == 0);
+  assert(pthread_join(t, (void **) &result) == 0);
 
   assert(result == PTHREAD_BARRIER_SERIAL_THREAD);
 

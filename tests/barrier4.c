@@ -23,13 +23,23 @@ func(void * arg)
   int result = pthread_barrier_wait(&barrier);
 
   assert(pthread_mutex_lock(&mx) == 0);
+
+//  printf("Barrier wait returned %d [%d]\n", result, WAIT_FAILED);
+//  fflush(stdout);
+
   if (result == PTHREAD_BARRIER_SERIAL_THREAD)
     {
       serialThreadCount++;
     }
-  else
+  else if (0 == result)
     {
       otherThreadCount++;
+    }
+  else
+    {
+      printf("Barrier wait failed: error = %s\n", error_string[result]);
+      fflush(stdout);
+      return NULL;
     }
   assert(pthread_mutex_unlock(&mx) == 0);
 

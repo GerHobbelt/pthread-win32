@@ -59,7 +59,7 @@ main()
 
   assert(pthread_spin_unlock(&lock) == 0);
 
-  assert(pthread_join(t, (void *) &result) == 0);
+  assert(pthread_join(t, (void **) &result) == 0);
   assert(result > 1000);
 
   assert(pthread_spin_destroy(&lock) == 0);

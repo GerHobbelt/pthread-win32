@@ -1,3 +1,25 @@
+2001-07-09  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* barrier.c: Fix several bugs in all routines. Now passes
+	tests/barrier5.c which is fairly rigorous. There is still
+	a non-optimal work-around for a race condition between
+	the barrier breeched event signal and event wait. Basically
+	the last (signalling) thread to hit the barrier yields
+	to allow any other threads, which may have lost the race,
+	to complete.
+
+2001-07-07  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* barrier.c: Changed synchronisation mechanism to a
+	Win32 manual reset Event and use PulseEvent to signal
+	waiting threads. If the implementation continued to use
+	a semaphore it would require a second semaphore and
+	some management to use them alternately as barriers. A
+	single semaphore allows threads to cascade from one barrier
+	through the next, leaving some threads blocked at the first.
+	* implement.h (pthread_barrier_t_): As per above.
+	* general: Made a number of other routines inlinable.
+
 2001-07-07  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* spin.c: Revamped and working; included static initialiser.
