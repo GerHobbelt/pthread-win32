@@ -98,35 +98,27 @@ _pthread_find_thread_entry(pthread_t thread)
   if (this->thread == NULL || this == start)
     {
       /* Failed to find the thread. */
-      return -1;
+      return NULL;
     }
 
   return this;
 }
 
 void
-_pthread_delete_thread_entry(_pthread_threads_thread_t * this)
+_pthread_delete_thread_entry(_pthread_threads_thread_t * thread_entry)
 {
   /* We don't check that the thread has been properly cleaned up, so
      it had better be done already. */
-  _pthread_threads_thread_t * this;
-  _pthread_threads_thread_t * entry;
 
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_count_mutex);
 
-  /* If this is not NULL then we are removing an entry for a
-     failed thread start. If this is NULL we need to get this
-     here within the critical section. */
-  if (this == NULL)
-    {
-      this = _PTHREAD_THIS;
-    }
+  /* Remove the thread entry if necessary. */
 
-  if (this->thread != NULL)
+  if (thread_entry->thread != NULL)
     {
-      this->thread = NULL;
-
+      thread_entry->thread = NULL;
+      
       if (_pthread_threads_count > 0)
 	{
 	  _pthread_threads_count--;

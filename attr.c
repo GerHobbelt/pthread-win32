@@ -98,9 +98,14 @@ pthread_attr_init(pthread_attr_t *attr)
   attr->stacksize = PTHREAD_STACK_MIN;
 #endif
 
-  attr->cancelability = PTHREAD_CANCEL_ENABLE;
+  attr->cancelstate = PTHREAD_CANCEL_ENABLE;
   attr->canceltype = PTHREAD_CANCEL_DEFERRED;
-  attr->detached = PTHREAD_CREATE_JOINABLE;
+  attr->detachedstate = PTHREAD_CREATE_JOINABLE;
+  memset(&(attr->sigmask), 0, sizeof(sigset_t));
+
+  /* Priority uses Win32 priority values. */
+  int priority = THREAD_PRIORITY_NORMAL;
+
   attr->valid = 0;
 
   return 0;

@@ -6,31 +6,28 @@
  * a thread.
  */
 
-#include <windows.h>
-#include <process.h>
 #include "pthread.h"
 #include "implement.h"
 
 void
 _pthread_vacuum(void)
 {
-  /* This function can be called from pthread_exit(), or from
-     _pthread_start_call() in which case cleanupstack should be
-     empty but destructorstack still needs to be run. */
-  _pthread_threads_thread_t * this;
-
-  this = *_PTHREAD_THIS;
-
   /* Run all the handlers. */
-  _pthread_handler_pop_all(&(this->cleanupstack), _PTHREAD_HANDLER_EXECUTE);
-  _pthread_handler_pop_all(&(this->destructorstack), _PTHREAD_HANDLER_EXECUTE);
+  _pthread_handler_pop_all(_PTHREAD_CLEANUP_STACK, 
+			   _PTHREAD_HANDLER_EXECUTE);
 
-  /* Pop any atfork handlers to free storage. */
-  _pthread_handler_pop_all(&(this->forkprepare), _PTHREAD_HANDLER_NOEXECUTE);
-  _pthread_handler_pop_all(&(this->forkparent), _PTHREAD_HANDLER_NOEXECUTE);
-  _pthread_handler_pop_all(&(this->forkchild), _PTHREAD_HANDLER_NOEXECUTE);
+  _pthread_handler_pop_all(_PTHREAD_DESTRUCTOR_STACK, 
+			   _PTHREAD_HANDLER_EXECUTE);
 
-  _pthread_delete_thread_entry(NULL);
+  /* Pop any atfork handlers without executing them. */
+  _pthread_handler_pop_all(_PTHREAD_FORKPREPARE_STACK, 
+			   _PTHREAD_HANDLER_NOEXECUTE);
+
+  _pthread_handler_pop_all(_PTHREAD_FORKPARENT_STACK, 
+			   _PTHREAD_HANDLER_NOEXECUTE);
+
+  _pthread_handler_pop_all(_PTHREAD_FORKCHILD_STACK,
+			   _PTHREAD_HANDLER_NOEXECUTE);
 }
 
 void
@@ -40,13 +37,12 @@ pthread_exit(void * value)
 
   this = _PTHREAD_THIS;
 
+  /* Copy value into the thread entry so it can be given
+     to any joining threads. */
   if (this->joinvalueptr != NULL)
     {
-      *(this->joinvalueptr) = value;
+      this->joinvalueptr = value;
     }
-
-  /* FIXME: More to do here. IE, if pthread_detach() was called
-     and value != NULL, do we free(value)? */
 
   /* Teleport back to _pthread_start_call() to cleanup and exit. */
   longjmp(this->call.env, 1);
