@@ -10,56 +10,172 @@
 int
 pthread_condattr_init(pthread_condattr_t *attr)
 {
-  if (attr == NULL)
-    {
-      /* This is disallowed. */
-      return EINVAL;
-    }
-
-  attr->ptr = malloc(sizeof(_pthread_condattr_t));
-  if (attr->ptr == NULL)
-    {
-      return ENOMEM;
-    }
-
-  /* FIXME: fill out the structure with default values. */
-  return 0;
+  return (attr == NULL) ? EINVAL : 0;
 }
 
 int
 pthread_condattr_destroy(pthread_condattr_t *attr)
 {
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-  
-  free(attr->ptr);
-  return 0;
+  return (attr == NULL) ? EINVAL : 0;
 }
 
 int
 pthread_condattr_setpshared(pthread_condattr_t *attr,
 			    int pshared)
 {
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-
-  (_pthread_condattr_t *) (attr->ptr)->pshared = pshared;
-  return 0;
+  return (attr == NULL) ? EINVAL : ENOSYS;
 }
 
 int
 pthread_condattr_getpshared(pthread_condattr_t *attr,
 			    int *pshared)
 {
-  if (is_attr(attr) != 0)
+  return (attr == NULL) ? EINVAL : ENOSYS;
+}
+
+int
+pthread_cond_init(pthread_cond_t *cv, const pthread_condattr_t *attr)
+{
+  /* Ensure we have a valid cond_t variable. */
+  if (cv == NULL)
     {
       return EINVAL;
     }
 
-  *pshared = (_pthread_condattr_t *) (attr->ptr)->pshared;
+  /* Initialize the count to 0. */
+  cv->waiters_count = 0;
+
+  /* Initialize the "mutex". */
+  pthread_mutex_init(cv->waiters_count_lock);
+
+  /* Create an auto-reset event. */
+  cv->events[SIGNAL] = CreateEvent (NULL,     /* no security */
+				    FALSE,    /* auto-reset event */
+				    FALSE,    /* non-signaled initially */
+				    NULL);    /* unnamed */
+
+  /* Create a manual-reset event. */
+  cv->events[BROADCAST] = CreateEvent (NULL,  /* no security */
+				       TRUE,  /* manual-reset */
+				       FALSE, /* non-signaled initially */
+				       NULL); /* unnamed */
+
   return 0;
+}
+
+int 
+pthread_cond_wait(pthread_cond_t *cv, pthread_mutex_t *mutex)
+{
+  int result, last_waiter;
+
+  /* Ensure we have a valid cond_t variable. */
+  if (cv == NULL)
+    {
+      return EINVAL;
+    }
+
+  /* Avoid race conditions. */
+  EnterCriticalSection (&cv->waiters_count_lock);
+  cv->waiters_count_++;
+  LeaveCriticalSection (&cv->waiters_count_lock);
+
+  /* It's okay to release the mutex here since Win32 manual-reset
+     events maintain state when used with SetEvent().  This avoids the
+     "lost wakeup" bug. */
+
+  pthread_mutex_unlock(mutex);
+
+  /* Wait for either event to become signaled due to
+     pthread_cond_signal() being called or pthread_cond_broadcast()
+     being called. */
+ 
+  result = WaitForMultipleObjects (2, ev->events, FALSE, INFINITE);
+
+  EnterCriticalSection (&cv->waiters_count_lock);
+  cv->waiters_count--;
+  last_waiter = cv->waiters_count == 0;
+  LeaveCriticalSection (&cv->waiters_count_lock);
+
+  /* Some thread called pthread_cond_broadcast(). */
+  if ((result = WAIT_OBJECT_0 + BROADCAST) && last_waiter)
+    {
+      /* We're the last waiter to be notified, so reset the manual
+	 event. */
+      ResetEvent(cv->events[BROADCAST]);
+    }
+
+  /* Reacquire the mutex. */
+  pthread_mutex_lock(mutex);
+
+  return 0;
+}
+
+int
+pthread_cond_timedwait(pthread_cond_t *cv, 
+		       pthread_mutex_t *mutex,
+		       const struct timespec *abstime)
+{
+  /* Yet to be implemented.  This will be identical to cond_wait(),
+     but we will need to get the timeout parameter in the call to
+     WaitForMultipleObject() as close to the time specified in
+     `abstime' as possible. */
+
+  return 0;
+}
+
+int 
+pthread_cond_broadcast (pthread_cond_t *cv)
+{
+  int have_waiters;
+
+  /* Ensure we have a valid cond_t variable. */
+  if (cv == NULL)
+    {
+      return EINVAL;
+    }
+
+  /* Avoid race conditions. */
+  EnterCriticalSection (&cv->waiters_count_lock_);
+  have_waiters = (cv->waiters_count > 0);
+  LeaveCriticalSection (&cv->waiters_count_lock_);
+
+  if (have_waiters) {
+    SetEvent(cv->events[BROADCAST]);
+  }
+
+  return 0;
+}
+
+int 
+pthread_cond_signal (pthread_cond_t *cv)
+{
+  int have_waiters;
+
+  /* Ensure we have a valid cond_t variable. */
+  if (cv == NULL)
+    {
+      return EINVAL;
+    }
+
+  /* Avoid race conditions. */
+  EnterCriticalSection (&cv->waiters_count_lock);
+  have_waiters = (cv->waiters_count > 0);
+  LeaveCriticalSection (&cv->waiters_count_lock);
+
+  if (have_waiters) {
+    SetEvent(cv->events[SIGNAL]);
+  }
+
+  return 0;
+}
+
+int
+pthread_cond_destroy(pthread_cond_t *cv)
+{
+  if (cv == NULL)
+    {
+	return EINVAL;
+    }
+
+  return pthread_mutex_destroy(cv->waiters_count_lock);
 }
