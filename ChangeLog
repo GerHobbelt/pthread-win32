@@ -1,3 +1,9 @@
+Sat Jul 11 14:48:54 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Preliminary implementation specific defines.
+
+	* create.c (pthread_create): Preliminary implementation.
+
 1998-07-11  Ben Elliston  <bje@cygnus.com>
 
 	* sync.c (pthread_join): Implement.
