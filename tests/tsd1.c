@@ -1,8 +1,7 @@
 /*
- * File: tsd1.c
+ * tsd1.c
  *
- * Test Synopsis:
- * - Thread Specific Data (TSD) key creation and destruction.
+ * Test Thread Specific Data (TSD) key creation and destruction.
  *
  * Description:
  * - 
@@ -44,73 +43,52 @@
  * - output identifies failed component
  */
 
-#include <pthread.h>
-#include <stdio.h>
+#include "test.h"
 
-pthread_key_t key = NULL;
-pthread_once_t key_once = PTHREAD_ONCE_INIT;
+static pthread_key_t key = NULL;
+static int accesscount[10];
+static int thread_set[10];
+static int thread_destroyed[10];
 
-void
+static void
 destroy_key(void * arg)
 {
-  /* arg is not NULL if we get to here. */
-  printf("SUCCESS: %s: destroying key.\n", (char *) arg);
+  int * j = (int *) arg;
 
-  free((char *) arg);
+  (*j)++;
+
+  assert(*j == 2);
+
+  thread_destroyed[j - accesscount] = 1;
 }
 
-void
-make_key(void)
-{
-  if (pthread_key_create(&key, destroy_key) != 0)
-    {
-      printf("Key create failed\n");
-      exit(1);
-    }
-}
-
-void
+static void
 setkey(void * arg)
 {
-  void * ptr;
+  int * j = (int *) arg;
 
-  if ((ptr = pthread_getspecific(key)) != NULL)
-    {
-      printf("ERROR: Thread %d, Key not initialised to NULL\n",
-	     (int) arg);
-      exit(1);
-    }
-  else
-    {
-      ptr = (void *) malloc(80);
-      sprintf((char *) ptr, "Thread %d Key",
-	      (int) arg);
-      (void) pthread_setspecific(key, ptr);
-    }
+  thread_set[j - accesscount] = 1;
 
-  if ((ptr = pthread_getspecific(key)) == NULL)
-    {
-      printf("FAILED: Thread %d Key value set or get failed.\n",
-	     (int) arg);
-      exit(1);
-    }
-  else
-    {
-      printf("SUCCESS: Thread %d Key value set and get succeeded.\n",
-	     (int) arg);
+  assert(*j == 0);
 
-      printf("SUCCESS: %s: exiting thread.\n", (char *) ptr);
-    }
+  assert(pthread_getspecific(key) == NULL);
+
+  assert(pthread_setspecific(key, arg) == 0);
+
+  assert(pthread_getspecific(key) == arg);
+
+  (*j)++;
+
+  assert(*j == 1);
 }
 
-void *
+static void *
 mythread(void * arg)
 {
   while (key == NULL)
     {
+	Sleep(0);
     }
-
-  printf("Thread %d, Key created\n", (int) arg);
 
   setkey(arg);
 
@@ -122,38 +100,70 @@ mythread(void * arg)
 int
 main()
 {
-  int rc;
-  int t;
+  int i;
+  int fail = 0;
   pthread_t thread[10];
 
-  for (t = 0; t < 5; t++)
+  for (i = 1; i < 5; i++)
     {
-      rc = pthread_create(&thread[t], NULL, mythread, (void *) (t + 1));
-      printf("pthread_create returned %d\n", rc);
-      if (rc != 0)
-	{
-	  return 1;
-	}
-    }
-
-  (void) pthread_once(&key_once, make_key);
-
-  /* Test main thread key. */
-  setkey((void *) 0);
-
-  Sleep(500);
-
-  for (t = 5; t < 10; t++)
-    {
-      rc = pthread_create(&thread[t], NULL, mythread, (void *) (t + 1));
-      printf("pthread_create returned %d\n", rc);
-      if (rc != 0)
-	{
-	  return 1;
-	}
+	accesscount[i] = thread_set[i] = thread_destroyed[i] = 0;
+      assert(pthread_create(&thread[i], NULL, mythread, (void *)&accesscount[i]) == 0);
     }
 
   Sleep(2000);
-  return 0;
-}
 
+  /*
+   * Here we test that existing threads will get a key created
+   * for them.
+   */
+  assert(pthread_key_create(&key, destroy_key) == 0);
+
+  /*
+   * Test main thread key.
+   */
+  accesscount[0] = 0;
+  setkey((void *) &accesscount[0]);
+
+  /*
+   * Here we test that new threads will get a key created
+   * for them.
+   */
+  for (i = 5; i < 10; i++)
+    {
+	accesscount[i] = thread_set[i] = thread_destroyed[i] = 0;
+      assert(pthread_create(&thread[i], NULL, mythread, (void *)&accesscount[i]) == 0);
+    }
+
+  /*
+   * Wait for all threads to complete.
+   */
+  for (i = 1; i < 10; i++)
+    {
+	int result = 0;
+
+	assert(pthread_join(thread[i], (void *) &result) == 0);
+    }
+
+  assert(pthread_key_delete(key) == 0);
+
+  for (i = 0; i < 10; i++)
+    {
+	/*
+	 * The counter is incremented once when the key is set to
+	 * a value, and again when the key is destroyed. If the key
+	 * doesn't get set for some reason then it will still be
+	 * NULL and the destroy function will not be called, and
+	 * hence accesscount will not equal 2.
+	 */
+	if (accesscount[i] != 2)
+	  {
+	    fail++;
+	    fprintf(stderr, "Thread %d key, set = %d, destroyed = %d\n",
+			i, thread_set[i], thread_destroyed[i]);
+	  }
+    }
+
+  fflush(stderr);
+
+  return (fail) ? 1 : 0;
+}

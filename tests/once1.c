@@ -1,25 +1,29 @@
 /*
- * Test for pthread_once().
+ * once1.c
  *
- * Depends on functions: pthread_create.
+ * Create a static pthread_once and test that it calls myfunc once.
+ *
+ * Depends on API functions:
+ *	pthread_once()
+ *	pthread_create()
  */
 
-#include <pthread.h>
-#include <stdio.h>
+#include "test.h"
 
 pthread_once_t once = PTHREAD_ONCE_INIT;
+
+static int washere = 0;
 
 void
 myfunc(void)
 {
-	printf("only see this once\n");
+  washere++;
 }
 
 void *
 mythread(void * arg)
 {
-   int rc = pthread_once(&once, myfunc);
-   printf("returned %d\n", rc); 
+   assert(pthread_once(&once, myfunc) == 0);
 
    return 0;
 }
@@ -27,19 +31,15 @@ mythread(void * arg)
 int
 main()
 {
-  int rc;
   pthread_t t1, t2;
   
-  if (pthread_create(&t1, NULL, mythread, NULL) != 0)
-    {
-      return 1;
-    }
+  assert(pthread_create(&t1, NULL, mythread, NULL) == 0);
 
-  if (pthread_create(&t2, NULL, mythread, NULL) != 0)
-    {
-      return 1;
-    }
+  assert(pthread_create(&t2, NULL, mythread, NULL) == 0);
 
   Sleep(2000);
+
+  assert(washere == 1);
+
   return 0;
 }
