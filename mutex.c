@@ -147,9 +147,15 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
 int
 pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
-  /* This only works on Windows NT 4.0 and above.  If this function is
-     called from Windows 95, we must return ENOSYS. */
-     
+  /* Typically evaluates to 31. */
+  int numbits = (sizeof(DWORD) * 8) - 1;
+
+  if ((GetVersion() >> numbits) != 1)
+    {
+      /* We're not on Windows NT; return ENOSYS. */
+      return ENOSYS;
+    }
+      
   if (mutex == NULL)
     {
       return EINVAL;
