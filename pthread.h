@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 typedef HANDLE pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
+typedef DWORD pthread_key_t;
 
 typedef struct {
   enum { SIGNAL, BROADCAST, NUM_EVENTS };
@@ -34,7 +35,7 @@ typedef struct {
   /* Count of the number of waiters. */
   unsigned waiters_count;
   
-  /* Serialize access to waiters_count_. */
+  /* Serialize access to waiters_count. */
   pthread_mutex_t waiters_count_lock;
 } pthread_cond_t;
 
@@ -146,6 +147,17 @@ int pthread_mutexattr_setprioceiling(pthread_mutexattr_t *attr,
 
 int pthread_mutexattr_getprioceiling(const pthread_mutexattr_t *attr,
 				     int *ceiling);
+
+/* Primitives for thread-specific data (TSD). */
+
+int pthread_key_create(pthread_key_t *key,
+		       void (*destructor)(void *));
+
+int pthread_setspecific(pthread_key_t key, void *value);
+
+void *pthread_getspecific(pthread_key_t key);
+
+int pthread_key_delete(pthread_key_t key);
 
 #ifdef __cplusplus
 }
