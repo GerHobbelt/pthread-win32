@@ -81,25 +81,14 @@ pthread_mutexattr_init(pthread_mutexattr_t *attr)
       return EINVAL;
     }
 
-  attr->ptr = malloc(sizeof(_pthread_mutexattr_t));
-  if (attr->ptr == NULL)
-    {
-      return ENOMEM;
-    }
-  
-  (_pthread_mutexattr_t *) (attr->ptr).proc_shared = PTHREAD_PROCESS_PRIVATE;
+  /* None of the optional attributes are supported yet. */
   return 0;
 }
 
 int
 pthread_mutexattr_destroy(pthread_mutexattr_t *attr)
 {
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-
-  free(attr->ptr);
+  /* Nothing to do. */
   return 0;
 }
 
