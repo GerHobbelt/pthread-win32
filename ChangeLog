@@ -1,5 +1,9 @@
 1998-07-19  Ben Elliston  <bje@cygnus.com>
 
+	* condvar.c (pthread_cond_wait): Generalise.  Moved from here ..
+	(cond_wait): To here.
+	(pthread_cond_timedwait): Implement; use generalised cond_wait().
+
 	* pthread.h (pthread_key_t): Define this type.
 	(pthread_key_create): Add function prototype.
 	(pthread_setspecific): Likewise.
