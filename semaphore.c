@@ -475,7 +475,7 @@ sem_post_multiple (sem_t * sem, int count )
       *              pointer to an instance of sem_t
       *
       *      count
-      *              counter, must be greater than or equal to zero.
+      *              counter, must be greater than zero.
       *
       * DESCRIPTION
       *      This function posts multiple wakeups to a semaphore. If there
@@ -487,14 +487,14 @@ sem_post_multiple (sem_t * sem, int count )
       *              -1              failed, error in errno
       * ERRNO
       *              EINVAL          'sem' is not a valid semaphore
-      *                              or count is not greater than zero.
+      *                              or count is less than or equal to zero.
       *
       * ------------------------------------------------------
       */
 {
   int result = 0;
 
-  if (sem == NULL || *sem == NULL || count < 0)
+  if (sem == NULL || *sem == NULL || count <= 0)
     {
       result = EINVAL;
     }
