@@ -107,7 +107,7 @@ cond_wait(pthread_cond_t *cv, pthread_mutex_t *mutex, DWORD abstime)
   pthread_mutex_unlock (&cv->waiters_count_lock);
 
   /* Some thread called pthread_cond_broadcast(). */
-  if ((result = WAIT_OBJECT_0 + BROADCAST) && last_waiter)
+  if ((result == WAIT_OBJECT_0 + BROADCAST) && last_waiter)
     {
       /* We're the last waiter to be notified, so reset the manual
 	 event. */

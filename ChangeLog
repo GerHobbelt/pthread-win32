@@ -1,3 +1,8 @@
+1998-10-30  Ben Elliston  <bje@cygnus.com>
+
+	* condvar.c (cond_wait): Fix semantic error. Test for equality
+	instead of making an assignment.
+
 Fri Oct 30 15:15:50 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* cleanup.c (_pthread_handler_push): Fixed bug appending new
