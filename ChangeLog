@@ -1,5 +1,8 @@
 Thu Aug  6 15:19:22 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* create.c (pthread_create): Typecast (HANDLE) NULL.
+	Typecast (unsigned (*)(void *)) start_routine.
+
 	* condvar.c (pthread_cond_init): Add address-of operator & to
 	arg 1 of pthread_mutex_init() call.
 	(pthread_cond_destroy): Add address-of operator & to
