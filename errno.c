@@ -10,32 +10,32 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2002 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@ise.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#if (! defined(HAVE_ERRNO)) && (! defined(_REENTRANT)) && (! defined(_MT))
+#if defined(NEED_ERRNO)
 
 #include "pthread.h"
 #include "implement.h"
@@ -56,11 +56,11 @@ static int reallyBad    = ENOMEM;
  * it on thread termination. We get all that for free
  * by simply storing the errno on the pthread_t structure.
  *
- * MSVC and Mingw32 already have there own thread-safe errno.
+ * MSVC and Mingw32 already have their own thread-safe errno.
  *
  * #if defined( _REENTRANT ) || defined( _MT )
  * #define errno *_errno()
- * 
+ *
  * int *_errno( void );
  * #else
  * extern int errno;
@@ -72,7 +72,7 @@ int * _errno( void )
 {
   pthread_t       self;
   int             *result;
-        
+
   if( ( self = pthread_self() ) == NULL )
     {
       /*
@@ -90,4 +90,5 @@ int * _errno( void )
 
 } /* _errno */
 
-#endif /* (! HAVE_ERRNO) || (!_REENTRANT && (!_MT || !_MD)) */
+#endif /* (NEED_ERRNO) */
+

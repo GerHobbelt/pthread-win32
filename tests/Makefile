@@ -71,7 +71,7 @@ EHFLAGS	=
 # stop.
 
 PASSES= loadfree.pass \
-	  self1.pass mutex5.pass  \
+	  semaphore1.pass  self1.pass  mutex5.pass  \
 	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  mutex2.pass  mutex3.pass  \
 	  condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
 	  exit1.pass  create1.pass  equal1.pass  \
@@ -166,8 +166,8 @@ VCX-bench:
 	@ $(ECHO) $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB)
 	@ $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB)
 
-.c.pre:
-	@ $(CC) /E $(EHFLAGS) $(CFLAGS) $(INCLUDES) /Fe$@ $<
+.c.i:
+	@ $(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<
 
 $(COPYFILES):
 	@ $(ECHO) Copying $@
@@ -184,6 +184,7 @@ clean:
 	- $(RM) semaphore.h
 	- $(RM) sched.h
 	- $(RM) *.e
+	- $(RM) *.i
 	- $(RM) *.obj
 	- $(RM) *.pdb
 	- $(RM) *.o
@@ -287,6 +288,7 @@ rwlock6_t.pass: rwlock5_t.pass
 rwlock6_t2.pass: rwlock6_t.pass
 self1.pass:
 self2.pass: create1.pass
+semaphore.pass:
 spin1.pass:
 spin2.pass: spin1.pass
 spin3.pass: spin2.pass

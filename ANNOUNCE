@@ -259,11 +259,21 @@ Known bugs in this snapshot
 ---------------------------
 
 1. Under MS VC++ (only tested with version 6.0), a term_func
-   set via the standard C++ set_terminate() function is not called
-   for some reason. The code in private.c ptw32_threadStart()
-   retrieves and calls the user supplied terminate routine, which
-   works as expected under MinGW32 g++, but doesn't run under
-   MS VC++ 6.0, presumably because set_terminate() returns NULL.
+   set via the standard C++ set_terminate() function is not called.
+
+   Notes from the MSVC++ manual:
+         1) A term_func() should call exit(), otherwise
+            abort() will be called on return to the caller.
+            A call to abort() raises SIGABRT and the default signal handler
+            for all signals terminates the calling program with
+            exit code 3.
+         2) A term_func() must not throw an exception. Therefore
+            term_func() should not call pthread_exit(), which
+            works by throwing an exception (pthreadVCE or pthreadVSE)
+            or by calling longjmp (pthreadVC).
+
+   Workaround: avoid using pthread_exit() in C++ applications. Exit
+   threads by dropping through the end of the thread routine.
 
 2. Cancellation problems in optimised code
    - Milan Gardian
@@ -344,9 +354,13 @@ Known bugs in this snapshot
    creation of production code is highly unreliable for the current version of
    the pthreads library.
 
+3. errno
 
-Caveats
--------
+   Under MSVC, errno isn't working.
+
+
+Special notes
+-------------
 
 1. [See also the discussion in the FAQ file - Q2, Q4, and Q5]
 

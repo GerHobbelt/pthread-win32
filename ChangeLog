@@ -1,3 +1,19 @@
+2002-02-28  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* errno.c: Compiler directive was incorrectly including code.
+	* pthread.h: Conditionally added some #defines from config.h
+	needed when not building the library. e.g. NEED_ERRNO, NEED_SEM.
+	(PTW32_DLLPORT): Now only defined if _DLL defined.
+	(_errno): Compiler directive was incorrectly including prototype.
+	* sched.h: Conditionally added some #defines from config.h
+	needed when not building the library.
+	* semaphore.h: Replace an instance of NEED_SEM that should
+	have been NEED_ERRNO. This change currently has nil effect.
+
+	* GNUmakefile: Correct some recent changes.
+
+	* Makefile: Add rule to generate pre-processor output.
+
 2002-02-23  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* pthread_rwlock_timedrdlock.c: New - untested.
