@@ -1,3 +1,8 @@
+2003-09-01  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* pthread_self.c (pthread_self): The newly aquired pthread_t must be
+	assigned to the reuse stack, not freed, if the routine fails somehow.
+
 2003-08-13  Ross Johnson  <rpj@ise.canberra.edu.au>
 
 	* pthread_getschedparam.c (pthread_getschedparam): An invalid thread ID

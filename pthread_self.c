@@ -110,7 +110,8 @@ pthread_self (void)
 			       FALSE,
 			       DUPLICATE_SAME_ACCESS ) )
 	    {
-	      free( self );
+	      /* Thread structs are never freed. */
+	      ptw32_threadReusePush(self);
 	      return (NULL);
 	    }
 #endif
