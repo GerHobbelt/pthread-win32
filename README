@@ -1,4 +1,4 @@
-This directory contains an implementation on pthreads for Win32, based on the
+This directory contains an implementation of pthreads for Win32, based on the
 Cygwin32 porting layer.
 
 bje@cygnus.com
