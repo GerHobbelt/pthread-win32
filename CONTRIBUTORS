@@ -11,6 +11,8 @@ Ross Johnson		rpj at callisto dot canberra dot edu dot au
 					early prototype routines;
 					ongoing project coordination/maintenance;
 					implementation of spin locks and barriers;
+					re-implemented pthread_once (version 1);
+					various enhancements;
 					bug fixes;
 					documentation;
 					testsuite.

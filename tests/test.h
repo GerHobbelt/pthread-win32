@@ -109,8 +109,13 @@ char * error_string[] = {
 # define ASSERT_TRACE 1
 #endif
 
+/*
+ * Trick to force the compiler to not optimise out dead or obvious expressions.
+ */
+int ptw32_assert_force = 1;
+
 # define assert(e) \
-   ((e) ? ((ASSERT_TRACE) ? fprintf(stderr, \
+   (ptw32_assert_force && (e) ? ((ASSERT_TRACE) ? fprintf(stderr, \
                                     "Assertion succeeded: (%s), file %s, line %d\n", \
 			            #e, __FILE__, (int) __LINE__), \
 	                            fflush(stderr) : \
@@ -120,7 +125,7 @@ char * error_string[] = {
 
 int assertE;
 # define assert_e(e, o, r) \
-   (((assertE = e) o (r)) ? ((ASSERT_TRACE) ? fprintf(stderr, \
+   (ptw32_assert_force && ((assertE = e) o (r)) ? ((ASSERT_TRACE) ? fprintf(stderr, \
                                     "Assertion succeeded: (%s), file %s, line %d\n", \
 			            #e, __FILE__, (int) __LINE__), \
 	                            fflush(stderr) : \

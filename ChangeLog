@@ -1,3 +1,12 @@
+2005-03-16  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* pthread_once.c (pthread_once): Fix faulty 'done' check; fix a
+	few races involving 'done' flag setting; fix incorrect 'done'
+	assignment.
+
+	* pthread_setcancelstate.c: Don't check for an async cancel event
+	if the library is using alertable async cancel..
+
 2005-03-14  Ross Johnson  <ross at callisto.canberra.edu.au>
 
 	* CVS (snapshot-2005-03-08-fixes): Created branch for

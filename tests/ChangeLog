@@ -1,5 +1,6 @@
-2005-03-12  Ross Johnson  <rpj@callisto.canberra.edu.au>
+2005-03-16  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
+	* mutex5.c: Prevent optimiser from removing asserts.
 	* once3.c: New test.
 
 2005-03-08  Ross Johnson  <rpj@callisto.canberra.edu.au>

@@ -108,9 +108,13 @@ CRITICAL_SECTION ptw32_spinlock_test_init_lock;
 CRITICAL_SECTION ptw32_cond_list_lock;
 
 /*
- * Global lock to serialise once_control event management.
+ * Global condition variable and mutex for once_control management.
  */
-CRITICAL_SECTION ptw32_once_event_lock;
+ptw32_once_control_t ptw32_once_control =
+  {
+    PTHREAD_COND_INITIALIZER,
+    PTHREAD_MUTEX_INITIALIZER
+  };
 
 #ifdef _UWIN
 /*
