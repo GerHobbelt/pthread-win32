@@ -1,3 +1,20 @@
+Fri Jul 24 21:13:55 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* cancel.c (pthread_cancel): Implement.
+	(pthread_testcancel): Implement.
+
+	* exit.c (pthread_exit): Add comment explaining the longjmp().
+
+	* implement.h (_pthread_threads_thread_t): New member cancelthread.
+	(_PTHREAD_YES): Define.
+	(_PTHREAD_NO): Define.
+	(RND_SIZEOF): Remove.
+
+	* create.c (pthread_create): Rename cancelability to cancelstate.
+
+	* pthread.h (pthread_attr_t): Rename cancelability to cancelstate.
+	(PTHREAD_CANCELED): Define.
+
 1998-07-24  Ben Elliston  <bje@cygnus.com>
 
 	* pthread.h (SIG_BLOCK): Define if not already defined.

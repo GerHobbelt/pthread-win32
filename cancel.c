@@ -47,3 +47,41 @@ pthread_setcanceltype(int type, int *oldtype)
   this->canceltype = type;
   return 0;
 }
+
+int
+pthread_cancel(pthread_t thread)
+{
+  _pthread_threads_thread_t * this;
+
+  this = _PTHREAD_THIS;
+
+  if (this == NULL)
+    {
+      return ESRCH;
+    }
+
+  this->cancelthread = _PTHREAD_YES;
+
+  return 0;
+}
+
+void
+pthread_testcancel(void)
+{
+  _pthread_threads_thread_t * this;
+
+  this = _PTHREAD_THIS;
+
+  if (this == NULL ||
+      this->attr.cancelstate == PTHREAD_CANCEL_DISABLE)
+    {
+      return;
+    }
+
+  if (this->cancelthread == _PTHREAD_YES)
+    {
+      pthread_exit(PTHREAD_CANCELED);
+
+      /* Never reached. */
+    }
+}

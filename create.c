@@ -19,12 +19,14 @@ _pthread_start_call(void * thisarg)
   /* We're now in a running thread. Any local variables here are on
      this threads private stack so we're safe to leave data in them
      until we leave. */
-  _pthread_threads_thread__t * this = thisarg;
+  _pthread_threads_thread__t * this;
   _pthread_call_t * call;
   unsigned (*func)(void *);
   void * arg;
   unsigned ret;
   int from;
+
+  this = (_pthread_threads_thread__t *) thisarg;
 
   if (this->detached == PTHREAD_CREATE_DETACHED)
     {
@@ -39,13 +41,15 @@ _pthread_start_call(void * thisarg)
 
   if (from == 0)
     {
+      /* Normal return from setjmp(). */
       ret = (*func)(arg);
 
       _pthread_vacuum();
     }
   else
     {
-      /* func() called pthread_exit() which called longjmp(). */
+      /* longjmp() teleported us here.
+	 func() called pthread_exit() which called longjmp(). */
       _pthread_vacuum();
 
       /* Never returns. */
@@ -82,7 +86,7 @@ pthread_create(pthread_t *thread,
 	      attr_copy->stacksize = PTHREAD_STACK_MIN;
 	    }
 
-	  attr_copy->cancelability = attr->cancelability;
+	  attr_copy->cancelstate = attr->cancelstate;
 	  attr_copy->canceltype = attr->canceltype;
 	  attr_copy->detached = attr->detached;
 	  attr_copy->priority = attr->priority;
@@ -119,7 +123,7 @@ pthread_create(pthread_t *thread,
     }
   else
     {
-      /* Undo everything. */
+      /* Remove the failed thread entry. */
       _pthread_delete_thread_entry(this);
     }
 

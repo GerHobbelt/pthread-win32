@@ -70,6 +70,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define PTHREAD_CANCEL_ASYNCHRONOUS 0
 #define PTHREAD_CANCEL_DEFERRED     1
 
+/* Cancelation return value.
+   This value must be neither NULL nor the value of any
+   pointer to an object in memory. */
+#define PTHREAD_CANCELED            ((void *) 1)
+
 typedef HANDLE pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
 typedef DWORD pthread_key_t;
@@ -83,7 +88,7 @@ typedef struct {
   size_t stacksize;                  /* PTHREAD_STACK_MIN */
 #endif
 
-  int cancelability;                 /* PTHREAD_CANCEL_DISABLE
+  int cancelstate;                   /* PTHREAD_CANCEL_DISABLE
 					PTHREAD_CANCEL_ENABLE */
 
   int detached;                      /* PTHREAD_CREATE_DETACHED

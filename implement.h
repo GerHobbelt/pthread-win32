@@ -9,6 +9,9 @@
 
 #define _PTHREAD_HASH_INDEX(x) (((ULONG) x) % PTHREAD_THREADS_MAX)
 
+#define _PTHREAD_YES 1
+#define _PTHREAD_NO  0
+
 /* Handler execution flags. */
 #define _PTHREAD_HANDLER_NOEXECUTE 0
 #define _PTHREAD_HANDLER_EXECUTE   1
@@ -18,11 +21,6 @@ enum { _PTHREAD_HANDLER_POP_LIFO, _PTHREAD_HANDLER_POP_FIFO };
 
 /* Special value to mark attribute objects as valid. */
 #define _PTHREAD_ATTR_INVALID 0xC0FFEE
-
-/* Round a sizeof(type) up to a multiple of sizeof(DWORD).
-   This is all compile time arithmetic.
- */
-#define RND_SIZEOF(T) (((sizeof(T) / sizeof(DWORD)) + 1) * sizeof(DWORD))
 
 /* General description of a handler function on a stack. */
 typedef struct _pthread_handler_node _pthread_handler_node_t;
@@ -52,6 +50,7 @@ struct _pthread_threads_thread {
   pthread_t                   thread;
   pthread_attr_t              attr;
   _pthread_call_t             call;
+  int                         cancelthread;
   void **                     joinvalueptr;
   _pthread_handler_node_t *   cleanupstack;
   _pthread_handler_node_t *   destructorstack;
