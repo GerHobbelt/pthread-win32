@@ -37,7 +37,7 @@ no.	name					status
 32	pthread_detach
 33	pthread_equal				*
 34	pthread_exit				*
-35	pthread_getschedparam
+35	pthread_getschedparam			*
 36	pthread_getspecific			*
 37	pthread_join				*
 38	pthread_key_create			*
@@ -58,9 +58,9 @@ no.	name					status
 53	pthread_mutex_unlock			*
 54	pthread_once				*
 55	pthread_self				*
-56	pthread_setcancelstate			
-57	pthread_setcanceltype			
-58	pthread_setschedparam
+56	pthread_setcancelstate			*	
+57	pthread_setcanceltype			*	
+58	pthread_setschedparam			*
 59	pthread_setspecific			*
 60	pthread_sigmask
 61	pthread_testcancel
