@@ -71,10 +71,18 @@ char * error_string[] = {
 # undef assert
 #endif
 
+#ifndef ASSERT_TRACE
+#define ASSERT_TRACE 0
+#endif
+
 #define assert(e) \
-  ((e) ? (void) 0 : \
-   (fprintf(stderr, "Assertion failed: (%s), file %s, line %d\n", \
-            #e, __FILE__, (int) __LINE__), exit(1)))
+  ((e) ? ((ASSERT_TRACE) ? fprintf(stderr, \
+                                   "Assertion succeeded: (%s), file %s, line %d\n", \
+			           #e, __FILE__, (int) __LINE__), \
+	                           fflush(stderr) : \
+                            (void) 0) : \
+         (fprintf(stderr, "Assertion failed: (%s), file %s, line %d\n", \
+                  #e, __FILE__, (int) __LINE__), exit(1)))
 
 #endif /* NDEBUG */
 

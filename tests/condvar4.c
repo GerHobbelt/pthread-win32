@@ -1,5 +1,5 @@
 /*
- * File: condvar1.c
+ * File: condvar4.c
  *
  * Test Synopsis:
  * - Test PTHREAD_COND_INITIALIZER.
@@ -50,11 +50,13 @@ typedef struct cvthing_t_ cvthing_t;
 struct cvthing_t_ {
   pthread_cond_t notbusy;
   pthread_mutex_t lock;
+  int shared;
 };
 
 static cvthing_t cvthing = {
-  PTHREAD_MUTEX_INITIALIZER,
   PTHREAD_COND_INITIALIZER,
+  PTHREAD_MUTEX_INITIALIZER,
+  0
 };
 
 enum {
@@ -66,9 +68,11 @@ mythread(void * arg)
 {
   assert(pthread_mutex_lock(&cvthing.lock) == 0);
 
-  assert(pthread_cond_signal(&cvthing.notbusy) == 0);
+  cvthing.shared++;
 
   assert(pthread_mutex_unlock(&cvthing.lock) == 0);
+
+  assert(pthread_cond_signal(&cvthing.notbusy) == 0);
 
   return 0;
 }
@@ -85,9 +89,17 @@ main()
 #endif
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
+  cvthing.shared = 0;
+
   assert((t[0] = pthread_self()) != NULL);
 
+  assert(cvthing.notbusy == PTHREAD_COND_INITIALIZER);
+
+  assert(cvthing.lock == PTHREAD_MUTEX_INITIALIZER);
+
   assert(pthread_mutex_lock(&cvthing.lock) == 0);
+
+  assert(cvthing.lock != PTHREAD_MUTEX_INITIALIZER);
 
   /* get current system time */
   _ftime(&currSysTime);
@@ -99,6 +111,8 @@ main()
 
   assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == ETIMEDOUT);
   
+  assert(cvthing.notbusy != PTHREAD_COND_INITIALIZER);
+
   assert(pthread_create(&t[1], NULL, mythread, (void *) 1) == 0);
 
   _ftime(&currSysTime);
@@ -108,11 +122,20 @@ main()
 
   abstime.tv_sec += 5;
 
-  assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == 0);
+  while (! cvthing.shared > 0)
+    assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == 0);
+
+  assert(cvthing.shared > 0);
 
   assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
+  assert(pthread_mutex_destroy(&cvthing.lock) == 0);
+
+  assert(cvthing.lock == NULL);
+
   assert(pthread_cond_destroy(&cvthing.notbusy) == 0);
+
+  assert(cvthing.notbusy == NULL);
 
   return 0;
 }

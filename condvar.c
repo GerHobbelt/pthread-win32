@@ -327,7 +327,7 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
       */
 {
   int result = EAGAIN;
-  pthread_cond_t cv;
+  pthread_cond_t cv = NULL;
 
   if (cond == NULL)
     {
@@ -443,16 +443,20 @@ pthread_cond_destroy (pthread_cond_t * cond)
 
   cv = *cond;
 
-  if (cv->waiters > 0)
+  if (cv != (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
-      return EBUSY;
+      if (cv->waiters > 0)
+	{
+	  return EBUSY;
+	}
+
+      (void) _pthread_sem_destroy (&(cv->sema));
+      (void) pthread_mutex_destroy (&(cv->waitersLock));
+      (void) CloseHandle (cv->waitersDone);
+
+      free(cv);
     }
 
-  (void) _pthread_sem_destroy (&(cv->sema));
-  (void) pthread_mutex_destroy (&(cv->waitersLock));
-  (void) CloseHandle (cv->waitersDone);
-
-  free(cv);
   *cond = NULL;
 
   return (result);
@@ -473,18 +477,23 @@ cond_timedwait (pthread_cond_t * cond,
       return EINVAL;
     }
 
-  cv = *cond;
-
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static condition variable. We check
    * again inside the guarded section of _cond_check_need_init()
    * to avoid race conditions.
    */
-  if (cv == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
+  if (*cond == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
     {
       result = _cond_check_need_init(cond);
     }
+
+  if (result != 0 && result != EBUSY)
+    {
+      return result;
+    }
+
+  cv = *cond;
 
   /*
    * OK to increment  cond->waiters because the caller locked 'mutex'

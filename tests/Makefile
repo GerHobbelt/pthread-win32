@@ -33,14 +33,36 @@ DLL	= pthread.dll
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
-TESTS	= count1 create1 equal1 exit1 exit2 exit3 \
-	 join1 mutex1 mutex2 mutex3 \
-	 once1 self1 self2 condvar1 condvar2 condvar3 condvar4 tsd1
+TESTS	= mutex1 condvar1 condvar2 exit1 create1 equal1 \
+	  exit2 exit3 \
+	  join1 mutex2 mutex3 \
+	  count1 once1 tsd1 self1 self2 eyal1 \
+	  condvar3 condvar4
 
 PASSES	= $(TESTS:%=%.pass)
 
 all:	$(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
+
+mutex1.pass:
+mutex2.pass:
+exit1.pass:
+condvar1.pass:
+self1.pass:
+condvar2.pass: condvar1.pass
+create1.pass: mutex2.pass
+mutex3.pass: create1.pass
+equal1.pass: create1.pass
+exit2.pass: create1.pass
+exit3.pass: create1.pass
+join1.pass: create1.pass
+count1.pass: join1.pass
+once1.pass: create1.pass
+tsd1.pass: join1.pass
+self2.pass: create1.pass
+eyal1.pass: tsd1.pass
+condvar3.pass: create1.pass
+condvar4.pass: create1.pass
 
 %.pass: %.exe $(LIB) $(DLL) $(HDR)
 	$*

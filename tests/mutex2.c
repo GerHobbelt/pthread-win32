@@ -26,5 +26,9 @@ main()
 
   assert(pthread_mutex_unlock(&mutex) == 0);
 
+  assert(pthread_mutex_destroy(&mutex) == 0);
+
+  assert(mutex == NULL);
+
   return 0;
 }
