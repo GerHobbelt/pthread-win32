@@ -1,5 +1,8 @@
 2002-02-23  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
+	* pthread_rwlock_timedrdlock.c: New - untested.
+	* pthread_rwlock_timedwrlock.c: New - untested.
+	
 	* Testsuite passed (except known MSVC++ problems)
 
 	* pthread_cond_destroy.c: Expand the time change
