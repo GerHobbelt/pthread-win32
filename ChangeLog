@@ -1,3 +1,8 @@
+Thu Oct 22 21:44:44 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* tsd.c: Add description of pthread_key_delete() from the
+	standard as a comment.
+
 Thu Oct 15 14:05:01 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* private.c (_pthread_new_thread): Remove init of destructorstack.
