@@ -1,5 +1,18 @@
 Fri Jul 31 00:05:45 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* Makefile (SRCS): Create. Preliminary.
+
+	* windows.h: Create. Contains Win32 definitions for compile
+	testing. This is just a standin for the real one.
+
+	* pthread.h (SIG_UNBLOCK): Fix typo. Was SIG_BLOCK.
+	(windows.h): Add include. Required for CRITICAL_SECTION.
+	(pthread_cond_t): Move enum declaration outside of struct
+	definition.
+	(unistd.h): Add include - may be temporary.
+
+	* condvar.c (windows.h): Add include.
+
 	* implement.h (_PTHREAD_THIS): Remove - no longer required.
 	(_PTHREAD_STACK): Use pthread_self() instead of _PTHREAD_THIS.
 
