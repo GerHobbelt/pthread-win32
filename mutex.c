@@ -91,7 +91,7 @@ ptw32_mutex_check_need_init(pthread_mutex_t *mutex)
   return(result);
 }
 
-int
+INLINE int
 pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
 {
   int result = 0;
@@ -762,7 +762,7 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec * abstime)
 }				/* ptw32_timed_semwait */
 
 
-int
+INLINE int
 pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   int result = 0;
@@ -829,7 +829,7 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
 }
 
 
-int
+INLINE int
 pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 {
   int result = 0;
@@ -940,6 +940,11 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 		    }
 		  case 2: /* abstime had passed before we started to wait. */
 		    {
+		      /*
+                       * If we timeout, it is up to us to adjust lock_idx to say
+                       * we're no longer waiting. wait_sema has not been touched.
+                       */
+                      (void) InterlockedDecrement( &mx->lock_idx );
 		      result = ETIMEDOUT;
 		      break;
 		    }
@@ -957,7 +962,7 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 }
 
 
-int
+INLINE int
 pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   int result = 0;
@@ -1011,7 +1016,7 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
   return(result);
 }
 
-int
+INLINE int
 pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
   int result = 0;
