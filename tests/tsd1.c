@@ -7,24 +7,38 @@ pthread_once_t key_once = PTHREAD_ONCE_INIT;
 void
 make_key(void)
 {
-  (void) pthread_key_create(&key, free);
+  if (pthread_key_create(&key, free) != 0)
+    {
+      printf("Key create failed\n");
+      exit(1);
+    }
 }
 
 void *
 mythread(void * arg)
 {
-  void *ptr;
+  void * ptr;
 
   (void) pthread_once(&key_once, make_key);
-  if ((ptr = pthread_getspecific(key)) == NULL)
+
+  if ((ptr = pthread_getspecific(key)) != NULL)
     {
-      ptr = malloc(80);
-      sprintf(ptr, "Thread %d\n", (int) arg);
+      printf("ERROR: Thread %d, Key 0x%x not initialised to NULL\n",
+	     (int) arg,
+	     (int) key);
+      exit(1);
+    }
+  else
+    {
+      ptr = (void *) malloc(80);
+      sprintf((char *) ptr, "Thread %d Key 0x%x succeeded\n",
+	      (int) arg,
+	      (int) key);
       (void) pthread_setspecific(key, ptr);
     }
 
-  if (pthread_getspecific(key) == NULL)
-    printf((char *) pthread_getspecific(key));
+  if ((ptr = pthread_getspecific(key)) != NULL)
+    printf((char *) ptr);
   else
     printf("Failed %d\n", (int) arg);
 
@@ -37,10 +51,10 @@ main()
   int rc;
   pthread_t t1, t2;
   
-  rc = pthread_create(&t1, NULL, mythread, 1);
+  rc = pthread_create(&t1, NULL, mythread, (void *) 1);
   printf("pthread_create returned %d\n", rc);
 
-  rc = pthread_create(&t2, NULL, mythread, 2);
+  rc = pthread_create(&t2, NULL, mythread, (void *) 2);
   printf("pthread_create returned %d\n", rc);
 
   Sleep(2000);
