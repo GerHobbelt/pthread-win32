@@ -84,7 +84,11 @@ pthread_detach(pthread_t thread)
     {
       return EINVAL;
     }
-
-  /* FIXME: As far as I can determine we just no-op. */
+  
+  this->attr.detached = PTHREAD_CREATE_DETACHED;
+  if (CloseHandle(thread) != TRUE)
+    {
+      return ESRCH;
+    }
   return 0;
 }
