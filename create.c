@@ -92,7 +92,7 @@ pthread_create(pthread_t *thread,
 	  attr_copy->priority = attr->priority;
 
 #if HAVE_SIGSET_T
-	  memcpy(attr_copy.sigmask, attr.sigmask, sizeof(sigset_t)); 
+	  memcpy(attr_copy->sigmask, attr->sigmask, sizeof(sigset_t)); 
 #endif /* HAVE_SIGSET_T */
 	}
 
