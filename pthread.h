@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 typedef HANDLE pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
 typedef DWORD pthread_key_t;
+typedef unsigned short pthread_once_t;
 
 typedef struct {
   enum { SIGNAL, BROADCAST, NUM_EVENTS };
@@ -41,6 +42,9 @@ typedef struct {
 
 typedef struct { void * ptr; } pthread_condattr_t;
 typedef struct { void * ptr; } pthread_mutexattr_t;
+
+/* Initialisers. */
+#define PTHREAD_ONCE_INIT 0
 
 #ifdef __cplusplus
 extern "C" {
@@ -182,10 +186,14 @@ struct _pthread_threads_thread {
 pthread_mutex_t _pthread_count_mutex = PTHREAD_MUTEX_INITIALIZER;
 DWORD _pthread_threads_count = 0;
 _pthread_threads_thread_t _pthread_threads_table[PTHREAD_THREADS_MAX];
+unsigned short _pthread_once_flag;
+pthread_mutex_t _pthread_once_lock = PTHREAD_MUTEX_INITIALIZER;
 #else
 extern pthread_mutex_t _pthread_count_mutex;
 extern DWORD _pthread_threads_count;
 extern _pthread_threads_thread_t _pthread_threads_table[];
+extern unsigned short _pthread_once_flag;
+pthread_mutex_t _pthread_once_lock;
 #endif
 
 /* End of application static data */
