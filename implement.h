@@ -1,14 +1,16 @@
 /*
  * implement.h
  *
- * Things that do not belong in pthread.h but may be needed
- * by other parts of this pthreads implementation internally.
+ * Implementation specific (non API) stuff.
  */
+
+#ifndef _IMPLEMENT_H
+#define _IMPLEMENT_H
 
 /* FIXME: Arbitrary. Need values from Win32.
  */
 #define PTHREAD_THREADS_MAX 256
-#define PTHREAD_STACK_MIN 65535
+#define PTHREAD_STACK_MIN   65535
 
 extern DWORD pthreads_thread_count;
 
@@ -23,3 +25,5 @@ typedef struct {
 typedef struct {
   int pshared;
 } _pthread_condattr_t;
+
+#endif /* _IMPLEMENT_H */
