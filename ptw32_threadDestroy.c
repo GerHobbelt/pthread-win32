@@ -76,10 +76,8 @@ ptw32_threadDestroy (pthread_t thread)
 #if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
       /*
        * See documentation for endthread vs endthreadex.
-       * Don't close the Win32 handle of implicit POSIX threads
-       * because the process may want to call GetExitCodeThread().
        */
-      if (threadCopy.threadH != 0 && !threadCopy.implicit)
+      if (threadCopy.threadH != 0)
 	{
 	  CloseHandle (threadCopy.threadH);
 	}
