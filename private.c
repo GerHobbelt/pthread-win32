@@ -25,10 +25,12 @@
  */
 
 int
-_pthread_new_thread_entry(pthread_t thread, 
-			  _pthread_threads_thread_t ** entry)
+_pthread_new_thread_entry(pthread_t thread, _pthread_threads_thread_t * entry)
 {
-  _pthread_threads_thread_t ** this;
+  _pthread_threads_thread_t * this;
+
+  /* CRITICAL SECTION */
+  pthread_mutex_lock(&_pthread_count_mutex);
 
   if (_pthread_threads_count >= PTHREAD_THREADS_MAX)
     {
@@ -37,7 +39,7 @@ _pthread_new_thread_entry(pthread_t thread,
 
   this = &_pthread_threads_table[_PTHREAD_HASH_INDEX(thread)];
 
-  while ((*this)->thread != NULL)
+  while (this->thread != NULL)
     {
       this++;
 
@@ -48,45 +50,40 @@ _pthread_new_thread_entry(pthread_t thread,
 	}
     }
 
-  if ((*this)->thread != NULL)
+  if (this->thread != NULL)
     {
       /* INTERNAL ERROR: There should be at least one slot left. */
       return ESRCH;
     }
   else
     {
-      new = (_pthread_threads_thread_t *) malloc(sizeof(_pthread_threads_thread_t));
-
-      if (new == NULL)
-	{
-	  return ENOMEM;
-	}
-
-      new->thread = thread;
-      pthread_attr_init(&(new->attr));
-      new->cleanupstack = NULL;
-      new->destructorstack = NULL;
-      new->forkpreparestack = NULL;
-      new->forkparentstack = NULL;
-      new->forkchildstack = NULL;
-      *this = new;
+      this->thread = thread;
+      pthread_attr_init(&(this->attr));
+      this->cleanupstack = NULL;
+      this->destructorstack = NULL;
+      this->forkpreparestack = NULL;
+      this->forkparentstack = NULL;
+      this->forkchildstack = NULL;
     }
 
   _pthread_threads_count++;
   entry = this;
 
+  pthread_mutex_unlock(&_pthread_count_mutex);
+  /* END CRITICAL SECTION */
+
   return 0;
 }
 
-_pthread_threads_thread **
+_pthread_threads_thread *
 _pthread_find_thread_entry(pthread_t thread)
 {
-  _pthread_threads_thread_t ** this;
-  _pthread_threads_thread_t ** start;
+  _pthread_threads_thread_t * this;
+  _pthread_threads_thread_t * start;
 
   start = this = &_pthread_threads_table[_PTHREAD_HASH_INDEX(thread)];
 
-  while ((*this)->thread != thread)
+  while (this->thread != thread)
     {
       this++;
 
@@ -96,7 +93,7 @@ _pthread_find_thread_entry(pthread_t thread)
 	  this = _pthread_threads_table;
 	}
 
-      if ((*this)->thread == NULL || this == start)
+      if (this->thread == NULL || this == start)
 	{
 	  /* Failed to find the thread. */
 	  return -1;
@@ -107,12 +104,12 @@ _pthread_find_thread_entry(pthread_t thread)
 }
 
 void
-_pthread_delete_thread_entry(_pthread_threads_thread_t ** this)
+_pthread_delete_thread_entry(_pthread_threads_thread_t * this)
 {
   /* We don't check that the thread has been properly cleaned up, so
      it had better be done already. */
-  _pthread_threads_thread ** this;
-  _pthread_threads_thread ** entry;
+  _pthread_threads_thread_t * this;
+  _pthread_threads_thread_t * entry;
 
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_count_mutex);
@@ -125,12 +122,9 @@ _pthread_delete_thread_entry(_pthread_threads_thread_t ** this)
       this = _PTHREAD_THIS;
     }
 
-  if (this != NULL)
+  if (this->thread != NULL)
     {
-      entry = this;
-      /* Do this first to avoid contention and then free the storage. */
-      this = NULL;
-      free(*entry);
+      this->thread = NULL;
 
       if (_pthread_threads_count > 0)
 	{
@@ -141,8 +135,11 @@ _pthread_delete_thread_entry(_pthread_threads_thread_t ** this)
 	  /* FIXME: INTERNAL ERROR: This should not happen. */
 	}
     }
+  else
+    {
+      /* FIXME: INTERNAL ERROR: This should not happen. */
+    }
 
   pthread_mutex_unlock(&_pthread_count_mutex);
   /* END CRITICAL SECTION */
 }
-

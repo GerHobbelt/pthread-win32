@@ -12,14 +12,19 @@
 #include "implement.h"
 
 unsigned
-_pthread_start_call(void *this)
+_pthread_start_call(void * call)
 {
   /* We're now in a running thread. Any local variables here are on
      this threads private stack so we're safe to leave data in them
      until we leave. */
-  unsigned (*func)(void *) = this->call.routine;
-  void * arg = this->call.arg;
+  _pthread_call_t * this;
+  unsigned (*func)(void *);
+  void * arg;
   unsigned ret;
+
+  this = (_pthread_call_t *) call;
+  func = call->routine;
+  arg = call->arg;
 
   ret = (*func)(arg);
 
@@ -40,30 +45,19 @@ pthread_create(pthread_t *thread,
   HANDLE   handle = NULL;
   unsigned flags;
   void *   security = NULL;
-
-  /* FIXME: This needs to be moved into process space. 
-     Perhaps into a structure that contains all
-     per thread info that is Win32 thread specific but
-     not visible from the pthreads API, and
-     accessible through HANDLE (or pthread_t).
-   */
-  SECURITY_ATTRIBUTES security_attr;
   DWORD  threadID;
-  /* Success unless otherwise set. */
-  int ret = 0;
   pthread_attr_t * attr_copy;
   _pthread_threads_thread_t * this;
+  /* Success unless otherwise set. */
+  int ret = 0;
 
-  /* CRITICAL SECTION */
-  pthread_mutex_lock(&_pthread_count_mutex);
-
-  if (_pthread_new_thread_entry((pthread_t) handle, &this) == 0)
+  if (_pthread_new_thread_entry((pthread_t) handle, this) == 0)
     {
       attr_copy = &(this->attr);
 
       if (attr != NULL) 
 	{
-	  /* Map attributes */
+	  /* Map attributes. */
 	  if (attr_copy->stacksize == 0)
 	    {
 	      attr_copy->stacksize = PTHREAD_STACK_MIN;
@@ -72,15 +66,13 @@ pthread_create(pthread_t *thread,
 	  attr_copy->cancelability = attr->cancelability;
 	}
 
-      /* Start suspended and resume at the last moment to avoid
-	 race conditions, ie. where a thread may enquire it's
-	 attributes before we finish storing them away. */
-      flags = 1;
+      /* Start running, not suspended. */
+      flags = 0;
 
       handle = (HANDLE) _beginthreadex(security,
 				       attr_copy->stacksize,
 				       _pthread_start_call,
-				       (void *) this,
+				       (void *) &(this->call),
 				       flags,
 				       &threadID);
 
@@ -94,17 +86,10 @@ pthread_create(pthread_t *thread,
       ret = EAGAIN;
     }
 
-  /* Let others in as soon as possible. */
-  pthread_mutex_unlock(&_pthread_count_mutex);
-  /* END CRITICAL SECTION */
-
   if (ret == 0)
     {
       /* Let the caller know the thread handle. */
       *thread = (pthread_t) handle;
-
-      /* POSIX threads are always running after creation. */
-      ResumeThread(handle);
     }
   else
     {
