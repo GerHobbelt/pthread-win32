@@ -1,3 +1,12 @@
+2002-09-20  Michael Johnson  <michaelj@maine.rr.com>
+
+	* pthread_cond_destroy.c (pthread_cond_destroy): 
+	When two different threads exist, and one is attempting to
+	destroy a condition variable while the other is attempting to
+	initialize a condition variable that was created with
+	PTHREAD_COND_INITIALIZER, a deadlock can occur. Shrink
+	the ptw32_cond_list_lock critical section to fix it.
+
 2002-07-31  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* ptw32_threadStart.c (ptw32_threadStart): Thread cancelLock

@@ -98,3 +98,5 @@ Max Woodbury		mtew@cds.duke.edu
 					reduced namespace pollution;
 					idea to separate routines to reduce statically
 					linked image sizes.
+Michael Johnson		michaelj@maine.rr.com
+					Bug fix.
