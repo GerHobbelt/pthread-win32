@@ -1,3 +1,12 @@
+2002-07-30  Ross Johnson  <rpj@ise.canberra.edu.au>
+
+	* sem_timedwait.c (sem_timedwait): Tighten checks for
+	unreasonable abstime values - that would result in
+	unexpected timeout values.
+
+	* w32_CancelableWait.c (ptw32_cancelable_wait):
+	Tighten up return value checking and add comments.
+
 2002-06-04  Rob Fanner  <rfanner@stonethree.com>
 
 	* sem_getvalue.c (sem_getvalue): The Johnson M. Hart
@@ -7,7 +16,7 @@
 	value. There is a small probability that this may
 	block other threads, but only momentarily.
 
-2002-06-03  Ross Johnson  <rpj@digit.ise.canberra.edu.au>
+2002-06-03  Ross Johnson  <rpj@ise.canberra.edu.au>
 
 	* sem_init.c (sem_init): Initialise Win32 semaphores
 	to _POSIX_SEM_VALUE_MAX (which this implementation

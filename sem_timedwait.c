@@ -116,63 +116,95 @@ sem_timedwait (sem_t * sem, const struct timespec * abstime)
   else
     {
       if (abstime == NULL)
-	{
-	  milliseconds = INFINITE;
-	}
+				{
+					milliseconds = INFINITE;
+				}
       else
-	{
-	  /* 
-	   * Calculate timeout as milliseconds from current system time. 
-	   */
+				{
+					milliseconds = 0;
 
-	  /* get current system time */
-
+					/* 
+					 * Calculate timeout as milliseconds from current system time. 
+					 */
+					
+					/* get current system time */
+					
 #ifdef NEED_FTIME
 
-	  {
-	    FILETIME ft;
-	    SYSTEMTIME st;
+					{
+						FILETIME ft;
+						SYSTEMTIME st;
 
-	    GetSystemTime(&st);
-	    SystemTimeToFileTime(&st, &ft);
-	    /*
-	     * GetSystemTimeAsFileTime(&ft); would be faster,
-	     * but it does not exist on WinCE
-	     */
-
-	    ptw32_filetime_to_timespec(&ft, &currSysTime);
-	  }
-
-	  /*
-	   * subtract current system time from abstime
-	   */
-	  milliseconds = (abstime->tv_sec - currSysTime.tv_sec) * MILLISEC_PER_SEC;
-	  milliseconds += ((abstime->tv_nsec - currSysTime.tv_nsec)
-                           + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
-
+						GetSystemTime(&st);
+						SystemTimeToFileTime(&st, &ft);
+						/*
+						 * GetSystemTimeAsFileTime(&ft); would be faster,
+						 * but it does not exist on WinCE
+						 */
+						
+						ptw32_filetime_to_timespec(&ft, &currSysTime);
+					}
+					
+					/*
+					 * subtract current system time from abstime in a way that checks
+					 * that abstime is never in the past, or is never equivalent to the
+					 * defined INFINITE value (0xFFFFFFFF).
+					 */
+					if (abstime->tv_sec >= currSysTime.tv_sec)
+						{
+							DWORD tmpMilliseconds;
+							DWORD tmpCurrMilliseconds;
+							
+							tmpMilliseconds = (abstime->tv_sec - currSysTime.tv_sec) * MILLISEC_PER_SEC;
+							tmpMilliseconds += ((abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2))
+								/ NANOSEC_PER_MILLISEC);
+							tmpCurrMilliseconds = ((currSysTime.tv_nsec + (NANOSEC_PER_MILLISEC/2))
+								/ NANOSEC_PER_MILLISEC);
+							if (tmpMilliseconds > tmpCurrMilliseconds)
+								{
+									milliseconds = tmpMilliseconds - tmpCurrMilliseconds;
+									if (milliseconds == INFINITE)
+										{
+											milliseconds--;
+										}
+								}
+						}
+					
 #else /* NEED_FTIME */
-	  _ftime(&currSysTime);
-
-	  /*
-	   * subtract current system time from abstime
-	   */
-	  milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
-	  milliseconds += ((abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC)
-            - currSysTime.millitm;
-
+					_ftime(&currSysTime);
+					
+					/*
+					 * subtract current system time from abstime in a way that checks
+					 * that abstime is never in the past, or is never equivalent to the
+					 * defined INFINITE value (0xFFFFFFFF).
+					 */
+					if (abstime->tv_sec >= currSysTime.time)
+						{
+							DWORD tmpMilliseconds;
+							
+							tmpMilliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
+							tmpMilliseconds += ((abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2))
+								/ NANOSEC_PER_MILLISEC);
+							if (tmpMilliseconds > currSysTime.millitm)
+								{
+									milliseconds = tmpMilliseconds - currSysTime.millitm;
+									if (milliseconds == INFINITE)
+										{
+											milliseconds--;
+										}
+								}
+						}
+					
 #endif /* NEED_FTIME */
-
-
-	  if (((int) milliseconds) < 0)
-	    milliseconds = 0;
-	}
-
+					
+				}
+			
 #ifdef NEED_SEM
-
+			
       result = (pthreadCancelableTimedWait ((*sem)->event, milliseconds));
-
+			
 #else /* NEED_SEM */
-
+			
       result = (pthreadCancelableTimedWait ((*sem)->sem, milliseconds));
 
 #endif

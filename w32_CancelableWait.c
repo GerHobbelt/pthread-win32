@@ -68,13 +68,13 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
        * Get cancelEvent handle
        */
       if (self->cancelState == PTHREAD_CANCEL_ENABLE)
-	{
+				{
 
-	  if ((handles[1] = self->cancelEvent) != NULL)
-	    {
-	      nHandles++;
-	    }
-	}
+					if ((handles[1] = self->cancelEvent) != NULL)
+						{
+							nHandles++;
+						}
+				}
     }
   else
     {
@@ -88,68 +88,61 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 				    timeout);
 
 
-  if (status == WAIT_FAILED)
-    {
-      result = EINVAL;
-    }
-  else if (status == WAIT_TIMEOUT)
-    {
-      result = ETIMEDOUT;
-    }
-  else if (status == WAIT_ABANDONED_0)
-    {
-      result = EINVAL;
-    }
-  else
-    {
-      /*
-       * Either got the handle or the cancel event
-       * was signaled
-       */
-      switch (status - WAIT_OBJECT_0)
-	{
-
-	case 0:
-	  /*
-	   * Got the handle
-	   */
-	  result = 0;
-	  break;
-
-	case 1:
-	  /*
-	   * Got cancel request
-	   */
-	  ResetEvent (handles[1]);
-
-	  if (self != NULL && !self->implicit)
-	    {
-	      /*
-	       * Thread started with pthread_create.
-	       * Make sure we haven't been async-canceled in the meantime.
-	       */
-	      (void) pthread_mutex_lock(&self->cancelLock);
-	      if (self->state < PThreadStateCanceling)
+	switch (status - WAIT_OBJECT_0)
 		{
-		  self->state = PThreadStateCanceling;
-		  self->cancelState = PTHREAD_CANCEL_DISABLE;
-		  (void) pthread_mutex_unlock(&self->cancelLock);
-		  ptw32_throw(PTW32_EPS_CANCEL);
+			case 0:
+				/*
+				 * Got the handle.
+				 * In the event that both handles are signalled, the smallest index
+				 * value (us) is returned. As it has been arranged, this ensures that
+				 * we don't drop a signal that we should act on (i.e. semaphore,
+				 * mutex, or condition variable etc).
+				 */
+				result = 0;
+				break;
 
-		  /* Never reached */
+			case 1:
+				/*
+				 * Got cancel request.
+				 * In the event that both handles are signalled, the cancel will
+				 * be ignored (see case 0 comment).
+				 */
+				ResetEvent (handles[1]);
+
+				if (self != NULL && !self->implicit)
+					{
+						/*
+						 * Thread started with pthread_create.
+						 * Make sure we haven't been async-canceled in the meantime.
+						 */
+						(void) pthread_mutex_lock(&self->cancelLock);
+						if (self->state < PThreadStateCanceling)
+							{
+								self->state = PThreadStateCanceling;
+								self->cancelState = PTHREAD_CANCEL_DISABLE;
+								(void) pthread_mutex_unlock(&self->cancelLock);
+								ptw32_throw(PTW32_EPS_CANCEL);
+										
+								/* Never reached */
+							}
+						(void) pthread_mutex_unlock(&self->cancelLock);
+					}
+						
+				/* Should never get to here. */
+				result = EINVAL;
+				break;
+
+			default:
+				if (status == WAIT_TIMEOUT)
+					{
+						result = ETIMEDOUT;
+					}
+				else
+					{
+						result = EINVAL;
+					}
+				break;
 		}
-	      (void) pthread_mutex_unlock(&self->cancelLock);
-	    }
-
-	  /* Should never get to here. */
-	  result = EINVAL;
-	  break;
-
-	default:
-	  result = EINVAL;
-	  break;
-	}
-    }
 
   return (result);
 
