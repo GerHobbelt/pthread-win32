@@ -378,21 +378,12 @@ pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
 
         if (rwl->nSharedAccessCount > 0) 
           {
-            /*
-             * pthread_rwlock_wrlock() is not a cancelation point
-             * so temporarily prevent pthread_cond_wait() from being one.
-             */
-            pthread_t self = pthread_self();
-            int oldCancelState;
-
             rwl->nCompletedSharedAccessCount = -rwl->nSharedAccessCount;
 
-            if (self->cancelType == PTHREAD_CANCEL_DEFERRED)
-              {
-                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldCancelState);
-              }
-
-            /* Could still be PTHREAD_CANCEL_ASYNCHRONOUS. */
+            /*
+             * This routine may be a cancelation point
+             * according to POSIX 1003.1j section 18.1.2.
+             */
             pthread_cleanup_push(ptw32_rwlock_cancelwrwait, (void*)rwl);
 
             do 
@@ -401,11 +392,6 @@ pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
                                            &(rwl->mtxSharedAccessCompleted));
               }
             while (result == 0 && rwl->nCompletedSharedAccessCount < 0);
-
-            if (self->cancelType == PTHREAD_CANCEL_DEFERRED)
-              {
-                pthread_setcancelstate(oldCancelState, NULL);
-              }
 
             pthread_cleanup_pop ((result != 0) ? 1 : 0);
 
