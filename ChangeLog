@@ -1,3 +1,7 @@
+1998-07-25  Ben Elliston  <bje@cygnus.com>
+
+	* fork.c (fork): Autoconfiscate.
+
 Sat Jul 25 00:00:13 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* create.c (_pthread_start_call): Set thread priority.  Ensure our
