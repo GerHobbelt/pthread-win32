@@ -121,11 +121,11 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 
 #endif /* NEED_FTIME */
 
-  const DWORD NANOSEC_PER_MILLISEC = 1000000;
-  const DWORD MILLISEC_PER_SEC = 1000;
+  const int64_t NANOSEC_PER_MILLISEC = 1000000;
+  const int64_t MILLISEC_PER_SEC = 1000;
   DWORD milliseconds;
-  DWORD tmpAbsMilliseconds;
-  DWORD tmpCurrMilliseconds;
+  int64_t tmpAbsMilliseconds;
+  int64_t tmpCurrMilliseconds;
 
   if (sem == NULL)
     {
@@ -150,8 +150,8 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 	   *
 	   * Assume all integers are unsigned, i.e. cannot test if less than 0.
 	   */
-	  tmpAbsMilliseconds =  abstime->tv_sec * MILLISEC_PER_SEC;
-	  tmpAbsMilliseconds += (abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
+	  tmpAbsMilliseconds =  (int64_t)abstime->tv_sec * MILLISEC_PER_SEC;
+	  tmpAbsMilliseconds += ((int64_t)abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
 
 	  /* get current system time */
 
@@ -171,21 +171,21 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 	    ptw32_filetime_to_timespec(&ft, &currSysTime);
 	  }
 
-	  tmpCurrMilliseconds = currSysTime.tv_sec * MILLISEC_PER_SEC;
-	  tmpCurrMilliseconds += (currSysTime.tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
+	  tmpCurrMilliseconds = (int64_t)currSysTime.tv_sec * MILLISEC_PER_SEC;
+	  tmpCurrMilliseconds += ((int64_t)currSysTime.tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
 
 #else /* ! NEED_FTIME */
 
 	  _ftime(&currSysTime);
 
-	  tmpCurrMilliseconds = (DWORD) currSysTime.time * MILLISEC_PER_SEC;
-	  tmpCurrMilliseconds += (DWORD) currSysTime.millitm;
+	  tmpCurrMilliseconds = (int64_t) currSysTime.time * MILLISEC_PER_SEC;
+	  tmpCurrMilliseconds += (int64_t) currSysTime.millitm;
 
 #endif /* NEED_FTIME */
 
 	  if (tmpAbsMilliseconds > tmpCurrMilliseconds)
 	    {
-	      milliseconds = tmpAbsMilliseconds - tmpCurrMilliseconds;
+	      milliseconds = (DWORD) (tmpAbsMilliseconds - tmpCurrMilliseconds);
 	      if (milliseconds == INFINITE)
 		{
 		  /* Timeouts must be finite */

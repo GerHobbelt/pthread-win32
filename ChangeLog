@@ -1,3 +1,17 @@
+2005-04-01  Kevin Lussier <Kevin at codegreennetworks.com>
+
+	* sem_timedwait.c (sem_timedwait): Increase size of temp variables to
+	avoid int overflows for large timeout values.
+	* implement.h (int64_t): Include or define.
+
+2005-03-31   Dimitar Panayotov <develop at mail.bg>^M
+
+	* pthread.h: Fix conditional defines for static linking.
+	* sched.h: Liekwise.
+	* semaphore.h: Likewise.
+	* dll.c (PTW32_STATIC_LIB): Module is conditionally included
+	in the build.
+
 2005-03-16  Ross Johnson  <ross at callisto.canberra.edu.au>^M
 
         * pthread_setcancelstate.c: Undo the last change.

@@ -37,8 +37,8 @@
  * See the README file for an explanation of the pthreads-win32 version
  * numbering scheme and how the DLL is named etc.
  */
-#define PTW32_VERSION 2,1,0,0
-#define PTW32_VERSION_STRING "2, 1, 0, 0\0"
+#define PTW32_VERSION 2,2,0,0
+#define PTW32_VERSION_STRING "2, 2, 0, 0\0"
 
 /* There are three implementations of cancel cleanup.
  * Note that pthread.h is included in both application
@@ -556,12 +556,14 @@ extern "C"
  * do NOT define PTW32_BUILD, and then the variables/functions will
  * be imported correctly.
  */
-#ifdef _DLL
+#ifndef PTW32_STATIC_LIB
 #  ifdef PTW32_BUILD
 #    define PTW32_DLLPORT __declspec (dllexport)
 #  else
 #    define PTW32_DLLPORT __declspec (dllimport)
 #  endif
+#else
+#  define PTW32_DLLPORT
 #endif
 
 /*

@@ -90,6 +90,12 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #define PTW32_INTERLOCKED_LPLONG PVOID*
 #endif
 
+#if defined(__MINGW32__)
+#include <stdint.h>
+#else
+#define int64_t _int64
+#endif
+
 typedef enum
 {
   /*
