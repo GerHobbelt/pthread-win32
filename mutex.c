@@ -4,26 +4,34 @@
  * Description:
  * This translation unit implements mutual exclusion (mutex) primitives.
  *
- * Pthreads-win32 - POSIX Threads Library for Win32
- * Copyright (C) 1998 Ben Elliston and Ross Johnson
- * Copyright (C) 1999,2000,2001 Ross Johnson
+ * --------------------------------------------------------------------------
  *
- * Contact Email: rpj@ise.canberra.edu.au
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2002 Pthreads-win32 contributors
+ * 
+ *      Contact Email: rpj@ise.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
 #ifndef _UWIN
@@ -933,7 +941,7 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 		       * possible error, so no need to test errno.
 		       */
 
-		      if (-1 == sem_trywait( &mx->wait_sema ))
+		      if ( -1 == sem_trywait( &mx->wait_sema ) )
 			{
 			  (void) InterlockedDecrement( &mx->lock_idx );
 			  result = ETIMEDOUT;
@@ -942,14 +950,39 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 		      LeaveCriticalSection(&mx->wait_cs);
 		      break;
 		    }
-		  case 2: /* abstime had passed before we started to wait. */
+		  case 2: /* abstime passed before we started to wait. */
 		    {
 		      /*
 		       * If we timeout, it is up to us to adjust lock_idx to say
-		       * we're no longer waiting. wait_sema has not been touched.
+		       * we're no longer waiting.
+                       *
+                       * The owner thread may still have posted wait_sema thinking
+                       * we were waiting. I believe we must check but then NOT do any
+                       * programmed work if we have acquired the mutex because
+                       * we don't how long ago abstime was. We MUST just release it
+                       * immediately.
 		       */
-		      (void) InterlockedDecrement( &mx->lock_idx );
+		      EnterCriticalSection(&mx->wait_cs);
+
 		      result = ETIMEDOUT;
+
+		      if ( -1 == sem_trywait( &mx->wait_sema ) )
+			{
+			  (void) InterlockedDecrement( &mx->lock_idx );
+			}
+                      else
+                        {
+                          if ( InterlockedDecrement( &mx->lock_idx ) >= 0 )
+                            {
+                              /* Someone else is waiting on that mutex */
+                              if ( sem_post( &mx->wait_sema ) != 0 )
+                                {
+                                  result = errno;
+                                }
+                            }
+                        }
+
+		      LeaveCriticalSection(&mx->wait_cs);
 		      break;
 		    }
 		  default:

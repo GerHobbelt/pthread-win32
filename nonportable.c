@@ -4,26 +4,34 @@
  * Description:
  * This translation unit implements non-portable thread functions.
  *
- * Pthreads-win32 - POSIX Threads Library for Win32
- * Copyright (C) 1998 Ben Elliston and Ross Johnson
- * Copyright (C) 1999,2000,2001 Ross Johnson
+ * --------------------------------------------------------------------------
  *
- * Contact Email: rpj@ise.canberra.edu.au
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2002 Pthreads-win32 contributors
+ * 
+ *      Contact Email: rpj@ise.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
 #include "pthread.h"
@@ -111,6 +119,7 @@ pthread_delay_np (struct timespec * interval)
   DWORD secs_in_millisecs;
   DWORD millisecs;
   DWORD status;
+  pthread_t self;
 
   if (interval == NULL)
     {
@@ -136,13 +145,18 @@ pthread_delay_np (struct timespec * interval)
       return EINVAL;
     }
 
+  if (NULL == (self = pthread_self()))
+    {
+      return ENOMEM;
+    }
+
   if (self->cancelState == PTHREAD_CANCEL_ENABLE)
     {
       /*
        * Async cancelation won't catch us until wait_time is up.
        * Deferred cancelation will cancel us immediately.
        */
-      if (WAIT_OBJECT_0 == 
+      if (WAIT_OBJECT_0 ==
           (status = WaitForSingleObject(self->cancelEvent, wait_time)) )
         {
           /*
@@ -157,9 +171,11 @@ pthread_delay_np (struct timespec * interval)
 
               ptw32_throw(PTW32_EPS_CANCEL);
             }
-        }
 
-      if (status != WAIT_TIMEOUT)
+          (void) pthread_mutex_unlock(&self->cancelLock);
+          return ESRCH;
+        }
+      else if (status != WAIT_TIMEOUT)
         {
           return EINVAL;
         }

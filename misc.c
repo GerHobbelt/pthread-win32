@@ -4,26 +4,34 @@
  * Description:
  * This translation unit implements miscellaneous thread functions.
  *
- * Pthreads-win32 - POSIX Threads Library for Win32
- * Copyright (C) 1998 Ben Elliston and Ross Johnson
- * Copyright (C) 1999,2000,2001 Ross Johnson
+ * --------------------------------------------------------------------------
  *
- * Contact Email: rpj@ise.canberra.edu.au
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA
+ *	Pthreads-win32 - POSIX Threads Library for Win32
+ *	Copyright(C) 1998 John E. Bossom
+ *	Copyright(C) 1999,2002 Pthreads-win32 contributors
+ * 
+ *	Contact Email: rpj@ise.canberra.edu.au
+ * 
+ *	The current list of contributors is contained
+ *	in the file CONTRIBUTORS included with the source
+ *	code distribution. The list can also be seen at the
+ *	following World Wide Web location:
+ *	http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *	This library is free software; you can redistribute it and/or
+ *	modify it under the terms of the GNU Lesser General Public
+ *	License as published by the Free Software Foundation; either
+ *	version 2 of the License, or (at your option) any later version.
+ * 
+ *	This library is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *	Lesser General Public License for more details.
+ * 
+ *	You should have received a copy of the GNU Lesser General Public
+ *	License along with this library in the file COPYING.LIB;
+ *	if not, write to the Free Software Foundation, Inc.,
+ *	59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
 #include "pthread.h"
@@ -32,40 +40,40 @@
 
 int
 pthread_once (
-               pthread_once_t * once_control,
-               void (*init_routine) (void)
+	       pthread_once_t * once_control,
+	       void (*init_routine) (void)
 )
-        /*
-         * ------------------------------------------------------
-         * DOCPUBLIC
-         *      If any thread in a process  with  a  once_control  parameter
-         *      makes  a  call to pthread_once(), the first call will summon
-         *      the init_routine(), but  subsequent  calls  will  not. The
-         *      once_control  parameter  determines  whether  the associated
-         *      initialization routine has been called.  The  init_routine()
-         *      is complete upon return of pthread_once().
-         *      This function guarantees that one and only one thread
-         *      executes the initialization routine, init_routine when
-         *      access is controlled by the pthread_once_t control
-         *      key.
-         *
-         * PARAMETERS
-         *      once_control
-         *              pointer to an instance of pthread_once_t
-         *
-         *      init_routine
-         *              pointer to an initialization routine
-         *
-         *
-         * DESCRIPTION
-         *      See above.
-         *
-         * RESULTS
-         *              0               success,
-         *              EINVAL          once_control or init_routine is NULL
-         *
-         * ------------------------------------------------------
-         */
+	/*
+	 * ------------------------------------------------------
+	 * DOCPUBLIC
+	 *	If any thread in a process  with  a  once_control  parameter
+	 *	makes  a  call to pthread_once(), the first call will summon
+	 *	the init_routine(), but  subsequent  calls  will  not. The
+	 *	once_control  parameter  determines  whether  the associated
+	 *	initialization routine has been called.  The  init_routine()
+	 *	is complete upon return of pthread_once().
+	 *	This function guarantees that one and only one thread
+	 *	executes the initialization routine, init_routine when
+	 *	access is controlled by the pthread_once_t control
+	 *	key.
+	 *
+	 * PARAMETERS
+	 *	once_control
+	 *		pointer to an instance of pthread_once_t
+	 *
+	 *	init_routine
+	 *		pointer to an initialization routine
+	 *
+	 *
+	 * DESCRIPTION
+	 *	See above.
+	 *
+	 * RESULTS
+	 *		0		success,
+	 *		EINVAL		once_control or init_routine is NULL
+	 *
+	 * ------------------------------------------------------
+	 */
 {
   int result;
 
@@ -84,28 +92,28 @@ pthread_once (
   if (!once_control->done)
     {
       if (InterlockedIncrement (&(once_control->started)) == 0)
-        {
-          /*
-           * First thread to increment the started variable
-           */
-          (*init_routine) ();
-          once_control->done = TRUE;
+	{
+	  /*
+	   * First thread to increment the started variable
+	   */
+	  (*init_routine) ();
+	  once_control->done = TRUE;
 
-        }
+	}
       else
-        {
-          /*
-           * Block until other thread finishes executing the onceRoutine
-           */
-          while (!(once_control->done))
-            {
-              /*
-               * The following gives up CPU cycles without pausing
-               * unnecessarily
-               */
-              Sleep (0);
-            }
-        }
+	{
+	  /*
+	   * Block until other thread finishes executing the onceRoutine
+	   */
+	  while (!(once_control->done))
+	    {
+	      /*
+	       * The following gives up CPU cycles without pausing
+	       * unnecessarily
+	       */
+	      Sleep (0);
+	    }
+	}
     }
 
   /*
@@ -120,7 +128,7 @@ pthread_once (
 FAIL0:
   return (result);
 
-}                               /* pthread_once */
+}				/* pthread_once */
 
 
 pthread_t
@@ -140,7 +148,7 @@ pthread_self (void)
       *      thread.
       *
       * RESULTS
-      *              pthread_t       reference to the current thread
+      * 	     pthread_t	     reference to the current thread
       *
       * ------------------------------------------------------
       */
@@ -175,7 +183,7 @@ pthread_self (void)
 	  self->thread = GetCurrentThreadId ();
 
 #ifdef NEED_DUPLICATEHANDLE
-	  /* 
+	  /*
 	   * DuplicateHandle does not exist on WinCE.
 	   *
 	   * NOTE:
@@ -219,7 +227,7 @@ pthread_equal (pthread_t t1, pthread_t t2)
       * PARAMETERS
       *      t1,
       *      t2
-      *              references to an instances of thread_t
+      * 	     references to an instances of thread_t
       *
       *
       * DESCRIPTION
@@ -227,8 +235,8 @@ pthread_equal (pthread_t t1, pthread_t t2)
       *      returns zero.
       *
       * RESULTS
-      *              non-zero        if t1 and t2 refer to the same thread,
-      *              0               t1 and t2 do not refer to the same thread
+      * 	     non-zero	     if t1 and t2 refer to the same thread,
+      * 	     0		     t1 and t2 do not refer to the same thread
       *
       * ------------------------------------------------------
       */
@@ -265,7 +273,7 @@ int
 pthread_getconcurrency(void)
 {
   return ptw32_concurrency;
-}                                                                               
+}										
 
 
 static INLINE int
@@ -298,13 +306,13 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
        * Get cancelEvent handle
        */
       if (self->cancelState == PTHREAD_CANCEL_ENABLE)
-        {
+	{
 
-          if ((handles[1] = self->cancelEvent) != NULL)
-            {
-              nHandles++;
-            }
-        }
+	  if ((handles[1] = self->cancelEvent) != NULL)
+	    {
+	      nHandles++;
+	    }
+	}
     }
   else
     {
@@ -312,10 +320,10 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
     }
 
   status = WaitForMultipleObjects (
-                                    nHandles,
-                                    handles,
-                                    FALSE,
-                                    timeout);
+				    nHandles,
+				    handles,
+				    FALSE,
+				    timeout);
 
 
   if (status == WAIT_FAILED)
@@ -337,53 +345,53 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
        * was signaled
        */
       switch (status - WAIT_OBJECT_0)
-        {
+	{
 
-        case 0:
-          /*
-           * Got the handle
-           */
-          result = 0;
-          break;
+	case 0:
+	  /*
+	   * Got the handle
+	   */
+	  result = 0;
+	  break;
 
-        case 1:
-          /*
-           * Got cancel request
-           */
-          ResetEvent (handles[1]);
+	case 1:
+	  /*
+	   * Got cancel request
+	   */
+	  ResetEvent (handles[1]);
 
-          if (self != NULL && !self->implicit)
-            {
-              /*
-               * Thread started with pthread_create.
-               * Make sure we haven't been async-canceled in the meantime.
-               */
-              (void) pthread_mutex_lock(&self->cancelLock);
-              if (self->state < PThreadStateCanceling)
-                {
-                  self->state = PThreadStateCanceling;
-                  self->cancelState = PTHREAD_CANCEL_DISABLE;
-                  (void) pthread_mutex_unlock(&self->cancelLock);
-                  ptw32_throw(PTW32_EPS_CANCEL);
+	  if (self != NULL && !self->implicit)
+	    {
+	      /*
+	       * Thread started with pthread_create.
+	       * Make sure we haven't been async-canceled in the meantime.
+	       */
+	      (void) pthread_mutex_lock(&self->cancelLock);
+	      if (self->state < PThreadStateCanceling)
+		{
+		  self->state = PThreadStateCanceling;
+		  self->cancelState = PTHREAD_CANCEL_DISABLE;
+		  (void) pthread_mutex_unlock(&self->cancelLock);
+		  ptw32_throw(PTW32_EPS_CANCEL);
 
-                  /* Never reached */
-                }
-              (void) pthread_mutex_unlock(&self->cancelLock);
-            }
+		  /* Never reached */
+		}
+	      (void) pthread_mutex_unlock(&self->cancelLock);
+	    }
 
-          /* Should never get to here. */
-          result = EINVAL;
-          break;
+	  /* Should never get to here. */
+	  result = EINVAL;
+	  break;
 
-        default:
-          result = EINVAL;
-          break;
-        }
+	default:
+	  result = EINVAL;
+	  break;
+	}
     }
 
   return (result);
 
-}                               /* CancelableWait */
+}				/* CancelableWait */
 
 int
 pthreadCancelableWait (HANDLE waitHandle)
@@ -411,6 +419,17 @@ ptw32_new (void)
       t->cancelState = PTHREAD_CANCEL_ENABLE;
       t->cancelType  = PTHREAD_CANCEL_DEFERRED;
       t->cancelLock  = PTHREAD_MUTEX_INITIALIZER;
+      t->cancelEvent = CreateEvent (
+				    0,
+				    (int) TRUE,    /* manualReset  */
+				    (int) FALSE,   /* setSignaled  */
+				    NULL);
+
+      if (t->cancelEvent == NULL)
+	{
+	  free (t);
+	  t = NULL;
+	}
     }
 
   return t;

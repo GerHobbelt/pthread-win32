@@ -2,25 +2,36 @@
  * File: exception1.c
  *
  *
- * Pthreads-win32 - POSIX Threads Library for Win32
- * Copyright (C) 1998 Ben Elliston and Ross Johnson
- * Copyright (C) 1999,2000,2001 Ross Johnson
+ * --------------------------------------------------------------------------
  *
- * Contact Email: rpj@ise.canberra.edu.au
+ * --------------------------------------------------------------------------
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *	Pthreads-win32 - POSIX Threads Library for Win32
+ *	Copyright(C) 1998 John E. Bossom
+ *	Copyright(C) 1999,2002 Pthreads-win32 contributors
+ * 
+ *	Contact Email: rpj@ise.canberra.edu.au
+ * 
+ *	The current list of contributors is contained
+ *	in the file CONTRIBUTORS included with the source
+ *	code distribution. The list can also be seen at the
+ *	following World Wide Web location:
+ *	http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *	This library is free software; you can redistribute it and/or
+ *	modify it under the terms of the GNU Lesser General Public
+ *	License as published by the Free Software Foundation; either
+ *	version 2 of the License, or (at your option) any later version.
+ * 
+ *	This library is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *	Lesser General Public License for more details.
+ * 
+ *	You should have received a copy of the GNU Lesser General Public
+ *	License along with this library in the file COPYING.LIB;
+ *	if not, write to the Free Software Foundation, Inc.,
+ *	59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  *
  * --------------------------------------------------------------------------
  *
@@ -89,10 +100,10 @@ exceptionedThread(void * arg)
 #if defined(_MSC_VER) && !defined(__cplusplus)
   __try
   {
-    int zero = 0;
+    int zero = (int) arg; /* Passed in from arg to avoid compiler error */
     int one = 1;
     /*
-     * The deliberate exception condition (zero devide) is
+     * The deliberate exception condition (zero divide) is
      * in an "if" to avoid being optimised out.
      */
     if (dummy == one/zero)
@@ -191,7 +202,7 @@ main()
 
   for (i = 0; i < NUMTHREADS; i++)
     {
-      assert(pthread_create(&et[i], NULL, exceptionedThread, NULL) == 0);
+      assert(pthread_create(&et[i], NULL, exceptionedThread, (void *) 0) == 0);
       assert(pthread_create(&ct[i], NULL, canceledThread, NULL) == 0);
     }
 
