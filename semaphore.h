@@ -123,34 +123,34 @@ typedef unsigned int mode_t;
 
 typedef struct sem_t_ * sem_t;
 
-PTW32_DLLPORT int sem_init (sem_t * sem,
+PTW32_DLLPORT int __cdecl sem_init (sem_t * sem,
 			    int pshared,
 			    unsigned int value);
 
-PTW32_DLLPORT int sem_destroy (sem_t * sem);
+PTW32_DLLPORT int __cdecl sem_destroy (sem_t * sem);
 
-PTW32_DLLPORT int sem_trywait (sem_t * sem);
+PTW32_DLLPORT int __cdecl sem_trywait (sem_t * sem);
 
-PTW32_DLLPORT int sem_wait (sem_t * sem);
+PTW32_DLLPORT int __cdecl sem_wait (sem_t * sem);
 
-PTW32_DLLPORT int sem_timedwait (sem_t * sem,
+PTW32_DLLPORT int __cdecl sem_timedwait (sem_t * sem,
 				 const struct timespec * abstime);
 
-PTW32_DLLPORT int sem_post (sem_t * sem);
+PTW32_DLLPORT int __cdecl sem_post (sem_t * sem);
 
-PTW32_DLLPORT int sem_post_multiple (sem_t * sem,
+PTW32_DLLPORT int __cdecl sem_post_multiple (sem_t * sem,
 				     int count);
 
-PTW32_DLLPORT int sem_open (const char * name,
+PTW32_DLLPORT int __cdecl sem_open (const char * name,
 			    int oflag,
 			    mode_t mode,
 			    unsigned int value);
 
-PTW32_DLLPORT int sem_close (sem_t * sem);
+PTW32_DLLPORT int __cdecl sem_close (sem_t * sem);
 
-PTW32_DLLPORT int sem_unlink (const char * name);
+PTW32_DLLPORT int __cdecl sem_unlink (const char * name);
 
-PTW32_DLLPORT int sem_getvalue (sem_t * sem,
+PTW32_DLLPORT int __cdecl sem_getvalue (sem_t * sem,
 				int * sval);
 
 #ifdef __cplusplus

@@ -139,15 +139,15 @@ extern "C"
 {
 #endif                          /* __cplusplus */
 
-PTW32_DLLPORT int sched_yield (void);
+PTW32_DLLPORT int __cdecl sched_yield (void);
 
-PTW32_DLLPORT int sched_get_priority_min (int policy);
+PTW32_DLLPORT int __cdecl sched_get_priority_min (int policy);
 
-PTW32_DLLPORT int sched_get_priority_max (int policy);
+PTW32_DLLPORT int __cdecl sched_get_priority_max (int policy);
 
-PTW32_DLLPORT int sched_setscheduler (pid_t pid, int policy);
+PTW32_DLLPORT int __cdecl sched_setscheduler (pid_t pid, int policy);
 
-PTW32_DLLPORT int sched_getscheduler (pid_t pid);
+PTW32_DLLPORT int __cdecl sched_getscheduler (pid_t pid);
 
 /*
  * Note that this macro returns ENOTSUP rather than
