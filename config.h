@@ -1,2 +1,0 @@
-#undef HAVE_SIGNAL_H
-#undef HAVE_SIGSET_T
