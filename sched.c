@@ -155,6 +155,8 @@ int
 pthread_setschedparam(pthread_t thread, int policy,
 			  const struct sched_param *param)
 {
+  int prio;
+
   /* Validate the thread id. */
   if (thread == NULL || thread->threadH == 0)
     {
@@ -173,15 +175,17 @@ pthread_setschedparam(pthread_t thread, int policy,
       return ENOTSUP;
     }
 
+  prio = param->sched_priority;
+
   /* Validate priority level. */
-  if (param->sched_priority < sched_get_priority_min(policy) ||
-      param->sched_priority > sched_get_priority_max(policy))
+  if (prio < sched_get_priority_min(policy) ||
+      prio > sched_get_priority_max(policy))
     {
       return EINVAL;
     }
 
   /* This is practically guaranteed to return TRUE. */
-  (void) SetThreadPriority(thread->threadH, param->sched_priority);
+  (void) SetThreadPriority(thread->threadH, prio);
 
   return 0;
 }
@@ -253,7 +257,7 @@ sched_get_priority_max(int policy)
   return sched_Max(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
 #else
   /* This is independent of scheduling policy in Win32. */
-  return sched_Max(THREAD_PRIORITY_LOWEST, THREAD_PRIORITY_HIGHEST);
+  return sched_Max(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL)
 #endif
 }
 
@@ -271,7 +275,7 @@ sched_get_priority_min(int policy)
   return sched_Min(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
 #else
   /* This is independent of scheduling policy in Win32. */
-  return sched_Min(THREAD_PRIORITY_LOWEST, THREAD_PRIORITY_HIGHEST);
+  return sched_Min(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
 #endif
 }
 

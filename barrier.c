@@ -27,14 +27,6 @@
 #include "implement.h"
 
 
-#ifdef __MINGW32__
-#define _LONG long
-#define _LPLONG long*
-#else
-#define _LONG PVOID
-#define _LPLONG PVOID*
-#endif
-
 int
 pthread_barrier_init(pthread_barrier_t * barrier,
                      const pthread_barrierattr_t * attr,
@@ -169,14 +161,14 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
 
   /*
    * The first thread across will be the PTHREAD_BARRIER_SERIAL_THREAD.
-   * It also sets up the alternate semaphore as the next barrier.
+   * This also sets up the alternate semaphore as the next barrier.
    */
   if (0 == result)
     {
-      result = ((_LONG) step ==
-                InterlockedCompareExchange((_LPLONG) &(b->iStep),
-                                           (_LONG) (1L - step),
-                                           (_LONG) step)
+      result = ((PTW32_INTERLOCKED_LONG) step ==
+                ptw32_interlocked_compare_exchange((PTW32_INTERLOCKED_LPLONG) &(b->iStep),
+                                                   (PTW32_INTERLOCKED_LONG) (1L - step),
+                                                   (PTW32_INTERLOCKED_LONG) step)
                 ? PTHREAD_BARRIER_SERIAL_THREAD
                 : 0);
     }

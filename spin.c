@@ -26,13 +26,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-#ifdef __MINGW32__
-#define _LONG long
-#define _LPLONG long*
-#else
-#define _LONG PVOID
-#define _LPLONG PVOID*
-#endif
 
 static INLINE int
 ptw32_spinlock_check_need_init(pthread_spinlock_t *lock)
@@ -177,10 +170,10 @@ pthread_spin_destroy(pthread_spinlock_t *lock)
           return pthread_mutex_destroy(&(s->u.mutex));
         }
 
-      if ( (_LONG) PTW32_SPIN_UNLOCKED ==
-           InterlockedCompareExchange((_LPLONG) &(s->interlock),
-                                      (_LONG) PTW32_OBJECT_INVALID,
-                                      (_LONG) PTW32_SPIN_UNLOCKED))
+      if ( (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED ==
+           ptw32_interlocked_compare_exchange((PTW32_INTERLOCKED_LPLONG) &(s->interlock),
+                                              (PTW32_INTERLOCKED_LONG) PTW32_OBJECT_INVALID,
+                                              (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED))
         {
           return 0;
         }
@@ -243,10 +236,10 @@ pthread_spin_lock(pthread_spinlock_t *lock)
 
   s = *lock;
 
-  while ( (_LONG) PTW32_SPIN_LOCKED ==
-          InterlockedCompareExchange((_LPLONG) &(s->interlock),
-                                     (_LONG) PTW32_SPIN_LOCKED,
-                                     (_LONG) PTW32_SPIN_UNLOCKED) )
+  while ( (PTW32_INTERLOCKED_LONG) PTW32_SPIN_LOCKED ==
+          ptw32_interlocked_compare_exchange((PTW32_INTERLOCKED_LPLONG) &(s->interlock),
+                                             (PTW32_INTERLOCKED_LONG) PTW32_SPIN_LOCKED,
+                                             (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED) )
     {}
 
   if (s->interlock == PTW32_SPIN_LOCKED)
@@ -271,9 +264,9 @@ pthread_spin_unlock(pthread_spinlock_t *lock)
       return EPERM;
     }
 
-  switch ((long) InterlockedCompareExchange((_LPLONG) &(s->interlock),
-                                            (_LONG) PTW32_SPIN_UNLOCKED,
-                                            (_LONG) PTW32_SPIN_LOCKED ))
+  switch ((long) ptw32_interlocked_compare_exchange((PTW32_INTERLOCKED_LPLONG) &(s->interlock),
+                                                    (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED,
+                                                    (PTW32_INTERLOCKED_LONG) PTW32_SPIN_LOCKED ))
     {
       case PTW32_SPIN_LOCKED:    return 0;
       case PTW32_SPIN_UNLOCKED:  return EPERM;
@@ -298,9 +291,9 @@ pthread_spin_trylock(pthread_spinlock_t *lock)
         }
     }
 
-  switch ((long) InterlockedCompareExchange((_LPLONG) &(s->interlock),
-                                            (_LONG) PTW32_SPIN_LOCKED,
-                                            (_LONG) PTW32_SPIN_UNLOCKED ))
+  switch ((long) ptw32_interlocked_compare_exchange((PTW32_INTERLOCKED_LPLONG) &(s->interlock),
+                                                    (PTW32_INTERLOCKED_LONG) PTW32_SPIN_LOCKED,
+                                                    (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED ))
     {
       case PTW32_SPIN_UNLOCKED:  return 0;
       case PTW32_SPIN_LOCKED:    return EBUSY;
