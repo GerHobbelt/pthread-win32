@@ -49,13 +49,20 @@
 pthread_once_t o = PTHREAD_ONCE_INIT;
 pthread_once_t once[NUM_ONCE];
 
-static int numOnce = 0;
-static int numThreads = 0;
+typedef struct {
+  int i;
+  CRITICAL_SECTION cs;
+} sharedInt_t;
+
+static sharedInt_t numOnce = {0, {0}};
+static sharedInt_t numThreads = {0, {0}};
 
 void
 myfunc(void)
 {
-  numOnce++;
+  EnterCriticalSection(&numOnce.cs);
+  numOnce.i++;
+  LeaveCriticalSection(&numOnce.cs);
   /* Simulate slow once routine so that following threads pile up behind it */
   Sleep(100);
 }
@@ -64,7 +71,9 @@ void *
 mythread(void * arg)
 {
    assert(pthread_once(&once[(int) arg], myfunc) == 0);
-   numThreads++;
+   EnterCriticalSection(&numThreads.cs);
+   numThreads.i++;   
+   LeaveCriticalSection(&numThreads.cs);
    return 0;
 }
 
@@ -74,6 +83,9 @@ main()
   pthread_t t[NUM_THREADS][NUM_ONCE];
   int i, j;
   
+  InitializeCriticalSection(&numThreads.cs);
+  InitializeCriticalSection(&numOnce.cs);
+
   for (j = 0; j < NUM_ONCE; j++)
     {
       once[j] = o;
@@ -87,8 +99,11 @@ main()
       if (pthread_join(t[i][j], NULL) != 0)
         printf("Join failed for [thread,once] = [%d,%d]\n", i, j);
 
-  assert(numOnce == NUM_ONCE);
-  assert(numThreads == NUM_THREADS * NUM_ONCE);
+  assert(numOnce.i == NUM_ONCE);
+  assert(numThreads.i == NUM_THREADS * NUM_ONCE);
+
+  DeleteCriticalSection(&numOnce.cs);
+  DeleteCriticalSection(&numThreads.cs);
 
   return 0;
 }

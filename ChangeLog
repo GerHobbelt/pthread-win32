@@ -1,3 +1,7 @@
+2005-04-06  Kevin Lussier <Kevin at codegreennetworks.com>
+
+	* Makefile: Added debug targets for all versions of the library.
+
 2005-04-01  Ross Johnson  <ross at callisto.canberra.edu.au>
 
 	* GNUmakefile: Add target to build libpthreadGC1.a as a static link

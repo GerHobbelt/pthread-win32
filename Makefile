@@ -9,21 +9,26 @@
 # DLL_VER:
 # See pthread.h and README - This number is computed as 'current - age'
 DLL_VER	= 1
+DLL_VERD= $(DLL_VER)d
 
-DEVROOT	= c:\pthreads
+DEVROOT	= C:\pthreads
 
 DLLDEST	= $(DEVROOT)\DLL
-LIBDEST	= $(DEVROOT)\DLL
+LIBDEST	= $(DEVROOT)\LIB
+HDRDEST	= $(DEVROOT)\INCLUDE
 
-DLLS	= pthreadVCE$(DLL_VER).dll pthreadVSE$(DLL_VER).dll pthreadVC$(DLL_VER).dll
-INLINED_STAMPS	= pthreadVCE$(DLL_VER).stamp pthreadVSE$(DLL_VER).stamp pthreadVC$(DLL_VER).stamp
-STATIC_STAMPS	= pthreadVCE$(DLL_VER).static pthreadVSE$(DLL_VER).static pthreadVC$(DLL_VER).static
+DLLS	= pthreadVCE$(DLL_VER).dll pthreadVSE$(DLL_VER).dll pthreadVC$(DLL_VER).dll \
+		  pthreadVCE$(DLL_VERD).dll pthreadVSE$(DLL_VERD).dll pthreadVC$(DLL_VERD).dll
+INLINED_STAMPS	= pthreadVCE$(DLL_VER).stamp pthreadVSE$(DLL_VER).stamp pthreadVC$(DLL_VER).stamp \
+				  pthreadVCE$(DLL_VERD).stamp pthreadVSE$(DLL_VERD).stamp pthreadVC$(DLL_VERD).stamp
+STATIC_STAMPS	= pthreadVCE$(DLL_VER).static pthreadVSE$(DLL_VER).static pthreadVC$(DLL_VER).static \
+				  pthreadVCE$(DLL_VERD).static pthreadVSE$(DLL_VERD).static pthreadVC$(DLL_VERD).static
 
 OPTIM	= /O2 /Ob2
-#OPTIM	=
+OPTIMD	=
 
 CFLAGS	= /W3 /MD /nologo /Yd /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
-#CFLAGS	= /W3 /MD /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
+CFLAGSD	= /Zi $(CFLAGS)
 
 
 # Default cleanup style
@@ -31,10 +36,13 @@ CLEANUP	= __CLEANUP_C
 
 # C++ Exceptions
 VCEFLAGS	= /GX /TP $(CFLAGS)
+VCEFLAGSD	= /GX /TP $(CFLAGSD)
 #Structured Exceptions
 VSEFLAGS	= $(CFLAGS)
+VSEFLAGSD	= $(CFLAGSD)
 #C cleanup code
 VCFLAGS	= $(CFLAGS)
+VCFLAGSD= $(CFLAGSD)
 
 DLL_INLINED_OBJS = \
 		pthread.obj \
@@ -370,20 +378,39 @@ help:
 	@ echo nmake clean VSE-inlined   (to build the MSVC inlined dll with structured exception handling)
 	@ echo nmake clean VC-inlined    (to build the MSVC inlined dll with C cleanup code)
 	@ echo nmake clean VC-static     (to build the MSVC static lib with C cleanup code)
+	@ echo nmake clean VCE-debug   (to build the debug MSVC dll with C++ exception handling)
+	@ echo nmake clean VSE-debug   (to build the debug MSVC dll with structured exception handling)
+	@ echo nmake clean VC-debug    (to build the debug MSVC dll with C cleanup code)
+	@ echo nmake clean VCE-inlined-debug   (to build the debug MSVC inlined dll with C++ exception handling)
+	@ echo nmake clean VSE-inlined-debug   (to build the debug MSVC inlined dll with structured exception handling)
+	@ echo nmake clean VC-inlined-debug    (to build the debug MSVC inlined dll with C cleanup code)
+	@ echo nmake clean VC-static-debug     (to build the debug MSVC static lib with C cleanup code)
 
 all:
 	@ nmake clean VCE-inlined
 	@ nmake clean VSE-inlined
 	@ nmake clean VC-inlined
+	@ nmake clean VCE-inlined-debug
+	@ nmake clean VSE-inlined-debug
+	@ nmake clean VC-inlined-debug
 
 VCE:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCEFLAGS)" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).dll
 
+VCE-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCEFLAGSD)" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).dll
+
 VSE:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VSEFLAGS)" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).dll
 
+VSE-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VSEFLAGSD)" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).dll
+
 VC:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS)" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).dll
+
+VC-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCFLAGSD)" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).dll
 
 #
 # The so-called inlined DLL is just a single translation unit with
@@ -392,14 +419,26 @@ VC:
 VCE-inlined:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).stamp
 
+VCE-inlined-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCEFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).stamp
+
 VSE-inlined:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VSEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).stamp
+
+VSE-inlined-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VSEFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).stamp
 
 VC-inlined:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).stamp
 
+VC-inlined-debug:
+	nmake /nologo EHFLAGS="$(OPTIMD) $(VCFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).stamp
+
 VC-static:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS) /DPTW32_BUILD_INLINED /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).static
+
+VC-static-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCFLAGSD) /DPTW32_BUILD_INLINED /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).static
 
 realclean: clean
 	if exist *.dll del *.dll
@@ -420,6 +459,9 @@ clean:
 install: $(DLLS)
 	copy pthread*.dll $(DLLDEST)
 	copy pthread*.lib $(LIBDEST)
+	copy pthread.h $(HDRDEST)
+	copy sched.h $(HDRDEST)
+	copy semaphore.h $(HDRDEST)
 
 $(DLLS): $(DLL_OBJS)
 	cl /LDd /Zi /nologo $(DLL_OBJS) \
