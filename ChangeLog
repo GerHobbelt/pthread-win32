@@ -1,3 +1,10 @@
+2002-12-17  Ross Johnson  <rpj@digit.ise.canberra.edu.au>
+
+	* pthread_mutex_lock.c (ptw32_semwait): New static routine to provide
+	a non-cancelable sem_wait() function. This is consistent with the
+	way that pthread_mutex_timedlock.c does it.
+	(pthread_mutex_lock): Use ptw32_semwait() instead of sem_wait().
+
 2002-12-11  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* pthread_mutex_trylock.c: Should return EBUSY rather than EDEADLK.

@@ -38,6 +38,80 @@
 #include "implement.h"
 
 
+static INLINE int
+ptw32_semwait (sem_t * sem)
+     /*
+      * ------------------------------------------------------
+      * DESCRIPTION
+      *      This function waits on a POSIX semaphore. If the
+      *      semaphore value is greater than zero, it decreases
+      *      its value by one. If the semaphore value is zero, then
+      *      the calling thread (or process) is blocked until it can
+      *      successfully decrease the value.
+			*
+			*      Unlike sem_wait(), this routine is not a cancelation point.
+      *
+      * RESULTS
+      * 	     0		     successfully decreased semaphore,
+      * 	     -1 	     failed, error in errno.
+      * ERRNO
+      * 	     EINVAL	     'sem' is not a valid semaphore,
+      * 	     ENOSYS	     semaphores are not supported,
+      * 	     EINTR	     the function was interrupted by a signal,
+      * 	     EDEADLK	   a deadlock condition was detected.
+      *
+      * ------------------------------------------------------
+      */
+{
+  int result = 0;
+
+  DWORD status;
+
+  if (sem == NULL)
+    {
+      result = EINVAL;
+    }
+  else
+    {
+
+#ifdef NEED_SEM
+
+      status = WaitForSingleObject( (*sem)->event, INFINITE );
+
+#else /* NEED_SEM */
+	    
+      status = WaitForSingleObject( (*sem)->sem, INFINITE );
+
+#endif
+
+      if (status == WAIT_OBJECT_0)
+				{
+
+#ifdef NEED_SEM
+
+					ptw32_decrease_semaphore(sem);
+
+#endif /* NEED_SEM */
+
+					return 0;
+				}
+      else
+				{
+					result = EINVAL;
+				}
+    }
+
+  if (result != 0)
+    {
+      errno = result;
+      return -1;
+    }
+
+  return 0;
+
+}				/* ptw32_semwait */
+
+
 int
 pthread_mutex_lock(pthread_mutex_t *mutex)
 {
@@ -59,9 +133,9 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     {
       if ((result = ptw32_mutex_check_need_init(mutex)) != 0)
-	{
-	  return(result);
-	}
+				{
+					return(result);
+				}
     }
 
   mx = *mutex;
@@ -70,35 +144,39 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
     {
       mx->recursive_count = 1;
       mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-			 ? pthread_self()
-			 : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
+				? pthread_self()
+				: (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
     }
   else
     {
       if( mx->kind != PTHREAD_MUTEX_FAST_NP &&
-	  pthread_equal( mx->ownerThread, pthread_self() ) )
-	{
-	  (void) InterlockedDecrement( &mx->lock_idx );
+				pthread_equal( mx->ownerThread, pthread_self() ) )
+				{
+					(void) InterlockedDecrement( &mx->lock_idx );
 
-	  if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP )
-	    {
-	      mx->recursive_count++;
-	    }
-	  else
-	    {
-	      result = EDEADLK;
-	    }
-	}
+					if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP )
+						{
+							mx->recursive_count++;
+						}
+					else
+						{
+							result = EDEADLK;
+						}
+				}
       else
-	{
-	  if ((result = sem_wait( &mx->wait_sema )) == 0)
-	    {
-	      mx->recursive_count = 1;
-	      mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-				 ? pthread_self()
-				 : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
-	    }
-	}
+				{
+					if (ptw32_semwait( &mx->wait_sema ) == 0)
+						{
+							mx->recursive_count = 1;
+							mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
+								? pthread_self()
+								: (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
+						}
+					else
+						{
+							result = errno;
+						}
+				}
     }
 
   return(result);

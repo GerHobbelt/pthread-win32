@@ -60,6 +60,8 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec * abstime)
       *      If 'abstime' is a NULL pointer then this function will
       *      block until it can successfully decrease the value or
       *      until interrupted by a signal.
+			*
+			*      Unlike sem_timedwait(), this routine is not a cancelation point.
       *
       * RESULTS
       * 	     2		     abstime has passed already
