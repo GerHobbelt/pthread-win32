@@ -49,6 +49,23 @@ The GNU library archive file name has changed to:
 	libpthreadw32.a	(the "32" is now "w32")
 
 
+Other name changes
+------------------
+
+All snapshots prior to and including snapshot 2000-08-13
+used "_pthread_" as the prefix to library internal
+functions, and "_PTHREAD_" to many library internal
+macros. These have now been changed to "ptw32_" and "PTW32_"
+respectively so as to not conflict with the ANSI standard's
+reservation of identifiers beginning with "_" and "__" for
+use by compiler implementations only.
+
+If you have written any applications and you are linking
+statically with the pthreads-win32 library then you may have
+included a call to _pthread_processInitialize. You will
+now have to change that to ptw32_processInitialize.
+
+
 Known bugs in this snapshot
 ---------------------------
 
@@ -104,12 +121,18 @@ pthread_mutexattr_setforcecs_np(pthread_mutexattr_t *attr,
 	Values for "forcecs" are:
 	PTHREAD_MUTEX_AUTO_CS_NP
 		- allow the library to decide based on
-		  availability of tryEnterCriticalSection()
+		  availability of tryEnterCriticalSection().
+		  The library determines this at runtime
+		  and will use critical sections whenever
+		  tryEnterCriticalSection() is available.
 	PTHREAD_MUTEX_FORCE_CS_NP
-		- force use of critical sections, but you'd
-		  better not try to use pthread_mutex_trylock()
-		  on that mutex if you want your application
-		  to work on all versions of Windows.
+		- force use of critical sections even if
+		  tryEnterCriticalSection() isn't provided
+		  by the system, but you'd better not try
+		  to use pthread_mutex_trylock() on any
+		  mutex that uses "attr" if you want your
+		  application to work on all versions of
+		  Windows.
 
 HANDLE
 pthread_getw32threadhandle_np(pthread_t thread);
@@ -120,6 +143,20 @@ pthread_getw32threadhandle_np(pthread_t thread);
 	Applications can use the win32 handle to set
 	win32 specific attributes of the thread.
 
+int
+pthreadCancelableWait (HANDLE waitHandle);
+
+int
+pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
+
+	These two functions provide hooks into the pthread_cancel
+	mechanism that will allow you to wait on a Windows handle
+	and make it a cancellation point. Both functions block
+	until either the given w32 handle is signaled, or
+	pthread_cancel has been called. It is implemented using
+	WaitForMultipleObjects on 'waitHandle' and a manually
+	reset w32 event used to implement pthread_cancel.
+ 
 
 Building under VC++ using either C++ EH or Structured EH
 --------------------------------------------------------
@@ -237,7 +274,8 @@ Zip file, or tar/gzipped format can be found at:
 
 	ftp://sources.redhat.com/pub/pthreads-win32
 
-The pre-built DLL, export libraries and matching pthread.h can be found at:
+The pre-built DLL, export libraries and matching pthread.h can
+be found at:
 
 	ftp://sources.redhat.com/pub/pthreads-win32/dll-latest
 
@@ -249,8 +287,8 @@ Home page:
 Mailing list
 ------------
 
-There is a mailing list for discussing pthreads on Win32. To join, send email
-to:
+There is a mailing list for discussing pthreads on Win32.
+To join, send email to:
 
 	pthreads-win32-subscribe@sources.redhat.com
 
@@ -262,9 +300,9 @@ Unsubscribe by sending mail to:
 Acknowledgements
 ----------------
 
-Pthreads-win32 is based substantially on a Win32 Pthreads implementation
-contributed by John E. Bossom <jebossom@cognos.com>. Many others
-have contributed important new code and bug fixes.
+Pthreads-win32 is based substantially on a Win32 Pthreads
+implementation contributed by John E. Bossom <jebossom@cognos.com>.
+Many others have contributed important new code and bug fixes.
 
 See the 'CONTRIBUTORS' file for the list of contributors.
 
