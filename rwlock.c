@@ -383,16 +383,13 @@ pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
              * so temporarily prevent pthread_cond_wait() from being one.
              */
             pthread_t self = pthread_self();
-            int cancelType = pthread_getcanceltype(self);
             int oldCancelState;
 
             rwl->nCompletedSharedAccessCount = -rwl->nSharedAccessCount;
 
-            if (cancelType == PTHREAD_CANCEL_DEFERRED)
+            if (self->cancelType == PTHREAD_CANCEL_DEFERRED)
               {
-                oldCancelState =
-                  pthread_setcancelstate(self,
-                                         PTHREAD_CANCEL_DISABLED);
+                 pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldCancelState);
               }
 
             /* Could still be PTHREAD_CANCEL_ASYNCHRONOUS. */
@@ -405,9 +402,9 @@ pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
               }
             while (result == 0 && rwl->nCompletedSharedAccessCount < 0);
 
-            if (cancelType == PTHREAD_CANCEL_DEFERRED)
+            if (self->cancelType == PTHREAD_CANCEL_DEFERRED)
               {
-                pthread_setcancelstate(self, oldCancelState);
+                pthread_setcancelstate(oldCancelState, NULL);
               }
 
             pthread_cleanup_pop ((result != 0) ? 1 : 0);

@@ -34,14 +34,14 @@ pthread_barrier_init(pthread_barrier_t * barrier,
 {
   int result = 0;
   int pshared = PTHREAD_PROCESS_PRIVATE;
-  pthread_barrier_t * b;
+  pthread_barrier_t b;
 
   if (barrier == NULL)
     {
       return EINVAL;
     }
 
-  b = (pthread_barrier_t *) calloc(1, sizeof(*b));
+  b = (pthread_barrier_t) calloc(1, sizeof(*b));
 
   if (b == NULL)
     {
@@ -56,7 +56,7 @@ pthread_barrier_init(pthread_barrier_t * barrier,
 
   b->nCurrentBarrierHeight = b->nInitialBarrierHeight = count;
 
-  result = pthread_mutex_init(&b->mtxExclusiveAccess, NULL);
+  result = pthread_mutex_init(&(b->mtxExclusiveAccess), NULL);
   if (0 != result)
     {
       goto FAIL0;
@@ -71,12 +71,13 @@ pthread_barrier_init(pthread_barrier_t * barrier,
   goto DONE;
 
  FAIL1:
-  (void) pthread_mutex_destroy(&b->mtxExclusiveAccess);
+  (void) pthread_mutex_destroy(&(b->mtxExclusiveAccess));
 
  FAIL0:
   (void) free(b);
 
  DONE:
+  *barrier = b;
   return(result);
 }
 
@@ -93,7 +94,7 @@ pthread_barrier_destroy(pthread_barrier_t *barrier)
 
   b = *barrier;
   
-  if (0 == pthread_mutex_trylock(&b->mtxExclusiveAccess))
+  if (0 == pthread_mutex_trylock(&(b->mtxExclusiveAccess)))
     {
       /*
        * FIXME!!!
@@ -127,16 +128,16 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
 
   b = *barrier;
 
-  result = pthread_mutex_lock(b->mtxExclusiveAccess);
+  result = pthread_mutex_lock(&(b->mtxExclusiveAccess));
 
   if (0 == result)
     {
       if (0 == --(b->nCurrentBarrierHeight))
         {
           b->nCurrentBarrierHeight = b->nInitialBarrierHeight;
-          (void) pthread_mutex_unlock(b->mtxExclusiveAccess);
+          (void) pthread_mutex_unlock(&(b->mtxExclusiveAccess));
           (void) sem_post_multiple(&(b->semBarrierBreeched),
-                                   b->InitialBarrierHeight);
+                                   b->nInitialBarrierHeight);
           /*
            * Would be better if the first thread to return
            * from this routine got this value. On a single
@@ -152,13 +153,11 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
            * so temporarily prevent sem_wait() from being one.
            */
           pthread_t self = pthread_self();
-          int cancelType = pthread_getcanceltype(self);
           int oldCancelState;
 
-          if (cancelType == PTHREAD_CANCEL_DEFERRED)
+          if (self->cancelType == PTHREAD_CANCEL_DEFERRED)
             {
-              oldCancelState = pthread_setcancelstate(self,
-                                                      PTHREAD_CANCEL_DISABLED);
+              pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldCancelState);
             }
 
           /* Could still be PTHREAD_CANCEL_ASYNCHRONOUS. */
@@ -170,9 +169,9 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
               result = errno;
             }
 
-          if (cancelType == PTHREAD_CANCEL_DEFERRED)
+          if (self->cancelType == PTHREAD_CANCEL_DEFERRED)
             {
-              pthread_setcancelstate(self, oldCancelState);
+              pthread_setcancelstate(oldCancelState, NULL);
             }
 
           pthread_cleanup_pop(1);

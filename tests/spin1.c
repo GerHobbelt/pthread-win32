@@ -8,16 +8,12 @@
 
 #include "test.h"
 
-pthread_spinlock_t lock = NULL;
+pthread_spinlock_t lock;
 
 int
 main()
 {
-  assert(lock == NULL);
-
   assert(pthread_spin_init(&lock, PTHREAD_PROCESS_PRIVATE) == 0);
-
-  assert(lock != NULL);
 
   assert(pthread_spin_lock(&lock) == 0);
 
@@ -25,7 +21,7 @@ main()
 
   assert(pthread_spin_destroy(&lock) == 0);
 
-  assert(lock == NULL);
+  assert(pthread_spin_lock(&lock) == EINVAL);
 
   return 0;
 }
