@@ -2,6 +2,14 @@ Fri Feb  5 13:42:30 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* semaphore.c: Comment format changes.
 
+Thu Feb  4 10:07:28 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* global.c: Remove Pthread_exception instantiation.
+
+	* cancel.c (pthread_testcancel): Change C++ exception throw.
+
+	* implement.h: Remove extern declaration.
+
 Wed Feb  3 13:04:44 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* cleanup.c: Rename _pthread_*_cleanup() to pthread_*_cleanup().
