@@ -37,6 +37,10 @@ void pthread_exit(void *value);
 
 pthread_t pthread_self(void);
 
+int pthread_equal(pthread_t t1, pthread_t t2);
+
+int pthread_join(pthread_t thread, void ** valueptr);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
