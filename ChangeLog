@@ -1,3 +1,53 @@
+Wed Jul 22 00:16:22 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* attr.c, implement.h, pthread.h, ChangeLog: Resolve CVS merge
+	conflicts.
+
+	* private.c (_pthread_find_thread_entry): Changes to return type
+	to support leaner _pthread_threads_table[] which now only stores
+	_pthread_thread_thread_t *.
+	(_pthread_new_thread_entry): Internal changes.
+	(_pthread_delete_thread_entry): Internal changes to avoid contention.
+ 	Calling routines changed accordingly.
+
+	* pthread.h: Modified cleanup macros to use new generic push and pop.
+	Added destructor and atfork stacks to _pthread_threads_thread_t.
+
+	* cleanup.c (_pthread_handler_push, _pthread_handler_pop,
+	_pthread_handler_pop_all): Renamed cleanup push and pop routines
+	and made generic to handle destructors and atfork handlers as
+	well.
+
+	* create.c (_pthread_start_call): New function is a wrapper for
+	all new threads. It allows us to do some cleanup when the thread
+	returns, ie. that is otherwise only done if the thread is cancelled.
+
+	* exit.c (_pthread_vacuum): New function contains code from 
+	pthread_exit() that we need in the new _pthread_start_call()
+	as well.
+
+	* implement.h: Various additions and minor changes.
+
+	* pthread.h: Various additions and minor changes.
+	Change cleanup handler macros to use generic handler push and pop
+	functions.
+
+	* attr.c: Minor mods to all functions.
+	(is_attr): Implemented missing function.
+
+	* create.c (pthread_create): More clean up.
+
+	* private.c (_pthread_find_thread_entry): Implement.
+	(_pthread_delete_thread_entry): Implement.
+	(_pthread_new_thread_entry): Implement.
+	These functions manipulate the implementations internal thread
+	table and are part of general code cleanup and modularisation.
+	They replace _pthread_getthreadindex() which was removed.
+
+	* exit.c (pthread_exit): Changed to use the new code above.
+
+	* pthread.h: Add cancelability constants. Update comments.
+
 1998-07-22  Ben Elliston  <bje@cygnus.com>
 
 	* attr.c (pthread_setstacksize): Update test of attr argument.
