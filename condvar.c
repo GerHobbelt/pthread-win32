@@ -413,10 +413,6 @@ cond_timedwait (pthread_cond_t * cond,
 
   /*
    * OK to increment  cv->waiters because the caller locked 'mutex'
-   *
-   * [RPJ] FIXME: This can still lead to race conditions, which I think
-   * are NOT the same as the unpredictable scheduling behaviour noted in the
-   * POSIX Pthread specs.
    */
   cv->waiters++;
 
