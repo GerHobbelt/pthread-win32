@@ -173,6 +173,7 @@ struct sem_t_
   HANDLE event;
 #else				/* NEED_SEM */
   int value;
+  pthread_mutex_t lock;
   HANDLE sem;
 #endif				/* NEED_SEM */
 };

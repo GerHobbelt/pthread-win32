@@ -190,9 +190,9 @@ main()
 
   cvthing.shared++;
 
-  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
-
   assert(pthread_cond_broadcast(&cvthing.notbusy) == 0);
+
+  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
   /*
    * Give threads time to complete.

@@ -128,15 +128,25 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 #else /* NEED_SEM */
 
 	  s->value = value;
-	  s->sem = CreateSemaphore (NULL,	/* Always NULL */
-				    (long) 0,	/* Force threads to wait */
-				    (long) _POSIX_SEM_VALUE_MAX,	/* Maximum value */
-				    NULL);	/* Name */
-
-	  if (0 == s->sem)
+	  if (pthread_mutex_init(&s->lock, NULL) == 0)
 	    {
-	      free (s);
+	      if ((s->sem = CreateSemaphore (NULL,	/* Always NULL */
+					     (long) 0,	/* Force threads to wait */
+					     (long) _POSIX_SEM_VALUE_MAX,	/* Maximum value */
+					     NULL)) == 0)	/* Name */
+		{
+		  (void) pthread_mutex_destroy(&s->lock);
+		  result = ENOSPC;
+		}
+	    }
+	  else
+	    {
 	      result = ENOSPC;
+	    }
+
+	  if (result != 0)
+	    {
+	      free(s);
 	    }
 
 #endif /* NEED_SEM */

@@ -78,9 +78,10 @@ sem_post_multiple (sem_t * sem, int count)
   int result = 0;
 #ifndef NEED_SEM
   long waiters;
+  sem_t s = *sem;
 #endif
 
-  if (sem == NULL || *sem == NULL || count <= 0)
+  if (s == NULL || count <= 0)
     {
       result = EINVAL;
     }
@@ -88,17 +89,27 @@ sem_post_multiple (sem_t * sem, int count)
 #ifdef NEED_SEM
 
   else if (!ptw32_increase_semaphore (sem, count))
-
-#else /* NEED_SEM */
-
-    else if ((waiters = -InterlockedExchangeAdd((LPLONG) &(*sem)->value, (LONG) count)) > 0
-	     && !ReleaseSemaphore((*sem)->sem,  (waiters<=count)?waiters:count, 0))
-
-#endif /* NEED_SEM */
-
     {
       result = EINVAL;
     }
+
+#else /* NEED_SEM */
+
+  else if ((result = pthread_mutex_lock (&s->lock)) == 0)
+    {
+      waiters = -s->value;
+      s->value += count;
+      if (waiters > 0)
+        {
+          if (!ReleaseSemaphore (s->sem,  (waiters<=count)?waiters:count, 0))
+            {
+              result = EINVAL;
+            }
+        }
+      (void) pthread_mutex_unlock (&s->lock);
+    }
+
+#endif /* NEED_SEM */
 
   if (result != 0)
     {

@@ -87,15 +87,21 @@ sem_trywait (sem_t * sem)
 #else /* NEED_SEM */
 
   int result = 0;
+  sem_t s = *sem;
 
-  if (sem == NULL || *sem == NULL)
+  if (s == NULL)
     {
       result = EINVAL;
     }
-  else if (InterlockedDecrement((LPLONG) &(*sem)->value) < 0)
+  else if ((result = pthread_mutex_lock (&s->lock)) == 0)
     {
-      (void) InterlockedIncrement((LPLONG) &(*sem)->value);
-      result = EAGAIN;
+      if (--s->value < 0)
+	{
+	  s->value++;
+	  result = EAGAIN;
+	}
+
+      (void) pthread_mutex_unlock (&s->lock);
     }
 
   if (result != 0)

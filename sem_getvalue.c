@@ -52,9 +52,7 @@ sem_getvalue (sem_t * sem, int *sval)
       * ------------------------------------------------------
       * DOCPUBLIC
       *      This function stores the current count value of the
-      *      semaphore. If the count is negative, it's absolute
-      *      value is the number of threads currently waiting on
-      *      the semaphore.
+      *      semaphore.
       * RESULTS
       *
       * Return value
@@ -88,21 +86,27 @@ sem_getvalue (sem_t * sem, int *sval)
     {
       long value;
       register sem_t s = *sem;
+      int result = 0;
 
 #ifdef NEED_SEM
 
       EnterCriticalSection (&s->sem_lock_cs);
       value = s->value;
       LeaveCriticalSection (&s->sem_lock_cs);
+      *sval = value;
 
 #else
 
-      value = s->value;
+      if ((result = pthread_mutex_lock(&s->lock)) == 0)
+        {
+          value = s->value;
+          (void) pthread_mutex_unlock(&s->lock);
+          *sval = value;
+        }
 
 #endif
 
-      *sval = value;
-      return 0;
+      return result;
     }
 
 }				/* sem_getvalue */

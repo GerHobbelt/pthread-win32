@@ -52,6 +52,17 @@
 #include "semaphore.h"
 #include "implement.h"
 
+static void
+ptw32_sem_timedwait_cleanup (void * sem)
+{
+  sem_t s = (sem_t) sem;
+
+  if (pthread_mutex_lock (&s->lock) == 0)
+    {
+      s->value++;
+      (void) pthread_mutex_unlock (&s->lock);
+    }
+}
 
 int
 sem_timedwait (sem_t * sem, const struct timespec *abstime)
@@ -94,6 +105,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
       */
 {
   int result = 0;
+  sem_t s = *sem;
 
 #ifdef NEED_FTIME
 
@@ -185,19 +197,29 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 
 #ifdef NEED_SEM
 
-      result = (pthreadCancelableTimedWait ((*sem)->event, milliseconds));
+      result = (pthreadCancelableTimedWait (s->event, milliseconds));
 
 #else /* NEED_SEM */
 
-      if (InterlockedDecrement((LPLONG) &(*sem)->value) < 0)
-        {
-          /* Must wait */
-	  result = pthreadCancelableTimedWait ((*sem)->sem, milliseconds);
-	  if (result != 0)
+      if ((result = pthread_mutex_lock (&s->lock)) == 0)
+	{
+	  int v = --s->value;
+	  (void) pthread_mutex_unlock (&s->lock);
+
+	  if (v < 0)
 	    {
-              (void) InterlockedIncrement((LPLONG) &(*sem)->value);
+	      /* Must wait */
+              pthread_cleanup_push(ptw32_sem_timedwait_cleanup, s);
+	      result = pthreadCancelableTimedWait (s->sem, milliseconds);
+              pthread_cleanup_pop(0);
+	      if (result != 0
+		  && pthread_mutex_lock (&s->lock) == 0)
+		{
+		  s->value++;
+		  (void) pthread_mutex_unlock (&s->lock);
+		}
 	    }
-        }
+	}
 
 #endif
 

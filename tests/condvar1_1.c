@@ -38,7 +38,7 @@
  *
  * Test Method (Validation or Falsification):
  * - Validation:
- *   Initiate and destry several CVs in random order.
+ *   Initiate and destroy several CVs in random order.
  *
  * Requirements Tested:
  * - 

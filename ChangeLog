@@ -1,3 +1,27 @@
+2004-10-22  Ross Johnson  <rpj at callisto.canberra.edu.au>
+
+	* sem_init.c (sem_init): Introduce a 'lock' element in order to
+	replace the interlocked operations with conventional serialisation.
+	This is needed in order to be able to atomically modify the sema value
+	and perform Win32 sema release operations. Win32 semaphores are used
+	instead of events in order to support efficient multiple posting.
+	If the whole modify/release isn't atomic, a race between sem_timedwait()
+	and sem_post() could result in a release when there is no waiting
+	semaphore, which would cause too many threads to proceed.
+	* sem_wait.c (sem_wait): Use new 'lock'element.
+	* sem_timedwait.c (sem_timedwait): Likewise.
+	* sem_trywait.c (sem_trywait): Likewise.
+	* sem_post.c (sem_post): Likewise.
+	* sem_post_multiple.c (sem_post_multiple): Likewise.
+	* sem_getvalue.c (sem_getvalue): Likewise.
+	* ptw32_semwait.c (ptw32_semwait): Likewise.
+	* sem_destroy.c (sem_destroy): Likewise; also tightened the conditions
+	for semaphore destruction; in particular, a semaphore will not be
+	destroyed if it has waiters.
+	* sem_timedwait.c (sem_timedwait): Added cancel cleanup handler to
+	restore sema value when cancelled.
+	* sem_wait.c (sem_wait): Likewise.
+
 2004-10-21  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
 	* pthread_mutex_unlock.c (pthread_mutex_unlock): Must use PulseEvent()

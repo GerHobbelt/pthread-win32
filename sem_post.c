@@ -73,8 +73,11 @@ sem_post (sem_t * sem)
       */
 {
   int result = 0;
+#ifndef NEED_SEM
+  sem_t s = *sem;
+#endif
 
-  if (sem == NULL || *sem == NULL)
+  if (s == NULL)
     {
       result = EINVAL;
     }
@@ -82,17 +85,24 @@ sem_post (sem_t * sem)
 #ifdef NEED_SEM
 
   else if (!ptw32_increase_semaphore (sem, 1))
-
-#else /* NEED_SEM */
-
-    else if (InterlockedIncrement((LPLONG) &(*sem)->value) <= 0
-	     && !ReleaseSemaphore((*sem)->sem, 1, NULL))
-
-#endif /* NEED_SEM */
-
     {
       result = EINVAL;
     }
+
+#else /* NEED_SEM */
+
+  else if ((result = pthread_mutex_lock (&s->lock)) == 0)
+    {
+      if (++s->value <= 0
+	  && !ReleaseSemaphore (s->sem, 1, NULL))
+	{
+	  result = EINVAL;
+	}
+      
+      (void) pthread_mutex_unlock (&s->lock);
+    }
+
+#endif /* NEED_SEM */
 
   if (result != 0)
     {

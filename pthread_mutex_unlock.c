@@ -100,7 +100,7 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 							 (LONG) 0) < 0)
 		    {
 		      /* Someone may be waiting on that mutex */
-		      if (SetEvent (mx->event) == 0)
+		      if (PulseEvent (mx->event) == 0)
 			{
 			  result = EINVAL;
 			}
