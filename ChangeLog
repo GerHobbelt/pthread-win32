@@ -1,3 +1,9 @@
+2001-06-04  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* condvar.c: Add original description of the algorithm as
+	developed by Terekhov and Thomas, plus reference to
+	README.CV.
+
 2001-06-03  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	Contributed by  - Alexander Terekhov <TEREKHOV@de.ibm.com>
