@@ -27,10 +27,6 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
-/*
- * Code contributed by John E. Bossom <JEB>.
- */
-
 
 typedef struct ThreadParms ThreadParms;
 typedef struct ThreadKeyAssoc ThreadKeyAssoc;
@@ -120,8 +116,8 @@ struct ThreadKeyAssoc {
  */
 #define SE_SUCCESS              0x00
 #define SE_INFORMATION	        0x01
-#define SE_WARNING              0x10
-#define SE_ERROR                0x11
+#define SE_WARNING              0x02
+#define SE_ERROR                0x03
 
 #define MAKE_SOFTWARE_EXCEPTION( _severity, _facility, _exception ) \
 ( (DWORD) ( ( (_severity) << 30 ) |	/* Severity code	*/ \
@@ -221,7 +217,6 @@ int _pthread_sem_post (_pthread_sem_t * sem);
 }
 #endif /* __cplusplus */
 
-/* </JEB> */
 
 /*
  * Check for old and new versions of cygwin. See the FAQ file:

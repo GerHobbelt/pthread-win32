@@ -33,9 +33,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-/*
- * Code contributed by John E. Bossom <JEB>.
- */
 
 int
 _pthread_processInitialize (void)
@@ -224,7 +221,7 @@ _pthread_threadStart (ThreadParms * threadParms)
    */
   return (status);
 
-}				/* threadStart */
+}				/* _pthread_threadStart */
 
 void
 _pthread_threadDestroy (pthread_t thread)
@@ -238,10 +235,15 @@ _pthread_threadDestroy (pthread_t thread)
 	  CloseHandle (thread->cancelEvent);
 	}
 
+      if( thread->threadH != 0 )
+	{
+	  CloseHandle( thread->threadH );
+	}
+
       free (thread);
     }
 
-}				/* threadDestroy */
+}				/* _pthread_threadDestroy */
 
 int
 _pthread_tkAssocCreate (ThreadKeyAssoc ** assocP,
@@ -347,7 +349,7 @@ FAIL0:
 
   return (result);
 
-}				/* tkAssocCreate */
+}				/* _pthread_tkAssocCreate */
 
 
 void
@@ -376,7 +378,7 @@ _pthread_tkAssocDestroy (ThreadKeyAssoc * assoc)
       free (assoc);
     }
 
-}				/* tkAssocDestroy */
+}				/* _pthread_tkAssocDestroy */
 
 
 void
@@ -507,9 +509,5 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 	}
     }
 
-}				/* callUserDestroyRoutines */
-
-/* </JEB> */
-
-
+}				/* _pthread_callUserDestroyRoutines */
 
