@@ -1,5 +1,10 @@
 Wed Feb 10 12:49:11 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* configure: Various temporary changes.
+	- Kevin Ruland <Kevin.Ruland@anheuser-busch.com>
+
+	* README: Update.
+
 	* pthread.def (pthread_attr_getstackaddr): uncomment
 	(pthread_attr_setstackaddr): uncomment
 
