@@ -12,7 +12,7 @@ func(void * arg)
 	pthread_exit(arg);
 
 	/* Never reached. */
-	exit(1);
+	assert(0);
 }
 
 int
@@ -26,6 +26,8 @@ main(int argc, char * argv[])
 	  {
 	    assert(pthread_create(&id[i], NULL, func, (void *) i) == 0);
 	  }
+
+	Sleep(1000);
 
 	/* Success. */
 	return 0;
