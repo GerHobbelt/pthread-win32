@@ -30,7 +30,9 @@
 
 #endif /* !_MSC_VER && !__cplusplus && __GNUC__ */
 
+#include <sys/timeb.h>
 #include "pthread.h"
+#include "semaphore.h"
 #include "implement.h"
 
 
@@ -511,3 +513,102 @@ _pthread_callUserDestroyRoutines (pthread_t thread)
 
 }				/* _pthread_callUserDestroyRoutines */
 
+
+int
+_pthread_sem_timedwait (sem_t * sem, const struct timespec * abstime)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      This function waits on a semaphore possibly until
+      *      'abstime' time.
+      *
+      * PARAMETERS
+      *      sem
+      *              pointer to an instance of sem_t
+      *
+      *      abstime
+      *              pointer to an instance of struct timespec
+      *
+      * DESCRIPTION
+      *      This function waits on a semaphore. If the
+      *      semaphore value is greater than zero, it decreases
+      *      its value by one. If the semaphore value is zero, then
+      *      the calling thread (or process) is blocked until it can
+      *      successfully decrease the value or until interrupted by
+      *      a signal.
+      *
+      *      If 'abstime' is a NULL pointer then this function will
+      *      block until it can successfully decrease the value or
+      *      until interrupted by a signal.
+      *
+      * RESULTS
+      *              0               successfully decreased semaphore,
+      *              -1              failed, error in errno
+      * ERRNO
+      *              EINVAL          'sem' is not a valid semaphore,
+      *              ENOSYS          semaphores are not supported,
+      *              EINTR           the function was interrupted by a signal,
+      *              EDEADLK         a deadlock condition was detected.
+      *              ETIMEDOUT       abstime elapsed before success.
+      *
+      * ------------------------------------------------------
+      */
+{
+  int result = 0;
+
+#if defined(__MINGW32__)
+
+  struct timeb currSysTime;
+
+#else
+
+  struct _timeb currSysTime;
+
+#endif
+
+  const DWORD NANOSEC_PER_MILLISEC = 1000000;
+  const DWORD MILLISEC_PER_SEC = 1000;
+  DWORD milliseconds;
+
+  if (sem == NULL)
+    {
+      result = EINVAL;
+    }
+  else
+    {
+      if (abstime == NULL)
+	{
+	  milliseconds = INFINITE;
+	}
+      else
+	{
+	  /* 
+	   * Calculate timeout as milliseconds from current system time. 
+	   */
+
+	  /* get current system time */
+	  _ftime(&currSysTime);
+
+	  /* subtract current system time from abstime */
+	  milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
+	  milliseconds += (abstime->tv_nsec / NANOSEC_PER_MILLISEC) -
+	    currSysTime.millitm;
+
+	  if (((int) milliseconds) < 0)
+	    milliseconds = 0;
+	}
+
+      result = (pthreadCancelableTimedWait (*sem, milliseconds));
+    }
+
+  if (result != 0)
+    {
+
+      errno = result;
+      return -1;
+
+    }
+
+  return 0;
+
+}				/* _pthread_sem_timedwait */

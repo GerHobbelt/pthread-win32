@@ -253,9 +253,6 @@ struct timespec {
 #define FALSE	0
 #endif /* !TRUE */
 
-
-/* #include <sched.h> */
-
 #ifdef __MINGW32__
 #define PT_STDCALL
 #else
@@ -419,14 +416,14 @@ extern "C"
 #define PTHREAD_THREADS_MAX				2019
 
 
-  typedef struct pthread_t_ *pthread_t;
-  typedef struct pthread_attr_t_ *pthread_attr_t;
-  typedef struct pthread_once_t_ pthread_once_t;
-  typedef struct pthread_key_t_ *pthread_key_t;
-  typedef struct pthread_mutex_t_ *pthread_mutex_t;
-  typedef struct pthread_mutexattr_t_ *pthread_mutexattr_t;
-  typedef struct pthread_cond_t_ *pthread_cond_t;
-  typedef struct pthread_condattr_t_ *pthread_condattr_t;
+typedef struct pthread_t_ *pthread_t;
+typedef struct pthread_attr_t_ *pthread_attr_t;
+typedef struct pthread_once_t_ pthread_once_t;
+typedef struct pthread_key_t_ *pthread_key_t;
+typedef struct pthread_mutex_t_ *pthread_mutex_t;
+typedef struct pthread_mutexattr_t_ *pthread_mutexattr_t;
+typedef struct pthread_cond_t_ *pthread_cond_t;
+typedef struct pthread_condattr_t_ *pthread_condattr_t;
 
 
 /*
@@ -501,141 +498,9 @@ struct pthread_once_t_
 };
 
 
-/*
- * ====================
- * ====================
- * Structure Definitions
- * ====================
- * ====================
- */
+#define PTHREAD_MUTEX_INITIALIZER ((pthread_mutex_t) -1)
 
-typedef enum {
-  /*
-   * This enumeration represents the state of the thread;
-   * The thread is still "alive" if the numeric value of the
-   * state is greater or equal "PThreadStateRunning".
-   */
-  PThreadStateInitial = 0,	/* Thread not running                   */
-  PThreadStateRunning,	        /* Thread alive & kicking               */
-  PThreadStateSuspended,	/* Thread alive but suspended           */
-  PThreadStateCanceling,	/* Thread alive but and is              */
-                                /* in the process of terminating        */
-                                /* due to a cancellation request        */
-  PThreadStateException,	/* Thread alive but exiting             */
-                                /* due to an exception                  */
-  PThreadStateLast
-}
-PThreadState;
-
-
-typedef enum {
-  /*
-   * This enumeration represents the reason why a thread has
-   * terminated/is terminating.
-   */
-  PThreadDemisePeaceful = 0,	/* Death due natural causes     */
-  PThreadDemiseCancelled,	/* Death due to user cancel     */
-  PThreadDemiseException,	/* Death due to unhandled       */
-                                /* exception                    */
-  PThreadDemiseNotDead	/* I'm not dead!                */
-}
-PThreadDemise;
-
-
-struct pthread_t_ {
-  DWORD thread;
-  HANDLE threadH;
-  PThreadState state;
-  PThreadDemise demise;
-  void *exitStatus;
-  void *parms;
-  int detachState;
-  int cancelState;
-  int cancelType;
-  HANDLE cancelEvent;
-#if HAVE_SIGSET_T
-  sigset_t sigmask;
-#endif /* HAVE_SIGSET_T */
-  int implicit:1;
-  void *keys;
-};
-
-
-/* 
- * Special value to mark attribute objects as valid.
- */
-#define _PTHREAD_ATTR_VALID ((unsigned long) 0xC4C0FFEE)
-
-struct pthread_attr_t_ {
-  unsigned long valid;
-  void *stackaddr;
-  size_t stacksize;
-  int detachstate;
-  int priority;
-#if HAVE_SIGSET_T
-  sigset_t sigmask;
-#endif /* HAVE_SIGSET_T */
-};
-
-
-/*
- * ====================
- * ====================
- * Mutexes and Condition Variables
- * ====================
- * ====================
- */
-
-enum {
-  _PTHREAD_OBJECT_INVALID = 0,  /* NULL */
-  _PTHREAD_OBJECT_AUTO_INIT
-};
-
-#define PTHREAD_MUTEX_INITIALIZER ((pthread_mutex_t) _PTHREAD_OBJECT_AUTO_INIT)
-
-struct pthread_mutex_t_ {
-  HANDLE mutex;
-  CRITICAL_SECTION cs;
-};
-
-
-struct pthread_mutexattr_t_ {
-  int pshared;
-  int forcecs;
-};
-
-
-struct pthread_key_t_ {
-  DWORD key;
-  void (*destructor) (void *);
-  pthread_mutex_t threadsLock;
-  void *threads;
-};
-
-
-#define PTHREAD_COND_INITIALIZER ((pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
-
-typedef HANDLE _pthread_sem_t;
-
-struct pthread_cond_t_ {
-  long waiters;                       /* # waiting threads             */
-  pthread_mutex_t waitersLock;        /* Mutex that guards access to 
-					 waiter count                  */
-  _pthread_sem_t sema;                /* Queue up threads waiting for the 
-					 condition to become signaled  */
-  HANDLE waitersDone;                 /* An auto reset event used by the 
-					 broadcast/signal thread to wait 
-					 for the waiting thread(s) to wake
-					 up and get a chance at the  
-					 semaphore                     */
-  int wasBroadcast;                   /* keeps track if we are signaling 
-					 or broadcasting               */
-};
-
-
-struct pthread_condattr_t_ {
-  int pshared;
-};
+#define PTHREAD_COND_INITIALIZER ((pthread_cond_t) -1)
 
 
 /*
@@ -655,13 +520,22 @@ struct pthread_condattr_t_ {
 #define SCHED_MIN   SCHED_OTHER
 #define SCHED_MAX   SCHED_RR
 
-  struct sched_param {
-    int sched_priority;
-  };
-
+struct sched_param {
+  int sched_priority;
+};
 
 
 /* There are three implementations of cancel cleanup.
+ * Note that pthread.h is included in both application
+ * compilation units and also internally for the library.
+ * The code here and within the library aims to work
+ * for all reasonable combinations of environments.
+ * For example, although the library itself can't be
+ * built (yet) in C, an application written in C can
+ * be linked and run against a library built using
+ * either WIN32 SEH or C++ EH.
+ *
+ * The three implementations are:
  *
  *   WIN32 SEH
  *   C
@@ -963,16 +837,11 @@ int pthread_getschedparam (pthread_t thread,
 			   int *policy,
 			   struct sched_param *param);
 
-int sched_get_priority_min (int policy);
-
-int sched_get_priority_max (int policy);
-
 int pthread_attr_getschedparam (const pthread_attr_t *attr,
 				struct sched_param *param);
 
 int pthread_attr_setschedparam (pthread_attr_t *attr,
 				const struct sched_param *param);
-
 
 /*
  * Protected Methods

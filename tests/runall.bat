@@ -1,4 +1,6 @@
-erase *.result
+@echo off
+
+if x%1==x-f echo y | erase *.pass > nul:
 
 call runtest cl mutex1
 call runtest cl mutex2

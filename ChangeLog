@@ -1,3 +1,47 @@
+Sun Apr  4 11:05:57 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* sched.c (sched.h): Include.
+
+	* sched.h: New file for POSIX 1b scheduling.
+
+	* pthread.h: Move opaque structures to implement.h; move sched_*
+	prototypes out and into sched.h.
+
+	* implement.h: Add opaque structures from pthread.h.
+
+	* sched.c (sched_yield): New function.
+
+	* condvar.c (_pthread_sem_*): Rename to sem_*; except for
+	_pthread_sem_timedwait which is an private function.
+
+Sat Apr  3 23:28:00 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* Makefile.in (OBJS): Add errno.o.
+
+Fri Apr  2 11:08:50 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h (_pthread_sem_*): Remove prototypes now defined in
+	semaphore.h.
+
+	* pthread.h (sempahore.h): Include.
+
+	* semaphore.h: New file for POSIX 1b semaphores.
+
+	* pthread.h (_pthread_sem_t): Change to sem_t. 
+
+	* semaphore.c (_pthread_sem_*): Change to sem_*; these functions
+	will be exported from the library; set errno on error.
+	- John Bossom <jebossom@cognos.com>
+	(_pthread_sem_timedwait): Moved to private.c.
+
+	* private.c (_pthread_sem_timedwait): Moved from semaphore.c;
+	set errno on error.
+
+	* errno.c (_errno): New file. New function.
+	- John Bossom
+
+	* pthread.h (pthread_t_): Add per-thread errno element.
+
 Fri Mar 26 14:11:45 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* semaphore.c (_pthread_sem_timedwait): Check for negative

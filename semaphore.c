@@ -9,17 +9,6 @@
  *
  *              POSIX 1003.1b-1993      (POSIX.1b)
  *
- *      They are supposed to follow the older UNIX convention for
- *      reporting errors. That is, on failure they are supposed
- *      to return a value of -1 and store the appropriate error
- *      number into 'errno'.
- *      HOWEVER,errno cannot be modified in a multithreaded
- *      program on WIN32; therefore, the value is returned as
- *      the function value.
- *      It is recommended that you compare for zero (0) for success
- *      instead of -1 for failure when checking the status of
- *      these functions.
- *
  * Contents:
  *              Public Methods                    Author
  *              --------------                    ------
@@ -53,15 +42,17 @@
  * MA 02111-1307, USA
  */
 
+#include <windows.h>
+#include <process.h>
 #include <sys/timeb.h>
-
 #include <string.h>
 
-#include <pthread.h>
-#include "implement.h"
+#include "pthread.h"
+#include "semaphore.h"
+
 
 int
-_pthread_sem_init (_pthread_sem_t * sem, int pshared, unsigned int value)
+sem_init (sem_t * sem, int pshared, unsigned int value)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -70,7 +61,7 @@ _pthread_sem_init (_pthread_sem_t * sem, int pshared, unsigned int value)
       *
       * PARAMETERS
       *      sem
-      *              pointer to an instance of _pthread_sem_t
+      *              pointer to an instance of sem_t
       *
       *      pshared
       *              if zero, this semaphore may only be shared between
@@ -87,6 +78,8 @@ _pthread_sem_init (_pthread_sem_t * sem, int pshared, unsigned int value)
       *
       * RESULTS
       *              0               successfully created semaphore,
+      *              -1              failed, error in errno
+      * ERRNO
       *              EINVAL          'sem' is not a valid semaphore,
       *              ENOSPC          a required resource has been exhausted,
       *              ENOSYS          semaphores are not supported,
@@ -110,7 +103,7 @@ _pthread_sem_init (_pthread_sem_t * sem, int pshared, unsigned int value)
     {
       /*
        * NOTE: Taking advantage of the fact that
-       *               _pthread_sem_t is a simple structure with one entry;
+       *               sem_t is a simple structure with one entry;
        *               We don't have to allocate it...
        */
       *sem = CreateSemaphore (
@@ -125,13 +118,19 @@ _pthread_sem_init (_pthread_sem_t * sem, int pshared, unsigned int value)
 	}
     }
 
-  return (result);
+  if (result != 0)
+    {
+      errno = result;
+      return -1;
+    }
+
+  return 0;
 
 }				/* sem_init */
 
 
 int
-_pthread_sem_destroy (_pthread_sem_t * sem)
+sem_destroy (sem_t * sem)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -139,13 +138,15 @@ _pthread_sem_destroy (_pthread_sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      *              pointer to an instance of _pthread_sem_t
+      *              pointer to an instance of sem_t
       *
       * DESCRIPTION
       *      This function destroys an unnamed semaphore.
       *
       * RESULTS
       *              0               successfully destroyed semaphore,
+      *              -1              failed, error in errno
+      * ERRNO
       *              EINVAL          'sem' is not a valid semaphore,
       *              ENOSYS          semaphores are not supported,
       *              EBUSY           threads (or processes) are currently
@@ -154,17 +155,30 @@ _pthread_sem_destroy (_pthread_sem_t * sem)
       * ------------------------------------------------------
       */
 {
-  return ((sem == NULL)
-	  ? EINVAL
-	  : (CloseHandle (*sem)
-	     ? 0
-	     : EINVAL));
+  int result = 0;
+
+  if (sem == NULL)
+    {
+      result = EINVAL;
+    }
+  else if (! CloseHandle (*sem))
+    {
+      result = EINVAL;
+    }
+
+  if (result != 0)
+    {
+      errno = result;
+      return -1;
+    }
+
+  return 0;
 
 }				/* sem_destroy */
 
 
 int
-_pthread_sem_trywait (_pthread_sem_t * sem)
+sem_trywait (sem_t * sem)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -172,7 +186,7 @@ _pthread_sem_trywait (_pthread_sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      *              pointer to an instance of _pthread_sem_t
+      *              pointer to an instance of sem_t
       *
       * DESCRIPTION
       *      This function tries to wait on a semaphore. If the
@@ -182,6 +196,8 @@ _pthread_sem_trywait (_pthread_sem_t * sem)
       *
       * RESULTS
       *              0               successfully decreased semaphore,
+      *              -1              failed, error in errno
+      * ERRNO
       *              EAGAIN          the semaphore was already locked,
       *              EINVAL          'sem' is not a valid semaphore,
       *              ENOSYS          semaphores are not supported,
@@ -191,17 +207,30 @@ _pthread_sem_trywait (_pthread_sem_t * sem)
       * ------------------------------------------------------
       */
 {
-  return ((sem == NULL)
-	  ? EINVAL
-	  : ((WaitForSingleObject (*sem, 0) == WAIT_TIMEOUT)
-	     ? EAGAIN
-	     : 0));
+  int result = 0;
+
+  if (sem == NULL)
+    {
+      result = EINVAL;
+    }
+  else if (WaitForSingleObject (*sem, 0) == WAIT_TIMEOUT)
+    {
+      result = EAGAIN;
+    }
+
+  if (result != 0)
+    {
+      errno = result;
+      return -1;
+    }
+
+  return 0;
 
 }				/* sem_trywait */
 
 
 int
-_pthread_sem_wait (_pthread_sem_t * sem)
+sem_wait (sem_t * sem)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -209,7 +238,7 @@ _pthread_sem_wait (_pthread_sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      *              pointer to an instance of _pthread_sem_t
+      *              pointer to an instance of sem_t
       *
       * DESCRIPTION
       *      This function waits on a semaphore. If the
@@ -221,6 +250,8 @@ _pthread_sem_wait (_pthread_sem_t * sem)
       *
       * RESULTS
       *              0               successfully decreased semaphore,
+      *              -1              failed, error in errno
+      * ERRNO
       *              EINVAL          'sem' is not a valid semaphore,
       *              ENOSYS          semaphores are not supported,
       *              EINTR           the function was interrupted by a signal,
@@ -229,96 +260,30 @@ _pthread_sem_wait (_pthread_sem_t * sem)
       * ------------------------------------------------------
       */
 {
+  int result = 0;
 
-  return ((sem == NULL)
-	  ? EINVAL
-	  : pthreadCancelableWait (*sem)
-    );
+  if (sem == NULL)
+    {
+      result = EINVAL;
+    }
+  else
+    {
+	result = pthreadCancelableWait (*sem);
+    }
+
+  if (result != 0)
+    {
+      errno = result;
+      return -1;
+    }
+
+  return 0;
 
 }				/* sem_wait */
 
 
 int
-_pthread_sem_timedwait (_pthread_sem_t * sem, const struct timespec * abstime)
-     /*
-      * ------------------------------------------------------
-      * DOCPUBLIC
-      *      This function waits on a semaphore possibly until
-      *      'abstime' time.
-      *
-      * PARAMETERS
-      *      sem
-      *              pointer to an instance of _pthread_sem_t
-      *
-      *      abstime
-      *              pointer to an instance of struct timespec
-      *
-      * DESCRIPTION
-      *      This function waits on a semaphore. If the
-      *      semaphore value is greater than zero, it decreases
-      *      its value by one. If the semaphore value is zero, then
-      *      the calling thread (or process) is blocked until it can
-      *      successfully decrease the value or until interrupted by
-      *      a signal.
-      *
-      *      If 'abstime' is a NULL pointer then this function will
-      *      block until it can successfully decrease the value or
-      *      until interrupted by a signal.
-      *
-      * RESULTS
-      *              0               successfully decreased semaphore,
-      *              EINVAL          'sem' is not a valid semaphore,
-      *              ENOSYS          semaphores are not supported,
-      *              EINTR           the function was interrupted by a signal,
-      *              EDEADLK         a deadlock condition was detected.
-      *              ETIMEDOUT       abstime elapsed before success.
-      *
-      * ------------------------------------------------------
-      */
-{
-#if defined(__MINGW32__)
-  struct timeb currSysTime;
-#else
-  struct _timeb currSysTime;
-#endif
-  const DWORD NANOSEC_PER_MILLISEC = 1000000;
-  const DWORD MILLISEC_PER_SEC = 1000;
-  DWORD milliseconds;
-
-  if (sem == NULL)
-    {
-      return EINVAL;
-    }
-
-  if (abstime == NULL)
-    {
-      milliseconds = INFINITE;
-    }
-  else
-    {
-      /* 
-       * Calculate timeout as milliseconds from current system time. 
-       */
-
-      /* get current system time */
-      _ftime(&currSysTime);
-
-      /* subtract current system time from abstime */
-      milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
-      milliseconds += (abstime->tv_nsec / NANOSEC_PER_MILLISEC) -
-	currSysTime.millitm;
-
-      if (((int) milliseconds) < 0)
-	milliseconds = 0;
-    }
-
-  return (pthreadCancelableTimedWait (*sem, milliseconds));
-
-}				/* _pthread_sem_timedwait */
-
-
-int
-_pthread_sem_post (_pthread_sem_t * sem)
+sem_post (sem_t * sem)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -326,7 +291,7 @@ _pthread_sem_post (_pthread_sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      *              pointer to an instance of _pthread_sem_t
+      *              pointer to an instance of sem_t
       *
       * DESCRIPTION
       *      This function posts a wakeup to a semaphore. If there
@@ -334,17 +299,33 @@ _pthread_sem_post (_pthread_sem_t * sem)
       *      otherwise, the semaphore value is incremented by one.
       *
       * RESULTS
-      *              0               successfully destroyed semaphore,
+      *              0               successfully posted semaphore,
+      *              -1              failed, error in errno
+      * ERRNO
       *              EINVAL          'sem' is not a valid semaphore,
       *              ENOSYS          semaphores are not supported,
       *
       * ------------------------------------------------------
       */
 {
-  return ((sem == NULL)
-	  ? EINVAL
-	  : (ReleaseSemaphore (*sem, 1, 0)
-	     ? 0
-	     : EINVAL));
+  int result = 0;
+
+  if (sem == NULL)
+    {
+	result = EINVAL;
+    }
+  else if (! ReleaseSemaphore (*sem, 1, 0))
+    {
+	result = EINVAL;
+    }
+
+
+  if (result != 0)
+    {
+      errno = result;
+      return -1;
+    }
+
+  return 0;
 
 }				/* sem_post */

@@ -1,23 +1,17 @@
 
-                PTHREADS-WIN32 SNAPSHOT 1999-03-16
+                PTHREADS-WIN32 SNAPSHOT 1999-04-04
                 ----------------------------------
        Web Site: http://sourceware.cygnus.com/pthreads-win32/
         Coordinator: Ross Johnson <rpj@ise.canberra.edu.au>
 
 
-We are pleased to announce the availability of Pthreads-win32, an
-Open Source Software (OSS) implementation of the Threads component
-of the POSIX 1003.1c 1996 Standard for Microsoft's Win32
-environment.
+We are pleased to announce the availability of a new snapshot of
+Pthreads-win32, an Open Source Software (OSS) implementation of the
+Threads component of the POSIX 1003.1c 1995 Standard for Microsoft's
+Win32 environment. Some functions from POSIX 1003.1b are supported.
 
 Pthreads-win32 is free software, distributed under the GNU Library
 General Public License (LGPL).
-
-This is the first general announcement of the library in workable
-form. We expect it to be stable in the real world having passed it's
-own test suite, however, if you do find bugs in the library please
-let us know either via the mailing list (see below), or by emailing
-the coordinator directly (see above).
 
 Pthreads-win32 is based substantially on a Win32 pthreads
 implementation contributed by John E. Bossom <jebossom@cognos.com>.
@@ -26,17 +20,35 @@ Please see the 'Acknowledgements' section at the end of this
 announcement for the list of contributors.
 
 
+Change Summary
+--------------
+
+Some POSIX 1b functions which were internally supported are now
+available as exported functions:
+
+	sem_init
+	sem_destroy
+	sem_wait
+	sem_trywait
+	sem_post
+	sched_yield
+	sched_get_priority_min
+	sched_get_priority_max
+
+Some minor bugs have been fixed. See the ChangeLog file for details.
+
+
 Level of standards conformance
 ------------------------------
 
-The following POSIX 1003.1c 1996 options are defined:
+The following POSIX 1003.1c 1995 options are defined:
 
       _POSIX_THREADS
       _POSIX_THREAD_SAFE_FUNCTIONS
       _POSIX_THREAD_ATTR_STACKSIZE
 
 
-The following POSIX 1003.1c 1996 options are not defined:
+The following POSIX 1003.1c 1995 options are not defined:
 
       _POSIX_THREAD_ATTR_STACKADDR
       _POSIX_THREAD_PRIORITY_SCHEDULING
@@ -112,15 +124,25 @@ The following functions are implemented:
       pthread_cond_broadcast  
 
       ---------------------------
+      Semaphores
+      ---------------------------
+      sem_init               (POSIX 1b)
+      sem_destroy            (POSIX 1b)
+      sem_post               (POSIX 1b)
+      sem_wait               (POSIX 1b)
+      sem_trywait            (POSIX 1b)
+
+      ---------------------------
       RealTime Scheduling
       ---------------------------
       pthread_attr_getschedparam  
       pthread_attr_setschedparam  
       pthread_getschedparam
       pthread_setschedparam
-      sched_get_priority_max
-      sched_get_priority_min
-      
+      sched_get_priority_max (POSIX 1b)
+      sched_get_priority_min (POSIX 1b)
+      sched_yield            (POSIX 1b)
+
       ---------------------------
       Signals
       ---------------------------
@@ -241,9 +263,11 @@ against the export library libpthread32.a built under Mingw32
 together with the version of pthread.dll built with MSVC.
       
 Cygwin: (http://sourceware.cygnus.com/cygwin/)
-Cygwin does not have thread-safe libraries and should not be used
-for threaded applications.
-      
+Cygwin aims to provide a complete POSIX environment on top of Win32, including
+threads. When this is complete, developers using Cygwin will not need
+pthreads-win32. At this time, Cygwin has preliminary support for multithreaded
+development, however, this is not turned on by default.
+
 Generally:
 For convenience, the following pre-built files can be downloaded from
 the FTP site:

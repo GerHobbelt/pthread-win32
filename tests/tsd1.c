@@ -43,6 +43,7 @@
  * - output identifies failed component
  */
 
+#include <sched.h>
 #include "test.h"
 
 static pthread_key_t key = NULL;
@@ -87,7 +88,7 @@ mythread(void * arg)
 {
   while (key == NULL)
     {
-	Sleep(0);
+	sched_yield();
     }
 
   setkey(arg);

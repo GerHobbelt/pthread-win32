@@ -27,15 +27,136 @@
 #ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
+#include <semaphore.h>
+
+typedef enum {
+  /*
+   * This enumeration represents the state of the thread;
+   * The thread is still "alive" if the numeric value of the
+   * state is greater or equal "PThreadStateRunning".
+   */
+  PThreadStateInitial = 0,	/* Thread not running                   */
+  PThreadStateRunning,	        /* Thread alive & kicking               */
+  PThreadStateSuspended,	/* Thread alive but suspended           */
+  PThreadStateCanceling,	/* Thread alive but and is              */
+                                /* in the process of terminating        */
+                                /* due to a cancellation request        */
+  PThreadStateException,	/* Thread alive but exiting             */
+                                /* due to an exception                  */
+  PThreadStateLast
+}
+PThreadState;
+
+
+typedef enum {
+  /*
+   * This enumeration represents the reason why a thread has
+   * terminated/is terminating.
+   */
+  PThreadDemisePeaceful = 0,	/* Death due natural causes     */
+  PThreadDemiseCancelled,	/* Death due to user cancel     */
+  PThreadDemiseException,	/* Death due to unhandled       */
+                                /* exception                    */
+  PThreadDemiseNotDead	/* I'm not dead!                */
+}
+PThreadDemise;
+
+struct pthread_t_ {
+  DWORD thread;
+  HANDLE threadH;
+  PThreadState state;
+  PThreadDemise demise;
+  void *exitStatus;
+  void *parms;
+  int ptErrno;
+  int detachState;
+  int cancelState;
+  int cancelType;
+  HANDLE cancelEvent;
+#if HAVE_SIGSET_T
+  sigset_t sigmask;
+#endif /* HAVE_SIGSET_T */
+  int implicit:1;
+  void *keys;
+};
+
+
+/* 
+ * Special value to mark attribute objects as valid.
+ */
+#define _PTHREAD_ATTR_VALID ((unsigned long) 0xC4C0FFEE)
+
+struct pthread_attr_t_ {
+  unsigned long valid;
+  void *stackaddr;
+  size_t stacksize;
+  int detachstate;
+  int priority;
+#if HAVE_SIGSET_T
+  sigset_t sigmask;
+#endif /* HAVE_SIGSET_T */
+};
+
+
+/*
+ * ====================
+ * ====================
+ * Mutexes and Condition Variables
+ * ====================
+ * ====================
+ */
+
+#define _PTHREAD_OBJECT_AUTO_INIT ((void *) -1)
+#define _PTHREAD_OBJECT_INVALID   NULL
+
+struct pthread_mutex_t_ {
+  HANDLE mutex;
+  CRITICAL_SECTION cs;
+};
+
+
+struct pthread_mutexattr_t_ {
+  int pshared;
+  int forcecs;
+};
+
+
+struct pthread_key_t_ {
+  DWORD key;
+  void (*destructor) (void *);
+  pthread_mutex_t threadsLock;
+  void *threads;
+};
+
 
 typedef struct ThreadParms ThreadParms;
 typedef struct ThreadKeyAssoc ThreadKeyAssoc;
-
 
 struct ThreadParms {
   pthread_t tid;
   void *(*start) (void *);
   void *arg;
+};
+
+
+struct pthread_cond_t_ {
+  long waiters;                       /* # waiting threads             */
+  pthread_mutex_t waitersLock;        /* Mutex that guards access to 
+					 waiter count                  */
+  sem_t sema;                         /* Queue up threads waiting for the 
+					 condition to become signaled  */
+  HANDLE waitersDone;                 /* An auto reset event used by the 
+					 broadcast/signal thread to wait 
+					 for the waiting thread(s) to wake
+					 up and get a chance at the  
+					 semaphore                     */
+  int wasBroadcast;                   /* keeps track if we are signaling 
+					 or broadcasting               */
+};
+
+
+struct pthread_condattr_t_ {
+  int pshared;
 };
 
 
@@ -198,20 +319,8 @@ int _pthread_tkAssocCreate (ThreadKeyAssoc ** assocP,
 
 void _pthread_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
-int _pthread_sem_init (_pthread_sem_t * sem, 
-		       int pshared, 
-		       unsigned int value);
-
-int _pthread_sem_destroy (_pthread_sem_t * sem);
-
-int _pthread_sem_trywait (_pthread_sem_t * sem);
-
-int _pthread_sem_wait (_pthread_sem_t * sem);
-
-int _pthread_sem_timedwait (_pthread_sem_t * sem,
+int _pthread_sem_timedwait (sem_t * sem,
 			    const struct timespec * abstime);
-
-int _pthread_sem_post (_pthread_sem_t * sem);
 
 #ifdef __cplusplus
 }
