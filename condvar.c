@@ -728,7 +728,11 @@ ptw32_cond_wait_cleanup(void * args)
               if (sem_post( &(cv->semBlockLock) ) != 0)
                 {
                   *resultPtr = errno;
-                  (void) pthread_mutex_unlock( &(cv->mtxUnblockLock) );
+                  /*
+                   * This is a fatal error for this CV,
+                   * so we deliberately don't unlock
+                   * cv->mtxUnblockLock before returning.
+                   */
                   return;
                 }
               nSignalsWasLeft = 0;
@@ -744,14 +748,22 @@ ptw32_cond_wait_cleanup(void * args)
       if (sem_wait( &(cv->semBlockLock) ) != 0)
         {
           *resultPtr = errno;
-          (void) pthread_mutex_unlock( &(cv->mtxUnblockLock) );
+          /*
+           * This is a fatal error for this CV,
+           * so we deliberately don't unlock
+           * cv->mtxUnblockLock before returning.
+           */
           return;
         }
       cv->nWaitersBlocked -= cv->nWaitersGone;
       if (sem_post( &(cv->semBlockLock) ) != 0)
         {
           *resultPtr = errno;
-          (void) pthread_mutex_unlock( &(cv->mtxUnblockLock) );
+          /*
+           * This is a fatal error for this CV,
+           * so we deliberately don't unlock
+           * cv->mtxUnblockLock before returning.
+           */
           return;
         }
       cv->nWaitersGone = 0;
