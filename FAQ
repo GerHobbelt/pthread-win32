@@ -304,6 +304,11 @@ A 6
 Once you've followed Thomas Pfaff's instructions below to fix
 Mingw32, then you can simply run "make" to build the library and dll.
 
+Note that you need to distribute the following DLLs along
+with your application:
+
+        pthreadGCE.dll
+        gcc.dll
 
 From - Sat Dec  9 22:56:10 2000
 From: "Thomas Pfaff" <tpfaff@gmx.net>
