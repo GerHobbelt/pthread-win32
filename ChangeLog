@@ -1,3 +1,8 @@
+2003-06-24  Piet van Bruggen  <pietvb@newbridges.nl>
+
+	* pthread_spin_destroy.c (pthread_spin_destroy): Was not freeing the
+	spinlock struct.
+
 2003-06-22  Nicolas Barry  <boozai@yahoo.com>
 
 	* pthread_mutex_destroy.c (pthread_mutex_destroy): When called

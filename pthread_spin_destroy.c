@@ -60,6 +60,17 @@ pthread_spin_destroy(pthread_spinlock_t *lock)
                                               (PTW32_INTERLOCKED_LONG) PTW32_OBJECT_INVALID,
                                               (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED))
         {
+	  /*
+	   * The spinlock isn't held by another thread so other threads that have
+	   * just entered another spin_* routine will get PTW32_OBJECT_INVALID
+	   * and so return EINVAL. This will not be so if the memory freed below is
+	   * re-allocated and initialised before that happens.
+	   *
+	   * We are relying on the application to be responsible for ensuring that
+	   * all other threads have finished with the spinlock before destroying it.
+	   */
+	  *lock = NULL;
+	  (void) free(s);
           return 0;
         }
 
