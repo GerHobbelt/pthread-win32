@@ -1,3 +1,14 @@
+1998-07-17  Ben Elliston  <bje@cygnus.com>
+
+	* implement.h (_pthread_mutexattr_t): Remove shared attribute.
+	
+	* mutex.c (pthread_mutexattr_setpshared): This optional function
+	is no longer supported, since we want to implement POSIX mutex
+	variables using the much more efficient Win32 critical section
+	primitives.  Critical section objects in Win32 cannot be shared
+	between processes.
+	(pthread_mutexattr_getpshared): Likewise.
+
 1998-07-14  Ben Elliston  <bje@cygnus.com>
 
 	* attr.c (pthread_attr_setstacksize): Implement.
@@ -60,7 +71,7 @@ Mon Jul 13 01:09:55 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 1998-07-12  Ben Elliston  <bje@cygnus.com>
 
-	* implement.h (_pthread_mutex_attr_t): Define this implementation
+	* implement.h (_pthread_mutexattr_t): Define this implementation
 	internal type.  Application programmers only see a mutex attribute
 	object as a void pointer.
 
