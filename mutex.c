@@ -835,6 +835,10 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
   int result = 0;
   pthread_mutex_t mx;
 
+#ifdef NEED_SEM
+  errno = ENOTSUP;
+  return -1;
+#endif
 
   if (mutex == NULL || *mutex == NULL)
     {

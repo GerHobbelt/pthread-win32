@@ -258,7 +258,7 @@ sem_trywait (sem_t * sem)
       * ERRNO
       * 	     EAGAIN	     the semaphore was already locked,
       * 	     EINVAL	     'sem' is not a valid semaphore,
-      * 	     ENOSYS	     semaphores are not supported,
+      * 	     ENOTSUP	     sem_trywait is not supported,
       * 	     EINTR	     the function was interrupted by a signal,
       * 	     EDEADLK	     a deadlock condition was detected.
       *
@@ -270,7 +270,7 @@ sem_trywait (sem_t * sem)
   /*
    * not yet implemented!
    */
-  int result = EINVAL;
+  errno = ENOTSUP;
   return -1;
 
 #else /* NEED_SEM */

@@ -1,3 +1,11 @@
+2002-02-01  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* semaphore.c (sem_trywait): Fix missing errno return
+	for systems that define NEED_SEM (e.g. early WinCE).
+	* mutex.c (pthread_mutex_timedlock): Return ENOTSUP
+	for systems that define NEED_SEM since they don't
+	have sem_trywait().
+
 2002-01-27  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* mutex.c (pthread_mutex_timedlock): New function suggested by
