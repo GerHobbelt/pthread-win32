@@ -658,7 +658,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
       /*
        * Check whether cv is still busy (still has waiters)
        */
-      if (cv->nWaitersBlocked > cv->nWaitersGone)
+      if (cv->nWaitersBlocked - cv->nWaitersGone - cv->nWaitersUnblocked > 0)
         {
           if (sem_post(&(cv->semBlockLock)) != 0)
             {
