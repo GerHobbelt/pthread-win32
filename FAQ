@@ -385,8 +385,11 @@ Ross
 Q 10	How do I create thread-safe applications using
 ----	pthreadGCE.dll, libpthreadw32.a and Mingw32?
 
-See Thomas Pfaff's email at:
+If you must use a MinGW32 gcc version 2.95 or earlier then
+see Thomas Pfaff's email at:
 http://sources.redhat.com/ml/pthreads-win32/2002/msg00000.html
+
+Later versions should thread-safe.
 
 ------------------------------------------------------------------------------
  
