@@ -40,22 +40,13 @@ remove_attr(pthread_mutexattr_t *attr)
 int
 pthread_mutex_init(pthread_mutex_t *mutex, pthread_mutex_attr_t *attr)
 {
-  /* FIXME: Attributes are currently ignored. */
-  
-  if ((is_attr(attr) != 0) || (mutex == NULL))
+  if (mutex == NULL)
     {
       return EINVAL;
     }
 
-  /* Create an unnamed mutex with default security and one which is
-     initially not held by the thread.  Default security (arg1 = NULL)
-     is portable to Win9x and NT, as Win9x has no security model. */
-
-  if ((*mutex = CreateMutex(NULL, FALSE, NULL)) == NULL)
-    {
-      /* This is almost certainly due to a lack of resources. */
-      return ENOMEM;
-    }
+  /* Create a critical section. */
+  InitializeCriticalSection(mutex);
 
   return 0;
 }
@@ -63,12 +54,12 @@ pthread_mutex_init(pthread_mutex_t *mutex, pthread_mutex_attr_t *attr)
 int
 pthread_mutex_destroy(pthread_mutex_t *mutex)
 {
-  if ((mutex == NULL) || (CloseHandle(*mutex) != TRUE))
+  if (mutex == NULL)
     {
-      /* This is almost certainly due to an invalid handle. */
       return EINVAL;
     }
 
+  DeleteCriticalSection(mutex);
   return 0;
 }
 
@@ -142,53 +133,27 @@ pthread_mutexattr_getprioceiling(const pthread_mutexattr_t *attr,
 int
 pthread_mutex_lock(pthread_mutex_t *mutex)
 {
-  switch (WaitForSingleObject(*mutex, INFINITE))
-    {
-    case WAIT_ABANDONED_0:
-      /* Thread holding the mutex abandoned it.  Fall through. */
-    case WAIT_FAILED:
-      /* This is probably due to an invalid handle. */
-      return EINVAL;
-    case WAIT_OBJECT_0:
-      /* We're good. */
-      return 0;
-    }
-  /* Not reached. */
+  EnterCriticalSection(mutex);
+  return 0;
 }
 
 int
 pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
-  if (ReleaseMutex(*mutex) != TRUE)
-    {
-      /* This is probably due to an invalid handle. */
-      return EINVAL;
-    }
-  else
-    {
-      return 0;
-    }
-
-  /* Not reached. */
+  LeaveCriticalSection(mutex);
+  return 0;
 }
 
 int
 pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
-  /* If the mutex is already held, return EBUSY. */
-  switch (WaitForSingleObject(*mutex, 0))
+  /* This only works on Windows NT 4.0 and above.  If this function is
+     called from Windows 95, we must return ENOSYS. */
+     
+  if (mutex == NULL)
     {
-    case WAIT_ABANDONED_0:
-      /* Thread holding the mutex abandoned it.  Fall through. */
-    case WAIT_FAILED:
-      /* This is probably due to an invalid handle. */
       return EINVAL;
-    case WAIT_TIMEOUT:
-      /* We couldn't get the lock. */
-      return EBUSY;
-    case WAIT_OBJECT_0:
-      /* We're good. */
-      return 0;
     }
-  /* Not reached. */
+
+  return (TryEnterCriticalSection(mutex) != TRUE) ? EBUSY : 0;
 }
