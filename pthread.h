@@ -984,7 +984,7 @@ class ptw32_exception_exit   : public ptw32_exception {};
 #ifndef PTW32_BUILD
 
 /* FIXME: This is only required if the library was built using SEH */
- *
+/*
  * Get internal SEH tag
  */
 DWORD ptw32_get_exception_services_code(void);

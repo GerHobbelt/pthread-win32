@@ -1,4 +1,13 @@
-2000-08-18  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+2000-08-22  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* private.c (ptw32_throw): Fix exception test;
+	move exceptionInformation declaration.
+
+	* tsd.c (pthread_key_create): newkey wrongly declared.
+
+	* pthread.h: Fix comment block.
+
+2000-08-18  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* mutex.c (pthread_mutex_destroy): Check that the mutex isn't
 	held; invalidate the mutex as early as possible to avoid
