@@ -6,6 +6,8 @@
  * threads.
  */
 
+#include <errno.h>
+
 #include <malloc.h>
 #include "pthread.h"
 #include "implement.h"
@@ -29,7 +31,7 @@ _pthread_handler_push(int stack,
 
   if (new_thread == NULL)
     {
-      return ENOMEM;
+      return 0; /* NOMEM */
     }
 
   new_thread->routine = routine;

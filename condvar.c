@@ -5,6 +5,8 @@
  * This translation unit implements condition variables and their primitives.
  */
 
+#include <errno.h>
+
 #include <windows.h>
 #include "pthread.h"
 

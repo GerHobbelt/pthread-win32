@@ -5,6 +5,8 @@
  * POSIX thread functions which implement thread-specific data (TSD).
  */
 
+#include <errno.h>
+
 #include "pthread.h"
 #include "implement.h"
 

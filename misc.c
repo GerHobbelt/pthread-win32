@@ -5,6 +5,8 @@
  * This translation unit implements miscellaneous thread functions.
  */
 
+#include <errno.h>
+
 #include "pthread.h"
 
 int

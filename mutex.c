@@ -5,6 +5,8 @@
  * This translation unit implements mutual exclusion (mutex) primitives.
  */
 
+#include <errno.h>
+
 #include "pthread.h"
 #include "implement.h"
 

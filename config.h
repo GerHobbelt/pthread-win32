@@ -1,2 +1,2 @@
-#define HAVE_SIGNAL_H
-#define HAVE_SIGSET_T
+#undef HAVE_SIGNAL_H
+#undef HAVE_SIGSET_T

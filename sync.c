@@ -6,6 +6,8 @@
  * synchronisation.
  */
 
+#include <errno.h>
+
 /* POSIX STANDARD: A thread may pass a value pointer to some data via
    pthread_exit(). That pointer will be stored in a location supplied
    as an argument to pthread_join().

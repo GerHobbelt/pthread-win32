@@ -5,9 +5,11 @@
  * This translation unit implements operations on thread attribute objects.
  */
 
+#include <errno.h>
+#include <string.h>
+
 #include "pthread.h"
 #include "implement.h"
-#include <string.h>
 
 static int
 is_attr(const pthread_attr_t *attr)
