@@ -96,6 +96,12 @@ SOURCE=.\attr.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\barrier.c
+# End Source File
+# Begin Source File
+
+# Begin Source File
+
 SOURCE=.\cancel.c
 # End Source File
 # Begin Source File
@@ -154,6 +160,12 @@ SOURCE=.\semaphore.c
 
 SOURCE=.\signal.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\spin.c
+# End Source File
+# Begin Source File
+
 # Begin Source File
 
 SOURCE=.\sync.c

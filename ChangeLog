@@ -1,3 +1,13 @@
+2002-01-14  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* attr.c (pthread_attr_setscope): Fix struct pointer
+	indirection error introduced 2002-01-04.
+	(pthread_attr_getscope): Likewise.
+
+2002-01-12  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* pthread.dsp (SOURCE): Add missing source files.
+
 2002-01-08  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* mutex.c (pthread_mutex_trylock): use

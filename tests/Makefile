@@ -44,6 +44,7 @@ PASSES= loadfree.pass \
 	  exit2.pass  exit3.pass  \
 	  join0.pass  join1.pass  join2.pass  \
 	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
+	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
 	  count1.pass  once1.pass  tsd1.pass  \
 	  self2.pass  \
 	  cancel1.pass  cancel2.pass  \
@@ -200,6 +201,14 @@ mutex2.pass: mutex1.pass
 mutex3.pass: create1.pass
 mutex4.pass: mutex3.pass
 mutex5.pass:
+mutex6.pass: mutex4.pass
+mutex6n.pass: mutex4.pass
+mutex6e.pass: mutex4.pass
+mutex6r.pass: mutex4.pass
+mutex7.pass: mutex6.pass
+mutex7n.pass: mutex6n.pass
+mutex7e.pass: mutex6e.pass
+mutex7r.pass: mutex6r.pass
 once1.pass: create1.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass

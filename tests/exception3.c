@@ -87,7 +87,7 @@ terminateFunction ()
 {
   pthread_mutex_lock(&caughtLock);
   caught++;
-#if 0
+#if 1
   {
      FILE * fp = fopen("pthread.log", "a");
      fprintf(fp, "Caught = %d\n", caught);
@@ -123,7 +123,7 @@ main()
       assert(pthread_create(&et[i], NULL, exceptionedThread, NULL) == 0);
     }
 
-  Sleep(10000);
+  Sleep(5000);
 
   assert(caught == NUMTHREADS);
 

@@ -42,6 +42,10 @@ mutex6::	mutex6.c
 mutex6e::	mutex6e.c
 mutex6n::	mutex6n.c
 mutex6r::	mutex6r.c
+mutex7::	mutex7.c
+mutex7e::	mutex7e.c
+mutex7n::	mutex7n.c
+mutex7r::	mutex7r.c
 equal1::	equal1.c
 exit2::		exit2.c
 exit3::		exit3.c
@@ -98,6 +102,7 @@ benchtest4::    benchtest4.c
 benchtest5::    benchtest5.c
 
 loadfree:	:test:
+mutex5		:test:	loadfree
 mutex1		:test:	loadfree
 mutex2		:test:	loadfree
 exit1		:test:	loadfree
@@ -110,6 +115,14 @@ cancel1		:test:	create1
 cancel2		:test:	cancel1
 mutex3		:test:	create1
 mutex4		:test:	mutex3
+mutex6		:test:	mutex4
+mutex6n		:test:	mutex4
+mutex6e		:test:	mutex4
+mutex6r		:test:	mutex4
+mutex7		:test:	mutex6
+mutex7n		:test:	mutex6n
+mutex7e		:test:	mutex6e
+mutex7r		:test:	mutex6r
 equal1		:test:	create1
 exit2		:test:	create1
 exit3		:test:	create1

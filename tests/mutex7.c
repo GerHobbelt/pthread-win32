@@ -1,5 +1,5 @@
 /* 
- * mutex6.c
+ * mutex7.c
  *
  *
  * Pthreads-win32 - POSIX Threads Library for Win32
@@ -26,8 +26,8 @@
  *
  * Test the default (type not set) mutex type.
  * Should be the same as PTHREAD_MUTEX_NORMAL.
- * Thread locks mutex twice (recursive lock).
- * Locking thread should deadlock on second attempt.
+ * Thread locks then trylocks mutex (attempted recursive lock).
+ * The thread should lock first time and EBUSY second time.
  *
  * Depends on API functions: 
  *	pthread_mutex_lock()
@@ -45,11 +45,10 @@ void * locker(void * arg)
 {
   assert(pthread_mutex_lock(&mutex) == 0);
   lockCount++;
-
-  /* Should wait here (deadlocked) */
-  assert(pthread_mutex_lock(&mutex) == 0);
+  assert(pthread_mutex_trylock(&mutex) == EBUSY);
   lockCount++;
   assert(pthread_mutex_unlock(&mutex) == 0);
+  assert(pthread_mutex_unlock(&mutex) == EPERM);
 
   return 0;
 }
@@ -64,16 +63,6 @@ main()
   assert(pthread_create(&t, NULL, locker, NULL) == 0);
 
   Sleep(1000);
-
-  assert(lockCount == 1);
-
-  /*
-   * Should succeed even though we don't own the lock
-   * because FAST mutexes don't check ownership.
-   */
-  assert(pthread_mutex_unlock(&mutex) == 0);
-
-  Sleep (1000);
 
   assert(lockCount == 2);
 
