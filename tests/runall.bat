@@ -6,6 +6,7 @@ if EXIST *.fail echo y | erase *.fail > nul:
 if EXIST *.notrun echo y | erase *.notrun > nul:
 
 :noforce
+call runtest cl loadfree _
 call runtest cl mutex1 _
 call runtest cl mutex2 _
 call runtest cl exit1 _
@@ -30,9 +31,6 @@ call runtest cl condvar3 create1
 call runtest cl condvar4 create1
 call runtest cl condvar5 condvar4
 call runtest cl condvar6 condvar5
-call runtest cl condvar7 condvar6
-call runtest cl condvar8 condvar7
-call runtest cl condvar9 condvar8
 call runtest cl errno1 mutex3
 call runtest cl rwlock1 condvar6
 call runtest cl rwlock2 rwlock1
@@ -43,7 +41,12 @@ call runtest cl rwlock6 rwlock5
 call runtest cl context1 cancel2
 call runtest cl cancel3 context1
 call runtest cl cancel4 cancel3
-call runtest cl loadfree _
+call runtest cl cleanup1 cancel4
+call runtest cl cleanup2 cleanup1
+call runtest cl cleanup3 cleanup2
+call runtest cl condvar7 cleanup1
+call runtest cl condvar8 condvar7
+call runtest cl condvar9 condvar8
 
 if NOT EXIST *.notrun goto skip1
 echo The following tests did not run (because prerequisite didn't pass?):

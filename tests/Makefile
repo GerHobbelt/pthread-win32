@@ -36,20 +36,22 @@ COPYFILES	= $(HDR) $(LIB) $(DLL)
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
-TESTS	= mutex1 condvar1 condvar2 exit1 create1 equal1 \
+TESTS	= loadfree \
+	  mutex1 condvar1 condvar2 exit1 create1 equal1 \
 	  exit2 exit3 \
 	  join1 join2 mutex2 mutex3 \
 	  count1 once1 tsd1 self1 self2 cancel1 eyal1 \
 	  condvar3 condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 \
-	  context1 cancel3 cancel4
+	  context1 cancel3 cancel4 cleanup1 cleanup2 cleanup3
 
 PASSES	= $(TESTS:%=%.pass)
 
 all:	$(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
+loadfree.pass:
 mutex1.pass:
 mutex2.pass:
 exit1.pass:
@@ -72,9 +74,9 @@ condvar3.pass: create1.pass
 condvar4.pass: create1.pass
 condvar5.pass: condvar4.pass
 condvar6.pass: condvar5.pass
-condvar7.pass: condvar6.pass
-condvar8.pass: condvar6.pass
-condvar9.pass: condvar6.pass
+condvar7.pass: condvar6.pass cleanup1.pass
+condvar8.pass: condvar7.pass
+condvar9.pass: condvar8.pass
 errno1.pass: mutex3.pass
 rwlock1.pass: condvar6.pass
 rwlock2.pass: rwlock1.pass
@@ -85,6 +87,9 @@ rwlock6.pass: rwlock5.pass
 context1.pass: cancel2.pass
 cancel3.pass: context1.pass
 cancel4.pass: cancel3.pass
+cleanup1.pass: cancel4.pass
+cleanup2.pass: cleanup1.pass
+cleanup3.pass: cleanup2.pass
 
 %.pass: %.exe $(LIB) $(DLL) $(HDR)
 	$*
