@@ -44,13 +44,10 @@ install: all
 	copy pthread.lib $(LIBDEST)
 
 pthread.dll: $(OBJ) pthread.def
-	cl /LDd /Zi *.obj /Fepthread.dll \
-		pthread.def \
-		/link /nodefaultlib:libcmt \
-		msvcrt.lib 
+	cl /LDd /Zi /MD $(OBJ) /Fepthread.dll pthread.def 
 
 .c.obj::
-	cl /W3 /MT /nologo /Yd /Zi /I. \
+	cl /W3 /MD /nologo /Yd /Zi /I. \
 		/D_WIN32_WINNT=0x400 \
 		/DSTDCALL=_stdcall \
 		-c $<
