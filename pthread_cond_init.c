@@ -157,6 +157,7 @@ DONE:
 
       LeaveCriticalSection(&ptw32_cond_list_lock);
     }
+
   *cond = cv;
 
   return result;
