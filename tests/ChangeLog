@@ -1,5 +1,19 @@
 2004-05-16  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
+	* condvar2.c (WIN32_WINNT): Define to avoid redefinition warning
+	from inclusion of implement.h.
+	* convar2_1.c: Likewise.
+	* condvar3_1.c: Likewise.
+	* condvar3_2.c: Likewise.
+	* context1.c: Likewise.
+	* sizes.c: Likewise.
+	* Makefile: Don't define _WIN32_WINNT on compiler command line.
+	* GNUmakefile: Likewise.
+	* priority1.c (main): Add column to output for actual win32
+	priority.
+
+2004-05-16  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
 	* cancel9.c: New test.
 	* cancel3.c: Remove inappropriate conditional compilation;
 	GNU C version of test suite no longer quietly skips this test.

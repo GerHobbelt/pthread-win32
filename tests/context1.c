@@ -71,6 +71,8 @@
  * - Process returns non-zero exit status.
  */
 
+#define _WIN32_WINNT 0x400
+
 #include "test.h"
 #include "../implement.h"
 
