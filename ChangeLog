@@ -14,7 +14,13 @@
 	(pthread_mutex_unlock): Likewise.
 
 	* pthread.h (pthread_condattr_setpshared): Fix typo.
-
+	(pthread_attr_init): Add function prototype.
+	(pthread_attr_destroy): Likewise.
+	(pthread_attr_setstacksize): Likewise.
+	(pthread_attr_getstacksize): Likewise.
+	(pthread_attr_setstackaddr): Likewise.
+	(pthread_attr_getstackaddr): Likewise.
+	
 Mon Jul 13 01:09:55 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* implement.h: Wrap in #ifndef _IMPLEMENT_H
