@@ -1,3 +1,9 @@
+1998-10-02  Ben Elliston  <bje@cygnus.com>
+
+	* COPYING: Remove.
+
+	* COPYING.LIB: Add. This library is under the LGPL.
+
 1998-09-13  Ben Elliston  <bje@cygnus.com>
 
 	* configure.in: Test for required system features.
