@@ -230,8 +230,8 @@
 
 #ifndef HAVE_STRUCT_TIMESPEC
 struct timespec {
-	int tv_sec;
-	int tv_nsec;
+	long tv_sec;
+	long tv_nsec;
 };
 #endif /* HAVE_STRUCT_TIMESPEC */
 
@@ -724,12 +724,6 @@ struct ptw32_cleanup_t
  */
 
 /*
- * Useful if an application wants to statically link
- * the lib rather than load the DLL at run-time.
- */
-int pthread_win32_initialize_np(void);
-
-/*
  * PThread Attribute Functions
  */
 int pthread_attr_init (pthread_attr_t * attr);
@@ -902,13 +896,28 @@ int pthread_rwlock_wrlock(pthread_rwlock_t *lock);
 
 int pthread_rwlock_unlock(pthread_rwlock_t *lock);
 
+
 /*
  * Non-portable functions
  */
+
+/* Possibly supported by other POSIX threads implimentations */
+int pthread_delay_np (struct timespec * interval);
+
+/* Pthread Win32 specific */
 int pthread_mutexattr_setforcecs_np(pthread_mutexattr_t *attr,
 				    int forcecs);
 
 HANDLE pthread_getw32threadhandle_np(pthread_t thread);
+
+/*
+ * Useful if an application wants to statically link
+ * the lib rather than load the DLL at run-time.
+ */
+int pthread_win32_process_attach_np(void);
+int pthread_win32_process_detach_np(void);
+int pthread_win32_thread_attach_np(void);
+int pthread_win32_thread_detach_np(void);
 
 
 /*
@@ -955,7 +964,7 @@ int * _errno( void );
 	  (_buf) )
 
 #define ctime_r( _clock, _buf ) \
-	( strcpy( (_buf), ctime( (_tm) ) ),  \
+	( strcpy( (_buf), ctime( (_clock) ) ),  \
           (_buf) )
 
 #define gmtime_r( _clock, _result ) \

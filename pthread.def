@@ -103,8 +103,14 @@ pthread_rwlock_unlock
 ;
 pthread_mutexattr_setforcecs_np
 pthread_getw32threadhandle_np
+pthread_delay_np
 pthreadCancelableWait
 pthreadCancelableTimedWait
+; For use when linking statically
+pthread_win32_process_attach_np
+pthread_win32_process_detach_np
+pthread_win32_thread_attach_np
+pthread_win32_thread_detach_np
 ;
 ; Needed if !defined(_MSC_VER) && !defined(__cplusplus)
 ;

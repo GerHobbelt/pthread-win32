@@ -49,7 +49,7 @@ PASSES= loadfree.pass \
 	  context1.pass  \
 	  cancel3.pass  cancel4.pass  cancel5.pass  \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
-	  exception1.pass 
+	  exception1.pass  exception2.pass exception3.pass
 
 all:
 	@ $(ECHO) Run one of the following command lines:
@@ -146,3 +146,5 @@ cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
 cleanup3.pass: cleanup2.pass
 exception1.pass: cancel4.pass
+exception2.pass: exception1.pass
+exception3.pass: exception2.pass

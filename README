@@ -71,17 +71,6 @@ Known bugs in this snapshot
 
 1. Asynchronous cancelation only works on Intel X86 machines.
 
-2. Running the test "join1.c" with the library built with Mingw32
-and the GNUmakefile included, the test fails with a segmentation (invalid
-page access) exception. The fault appears to be in the assembler code
-emmitted by the compiler [to handle exception contexts] at the
-end of the try block in ptw32_threadStart().
-
-3. There are problems using the libpthreadw32.a stub archive derived
-from either of pthreadVSE.dll or pthreadVCE.dll. The cleanup1.c test
-fails. This is now an expected result of having different EH and cleanup
-handler schemes in the library and application.
-
 
 Caveats
 -------
@@ -144,6 +133,34 @@ pthread_getw32threadhandle_np(pthread_t thread);
 	win32 specific attributes of the thread.
 
 int
+pthread_delay_np (const struct timespec *interval);
+
+        This routine causes a thread to delay execution for a specific period of time.
+        This period ends at the current time plus the specified interval. The routine
+        will not return before the end of the period is reached, but may return an
+        arbitrary amount of time after the period has gone by. This can be due to
+        system load, thread priorities, and system timer granularity.
+
+        Specifying an interval of zero (0) seconds and zero (0) nanoseconds is
+        allowed and can be used to force the thread to give up the processor or to
+        deliver a pending cancelation request.
+
+        This routine is a cancelation point.
+
+        The timespec structure contains the following two fields:
+
+                tv_sec is an integer number of seconds.
+                tv_nsec is an integer number of nanoseconds. 
+
+        Return Values
+
+        If an error condition occurs, this routine returns an integer value
+        indicating the type of error. Possible return values are as follows:
+
+        0          Successful completion. 
+        [EINVAL]   The value specified by interval is invalid. 
+
+int
 pthreadCancelableWait (HANDLE waitHandle);
 
 int
@@ -156,7 +173,7 @@ pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
 	pthread_cancel has been called. It is implemented using
 	WaitForMultipleObjects on 'waitHandle' and a manually
 	reset w32 event used to implement pthread_cancel.
- 
+
 
 Building under VC++ using either C++ EH or Structured EH
 --------------------------------------------------------
@@ -182,20 +199,15 @@ nmake clean VSE
 Building under Mingw32
 ----------------------
 
-The dll can be built with Mingw32 gcc-2.95.2 or later.
+The dll can be built with Mingw32 gcc-2.95.2-1 after you've
+made the changes to Mingw32 desribed in Question 6 of the FAQ.
+Hopefully versions after gcc-2.95.2-1 won't require the fix.
+
 Run "make" in the source directory (uses GNUmakefile). This builds
 pthreadGCE.dll and libpthreadw32.a.
 
-To generate the libpthreadw32.a file from pthreadVCE.dll rather than
-building the library with G++, run "make fake.a". (You must have
-pthreadVCE.dll already built - see above.)
-Please note that VC++ and GNU exception handling is implemented
-completely differently and so automatic cleanup of objects and
-the propagation of exceptions themselves between the two schemes is not
-going to happen.
-
 You can run the testsuite by changing to the "tests" directory and
-running "make clean" and then "make". See the "Known bugs" section above.
+running "make clean" and then "make".
 
 
 Building the library under Cygwin

@@ -301,9 +301,6 @@ struct ThreadKeyAssoc {
 #define PTW32_EPS_EXIT         1
 
 
-/* Function pointer to TryEnterCriticalSection if it exists; otherwise NULL */
-extern BOOL (WINAPI *ptw32_try_enter_critical_section)(LPCRITICAL_SECTION);
-
 /* Declared in global.c */
 extern int ptw32_processInitialized;
 extern pthread_key_t ptw32_selfThreadKey;
@@ -311,6 +308,8 @@ extern pthread_key_t ptw32_cleanupKey;
 extern CRITICAL_SECTION ptw32_mutex_test_init_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
 extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
+extern BOOL (WINAPI *ptw32_try_enter_critical_section)(LPCRITICAL_SECTION);
+
 
 /* Declared in misc.c */
 #ifdef NEED_CALLOC

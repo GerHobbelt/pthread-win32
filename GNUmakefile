@@ -30,7 +30,8 @@ AR	= ar
 
 LD	= gcc -mdll
 
-OPT	= -g -O0
+#OPT	= -g -O0
+OPT	= -O3
 
 ## Mingw32
 CFLAGS	= $(OPT) -x $(GLANG) -I. -mthreads -D_WIN32_WINNT=0x400 -DHAVE_CONFIG_H -DPTW32_BUILD -Wall

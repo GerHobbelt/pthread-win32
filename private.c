@@ -154,22 +154,77 @@ ptw32_processTerminate (void)
 
 }				/* processTerminate */
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__cplusplus)
 
 static DWORD
 ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
 {
-  DWORD param;
-  DWORD numParams = ep->ExceptionRecord->NumberParameters;
-  
-  numParams = (numParams > 3) ? 3 : numParams;
-
-  for (param = 0; param < numParams; param++)
+  switch (ep->ExceptionRecord->ExceptionCode)
     {
-      ei[param] = ep->ExceptionRecord->ExceptionInformation[param];
-    }
+      case EXCEPTION_PTW32_SERVICES:
+        {
+          DWORD param;
+          DWORD numParams = ep->ExceptionRecord->NumberParameters;
 
-  return EXCEPTION_EXECUTE_HANDLER;
+          numParams = (numParams > 3) ? 3 : numParams;
+
+          for (param = 0; param < numParams; param++)
+            {
+              ei[param] = ep->ExceptionRecord->ExceptionInformation[param];
+            }
+
+          return EXCEPTION_EXECUTE_HANDLER;
+          break;
+        }
+      default:
+        {
+          /*
+           * A system unexpected exception has occurred running the user's
+           * routine. We need to cleanup before letting the exception
+           * out of thread scope.
+           */
+          pthread_t self = pthread_self();
+
+          (void) pthread_mutex_destroy(&self->cancelLock);
+          ptw32_callUserDestroyRoutines(self);
+
+          return EXCEPTION_CONTINUE_SEARCH;
+          break;
+        }
+    }
+}
+
+#elif defined(__cplusplus)
+
+#if defined(_MSC_VER)
+#include <eh.h>
+static terminate_function ptw32_oldTerminate;
+#else
+#include <new.h>
+static terminate_handler ptw32_oldTerminate;
+#endif
+
+#if 0
+#include <stdio.h>
+static pthread_mutex_t termLock = PTHREAD_MUTEX_INITIALIZER;
+#endif
+
+void
+ptw32_terminate ()
+{
+  pthread_t self = pthread_self();
+#if 0
+  FILE * fp;
+  pthread_mutex_lock(&termLock);
+  fp = fopen("pthread.log", "a");
+  fprintf(fp, "Terminate\n");
+  fclose(fp);
+  pthread_mutex_unlock(&termLock);
+#endif
+  set_terminate(ptw32_oldTerminate);
+  (void) pthread_mutex_destroy(&self->cancelLock);
+  ptw32_callUserDestroyRoutines(self);
+  terminate();
 }
 
 #endif /* _MSC_VER */
@@ -189,7 +244,7 @@ ptw32_threadStart (ThreadParms * threadParms)
   DWORD ei[] = {0,0,0};
 #endif
 
-  void * status;
+  void * status = (void *) 0;
 
   self = threadParms->tid;
   start = threadParms->start;
@@ -226,53 +281,64 @@ ptw32_threadStart (ThreadParms * threadParms)
   }
   __except (ExceptionFilter(GetExceptionInformation(), ei))
   {
-    DWORD ec = GetExceptionCode();
-
-    if (ec == EXCEPTION_PTW32_SERVICES)
-      {
-	switch (ei[0])
-	  {
-	  case PTW32_EPS_CANCEL:
-	    status = PTHREAD_CANCELED;
-	    break;
-	  case PTW32_EPS_EXIT:
-	    status = self->exitStatus;
-	    break;
-	  default:
-	    status = PTHREAD_CANCELED;
+     switch (ei[0])
+       {
+        case PTW32_EPS_CANCEL:
+          status = PTHREAD_CANCELED;
           break;
-	  }
-      }
-    else
-      {
-	/*
-	 * A system unexpected exception had occurred running the user's
-	 * routine. We get control back within this block because
-         * we can't allow the exception to pass out of thread scope.
-	 */
-	status = PTHREAD_CANCELED;
-      }
+        case PTW32_EPS_EXIT:
+          status = self->exitStatus;
+          break;
+        default:
+          status = PTHREAD_CANCELED;
+          break;
+       }
   }
 
 #else /* _MSC_VER && !__cplusplus */
 
 #ifdef __cplusplus
 
+  ptw32_oldTerminate = set_terminate(&ptw32_terminate);
+
   try
   {
     /*
-     * Run the caller's routine;
+     * Run the caller's routine in a nested try block so that we
+     * can run the user's terminate function, which may call
+     * pthread_exit() or be canceled.
      */
-    status = self->exitStatus = (*start) (arg);
+    try
+      {
+        status = self->exitStatus = (*start) (arg);
+      }
+    catch (ptw32_exception &)
+      {
+        /*
+         * Pass these through to the outer block.
+         */
+        throw;
+      }
+    catch(...)
+     {
+       /*
+        * We want to run the user's terminate function if supplied.
+        * That function may call pthread_exit() or be canceled, which will
+        * be handled by the outer try block.
+        * 
+        * ptw32_terminate() will be called if there is no user supplied function.
+        */
+       (void) terminate();
+     }
   }
-  catch (ptw32_exception_cancel)
+  catch (ptw32_exception_cancel &)
     {
       /*
        * Thread was cancelled.
        */
       status = self->exitStatus = PTHREAD_CANCELED;
     }
-  catch (ptw32_exception_exit)
+  catch (ptw32_exception_exit &)
     {
       /*
        * Thread was exited via pthread_exit().
@@ -282,11 +348,18 @@ ptw32_threadStart (ThreadParms * threadParms)
   catch (...)
     {
       /*
-       * A system unexpected exception had occurred running the user's
-       * routine. We get control back within this block because
-       * we can't allow the exception out of thread scope.
+       * A system unexpected exception has occurred running the user's
+       * terminate routine. We get control back within this block - cleanup
+       * and release the exception out of thread scope.
        */
       status = self->exitStatus = PTHREAD_CANCELED;
+      (void) pthread_mutex_destroy(&self->cancelLock);
+      ptw32_callUserDestroyRoutines(self);
+      throw;
+
+      /*
+       * Never reached.
+       */
     }
 
 #else /* __cplusplus */
