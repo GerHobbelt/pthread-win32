@@ -116,7 +116,7 @@ void _pthread_vacuum(void);
 
 /* Global data declared in global.c */
 
-extern pthread_mutex_t _pthread_count_mutex;
+extern pthread_mutex_t _pthread_table_mutex;
 
 extern DWORD _pthread_threads_count;
 

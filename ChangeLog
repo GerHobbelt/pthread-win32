@@ -1,5 +1,18 @@
 Sun Jul 26 00:09:59 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* sync.c: Rename all instances of _pthread_count_mutex to
+	_pthread_table_mutex.
+
+	* implement.h: Rename _pthread_count_mutex to
+	_pthread_table_mutex.
+
+	* global.c: Rename _pthread_count_mutex to
+	_pthread_table_mutex.
+
+	* create.c (pthread_create): Add critical sections.
+	(_pthread_start_call): Rename _pthread_count_mutex to
+	_pthread_table_mutex.
+
 	* cancel.c (pthread_setcancelstate): Fix indirection bug and rename
 	"this" to "us".
 

@@ -76,7 +76,7 @@ pthread_join(pthread_t thread, void ** valueptr)
       target_thread_mutex = _PTHREAD_THREAD_MUTEX(target);
 
       /* CRITICAL SECTION */
-      pthread_mutex_lock(&_pthread_count_mutex);
+      pthread_mutex_lock(&_pthread_table_mutex);
 
       /* If the thread is in DETACHED state, then join will return
 	 immediately. */
@@ -89,7 +89,7 @@ pthread_join(pthread_t thread, void ** valueptr)
 
       target->join_count++;
 
-      pthread_mutex_lock(&_pthread_count_mutex);
+      pthread_mutex_lock(&_pthread_table_mutex);
       /* END CRITICAL SECTION */
 
       /* CANCELATION POINT */
@@ -116,7 +116,7 @@ pthread_join(pthread_t thread, void ** valueptr)
 	 following critical section. */
 
       /* CRITICAL SECTION */
-      pthread_mutex_lock(&_pthread_count_mutex);
+      pthread_mutex_lock(&_pthread_table_mutex);
 
       /* Collect the value pointer passed to pthread_exit().  If
 	 another thread detaches our target thread while we're
@@ -144,7 +144,7 @@ pthread_join(pthread_t thread, void ** valueptr)
 	  _pthread_delete_thread_entry(target);
 	}
 
-      pthread_mutex_lock(&_pthread_count_mutex);
+      pthread_mutex_lock(&_pthread_table_mutex);
       /* END CRITICAL SECTION */
 
       return ret;
@@ -163,7 +163,7 @@ pthread_detach(pthread_t thread)
   pthread_mutex_t * target_thread_mutex;
 
   /* CRITICAL SECTION */
-  pthread_mutex_lock(&_pthread_count_mutex);
+  pthread_mutex_lock(&_pthread_table_mutex);
 
   target = _pthread_find_thread_entry(thread);
 
@@ -195,7 +195,7 @@ pthread_detach(pthread_t thread)
 	}
     }
 
-  pthread_mutex_unlock(&_pthread_count_mutex);
+  pthread_mutex_unlock(&_pthread_table_mutex);
   /* END CRITICAL SECTION */
 
   return ret;
