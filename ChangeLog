@@ -1,3 +1,19 @@
+1998-07-24  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.h (SIG_BLOCK): Define if not already defined.
+	(SIG_UNBLOCK): Likewise.
+	(SIG_SETMASK): Likewise.
+	(pthread_attr_t): Add signal mask member.
+	(pthread_sigmask): Add function prototype.
+
+	* signal.c (pthread_sigmask): Implement.
+
+	* create.c: #include <string.h> to get a prototype for memcpy().
+	(pthread_create): New threads inherit their creator's signal
+	mask.  Copy the signal mask to the new thread structure.
+
+	
+
 Fri Jul 24 16:33:17 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* fork.c (pthread_atfork): Add all the necessary push calls.
