@@ -45,7 +45,7 @@
 #include "semaphore.h"
 #include "implement.h"
 
-static void
+static inline void
 ptw32_sem_wait_cleanup(void * sem)
 {
   sem_t s = (sem_t) sem;
@@ -53,6 +53,7 @@ ptw32_sem_wait_cleanup(void * sem)
   if (pthread_mutex_lock (&s->lock) == 0)
     {
       s->value++;
+      ReleaseSemaphore(s->sem, 1, 0);
       (void) pthread_mutex_unlock (&s->lock);
     }
 }
@@ -115,7 +116,13 @@ sem_wait (sem_t * sem)
 	      /* Must wait */
 	      pthread_cleanup_push(ptw32_sem_wait_cleanup, s);
 	      result = pthreadCancelableWait (s->sem);
-	      pthread_cleanup_pop(0);
+	      /*
+	       * Restore the semaphore counters if no longer waiting
+	       * and not taking the semaphore. This will occur if the
+	       * thread is cancelled while waiting, or the wake was
+	       * not the result of a post event given to us.
+	       */
+	      pthread_cleanup_pop(result);
 	    }
 	}
      
