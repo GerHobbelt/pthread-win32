@@ -99,58 +99,58 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec * abstime)
   else
     {
       if (abstime == NULL)
-	{
-	  milliseconds = INFINITE;
-	}
+				{
+					milliseconds = INFINITE;
+				}
       else
-	{
-	  /* 
-	   * Calculate timeout as milliseconds from current system time. 
-	   */
-
-	  /* get current system time */
-
+				{
+					/* 
+					 * Calculate timeout as milliseconds from current system time. 
+					 */
+					
+					/* get current system time */
+					
 #ifdef NEED_FTIME
-
-	  {
-	    FILETIME ft;
-	    SYSTEMTIME st;
-
-	    GetSystemTime(&st);
-	    SystemTimeToFileTime(&st, &ft);
-	    /*
-	     * GetSystemTimeAsFileTime(&ft); would be faster,
-	     * but it does not exist on WinCE
-	     */
-
-	    ptw32_filetime_to_timespec(&ft, &currSysTime);
-	  }
-
-	  /*
-	   * subtract current system time from abstime
-	   */
-	  milliseconds = (abstime->tv_sec - currSysTime.tv_sec) * MILLISEC_PER_SEC;
-	  milliseconds += ((abstime->tv_nsec - currSysTime.tv_nsec)
-                           + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
+					
+					{
+						FILETIME ft;
+						SYSTEMTIME st;
+						
+						GetSystemTime(&st);
+						SystemTimeToFileTime(&st, &ft);
+						/*
+						 * GetSystemTimeAsFileTime(&ft); would be faster,
+						 * but it does not exist on WinCE
+						 */
+						
+						ptw32_filetime_to_timespec(&ft, &currSysTime);
+					}
+					
+					/*
+					 * subtract current system time from abstime
+					 */
+					milliseconds = (abstime->tv_sec - currSysTime.tv_sec) * MILLISEC_PER_SEC;
+					milliseconds += ((abstime->tv_nsec - currSysTime.tv_nsec)
+						+ (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
 
 #else /* NEED_FTIME */
-	  _ftime(&currSysTime);
+					_ftime(&currSysTime);
 
-	  /*
-	   * subtract current system time from abstime
-	   */
-	  milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
-	  milliseconds += ((abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC)
+					/*
+					 * subtract current system time from abstime
+					 */
+					milliseconds = (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
+					milliseconds += ((abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC)
             - currSysTime.millitm;
 
 #endif /* NEED_FTIME */
 
 
-	  if (((int) milliseconds) < 0)
-	    {
-	      return 2;
-	    }
-	}
+					if (((int) milliseconds) < 0)
+						{
+							return 2;
+						}
+				}
 
 #ifdef NEED_SEM
 
@@ -163,24 +163,24 @@ ptw32_timed_semwait (sem_t * sem, const struct timespec * abstime)
 #endif
 
       if (status == WAIT_OBJECT_0)
-	{
+				{
 
 #ifdef NEED_SEM
 
-	  ptw32_decrease_semaphore(sem);
+					ptw32_decrease_semaphore(sem);
 
 #endif /* NEED_SEM */
 
-	  return 0;
-	}
+					return 0;
+				}
       else if (status == WAIT_TIMEOUT)
-	{
-	  return 1;
-	}
+				{
+					return 1;
+				}
       else
-	{
-	  result = EINVAL;
-	}
+				{
+					result = EINVAL;
+				}
     }
 
   if (result != 0)
@@ -219,9 +219,9 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     {
       if ((result = ptw32_mutex_check_need_init(mutex)) != 0)
-	{
-	  return(result);
-	}
+				{
+					return(result);
+				}
     }
 
   mx = *mutex;
@@ -230,126 +230,126 @@ pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
     {
       mx->recursive_count = 1;
       mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-			 ? pthread_self()
-			 : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
+				? pthread_self()
+				: (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
     }
   else
     {
       if( mx->kind != PTHREAD_MUTEX_FAST_NP &&
-	  pthread_equal( mx->ownerThread, pthread_self() ) )
-	{
-	  (void) InterlockedDecrement( &mx->lock_idx );
+				pthread_equal( mx->ownerThread, pthread_self() ) )
+				{
+					(void) InterlockedDecrement( &mx->lock_idx );
 
-	  if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP )
-	    {
-	      mx->recursive_count++;
-	    }
-	  else
-	    {
-	      result = EDEADLK;
-	    }
-	}
+					if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP )
+						{
+							mx->recursive_count++;
+						}
+					else
+						{
+							result = EDEADLK;
+						}
+				}
       else
-	{
-	  if (abstime == NULL)
-	    {
-	      result = EINVAL;
-	    }
-	  else
-	    {
-	      switch (ptw32_timed_semwait( &mx->wait_sema, abstime ))
-		{
-		  case 0: /* We got the mutex. */
-		    {
-		      mx->recursive_count = 1;
-		      mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-					 ? pthread_self()
-					 : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
-		      break;
-		    }
-		  case 1: /* Timedout, try a second grab. */
-		    {
-		      EnterCriticalSection(&mx->wait_cs);
+				{
+					if (abstime == NULL)
+						{
+							result = EINVAL;
+						}
+					else
+						{
+							switch (ptw32_timed_semwait( &mx->wait_sema, abstime ))
+								{
+									case 0: /* We got the mutex. */
+									{
+										mx->recursive_count = 1;
+										mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
+											? pthread_self()
+											: (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
+										break;
+									}
+									case 1: /* Timedout, try a second grab. */
+									{
+										EnterCriticalSection(&mx->wait_cs);
 
-		      /*
-		       * If we timeout, it is up to us to adjust lock_idx to say
-		       * we're no longer waiting. If the mutex was also unlocked
-		       * while we were timing out, and we simply return ETIMEDOUT,
-		       * then wait_sema would be left in a state that is not consistent
-		       * with the state of lock_idx.
-		       *
-		       * We must check to see if wait_sema has just been posted
-		       * but we can't just call sem_getvalue - we must compete for
-		       * the semaphore using sem_trywait(), otherwise we would need
-		       * additional critical sections elsewhere, which would make the
-		       * logic too inefficient.
-		       *
-		       * If sem_trywait returns EAGAIN then either wait_sema
-		       * was given directly to another waiting thread or
-		       * another thread has called sem_*wait() before us and
-		       * taken the lock. Then we MUST decrement lock_idx and return
-		       * ETIMEDOUT.
-		       *
-		       * Otherwise we MUST return success (because we have effectively
-		       * acquired the lock that would have been ours had we not
-		       * timed out), and NOT decrement lock_idx.
-		       *
-		       * We can almost guarrantee that EAGAIN is the only
-		       * possible error, so no need to test errno.
-		       */
+										/*
+										 * If we timeout, it is up to us to adjust lock_idx to say
+										 * we're no longer waiting. If the mutex was also unlocked
+										 * while we were timing out, and we simply return ETIMEDOUT,
+										 * then wait_sema would be left in a state that is not consistent
+										 * with the state of lock_idx.
+										 *
+										 * We must check to see if wait_sema has just been posted
+										 * but we can't just call sem_getvalue - we must compete for
+										 * the semaphore using sem_trywait(), otherwise we would need
+										 * additional critical sections elsewhere, which would make the
+										 * logic too inefficient.
+										 *
+										 * If sem_trywait returns EAGAIN then either wait_sema
+										 * was given directly to another waiting thread or
+										 * another thread has called sem_*wait() before us and
+										 * taken the lock. Then we MUST decrement lock_idx and return
+										 * ETIMEDOUT.
+										 *
+										 * Otherwise we MUST return success (because we have effectively
+										 * acquired the lock that would have been ours had we not
+										 * timed out), and NOT decrement lock_idx.
+										 *
+										 * We can almost guarrantee that EAGAIN is the only
+										 * possible error, so no need to test errno.
+										 */
 
-		      if ( -1 == sem_trywait( &mx->wait_sema ) )
-			{
-			  (void) InterlockedDecrement( &mx->lock_idx );
-			  result = ETIMEDOUT;
-			}
+										if ( -1 == sem_trywait( &mx->wait_sema ) )
+											{
+												(void) InterlockedDecrement( &mx->lock_idx );
+												result = ETIMEDOUT;
+											}
 
-		      LeaveCriticalSection(&mx->wait_cs);
-		      break;
-		    }
-		  case 2: /* abstime passed before we started to wait. */
-		    {
-		      /*
-		       * If we timeout, it is up to us to adjust lock_idx to say
-		       * we're no longer waiting.
-                       *
-                       * The owner thread may still have posted wait_sema thinking
-                       * we were waiting. I believe we must check but then NOT do any
-                       * programmed work if we have acquired the mutex because
-                       * we don't how long ago abstime was. We MUST just release it
-                       * immediately.
-		       */
-		      EnterCriticalSection(&mx->wait_cs);
+										LeaveCriticalSection(&mx->wait_cs);
+										break;
+									}
+									case 2: /* abstime passed before we started to wait. */
+									{
+										/*
+										 * If we timeout, it is up to us to adjust lock_idx to say
+										 * we're no longer waiting.
+										 *
+										 * The owner thread may still have posted wait_sema thinking
+										 * we were waiting. I believe we must check but then NOT do any
+										 * programmed work if we have acquired the mutex because
+										 * we don't how long ago abstime was. We MUST just release it
+										 * immediately.
+										 */
+										EnterCriticalSection(&mx->wait_cs);
 
-		      result = ETIMEDOUT;
+										result = ETIMEDOUT;
 
-		      if ( -1 == sem_trywait( &mx->wait_sema ) )
-			{
-			  (void) InterlockedDecrement( &mx->lock_idx );
-			}
-                      else
-                        {
-                          if ( InterlockedDecrement( &mx->lock_idx ) >= 0 )
-                            {
-                              /* Someone else is waiting on that mutex */
-                              if ( sem_post( &mx->wait_sema ) != 0 )
-                                {
-                                  result = errno;
-                                }
-                            }
-                        }
+										if ( -1 == sem_trywait( &mx->wait_sema ) )
+											{
+												(void) InterlockedDecrement( &mx->lock_idx );
+											}
+										else
+											{
+												if ( InterlockedDecrement( &mx->lock_idx ) >= 0 )
+													{
+														/* Someone else is waiting on that mutex */
+														if ( sem_post( &mx->wait_sema ) != 0 )
+															{
+																result = errno;
+															}
+													}
+											}
 
-		      LeaveCriticalSection(&mx->wait_cs);
-		      break;
-		    }
-		  default:
-		    {
-		      result = errno;
-		      break;
-		    }
-		}
-	    }
-	}
+										LeaveCriticalSection(&mx->wait_cs);
+										break;
+									}
+									default:
+									{
+										result = errno;
+										break;
+									}
+								}
+						}
+				}
     }
 
   return(result);

@@ -458,6 +458,7 @@ clean:
 	-$(RM) *~
 	-$(RM) *.i
 	-$(RM) *.o
+	-$(RM) *.obj
 	-$(RM) *.exe
 	-$(RM) $(PTHREAD_DEF)
 
@@ -466,6 +467,8 @@ realclean: clean
 	-$(RM) $(GCE_LIB)
 	-$(RM) $(GC_DLL)
 	-$(RM) $(GCE_DLL)
+	-$(RM) $(GC_INLINED_STAMP)
+	-$(RM) $(GCE_INLINED_STAMP)
 
 attr.o:		attr.c $(ATTR_SRCS) $(INCL)
 barrier.o:	barrier.c $(BARRIER_SRCS) $(INCL)

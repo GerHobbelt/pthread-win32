@@ -198,6 +198,7 @@
 #endif /* HAVE_SIGNAL_H */
 
 #include <setjmp.h>
+#include <limits.h>
 
 /*
  * This is a duplicate of what is in the autoconf config.h,
@@ -385,12 +386,12 @@ extern "C"
  *			process (must be at least 64).
  *
  * _POSIX_SEM_NSEMS_MAX
- *      The maximum number of semaphores a process can have.
- *      (only defined if not already defined)
+ *	The maximum number of semaphores a process can have.
+ *	(only defined if not already defined)
  *
  * _POSIX_SEM_VALUE_MAX
- *      The maximum value a semaphore can have.
- *      (only defined if not already defined)
+ *	The maximum value a semaphore can have.
+ *	(only defined if not already defined)
  *
  * -------------------------------------------------------------
  */
@@ -459,14 +460,15 @@ extern "C"
  *
  */
 #define PTHREAD_DESTRUCTOR_ITERATIONS			       4
-#define PTHREAD_KEYS_MAX                        64
-#define PTHREAD_STACK_MIN                        0
-#define PTHREAD_THREADS_MAX                   2019
+#define PTHREAD_KEYS_MAX			64
+#define PTHREAD_STACK_MIN			 0
+#define PTHREAD_THREADS_MAX		      2019
 #ifndef _POSIX_SEM_NSEMS_MAX
-#  define _POSIX_SEM_NSEMS_MAX           (INT_MAX)
+/* Not used and only an arbitrary value. */
+#  define _POSIX_SEM_NSEMS_MAX		      1024
 #endif
 #ifndef _POSIX_SEM_VALUE_MAX
-#  define _POSIX_SEM_VALUE_MAX       (INT_MAX - 1)
+#  define _POSIX_SEM_VALUE_MAX	       (INT_MAX/2)
 #endif
 
 #if __GNUC__ && ! defined (__declspec)
