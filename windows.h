@@ -47,19 +47,6 @@ enum {
   THREAD_PRIORITY_ERROR_RETURN
 };
 
-/* Error numbers */
-
-enum {
-  EINVAL,
-  ENOMEM,
-  ENOSYS,
-  EAGAIN,
-  EDEADLK,
-  EBUSY,
-  ENOSUP,
-  ESRCH
-};
-
 typedef void VOID;
 
 typedef int BOOL;
