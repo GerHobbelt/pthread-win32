@@ -19,6 +19,6 @@ pthread $(VERSION) :LIBRARY: pthread.def attr.c cancel.c cleanup.c condvar.c \
 :: ANNOUNCE CONTRIBUTORS COPYING.LIB ChangeLog FAQ GNUmakefile MAINTAINERS \
 	Makefile Makefile.in Makefile.vc NEWS PROGRESS README README.WinCE \
 	TODO WinCE-PORT install-sh errno.c tests tests.mk acconfig.h \
-        config.guess config.h.in config.sub configure configure.in signal.c \
+	config.guess config.h.in config.sub configure configure.in signal.c \
 	README.CV README.NONPORTABLE pthread.dsp pthread.dsw
 
