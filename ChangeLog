@@ -1,3 +1,10 @@
+2004-05-06  Makato Kato  <raven@oldskool.jp>
+
+	* pthread.h (DWORD_PTR): Define typedef for older MSVC.
+	* pthread_cancel.c (AMD64): Add architecture specific Context register.
+	* ptw32_getprocessors.c: Use correct types (DWORD_PTR) for mask
+	variables.
+
 2004-04-06  P. van Bruggen  <pietvb@newbridges.nl>
 
 	* ptw32_threadDestroy.c: Destroy threadLock mutex to
