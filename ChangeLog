@@ -1,3 +1,7 @@
+1998-12-11  Ben Elliston  <bje@toilet.to.cygnus.com>
+
+	* README: Update info about subscribing to the mailing list.
+
 Mon Dec  7 09:44:40 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* dll.c (PthreadsEntryPoint): Cast return value of GetProcAddress
