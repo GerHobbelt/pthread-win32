@@ -369,15 +369,10 @@ ptw32_threadStart (void * vthreadParms)
         * That function may call pthread_exit() or be canceled, which will
         * be handled by the outer try block.
         * 
-        * ptw32_terminate() will be called if there is no user supplied function.
+        * ptw32_terminate() will be called if there is no user
+        * supplied function.
         */
 
-       //Original invocation:
-       //(void) terminate();
-
-
-       //New invocation:
-       //  a) get pointer to the termination function
 #if defined(_MSC_VER)
        terminate_function term_func = set_terminate(0);
 #else
@@ -386,14 +381,10 @@ ptw32_threadStart (void * vthreadParms)
 
        set_terminate(term_func);
 
-       //  b) call the termination function (if any)
        if (term_func != 0) {
            term_func();
        }
 
-       //  c) if there was no termination function or the termination function did
-       //     not exit thread/process, (we got this far), propagate the exception on!
-       //     (should be caught by the second level try/catch block below)
        throw;
      }
   }
