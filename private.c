@@ -391,8 +391,7 @@ ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
    * Have to create an association and add it
    * to both the key and the thread.
    */
-  assoc = (ThreadKeyAssoc *)
-    calloc (1, sizeof (*assoc));
+  assoc = (ThreadKeyAssoc *) calloc (1, sizeof (*assoc));
 
   if (assoc == NULL)
     {
@@ -400,10 +399,21 @@ ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
       goto FAIL0;
     }
 
+#if 0
+
   if ((result = pthread_mutex_init (&(assoc->lock), NULL)) != 0)
     {
       goto FAIL1;
     }
+
+#else
+
+  /*
+   * Initialise only when used for the first time.
+   */
+  assoc->lock = PTHREAD_MUTEX_INITIALIZER;
+
+#endif
 
   assoc->thread = thread;
   assoc->key = key;

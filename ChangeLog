@@ -1,4 +1,23 @@
-2000-08-18  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+2000-08-18  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* mutex.c (pthread_mutex_destroy): Check that the mutex isn't
+	held; invalidate the mutex as early as possible to avoid
+	contention; not perfect - FIXME!
+
+	* rwlock.c (pthread_rwlock_init): Remove redundant assignment
+	to "rw".
+	(pthread_rwlock_destroy): Invalidate the rwlock before
+	freeing up any of it's resources - to avoid contention.
+
+	* private.c (ptw32_tkAssocCreate): Change assoc->lock
+	to use a dynamically initialised mutex - only consumes
+	a W32 mutex or critical section when first used,
+	not before.
+
+	* mutex.c (pthread_mutex_init): Remove redundant assignment
+	to "mx".
+	(pthread_mutexattr_destroy): Set attribute to NULL
+	before freeing it's memory - to avoid contention.
 
 	* implement.h (PTW32_EPS_CANCEL/PTW32_EPS_EXIT):
 	Must be defined for all compilers - used as generic
