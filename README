@@ -109,8 +109,8 @@ nmake clean VSE
 Building under Mingw32
 ----------------------
 
-pthread.dll can be built with the current development version of mingw32.
-Run "make" in the soruce directory (uses GNUmakefile). This builds
+The dll can be built with Mingw32 gcc-2.95.2 or later.
+Run "make" in the source directory (uses GNUmakefile). This builds
 pthreadGCE.dll and libpthreadw32.a.
 
 To generate the libpthreadw32.a file from pthreadVCE.dll rather than
