@@ -12,6 +12,9 @@ func(void * arg)
 {
 	printf("Hello world\n");
 	pthread_exit(arg);
+
+	/* Never reached. */
+	return 0;
 }
 
 int
@@ -24,7 +27,7 @@ main(int argc, char * argv[])
 
 	for (i = 0; i < 4; i++)
 	{
-		pthread_create(&id[i], NULL, entry, (void *) i);
+		pthread_create(&id[i], NULL, func, (void *) i);
 	}
 
 	/* Semantics should be the same as POSIX. Wait for the workers. */
