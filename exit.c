@@ -55,7 +55,8 @@ _pthread_exit(void * value, int return_code)
      be deleted by the last waiting pthread_join() after this thread
      has terminated. */
 
-  if (us->detach == TRUE
+  if (pthread_attr_getdetachedstate(us, &detachstate) == 0 
+      && detachstate == PTHREAD_CREATE_DETACHED
       && us->join_count == 0)
     {
       _pthread_delete_thread_entry(us);

@@ -1,3 +1,16 @@
+Mon Jul 27 00:20:37 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* private.c (_pthread_delete_thread_entry): Destroy the thread
+ 	entry attribute object before deleting the thread entry itself.
+
+	* attr.c (pthread_attr_init): Initialise cancel_pending = FALSE.
+	(pthread_attr_setdetachstate): Rename "detached" to "detachedstate".
+	(pthread_attr_getdetachstate): Ditto.
+
+	* exit.c (_pthread_exit): Fix incorrect check for detachedstate.
+
+	* implement.h (_pthread_call_t): Remove env member. 
+
 Sun Jul 26 13:06:12 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* implement.h (_pthread_new_thread_entry): Fix prototype.
