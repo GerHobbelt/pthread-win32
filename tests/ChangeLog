@@ -1,3 +1,15 @@
+1999-02-23  Ross Johnson  <rpj@ise.canberra.edu.au>
+
+	* Makefile: Now actually runs the tests.
+
+	* tests.h: Define our own assert macro. The Mingw32
+	version pops up a dialog but we want to run non-interactively.
+
+	* equal1.c: use assert a little more directly so that it
+	prints the actual call statement.
+
+	* exit1.c: Modify to return 0 on success, 1 on failure.
+
 1999-02-22  Ross Johnson  <rpj@ise.canberra.edu.au>
 
 	* self2.c: Bring up to date.

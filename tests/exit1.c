@@ -10,5 +10,8 @@ int
 main(int argc, char * argv[])
 {
 	/* A simple test firstly. */
-	pthread_exit((void *) 2);
+	pthread_exit((void *) 0);
+
+	/* Not reached */
+	return 1;
 }
