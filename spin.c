@@ -253,17 +253,18 @@ pthread_spin_unlock(pthread_spinlock_t *lock)
 {
   register pthread_spinlock_t s = *lock;
 
-  if (s->interlock == PTW32_SPIN_USE_MUTEX)
+  if (s == PTHREAD_SPINLOCK_INITIALIZER)
     {
-      return pthread_mutex_unlock(&(s->u.mutex));
+      return EPERM;
     }
 
-  if ((_LONG) PTW32_SPIN_LOCKED ==
-      InterlockedCompareExchange((_LPLONG) &(s->interlock),
-                                 (_LONG) PTW32_SPIN_UNLOCKED,
-                                 (_LONG) PTW32_SPIN_LOCKED ) )
+  switch ((long) InterlockedCompareExchange((_LPLONG) &(s->interlock),
+                                            (_LONG) PTW32_SPIN_UNLOCKED,
+                                            (_LONG) PTW32_SPIN_LOCKED ))
     {
-      return 0;
+      case PTW32_SPIN_LOCKED:    return 0;
+      case PTW32_SPIN_UNLOCKED:  return EPERM;
+      case PTW32_SPIN_USE_MUTEX: return pthread_mutex_unlock(&(s->u.mutex));
     }
 
   return EINVAL;
