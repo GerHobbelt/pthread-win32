@@ -106,36 +106,16 @@ pthread_mutexattr_destroy(pthread_mutexattr_t *attr)
 int
 pthread_mutexattr_setpshared(pthread_mutexattr_t *attr, int process_shared)
 {
-  /* Ensure the value for this attribute is within the legal range. */
-  if ((process_shared != PTHREAD_PROCESS_PRIVATE) ||
-      (process_shared != PTHREAD_PROCESS_SHARED))
-    {
-      return EINVAL;
-    }
-
-  /* Ensure attr points to a valid attribute object. */
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-
-  /* Everything is okay. */
-  (_pthread_mutexattr_t *) (attr->ptr)->proc_shared = process_shared;
-  return 0;
+  /* This function is not supported. */
+  return ENOSYS;
 }
 
 int
 pthread_mutexattr_getpshared(const pthread_mutexattr_t *attr,
 			     int *process_shared)
 {
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-
-  /* Everything is okay. */
-  *process_shared = (_pthread_mutexattr_t *) (attr->ptr)->proc_shared;
-  return 0;
+  /* This function is not supported. */
+  return ENOSYS;
 }
   
 int
