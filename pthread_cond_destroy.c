@@ -168,6 +168,8 @@ pthread_cond_destroy (pthread_cond_t * cond)
           /*
            * Now it is safe to destroy
            */
+          EnterCriticalSection(&ptw32_cond_list_lock);
+
           *cond = NULL;
 
           if (sem_destroy(&(cv->semBlockLock)) != 0)
@@ -184,8 +186,6 @@ pthread_cond_destroy (pthread_cond_t * cond)
             }
 
           /* Unlink the CV from the list */
-
-          EnterCriticalSection(&ptw32_cond_list_lock);
 
           if (ptw32_cond_list_head == cv)
             {
