@@ -11,6 +11,14 @@
 #include "pthread.h"
 #include "implement.h"
 
+
+int _pthread_processInitialized = FALSE;
+pthread_key_t _pthread_selfThreadKey = NULL;
+pthread_key_t _pthread_cleanupKey = NULL;
+
+
+#if 0 /* Pre Bossom */
+
 /* POSIX run-time invariant values. (Currently POSIX minimum values)
 
    Making these constants will mean that applications remain binary
@@ -81,3 +89,5 @@ pthread_key_t _pthread_key_reuse[_PTHREAD_MAX_KEYS];
 
 /* Index to the first available reusable pthread_key_t. */
 int _pthread_key_reuse_top;
+
+#endif /* Pre Bossom */

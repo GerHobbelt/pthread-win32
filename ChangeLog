@@ -1,11 +1,71 @@
-1998-12-11  Ben Elliston  <bje@toilet.to.cygnus.com>
+Sun Dec 20 14:51:58 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
-	* README: Update info about subscribing to the mailing list.
+	* misc.c (pthreadCancelableWait): New function by John Bossom. Non-standard
+	but provides a hook that can be used to implement cancellation points in
+	applications that use this library.
+
+	* pthread.h (pthread_cleanup_pop): C++ (non-WIN32) version uses
+	try/catch to emulate John Bossom's WIN32 __try/__finally behaviour.
+	In the WIN32 version __finally block, add a test for AbnormalTermination otherwise
+	cleanup is only run if the cleanup_pop execute arg is non-zero. Cancellation
+	should cause the cleanup to run irrespective of the execute arg.
+
+	* condvar.c (pthread_condattr_init): Replaced by John Bossom's version.
+	(pthread_condattr_destroy): Replaced by John Bossom's version.
+	(pthread_condattr_getpshared): Replaced by John Bossom's version.
+	(pthread_condattr_setpshared): Replaced by John Bossom's version.
+	(pthread_cond_init): Replaced by John Bossom's version.
+	Fix comment (refered to mutex rather than condition variable).
+	(pthread_cond_destroy): Replaced by John Bossom's version.
+	(pthread_cond_wait): Replaced by John Bossom's version.
+	(pthread_cond_timedwait): Replaced by John Bossom's version.
+	(pthread_cond_signal): Replaced by John Bossom's version.
+	(pthread_cond_broadcast): Replaced by John Bossom's version.
+
+Thu Dec 17 19:10:46 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* tsd.c (pthread_key_create): Replaced by John Bossom's version.
+	(pthread_key_delete): Replaced by John Bossom's version.
+	(pthread_setspecific): Replaced by John Bossom's version.
+	(pthread_getspecific): Replaced by John Bossom's version.
 
 Mon Dec  7 09:44:40 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* cancel.c (pthread_setcancelstate): Replaced by John Bossom's version.
+	(pthread_setcanceltype): Replaced by John Bossom's version.
+	(pthread_testcancel): Replaced by John Bossom's version.
+	(pthread_cancel): Replaced by John Bossom's version.
+	
+	* exit.c (pthread_exit): Replaced by John Bossom's version.
+
+	* misc.c (pthread_self): Replaced by John Bossom's version.
+	(pthread_equal): Replaced by John Bossom's version.
+
+	* sync.c (pthread_detach): Replaced by John Bossom's version.
+	(pthread_join): Replaced by John Bossom's version.
+
+	* create.c (pthread_create): Replaced by John Bossom's version.
+
+	* private.c (_pthread_processInitialize): New by John Bossom.
+	(_pthread_processTerminate): Non-public function by John Bossom.
+	(_pthread_threadStart): Non-public function by John Bossom.
+ 	(_pthread_threadDestroy): Non-public function by John Bossom.
+	(_pthread_cleanupStack): Non-public function by John Bossom.
+	(_pthread_tkAssocCreate): Non-public function by John Bossom.
+	(_pthread_tkAssocDestroy): Non-public function by John Bossom.
+	(_pthread_callUserDestroyRoutines): Non-public function by John Bossom.
+
+	* implement.h: Added John Bossom's non-API structures and
+	declarations.
+
 	* dll.c (PthreadsEntryPoint): Cast return value of GetProcAddress
 	to resolve compile warning from MSVC.
+
+	* dll.c (DLLmain): Replaced by John Bossom's version.
+	* dll.c (PthreadsEntryPoint):
+	Re-applied Anders Norlander's patch:-
+	Initialize _pthread_try_enter_critical_section at startup
+	and release kernel32 handle when DLL is being unloaded.
 
 Sun Dec  6 21:54:35 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
@@ -13,7 +73,7 @@ Sun Dec  6 21:54:35 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* cleanup.c (_pthread_destructor_run_all): Fix TSD key management.
 	This is a tidy-up before TSD and Thread management is completely
-	replaced by John Bossom's much more elegant code.
+	replaced by John Bossom's code.
 
 	* tsd.c (pthread_key_create): Fix TSD key management.
 
