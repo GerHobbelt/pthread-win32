@@ -172,4 +172,35 @@ void _pthread_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
 /* </JEB> */
 
+/*
+ * Check for old and new versions of cygwin. See the FAQ file:
+ *
+ * Question 1 - How do I get pthreads-win32 to link under Cygwin32 or Mingw32?
+ *
+ * Patch by Anders Norlander <anorland@hem2.passagen.se>
+ */
+#if defined(__CYGWIN32__) || defined(__CYGWIN__)
+
+/* Macro uses args so we can cast start_proc to LPTHREAD_START_ROUTINE
+ * in order to avoid warnings because of return type
+ */
+
+#define _beginthreadex(security, \
+		       stack_size, \
+		       start_proc, \
+		       arg, \
+		       flags, \
+		       pid) \
+        CreateThread(security, \
+		     stack_size, \
+		     (LPTHREAD_START_ROUTINE) start_proc, \
+		     arg, \
+		     flags, \
+		     pid)
+
+#define _endthreadex ExitThread
+
+#endif /* __CYGWIN32__ || __CYGWIN__ */
+
+
 #endif /* _IMPLEMENT_H */

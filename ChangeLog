@@ -1,3 +1,9 @@
+Sat Jan  9 14:32:08 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Compile-time switch for CYGWIN derived environments
+	to use CreateThread instead of _beginthreadex. Ditto for ExitThread.
+	Patch provided by Anders Norlander  <anorland@hem2.passagen.se>.
+
 Tue Jan  5 16:33:04 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* cleanup.c (_pthread_pop_cleanup): Add C++ version of __try/__except
