@@ -31,10 +31,6 @@ struct _pthread_cleanup_node {
   void * arg;
 };
 
-typedef struct {
-  size_t stacksize;
-} _pthread_attr_t;
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
