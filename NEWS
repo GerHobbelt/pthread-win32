@@ -1,3 +1,17 @@
+SNAPSHOT 2003-09-04
+-------------------
+
+Bug fixes
+---------
+* ptw32_cancelableWait() now allows cancelation of waiting implicit POSIX
+threads.
+
+New test
+--------
+* cancel8.c tests cancelation of Win32 threads waiting at a POSIX cancelation
+point.
+
+
 SNAPSHOT 2003-09-03
 -------------------
 
@@ -38,6 +52,10 @@ automatically by any POSIX routines that need a POSIX handle (unless the routine
 needs a pthread_t as a parameter of course). A Win32 thread can discover it's own
 POSIX thread ID by calling pthread_self(), which will create the handle if
 necessary and return the pthread_t value.
+
+New tests
+---------
+Test the above new feature.
 
 
 SNAPSHOT 2003-08-19

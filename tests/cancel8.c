@@ -105,7 +105,6 @@ void
 #endif
 Win32thread(void * arg)
 {
-  int i;
   bag_t * bag = (bag_t *) arg;
 
   assert(bag == &threadbag[bag->threadnum]);
