@@ -473,6 +473,11 @@ extern "C"
 #define PTHREAD_PROCESS_PRIVATE		0
 #define PTHREAD_PROCESS_SHARED		1
 
+/*
+ * pthread_mutexattr_setforcecs_np
+ */
+#define PTHREAD_MUTEX_AUTO_CS_NP        0
+#define PTHREAD_MUTEX_FORCE_CS_NP       1
 
 /*
  * ====================

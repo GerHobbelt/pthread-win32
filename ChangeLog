@@ -1,5 +1,8 @@
 Sat Jan 23 17:36:40 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* pthread.h (PTHREAD_MUTEX_AUTO_CS_NP): New.
+	(PTHREAD_MUTEX_FORCE_CS_NP): New.
+
 	* README: Updated.
 
 Wed Jan 20 09:31:28 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
