@@ -1,3 +1,11 @@
+Tue Jan  5 16:33:04 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* cleanup.c (_pthread_pop_cleanup): Add C++ version of __try/__except
+	block. Move trailing "}" out of #ifdef _WIN32 block left there by
+	(rpj's) mistake.
+
+	* private.c: Remove #include <errno.h> which is included by pthread.h.
+
 1998-12-11  Ben Elliston  <bje@toilet.to.cygnus.com>
 
 	* README: Update info about subscribing to the mailing list.

@@ -54,30 +54,53 @@ _pthread_pop_cleanup (int execute)
 #ifdef _WIN32
 
           __try
-          {
-            /*
-             * Run the caller's cleanup routine.
-             */
-            (*cleanup->routine) (cleanup->arg);
-          }
+	    {
+	      /*
+	       * Run the caller's cleanup routine.
+	       */
+	      (*cleanup->routine) (cleanup->arg);
+	    }
           __except (EXCEPTION_EXECUTE_HANDLER)
-          {
-            /*
-             * A system unexpected exception had occurred
-             * running the user's cleanup routine.
-             * We get control back within this block.
-             */
-          }
-        }
+	    {
+	      /*
+	       * A system unexpected exception had occurred
+	       * running the user's cleanup routine.
+	       * We get control back within this block.
+	       */
+	    }
+      
+#else /* _WIN32 */
 
-#else
+#ifdef _cplusplus
 
-      /*
-       * Run the caller's cleanup routine.
-       */
-      (*cleanup->routine) (cleanup->arg);
+	  try
+	    {
+	      /*
+	       * Run the caller's cleanup routine.
+	       */
+	      (*cleanup->routine) (cleanup->arg);
+	    }
+	  catch(...)
+	    {
+	      /*
+	       * A system unexpected exception had occurred
+	       * running the user's cleanup routine.
+	       * We get control back within this block.
+	       */
+	    }
+
+#else /* _cplusplus */
+      
+	  /*
+	   * Run the caller's cleanup routine and FIXME: hope for the best.
+	   */
+	  (*cleanup->routine) (cleanup->arg);
+
+#endif /* _cplusplus */
 
 #endif /* _WIN32 */
+
+        }
 
       pthread_setspecific (_pthread_cleanupKey, cleanup->prev);
     }
