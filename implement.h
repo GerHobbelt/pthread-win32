@@ -69,7 +69,7 @@
 #define INLINE
 #endif
 
-#ifdef __MINGW32__
+#if defined (__MINGW32__) || (_MSC_VER >= 1300)
 #define PTW32_INTERLOCKED_LONG long
 #define PTW32_INTERLOCKED_LPLONG long*
 #else
