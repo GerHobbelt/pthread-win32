@@ -1,11 +1,15 @@
 1998-07-20  Ben Elliston  <bje@cygnus.com>
 
-	* misc.c (pthread_once): Implement.
-
-	* pthread.h (_pthread_once_flag): Add new variable.
+	* misc.c (pthread_once): Implement.  Don't use a per-application
+	flag and mutex--make `pthread_once_t' contain these elements in
+	their structure.  The earlier version had incorrect semantics.
+	
+	* pthread.h (_pthread_once_flag): Add new variable.  Remove.
 	(_pthread_once_lock): Add new mutex lock to ensure integrity of
-	access to _pthread_once_flag.
-
+	access to _pthread_once_flag.  Remove.
+	(pthread_once): Add function prototype.
+	(pthread_once_t): Define this type.
+	
 Mon Jul 20 02:31:05 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* private.c (_pthread_getthreadindex): Implement.
