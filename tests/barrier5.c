@@ -23,6 +23,7 @@ func(void * barrierHeight)
 {
   int i;
   int result;
+  int serialThreads = 0;
 
   for (i = 1; i < BARRIERS; i++)
     {
@@ -38,6 +39,7 @@ func(void * barrierHeight)
        */
       if (result == PTHREAD_BARRIER_SERIAL_THREAD)
         {
+          serialThreads++;
           assert(barrierReleases[i - 1] == (int) barrierHeight);
           barrierReleases[i + 1] = 0;
         }
@@ -49,13 +51,15 @@ func(void * barrierHeight)
         }
     }
 
-  return NULL;
+  return (void *) serialThreads;
 }
 
 int
 main()
 {
   int i, j;
+  int result;
+  int serialThreadsTotal;
   pthread_t t[NUMTHREADS + 1];
 
   for (j = 1; j <= NUMTHREADS; j++)
@@ -72,11 +76,14 @@ main()
           assert(pthread_create(&t[i], NULL, func, (void *) j) == 0);
         }
 
+      serialThreadsTotal = 0;
       for (i = 1; i <= j; i++)
         {
-          assert(pthread_join(t[i], NULL) == 0);
+          assert(pthread_join(t[i], (void **) &result) == 0);
+          serialThreadsTotal += result;
         }
 
+      assert(serialThreadsTotal == BARRIERS - 1);
       assert(barrierReleases[BARRIERS - 1] == j);
       assert(barrierReleases[BARRIERS] == 0);
 

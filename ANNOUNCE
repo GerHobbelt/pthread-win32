@@ -1,4 +1,4 @@
-                 PTHREADS-WIN32 SNAPSHOT 2001-??-??
+                 PTHREADS-WIN32 SNAPSHOT 2001-07-12
                  ----------------------------------
        Web Site: http://sources.redhat.com/pthreads-win32/
       FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -65,7 +65,7 @@ auto-initialiser initialisation fails.
 
 _POSIX_READER_WRITER_LOCKS is now defined.
 
-pthread_rwlock_wrlock() was inadvertantly a cancelation point.
+pthread_rwlock_wrlock() was a cancelation point.
 
 ---------------------------
 Known bugs in this snapshot

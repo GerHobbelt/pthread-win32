@@ -1,3 +1,8 @@
+2001-07-12  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* barrier5.c: Assert that precisely one thread receives
+	PTHREAD_BARRIER_SERIAL_THREAD at each barrier.
+
 2001-07-09  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* barrier3.c: Fixed.
