@@ -15,6 +15,13 @@ then
     AC_DEFINE(HAVE_SIGSET_T)
   fi
 fi
+AC_CACHE_CHECK(for _stdcall keyword, p32_cv_stdcall,
+  AC_TRY_COMPILE( ,[int _stdcall foo();],
+    p32_cv_stdcall=yes, p32_cv_stdcall=no))
+
+if test x$p32_cv_stdcall = xyes ; then
+  AC_DEFINE(STDCALL, _stdcall)
+fi
 
 AC_CHECK_HEADERS(windows.h,,AC_MSG_WARN([Target system must be Win32]))
 AC_OUTPUT(Makefile)
