@@ -36,11 +36,12 @@ COPYFILES	= $(HDR) $(LIB) $(DLL)
 # stop.
 
 TESTS	= loadfree \
-	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r condvar1 condvar2 exit1 create1 equal1 \
+	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
+	  condvar1 condvar2 condvar2_1 exit1 create1 equal1 \
 	  exit2 exit3 \
 	  join0 join1 join2 mutex2 mutex3 mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  count1 once1 tsd1 self2 cancel1 cancel2 eyal1 \
-	  condvar3 condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
+	  condvar3 condvar3_1 condvar3_2 condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 rwlock7 \
 	  context1 cancel3 cancel4 cancel5 \
@@ -72,6 +73,7 @@ all-GCE: $(PASSES)
 
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
+cancel2_1.pass: cancel2.pass
 cancel3.pass: context1.pass
 cancel4.pass: cancel3.pass
 cancel5.pass: cancel3.pass
@@ -81,7 +83,10 @@ cleanup2.pass: cleanup1.pass
 cleanup3.pass: cleanup2.pass
 condvar1.pass:
 condvar2.pass: condvar1.pass
-condvar3.pass: create1.pass
+condvar2_1.pass: condvar2.pass join2.pass
+condvar3.pass: create1.pass condvar2.pass
+condvar3_1.pass: condvar3.pass join2.pass
+condvar3_2.pass: condvar3_1.pass
 condvar4.pass: create1.pass
 condvar5.pass: condvar4.pass
 condvar6.pass: condvar5.pass

@@ -1,8 +1,8 @@
 /*
- * File: condvar2.c
+ * File: condvar3_1.c
  *
  * Test Synopsis:
- * - Test timed wait on a CV.
+ * - Test timeout of multiple waits on a CV with some signaled.
  *
  * Test Method (Validation or Falsification):
  * - Validation
@@ -17,7 +17,9 @@
  * - 
  *
  * Description:
- * - Because the CV is never signaled, we expect the wait to time out.
+ * - Because some CVs are never signaled, we expect their waits to time out.
+ *   Some are signaled, the rest time out. Pthread_cond_destroy() will fail
+ *   unless all are accounted for, either signaled or timedout.
  *
  * Environment:
  * -
@@ -44,23 +46,53 @@
 #include "test.h"
 #include <sys/timeb.h>
 
-pthread_cond_t cv;
-pthread_mutex_t mutex;
+static pthread_cond_t cv;
+static pthread_mutex_t mutex;
+static struct timespec abstime = { 0, 0 };
+static int timedout = 0;
+static int signaled = 0;
+static int awoken = 0;
+
+enum {
+  NUMTHREADS = 60
+};
+
+void *
+mythread(void * arg)
+{
+  int result;
+
+  assert(pthread_mutex_lock(&mutex) == 0);
+
+  result = pthread_cond_timedwait(&cv, &mutex, &abstime);
+  if (result == ETIMEDOUT)
+    {
+      timedout++;
+    }
+  else
+    {
+      awoken++;
+    }
+
+  assert(pthread_mutex_unlock(&mutex) == 0);
+
+  return arg;
+}
 
 #include "../implement.h"
 
 int
 main()
 {
-  struct timespec abstime = { 0, 0 };
+  int i;
+  pthread_t t[NUMTHREADS + 1];
+  int result = 0;
   struct _timeb currSysTime;
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   assert(pthread_cond_init(&cv, NULL) == 0);
 
   assert(pthread_mutex_init(&mutex, NULL) == 0);
-
-  assert(pthread_mutex_lock(&mutex) == 0);
 
   /* get current system time */
   _ftime(&currSysTime);
@@ -70,9 +102,29 @@ main()
 
   abstime.tv_sec += 5;
 
-  assert(pthread_cond_timedwait(&cv, &mutex, &abstime) == ETIMEDOUT);
-  
+  assert(pthread_mutex_lock(&mutex) == 0);
+
+  for (i = 1; i <= NUMTHREADS; i++)
+    {
+      assert(pthread_create(&t[i], NULL, mythread, (void *) i) == 0);
+    }
+
   assert(pthread_mutex_unlock(&mutex) == 0);
+
+  for (i = NUMTHREADS/3; i <= 2*NUMTHREADS/3; i++)
+    {
+      assert(pthread_cond_signal(&cv) == 0);
+      signaled++;
+    }
+
+  for (i = 1; i <= NUMTHREADS; i++)
+    {
+      assert(pthread_join(t[i], (void **) &result) == 0);
+	assert(result == i);
+    }
+
+  assert(signaled == awoken);
+  assert(timedout == NUMTHREADS - signaled);
 
   {
   int result = pthread_cond_destroy(&cv);

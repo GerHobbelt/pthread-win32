@@ -1,3 +1,9 @@
+2001-06-3  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* condvar2_1.c: New test.
+	* condvar3_1.c: New test.
+	* condvar3_2.c: New test.
+
 2001-05-30  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* mutex1n.c: New test.
