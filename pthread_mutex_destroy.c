@@ -60,17 +60,10 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
       result = pthread_mutex_trylock(&mx);
 
       /*
-       * The mutex type may not be RECURSIVE therefore trylock may return EBUSY if
-       * we already own the mutex. Here we are assuming that it's OK to destroy
-       * a mutex that we own and have locked recursively.
-       *
-       * For FAST mutexes we record the owner as ANONYMOUS for speed. In this
-       * case we assume that the thread calling pthread_mutex_destroy() is the
-       * owner, if the mutex is owned at all.
+       * If trylock succeeded and the mutex is not recursively locked it
+       * can be destroyed.
        */
-      if (result == 0
-	  || mx->ownerThread == (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS
-	  || pthread_equal( mx->ownerThread, pthread_self() ) )
+      if (result == 0 && 1 == mx->recursive_count)
 	{
 	  /*
 	   * FIXME!!!

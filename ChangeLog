@@ -1,3 +1,10 @@
+2002-12-11  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* pthread_mutex_trylock.c: Should return EBUSY rather than EDEADLK.
+	* pthread_mutex_destroy.c: Remove redundant ownership test (the
+	trylock call does this for us); do not destroy a recursively locked
+	mutex.
+
 2002-09-20  Michael Johnson  <michaelj@maine.rr.com>
 
 	* pthread_cond_destroy.c (pthread_cond_destroy): 

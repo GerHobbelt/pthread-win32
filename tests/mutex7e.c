@@ -37,7 +37,7 @@
  *
  * Tests PTHREAD_MUTEX_ERRORCHECK mutex type.
  * Thread locks and then trylocks mutex (attempted recursive lock).
- * Trylock should fail with an EDEADLK error.
+ * Trylock should fail with an EBUSY error.
  * The second unlock attempt should fail with an EPERM error.
  *
  * Depends on API functions: 
@@ -64,7 +64,7 @@ void * locker(void * arg)
 {
   assert(pthread_mutex_lock(&mutex) == 0);
   lockCount++;
-  assert(pthread_mutex_trylock(&mutex) == EDEADLK);
+  assert(pthread_mutex_trylock(&mutex) == EBUSY);
   lockCount++;
   assert(pthread_mutex_unlock(&mutex) == 0);
   assert(pthread_mutex_unlock(&mutex) == EPERM);

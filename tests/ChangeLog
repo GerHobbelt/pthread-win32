@@ -1,3 +1,7 @@
+2002-12-11  Ross Johnson  <ross@special.ise.canberra.edu.au>
+
+	* mutex7e.c: Assert EBUSY return instead of EDEADLK.
+
 2002-06-03  Ross Johnson  <rpj@digit.ise.canberra.edu.au>
 
 	* semaphore2.c: New test.
