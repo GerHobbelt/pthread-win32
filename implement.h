@@ -98,16 +98,18 @@ void _pthread_handler_pop_all(int stack,
 
 /* Primitives to manage threads table entries. */
 
-int _pthread_new_thread_entry(pthread_t thread, 
-			      _pthread_threads_thread_t ** entry);
+int _pthread_new_thread_entry(pthread_t thread,
+			      _pthread_threads_thread_t * entry);
 
-_pthread_threads_thread ** _pthread_find_thread_entry(pthread_t thread);
+_pthread_threads_thread_t * _pthread_find_thread_entry(pthread_t thread);
 
-void _pthread_delete_thread_entry(_pthread_threads_thread_t ** this);
+void _pthread_delete_thread_entry(_pthread_threads_thread_t * this);
 
 /* Thread cleanup. */
 
 void _pthread_vacuum(void);
+
+void _pthread_exit(void * value, int return_code);
 
 #ifdef __cplusplus
 }
