@@ -1,3 +1,13 @@
+RELEASE 1.5.0
+-------------
+(2005-03-16)
+
+Bugs fixed
+----------
+
+* Reverse change to pthread_setcancelstate() made in 1.4.0.
+
+
 RELEASE 1.4.0
 -------------
 (2005-03-16)
