@@ -40,7 +40,7 @@
 
 
 INLINE int
-ptw32_cond_check_need_init (pthread_cond_t *cond)
+ptw32_cond_check_need_init (pthread_cond_t * cond)
 {
   int result = 0;
 
@@ -65,7 +65,7 @@ ptw32_cond_check_need_init (pthread_cond_t *cond)
    * the number of processors + 1.
    *
    */
-  EnterCriticalSection(&ptw32_cond_test_init_lock);
+  EnterCriticalSection (&ptw32_cond_test_init_lock);
 
   /*
    * We got here possibly under race
@@ -76,7 +76,7 @@ ptw32_cond_check_need_init (pthread_cond_t *cond)
    */
   if (*cond == PTHREAD_COND_INITIALIZER)
     {
-      result = pthread_cond_init(cond, NULL);
+      result = pthread_cond_init (cond, NULL);
     }
   else if (*cond == NULL)
     {
@@ -88,7 +88,7 @@ ptw32_cond_check_need_init (pthread_cond_t *cond)
       result = EINVAL;
     }
 
-  LeaveCriticalSection(&ptw32_cond_test_init_lock);
+  LeaveCriticalSection (&ptw32_cond_test_init_lock);
 
   return result;
 }

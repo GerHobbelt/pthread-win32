@@ -46,22 +46,22 @@ ptw32_threadDestroy (pthread_t thread)
 
   if (thread != NULL)
     {
-      (void) pthread_mutex_lock(&thread->cancelLock);
+      (void) pthread_mutex_lock (&thread->cancelLock);
       thread->state = PThreadStateLast;
-      (void) pthread_mutex_unlock(&thread->cancelLock);
+      (void) pthread_mutex_unlock (&thread->cancelLock);
 
       ptw32_callUserDestroyRoutines (thread);
 
       /*
        * Copy thread state so that the thread can be atomically NULLed.
        */
-      memcpy(&threadCopy, thread, sizeof(threadCopy));
+      memcpy (&threadCopy, thread, sizeof (threadCopy));
 
       /*
        * Thread ID structs are never freed. They're NULLed and reused.
        * This also sets the thread to PThreadStateInitial (invalid).
        */
-      ptw32_threadReusePush(thread);
+      ptw32_threadReusePush (thread);
 
       /* Now work on the copy. */
       if (threadCopy.cancelEvent != NULL)
@@ -78,13 +78,12 @@ ptw32_threadDestroy (pthread_t thread)
        * Don't close the Win32 handle of implicit POSIX threads
        * because the process may want to call GetExitCodeThread().
        */
-      if( threadCopy.threadH != 0 && ! threadCopy.implicit )
+      if (threadCopy.threadH != 0 && !threadCopy.implicit)
 	{
-	  CloseHandle( threadCopy.threadH );
+	  CloseHandle (threadCopy.threadH);
 	}
 #endif
 
     }
 
 }				/* ptw32_threadDestroy */
-

@@ -34,15 +34,18 @@
 
 CP	= copy
 RM	= erase
+CAT	= type
 MKDIR	= mkdir
 TOUCH	= echo Passed >
 ECHO	= @echo
+
+QAPC	= ..\QueueUserAPCEx\User\quserex.dll
 
 CPHDR	= pthread.h semaphore.h sched.h
 
 OPTIM	= /O2 /Ob0
 
-XXLIBS	=
+XXLIBS	= ws2_32.lib
 
 # C++ Exceptions
 VCEFLAGS	= /GX /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
@@ -59,12 +62,16 @@ VCDLL	= pthreadVC.dll
 # C++ Exceptions in application - using VC version of pthreads dll
 VCXFLAGS	= /GX /TP /D__CLEANUP_C
 
+# Defaults
+CPLIB	= pthreadVC.lib
+CPDLL	= pthreadVC.dll
+
 CFLAGS= $(OPTIM) /W3 /WX /MD /nologo /Yd /Zi -D_WIN32_WINNT=0x400
 LFLAGS= /INCREMENTAL:NO
 INCLUDES=-I.
 BUILD_DIR=..
 
-COPYFILES	= $(CPHDR) $(CPLIB) $(CPDLL)
+COPYFILES	= $(CPHDR) $(CPLIB) $(CPDLL) $(QAPC)
 
 TEST		=
 EHFLAGS	=
@@ -100,7 +107,8 @@ PASSES= sizes.pass  loadfree.pass \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  \
-	  exception1.pass  exception2.pass  exception3.pass
+	  exception1.pass  exception2.pass  exception3.pass  \
+	  cancel9
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
@@ -123,11 +131,22 @@ all:
 	@ nmake clean VSE
 	@ nmake clean VC-bench
 
-tests: $(CPLIB) $(CPDLL) $(CPHDR) $(PASSES)
+# This allows an individual test application to be made using the default lib.
+# e.g. nmake clean test cancel3.exe
+test: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC)
+
+tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
 benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(XXLIBS) $(BENCHRESULTS)
 	@ $(ECHO) ALL BENCH TESTS DONE.
+
+sizes.pass: sizes.exe
+	@ $(ECHO) ... Running $(TEST) test: $*.exe
+	@ .\$*.exe > SIZES.$(TEST)
+	@ $(CAT) SIZES.$(TEST)
+	@ $(ECHO) ...... Passed
+	@ $(TOUCH) $*.pass
 
 $(PASSES): $*.exe
 	@ $(ECHO) ... Running $(TEST) test: $*.exe
@@ -180,9 +199,9 @@ $(COPYFILES):
 	@ $(ECHO) Copying $@
 	@ $(CP) $(BUILD_DIR)\$@ .
 
-pthread.dll:
-	@ $(CP) $(CPDLL) $*.dll
-	@ $(CP) $(CPLIB) $*.lib
+pthread.dll: $(CPDLL)
+	@ $(CP) $(CPDLL) pthread.dll
+	@ $(CP) $(CPLIB) pthread.lib
 
 clean:
 	- $(RM) *.dll
@@ -312,3 +331,4 @@ spin4.pass: spin3.pass
 tsd1.pass: join1.pass
 valid1.pass: join1.pass
 valid2.pass: valid1.pass
+cancel9.pass: cancel8.pass

@@ -40,7 +40,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-static int reallyBad    = ENOMEM;
+static int reallyBad = ENOMEM;
 
 /*
  * Re-entrant errno.
@@ -68,12 +68,13 @@ static int reallyBad    = ENOMEM;
  *
  */
 
-int * _errno( void )
+int *
+_errno (void)
 {
-  pthread_t       self;
-  int             *result;
+  pthread_t self;
+  int *result;
 
-  if( ( self = pthread_self() ) == NULL )
+  if ((self = pthread_self ()) == NULL)
     {
       /*
        * Yikes! unable to allocate a thread!
@@ -86,9 +87,8 @@ int * _errno( void )
       result = &(self->ptErrno);
     }
 
-  return( result );
+  return (result);
 
-} /* _errno */
+}				/* _errno */
 
 #endif /* (NEED_ERRNO) */
-

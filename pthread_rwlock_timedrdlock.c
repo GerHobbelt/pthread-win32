@@ -41,65 +41,70 @@
 #include "implement.h"
 
 int
-pthread_rwlock_timedrdlock(pthread_rwlock_t *rwlock, const struct timespec * abstime)
+pthread_rwlock_timedrdlock (pthread_rwlock_t * rwlock,
+			    const struct timespec *abstime)
 {
-    int result;
-    pthread_rwlock_t rwl;
+  int result;
+  pthread_rwlock_t rwl;
 
-    if (rwlock == NULL || *rwlock == NULL)
-      {
-	return EINVAL;
-      }
+  if (rwlock == NULL || *rwlock == NULL)
+    {
+      return EINVAL;
+    }
 
-    /*
-     * We do a quick check to see if we need to do more work
-     * to initialise a static rwlock. We check
-     * again inside the guarded section of ptw32_rwlock_check_need_init()
-     * to avoid race conditions.
-     */
-    if (*rwlock == PTHREAD_RWLOCK_INITIALIZER)
-      {
-	result = ptw32_rwlock_check_need_init(rwlock);
+  /*
+   * We do a quick check to see if we need to do more work
+   * to initialise a static rwlock. We check
+   * again inside the guarded section of ptw32_rwlock_check_need_init()
+   * to avoid race conditions.
+   */
+  if (*rwlock == PTHREAD_RWLOCK_INITIALIZER)
+    {
+      result = ptw32_rwlock_check_need_init (rwlock);
 
-	if (result != 0 && result != EBUSY)
-	  {
-	    return result;
-	  }
-      }
+      if (result != 0 && result != EBUSY)
+	{
+	  return result;
+	}
+    }
 
-    rwl = *rwlock;
+  rwl = *rwlock;
 
-    if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
-      {
-	return EINVAL;
-      }
+  if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
+    {
+      return EINVAL;
+    }
 
-    if ((result = pthread_mutex_timedlock(&(rwl->mtxExclusiveAccess), abstime)) != 0)
-      {
-	return result;
-      }
+  if ((result =
+       pthread_mutex_timedlock (&(rwl->mtxExclusiveAccess), abstime)) != 0)
+    {
+      return result;
+    }
 
-    if (++rwl->nSharedAccessCount == INT_MAX)
-      {
-	if ((result = pthread_mutex_timedlock(&(rwl->mtxSharedAccessCompleted), abstime)) != 0)
-	  {
-            if (result == ETIMEDOUT)
-              {
-                ++rwl->nCompletedSharedAccessCount;
-              }
-	    (void) pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
-	    return result;
-	  }
+  if (++rwl->nSharedAccessCount == INT_MAX)
+    {
+      if ((result =
+	   pthread_mutex_timedlock (&(rwl->mtxSharedAccessCompleted),
+				    abstime)) != 0)
+	{
+	  if (result == ETIMEDOUT)
+	    {
+	      ++rwl->nCompletedSharedAccessCount;
+	    }
+	  (void) pthread_mutex_unlock (&(rwl->mtxExclusiveAccess));
+	  return result;
+	}
 
-	rwl->nSharedAccessCount -= rwl->nCompletedSharedAccessCount;
-	rwl->nCompletedSharedAccessCount = 0;
+      rwl->nSharedAccessCount -= rwl->nCompletedSharedAccessCount;
+      rwl->nCompletedSharedAccessCount = 0;
 
-	if ((result = pthread_mutex_unlock(&(rwl->mtxSharedAccessCompleted))) != 0)
-	  {
-	    (void) pthread_mutex_unlock(&(rwl->mtxExclusiveAccess));
-	    return result;
-	  }
-      }
+      if ((result =
+	   pthread_mutex_unlock (&(rwl->mtxSharedAccessCompleted))) != 0)
+	{
+	  (void) pthread_mutex_unlock (&(rwl->mtxExclusiveAccess));
+	  return result;
+	}
+    }
 
-    return (pthread_mutex_unlock(&(rwl->mtxExclusiveAccess)));
+  return (pthread_mutex_unlock (&(rwl->mtxExclusiveAccess)));
 }

@@ -39,13 +39,13 @@
 #include "sched.h"
 
 int
-pthread_setschedparam(pthread_t thread, int policy,
-			  const struct sched_param *param)
+pthread_setschedparam (pthread_t thread, int policy,
+		       const struct sched_param *param)
 {
   int result;
 
   /* Validate the thread id. */
-  result = pthread_kill(thread, 0);
+  result = pthread_kill (thread, 0);
   if (0 != result)
     {
       return result;
@@ -63,12 +63,12 @@ pthread_setschedparam(pthread_t thread, int policy,
       return ENOTSUP;
     }
 
-  return (ptw32_setthreadpriority(thread, policy, param->sched_priority));
+  return (ptw32_setthreadpriority (thread, policy, param->sched_priority));
 }
 
 
 int
-ptw32_setthreadpriority(pthread_t thread, int policy, int priority)
+ptw32_setthreadpriority (pthread_t thread, int policy, int priority)
 {
   int prio;
   int result;
@@ -76,8 +76,8 @@ ptw32_setthreadpriority(pthread_t thread, int policy, int priority)
   prio = priority;
 
   /* Validate priority level. */
-  if (prio < sched_get_priority_min(policy) ||
-      prio > sched_get_priority_max(policy))
+  if (prio < sched_get_priority_min (policy) ||
+      prio > sched_get_priority_max (policy))
     {
       return EINVAL;
     }
@@ -87,38 +87,37 @@ ptw32_setthreadpriority(pthread_t thread, int policy, int priority)
 #else
 /* Everything else */
 
-  if (THREAD_PRIORITY_IDLE < prio
-      && THREAD_PRIORITY_LOWEST > prio)
+  if (THREAD_PRIORITY_IDLE < prio && THREAD_PRIORITY_LOWEST > prio)
     {
       prio = THREAD_PRIORITY_LOWEST;
     }
   else if (THREAD_PRIORITY_TIME_CRITICAL > prio
-           && THREAD_PRIORITY_HIGHEST < prio)
+	   && THREAD_PRIORITY_HIGHEST < prio)
     {
       prio = THREAD_PRIORITY_HIGHEST;
     }
 
 #endif
 
-  result = pthread_mutex_lock(&thread->threadLock);
+  result = pthread_mutex_lock (&thread->threadLock);
 
   if (0 == result)
     {
       /* If this fails, the current priority is unchanged. */
-      if (0 == SetThreadPriority(thread->threadH, prio))
-        {
-          result = EINVAL;
-        }
+      if (0 == SetThreadPriority (thread->threadH, prio))
+	{
+	  result = EINVAL;
+	}
       else
-        {
-          /*
-           * Must record the thread's sched_priority as given,
-           * not as finally adjusted.
-           */
-          thread->sched_priority = priority;
-      }
+	{
+	  /*
+	   * Must record the thread's sched_priority as given,
+	   * not as finally adjusted.
+	   */
+	  thread->sched_priority = priority;
+	}
 
-      (void) pthread_mutex_unlock(&thread->threadLock);
+      (void) pthread_mutex_unlock (&thread->threadLock);
     }
 
   return result;

@@ -47,7 +47,7 @@
 
 
 int
-sem_post_multiple (sem_t * sem, int count )
+sem_post_multiple (sem_t * sem, int count)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -55,10 +55,10 @@ sem_post_multiple (sem_t * sem, int count )
       *
       * PARAMETERS
       *      sem
-      * 	     pointer to an instance of sem_t
+      *              pointer to an instance of sem_t
       *
       *      count
-      * 	     counter, must be greater than zero.
+      *              counter, must be greater than zero.
       *
       * DESCRIPTION
       *      This function posts multiple wakeups to a semaphore. If there
@@ -66,11 +66,11 @@ sem_post_multiple (sem_t * sem, int count )
       *      the semaphore value is incremented by count - n.
       *
       * RESULTS
-      * 	     0		     successfully posted semaphore,
-      * 	     -1 	     failed, error in errno
+      *              0               successfully posted semaphore,
+      *              -1              failed, error in errno
       * ERRNO
-      * 	     EINVAL	     'sem' is not a valid semaphore
-      * 			     or count is less than or equal to zero.
+      *              EINVAL          'sem' is not a valid semaphore
+      *                              or count is less than or equal to zero.
       *
       * ------------------------------------------------------
       */
@@ -84,11 +84,11 @@ sem_post_multiple (sem_t * sem, int count )
 
 #ifdef NEED_SEM
 
-  else if (! ptw32_increase_semaphore (sem, count))
+  else if (!ptw32_increase_semaphore (sem, count))
 
 #else /* NEED_SEM */
 
-  else if (! ReleaseSemaphore ((*sem)->sem, count, 0))
+  else if (!ReleaseSemaphore ((*sem)->sem, count, 0))
 
 #endif /* NEED_SEM */
 

@@ -301,7 +301,8 @@ ptw32_cond_wait_cleanup (void *args)
     }
   else if (INT_MAX / 2 == ++(cv->nWaitersGone))
     {
-      if (sem_wait (&(cv->semBlockLock)) != 0)
+      /* Use the non-cancellable version of sem_wait() */
+      if (ptw32_semwait (&(cv->semBlockLock)) != 0)
 	{
 	  *resultPtr = errno;
 	  /*
@@ -382,6 +383,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
 
   cv = *cond;
 
+  /* Thread can be cancelled in sem_wait() but this is OK */
   if (sem_wait (&(cv->semBlockLock)) != 0)
     {
       return errno;

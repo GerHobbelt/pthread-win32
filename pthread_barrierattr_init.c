@@ -82,5 +82,4 @@ pthread_barrierattr_init (pthread_barrierattr_t * attr)
   *attr = ba;
 
   return (result);
-}                               /* pthread_barrierattr_init */
-
+}				/* pthread_barrierattr_init */

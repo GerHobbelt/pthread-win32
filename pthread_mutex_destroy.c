@@ -39,13 +39,12 @@
 
 
 int
-pthread_mutex_destroy(pthread_mutex_t *mutex)
+pthread_mutex_destroy (pthread_mutex_t * mutex)
 {
   int result = 0;
   pthread_mutex_t mx;
 
-  if (mutex == NULL
-      || *mutex == NULL)
+  if (mutex == NULL || *mutex == NULL)
     {
       return EINVAL;
     }
@@ -57,7 +56,7 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
     {
       mx = *mutex;
 
-      result = pthread_mutex_trylock(&mx);
+      result = pthread_mutex_trylock (&mx);
 
       /*
        * If trylock succeeded and the mutex is not recursively locked it
@@ -80,13 +79,13 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
 	       */
 	      *mutex = NULL;
 
-	      result = pthread_mutex_unlock(&mx);
+	      result = pthread_mutex_unlock (&mx);
 
 	      if (result == 0)
 		{
-		  (void) sem_destroy( &mx->wait_sema );
-		  DeleteCriticalSection( &mx->wait_cs );
-		  free(mx);
+		  (void) sem_destroy (&mx->wait_sema);
+		  DeleteCriticalSection (&mx->wait_cs);
+		  free (mx);
 		}
 	      else
 		{
@@ -96,12 +95,12 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
 		  *mutex = mx;
 		}
 	    }
-	  else   /* mx->recursive_count > 1 */
+	  else			/* mx->recursive_count > 1 */
 	    {
 	      /*
 	       * The mutex must be recursive and already locked by us (this thread).
 	       */
-	      mx->recursive_count--;  /* Undo effect of pthread_mutex_trylock() above */
+	      mx->recursive_count--;	/* Undo effect of pthread_mutex_trylock() above */
 	      result = EBUSY;
 	    }
 	}
@@ -111,7 +110,7 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
       /*
        * See notes in ptw32_mutex_check_need_init() above also.
        */
-      EnterCriticalSection(&ptw32_mutex_test_init_lock);
+      EnterCriticalSection (&ptw32_mutex_test_init_lock);
 
       /*
        * Check again.
@@ -135,8 +134,8 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
 	  result = EBUSY;
 	}
 
-      LeaveCriticalSection(&ptw32_mutex_test_init_lock);
+      LeaveCriticalSection (&ptw32_mutex_test_init_lock);
     }
 
-  return(result);
+  return (result);
 }

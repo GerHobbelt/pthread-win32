@@ -39,38 +39,35 @@
 
 
 int
-pthread_once (
-	       pthread_once_t * once_control,
-	       void (*init_routine) (void)
-)
+pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	/*
 	 * ------------------------------------------------------
 	 * DOCPUBLIC
-	 *	If any thread in a process  with  a  once_control  parameter
-	 *	makes  a  call to pthread_once(), the first call will summon
-	 *	the init_routine(), but  subsequent  calls  will  not. The
-	 *	once_control  parameter  determines  whether  the associated
-	 *	initialization routine has been called.  The  init_routine()
-	 *	is complete upon return of pthread_once().
-	 *	This function guarantees that one and only one thread
-	 *	executes the initialization routine, init_routine when
-	 *	access is controlled by the pthread_once_t control
-	 *	key.
+	 *      If any thread in a process  with  a  once_control  parameter
+	 *      makes  a  call to pthread_once(), the first call will summon
+	 *      the init_routine(), but  subsequent  calls  will  not. The
+	 *      once_control  parameter  determines  whether  the associated
+	 *      initialization routine has been called.  The  init_routine()
+	 *      is complete upon return of pthread_once().
+	 *      This function guarantees that one and only one thread
+	 *      executes the initialization routine, init_routine when
+	 *      access is controlled by the pthread_once_t control
+	 *      key.
 	 *
 	 * PARAMETERS
-	 *	once_control
-	 *		pointer to an instance of pthread_once_t
+	 *      once_control
+	 *              pointer to an instance of pthread_once_t
 	 *
-	 *	init_routine
-	 *		pointer to an initialization routine
+	 *      init_routine
+	 *              pointer to an initialization routine
 	 *
 	 *
 	 * DESCRIPTION
-	 *	See above.
+	 *      See above.
 	 *
 	 * RESULTS
-	 *		0		success,
-	 *		EINVAL		once_control or init_routine is NULL
+	 *              0               success,
+	 *              EINVAL          once_control or init_routine is NULL
 	 *
 	 * ------------------------------------------------------
 	 */

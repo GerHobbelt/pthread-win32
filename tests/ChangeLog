@@ -1,3 +1,17 @@
+2004-05-16  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* cancel9.c: New test.
+	* cancel3.c: Remove inappropriate conditional compilation;
+	GNU C version of test suite no longer quietly skips this test.
+	* cancel5.c: Likewise.
+	* GNUmakefile: Can now build individual test app using default
+	C version of library using 'make clean testname.c'.
+	* Makefile: Likewise for VC using 'nmake clean test testname.c'.
+
+2003-10-14  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* Wmakefile: New makefile for Watcom testing.
+
 2003-09-18  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* benchtest.h: Move old mutex code into benchlib.c.

@@ -39,7 +39,7 @@
 
 
 int
-pthread_barrier_destroy(pthread_barrier_t *barrier)
+pthread_barrier_destroy (pthread_barrier_t * barrier)
 {
   int result = 0;
   pthread_barrier_t b;
@@ -52,19 +52,16 @@ pthread_barrier_destroy(pthread_barrier_t *barrier)
   b = *barrier;
   *barrier = NULL;
 
-  if (0 == (result = sem_destroy(&(b->semBarrierBreeched[0]))))
+  if (0 == (result = sem_destroy (&(b->semBarrierBreeched[0]))))
     {
-      if (0 == (result = sem_destroy(&(b->semBarrierBreeched[1]))))
-        {
-          (void) free(b);
-          return 0;
-        }
-      (void) sem_init(&(b->semBarrierBreeched[0]),
-                        b->pshared,
-                        0);
+      if (0 == (result = sem_destroy (&(b->semBarrierBreeched[1]))))
+	{
+	  (void) free (b);
+	  return 0;
+	}
+      (void) sem_init (&(b->semBarrierBreeched[0]), b->pshared, 0);
     }
 
   *barrier = b;
-  return(result);
+  return (result);
 }
-

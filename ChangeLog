@@ -1,3 +1,27 @@
+2004-05-16  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* pthread_cancel.c (pthread_cancel): Adapted to use auto-detected
+	QueueUserAPCEx features at run-time.
+	(ptw32_RegisterCancelation): Drop in replacement for QueueUserAPCEx()
+	if it can't be used. Provides older style non-preemptive async
+	cancelation.
+	* pthread_win32_attach_detach_np.c (pthread_win32_attach_np):
+	Auto-detect quserex.dll and the availability of alertdrv.sys;
+	initialise and close on process attach/detach.
+	* global.c (ptw32_register_cancelation): Pointer to either
+	QueueUserAPCEx() or ptw32_RegisterCancelation() depending on
+	availability. QueueUserAPCEx makes pre-emptive async cancelation
+	possible.
+	* implement.h: Add definitions and prototypes related to QueueUserAPC.
+
+2004-05-16  Panagiotis E. Hadjidoukas <peh at hpclab.ceid.upatras.gr>
+
+	* QueueUserAPCEx (separate contributed package): Provides preemptive
+	APC feature.
+	* pthread_cancel.c (pthread_cancel): Initial integration of
+	QueueUserAPCEx into pthreads-win32 to provide true pre-emptive
+	async cancelation of threads, including blocked threads.
+
 2004-05-06  Makoto Kato  <raven at oldskool.jp>
 
 	* pthread.h (DWORD_PTR): Define typedef for older MSVC.
@@ -17,6 +41,50 @@
 2003-12-10  Philippe Di Cristo  <philipped at voicebox.com>
 
 	* sem_timedwait.c (sem_timedwait): Fix timeout calculations.
+
+2003-10-20  Alexander Terekhov  <TEREKHOV at de.ibm.com>
+
+	* pthread_mutex_timedlock.c (ptw32_semwait): Move to individual module.
+	* ptw32_semwait.c: New module.
+	* pthread_cond_wait.c (ptw32_cond_wait_cleanup): Replace cancelable
+	sem_wait() call with non-cancelable ptw32_semwait() call.
+	* pthread.c (private.c): Re-order for inlining. GNU C warned that
+	function ptw32_semwait() was defined 'inline' after it was called.
+	* pthread_cond_signal.c (ptw32_cond_unblock): Likewise.
+	* pthread_delay_np.c: Disable Watcom warning with comment.
+	* *.c (process.h): Remove include from .c files. This is conditionally
+	included by the common project include files.
+
+2003-10-20  James Ewing  <james.ewing at sveasoft.com>
+
+	* ptw32_getprocessors.c: Some Win32 environments don't have
+	GetProcessAffinityMask(), so always return CPU count = 1 for them.
+	* config.h (NEED_PROCESSOR_AFFINITY_MASK): Define for WinCE.
+	
+2003-10-15  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* Re-indented all .c files using default GNU style to remove assorted
+	editor ugliness (used GNU indent utility in default style).
+
+2003-10-15  Alex Blanco  <Alex.Blanco at motorola.com>
+
+	* sem_init.c (sem_init): Would call CreateSemaphore even if the sema
+	struct calloc failed; was not freeing calloced memory if either
+	CreateSemaphore or CreateEvent failed.
+
+2003-10-14  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* pthread.h: Add Watcom compiler compatibility. Esssentially just add
+	the cdecl attribute to all exposed function prototypes so that Watcom
+	generates function call code compatible with non-Watcom built libraries.
+	By default, Watcom uses registers to pass function args if possible rather
+	than pushing to stack.
+	* semaphore.h: Likewise.
+	* sched.h: Likewise.
+	* pthread_cond_wait.c (ptw32_cond_wait_cleanup): Define with cdecl attribute
+	for Watcom compatibility. This routine is called via pthread_cleanup_push so
+	it had to match function arg definition.
+	* Wmakefile: New makefile for Watcom builds.
 
 2003-09-14  Ross Johnson  <rpj at callisto.canberra.edu.au>
 

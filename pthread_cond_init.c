@@ -87,7 +87,7 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
       goto DONE;
     }
 
-  cv = (pthread_cond_t) calloc(1, sizeof (*cv));
+  cv = (pthread_cond_t) calloc (1, sizeof (*cv));
 
   if (cv == NULL)
     {
@@ -95,23 +95,23 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
       goto DONE;
     }
 
-  cv->nWaitersBlocked   = 0;
+  cv->nWaitersBlocked = 0;
   cv->nWaitersToUnblock = 0;
-  cv->nWaitersGone      = 0;
+  cv->nWaitersGone = 0;
 
-  if (sem_init(&(cv->semBlockLock), 0, 1) != 0)
+  if (sem_init (&(cv->semBlockLock), 0, 1) != 0)
     {
       result = errno;
       goto FAIL0;
     }
 
-  if (sem_init(&(cv->semBlockQueue), 0, 0) != 0)
+  if (sem_init (&(cv->semBlockQueue), 0, 0) != 0)
     {
       result = errno;
       goto FAIL1;
     }
 
-  if ((result = pthread_mutex_init(&(cv->mtxUnblockLock), 0)) != 0)
+  if ((result = pthread_mutex_init (&(cv->mtxUnblockLock), 0)) != 0)
     {
       goto FAIL2;
     }
@@ -126,40 +126,40 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
    * -------------
    */
 FAIL2:
-  (void) sem_destroy(&(cv->semBlockQueue));
+  (void) sem_destroy (&(cv->semBlockQueue));
 
 FAIL1:
-  (void) sem_destroy(&(cv->semBlockLock));
+  (void) sem_destroy (&(cv->semBlockLock));
 
 FAIL0:
-  (void) free(cv);
+  (void) free (cv);
   cv = NULL;
 
 DONE:
   if (0 == result)
     {
-      EnterCriticalSection(&ptw32_cond_list_lock);
+      EnterCriticalSection (&ptw32_cond_list_lock);
 
       cv->next = NULL;
       cv->prev = ptw32_cond_list_tail;
 
       if (ptw32_cond_list_tail != NULL)
-        {
-          ptw32_cond_list_tail->next = cv;
-        }
+	{
+	  ptw32_cond_list_tail->next = cv;
+	}
 
       ptw32_cond_list_tail = cv;
 
       if (ptw32_cond_list_head == NULL)
-        {
-          ptw32_cond_list_head = cv;
-        }
+	{
+	  ptw32_cond_list_head = cv;
+	}
 
-      LeaveCriticalSection(&ptw32_cond_list_lock);
+      LeaveCriticalSection (&ptw32_cond_list_lock);
     }
 
   *cond = cv;
 
   return result;
 
-}                               /* pthread_cond_init */
+}				/* pthread_cond_init */

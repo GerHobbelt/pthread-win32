@@ -50,30 +50,39 @@
  * This can't be inlined because we need to know it's address so that
  * we can call it through a pointer.
  */
+
 PTW32_INTERLOCKED_LONG WINAPI
-ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG location,
-				 PTW32_INTERLOCKED_LONG   value,
-				 PTW32_INTERLOCKED_LONG   comparand)
+ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
+				  PTW32_INTERLOCKED_LONG value,
+				  PTW32_INTERLOCKED_LONG comparand)
 {
+
+#if defined(__WATCOMC__)
+/* Don't report that result is not assigned a value before being referenced */
+#pragma disable_message (200)
+#endif
+
   PTW32_INTERLOCKED_LONG result;
+
+/* *INDENT-OFF* */
 
 #if defined(_M_IX86) || defined(_X86_)
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__WATCOMC__)
 
   _asm {
-    PUSH	 ecx
-    PUSH	 edx
-    MOV 	 ecx,dword ptr [location]
-    MOV 	 edx,dword ptr [value]
-    MOV 	 eax,dword ptr [comparand]
-    LOCK CMPXCHG dword ptr [ecx],edx	    ; if (EAX == [ECX]), 
-					    ;	[ECX] = EDX
-					    ; else
-					    ;	EAX = [ECX]
-    MOV 	 dword ptr [result], eax
-    POP 	 edx
-    POP 	 ecx
+    PUSH         ecx
+    PUSH         edx
+    MOV          ecx,dword ptr [location]
+    MOV          edx,dword ptr [value]
+    MOV          eax,dword ptr [comparand]
+    LOCK CMPXCHG dword ptr [ecx],edx        ; if (EAX == [ECX]), 
+                                            ;   [ECX] = EDX
+                                            ; else
+                                            ;   EAX = [ECX]
+    MOV          dword ptr [result], eax
+    POP          edx
+    POP          ecx
   }
 
 #elif defined(__GNUC__)
@@ -81,10 +90,10 @@ ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG location,
   __asm__
     (
      "lock\n\t"
-     "cmpxchgl	     %3,(%0)"	 /* if (EAX == [location]), */
-				 /*   [location] = value    */
-				 /* else		    */
-				 /*   EAX = [location]		 */
+     "cmpxchgl       %3,(%0)"    /* if (EAX == [location]), */
+                                 /*   [location] = value    */
+                                 /* else                    */
+                                 /*   EAX = [location]           */
      :"=r" (location), "=a" (result)
      :"0"  (location), "q" (value), "a" (comparand)
      : "memory" );
@@ -104,5 +113,12 @@ ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG location,
 
 #endif
 
+/* *INDENT-ON* */
+
   return result;
+
+#if defined(__WATCOMC__)
+#pragma enable_message (200)
+#endif
+
 }

@@ -79,7 +79,7 @@
  *  intRC = pthread_delay_np(&tsWait);
  */
 int
-pthread_delay_np (struct timespec * interval)
+pthread_delay_np (struct timespec *interval)
 {
   DWORD wait_time;
   DWORD secs_in_millisecs;
@@ -94,9 +94,9 @@ pthread_delay_np (struct timespec * interval)
 
   if (interval->tv_sec == 0L && interval->tv_nsec == 0L)
     {
-      pthread_testcancel();
-      Sleep(0);
-      pthread_testcancel();
+      pthread_testcancel ();
+      Sleep (0);
+      pthread_testcancel ();
       return (0);
     }
 
@@ -106,12 +106,25 @@ pthread_delay_np (struct timespec * interval)
   /* convert nanosecs to millisecs (rounding up) */
   millisecs = (interval->tv_nsec + 999999L) / 1000000L;
 
+#if defined(__WATCOMC__)
+#pragma disable_message (124)
+#endif
+
+  /*
+   * Most compilers will issue a warning 'comparison always 0'
+   * because the variable type is unsigned, but we need to keep this
+   * for some reason I can't recall now.
+   */
   if (0 > (wait_time = secs_in_millisecs + millisecs))
     {
       return EINVAL;
     }
 
-  if (NULL == (self = pthread_self()))
+#if defined(__WATCOMC__)
+#pragma enable_message (124)
+#endif
+
+  if (NULL == (self = pthread_self ()))
     {
       return ENOMEM;
     }
@@ -123,32 +136,32 @@ pthread_delay_np (struct timespec * interval)
        * Deferred cancelation will cancel us immediately.
        */
       if (WAIT_OBJECT_0 ==
-          (status = WaitForSingleObject(self->cancelEvent, wait_time)) )
-        {
-          /*
-           * Canceling!
-           */
-          (void) pthread_mutex_lock(&self->cancelLock);
-          if (self->state < PThreadStateCanceling)
-            {
-              self->state = PThreadStateCanceling;
-              self->cancelState = PTHREAD_CANCEL_DISABLE;
-              (void) pthread_mutex_unlock(&self->cancelLock);
+	  (status = WaitForSingleObject (self->cancelEvent, wait_time)))
+	{
+	  /*
+	   * Canceling!
+	   */
+	  (void) pthread_mutex_lock (&self->cancelLock);
+	  if (self->state < PThreadStateCanceling)
+	    {
+	      self->state = PThreadStateCanceling;
+	      self->cancelState = PTHREAD_CANCEL_DISABLE;
+	      (void) pthread_mutex_unlock (&self->cancelLock);
 
-              ptw32_throw(PTW32_EPS_CANCEL);
-            }
+	      ptw32_throw (PTW32_EPS_CANCEL);
+	    }
 
-          (void) pthread_mutex_unlock(&self->cancelLock);
-          return ESRCH;
-        }
+	  (void) pthread_mutex_unlock (&self->cancelLock);
+	  return ESRCH;
+	}
       else if (status != WAIT_TIMEOUT)
-        {
-          return EINVAL;
-        }
+	{
+	  return EINVAL;
+	}
     }
   else
     {
-      Sleep( wait_time );
+      Sleep (wait_time);
     }
 
   return (0);

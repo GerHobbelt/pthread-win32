@@ -57,22 +57,23 @@ ptw32_processInitialize (void)
       *      ptw32_processInitialized to TRUE.
       *
       * RESULTS
-      * 	     TRUE    if successful,
-      * 	     FALSE   otherwise
+      *              TRUE    if successful,
+      *              FALSE   otherwise
       *
       * ------------------------------------------------------
       */
 {
-	if (ptw32_processInitialized) {
-		/* 
-		 * Ignore if already initialized. this is useful for 
-		 * programs that uses a non-dll pthread
-		 * library. Such programs must call ptw32_processInitialize() explicitly,
-		 * since this initialization routine is automatically called only when
-		 * the dll is loaded.
-		 */
-		return PTW32_TRUE;
-	}
+  if (ptw32_processInitialized)
+    {
+      /* 
+       * Ignore if already initialized. this is useful for 
+       * programs that uses a non-dll pthread
+       * library. Such programs must call ptw32_processInitialize() explicitly,
+       * since this initialization routine is automatically called only when
+       * the dll is loaded.
+       */
+      return PTW32_TRUE;
+    }
 
   ptw32_processInitialized = PTW32_TRUE;
 
@@ -89,12 +90,12 @@ ptw32_processInitialize (void)
   /* 
    * Set up the global locks.
    */
-  InitializeCriticalSection(&ptw32_thread_reuse_lock);
-  InitializeCriticalSection(&ptw32_mutex_test_init_lock);
-  InitializeCriticalSection(&ptw32_cond_list_lock);
-  InitializeCriticalSection(&ptw32_cond_test_init_lock);
-  InitializeCriticalSection(&ptw32_rwlock_test_init_lock);
-  InitializeCriticalSection(&ptw32_spinlock_test_init_lock);
+  InitializeCriticalSection (&ptw32_thread_reuse_lock);
+  InitializeCriticalSection (&ptw32_mutex_test_init_lock);
+  InitializeCriticalSection (&ptw32_cond_list_lock);
+  InitializeCriticalSection (&ptw32_cond_test_init_lock);
+  InitializeCriticalSection (&ptw32_rwlock_test_init_lock);
+  InitializeCriticalSection (&ptw32_spinlock_test_init_lock);
 
   return (ptw32_processInitialized);
 

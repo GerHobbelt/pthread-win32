@@ -39,7 +39,7 @@
 #include "sched.h"
 
 int
-sched_yield(void)
+sched_yield (void)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -65,7 +65,7 @@ sched_yield(void)
       * ------------------------------------------------------
       */
 {
-  Sleep(0);
+  Sleep (0);
 
   return 0;
 }

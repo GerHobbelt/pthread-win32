@@ -47,7 +47,7 @@
  * C++, and SEH).
  */
 void
-ptw32_throw(DWORD exception)
+ptw32_throw (DWORD exception)
 {
   /*
    * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
@@ -59,11 +59,10 @@ ptw32_throw(DWORD exception)
   DWORD exceptionInformation[3];
 #endif
 
-  if (exception != PTW32_EPS_CANCEL &&
-      exception != PTW32_EPS_EXIT)
+  if (exception != PTW32_EPS_CANCEL && exception != PTW32_EPS_EXIT)
     {
       /* Should never enter here */
-      exit(1);
+      exit (1);
     }
 
   if (NULL == self || self->implicit)
@@ -86,7 +85,7 @@ ptw32_throw(DWORD exception)
 	  break;
 	}
 
-      pthread_win32_thread_detach_np();
+      pthread_win32_thread_detach_np ();
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
       _endthreadex (exitCode);
@@ -103,19 +102,14 @@ ptw32_throw(DWORD exception)
   exceptionInformation[1] = (DWORD) (0);
   exceptionInformation[2] = (DWORD) (0);
 
-  RaiseException (
-		  EXCEPTION_PTW32_SERVICES,
-		  0,
-		  3,
-		  exceptionInformation);
+  RaiseException (EXCEPTION_PTW32_SERVICES, 0, 3, exceptionInformation);
 
 #else /* __CLEANUP_SEH */
 
 #ifdef __CLEANUP_C
 
-  ptw32_pop_cleanup_all( 1 );
-
-  longjmp( self->start_mark, exception );
+  ptw32_pop_cleanup_all (1);
+  longjmp (self->start_mark, exception);
 
 #else /* __CLEANUP_C */
 
@@ -124,10 +118,10 @@ ptw32_throw(DWORD exception)
   switch (exception)
     {
     case PTW32_EPS_CANCEL:
-      throw ptw32_exception_cancel();
+      throw ptw32_exception_cancel ();
       break;
     case PTW32_EPS_EXIT:
-      throw ptw32_exception_exit();
+      throw ptw32_exception_exit ();
       break;
     }
 
@@ -146,15 +140,16 @@ ptw32_throw(DWORD exception)
 
 
 void
-ptw32_pop_cleanup_all(int execute)
+ptw32_pop_cleanup_all (int execute)
 {
-	while( NULL != ptw32_pop_cleanup(execute) ) {
-	}
+  while (NULL != ptw32_pop_cleanup (execute))
+    {
+    }
 }
 
 
 DWORD
-ptw32_get_exception_services_code(void)
+ptw32_get_exception_services_code (void)
 {
 #ifdef __CLEANUP_SEH
 

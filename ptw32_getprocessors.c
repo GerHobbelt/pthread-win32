@@ -53,15 +53,20 @@
  * newly initialised spinlocks will notice.
  */
 int
-ptw32_getprocessors(int * count)
+ptw32_getprocessors (int *count)
 {
   DWORD_PTR vProcessCPUs;
   DWORD_PTR vSystemCPUs;
   int result = 0;
 
-  if (GetProcessAffinityMask(GetCurrentProcess(),
-			     &vProcessCPUs,
-			     &vSystemCPUs))
+#if defined(NEED_PROCESS_AFFINITY_MASK)
+
+  *count = 1;
+
+#else
+
+  if (GetProcessAffinityMask (GetCurrentProcess (),
+			      &vProcessCPUs, &vSystemCPUs))
     {
       DWORD_PTR bit;
       int CPUs = 0;
@@ -80,5 +85,7 @@ ptw32_getprocessors(int * count)
       result = EAGAIN;
     }
 
-  return(result);
+#endif
+
+  return (result);
 }

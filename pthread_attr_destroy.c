@@ -39,7 +39,7 @@
 
 
 int
-pthread_attr_destroy(pthread_attr_t *attr)
+pthread_attr_destroy (pthread_attr_t * attr)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -63,7 +63,7 @@ pthread_attr_destroy(pthread_attr_t *attr)
       * ------------------------------------------------------
       */
 {
-  if (ptw32_is_attr(attr) != 0)
+  if (ptw32_is_attr (attr) != 0)
     {
       return EINVAL;
     }
@@ -77,4 +77,3 @@ pthread_attr_destroy(pthread_attr_t *attr)
 
   return 0;
 }
-

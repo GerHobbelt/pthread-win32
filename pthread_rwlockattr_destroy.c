@@ -50,7 +50,7 @@ pthread_rwlockattr_destroy (pthread_rwlockattr_t * attr)
       *
       * PARAMETERS
       *      attr
-      * 	     pointer to an instance of pthread_rwlockattr_t
+      *              pointer to an instance of pthread_rwlockattr_t
       *
       *
       * DESCRIPTION
@@ -58,11 +58,11 @@ pthread_rwlockattr_destroy (pthread_rwlockattr_t * attr)
       *      no longer be used.
       *
       *      NOTES:
-      * 	     1)      Does not affect rwlockss created using 'attr'
+      *              1)      Does not affect rwlockss created using 'attr'
       *
       * RESULTS
-      * 	     0		     successfully released attr,
-      * 	     EINVAL	     'attr' is invalid.
+      *              0               successfully released attr,
+      *              EINVAL          'attr' is invalid.
       *
       * ------------------------------------------------------
       */
@@ -81,5 +81,5 @@ pthread_rwlockattr_destroy (pthread_rwlockattr_t * attr)
       free (rwa);
     }
 
-  return(result);
+  return (result);
 }				/* pthread_rwlockattr_destroy */

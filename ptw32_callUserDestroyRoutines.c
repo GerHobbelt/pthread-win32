@@ -39,8 +39,9 @@
 #include "implement.h"
 
 #ifdef __cplusplus
-# if ! defined (_MSC_VER) && ! (defined(__GNUC__) && __GNUC__ < 3)
-    using std::terminate;
+# if ! defined (_MSC_VER) && ! (defined(__GNUC__) && __GNUC__ < 3) && ! defined(__WATCOMC__)
+using
+  std::terminate;
 # endif
 #endif
 
@@ -55,16 +56,18 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
       * It simulates the behaviour of POSIX Threads.
       *
       * PARAMETERS
-      * 	     thread
-      * 		     an instance of pthread_t
+      *              thread
+      *                      an instance of pthread_t
       *
       * RETURNS
-      * 	     N/A
+      *              N/A
       * -------------------------------------------------------------------
       */
 {
-  ThreadKeyAssoc **nextP;
-  ThreadKeyAssoc *assoc;
+  ThreadKeyAssoc **
+    nextP;
+  ThreadKeyAssoc *
+    assoc;
 
   if (thread != NULL)
     {
@@ -87,7 +90,8 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 
 	  if (pthread_mutex_lock (&(assoc->lock)) == 0)
 	    {
-	      pthread_key_t k;
+	      pthread_key_t
+		k;
 	      if ((k = assoc->key) != NULL)
 		{
 		  /*
@@ -97,7 +101,8 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 		   * key is valid and we can call the destroy
 		   * routine;
 		   */
-		  void *value = NULL;
+		  void *
+		    value = NULL;
 
 		  value = pthread_getspecific (k);
 		  if (value != NULL && k->destructor != NULL)
@@ -123,15 +128,15 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 			 * should not get any internal pthreads
 			 * exceptions.
 			 */
-			terminate();
+			terminate ();
 		      }
 
-#else  /* __cplusplus */
+#else /* __cplusplus */
 
-			/*
-			 * Run the caller's cleanup routine.
-			 */
-			(*(k->destructor)) (value);
+		      /*
+		       * Run the caller's cleanup routine.
+		       */
+		      (*(k->destructor)) (value);
 
 #endif /* __cplusplus */
 		    }

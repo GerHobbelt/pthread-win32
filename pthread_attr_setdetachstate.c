@@ -39,8 +39,7 @@
 
 
 int
-pthread_attr_setdetachstate(pthread_attr_t *attr,
-                            int detachstate)
+pthread_attr_setdetachstate (pthread_attr_t * attr, int detachstate)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -76,7 +75,7 @@ pthread_attr_setdetachstate(pthread_attr_t *attr,
       * ------------------------------------------------------
       */
 {
-  if (ptw32_is_attr(attr) != 0)
+  if (ptw32_is_attr (attr) != 0)
     {
       return EINVAL;
     }
@@ -90,4 +89,3 @@ pthread_attr_setdetachstate(pthread_attr_t *attr,
   (*attr)->detachstate = detachstate;
   return 0;
 }
-

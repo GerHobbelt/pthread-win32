@@ -64,8 +64,6 @@
  * - Process returns non-zero exit status.
  */
 
-#if defined(_MSC_VER) || defined(__cplusplus)
-
 #include "test.h"
 
 /*
@@ -195,13 +193,3 @@ main()
    */
   return 0;
 }
-
-#else /* defined(_MSC_VER) || defined(__cplusplus) */
-
-int
-main()
-{
-  return 0;
-}
-
-#endif /* defined(_MSC_VER) || defined(__cplusplus) */

@@ -45,9 +45,6 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#ifndef _UWIN
-#  include <process.h>
-#endif
 #ifndef NEED_FTIME
 #  include <sys/timeb.h>
 #endif
@@ -74,4 +71,3 @@
 #include "ptw32_decrease_semaphore.c"
 #include "ptw32_increase_semaphore.c"
 #endif
-

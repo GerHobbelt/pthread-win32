@@ -38,7 +38,7 @@
 #include "implement.h"
 
 int
-pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr, int *kind)
+pthread_mutexattr_getkind_np (pthread_mutexattr_t * attr, int *kind)
 {
-  return pthread_mutexattr_gettype( attr, kind );
+  return pthread_mutexattr_gettype (attr, kind);
 }

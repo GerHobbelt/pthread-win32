@@ -80,11 +80,10 @@ pthread_setcancelstate (int state, int *oldstate)
       */
 {
   int result = 0;
-  pthread_t self = pthread_self();
+  pthread_t self = pthread_self ();
 
   if (self == NULL
-      || (state != PTHREAD_CANCEL_ENABLE
-          && state != PTHREAD_CANCEL_DISABLE))
+      || (state != PTHREAD_CANCEL_ENABLE && state != PTHREAD_CANCEL_DISABLE))
     {
       return EINVAL;
     }
@@ -92,7 +91,7 @@ pthread_setcancelstate (int state, int *oldstate)
   /*
    * Lock for async-cancel safety.
    */
-  (void) pthread_mutex_lock(&self->cancelLock);
+  (void) pthread_mutex_lock (&self->cancelLock);
 
   if (oldstate != NULL)
     {
@@ -106,20 +105,19 @@ pthread_setcancelstate (int state, int *oldstate)
    */
   if (state == PTHREAD_CANCEL_ENABLE
       && self->cancelType == PTHREAD_CANCEL_ASYNCHRONOUS
-      && WaitForSingleObject(self->cancelEvent, 0) == WAIT_OBJECT_0)
+      && WaitForSingleObject (self->cancelEvent, 0) == WAIT_OBJECT_0)
     {
       self->state = PThreadStateCanceling;
       self->cancelState = PTHREAD_CANCEL_DISABLE;
-      ResetEvent(self->cancelEvent);
-      (void) pthread_mutex_unlock(&self->cancelLock);
-      ptw32_throw(PTW32_EPS_CANCEL);
+      ResetEvent (self->cancelEvent);
+      (void) pthread_mutex_unlock (&self->cancelLock);
+      ptw32_throw (PTW32_EPS_CANCEL);
 
       /* Never reached */
     }
 
-  (void) pthread_mutex_unlock(&self->cancelLock);
+  (void) pthread_mutex_unlock (&self->cancelLock);
 
   return (result);
 
-}                               /* pthread_setcancelstate */
-
+}				/* pthread_setcancelstate */

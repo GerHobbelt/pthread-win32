@@ -49,26 +49,26 @@
 #ifdef NEED_SEM
 
 INLINE void
-ptw32_decrease_semaphore(sem_t * sem)
+ptw32_decrease_semaphore (sem_t * sem)
 {
   register sem_t s = *sem;
 
-  EnterCriticalSection(&s->sem_lock_cs);
+  EnterCriticalSection (&s->sem_lock_cs);
 
   if (s->value != 0)
     {
       s->value--;
       if (s->value != 0)
-				{
-					SetEvent(s->event);
-				}
+	{
+	  SetEvent (s->event);
+	}
     }
   else
     {
       /* this case should not happen! */
     }
 
-  LeaveCriticalSection(&s->sem_lock_cs);
+  LeaveCriticalSection (&s->sem_lock_cs);
 }
 
 #endif /* NEED_SEM */

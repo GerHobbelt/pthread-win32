@@ -34,6 +34,7 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+//#include "../QueueUserAPCEx/User/QueueUserAPCEx.h"
 #include "pthread.h"
 #include "implement.h"
 
@@ -41,6 +42,11 @@
  * Handle to kernel32.dll 
  */
 static HINSTANCE ptw32_h_kernel32;
+
+/*
+ * Handle to quserex.dll 
+ */
+static HINSTANCE ptw32_h_quserex;
 
 BOOL
 pthread_win32_process_attach_np ()
@@ -52,21 +58,24 @@ pthread_win32_process_attach_np ()
   pthread_count++;
 #endif
 
+  ptw32_features = 0;
+
 #ifndef TEST_ICE
 
   /*
    * Load KERNEL32 and try to get address of InterlockedCompareExchange
    */
-  ptw32_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
+  ptw32_h_kernel32 = LoadLibrary (TEXT ("KERNEL32.DLL"));
 
   ptw32_interlocked_compare_exchange =
-    (PTW32_INTERLOCKED_LONG (WINAPI *)(PTW32_INTERLOCKED_LPLONG, PTW32_INTERLOCKED_LONG, PTW32_INTERLOCKED_LONG))
+    (PTW32_INTERLOCKED_LONG (WINAPI *)
+     (PTW32_INTERLOCKED_LPLONG, PTW32_INTERLOCKED_LONG,
+      PTW32_INTERLOCKED_LONG))
 #if defined(NEED_UNICODE_CONSTS)
-    GetProcAddress(ptw32_h_kernel32,
-                   (const TCHAR *)TEXT("InterlockedCompareExchange"));
+    GetProcAddress (ptw32_h_kernel32,
+		    (const TCHAR *) TEXT ("InterlockedCompareExchange"));
 #else
-    GetProcAddress(ptw32_h_kernel32,
-                   (LPCSTR) "InterlockedCompareExchange");
+    GetProcAddress (ptw32_h_kernel32, (LPCSTR) "InterlockedCompareExchange");
 #endif
 
   if (ptw32_interlocked_compare_exchange == NULL)
@@ -87,8 +96,12 @@ pthread_win32_process_attach_np ()
        * provide InterlockedCompareExchange, the bug will be
        * effortlessly avoided.
        */
-      (void) FreeLibrary(ptw32_h_kernel32);
+      (void) FreeLibrary (ptw32_h_kernel32);
       ptw32_h_kernel32 = 0;
+    }
+  else
+    {
+      ptw32_features |= PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE;
     }
 
 #else /* TEST_ICE */
@@ -96,6 +109,59 @@ pthread_win32_process_attach_np ()
   ptw32_interlocked_compare_exchange = ptw32_InterlockedCompareExchange;
 
 #endif /* TEST_ICE */
+
+  /*
+   * Load QUSEREX.DLL and try to get address of QueueUserAPCEx
+   */
+  ptw32_h_quserex = LoadLibrary (TEXT ("QUSEREX.DLL"));
+
+  if (ptw32_h_quserex != NULL)
+    {
+      ptw32_register_cancelation = (DWORD (*)(PAPCFUNC, HANDLE, DWORD))
+#if defined(NEED_UNICODE_CONSTS)
+	GetProcAddress (ptw32_h_quserex,
+			(const TCHAR *) TEXT ("QueueUserAPCEx"));
+#else
+	GetProcAddress (ptw32_h_quserex, (LPCSTR) "QueueUserAPCEx");
+#endif
+    }
+
+  if (NULL == ptw32_register_cancelation)
+    {
+      ptw32_register_cancelation = ptw32_RegisterCancelation;
+
+      if (ptw32_h_quserex != NULL)
+	{
+	  (void) FreeLibrary (ptw32_h_quserex);
+	}
+      ptw32_h_quserex = 0;
+    }
+  else
+    {
+      /* Initialise QueueUserAPCEx */
+      BOOL (*queue_user_apc_ex_init) (VOID);
+
+      queue_user_apc_ex_init = (BOOL (*)(VOID))
+#if defined(NEED_UNICODE_CONSTS)
+	GetProcAddress (ptw32_h_quserex,
+			(const TCHAR *) TEXT ("QueueUserAPCEx_Init"));
+#else
+	GetProcAddress (ptw32_h_quserex, (LPCSTR) "QueueUserAPCEx_Init");
+#endif
+
+      if (queue_user_apc_ex_init == NULL || !queue_user_apc_ex_init ())
+	{
+	  ptw32_register_cancelation = ptw32_RegisterCancelation;
+
+	  (void) FreeLibrary (ptw32_h_quserex);
+	  ptw32_h_quserex = 0;
+	}
+    }
+
+  if (ptw32_h_quserex)
+    {
+      ptw32_features |= PTW32_ALERTABLE_ASYNC_CANCEL;
+    }
 
   return result;
 }
@@ -112,22 +178,41 @@ pthread_win32_process_detach_np ()
        * Detached threads have their resources automatically
        * cleaned up upon exit (others must be 'joined').
        */
-      if (self != NULL &&
-          self->detachState == PTHREAD_CREATE_DETACHED)
-        {
-          ptw32_threadDestroy (self);
+      if (self != NULL && self->detachState == PTHREAD_CREATE_DETACHED)
+	{
+	  ptw32_threadDestroy (self);
 	  TlsSetValue (ptw32_selfThreadKey->key, NULL);
-        }
+	}
 
       /*
        * The DLL is being unmapped from the process's address space
        */
       ptw32_processTerminate ();
 
+      if (ptw32_h_quserex)
+	{
+	  /* Close QueueUserAPCEx */
+	  BOOL (*queue_user_apc_ex_fini) (VOID);
+
+	  queue_user_apc_ex_fini = (BOOL (*)(VOID))
+#if defined(NEED_UNICODE_CONSTS)
+	    GetProcAddress (ptw32_h_quserex,
+			    (const TCHAR *) TEXT ("QueueUserAPCEx_Fini"));
+#else
+	    GetProcAddress (ptw32_h_quserex, (LPCSTR) "QueueUserAPCEx_Fini");
+#endif
+
+	  if (queue_user_apc_ex_fini != NULL)
+	    {
+	      (void) queue_user_apc_ex_fini ();
+	    }
+	  (void) FreeLibrary (ptw32_h_quserex);
+	}
+
       if (ptw32_h_kernel32)
-        {
-           (void) FreeLibrary(ptw32_h_kernel32);
-        }
+	{
+	  (void) FreeLibrary (ptw32_h_kernel32);
+	}
     }
 
   return TRUE;
@@ -145,22 +230,27 @@ pthread_win32_thread_detach_np ()
   if (ptw32_processInitialized)
     {
       /*
-       * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
+       * Don't use pthread_self() - to avoid creating an implicit POSIX thread handle
        * unnecessarily.
        */
-       pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
+      pthread_t self = (pthread_t) pthread_getspecific (ptw32_selfThreadKey);
 
-       /*
-        * Detached threads have their resources automatically
-        * cleaned up upon exit (others must be 'joined').
-        */
-       if (self != NULL &&
-           self->detachState == PTHREAD_CREATE_DETACHED)
-         {
-           ptw32_threadDestroy (self);
-	   TlsSetValue (ptw32_selfThreadKey->key, NULL);
-         }
+      /*
+       * Detached threads have their resources automatically
+       * cleaned up upon exit (others must be 'joined').
+       */
+      if (self != NULL && self->detachState == PTHREAD_CREATE_DETACHED)
+	{
+	  ptw32_threadDestroy (self);
+	  TlsSetValue (ptw32_selfThreadKey->key, NULL);
+	}
     }
 
   return TRUE;
+}
+
+BOOL
+pthread_win32_test_features_np (int feature_mask)
+{
+  return ((ptw32_features & feature_mask) == feature_mask);
 }

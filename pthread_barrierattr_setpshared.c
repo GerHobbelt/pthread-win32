@@ -39,8 +39,7 @@
 
 
 int
-pthread_barrierattr_setpshared (pthread_barrierattr_t * attr,
-                                int pshared)
+pthread_barrierattr_setpshared (pthread_barrierattr_t * attr, int pshared)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -89,24 +88,24 @@ pthread_barrierattr_setpshared (pthread_barrierattr_t * attr,
        (pshared == PTHREAD_PROCESS_PRIVATE)))
     {
       if (pshared == PTHREAD_PROCESS_SHARED)
-        {
+	{
 
 #if !defined( _POSIX_THREAD_PROCESS_SHARED )
 
-          result = ENOSYS;
-          pshared = PTHREAD_PROCESS_PRIVATE;
+	  result = ENOSYS;
+	  pshared = PTHREAD_PROCESS_PRIVATE;
 
 #else
 
-          result = 0;
+	  result = 0;
 
 #endif /* _POSIX_THREAD_PROCESS_SHARED */
 
-        }
+	}
       else
-        {
-          result = 0;
-        }
+	{
+	  result = 0;
+	}
 
       (*attr)->pshared = pshared;
     }
@@ -117,4 +116,4 @@ pthread_barrierattr_setpshared (pthread_barrierattr_t * attr,
 
   return (result);
 
-}                               /* pthread_barrierattr_setpshared */
+}				/* pthread_barrierattr_setpshared */

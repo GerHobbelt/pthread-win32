@@ -51,16 +51,16 @@ pthread_rwlockattr_getpshared (const pthread_rwlockattr_t * attr,
       *
       * PARAMETERS
       *      attr
-      * 	     pointer to an instance of pthread_rwlockattr_t
+      *              pointer to an instance of pthread_rwlockattr_t
       *
       *      pshared
-      * 	     will be set to one of:
+      *              will be set to one of:
       *
-      * 		     PTHREAD_PROCESS_SHARED
-      * 			     May be shared if in shared memory
+      *                      PTHREAD_PROCESS_SHARED
+      *                              May be shared if in shared memory
       *
-      * 		     PTHREAD_PROCESS_PRIVATE
-      * 			     Cannot be shared.
+      *                      PTHREAD_PROCESS_PRIVATE
+      *                              Cannot be shared.
       *
       *
       * DESCRIPTION
@@ -68,23 +68,22 @@ pthread_rwlockattr_getpshared (const pthread_rwlockattr_t * attr,
       *      processes if pthread_rwlock_t variable is allocated
       *      in memory shared by these processes.
       *      NOTES:
-      * 	     1)      pshared rwlocks MUST be allocated in shared
-      * 		     memory.
-      * 	     2)      The following macro is defined if shared rwlocks
-      * 		     are supported:
-      * 			     _POSIX_THREAD_PROCESS_SHARED
+      *              1)      pshared rwlocks MUST be allocated in shared
+      *                      memory.
+      *              2)      The following macro is defined if shared rwlocks
+      *                      are supported:
+      *                              _POSIX_THREAD_PROCESS_SHARED
       *
       * RESULTS
-      * 	     0		     successfully retrieved attribute,
-      * 	     EINVAL	     'attr' is invalid,
+      *              0               successfully retrieved attribute,
+      *              EINVAL          'attr' is invalid,
       *
       * ------------------------------------------------------
       */
 {
   int result;
 
-  if ((attr != NULL && *attr != NULL) &&
-      (pshared != NULL))
+  if ((attr != NULL && *attr != NULL) && (pshared != NULL))
     {
       *pshared = (*attr)->pshared;
       result = 0;

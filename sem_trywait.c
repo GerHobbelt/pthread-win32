@@ -55,7 +55,7 @@ sem_trywait (sem_t * sem)
       *
       * PARAMETERS
       *      sem
-      * 	     pointer to an instance of sem_t
+      *              pointer to an instance of sem_t
       *
       * DESCRIPTION
       *      This function tries to wait on a semaphore. If the
@@ -64,14 +64,14 @@ sem_trywait (sem_t * sem)
       *      this function returns immediately with the error EAGAIN
       *
       * RESULTS
-      * 	     0		     successfully decreased semaphore,
-      * 	     -1 	     failed, error in errno
+      *              0               successfully decreased semaphore,
+      *              -1              failed, error in errno
       * ERRNO
-      * 	     EAGAIN	     the semaphore was already locked,
-      * 	     EINVAL	     'sem' is not a valid semaphore,
-      * 	     ENOTSUP	     sem_trywait is not supported,
-      * 	     EINTR	     the function was interrupted by a signal,
-      * 	     EDEADLK	     a deadlock condition was detected.
+      *              EAGAIN          the semaphore was already locked,
+      *              EINVAL          'sem' is not a valid semaphore,
+      *              ENOTSUP         sem_trywait is not supported,
+      *              EINTR           the function was interrupted by a signal,
+      *              EDEADLK         a deadlock condition was detected.
       *
       * ------------------------------------------------------
       */

@@ -39,7 +39,7 @@
 
 
 int
-pthread_mutex_unlock(pthread_mutex_t *mutex)
+pthread_mutex_unlock (pthread_mutex_t * mutex)
 {
   int result = 0;
   pthread_mutex_t mx;
@@ -59,24 +59,24 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
   if (mx != PTHREAD_MUTEX_INITIALIZER)
     {
       if (mx->ownerThread == (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS
-	  || pthread_equal(mx->ownerThread, pthread_self()))
+	  || pthread_equal (mx->ownerThread, pthread_self ()))
 	{
-	  if( mx->kind != PTHREAD_MUTEX_RECURSIVE_NP
-	      || 0 == --mx->recursive_count )
+	  if (mx->kind != PTHREAD_MUTEX_RECURSIVE_NP
+	      || 0 == --mx->recursive_count)
 	    {
 	      mx->ownerThread = NULL;
-	      EnterCriticalSection( &mx->wait_cs );
+	      EnterCriticalSection (&mx->wait_cs);
 
-	      if( InterlockedDecrement( &mx->lock_idx ) >= 0 )
+	      if (InterlockedDecrement (&mx->lock_idx) >= 0)
 		{
 		  /* Someone is waiting on that mutex */
-		  if (sem_post( &mx->wait_sema ) != 0)
+		  if (sem_post (&mx->wait_sema) != 0)
 		    {
 		      result = errno;
 		    }
 		}
 
-	      LeaveCriticalSection( &mx->wait_cs );
+	      LeaveCriticalSection (&mx->wait_cs);
 	    }
 	}
       else
@@ -89,5 +89,5 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
       result = EINVAL;
     }
 
-  return(result);
+  return (result);
 }

@@ -50,7 +50,7 @@ pthread_rwlockattr_init (pthread_rwlockattr_t * attr)
       *
       * PARAMETERS
       *      attr
-      * 	     pointer to an instance of pthread_rwlockattr_t
+      *              pointer to an instance of pthread_rwlockattr_t
       *
       *
       * DESCRIPTION
@@ -58,8 +58,8 @@ pthread_rwlockattr_init (pthread_rwlockattr_t * attr)
       *      attributes.
       *
       * RESULTS
-      * 	     0		     successfully initialized attr,
-      * 	     ENOMEM	     insufficient memory for attr.
+      *              0               successfully initialized attr,
+      *              ENOMEM          insufficient memory for attr.
       *
       * ------------------------------------------------------
       */
@@ -80,5 +80,5 @@ pthread_rwlockattr_init (pthread_rwlockattr_t * attr)
 
   *attr = rwa;
 
-  return(result);
+  return (result);
 }				/* pthread_rwlockattr_init */

@@ -39,7 +39,7 @@
 
 
 int
-pthread_spin_init(pthread_spinlock_t *lock, int pshared)
+pthread_spin_init (pthread_spinlock_t * lock, int pshared)
 {
   pthread_spinlock_t s;
   int cpus = 0;
@@ -50,7 +50,7 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
       return EINVAL;
     }
 
-  if (0 != ptw32_getprocessors(&cpus))
+  if (0 != ptw32_getprocessors (&cpus))
     {
       cpus = 1;
     }
@@ -58,29 +58,29 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
   if (cpus > 1)
     {
       if (pshared == PTHREAD_PROCESS_SHARED)
-        {
-          /*
-           * Creating spinlock that can be shared between
-           * processes.
-           */
+	{
+	  /*
+	   * Creating spinlock that can be shared between
+	   * processes.
+	   */
 #if _POSIX_THREAD_PROCESS_SHARED
 
-          /*
-           * Not implemented yet.
-           */
+	  /*
+	   * Not implemented yet.
+	   */
 
 #error ERROR [__FILE__, line __LINE__]: Process shared spin locks are not supported yet.
 
 #else
 
-          return ENOSYS;
+	  return ENOSYS;
 
 #endif /* _POSIX_THREAD_PROCESS_SHARED */
 
-        }
+	}
     }
 
-  s = (pthread_spinlock_t) calloc(1, sizeof(*s));
+  s = (pthread_spinlock_t) calloc (1, sizeof (*s));
 
   if (s == NULL)
     {
@@ -95,18 +95,18 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
   else
     {
       pthread_mutexattr_t ma;
-      result = pthread_mutexattr_init(&ma);
+      result = pthread_mutexattr_init (&ma);
 
       if (0 == result)
-        {
-          ma->pshared = pshared;
-          result = pthread_mutex_init(&(s->u.mutex), &ma);
-          if (0 == result)
-            {
-              s->interlock = PTW32_SPIN_USE_MUTEX;
-            }
-        }
-      (void) pthread_mutexattr_destroy(&ma);
+	{
+	  ma->pshared = pshared;
+	  result = pthread_mutex_init (&(s->u.mutex), &ma);
+	  if (0 == result)
+	    {
+	      s->interlock = PTW32_SPIN_USE_MUTEX;
+	    }
+	}
+      (void) pthread_mutexattr_destroy (&ma);
     }
 
   if (0 == result)
@@ -115,9 +115,9 @@ pthread_spin_init(pthread_spinlock_t *lock, int pshared)
     }
   else
     {
-      (void) free(s);
+      (void) free (s);
       *lock = NULL;
     }
 
-  return(result);
+  return (result);
 }

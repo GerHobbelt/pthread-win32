@@ -48,25 +48,25 @@
 #ifdef NEED_SEM
 
 INLINE BOOL
-ptw32_increase_semaphore(sem_t * sem, unsigned int n)
+ptw32_increase_semaphore (sem_t * sem, unsigned int n)
 {
   BOOL result;
   register sem_t s = *sem;
 
-  EnterCriticalSection(&s->sem_lock_cs);
+  EnterCriticalSection (&s->sem_lock_cs);
 
   if (s->value + n > s->value)
     {
-       s->value += n;
-       SetEvent(s->event);
-       result = PTW32_TRUE;
+      s->value += n;
+      SetEvent (s->event);
+      result = PTW32_TRUE;
     }
   else
     {
-       result = PTW32_FALSE;
+      result = PTW32_FALSE;
     }
 
-  LeaveCriticalSection(&s->sem_lock_cs);
+  LeaveCriticalSection (&s->sem_lock_cs);
   return result;
 }
 

@@ -39,13 +39,13 @@
 #include "sched.h"
 
 int
-pthread_getschedparam(pthread_t thread, int *policy,
-			  struct sched_param *param)
+pthread_getschedparam (pthread_t thread, int *policy,
+		       struct sched_param *param)
 {
   int result;
 
   /* Validate the thread id. */
-  result = pthread_kill(thread, 0);
+  result = pthread_kill (thread, 0);
   if (0 != result)
     {
       return result;

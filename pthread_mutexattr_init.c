@@ -48,7 +48,7 @@ pthread_mutexattr_init (pthread_mutexattr_t * attr)
       *
       * PARAMETERS
       *      attr
-      * 	     pointer to an instance of pthread_mutexattr_t
+      *              pointer to an instance of pthread_mutexattr_t
       *
       *
       * DESCRIPTION
@@ -56,11 +56,11 @@ pthread_mutexattr_init (pthread_mutexattr_t * attr)
       *      attributes.
       *
       *      NOTES:
-      * 	     1)      Used to define mutex types
+      *              1)      Used to define mutex types
       *
       * RESULTS
-      * 	     0		     successfully initialized attr,
-      * 	     ENOMEM	     insufficient memory for attr.
+      *              0               successfully initialized attr,
+      *              ENOMEM          insufficient memory for attr.
       *
       * ------------------------------------------------------
       */
@@ -82,5 +82,5 @@ pthread_mutexattr_init (pthread_mutexattr_t * attr)
 
   *attr = ma;
 
-  return(result);
+  return (result);
 }				/* pthread_mutexattr_init */
