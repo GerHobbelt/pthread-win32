@@ -6,6 +6,13 @@
  */
 
 #include "pthread.h"
+#include "implement.h"
+
+static int
+is_attr(const pthread_attr_t *attr)
+{
+  return (attr == NULL || attr->valid != _PTHREAD_ATTR_VALID) ? 1 : 0;
+}
 
 int
 pthread_attr_setschedparam(pthread_attr_t *attr,
@@ -54,14 +61,14 @@ int pthread_setschedparam(pthread_t thread, int policy,
     }
 
   /* Validate priority level. */
-  if (param->sched_policy < sched_get_priority_min(policy) ||
-      param->sched_policy > sched_get_priority_max(policy))
+  if (param->sched_priority < sched_get_priority_min(policy) ||
+      param->sched_priority > sched_get_priority_max(policy))
     {
       return EINVAL;
     }
 
   /* This is practically guaranteed to return TRUE. */
-  (void) SetThreadPriority(thread->win32handle, param->sched_policy);
+  (void) SetThreadPriority(thread->win32handle, param->sched_priority);
   return 0;
 }
 
@@ -92,7 +99,7 @@ int pthread_getschedparam(pthread_t thread, int *policy,
       return EINVAL;
     }
   
-  param->sched_policy = prio;
+  param->sched_priority = prio;
   return 0;
 }
 
