@@ -1,3 +1,7 @@
+Sat Jan 23 17:36:40 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* README: Updated.
+
 Wed Jan 20 09:31:28 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* pthread.h (pthread_mutexattr_t): Changed to a pointer.

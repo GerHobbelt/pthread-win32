@@ -13,16 +13,17 @@ and place the fllowing text in the message body:
 
 Building the library with Cygwin32 or Mingw32
 ---------------------------------------------
-Jan 9, 1999
+Jan 23, 1999
 
-The package cannot yet be built using cygwin32 or mingw32 because
-the win32 compatibility stub libraries that come with those tools generate
-their stub library function calls from the Win95 dll set
-which don't include the _beginthreadx or _endthreadx functions used in this
-package.
+The package cannot be built using cygwin32 or mingw32 yet.
+I'm working on this now. Initially it will be made to compile using g++
+because the implementation uses exception handling for cancellation
+to work. The library is C callable though so if you need to write
+applications in C you'll have to grab the pre-built DLL.
 
-The complete zipped (should be pkunzip compatible) source code and
-a precompiled DLL and matching pthread.h can be found at:
+
+The complete source code in tar format and a precompiled DLL and
+matching pthread.h can be found at:
 	ftp://sourceware.cygnus.com/pub/pthreads-win32
 
 Home page:
