@@ -1,4 +1,4 @@
-                 PTHREADS-WIN32 SNAPSHOT 2001-07-03
+                 PTHREADS-WIN32 SNAPSHOT 2001-??-??
                  ----------------------------------
        Web Site: http://sources.redhat.com/pthreads-win32/
       FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -26,236 +26,41 @@ announcement for the list of contributors.
 Changes since the last snapshot
 -------------------------------
 
------------------------
-Additions to Scheduling
------------------------
-New routines:
-	pthread_attr_setinheritsched()
-	pthread_attr_getinheritsched()
-	pthread_attr_setschedpolicy()
-	pthread_attr_getschedpolicy()
-	sched_setscheduler()
-	sched_getscheduler()
-	sched_rr_get_interval()
-Now defined:
-	_POSIX_THREAD_PRIORITY_SCHEDULING
+----------------------------------
+New: Spin locks (alpha level code)
+----------------------------------
+These are part of POSIX 1003.1j. They are
+useful only on multiprocessor machines.
 
-These routines complete the set required for defining
-_POSIX_THREAD_PRIORITY_SCHEDULING.
+        #define _POSIX_SPIN_LOCKS
+        pthread_spin_init()
+        pthread_spin_destroy()
+        pthread_spin_lock()
+        pthread_spin_unlock()
+        pthread_spin_trylock()
 
+--------------------------------
+New: Barriers (alpha level code)
+--------------------------------
+These are part of POSIX 1003.1j. They are generally
+useful.
 
-sched_setscheduler
-sched_getscheduler
-------------------
-These routines will require patching to work with UWIN
-and any other system that provides it's own pid_t.
-Our pthread.h conditionally defines pid_t as a DWORD, which
-is the type returned by GetCurrentProcessId().
-
-The only supported policy is SCHED_OTHER, however, in
-order to provide semantic compatibility these routines
-verify the following:
-- that the process identified by pid exists;
-- that permission is granted to set or query the policy;
-The appropriate error is returned if either of these fail.
-On success, both routines return SCHED_OTHER.
-
-
-sched_rr_get_interval
----------------------
-Always returns -1 and sets errno to ENOTSUP. This is
-implemented as a macro. It returns ENOTSUP rather than
-ENOSYS because sched_get_priority_max() and
-sched_get_priority_min() are supported, but only for
-SCHED_OTHER.
-
-
-pthread_attr_setschedpolicy
-pthread_attr_getschedpolicy
----------------------------
-The only valid supported policy is SCHED_OTHER.
-Attempting to set other policies results in an ENOTSUP
-error.
-
-
-pthread_attr_setinheritsched
-pthread_attr_getinheritsched
-----------------------------
-The two possible values that can be set are
-PTHREAD_INHERIT_SCHED and PTHREAD_EXPLICIT_SCHED.
-
-Neither the POSIX standard nor the Single Unix Spec
-specifies which should be the default value.
-Consequently, implementations use different defaults,
-eg (from a scan of the web):
-
-PTHREAD_INHERIT_SCHED default:
-	HP, MKS Toolkit, QNX, AIX (?)
-
-PTHREAD_EXPLICIT_SCHED default:
-	IBM OS/400, Linux, Sun
-
-All Win32 threads are created with THREAD_PRIORITY_NORMAL.
-They do not inherit the priority of the parent thread or the
-process. This behaviour is equivalent to the following
-Pthreads defaults:
-
-	Inheritance:	PTHREAD_EXPLICIT_SCHED
-	Priority:		THREAD_PRIORITY_NORMAL
-
-These are also the defaults in pthreads-win32, and now
-reinforced by changes to the library which now actually
-use these values and routines. This choice maintains the
-notion that, from the Pthread point-of-view, Win32
-threads (those not created via pthread_create()) are
-treated as detached POSIX threads with default attribute
-values.
-
-
-------------------
-Changes to Mutexes
-------------------
-Background:
-Snapshot-2001-06-06 included Thomas Pfaff's enhancements
-to the mutex routines to improve speed. The improvements
-are very large on Win9x class systems where pthreads-win32
-previously used Win32 mutexes rather than critical
-sections as the underlying mechanism. Based on some new
-benchtest programs that have been run on a Win98 machine
-(and included in the tests directory), WNT systems speed
-has probably decreased a little. On Win9x the enhancements
-also resulted in speed improvements in other primitives
-which use mutexes internally, such as condition variables
-and read-write locks. Thomas also added mutex
-types to the library as described in the Single Unix
-Specification documentation, and as provided with
-the majority of major Unix and Linux Pthreads
-implementations.
-
-Overall, the library now provides far more consistent performance
-across the different Windows variants and greater compatibility.
-Future work will continue to improve on this.
-
-New changes:
-Changes have been made to further improve the speed of the
-default PTHREAD_MUTEX_NORMAL type (and therefore also
-PTHREAD_MUTEX_DEFAULT which is equivalent in pthreads-win32).
-
-Specifically, the library no longer sets or checks the real
-mutex owner when locking, unlocking, trylocking, or
-destroying PTHREAD_MUTEX_NORMAL mutexes. This saves
-significant overhead and results in measured speed increases
-of around 90 percent for non-blocking lock operations, and a
-slight improvement for blocking lock operations. Since the
-type of mutex used internally is PTHREAD_MUTEX_DEFAULT, this
-also results in additional speed improvements to CVs and R/W
-lock operations. Subjective observation shows an
-improvement of up to 30-35% in R/W locks
-(from tests/rwlock7.c). This is compared to the
-already improved snapshot-2001-06-06.
-
-The price paid for this improvement is that some checking
-for errors is not done for these mutex types. The onus
-is placed on the developer to check application code
-for logical errors, or use a safer mutex type such as
-PTHREAD_MUTEX_ERRORCHECK. For example, it is now
-possible for a non-owner thread to unlock or destroy
-a mutex of these types. However, because the owner
-is not simply left as NULL but set to a special anonymous
-owner value when locked and then reset to NULL when
-unlocked or destroyed, an error will ultimately eventuate
-when the owner thread subsequently attempts to unlock or
-destroy the mutex.
-
-These changes are consistent with both the behaviour exhibited
-by PTHREAD_MUTEX_NORMAL in other implementations and their
-documentation, including the Open Group documentation.
-
-
-------------
-Benchmarking
-------------
-There is a new but growing set a benchmarking programs in the
-"tests" directory. These should be runnable using the
-following command-lines corresponding to each of the possible
-library builds:
-
-MSVC:
-nmake clean VC-bench
-nmake clean VCE-bench
-nmake clean VSE-bench
-
-Mingw32:
-make clean GC-bench
-make clean GCE-bench
-
-UWIN:
-The benchtests are run as part of the testsuite.
-
-
-In this snapshot there are four benchtests timing
-various mutex senarios. They are:
-
-benchtest1 - Lock plus unlock on an unlocked mutex.
-benchtest2 - Lock plus unlock on a locked mutex.
-benchtest3 - Trylock on a locked mutex.
-benchtest4 - Trylock plus unlock on an unlocked mutex.
-
-
-Each test times up to three alternate synchronisation
-implementations as a reference, and then times each of
-the four mutex types provided by the library. Each is
-described below:
-
-Simple Critical Section
-- uses a simple Win32 critical section. There is no
-additional overhead for this case as there is in the
-remaining cases.
-
-POSIX mutex implemented using a Critical Section
-- The old implementation which uses runtime adaptation
-depending on the Windows variant being run on. When
-the pthreads DLL was run on WinNT or higher then
-POSIX mutexes would use Win32 Critical Sections.
-
-POSIX mutex implemented using a Win32 Mutex
-- The old implementation which uses runtime adaptation
-depending on the Windows variant being run on. When
-the pthreads DLL was run on Win9x then POSIX mutexes
-would use Win32 Mutexes (because TryEnterCriticalSection
-is not implemented on Win9x).
-
-PTHREAD_MUTEX_DEFAULT
-PTHREAD_MUTEX_NORMAL
-PTHREAD_MUTEX_ERRORCHECK
-PTHREAD_MUTEX_RECURSIVE
-- The current implementation supports these mutex types.
-The underlying basis of POSIX mutexes is now the same
-irrespective of the Windows variant.
-
-
-In all benchtests, the operation is repeated a large
-number of times and an average is calculated. Loop
-overhead is measured and subtracted from all test times.
-
+        #define _POSIX_BARRIERS
+        pthread_barrier_init()
+        pthread_barrier_destroy()
+        pthread_barrier_wait()
+        pthread_barrierattr_init()
+        pthread_barrierattr_destroy()
+        pthread_barrierattr_getpshared()
+        pthread_barrierattr_setpshared()
 
 ---------
 Bug fixes
 ---------
-Pthread_create now sets the priority of the new thread
-from the value set in the thread attribute. 
-- from Ralf.Brese@pdb4.siemens.de.
+In pthread_mutex_lock, return the error if an
+auto-initialiser initialisation fails.
 
-In the last snapshot I introduced a "lost signal" bug into
-the condition variables code.
-- fixed by Alexander Terekhov
-- reported by Timur Aydin taydin@snet.net
-
-
----------
-New tests
----------
-Several new tests have been added to the test suite.
+_POSIX_READER_WRITER_LOCKS is now defined.
 
 
 ---------------------------
@@ -327,16 +132,19 @@ reliably.
 Level of standards conformance
 ------------------------------
 
-The following POSIX 1003.1c 1995 and POSIX 1003.1b options are defined:
+The following POSIX 1003.1c/1b/1j options are defined:
 
       _POSIX_THREADS
       _POSIX_THREAD_SAFE_FUNCTIONS
       _POSIX_THREAD_ATTR_STACKSIZE
       _POSIX_THREAD_PRIORITY_SCHEDULING
       _POSIX_SEMAPHORES
+      _POSIX_READER_WRITER_LOCKS
+      _POSIX_SPIN_LOCKS
+      _POSIX_BARRIERS
 
 
-The following POSIX 1003.1c 1995 options are not defined:
+The following POSIX 1003.1c options are not defined:
 
       _POSIX_THREAD_ATTR_STACKADDR
       _POSIX_THREAD_PRIO_INHERIT
@@ -415,7 +223,7 @@ The following functions are implemented:
       pthread_cond_broadcast  
 
       ---------------------------
-      Read/Write Locks:
+      Read/Write Locks - POSIX 1j
       ---------------------------
       pthread_rwlock_init
       pthread_rwlock_destroy
@@ -426,17 +234,37 @@ The following functions are implemented:
       pthread_rwlock_unlock
 
       ---------------------------
-      Semaphores
+      Spin Locks - POSIX 1j
       ---------------------------
-      sem_init               (POSIX 1b)
-      sem_destroy            (POSIX 1b)
-      sem_post               (POSIX 1b)
-      sem_wait               (POSIX 1b)
-      sem_trywait            (POSIX 1b)
-      sem_open               (POSIX 1b - returns an error ENOSYS)
-      sem_close              (POSIX 1b - returns an error ENOSYS)
-      sem_unlink             (POSIX 1b - returns an error ENOSYS)
-      sem_getvalue           (POSIX 1b - returns an error ENOSYS)
+      pthread_spin_init
+      pthread_spin_destroy
+      pthread_spin_lock
+      pthread_spin_unlock
+      pthread_spin_trylock
+
+      ---------------------------
+      Barriers - POSIX 1j
+      ---------------------------
+      pthread_barrier_init
+      pthread_barrier_destroy
+      pthread_barrier_wait
+      pthread_barrierattr_init
+      pthread_barrierattr_destroy
+      pthread_barrierattr_getpshared
+      pthread_barrierattr_setpshared
+
+      ---------------------------
+      Semaphores - POSIX 1b
+      ---------------------------
+      sem_init
+      sem_destroy
+      sem_post
+      sem_wait
+      sem_trywait
+      sem_open               (returns an error ENOSYS)
+      sem_close              (returns an error ENOSYS)
+      sem_unlink             (returns an error ENOSYS)
+      sem_getvalue           (returns an error ENOSYS)
 
       ---------------------------
       RealTime Scheduling

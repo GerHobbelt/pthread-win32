@@ -136,6 +136,8 @@ struct sem_t_ {
 
 #define PTW32_OBJECT_AUTO_INIT ((void *) -1)
 #define PTW32_OBJECT_INVALID   NULL
+#define PTW32_SPIN_UNLOCKED    ((void *) 1)
+#define PTW32_SPIN_LOCKED      ((void *) 2)
 
 struct pthread_mutex_t_ {
   LONG lock_idx;
@@ -146,12 +148,28 @@ struct pthread_mutex_t_ {
   CRITICAL_SECTION try_lock_cs;
 };
 
-
 struct pthread_mutexattr_t_ {
   int pshared;
   int kind;
 };
 
+struct pthread_spinlock_t_ {
+  union {
+    LONG interlock;
+    pthread_mutex_t mx;
+  } u;
+};
+
+struct pthread_barrier_t_ {
+  LONG nCurrentBarrierHeight;
+  LONG nInitialBarrierHeight;
+  sem_t semBarrierBreeched;
+  pthread_mutex_t mtxExclusiveAccess;
+};
+
+struct pthread_barrierattr_t_ {
+  int pshared;
+};
 
 struct pthread_key_t_ {
   DWORD key;

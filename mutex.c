@@ -632,7 +632,10 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
    */
   if (*mutex == (pthread_mutex_t) PTW32_OBJECT_AUTO_INIT)
     {
-      result = ptw32_mutex_check_need_init(mutex);
+      if ((result = ptw32_mutex_check_need_init(mutex)) != 0)
+        {
+          return(result);
+        }
     }
 
   mx = *mutex;
