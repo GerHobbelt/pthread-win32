@@ -116,7 +116,7 @@ pthread_join(pthread_t thread, void ** valueptr)
 	 following critical section. */
 
       /* CRITICAL SECTION */
-      pthread_mutex_lock(target_thread_mutex);
+      pthread_mutex_lock(&_pthread_count_mutex);
 
       /* Collect the value pointer passed to pthread_exit().  If
 	 another thread detaches our target thread while we're
@@ -124,7 +124,8 @@ pthread_join(pthread_t thread, void ** valueptr)
 	 pointed to by target->joinvalueptr has been freed or
 	 otherwise no longer valid. */
 
-      if (target->detach == TRUE)
+      if (pthread_attr_getdetachedstate(&(target->attr), &detachstate) != 0 
+	  || detachstate == PTHREAD_CREATE_DETACHED)
 	{
 	  ret = EDEADLK;
 	}
@@ -143,7 +144,7 @@ pthread_join(pthread_t thread, void ** valueptr)
 	  _pthread_delete_thread_entry(target);
 	}
 
-      pthread_mutex_lock(target_thread_mutex);
+      pthread_mutex_lock(&_pthread_count_mutex);
       /* END CRITICAL SECTION */
 
       return ret;

@@ -103,13 +103,13 @@ pthread_create(pthread_t *thread,
   void *   security = NULL;
   DWORD  threadID;
   pthread_attr_t * attr_copy;
-  _pthread_threads_thread_t * this;
+  _pthread_threads_thread_t * us;
   /* Success unless otherwise set. */
   int ret = 0;
 
-  if (_pthread_new_thread_entry((pthread_t) handle, this) == 0)
+  if (_pthread_new_thread_entry((pthread_t) handle, us) == 0)
     {
-      attr_copy = &(this->attr);
+      attr_copy = &(us->attr);
 
       /* Map given attributes otherwise just use default values. */
       if (attr != NULL) 
@@ -119,8 +119,6 @@ pthread_create(pthread_t *thread,
 	      attr_copy->stacksize = PTHREAD_STACK_MIN;
 	    }
 
-	  attr_copy->cancelstate = attr->cancelstate;
-	  attr_copy->canceltype = attr->canceltype;
 	  attr_copy->detachedstate = attr->detachedstate;
 	  attr_copy->priority = attr->priority;
 
@@ -129,15 +127,13 @@ pthread_create(pthread_t *thread,
 #endif /* HAVE_SIGSET_T */
 	}
 
-      this->detach = (attr->detachedstate == PTHREAD_CREATE_DETACHED);
-
       /* Start running, not suspended. */
       flags = 0;
 
       handle = (HANDLE) _beginthreadex(security,
 				       attr_copy->stacksize,
 				       _pthread_start_call,
-				       (void *) this,
+				       (void *) us,
 				       flags,
 				       &threadID);
 
@@ -159,7 +155,7 @@ pthread_create(pthread_t *thread,
   else
     {
       /* Remove the failed thread entry. */
-      _pthread_delete_thread_entry(this);
+      _pthread_delete_thread_entry(us);
     }
 
   return ret;

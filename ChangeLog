@@ -1,5 +1,23 @@
 Sun Jul 26 00:09:59 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* condvar.c (cond_wait): Add cancelation point. This applies the
+	point to both pthread_cond_wait() and pthread_cond_timedwait().
+
+	* exit.c (pthread_exit): Rename "this" to "us".
+
+	* implement.h: Add comment.
+
+	* sync.c (pthread_join): I've satisfied myself that pthread_detach()
+	does set the detached attribute in the thread entry attributes
+	to PTHREAD_CREATE_DETACHED. "if" conditions were changed to test
+	that attribute instead of a separate flag.
+
+	* create.c (pthread_create): Rename "this" to "us".
+	(pthread_create): cancelstate and canceltype are not attributes
+	so the copy to thread entry attribute storage was removed.
+	Only the thread itself can change it's cancelstate or canceltype,
+	ie. the thread must exist already.
+
 	* private.c (_pthread_delete_thread_entry): Mutex locks removed.
 	Mutexes must be applied at the caller level.
 	(_pthread_new_thread_entry): Ditto.

@@ -70,6 +70,8 @@ struct _pthread_threads_thread {
 						   PTHREAD_CANCEL_DEFERRED */
   void **                     joinvalueptr;
   int                         join_count;
+
+  /* These must be kept in this order and together. */
   _pthread_handler_node_t *   cleanupstack;
   _pthread_handler_node_t *   destructorstack;
   _pthread_handler_node_t *   forkpreparestack;
