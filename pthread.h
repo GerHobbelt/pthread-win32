@@ -74,8 +74,13 @@ struct timespec {
    pointer to an object in memory. */
 #define PTHREAD_CANCELED            ((void *) 1)
 
+#define PTHREAD_MUTEX_INITIALIZER {0 /* ignore internals */ }
+
 typedef struct _pthread * pthread_t;
-typedef CRITICAL_SECTION pthread_mutex_t;
+typedef struct {
+	int valid;
+	CRITICAL_SECTION cs;
+} pthread_mutex_t;
 typedef DWORD pthread_key_t;
 
 
