@@ -87,7 +87,7 @@ ptw32_throw (DWORD exception)
 
       pthread_win32_thread_detach_np ();
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
       _endthreadex (exitCode);
 #else
       _endthread ();

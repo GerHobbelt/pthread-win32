@@ -168,7 +168,7 @@ pthread_create (pthread_t * tid,
    * finished with it here.
    */
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__) 
 
   thread->threadH = threadH = (HANDLE) _beginthreadex ((void *) NULL,	/* No security info             */
 						       (unsigned) stackSize,	/* default stack size   */

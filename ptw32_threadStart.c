@@ -119,7 +119,7 @@ ptw32_terminate ()
 
 #endif
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (__MINGW32__) || (defined (__MSVCRT__) && ! defined (__DMC__))
 unsigned
   __stdcall
 #else
@@ -355,7 +355,7 @@ ptw32_threadStart (void *vthreadParms)
       ptw32_callUserDestroyRoutines (self);
     }
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
   _endthreadex ((unsigned) status);
 #else
   _endthread ();
@@ -365,7 +365,7 @@ ptw32_threadStart (void *vthreadParms)
    * Never reached.
    */
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
   return (unsigned) status;
 #endif
 

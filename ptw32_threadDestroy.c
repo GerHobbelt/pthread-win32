@@ -72,7 +72,7 @@ ptw32_threadDestroy (pthread_t thread)
       (void) pthread_mutex_destroy(&threadCopy.cancelLock);
       (void) pthread_mutex_destroy(&threadCopy.threadLock);
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
       /*
        * See documentation for endthread vs endthreadex.
        * Don't close the Win32 handle of implicit POSIX threads

@@ -80,4 +80,11 @@
 #ifdef __WATCOMC__
 #endif
 
+#ifdef __DMC__
+#define HAVE_SIGNAL_H
+#define HAVE_C_INLINE
+#endif
+
+
+
 #endif
