@@ -753,9 +753,9 @@ ptw32_cond_wait_cleanup(void * args)
   int result;
 
   /*
-   * Whether we got here as a result of signal/broadcast or because of 
-   * timeout on wait or thread cancellation we indicate that we are no 
-   * longer waiting. The waiter is responsible for adjusting waiters 
+   * Whether we got here as a result of signal/broadcast or because of
+   * timeout on wait or thread cancellation we indicate that we are no
+   * longer waiting. The waiter is responsible for adjusting waiters
    * (to)unblock(ed) counts (protected by unblock lock).
    */
   if ((result = pthread_mutex_lock(&(cv->mtxUnblockLock))) != 0)
@@ -853,7 +853,7 @@ ptw32_cond_wait_cleanup(void * args)
     }
 
   /*
-   * XSH: Upon successful return, the mutex has been locked and is owned 
+   * XSH: Upon successful return, the mutex has been locked and is owned
    * by the calling thread
    */
   if ((result = pthread_mutex_lock(cleanup_args->mutexPtr)) != 0)
@@ -963,7 +963,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
    */
   pthread_cleanup_pop(1);
 #ifdef _MSC_VER
-#pragma inline_depth(8)
+#pragma inline_depth()
 #endif
 
   /*

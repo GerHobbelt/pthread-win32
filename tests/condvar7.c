@@ -126,7 +126,7 @@ mythread(void * arg)
 
   pthread_cleanup_pop(0);
 #ifdef _MSC_VER
-#pragma inline_depth(8)
+#pragma inline_depth()
 #endif
 
   assert(cvthing.shared > 0);

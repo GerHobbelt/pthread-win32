@@ -151,6 +151,8 @@ As defined in the new POSIX standard, and the Single Unix Spec version 3:
 
 pthread.h no longer includes windows.h
 --------------------------------------
+[Not yet for G++]
+
 This was done to prevent conflicts.
 
 HANDLE, DWORD, and NULL are temporarily defined within pthread.h if
@@ -208,13 +210,19 @@ Known bugs in this snapshot
 
    Workaround [rpj - 2 Feb 2002]
    -----------------------------
-   The problem disappears when /Ob0 is used, i.e. /O2 /Ob0 works OK.
+   The problem disappears when /Ob0 is used, i.e. /O2 /Ob0 works OK,
+   but if you want to use inlining optimisation you can be much more
+   specific about where it's switched off and on by using a pragma.
 
    So the inlining optimisation is interfering with the way that cleanup
-   handlers are run. In order to confirm this, the following use of pragmas
-   gets around the problem but I don't know how to make it transparent, in say,
-   pthread.h where pthread_cleanup_push is a macro that expands (in the C++ case) to
-   a local object instantiation with handlerFunc as the destructor (see pthread.h):
+   handlers are run. It appears to relate to auto-inlining of class methods
+   since this is the only auto inlining that is performed at /O1 optimisation
+   (functions with the "inline" qualifier are also inlined, but the problem
+   doesn't appear to involve any such functions in the library or testsuite).
+
+   In order to confirm the inlining culprit, the following use of pragmas
+   eliminate the problem but I don't know how to make it transparent, putting
+   it in, say, pthread.h where pthread_cleanup_push defined as a macro.
 
    #pragma inline_depth(0)
      pthread_cleanup_push(handlerFunc, (void *) &arg);
@@ -222,13 +230,26 @@ Known bugs in this snapshot
         /* ... */
 
      pthread_cleanup_pop(0);
-   #pragma inline_depth(8)
+   #pragma inline_depth()
+
+   Note the empty () value after the pop macro. This resets depth to the
+   default. Or you can specify a non-zero depth here.
 
    The pragma is also needed (and now used) within the library itself wherever
    cleanup handlers are used (condvar.c and rwlock.c).
 
-   Use of these pragmas allows compiler optimisation /O2 to be used for
-   both the library and applications.
+   Use of these pragmas allows compiler optimisations /O1 and /O2 to be
+   used for either or both the library and applications.
+
+   Experimenting further, I found that wrapping the actual cleanup handler
+   function with #pragma auto_inline(off|on) does NOT work.
+
+   MSVC6.0 doesn't appear to support the C99 standard's _Pragma directive,
+   however, later versions may. This form is embeddable inside #define
+   macros, which would be ideal because it would mean that it could be added
+   to the push/pop macro definitions in pthread.h and hidden from the
+   application programmer.
+
    [/rpj]
 
    Original problem description
