@@ -1,0 +1,118 @@
+SNAPSHOT 2000-08-13
+-------------------
+
+New:
+-       Renamed DLL and LIB files:
+                pthreadVSE.dll  (MS VC++/Structured EH)
+                pthreadVSE.lib
+                pthreadVCE.dll  (MS VC++/C++ EH)
+                pthreadVCE.lib
+                pthreadGCE.dll  (GNU G++/C++ EH)
+                libpthreadw32.a
+
+        Both your application and the pthread dll should use the
+        same exception handling scheme.
+
+Bugs fixed:
+-       MSVC++ C++ exception handling.
+
+Some new tests have been added.
+
+
+SNAPSHOT 2000-08-10
+-------------------
+
+New:
+-       asynchronous cancelation on X86 (Jason Nye)
+-       Makefile compatible with MS nmake to replace
+        buildlib.bat
+-       GNUmakefile for Mingw32
+-       tests/Makefile for MS nmake replaces runall.bat
+-       tests/GNUmakefile for Mingw32
+
+Bugs fixed:
+-       kernel32 load/free problem
+-       attempt to hide internel exceptions from application
+        exception handlers (__try/__except and try/catch blocks)
+-       Win32 thread handle leakage bug
+        (David Baggett/Paul Redondo/Eyal Lebedinsky)
+
+Some new tests have been added.
+
+
+SNAPSHOT 1999-11-02
+-------------------
+
+Bugs fixed:
+-       ctime_r macro had an incorrect argument (Erik Hensema),
+-       threads were not being created 
+        PTHREAD_CANCEL_DEFERRED. This should have
+        had little effect as deferred is the only
+        supported type. (Ross Johnson).
+
+Some compatibility improvements added, eg.
+-       pthread_setcancelstate accepts NULL pointer
+        for the previous value argument. Ditto for
+        pthread_setcanceltype. This is compatible
+        with Solaris but should not affect
+        standard applications (Erik Hensema)
+
+Some new tests have been added.
+
+
+SNAPSHOT 1999-10-17
+-------------------
+
+Bug fix - Cancelation of threads waiting on condition variables
+now works properly (Lorin Hochstein and Peter Slacik)
+
+
+SNAPSHOT 1999-08-12
+-------------------
+
+Fixed exception stack cleanup if calling pthread_exit()
+- (Lorin Hochstein and John Bossom).
+
+Fixed bugs in condition variables - (Peter Slacik):
+        - additional contention checks
+        - properly adjust number of waiting threads after timed
+          condvar timeout.
+
+
+SNAPSHOT 1999-05-30
+-------------------
+
+Some minor bugs have been fixed. See the ChangeLog file for details.
+
+Some more POSIX 1b functions are now included but ony return an
+error (ENOSYS) if called. They are:
+
+        sem_open
+        sem_close
+        sem_unlink
+        sem_getvalue
+
+
+SNAPSHOT 1999-04-07
+-------------------
+
+Some POSIX 1b functions which were internally supported are now
+available as exported functions:
+
+        sem_init
+        sem_destroy
+        sem_wait
+        sem_trywait
+        sem_post
+        sched_yield
+        sched_get_priority_min
+        sched_get_priority_max
+
+Some minor bugs have been fixed. See the ChangeLog file for details.
+
+
+SNAPSHOT 1999-03-16
+-------------------
+
+Initial release.
+
