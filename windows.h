@@ -6,6 +6,17 @@
  *
  */
 
+#ifndef WINDOWS_H
+#define WINDOWS_H
+
+#ifndef TRUE
+#define TRUE 1
+#endif /* TRUE */
+
+#ifndef FALSE
+#define FALSE 0
+#endif /* FALSE */
+
 #define WINAPI
 
 #define CONST const
@@ -18,13 +29,23 @@
 
 #define DLL_PROCESS_DETACH 3
 
+#define INFINITE 42
+
+#define WAIT_OBJECT_0 0
+
+#define WAIT_FAILED 1
+
 /* Error numbers */
 
 enum {
   EINVAL,
   ENOMEM,
   ENOSYS,
-  EAGAIN
+  EAGAIN,
+  EDEADLK,
+  EBUSY,
+  ENOSUP,
+  ESRCH
 };
 
 typedef void VOID;
@@ -68,7 +89,7 @@ VOID DeleteCriticalSection(LPCRITICAL_SECTION criticalSection);
 
 VOID InitializeCriticalSection(LPCRITICAL_SECTION criticalSection);
 
-VOID TryEnterCriticalSection(LPCRITICAL_SECTION criticalSection);
+BOOL TryEnterCriticalSection(LPCRITICAL_SECTION criticalSection);
 
 DWORD WaitForMultipleObjects(DWORD numObjects,
 			     CONST HANDLE * objectArray,
@@ -84,7 +105,7 @@ BOOL TlsFree(DWORD index);
 
 BOOL TlsSetValue(DWORD index, LPVOID value);
 
-BOOL TlsSetValue(DWORD index, LPVOID value);
+LPVOID TlsGetValue(DWORD index);
 
 BOOL SetThreadPriority(HANDLE threadHandle, int priority);
 
@@ -101,3 +122,4 @@ VOID _endthreadex(DWORD);
 
 DWORD GetVersion(VOID);
 
+#endif /* WINDOWS_H */
