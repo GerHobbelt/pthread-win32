@@ -35,6 +35,11 @@ pthread_sigmask(int how, sigset_t const *set, sigset_t *oset)
 {
   pthread_t thread = pthread_self();
 
+  if (thread == NULL)
+    {
+      return ENOENT;
+    }
+
   /* Validate the `how' argument.*/
   if (set != NULL)
     {

@@ -175,7 +175,7 @@ pthread_self (void)
 	   * NOTE:
 	   * GetCurrentThread only returns a pseudo-handle
 	   * which is only valid in the current thread context.
-	   * Therefore, you should not use pass the handle to
+	   * Therefore, you should not pass the handle to
 	   * other threads for whatever purpose.
 	   */
 	  self->threadH = GetCurrentThread();

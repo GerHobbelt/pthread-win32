@@ -1,3 +1,34 @@
+2000-07-25  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* dll.c (dllMain): Remove 2000-07-21 change - problem
+	appears to be in pthread_create().
+
+2000-07-21  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* create.c (pthread_create): Set threadH to 0 (zero)
+	everywhere. Some assignments were using NULL. Maybe
+	it should be NULL everywhere - need to check. (I know
+	they are nearly always the same thing - but not by
+	definition.)
+
+	* dll.c: Include resource leakage work-around. This is a
+	partial FIXME which doesn't stop all leakage. The real
+	problem needs to be found and fixed.
+	- "David Baggett" <dmb@itasoftware.com>
+
+	* misc.c (pthread_self): Try to catch NULL thread handles
+	at the point where they might be generated, even though
+	they should always be valid at this point.
+
+	* tsd.c (pthread_setspecific): return an error value if
+	pthread_self() returns NULL.
+
+	* sync.c (pthread_join): return an error value if
+	pthread_self() returns NULL.
+
+	* signal.c (pthread_sigmask): return an error value if
+	pthread_self() returns NULL.
+
 2000-01-06  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* Makefile: Remove inconsistencies in 'cl' args

@@ -152,14 +152,12 @@ DllMain (
 
 	    /*
 	     * Detached threads have their resources automatically
-	     * cleaned up upon exit (others must be 'joined'
+	     * cleaned up upon exit (others must be 'joined').
 	     */
 	    if (self != NULL &&
 		self->detachState == PTHREAD_CREATE_DETACHED)
 	      {
-
 		pthread_setspecific (_pthread_selfThreadKey, NULL);
-
 		_pthread_threadDestroy (self);
 	      }
 
