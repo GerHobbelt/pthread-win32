@@ -1,3 +1,9 @@
+Sat Sep 10 12:56:13 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* mutex.c (pthread_mutex_destroy): Don't free mutex memory
+	if mutex is PTHREAD_MUTEX_INITIALIZER and has not been
+	initialised yet.
+
 Wed Sep  8 12:56:13 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* mutex.c (pthread_mutex_destroy): Free mutex memory.

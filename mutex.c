@@ -192,12 +192,20 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
 	{
 	  result = (CloseHandle (mx->mutex) ? 0 : EINVAL);
 	}
-    }
 
-  if (result == 0)
+      if (result == 0)
+        {
+          mx->mutex = 0;
+          free(mx);
+          *mutex = NULL;
+        }
+    }
+  else
     {
-      mx->mutex = 0;
-      free(mx);
+      /*
+       * This is all we need to do to destroy a statically
+       * initialised mutex that has not yet been used (initialised).
+       */
       *mutex = NULL;
     }
 
