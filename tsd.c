@@ -64,47 +64,33 @@ pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
       */
 {
   int result = 0;
-  
-  if ((*key = (pthread_key_t) calloc (1, sizeof (**key))) == NULL)
+  pthread_key_t *newkey;
+
+  if ((newkey = (pthread_key_t) calloc (1, sizeof (*newkey))) == NULL)
     {
       result = ENOMEM;
     }
-  else if (((*key)->key = TlsAlloc ()) == TLS_OUT_OF_INDEXES)
+  else if ((newkey->key = TlsAlloc()) == TLS_OUT_OF_INDEXES)
     {
       result = EAGAIN;
 
-      free (*key);
-      *key = NULL;
+      free (newkey);
+      newkey = NULL;
     }
   else if (destructor != NULL)
     {
       /*
        * Have to manage associations between thread and key;
        * Therefore, need a lock that allows multiple threads
-       * to gain exclusive access to the key->threads list
-       */
-#if 1
-      /*
+       * to gain exclusive access to the key->threads list.
+       *
        * The mutex will only be created when it is first locked.
        */
-      (*key)->threadsLock = PTHREAD_MUTEX_INITIALIZER;
-      (*key)->destructor = destructor;
-#else
-      result = pthread_mutex_init (&((*key)->threadsLock), NULL);
-
-      if (result != 0)
-        {
-          TlsFree ((*key)->key);
-
-          free (*key);
-          *key = NULL;
-        }
-      else
-	{
-      	  (*key)->destructor = destructor;
-	}
-#endif
+      newkey->threadsLock = PTHREAD_MUTEX_INITIALIZER;
+      newkey->destructor = destructor;
     }
+
+  *key = newkey;
 
   return (result);
 }
