@@ -378,6 +378,22 @@ make clean GCX	(tests the GC version of the library with C++ (EH)
 			 applications)
 
 
+Building the library as a statically linkable library
+-----------------------------------------------------
+
+General: PTW32_STATIC_LIB must be defined for both the library build and the
+application build. The following 'make' command lines define this for the
+library build.
+
+MSVC (creates pthreadVCn.lib as a static link lib):
+nmake clean VC-static
+
+MinGW32 (creates libpthreadGCn.a as a static link lib):
+make clean GC-static
+
+Define PTW32_STATIC_LIB when building your application.
+
+
 Building the library under Cygwin
 ---------------------------------
 

@@ -17,6 +17,7 @@ LIBDEST	= $(DEVROOT)\DLL
 
 DLLS	= pthreadVCE$(DLL_VER).dll pthreadVSE$(DLL_VER).dll pthreadVC$(DLL_VER).dll
 INLINED_STAMPS	= pthreadVCE$(DLL_VER).stamp pthreadVSE$(DLL_VER).stamp pthreadVC$(DLL_VER).stamp
+STATIC_STAMPS	= pthreadVCE$(DLL_VER).static pthreadVSE$(DLL_VER).static pthreadVC$(DLL_VER).static
 
 OPTIM	= /O2 /Ob2
 #OPTIM	=
@@ -368,6 +369,7 @@ help:
 	@ echo nmake clean VCE-inlined   (to build the MSVC inlined dll with C++ exception handling)
 	@ echo nmake clean VSE-inlined   (to build the MSVC inlined dll with structured exception handling)
 	@ echo nmake clean VC-inlined    (to build the MSVC inlined dll with C cleanup code)
+	@ echo nmake clean VC-static     (to build the MSVC static lib with C cleanup code)
 
 all:
 	@ nmake clean VCE-inlined
@@ -395,6 +397,9 @@ VSE-inlined:
 
 VC-inlined:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).stamp
+
+VC-static:
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS) /DPTW32_BUILD_INLINED /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).static
 
 realclean: clean
 	if exist *.dll del *.dll
@@ -425,6 +430,10 @@ $(INLINED_STAMPS): $(DLL_INLINED_OBJS)
 	cl /LDd /Zi /nologo $(DLL_INLINED_OBJS) \
 		/link /nodefaultlib:libcmt /implib:$*.lib \
 		msvcrt.lib wsock32.lib /out:$*.dll
+
+$(STATIC_STAMPS): $(DLL_INLINED_OBJS)
+	if exist $*.lib del $*.lib
+	lib $(DLL_INLINED_OBJS) /out:$*.lib
 
 .c.obj:
 	cl $(EHFLAGS) /D$(CLEANUP) -c $<
