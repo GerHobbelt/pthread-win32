@@ -23,19 +23,20 @@
  * - 
  *
  * Input:
- * - 
+ * - None.
  *
  * Output:
- * - 
+ * - File name, Line number, and failed expression on failure.
+ * - No output on success.
  *
  * Assumptions:
  * - 
  *
  * Pass Criteria:
- * - 
+ * - Process returns zero exit status.
  *
  * Fail Criteria:
- * - 
+ * - Process returns non-zero exit status.
  */
 
 #include "test.h"
