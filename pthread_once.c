@@ -38,19 +38,23 @@
 #include "implement.h"
 
 
-void ptw32_once_init_routine_cleanup(void * arg)
+static void
+ptw32_once_init_routine_cleanup(void * arg)
 {
   pthread_once_t * once_control = (pthread_once_t *) arg;
 
   (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_CANCELLED);
-
   (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->started, (LONG)PTW32_FALSE);
 
-  // There are waiters, wake some up
-  // We're deliberately not using PulseEvent. It's iffy, and deprecated.
   EnterCriticalSection(&ptw32_once_event_lock);
   if (once_control->event)
-    SetEvent(once_control->event);
+    {
+      /*
+       * There are waiters, wake some up
+       * We're deliberately not using PulseEvent. It's iffy, and deprecated.
+       */
+      SetEvent(once_control->event);
+    }
   LeaveCriticalSection(&ptw32_once_event_lock);
 }
 
@@ -108,20 +112,27 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
       result = 0;
     }
 
-  while (!(InterlockedExchangeAdd((LPLONG)&once_control->state, 0L) & (LONG)PTW32_ONCE_DONE))  // Atomic Read
+  while (!(InterlockedExchangeAdd((LPLONG)&once_control->state, 0L) /* Atomic Read */
+	   & (LONG)PTW32_ONCE_DONE))
     {
       if (!PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->started, (LONG)PTW32_TRUE))
 	{
-	  // Clear residual state from a cancelled init_routine
-	  // (and DONE still hasn't been set of course).
+	  /*
+	   * Clear residual state from a cancelled init_routine
+	   * (and DONE still hasn't been set of course).
+	   */
 	  if (PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_CLEAR)
 	      & PTW32_ONCE_CANCELLED)
 	    {
-	      // The previous initter was cancelled.
-	      // We now have a new initter (us) and we need to make the rest wait again.
+	      /*
+	       * The previous initter was cancelled.
+	       * We now have a new initter (us) and we need to make the rest wait again.
+	       */
 	      EnterCriticalSection(&ptw32_once_event_lock);
 	      if (once_control->event)
-		ResetEvent(once_control->event);
+		{
+		  ResetEvent(once_control->event);
+		}
 	      LeaveCriticalSection(&ptw32_once_event_lock);
 
 	      /*
@@ -133,67 +144,73 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	    }
 
 	  pthread_cleanup_push(ptw32_once_init_routine_cleanup, (void *) once_control);
-
 	  (*init_routine)();
-
 	  pthread_cleanup_pop(0);
 
 	  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_DONE);
 
-	  // we didn't create the event.
-	  // it is only there if there is someone waiting
+	  /*
+	   * we didn't create the event.
+	   * it is only there if there is someone waiting
+	   */
 	  EnterCriticalSection(&ptw32_once_event_lock);
 	  if (once_control->event)
-	    SetEvent(once_control->event);
+	    {
+	      SetEvent(once_control->event);
+	    }
 	  LeaveCriticalSection(&ptw32_once_event_lock);
 	}
       else
 	{
-	  // wait for init.
-	  // while waiting, create an event to wait on
+	  /*
+	   * wait for init.
+	   * while waiting, create an event to wait on
+	   */
 
 	  EnterCriticalSection(&ptw32_once_event_lock);
-	  (void) InterlockedIncrement((LPLONG)&once_control->eventUsers);
+	  once_control->eventUsers++;
 
 	  /*
+	   * RE CANCELLATION:
 	   * If we are the first thread after the initter thread, and the init_routine is cancelled
 	   * while we're suspended at this point in the code:-
 	   * - state will not get set to PTW32_ONCE_DONE;
 	   * - cleanup will not see an event and cannot set it;
-	   * - therefore, we will eventually resume, create an event and wait on it;
+	   * - therefore, we will eventually resume, create an event and wait on it, maybe forever;
 	   * Remedy: cleanup must set state == CANCELLED before checking for an event, so that
 	   * we will see it and avoid waiting (as for state == DONE). We will go around again and
 	   * we may become the initter.
 	   * If we are still the only other thread when we get to the end of this block, we will
 	   * have closed the event (good). If another thread beats us to be initter, then we will
-	   * re-enter here (good). If, when we reach lights out, other threads have reached this
-	   * point, we will not close the event. The eventUsers counter will still correctly reflect
-	   * the real number of waiters, the old event will remain in use. It will be reset
-	   * by the new initter after clearing the CANCELLED state, causing any threads that are
+	   * re-enter here (good). In case the old event is reused, the event is always reset by
+	   * the new initter after clearing the CANCELLED state, causing any threads that are
 	   * cycling around the loop to wait again.
 	   */
 
-	  if (!InterlockedExchangeAdd((LPLONG)&once_control->event, 0L)) // Atomic Read
+	  if (!once_control->event)
 	    {
 	      once_control->event = CreateEvent(NULL, PTW32_TRUE, PTW32_FALSE, NULL);
 	    }
 	  LeaveCriticalSection(&ptw32_once_event_lock);
 
-	  // check 'state' again in case the initting thread has finished or cancelled
-	  // and left before seeing that there was an event to trigger.
-	  // (Now that the event IS created, if init gets finished AFTER this,
-	  //  then the event handle is guaranteed to be seen and triggered).
+	  /*
+	   * check 'state' again in case the initting thread has finished or cancelled
+	   * and left before seeing that there was an event to trigger.
+	   * (Now that the event IS created, if init gets finished AFTER this,
+	   * then the event handle is guaranteed to be seen and triggered).
+	   */
 
-	  if (!InterlockedExchangeAdd((LPLONG)&once_control->state, 0L)) // Atomic Reads
+	  if (!InterlockedExchangeAdd((LPLONG)&once_control->state, 0L)) /* Atomic Read */
 	    {
-	      // Neither DONE nor CANCELLED
+	      /* Neither DONE nor CANCELLED */
 	      (void) WaitForSingleObject(once_control->event, INFINITE);
 	    }
 
-	  // last one out shut off the lights:
+	  /* last one out shut off the lights */
 	  EnterCriticalSection(&ptw32_once_event_lock);
-	  if (InterlockedDecrement((LPLONG)&once_control->eventUsers) == 0) // we were last
+	  if (0 == --once_control->eventUsers)
 	    {
+	      /* we were last */
 	      CloseHandle(once_control->event);
 	      once_control->event = 0;
 	    }
