@@ -1,3 +1,8 @@
+2004-05-20  Ross Johnson  <ross@special.ise.canberra.edu.au>
+
+	* README.NONPORTABLE: Document pthread_win32_test_features_np().
+	* FAQ: Update various answers.
+
 2004-05-19  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* Makefile: Don't define _WIN32_WINNT on compiler command line.
