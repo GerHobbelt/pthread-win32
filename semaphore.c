@@ -487,7 +487,7 @@ sem_post_multiple (sem_t * sem, int count )
       *              -1              failed, error in errno
       * ERRNO
       *              EINVAL          'sem' is not a valid semaphore
-      *                              or count is less than zero.
+      *                              or count is not greater than zero.
       *
       * ------------------------------------------------------
       */
@@ -498,10 +498,7 @@ sem_post_multiple (sem_t * sem, int count )
     {
       result = EINVAL;
     }
-  else if (count == 0)
-    {
-      return 0;
-    }
+  else
 
 #ifdef NEED_SEM
 

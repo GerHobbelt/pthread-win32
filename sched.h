@@ -66,8 +66,18 @@ int sched_setscheduler (pid_t pid, int policy);
 
 int sched_getscheduler (pid_t pid);
 
+/*
+ * Note that this macro returns ENOTSUP rather than
+ * ENOSYS as might be expected. However, returning ENOSYS
+ * should mean that sched_get_priority_{min,max} are
+ * not implemented as well as sched_rr_get_interval.
+ * This is not the case, since we just don't support
+ * round-robin scheduling. Therefore I have chosen to
+ * return the same value as sched_setscheduler when
+ * SCHED_RR is passed to it.
+ */
 #define sched_rr_get_interval(_pid, _interval) \
-  ( errno = ENOSYS, (int) -1 )
+  ( errno = ENOTSUP, (int) -1 )
 
 
 #ifdef __cplusplus
