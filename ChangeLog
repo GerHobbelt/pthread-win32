@@ -1,3 +1,15 @@
+Thu Aug  6 15:19:22 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* windows.h (THREAD_PRIORITY_ERROR_RETURN): Add.
+	(THREAD_PRIORITY_LOWEST): Add.
+	(THREAD_PRIORITY_HIGHEST): Add.
+
+	* sched.c (is_attr): Add function.
+	(implement.h): Add include.
+	(pthread_setschedparam): Rename all instances of "sched_policy"
+	to "sched_priority".
+	(pthread_getschedparam): Ditto.
+
 Tue Aug  4 16:57:58 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* private.c (_pthread_delete_thread): Fix typo. Add missing ';'.

@@ -38,7 +38,13 @@
 /* Priority levels */
 
 enum {
-  THREAD_PRIORITY_NORMAL
+  THREAD_PRIORITY_LOWEST,
+  THREAD_PRIORITY_NORMAL,
+  THREAD_PRIORITY_HIGHEST
+};
+
+enum {
+  THREAD_PRIORITY_ERROR_RETURN
 };
 
 /* Error numbers */
