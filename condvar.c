@@ -400,53 +400,10 @@ pthread_cond_destroy (pthread_cond_t * cond)
   return (result);
 }
 
-int
-pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
-     /*
-      * ------------------------------------------------------
-      * DOCPUBLIC
-      *      This function waits on a condition variable until
-      *      awakened by a signal or broadcast.
-      *
-      *      Caller MUST be holding the mutex lock; the
-      *      lock is released and the caller is blocked waiting
-      *      on 'cond'. When 'cond' is signaled, the mutex
-      *      is re-acquired before returning to the caller.
-      *
-      * PARAMETERS
-      *      cond
-      *              pointer to an instance of pthread_cond_t
-      *
-      *      mutex
-      *              pointer to an instance of pthread_mutex_t
-      *
-      *
-      * DESCRIPTION
-      *      This function waits on a condition variable until
-      *      awakened by a signal or broadcast.
-      *
-      *      NOTES:
-      *      1)      The function must be called with 'mutex' LOCKED
-      *               by the calling thread, or undefined behaviour
-      *              will result.
-      *
-      *      2)      This routine atomically releases 'mutex' and causes
-      *              the calling thread to block on the condition variable.
-      *              The blocked thread may be awakened by 
-      *                      pthread_cond_signal or 
-      *                      pthread_cond_broadcast.
-      *
-      * Upon successful completion, the 'mutex' has been locked and 
-      * is owned by the calling thread.
-      *
-      * RESULTS
-      *              0               caught condition; mutex released,
-      *              EINVAL          'cond' or 'mutex' is invalid,
-      *              EINVAL          different mutexes for concurrent waits,
-      *              EINVAL          mutex is not held by the calling thread,
-      *
-      * ------------------------------------------------------
-      */
+static int
+cond_timedwait (pthread_cond_t * cond, 
+		pthread_mutex_t * mutex,
+		const struct timespec *abstime)
 {
   int result = 0;
   pthread_cond_t cv;
@@ -457,9 +414,9 @@ pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
   /*
    * OK to increment  cv->waiters because the caller locked 'mutex'
    *
-   * FIXME: This is true. However, it is technically possible to call cond_wait
-   * on this cv with a different mutex. The standard leaves the result of such an
-   * action as undefined. (RPJ)
+   * [RPJ] FIXME: This can still lead to race conditions, which I think
+   * are NOT the same as the unpredictable scheduling behaviour noted in the
+   * POSIX Pthread specs.
    */
   cv->waiters++;
 
@@ -478,14 +435,15 @@ pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
        *              pthread_cond_broadcast
        *
        * Note: 
-       *      sem_wait is a cancellation point, hence providing the
+       *      _pthread_sem_timedwait is a cancellation point,
+       *      hence providing the
        *      mechanism for making pthread_cond_wait a cancellation
        *      point. We use the cleanup mechanism to ensure we
        *  re-lock the mutex if we are cancelled.
        */
       pthread_cleanup_push (pthread_mutex_lock, mutex);
 
-      result = sem_wait (&(cv->sema));
+      result = _pthread_sem_timedwait (&(cv->sema), abstime);
 
       pthread_cleanup_pop (0);
     }
@@ -529,18 +487,74 @@ pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
 
   return (result);
 
+}                               /* cond_timedwait */
+
+
+int
+pthread_cond_wait (pthread_cond_t * cond,
+		   pthread_mutex_t * mutex)
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      This function waits on a condition variable until
+      *      awakened by a signal or broadcast.
+      *
+      *      Caller MUST be holding the mutex lock; the
+      *      lock is released and the caller is blocked waiting
+      *      on 'cond'. When 'cond' is signaled, the mutex
+      *      is re-acquired before returning to the caller.
+      *
+      * PARAMETERS
+      *      cond
+      *              pointer to an instance of pthread_cond_t
+      *
+      *      mutex
+      *              pointer to an instance of pthread_mutex_t
+      *
+      *
+      * DESCRIPTION
+      *      This function waits on a condition variable until
+      *      awakened by a signal or broadcast.
+      *
+      *      NOTES:
+      *      1)      The function must be called with 'mutex' LOCKED
+      *               by the calling thread, or undefined behaviour
+      *              will result.
+      *
+      *      2)      This routine atomically releases 'mutex' and causes
+      *              the calling thread to block on the condition variable.
+      *              The blocked thread may be awakened by 
+      *                      pthread_cond_signal or 
+      *                      pthread_cond_broadcast.
+      *
+      * Upon successful completion, the 'mutex' has been locked and 
+      * is owned by the calling thread.
+      *
+      *
+      * RESULTS
+      *              0               caught condition; mutex released,
+      *              EINVAL          'cond' or 'mutex' is invalid,
+      *              EINVAL          different mutexes for concurrent waits,
+      *              EINVAL          mutex is not held by the calling thread,
+      *
+      * ------------------------------------------------------
+      */
+{
+  /* The NULL abstime arg means INFINITE waiting. */
+  return(cond_timedwait(cond, mutex, NULL));
 }                               /* pthread_cond_wait */
 
 
 int
-pthread_cond_timedwait (pthread_cond_t * cond,
-                         pthread_mutex_t * mutex,
-                         const struct timespec *abstime)
+pthread_cond_timedwait (pthread_cond_t * cond, 
+		pthread_mutex_t * mutex,
+		const struct timespec *abstime)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
-      *      This function initializes an unnamed semaphore. the
-      *      initial value of the semaphore is 'value'
+      *      This function waits on a condition variable either until
+      *      awakened by a signal or broadcast; or until the time
+      *      specified by abstime passes.
       *
       * PARAMETERS
       *      cond
@@ -569,21 +583,30 @@ pthread_cond_timedwait (pthread_cond_t * cond,
       *                      pthread_cond_signal or 
       *                      pthread_cond_broadcast.
       *
+      *
       * RESULTS
       *              0               caught condition; mutex released,
-      *              EINVAL          'cond' or 'mutex' is invalid,
+      *              EINVAL          'cond', 'mutex', or abstime is invalid,
       *              EINVAL          different mutexes for concurrent waits,
       *              EINVAL          mutex is not held by the calling thread,
+      *              ETIMEDOUT       abstime ellapsed before cond was signaled.
       *
       * ------------------------------------------------------
       */
 {
   int result = 0;
-  /*
-   * NOT IMPLEMENTED YET!!!
-   */
-  return (result);
-}
+
+  if (abstime == NULL)
+    {
+      result = EINVAL;
+    }
+  else
+    {
+      result = cond_timedwait(cond, mutex, abstime);
+    }
+
+  return(result);
+}                               /* pthread_cond_timedwait */
 
 
 int
