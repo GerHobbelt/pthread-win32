@@ -131,15 +131,14 @@ for future use.
 
 The numbers are changed as follows:
 
-1. Start with version information of '0.0.0.0'.
-2. If the library source code has changed at all since the last update,
+1. If the library source code has changed at all since the last update,
    then increment revision (`c:r:a' becomes `c:r+1:a').
-3. If any interfaces have been added, removed, or changed since the last
+2. If any interfaces have been added, removed, or changed since the last
    update, increment current, and set revision to 0.
-4. If any interfaces have been added since the last public release, then
+3. If any interfaces have been added since the last public release, then
    increment age.
-5. If any interfaces have been removed since the last public release, then
-   set age to 0.
+4. If any interfaces have been removed or changed since the last public
+   release, then set age to 0.
 
 
 DLL compatibility numbering is an attempt to ensure that applications
@@ -159,7 +158,7 @@ detailed explanation.)
 
 Using this method, DLL name/s will only change when the DLL's
 backwards compatibility changes. Note that the addition of new
-'interfaces' will not change the DLL's compatibility for older
+'interfaces' will not of itself change the DLL's compatibility for older
 applications.
 
 
