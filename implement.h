@@ -290,13 +290,15 @@ struct ThreadKeyAssoc {
 #define PTW32_SERVICES_FACILITY		0xBAD
 #define PTW32_SERVICES_ERROR	       	0xDEED
 
+#endif /* _MSC_VER */
+
 /*
  * Services available through EXCEPTION_PTW32_SERVICES
+ * and also used [as parameters to ptw32_throw()] as
+ * generic exception selectors.
  */
 #define PTW32_EPS_CANCEL       0
 #define PTW32_EPS_EXIT         1
-
-#endif /* _MSC_VER */
 
 
 /* Function pointer to TryEnterCriticalSection if it exists; otherwise NULL */
