@@ -1080,9 +1080,10 @@ ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG location,
 #else
 
   /*
-   * If we get to here then we should be running on a Win95 system but either
-   * running on something other than an X86 processor, or a compiler other
-   * than MSVC or GCC. Pthreads-win32 doesn't support that platform (yet).
+   * If execution gets to here then we should be running on a Win95 system
+   * but either running on something other than an X86 processor, or a
+   * compiler other than MSVC or GCC. Pthreads-win32 doesn't support that
+   * platform (yet).
    */
 
   result = 0;

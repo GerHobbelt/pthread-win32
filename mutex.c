@@ -699,12 +699,12 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
 	    {
 	      mx->ownerThread = NULL;
 	      
-          if( InterlockedDecrement( &mx->lock_idx ) >= 0 )
-          {
-             /* Someone is waiting on that mutex */
-             ReleaseSemaphore( mx->wait_sema, 1, NULL );
-          }
-        }
+              if( InterlockedDecrement( &mx->lock_idx ) >= 0 )
+                {
+                  /* Someone is waiting on that mutex */
+                  ReleaseSemaphore( mx->wait_sema, 1, NULL );
+                }
+            }
 	}
       else
 	{
@@ -745,35 +745,35 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
 
   if (result == 0)
     {
-
-      if( PTW32_MUTEX_LOCK_IDX_INIT == ptw32_InterlockedCompareExchange(
-             &mx->lock_idx, 0, PTW32_MUTEX_LOCK_IDX_INIT ) )
-      {
-         mx->recursive_count = 1;
-         mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-                            ? pthread_self()
-                            : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
-      }
-
+      if ( (PTW32_INTERLOCKED_LONG) PTW32_MUTEX_LOCK_IDX_INIT ==
+           ptw32_interlocked_compare_exchange((PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+                                              (PTW32_INTERLOCKED_LONG) 0,
+                                              (PTW32_INTERLOCKED_LONG) PTW32_MUTEX_LOCK_IDX_INIT))
+        {
+          mx->recursive_count = 1;
+          mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
+                             ? pthread_self()
+                             : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
+        }
       else
-      {
-         if( mx->kind != PTHREAD_MUTEX_FAST_NP &&
-             pthread_equal( mx->ownerThread, pthread_self() ) )
-         {
-            if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP )
+        {
+          if( mx->kind != PTHREAD_MUTEX_FAST_NP &&
+              pthread_equal( mx->ownerThread, pthread_self() ) )
             {
-               mx->recursive_count++;
+              if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP )
+                {
+                  mx->recursive_count++;
+                }
+              else
+                {
+                  result = EDEADLK;
+                }
             }
-            else
+          else
             {
-               result = EDEADLK;
+              result = EBUSY;
             }
-         }
-         else
-         {
-            result = EBUSY;
-         }
-      }
+        }
     }
 
   return(result);

@@ -156,11 +156,17 @@ struct sem_t_ {
 #define PTW32_OBJECT_INVALID   NULL
 
 struct pthread_mutex_t_ {
-  LONG lock_idx;
-  int recursive_count;
-  int kind;
+  LONG lock_idx;               /* Provides exclusive access to mutex state
+                                  via the Interlocked* mechanism, as well
+                                  as a count of the number of threads
+                                  waiting on the mutex. */
+  int recursive_count;         /* Number of unlocks a thread needs to perform
+                                  before the lock is released (recursive
+                                  mutexes only). */
+  int kind;                    /* Mutex type. */
   pthread_t ownerThread;
-  HANDLE wait_sema;
+  HANDLE wait_sema;            /* Mutex release notification to waiting
+                                  threads. */
 };
 
 struct pthread_mutexattr_t_ {
