@@ -1,3 +1,8 @@
+Fri Jul 31 00:05:45 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h (_PTHREAD_THIS): Remove - no longer required.
+	(_PTHREAD_STACK): Use pthread_self() instead of _PTHREAD_THIS.
+
 Thu Jul 30 23:12:45 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* implement.h: Remove _pthread_find_entry() prototype.
