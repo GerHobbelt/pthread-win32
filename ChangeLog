@@ -1,3 +1,7 @@
+Tue Mar 16  1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* all: Add GNU LGPL and Copyright and Warranty.
+	
 Mon Mar 15 00:20:13 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* condvar.c (pthread_cond_init): fix possible uninitialised use

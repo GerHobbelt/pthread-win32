@@ -1,24 +1,30 @@
-This directory contains an implementation of pthreads for Win32. 
+PTHREADS-WIN32
+==============
+
+Pthreads-win32 is free software, distributed under the GNU Library
+General Public License (LGPL). See the file 'COPYING.LIB' for terms
+and conditions.
 
 Mailing list
 ------------
 
-There is a mailing list for discussing pthreads on Win32 which is
-managed by Majordomo. To subscribe, send mail to majordomo@air.net.au
-and place the fllowing text in the message body:
+There is a mailing list for discussing pthreads on Win32. To join, send
+enail to:
 
-	subscribe pthreads-win32
+	pthreads-win32-subscribe@sourceware.cygnus.com
 
 
-Building the library with Cygwin or Mingw32
----------------------------------------------
-Feb 18, 1999
+Acknowledgements
+----------------
 
-If you have a suitable environment then you can run the configure script,
-otherwise you should edit "Makefile" and "config.h" as required.
+Pthreads-win32 is based substantially on a Win32 Pthreads implementation
+contributed by John E. Bossom <jebossom@cognos.com>.
 
-gcc cannot be used because the library requires C++ EH. g++ must be usedi
-(but see below).
+See the 'MAINTAINERS' file for the list of contributors.
+
+
+Why you cannot build the library with Cygwin or Mingw32
+-------------------------------------------------------
 
 The DLL pthread.dll still cannot be built using g++ due to non thread-safe
 exception handling in g++.  Thanks to Kevin Ruland for researching this
