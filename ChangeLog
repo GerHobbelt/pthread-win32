@@ -1,5 +1,20 @@
 2001-06-06  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
+	* semaphore.h (sem_t): Is now an opaque pointer;
+	moved actual definition to implement.h.
+	* implement.h (sem_t_): Move here from semaphore.h;
+	was the definition of sem_t.
+	* semaphore.c: Wherever necessary, changed use of sem
+	from that of a pointer to a pointer-pointer; added
+	extra checks for a valid sem_t; NULL sem_t when
+	it is destroyed; added extra checks when creating
+	and destroying sem_t elements in the NEED_SEM
+	code branches; changed from using a pthread_mutex_t
+	((*sem)->mutex) to CRITICAL_SECTION ((*sem)->sem_lock_cs)
+	in NEED_SEM branches for access serialisation.
+
+2001-06-06  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
 	* mutex.c (pthread_mutexattr_init): Remove 
 	ptw32_mutex_default_kind.
 	
@@ -3086,4 +3101,3 @@ Sat Jul 11 14:48:54 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 	* create.c (pthread_create): A dummy stub right now.
 
 	* pthread.h (pthread_create): Add function prototype.
-

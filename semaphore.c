@@ -9,18 +9,6 @@
  *
  *              POSIX 1003.1b-1993      (POSIX.1b)
  *
- * Contents:
- *              Public Methods                    Author
- *              --------------                    ------
- *              sem_init                          John E. Bossom  Mar 1998
- *              sem_destroy                       John E. Bossom  Mar 1998
- *              sem_trywait                       John E. Bossom  Mar 1998
- *              sem_wait                          John E. Bossom  Mar 1998
- *              sem_post                          John E. Bossom  Mar 1998
- *
- *              Private Methods
- *              ---------------
- *
  * -------------------------------------------------------------
  *
  * Pthreads-win32 - POSIX Threads Library for Win32
@@ -104,29 +92,46 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 
 #ifdef NEED_SEM
 
-      sem->value = value;
-      pthread_mutex_init(&sem->mutex, NULL);
-      sem->event = CreateEvent (NULL,
-				FALSE,	/* manual reset */
-				FALSE,	/* initial state */
-				NULL);
-      if (value != 0)
+      sem_t s = (sem_t) calloc (1, sizeof (*sem_t));
+
+      if (s == NULL)
         {
-	  SetEvent(sem->event);
+          result = ENOMEM;
         }
+      else
+        {
+          s->value = value;
+          s->event = CreateEvent (NULL,
+                                  FALSE,	/* manual reset */
+                                  FALSE,	/* initial state */
+                                  NULL);
+          if (s->Event == 0)
+            {
+              result = ENOSPC;
+            }
+          else
+            {
+              if (value != 0)
+                {
+                  SetEvent(s->event);
+                }
+              InitializeCriticalSection(&s->sem_lock_cs);
+
+              *sem = s;
+            }
 
 #else /* NEED_SEM */
 
       /*
        * NOTE: Taking advantage of the fact that
-       *               sem_t is a simple structure with one entry;
-       *               We don't have to allocate it...
+       * sem_t is a simple structure with one entry;
+       * We don't have to allocate it...
        */
       *sem = CreateSemaphore (
-			       0,
-			       value,
-			       0x7FFFFFF,
-			       NULL);
+                              0,
+                              value,
+                              0x7FFFFFF,
+                              NULL);
 
       if (*sem == 0)
 	{
@@ -175,34 +180,42 @@ sem_destroy (sem_t * sem)
       */
 {
   int result = 0;
+  sem_t s = *sem;
 
-  if (sem == NULL)
+  if (sem == NULL || *sem == NULL)
     {
       result = EINVAL;
     }
+  else
+    {
+      *sem = NULL;
 
 #ifdef NEED_SEM
 
-  else
-    {
-      pthread_mutex_destroy(&sem->mutex);
-      if (!CloseHandle(sem->event))
+      if (! CloseHandle(s->event))
         {
           result = EINVAL;
         }
-    }
+      else
+        {
+          DeleteCriticalSection(&s->sem_lock_cs);
+          free(s);
+        }
 
 #else /* NEED_SEM */
 
-  else if (! CloseHandle (*sem))
-    {
-      result = EINVAL;
-    }
+      if (! CloseHandle (s))
+        {
+          result = EINVAL;
+        }
 
 #endif /* NEED_SEM */
 
+    }
+
   if (result != 0)
     {
+      *sem = s;
       errno = result;
       return -1;
     }
@@ -242,27 +255,26 @@ sem_trywait (sem_t * sem)
       * ------------------------------------------------------
       */
 {
-  int result = 0;
-
-  if (sem == NULL)
-    {
-      result = EINVAL;
-    }
-
 #ifdef NEED_SEM
 
-  /* not yet implemented! */
-  result = EINVAL;
+  /*
+   * not yet implemented!
+   */
+  int result = EINVAL;
   return -1;
 
 #else /* NEED_SEM */
 
+  int result = 0;
+
+  if (sem == NULL || *sem == NULL)
+    {
+      result = EINVAL;
+    }
   else if (WaitForSingleObject (*sem, 0) == WAIT_TIMEOUT)
     {
       result = EAGAIN;
     }
-
-#endif /* NEED_SEM */
 
   if (result != 0)
     {
@@ -272,6 +284,8 @@ sem_trywait (sem_t * sem)
 
   return 0;
 
+#endif /* NEED_SEM */
+
 }				/* sem_trywait */
 
 
@@ -280,14 +294,16 @@ sem_trywait (sem_t * sem)
 void 
 ptw32_decrease_semaphore(sem_t * sem)
 {
-  pthread_mutex_lock(&sem->mutex);
+  register sem_t s = *sem;
 
-  if (sem->value != 0)
+  EnterCriticalSection(&s->sem_lock_cs);
+
+  if (s->value != 0)
     {
-      sem->value--;
-      if (sem->value != 0)
+      s->value--;
+      if (s->value != 0)
         {
-          SetEvent(sem->event);
+          SetEvent(s->event);
         }
     }
   else
@@ -295,20 +311,21 @@ ptw32_decrease_semaphore(sem_t * sem)
       /* this case should not happen! */
     }
 
-  pthread_mutex_unlock(&sem->mutex);
+  LeaveCriticalSection(&s->sem_lock_cs);
 }
 
 BOOL 
 ptw32_increase_semaphore(sem_t * sem, unsigned int n)
 {
   BOOL result;
+  register sem_t s = *sem;
 
-  pthread_mutex_lock(&sem->mutex);
+  EnterCriticalSection(&s->sem_lock_cs);
 
-  if (sem->value + n > sem->value)
+  if (s->value + n > s->value)
     {
-       sem->value += n;
-       SetEvent(sem->event);
+       s->value += n;
+       SetEvent(s->event);
        result = TRUE;
     }
   else
@@ -316,7 +333,7 @@ ptw32_increase_semaphore(sem_t * sem, unsigned int n)
        result = FALSE;
     }
 
-  pthread_mutex_unlock(&sem->mutex);
+  LeaveCriticalSection(&s->sem_lock_cs);
   return result;
 }
 
@@ -355,7 +372,7 @@ sem_wait (sem_t * sem)
 {
   int result = 0;
 
-  if (sem == NULL)
+  if (sem == NULL || *sem == NULL)
     {
       result = EINVAL;
     }
@@ -364,7 +381,7 @@ sem_wait (sem_t * sem)
 
 #ifdef NEED_SEM
 
-	result = pthreadCancelableWait (sem->event);
+	result = pthreadCancelableWait ((*sem)->event);
 
 #else /* NEED_SEM */
 
@@ -419,7 +436,7 @@ sem_post (sem_t * sem)
 {
   int result = 0;
 
-  if (sem == NULL)
+  if (sem == NULL || *sem == NULL)
     {
 	result = EINVAL;
     }
