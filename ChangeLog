@@ -1,6 +1,22 @@
 1998-07-22  Ben Elliston  <bje@cygnus.com>
 
+	* attr.c (pthread_setstacksize): Update test of attr argument.
+	(pthread_getstacksize): Likewise.
+	(pthread_setstackaddr): Likewise.
+	(pthread_getstackaddr): Likewise.
+	(pthread_attr_init): No need to allocate any storage.
+	(pthread_attr_destroy): No need to free any storage.
+
+	* mutex.c (is_attr): Not likely to be needed; remove.
+	(remove_attr): Likewise.
+	(insert_attr): Likewise.
+
+	* implement.h (_pthread_mutexattr_t): Moved to a public definition
+	in pthread.h.  There was little gain in hiding these details.
+	(_pthread_condattr_t): Likewise.
+
 	* pthread.h (pthread_atfork): Add function prototype.
+	(pthread_attr_t): Moved here from implement.h.
 
 	* fork.c (pthread_atfork): Preliminary implementation.
 	(_pthread_fork): Likewise.

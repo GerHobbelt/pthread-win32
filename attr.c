@@ -18,13 +18,13 @@ pthread_attr_setstacksize(pthread_attr_t *attr,
       return EINVAL;
     }
 
-  if (is_attr(attr) != 0)
+  if (attr == NULL)
     {
       return EINVAL;
     }
 
   /* Everything is okay. */
-  (_pthread_attr_t *) (attr->ptr)->stacksize = stacksize;
+  attr->stacksize = stacksize;
   return 0;
 }
 
@@ -32,13 +32,13 @@ int
 pthread_attr_getstacksize(const pthread_attr_t *attr,
 			  size_t *stacksize)
 {
-  if (is_attr(attr) != 0)
+  if (attr == NULL)
     {
       return EINVAL;
     }
 
   /* Everything is okay. */
-  *stacksize = (_pthread_attr_t *) (attr->ptr)->stacksize;
+  *stacksize = attr->stacksize;
   return 0;
 }
 
@@ -46,7 +46,7 @@ int
 pthread_attr_setstackaddr(pthread_attr_t *attr,
 			  void *stackaddr)
 {
-  if ((is_attr(attr) != 0))
+  if (attr == NULL)
     {
       return EINVAL;
     }
@@ -59,7 +59,7 @@ int
 pthread_attr_getstackaddr(const pthread_attr_t *attr,
 			  void **stackaddr)
 {
-  if ((is_attr(attr) != 0))
+  if (attr == NULL)
     {
       return EINVAL;
     }
@@ -77,24 +77,20 @@ pthread_attr_init(pthread_attr_t *attr)
       return EINVAL;
     }
 
-  attr->ptr = malloc(sizeof(_pthread_attr_t));
-  if (attr->ptr == NULL)
-    {
-      return ENOMEM;
-    }
-  
   /* FIXME: Fill out the structure with default values. */
+  attr->stacksize = 0;
+
   return 0;
 }
 
 int
 pthread_attr_destroy(pthread_attr_t *attr)
 {
-  if (is_attr(attr) != 0)
+  if (attr == NULL)
     {
       return EINVAL;
     }
  
-  free (attr->ptr);
+  /* Nothing to do. */
   return 0;
 }
