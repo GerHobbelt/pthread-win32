@@ -1,3 +1,8 @@
+Wed Sep  8 12:56:13 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* mutex.c (pthread_mutex_destroy): Free mutex memory.
+	- Milan Gardian <mg@tatramed.sk>
+
 1999-08-22  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* exit.c (pthread_exit): Fix reference to potentially
