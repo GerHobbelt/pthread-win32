@@ -71,7 +71,7 @@ _pthread_pop_cleanup (int execute)
       
 #else /* _WIN32 */
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 
 	  try
 	    {
@@ -89,20 +89,24 @@ _pthread_pop_cleanup (int execute)
 	       */
 	    }
 
-#else /* _cplusplus */
+#else /* __cplusplus */
       
+#if defined(__CYGWIN__) || defined(__CYGWIN32__)
+#warning Compile __FILE__ as C++ or thread cancellation will not work properly.
+#endif
+
 	  /*
 	   * Run the caller's cleanup routine and FIXME: hope for the best.
 	   */
 	  (*cleanup->routine) (cleanup->arg);
 
-#endif /* _cplusplus */
+#endif /* __cplusplus */
 
 #endif /* _WIN32 */
 
         }
 
-#if !defined(_WIN32) && !defined(_cplusplus)
+#if !defined(_WIN32) && !defined(__cplusplus)
 
       pthread_setspecific (_pthread_cleanupKey, cleanup->prev);
 
@@ -161,7 +165,7 @@ _pthread_push_cleanup (_pthread_cleanup_t * cleanup,
   cleanup->routine = routine;
   cleanup->arg = arg;
 
-#if !defined(_WIN32) && !defined(_cplusplus)
+#if !defined(_WIN32) && !defined(__cplusplus)
 
   cleanup->prev = pthread_getspecific (_pthread_cleanupKey);
 

@@ -163,7 +163,9 @@ _pthread_threadStart (ThreadParms * threadParms)
 
 #else /* __cplusplus */
 
-#error Warning: Compile __FILE__ as C++ or thread cancellation will not work.
+#if defined(__CYGWIN__) || defined(__CYGWIN32__)
+#warning Compile __FILE__ as C++ or thread cancellation will not work properly.
+#endif
 
   /*
    * Run the caller's routine;
