@@ -34,6 +34,8 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#ifndef PTW32_STATIC_LIB
+
 #include "pthread.h"
 #include "implement.h"
 
@@ -86,3 +88,5 @@ DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
   return (result);
 
 }				/* DllMain */
+
+#endif /* PTW32_STATIC_LIB */
