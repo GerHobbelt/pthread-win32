@@ -8,6 +8,8 @@
 	* acconfig.h (STDCALL): New define.
 
 	* config.h.in: Regenerate.
+
+	* create.c (_pthread_start_call): Add STDCALL prefix.
 	
 	* mutex.c (pthread_mutex_init): Correct function signature.
 
