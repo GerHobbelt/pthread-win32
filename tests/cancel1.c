@@ -1,273 +1,147 @@
-/********************************************************
- * An example source module to accompany...
+/*
+ * File: cancel1.c
  *
- * "Using POSIX Threads: Programming with Pthreads"
- *     by Brad nichols, Dick Buttlar, Jackie Farrell
- *     O'Reilly & Associates, Inc.
+ * Test Synopsis: Test setting cancel state and cancel type.
+ * - 
  *
- ********************************************************
- * cancel.c --
+ * Test Method (Validation or Falsification):
+ * - 
  *
- * Demonstrates pthread cancellation.
+ * Requirements Tested:
+ * - pthread_setcancelstate function
+ * - pthread_setcanceltype function
  *
+ * Features Tested:
+ * - 
+ *
+ * Cases Tested:
+ * - 
+ *
+ * Description:
+ * - 
+ *
+ * Environment:
+ * - 
+ *
+ * Input:
+ * - None.
+ *
+ * Output:
+ * - File name, Line number, and failed expression on failure.
+ * - No output on success.
+ *
+ * Assumptions:
+ * - pthread_create, pthread_self work.
+ *
+ * Pass Criteria:
+ * - Process returns zero exit status.
+ *
+ * Fail Criteria:
+ * - Process returns non-zero exit status.
  */
 
-#include <stdio.h>
-#include "pthread.h"
-
-#define NUM_THREADS  3
-#define MESSAGE_MAX_LEN 80
-
-int               count=NUM_THREADS;    /* number of threads active */
-pthread_mutex_t   lock=PTHREAD_MUTEX_INITIALIZER; /* mutual exclusion 
-						     for count */
-pthread_cond_t    init_done=PTHREAD_COND_INITIALIZER; /* signaled by 
-							 each thread after
-							 completing initial-
-							 ization */
-int id_arg[3] = {0,1,2};
+#include "test.h"
 
 /*
- * Cleanup routine: last_breath()
+ * Create NUMTHREADS threads in addition to the Main thread.
  */
-void last_breath(char *messagep)
-{  
-  printf("\n\n%s last_breath() cleanup routine: free'ing 0x%x\n\n", 
-	 messagep, messagep);
+enum {
+  NUMTHREADS = 2
+};
 
-  free(messagep);
-}
+typedef struct bag_t_ bag_t;
+struct bag_t_ {
+  int threadnum;
+  int started;
+  /* Add more per-thread state variables here */
+};
 
-/*
- * print_count()
- */
-void print_count(char *messagep, int id, int i)
+static bag_t threadbag[NUMTHREADS + 1];
+
+void *
+mythread(void * arg)
 {
-  int last_type,tmp_type;
+  bag_t * bag = (bag_t *) arg;
 
-  pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &last_type);
-  switch(id) {
-  case 0:
-    printf("%s %4d\n", messagep, i);
-    break;
-  case 1:
-    printf("%s \t%4d\n", messagep, i);
-    break;
-  case 2:
-    printf("%s \t\t%4d\n", messagep, i);
-    break;
-  }
-  pthread_setcanceltype(last_type, &tmp_type);
-}
+  assert(bag == &threadbag[bag->threadnum]);
+  assert(bag->started == 0);
+  bag->started = 1;
 
-/*
- * bullet_proof()
- */
-void *bullet_proof(void *id_p)
-{
-  int i=0, last_state;
-  int *my_id = id_p;
-  char *messagep;
-
-
-  messagep = (char *)malloc(MESSAGE_MAX_LEN);
-  sprintf(messagep, "Bullet Proof, thread #%d: ", *my_id);
-
-  printf("%s\tI'm Alive, setting general cancellation OFF\n", 
-	 messagep);
-
-  /* push last_breath() routine onto stack */
-  pthread_cleanup_push( (void *)last_breath, (void *)messagep );
-  
-  /* We turn off general cancelability here ... */
-  pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &last_state);
-  
-  pthread_mutex_lock(&lock);
+  /* ... */
   {
-    printf("\n%s signaling main that my init is done\n", messagep);
-    count -= 1;
-    /* signal to program that entering loop */
-    pthread_cond_signal(&init_done);
-    pthread_mutex_unlock(&lock);
+    int oldstate;
+    int oldtype;
+
+    assert(pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate) == 0);
+    assert(oldstate == PTHREAD_CANCEL_ENABLE); /* Check default */
+    assert(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == 0);
+    assert(pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) == 0);
+    assert(pthread_setcancelstate(oldstate, &oldstate) == 0);
+    assert(oldstate == PTHREAD_CANCEL_DISABLE); /* Check setting */
+
+    assert(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldtype) == 0);
+    assert(oldtype == PTHREAD_CANCEL_DEFERRED); /* Check default */
+    assert(pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL) == 0);
+    assert(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL) == 0);
+    assert(pthread_setcanceltype(oldtype, &oldtype) == 0);
+    assert(oldtype == PTHREAD_CANCEL_ASYNCHRONOUS); /* Check setting */
   }
-
-  /* loop forever until picked off with a cancel */
-  for(;;i++) {
-    if (i%1000 == 0) 
-      print_count(messagep, *my_id, i); 
-    if (i%100000 == 0) {
-      printf("\n%s This is the thread that never ends... #%d\n",
-	     messagep, i);
-    }
-  }
-
-  /* Never get this far   */
-
-  /* This pop is required by the standard, every push must have a pop 
-     in the same lexical block. */
-  pthread_cleanup_pop(0);
-
-  return(NULL);
-}
-
-/*
- * ask_for_it()
- */
-void *ask_for_it(void *id_p)
-{
-  int i=0, last_state, last_type;
-  int *my_id = id_p;
-  char *messagep;
-
-
-  messagep = (char *)malloc(MESSAGE_MAX_LEN);
-  sprintf(messagep, "Ask For It, thread #%d: ", *my_id);
-
-  /* push last_breath() routine onto stack */
-  pthread_cleanup_push( (void *)last_breath, (void *)messagep);
-  
-  /* We can turn on general cancelability here. Disable async cancellation */
-  printf("%s\tI'm Alive, setting deferred cancellation ON\n", 
-	 messagep);
-  pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &last_type);
-  pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &last_state);
-
-  pthread_mutex_lock(&lock);
-  {
-    printf("\n%s signaling main that my init is done\n", messagep);
-    count -= 1;
-    /* signal to program that entering loop */
-    pthread_cond_signal(&init_done);
-    pthread_mutex_unlock(&lock);
-  }
-
-  /* loop forever until picked off with a cancel */
-  for(;;i++) {
-    if (i%1000 == 0)
-      print_count(messagep, *my_id, i);
-    if (i%10000 == 0) {
-      printf("\n%s\tLook, I'll tell you when you can cancel me.\n",messagep,i);
-    }
-    pthread_testcancel();
-  }
-
-  /* never get this far */
-
-  /* This pop is required by the standard, every push must have a pop 
-     in the same lexical block. */
-  pthread_cleanup_pop(0);
-
-  return(NULL);
-}
-
-/*
- * sitting_duck()
- */
-void *sitting_duck(void *id_p)
-{
-  int i=0, last_state, last_type, last_tmp;
-  int *my_id = id_p;
-  char *messagep;
-
-
-  messagep = (char *)malloc(MESSAGE_MAX_LEN);
-  sprintf(messagep, "Sitting Duck, thread #%d: ", *my_id);
-
-  /* push last_breath() routine onto stack */
-  pthread_cleanup_push( (void *)last_breath, (void *)messagep);
-  
-  pthread_mutex_lock(&lock);
-  {
-    printf("\n%s signaling main that my init is done\n", messagep);
-    count -= 1;
-    /* signal to program that entering loop */
-    pthread_cond_signal(&init_done);
-    pthread_mutex_unlock(&lock);
-  }
-
-  /* Now, we're safe to turn on async cancellability */
-  printf("%s\tI'm Alive, setting async cancellation ON\n", 
-	 messagep);
-  pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &last_type);
-  pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &last_state);
- 
-  /* loop forever until picked off with a cancel */
-  for(;;i++) {
-    if (i%1000 == 0) 
-      print_count(messagep, *my_id, i++);
-    if (i%10000 == 0) {
-      pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &last_tmp);
-      printf("\n%s\tHum, nobody here but us chickens. %d\n", messagep,i);
-      pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &last_tmp);
-    }
-  }
-  
-  /* never get this far */
-
-  /* This pop is required by the standard, every push must have a pop 
-     in the same lexical block. */
-  pthread_cleanup_pop(0);
-
-  return(NULL);
-}
-
-extern int 
-main(void)
-{
-  int       i;
-  void * statusp;
-  pthread_t threads[NUM_THREADS];
-
-
-  /* spawn the threads */
-  pthread_create(&(threads[0]), 
-		 NULL,
-		 ask_for_it,
-		 (void *) &(id_arg[0]));
-
-  pthread_create(&(threads[1]), 
-		 NULL,
-		 sitting_duck,
-		 (void *) &(id_arg[1]));
-
-  pthread_create(&(threads[2]), 
-		 NULL,
-		 bullet_proof,
-		 (void *) &(id_arg[2]));
-
-  printf("main(): %d threads created\n", NUM_THREADS);
-  
-  pthread_mutex_lock(&lock);
-  
-  /* wait until all threads have entered loops */
-  while (count != 0) {
-      pthread_cond_wait(&init_done, &lock);
-  }
-
-  pthread_mutex_unlock(&lock);
-
-  printf("main(): all threads have signaled that ready\n");
-
-  /* cancel each thread */
-  for (i=0; i<NUM_THREADS; i++) {
-    pthread_cancel(threads[i]);
-  }
-
-  /* wait until all threads have finished */
-  for (i=0; i<NUM_THREADS; i++) {
-    pthread_join(threads[i], &statusp);
-    if (statusp == PTHREAD_CANCELED) {
-      printf("main(): joined to thread %d, statusp=PTHREAD_CANCELED\n",i);
-    } else {
-      printf("main(): joined to thread %d\n",i);
-    }
-  }
-
-  printf("main()\t\tall %d threads have finished. \n", NUM_THREADS);
 
   return 0;
 }
 
+int
+main()
+{
+  int failed = 0;
+  int i;
+  pthread_t t[NUMTHREADS + 1];
 
+  assert((t[0] = pthread_self()) != NULL);
 
+  for (i = 1; i <= NUMTHREADS; i++)
+    {
+      threadbag[i].started = 0;
+      threadbag[i].threadnum = i;
+      assert(pthread_create(&t[i], NULL, mythread, (void *) &threadbag[i]) == 0);
+    }
 
+  /*
+   * Code to control or munipulate child threads should probably go here.
+   */
+
+  /*
+   * Give threads time to run.
+   */
+  Sleep(NUMTHREADS * 1000);
+
+  /*
+   * Standard check that all threads started.
+   */
+  for (i = 1; i <= NUMTHREADS; i++)
+    { 
+      failed = !threadbag[i].started;
+
+      if (failed)
+	{
+	  fprintf(stderr, "Thread %d: started %d\n", i, threadbag[i].started);
+	}
+    }
+
+  assert(!failed);
+
+  /*
+   * Check any results here. Set "failed" and only print ouput on failure.
+   */
+  for (i = 1; i <= NUMTHREADS; i++)
+    { 
+      /* ... */
+    }
+
+  assert(!failed);
+
+  /*
+   * Success.
+   */
+  return 0;
+}

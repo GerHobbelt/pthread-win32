@@ -1,3 +1,18 @@
+1999-10-30  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* create.c (pthread_create): Explicitly initialise thread state to
+	default values.
+
+	* cancel.c (pthread_setcancelstate): Check for NULL 'oldstate'
+	for compatibility with Solaris pthreads;
+	(pthread_setcanceltype): ditto:
+	- Erik Hensema <erik.hensema@group2000.nl>
+
+1999-10-23  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.h (ctime_r): Fix incorrect argument "_tm"
+	- Erik Hensema <erik.hensema@group2000.nl>
+
 1999-10-21  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* pthread.h (_POSIX_THREADS): Only define it if it isn't
