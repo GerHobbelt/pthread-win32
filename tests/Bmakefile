@@ -70,7 +70,6 @@ BUILD_DIR=..
 
 COPYFILES	= $(CPHDR) $(CPLIB) $(CPDLL) $(QAPC)
 
-TEST		=
 EHFLAGS	=
 
 # If a test case returns a non-zero exit code to the shell, make will

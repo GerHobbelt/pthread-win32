@@ -73,7 +73,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 
 #if defined(_M_IX86) || defined(_X86_)
 
-#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(X__BORLANDC__)
+#if defined(_MSC_VER) || defined(__WATCOMC__) || (defined(__BORLANDC__) && defined(HAVE_TASM32))
 #define HAVE_INLINABLE_INTERLOCKED_CMPXCHG
 
     {
@@ -184,7 +184,7 @@ ptw32_InterlockedExchange (LPLONG location,
 
 #if defined(_M_IX86) || defined(_X86_)
 
-#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(X__BORLANDC__)
+#if defined(_MSC_VER) || defined(__WATCOMC__) || (defined(__BORLANDC__) && defined(HAVE_TASM32))
 #define HAVE_INLINABLE_INTERLOCKED_XCHG
 
     {
