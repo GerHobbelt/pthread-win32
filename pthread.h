@@ -48,6 +48,24 @@ int pthread_equal(pthread_t t1, pthread_t t2);
 
 int pthread_join(pthread_t thread, void ** valueptr);
 
+/* Functions for manipulating thread attribute objects. */
+
+int pthread_attr_init(pthread_attr_t *attr);
+
+int pthread_attr_destroy(pthread_attr_t *attr);
+
+int pthread_attr_setstacksize(pthread_attr_t *attr,
+			      size_t stacksize);
+
+int pthread_attr_getstacksize(const pthread_attr_t *attr,
+			      size_t *stacksize);
+
+int pthread_attr_setstackaddr(pthread_attr_t *attr,
+			      void *stackaddr);
+
+int pthread_attr_getstackaddr(const pthread_attr_t *attr,
+			      void **stackaddr);
+
 /* Functions for manipulating cond. var. attribute objects. */
 
 int pthread_condattr_init(pthread_condattr_t *attr);
