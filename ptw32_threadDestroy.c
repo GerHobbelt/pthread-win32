@@ -51,18 +51,18 @@ ptw32_threadDestroy (pthread_t thread)
       ptw32_callUserDestroyRoutines (thread);
 
       if (thread->cancelEvent != NULL)
-	{
-	  CloseHandle (thread->cancelEvent);
-	}
+				{
+					CloseHandle (thread->cancelEvent);
+				}
 
       (void) pthread_mutex_destroy(&thread->cancelLock);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
       /* See documentation for endthread vs endthreadex. */
       if( thread->threadH != 0 )
-	{
-	  CloseHandle( thread->threadH );
-	}
+				{
+					CloseHandle( thread->threadH );
+				}
 #endif
 
       free (thread);

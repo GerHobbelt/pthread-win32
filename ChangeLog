@@ -1,3 +1,12 @@
+2002-07-31  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* ptw32_threadStart.c (ptw32_threadStart): Thread cancelLock
+	destruction moved to ptw32_threadDestroy().
+
+	* ptw32_threadDestroy.c (ptw32_threadDestroy):  Destroy
+	the thread's cancelLock. Moved here from ptw32_threadStart.c
+	to cleanup implicit threads as well.
+
 2002-07-30  Alexander Terekhov  <TEREKHOV@de.ibm.com>
 
 	* pthread_cond_wait.c (ptw32_cond_wait_cleanup): 
