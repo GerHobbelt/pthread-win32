@@ -276,8 +276,8 @@ enum {
 
 #define pthread_cleanup_push(routine, arg) \
 { \
-  _pthread_handler_push(_PTHREAD_CLEANUP_STACK, \
-			_PTHREAD_HANDLER_POP_LIFO, routine, arg);
+  (void ) _pthread_handler_push(_PTHREAD_CLEANUP_STACK, \
+				_PTHREAD_HANDLER_POP_LIFO, routine, arg);
 
 #ifdef pthread_cleanup_pop
 #undef pthread_cleanup_pop

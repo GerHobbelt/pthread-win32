@@ -9,7 +9,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-void
+int
 _pthread_handler_push(int stack,
 		      int poporder,
 		      void (*routine)(void *), 
@@ -27,7 +27,7 @@ _pthread_handler_push(int stack,
 
   if (new == NULL)
     {
-      /* FIXME: INTERNAL ERROR */
+      return ENOMEM;
     }
 
   new->routine = routine;
@@ -60,6 +60,7 @@ _pthread_handler_push(int stack,
 	  next = new;
 	}
     }
+  return 0;
 }
 
 void
