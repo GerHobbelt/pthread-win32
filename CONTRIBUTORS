@@ -74,6 +74,7 @@ Alexander Terekhov	TEREKHOV at de dot ibm dot com
 					condition variables;
 					enhancements to semaphores;
 					enhancements to mutexes;
+					new mutex implementation in 'futex' style;
 					system clock change handling re CV timeouts;
 					bug fixes.
 Thomas Pfaff		tpfaff at gmx dot net

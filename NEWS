@@ -1,3 +1,16 @@
+SNAPSHOT 2005-01-25
+-------------------
+
+Bug fixes
+---------
+
+* Attempted acquisition of a recursive mutex could cause waiting threads
+to not be woken when the mutex was released.
+- Ralf Kubis  <RKubis at mc.com>
+
+* Various package omissions have been fixed.
+
+
 SNAPSHOT 2005-01-03
 -------------------
 

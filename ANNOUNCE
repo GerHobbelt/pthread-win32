@@ -1,9 +1,13 @@
-		 PTHREADS-WIN32 SNAPSHOT 2005-01-03
+		 PTHREADS-WIN32 SNAPSHOT 2005-01-25
 		 ----------------------------------
 	 Web Site: http://sources.redhat.com/pthreads-win32/
 	FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
 	 Maintainer: Ross Johnson <rpj@callisto.canberra.edu.au>
 
+
+[Please note: snapshots from 2004-11-03 are using a new mutex implementation
+and should be regarded as beta code. You may not want to use it in production
+yet but please try it if you can.]
 
 We are pleased to announce the availability of a new snapshot of
 Pthreads-win32, an Open Source Software implementation of the
