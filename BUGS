@@ -30,7 +30,10 @@ Known bugs
    [Please note: this workaround did not solve a similar problem in
    snapshot-2004-11-03 or later, even though similar symptoms were seen.
    tests\semaphore4.c fails in that snapshot for the VCE version of the
-   DLL. It suspected to be a compiler bug in VC6.0, and also seen in VC7.0.]
+   DLL. It is suspected to be a compiler bug in VC6.0, and also seen in
+   VC7.0 and VS .NET 2003. The GNU C++ compiler does not have a problem
+   with this test, and it has been reported (2005-03-05) that the Intel
+   C++ 8.1 compiler is also fine with this test.]
 
    The problem disappears when /Ob0 is used, i.e. /O2 /Ob0 works OK,
    but if you want to use inlining optimisation you can be much more
