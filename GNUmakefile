@@ -51,7 +51,7 @@ AR	= ar
 
 #OPT	= -g -O0
 #OPT	= -O3
-OPT	= -O3 -finline-functions
+OPT	= $(CLEANUP) -O3 -finline-functions
 XOPT	=
 
 RCFLAGS		= --include-dir=.
@@ -83,8 +83,8 @@ LFLAGS		= -lwsock32
 #
 # ----------------------------------------------------------------------
 
-GC_CFLAGS	= $(PTW32_FLAGS) -D__CLEANUP_C
-GCE_CFLAGS	= $(PTW32_FLAGS) -D__CLEANUP_CXX -mthreads
+GC_CFLAGS	= $(PTW32_FLAGS) 
+GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
 
 ## Mingw32
 MAKE		= make
@@ -442,16 +442,16 @@ all:
 	@ $(MAKE) clean GC
 
 GC:
-		$(MAKE) CC=gcc CLEANUP_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_DLL)
+		$(MAKE) CC=gcc CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_DLL)
 
 GCE:
-		$(MAKE) CC=g++ CLEANUP_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_DLL)
+		$(MAKE) CC=g++ CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_DLL)
 
 GC-inlined:
-		$(MAKE) CC=gcc XOPT="-DPTW32_BUILD_INLINED" CLEANUP_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_INLINED_STAMP)
+		$(MAKE) CC=gcc XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_INLINED_STAMP)
 
 GCE-inlined:
-		$(MAKE) CC=g++ XOPT="-DPTW32_BUILD_INLINED" CLEANUP_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
+		$(MAKE) CC=g++ XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
 
 tests:
 	@ cd tests
@@ -464,11 +464,11 @@ tests:
 	$(CC) -c $(CFLAGS) -Wa,-ahl $^ > $@
 
 %.o: %.rc
-	$(RC) $(RCFLAGS) -o $@ $<
+	$(RC) $(RCFLAGS) $(CLEANUP) -o $@ $<
 
 .SUFFIXES: .dll .rc .c .o
 
-.c.o:;		 $(CC) -c -o $@ $(CFLAGS) $(CLEANUP_FLAGS) $<
+.c.o:;		 $(CC) -c -o $@ $(CFLAGS) $(XC_FLAGS) $<
 
 
 $(GC_DLL): $(DLL_OBJS)
