@@ -53,13 +53,20 @@
 pthread_once_t o = PTHREAD_ONCE_INIT;
 pthread_once_t once[NUM_ONCE];
 
-static int numOnce = 0;
-static int numThreads = 0;
+typedef struct {
+  int i;
+  CRITICAL_SECTION cs;
+} sharedInt_t;
+
+static sharedInt_t numOnce = {0, {0}};
+static sharedInt_t numThreads = {0, {0}};
 
 void
 myfunc(void)
 {
-  numOnce++;
+  EnterCriticalSection(&numOnce.cs);
+  numOnce.i++;
+  LeaveCriticalSection(&numOnce.cs);
   /* Simulate slow once routine so that following threads pile up behind it */
   Sleep(10);
   /* test for cancelation late so we're sure to have waiters. */
@@ -77,7 +84,9 @@ mythread(void * arg)
    */
   pthread_cancel(pthread_self());
   assert(pthread_once(&once[(int) arg], myfunc) == 0);
-  numThreads++;
+  EnterCriticalSection(&numThreads.cs);
+  numThreads.i++;
+  LeaveCriticalSection(&numThreads.cs);
   return 0;
 }
 
@@ -87,6 +96,9 @@ main()
   pthread_t t[NUM_THREADS][NUM_ONCE];
   int i, j;
   
+  InitializeCriticalSection(&numThreads.cs);
+  InitializeCriticalSection(&numOnce.cs);
+
   for (j = 0; j < NUM_ONCE; j++)
     {
       once[j] = o;
@@ -107,8 +119,11 @@ main()
    * pthread_once and so numThreads should never be incremented. However,
    * numOnce should be incremented by every thread (NUM_THREADS*NUM_ONCE).
    */
-  assert(numOnce == NUM_ONCE * NUM_THREADS);
-  assert(numThreads == 0);
+  assert(numOnce.i == NUM_ONCE * NUM_THREADS);
+  assert(numThreads.i == 0);
+
+  DeleteCriticalSection(&numOnce.cs);
+  DeleteCriticalSection(&numThreads.cs);
 
   return 0;
 }
