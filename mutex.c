@@ -37,6 +37,41 @@ remove_attr(pthread_mutexattr_t *attr)
 }
 
 int
+pthread_mutex_init(pthread_mutex_t *mutex, pthread_mutex_attr_t *attr)
+{
+  /* FIXME: Attributes are currently ignored. */
+  
+  if ((is_attr(attr) != 0) || (mutex == NULL))
+    {
+      return EINVAL;
+    }
+
+  /* Create an unnamed mutex with default security and one which is
+     initially not held by the thread.  Default security (arg1 = NULL)
+     is portable to Win9x and NT, as Win9x has no security model. */
+
+  if ((*mutex = CreateMutex(NULL, FALSE, NULL)) == NULL)
+    {
+      /* This is almost certainly due to a lack of resources. */
+      return ENOMEM;
+    }
+
+  return 0;
+}
+
+int
+pthread_mutex_destroy(pthread_mutex_t *mutex)
+{
+  if ((mutex == NULL) || (CloseHandle(*mutex) != TRUE))
+    {
+      /* This is almost certainly due to an invalid handle. */
+      return EINVAL;
+    }
+
+  return 0;
+}
+
+int
 pthread_mutexattr_init(pthread_mutexattr_t *attr)
 {
   if (attr == NULL)
@@ -52,7 +87,6 @@ pthread_mutexattr_init(pthread_mutexattr_t *attr)
     }
   
   (_pthread_mutexattr_t *) (attr->ptr).proc_shared = PTHREAD_PROCESS_PRIVATE;
-  
   return 0;
 }
 
@@ -135,4 +169,58 @@ pthread_mutexattr_getprioceiling(const pthread_mutexattr_t *attr,
 {
   /* This function is not supported. */
   return ENOSYS;
+}
+
+int
+pthread_lock(pthread_mutex_t *mutex)
+{
+  switch (WaitForSingleObject(*mutex, INFINITE))
+    {
+    case WAIT_ABANDONED_0:
+      /* Thread holding the mutex abandoned it.  Fall through. */
+    case WAIT_FAILED:
+      /* This is probably due to an invalid handle. */
+      return EINVAL;
+    case WAIT_OBJECT_0:
+      /* We're good. */
+      return 0;
+    }
+  /* Not reached. */
+}
+
+int
+pthread_unlock(pthread_mutex_t *mutex)
+{
+  if (ReleaseMutex(*mutex) != TRUE)
+    {
+      /* This is probably due to an invalid handle. */
+      return EINVAL;
+    }
+  else
+    {
+      return 0;
+    }
+
+  /* Not reached. */
+}
+
+int
+pthread_trylock(pthread_mutex_t *mutex)
+{
+  /* If the mutex is already held, return EBUSY. */
+  switch (WaitForSingleObject(*mutex, 0))
+    {
+    case WAIT_ABANDONED_0:
+      /* Thread holding the mutex abandoned it.  Fall through. */
+    case WAIT_FAILED:
+      /* This is probably due to an invalid handle. */
+      return EINVAL;
+    case WAIT_TIMEOUT:
+      /* We couldn't get the lock. */
+      return EBUSY;
+    case WAIT_OBJECT_0:
+      /* We're good. */
+      return 0;
+    }
+  /* Not reached. */
 }
