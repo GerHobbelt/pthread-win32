@@ -65,7 +65,7 @@ typedef unsigned int mode_t;
 #endif
 
 
-typedef sem_t_ * sem_t;
+typedef struct sem_t_ * sem_t;
 
 int sem_init (sem_t * sem,
 	      int pshared,

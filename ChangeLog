@@ -1,3 +1,11 @@
+2001-06-08  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* semaphore.h (sem_t): Fixed for compile and test.
+	* implement.h (sem_t_): Likewise.
+	* semaphore.c: Likewise.
+	* private.c (ptw32_sem_timedwait): Updated to use new
+	opaque sem_t.
+
 2001-06-06  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* semaphore.h (sem_t): Is now an opaque pointer;

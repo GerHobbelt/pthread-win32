@@ -293,8 +293,8 @@ The following functions are implemented:
       pthread_attr_setschedparam  
       pthread_getschedparam
       pthread_setschedparam
-      pthread_getconcurrency (always returns '0' indicating system default)
-      pthread_setconcurrency (accepts any value >= 0 but is ignored)
+      pthread_getconcurrency
+      pthread_setconcurrency
       pthread_attr_getscope  (returns an error ENOSYS)
       pthread_attr_setscope  (returns an error ENOSYS)
       sched_get_priority_max (POSIX 1b)
