@@ -1,0 +1,72 @@
+                  =========================================
+                  PTHREADS-WIN32 Frequently Asked Questions
+                  =========================================
+
+INDEX
+-----
+
+Q 1	How do I get pthreads-win32 to link under Cygwin32 or Mingw32?
+
+
+=============================================================================
+
+Q 1	How do I get pthreads-win32 to link under Cygwin32 or Mingw32?
+---
+
+A 1
+---
+The following email from Anders Norlander explains how to solve this
+problem. I think the proviso is that the DLL and your application should
+both be built with the same development environment (cygwin, mingw,
+or MSVC etc).
+
+Date: Mon, 07 Dec 1998 15:11:37 +0100
+From: Anders Norlander <anorland@hem2.passagen.se>
+To: Ross Johnson <rpj@ise.canberra.edu.au>
+Cc: pthreads-win32 <pthreads-win32@air.net.au>
+Subject: Re: pthreads-win32: TryEnterCriticalSection patch (fwd)
+
+Ross Johnson wrote:
+> 
+> Anders,
+> 
+> You said you're using GCC. Is that from cygwin32 or mingw32? What is your
+> environment (so I can perhaps help other people out)? We have problems
+> with cygwin32 et al that have been built on Win95. They're missing
+> _{begin,end}threadex.
+
+Ross,
+
+I use mingw32 when compiling pthreads-win32, but unlike most people I
+use MSVCRT as the C library instead of CRTDLL. For those that don't
+feel like configuring and building the necessary components themselves,
+Mumit Khan has released an add on for mingw32 to make it use MSVCRT40.
+It is available at his ftp site, follow the minw32 links at
+http://www.xraylith.wisc.edu/~khan/software/gnu-win32/
+
+For cygwin it is a completely different matter. I suppose
+pthreads-win32 uses _beginthreadex and _endthreadex because the Win32
+docs say that programs calling functions in the C library should not
+use CreateThread and ExitThread. However, this applies only to
+Microsoft's (and possibly others) multithreaded C libraries that need
+to keep track of per thread data, it does not apply to cygwin.
+This code solves the problem:
+
+/* Check for old and new versions of cygwin */
+#if defined(__CYGWIN32__) || defined(__CYGWIN__)
+/* Macro uses args so we can cast start_proc to LPTHREAD_START_ROUTINE
+   in order to avoid warnings because of return type */
+#define _beginthreadex(security, stack_size, start_proc, arg, flags,
+pid) \
+CreateThread(security, stack_size, (LPTHREAD_START_ROUTINE) start_proc,
+\
+             arg, flags, pid)
+#define _endthreadex ExitThread
+#endif
+
+I would be extremely careful using threads with cygwin, since it is
+not (yet) threadsafe.
+
+Regards,
+Anders
+
