@@ -1,5 +1,8 @@
 Fri Jul 24 03:00:25 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
+	* create.c (pthread_create): Ensure values of new attribute members
+	are copied to the thread attribute object.
+
 	* attr.c (pthread_attr_destroy):  Fix merge conflicts.
 	(pthread_attr_getdetachstate):  Fix merge conflicts.
 	(pthread_attr_setdetachstate):  Fix merge conflicts.
