@@ -284,17 +284,13 @@ pthread_spin_trylock(pthread_spinlock_t *lock)
         }
     }
 
-  if ((_LONG) PTW32_SPIN_UNLOCKED ==
-      InterlockedCompareExchange((_LPLONG) &(s->interlock),
-                                 (_LONG) PTW32_SPIN_LOCKED,
-                                 (_LONG) PTW32_SPIN_UNLOCKED ) )
+  switch ((long) InterlockedCompareExchange((_LPLONG) &(s->interlock),
+                                            (_LONG) PTW32_SPIN_LOCKED,
+                                            (_LONG) PTW32_SPIN_UNLOCKED ))
     {
-      return 0;
-    }
-
-  if (s->interlock == PTW32_SPIN_USE_MUTEX)
-    {
-      return pthread_mutex_trylock(&(s->u.mutex));
+      case PTW32_SPIN_UNLOCKED:  return 0;
+      case PTW32_SPIN_LOCKED:    return EBUSY;
+      case PTW32_SPIN_USE_MUTEX: return pthread_mutex_trylock(&(s->u.mutex));
     }
 
   return EINVAL;
