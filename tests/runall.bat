@@ -25,3 +25,7 @@ call runtest cl condvar4
 call runtest cl condvar5
 call runtest cl condvar6
 call runtest cl errno1
+call runtest cl rwlock1
+call runtest cl rwlock2
+call runtest cl rwlock3
+call runtest cl rwlock4

@@ -77,6 +77,7 @@ _pthread_processInitialize (void)
    */
   InitializeCriticalSection(&_pthread_mutex_test_init_lock);
   InitializeCriticalSection(&_pthread_cond_test_init_lock);
+  InitializeCriticalSection(&_pthread_rwlock_test_init_lock);
 
   return (_pthread_processInitialized);
 
@@ -131,8 +132,9 @@ _pthread_processTerminate (void)
       /* 
        * Destroy the global test and init check locks.
        */
-      DeleteCriticalSection(&_pthread_mutex_test_init_lock);
+      DeleteCriticalSection(&_pthread_rwlock_test_init_lock);
       DeleteCriticalSection(&_pthread_cond_test_init_lock);
+      DeleteCriticalSection(&_pthread_mutex_test_init_lock);
 
       _pthread_processInitialized = FALSE;
     }

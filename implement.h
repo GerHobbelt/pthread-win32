@@ -161,6 +161,22 @@ struct pthread_condattr_t_ {
   int pshared;
 };
 
+#define RW_MAGIC    0x19283746
+
+struct pthread_rwlock_t_ {
+    pthread_mutex_t rw_mutex;        /* basic lock on this struct */
+    pthread_cond_t  rw_condreaders;  /* for reader threads waiting */
+    pthread_cond_t  rw_condwriters;  /* for writer threads waiting */
+    int             rw_magic;        /* for error checking */
+    int             rw_nwaitreaders; /* the number waiting */
+    int             rw_nwaitwriters; /* the number waiting */
+    int             rw_refcount;     /* -1 if writer has the lock,
+                                        else # readers holding the lock */
+};
+
+struct pthread_rwlockattr_t_ {
+  int pshared;
+};
 
 struct ThreadKeyAssoc {
   /*
@@ -297,6 +313,7 @@ extern pthread_key_t _pthread_selfThreadKey;
 extern pthread_key_t _pthread_cleanupKey;
 extern CRITICAL_SECTION _pthread_mutex_test_init_lock;
 extern CRITICAL_SECTION _pthread_cond_test_init_lock;
+extern CRITICAL_SECTION _pthread_rwlock_test_init_lock;
 
 
 #ifdef __cplusplus
