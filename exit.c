@@ -31,16 +31,14 @@ _pthread_vacuum(void)
 }
 
 void
-_pthread_exit(void * value, int return_code)
+_pthread_exit(pthread_t thread, void * value, int return_code)
 {
-  _pthread_threads_thread_t * us = _PTHREAD_THIS;
-
   /* CRITICAL SECTION */
   pthread_mutex_lock(&_pthread_table_mutex);
 
   /* Copy value into the thread entry so it can be given
      to any joining threads. */
-  us->joinvalueptr = value;
+  thread->joinvalueptr = value;
 
   pthread_mutex_lock(&_pthread_table_mutex);
   /* END CRITICAL SECTION */
@@ -55,11 +53,11 @@ _pthread_exit(void * value, int return_code)
      be deleted by the last waiting pthread_join() after this thread
      has terminated. */
 
-  if (pthread_attr_getdetachedstate(us, &detachstate) == 0 
+  if (pthread_attr_getdetachedstate(thread, &detachstate) == 0 
       && detachstate == PTHREAD_CREATE_DETACHED
-      && us->join_count == 0)
+      && thread->join_count == 0)
     {
-      _pthread_delete_thread_entry(us);
+      (void) _pthread_delete_thread(thread);
     }
 
   pthread_mutex_lock(&_pthread_table_mutex);
@@ -71,5 +69,5 @@ _pthread_exit(void * value, int return_code)
 void
 pthread_exit(void * value)
 {
-  _pthread_exit(value, 0);
+  _pthread_exit(pthread_this(), value, 0);
 }

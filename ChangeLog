@@ -1,5 +1,10 @@
 Tue Jul 28 14:04:29 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
 
+	* exit.c (_pthread_exit): Add new pthread_t arg.
+	Rename _pthread_delete_thread_entry to _pthread_delete_thread.
+	Rename "us" to "thread".
+	(pthread_exit): Call _pthread_exit with added thread arg.
+
 	* create.c (_pthread_start_call): Insert missing ")".
 	Add "us" arg to _pthread_exit() call.
 	(pthread_create): Modify to use new thread allocation scheme.
