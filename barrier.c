@@ -125,7 +125,7 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
   b = *barrier;
   step = b->iStep;
 
-  if (0 == InterlockedDecrement((_LPLONG) &(b->nCurrentBarrierHeight)))
+  if (0 == InterlockedDecrement((long *) &(b->nCurrentBarrierHeight)))
     {
       /* Must be done before posting the semaphore. */
       b->nCurrentBarrierHeight = b->nInitialBarrierHeight;
@@ -136,14 +136,13 @@ pthread_barrier_wait(pthread_barrier_t *barrier)
        * entered barrier_wait and checked nCurrentBarrierHeight before this
        * barrier's sema can be posted. Any threads that have not quite
        * entered sem_wait below when the multiple_post has completed
-       * will nevertheless continue through the sema (barrier)
+       * will nevertheless continue through the semaphore (barrier)
        * and will not be left stranded.
        */
-      if (b->nInitialBarrierHeight > 1)
-        {
-          result = sem_post_multiple(&(b->semBarrierBreeched[step]),
-                                     b->nInitialBarrierHeight - 1);
-        }
+      result = (b->nInitialBarrierHeight > 1
+                ? sem_post_multiple(&(b->semBarrierBreeched[step]),
+                                    b->nInitialBarrierHeight - 1)
+                : 0);
     }
   else
     {
