@@ -17,9 +17,9 @@ enum {
 };
 
 #define _PTHREAD_VALID(T) \
-  (T) != NULL \
-  && ((T)->ptstatus == _PTHREAD_NEW
-      || (T)->ptstatus == _PTHREAD_INUSE)
+  ((T) != NULL \
+   && ((T)->ptstatus == _PTHREAD_NEW
+       || (T)->ptstatus == _PTHREAD_INUSE))
 
 /* Handler execution flags. */
 #define _PTHREAD_HANDLER_NOEXECUTE 0
@@ -114,8 +114,6 @@ void _pthread_handler_pop_all(int stack,
 
 int _pthread_new_thread(pthread_t * thread);
 
-pthread_t _pthread_find_thread(HANDLE win32handle);
-
 int _pthread_delete_thread(pthread_t thread);
 
 /* Thread cleanup. */
@@ -127,6 +125,11 @@ void _pthread_exit(pthread_t thread, void * value, int return_code);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+
+/* Global declared dll.c */
+
+extern DWORD _pthread_threadID_TlsIndex;
 
 
 /* Global data declared in global.c */

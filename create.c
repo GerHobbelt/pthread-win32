@@ -28,6 +28,8 @@ _pthread_start_call(void * us_arg)
 
   us = (pthread_t) us_arg;
 
+  (void) TlsSetValue(_pthread_threadID_TlsIndex, (LPVOID) us);
+
   /* FIXME: For now, if priority setting fails then at least ensure
      that our records reflect true reality. */
   if (SetThreadPriority((HANDLE) us->win32handle, us->attr.priority) == FALSE)
