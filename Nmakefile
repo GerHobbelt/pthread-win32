@@ -12,9 +12,9 @@ _errno		== _ast_errno
 
 $(INCLUDEDIR)	:INSTALLDIR:	pthread.h sched.h
 
-pthread $(VERSION) :LIBRARY: pthread.def attr.c cancel.c cleanup.c condvar.c \
+pthread $(VERSION) :LIBRARY: pthread.def attr.c barrier.c cancel.c cleanup.c condvar.c \
 	create.c dll.c exit.c fork.c global.c misc.c mutex.c private.c \
-	rwlock.c sched.c semaphore.c sync.c tsd.c nonportable.c
+	rwlock.c sched.c semaphore.c spin.c sync.c tsd.c nonportable.c
 
 :: ANNOUNCE CONTRIBUTORS COPYING.LIB ChangeLog FAQ GNUmakefile MAINTAINERS \
 	Makefile Makefile.in Makefile.vc NEWS PROGRESS README README.WinCE \
