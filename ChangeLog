@@ -1,9 +1,58 @@
+Sun Jan 24 01:34:52 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* semaphore.c (sem_wait): Remove second arg to 
+	pthreadCancelableWait() call.
+
 Sat Jan 23 17:36:40 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.def: Add new functions to export list.
 
 	* pthread.h (PTHREAD_MUTEX_AUTO_CS_NP): New.
 	(PTHREAD_MUTEX_FORCE_CS_NP): New.
 
 	* README: Updated.
+
+Fri Jan 22 14:31:59 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* Makefile.in (CFLAGS): Remove -fhandle-exceptions. Not needed
+	with egcs. Add -g for debugging.
+
+	* create.c (pthread_create): Replace __stdcall with PT_STDCALL
+	macro. This is a hack and must be fixed.
+
+	* misc.c (CancelableWait): Remove redundant statement.
+
+	* mutex.c (pthread_mutexattr_init): Cast calloc return value.
+
+	* misc.c (CancelableWait): Add cast.
+	(pthread_self): Add cast.
+
+	* exit.c (pthread_exit): Add cast.
+
+	* condvar.c (pthread_condattr_init): Cast calloc return value.
+
+	* cleanup.c: Reorganise conditional compilation.
+
+	* attr.c (pthread_attr_init): Remove unused 'result'.
+	Cast malloc return value.
+
+	* private.c (_pthread_callUserDestroyRoutines): Redo conditional
+	compilation.
+
+	* misc.c (CancelableWait): C++ version uses 'throw'.
+
+	* cancel.c (pthread_testcancel): Ditto.
+
+	* implement.h (class pthread_exception): Define for C++.
+
+	* pthread.h: Fix C, C++, and Win32 SEH condition compilation
+	mayhem around pthread_cleanup_* defines. C++ version now uses John
+	Bossom's cleanup handlers.
+	(pthread_attr_t): Make 'valid' unsigned.
+	Define '_timeb' as 'timeb' for Ming32.
+	Define PT_STDCALL as nothing for Mingw32. May be temporary.
+
+	* cancel.c (pthread_testcancel): Cast return value.
 
 Wed Jan 20 09:31:28 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 

@@ -212,7 +212,7 @@ sem_wait (sem_t * sem)
 
   return ((sem == NULL)
 	  ? EINVAL
-	  : pthreadCancelableWait (*sem, INFINITE)
+	  : pthreadCancelableWait (*sem)
     );
 
 }				/* sem_wait */

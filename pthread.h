@@ -205,6 +205,8 @@
 #include <signal.h>
 #endif /* HAVE_SIGNAL_H */
 
+#include <malloc.h>
+
 #ifndef HAVE_STRUCT_TIMESPEC
 struct timespec {
 	int tv_sec;
@@ -248,8 +250,22 @@ struct timespec {
 
 
 #include <semaphore.h>
-/* #include <sched.h> /**/
+/* #include <sched.h> */
 
+#ifdef __MINGW32__
+#define PT_STDCALL
+#else
+#define PT_STDCALL __stdcall
+#endif
+
+/* 
+ * This should perhaps be in autoconf or 
+ * possibly fixed in Mingw32 to
+ * correspond to the Windows headers.
+ */
+#ifdef __MINGW32__
+#define _timeb timeb
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -562,7 +578,7 @@ struct pthread_t_ {
 #define _PTHREAD_ATTR_VALID 0xC4C0FFEE
 
 struct pthread_attr_t_ {
-  long valid;
+  unsigned long valid;
   void *stackaddr;
   size_t stacksize;
   int detachstate;
@@ -647,26 +663,23 @@ struct pthread_once_t_ {
 
 /* There are three implementations of cancel cleanup.
  *
+ *   WIN32 SEH
  *   C
- *   C++ (as per Cygwin32 or Mingw32)
- *   WIN32 SEH or C++
+ *   C++
  */
+
+#ifdef _MSC_VER
+	/*
+	 * WIN32 SEH version of cancel cleanup.
+	 */
 
   typedef struct _pthread_cleanup_t _pthread_cleanup_t;
 
   struct _pthread_cleanup_t
-    {
-      void (*routine) (void *);
-      void *arg;
-#if !defined(_WIN32) && !defined(__cplusplus)
-      _pthread_cleanup_t *prev;
-#endif
-    };
-
-#ifdef _WIN32
-	/*
-	 * WIN32 SEH version of cancel cleanup.
-	 */
+  {
+    void (*routine) (void *);
+    void *arg;
+  };
 
 #define pthread_cleanup_push( _rout, _arg ) \
 	{ \
@@ -688,13 +701,22 @@ struct pthread_once_t_ {
 		} \
 	}
 
-#else /* _WIN32 */
+#else /* _MSC_VER */
 
 #ifndef __cplusplus
 
 	/*
 	 * C implementation of PThreads cancel cleanup
 	 */
+
+  typedef struct _pthread_cleanup_t _pthread_cleanup_t;
+
+  struct _pthread_cleanup_t
+  {
+    void (*routine) (void *);
+    void *arg;
+    _pthread_cleanup_t *prev;
+  };
 
 #define pthread_cleanup_push( _rout, _arg ) \
 	{ \
@@ -709,38 +731,84 @@ struct pthread_once_t_ {
 #else /* !__cplusplus */
 
 	/*
-	 * C++ (ie. Cygwin32 or Mingw32) version of cancel cleanup.
+	 * C++ version of cancel cleanup.
+	 * - John E. Bossom.
 	 *
 	 * Emulate try-finally behaviour.
 	 */
 
+	class PThreadCleanup {
+	  /*
+	   * PThreadCleanup
+	   *
+	   * Purpose
+	   *      This class is a C++ helper class that is
+	   *      used to implement pthread_cleanup_push/
+	   *      pthread_cleanup_pop.
+	   *      The destructor of this class automatically
+	   *      pops the pushed cleanup routine regardless
+	   *      of how the code exits the scope
+	   *      (i.e. such as by an exception)
+	   */
+	  void            (*cleanUpRout)( void * );
+	  void    *       obj;
+	  int             executeIt;
+
+	public:
+	  PThreadCleanup() :
+	    cleanUpRout( NULL ),
+	    obj( NULL ),
+	    executeIt( 0 )
+	    /*
+	     * No cleanup performed
+	     */
+	    {
+	    }
+
+	  PThreadCleanup(
+			 void            (*routine)( void * ),
+			 void    *       arg ) :
+	    cleanUpRout( routine ),
+	    obj( arg ),
+	    executeIt( 1 )
+	    /*
+             * Registers a cleanup routine for 'arg'
+             */
+	    {
+	    }
+
+	  ~PThreadCleanup()
+	    {
+	      if ( executeIt && cleanUpRout != NULL )
+		{
+		  (*cleanUpRout)( obj );
+		}
+	    }
+
+	  void execute( int exec )
+	    {
+	      executeIt = exec;
+	    }
+	};
+
+	/*
+	 * C++ implementation of PThreads cancel cleanup;
+	 * This implementation takes advantage of a helper
+	 * class who's destructor automatically calls the
+	 * cleanup routine if we exit our scope weirdly
+	 */
 #define pthread_cleanup_push( _rout, _arg ) \
-	{ \
-	    _pthread_cleanup_t	_cleanup; \
-	    \
-            _cleanup.routine	= (_rout); \
-	    _cleanup.arg	= (_arg); \
-	    try \
-	      { \
+        { \
+	    PThreadCleanup  cleanup((void (PT_STDCALL *)(void *))(_rout), \
+				    (void *) (_arg) );
 
 #define pthread_cleanup_pop( _execute ) \
-	      } \
-	    catch(...) \
-	      { \
-		  (*(_cleanup.routine))( _cleanup.arg ); \
-		  \
-		  throw; \
-	      } \
-              \
-	      if (_execute) \
-		{ \
-		    (*(_cleanup.routine))( _cleanup.arg ); \
-		} \
-      	}
-
-#endif /* _WIN32 */
+	    cleanup.execute( _execute ); \
+	}
 
 #endif /* !__cplusplus */
+
+#endif /* _MSC_VER */
 
 /*
  * ===============
@@ -797,7 +865,7 @@ pthread_t pthread_self (void);
 
 int pthread_cancel (pthread_t thread);
 
-#if !defined(__cplusplus) && !defined(_WIN32)
+#if !defined(__cplusplus) && !defined(_MSC_VER)
 
 _pthread_cleanup_t *_pthread_pop_cleanup (int execute);
 
@@ -805,7 +873,7 @@ void _pthread_push_cleanup (_pthread_cleanup_t * cleanup,
 			   void (*routine) (void *),
 			   void *arg);
 
-#endif /* !__cplusplus && ! _WIN32 */
+#endif /* !__cplusplus && ! _MSC_VER */
 
 int pthread_setcancelstate (int state,
 			    int *oldstate);

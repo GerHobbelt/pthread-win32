@@ -163,7 +163,8 @@ pthread_testcancel (void)
 {
   pthread_t self;
 
-  if ((self = pthread_getspecific (_pthread_selfThreadKey)) != NULL)
+  if ((self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey)) 
+      != NULL)
     {
 
       if (self->cancelState == PTHREAD_CANCEL_ENABLE)
@@ -175,6 +176,9 @@ pthread_testcancel (void)
 	      /*
 	       * Canceling!
 	       */
+
+#ifdef _MSC_VER
+
 	      DWORD exceptionInformation[3];
 
 	      exceptionInformation[0] = (DWORD) (0);
@@ -185,6 +189,17 @@ pthread_testcancel (void)
 			       0,
 			       3,
 			       exceptionInformation);
+
+#else /* _MSC_VER */
+
+#ifdef __cplusplus
+
+	      throw pthread_exception;
+
+#endif /* __cplusplus */
+
+#endif /* _MSC_VER */
+
 	    }
 	}
     }

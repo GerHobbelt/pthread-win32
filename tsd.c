@@ -215,7 +215,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
        * Resolve catch-22 of registering thread with threadSelf
        * key
        */
-      self = pthread_getspecific (_pthread_selfThreadKey);
+      self = (pthread_t) pthread_getspecific (_pthread_selfThreadKey);
       if (self == NULL)
         {
           self = (pthread_t) value;
