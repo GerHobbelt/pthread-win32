@@ -25,8 +25,8 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  */
-#if !defined( SCHED_H )
-#define SCHED_H
+#ifndef _SCHED_H
+#define _SCHED_H
 
 #ifdef _MSC_VER
 /*
@@ -70,4 +70,4 @@ int sched_get_priority_max (int policy);
 #endif                          /* __cplusplus */
 
 
-#endif                          /* !SCHED_H */
+#endif                          /* !_SCHED_H */

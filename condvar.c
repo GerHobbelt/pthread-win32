@@ -23,10 +23,6 @@
  * MA 02111-1307, USA
  */
 
-/*
- * Code contributed by John E. Bossom <JEB>.
- */
-
 #include "pthread.h"
 #include "implement.h"
 
@@ -871,5 +867,4 @@ pthread_cond_broadcast (pthread_cond_t * cond)
 
 }
 
-/* </JEB> */
 

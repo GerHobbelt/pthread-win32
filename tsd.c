@@ -26,10 +26,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-/*
- * Code contributed by John E. Bossom <JEB>.
- */
-
 int
 pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
      /*
@@ -323,6 +319,4 @@ pthread_getspecific (pthread_key_t key)
 {
   return (TlsGetValue (key->key));
 }
-
-/* </JEB> */
 

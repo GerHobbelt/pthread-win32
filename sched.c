@@ -25,9 +25,9 @@
 
 #define ENOSUP 0
 
-#include "sched.h"
 #include "pthread.h"
 #include "implement.h"
+#include "sched.h"
 
 static int
 is_attr(const pthread_attr_t *attr)

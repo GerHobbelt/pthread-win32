@@ -27,10 +27,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-/*
- * Code contributed by John E. Bossom <JEB>.
- */
-
 void
 pthread_exit (void *value_ptr)
      /*

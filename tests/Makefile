@@ -26,9 +26,11 @@ LIBS	= ./libpthread32.a
 #INCLUDES	= -I.
 #LIBS	= pthread.lib
 
-HDR	= pthread.h
+HDR	= pthread.h semaphore.h sched.h
 LIB	= libpthread32.a
 DLL	= pthread.dll
+
+COPYFILES	= $(HDR) $(LIB) $(DLL)
 
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
@@ -66,27 +68,21 @@ condvar4.pass: create1.pass
 
 %.pass: %.exe $(LIB) $(DLL) $(HDR)
 	$*
-	@$(ECHO) Passed
+	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
 %.exe: %.c
 	@ $(CC) $(CFLAGS) $(INCLUDES) $(LIBS)
 
-$(LIB):
-	@ $(ECHO) Copying the library
-	@ $(CP) $(BUILD_DIR)\$@ .
-
-$(HDR):
-	@ $(ECHO) Copying the header file
-	@ $(CP) $(BUILD_DIR)\$@ .
-
-$(DLL):
-	@ $(ECHO) Copying the DLL
+$(COPYFILES):
+	@ $(ECHO) Copying $@
 	@ $(CP) $(BUILD_DIR)\$@ .
 
 clean:
 	- $(RM) *.dll
-	- $(RM) $(LIB)
-	- $(RM) $(HDR)
+	- $(RM) pthread.h
+	- $(RM) semaphore.h
+	- $(RM) sched.h
+	- $(RM) *.a
 	- $(RM) *.exe
 	- $(RM) *.pass

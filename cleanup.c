@@ -33,10 +33,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-/*
- * Code contributed by John E. Bossom <JEB>.
- */
-
 _pthread_cleanup_t *
 pthread_pop_cleanup (int execute)
      /*
@@ -194,5 +190,4 @@ pthread_push_cleanup (_pthread_cleanup_t * cleanup,
 
 }                               /* _pthread_push_cleanup */
 
-/* </JEB> */
 
