@@ -79,13 +79,13 @@ enum {
 };
 
 
-static int done = ;
+static long done = 0;
 
 void * func(void * arg)
 {
   sched_yield();
 
-  InterlockedIncrement((void *) &done);
+  InterlockedIncrement(&done);
 
   return (void *) 0; 
 }

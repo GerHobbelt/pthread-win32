@@ -7,7 +7,7 @@ Ben Elliston		bje@cygnus.com
 					Initiated the project;
 					setup the project infrastructure (CVS, web page, etc.);
 					early prototype routines.
-Ross Johnson		rpj@ise.canberra.edu.au
+Ross Johnson		rpj@callisto.canberra.edu.au
 					early prototype routines;
 					ongoing project coordination/maintenance;
 					implementation of spin locks and barriers;

@@ -72,20 +72,19 @@
  */
 
 #include "test.h"
-
  
 int
 main()
 {
-  pthread_t t;
+  pthread_t ptrToNull = NULL;
+  /* This should be bigger than a pthread handle. */
+  char corruptDummy[1000];
 
-  assert(sizeof(t) > (4 * sizeof(void *)));
+  memset(corruptDummy, 0x5A, sizeof(corruptDummy));
 
-  t = (pthread_t) malloc(sizeof(t));
-
-  assert(t != NULL);
-  memset(t, 0x5A, sizeof(t));
-  assert(pthread_kill(t, 0) == ESRCH);
+  assert(pthread_kill(NULL, 0) == ESRCH);
+  assert(pthread_kill(ptrToNull, 0) == ESRCH);
+  assert(pthread_kill((pthread_t) corruptDummy, 0) == ESRCH);
 
   return 0;
 }
