@@ -1,5 +1,5 @@
 ; pthread.def
-; Last updated: $Date: 1999/04/03 22:05:47 $
+; Last updated: $Date: 1999/05/29 06:44:34 $
 
 ; Currently unimplemented functions are commented out.
 
@@ -83,6 +83,10 @@ sem_destroy
 sem_trywait
 sem_wait
 sem_post
+sem_open
+sem_close
+sem_unlink
+sem_getvalue
 ;
 ; Non-portable but useful
 ;

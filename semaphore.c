@@ -329,3 +329,36 @@ sem_post (sem_t * sem)
   return 0;
 
 }				/* sem_post */
+
+
+int
+sem_open (const char * name, int oflag, mode_t mode, unsigned int value)
+{
+  errno = ENOSYS;
+  return -1;
+}				/* sem_open */
+
+
+int
+sem_close (sem_t * sem)
+{
+  errno = ENOSYS;
+  return -1;
+}				/* sem_close */
+
+
+int
+sem_unlink (const char * name)
+{
+  errno = ENOSYS;
+  return -1;
+}				/* sem_unlink */
+
+
+int
+sem_getvalue (sem_t * sem, int * sval)
+{
+  errno = ENOSYS;
+  return -1;
+}				/* sem_getvalue */
+

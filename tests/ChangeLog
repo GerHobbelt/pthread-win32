@@ -1,3 +1,17 @@
+Sat May 29 23:29:04 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* runall.bat (condvar5): Add new test.
+
+	* runall.bat (condvar6): Add new test.
+
+	* Makefile (condvar5) : Add new test.
+	
+	* Makefile (condvar6) : Add new test.
+	
+	* condvar5.c: New test for pthread_cond_broadcast().
+
+	* condvar6.c: New test for pthread_cond_broadcast().
+
 Sun Apr  4 12:04:28 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* tsd1.c (mythread): Change Sleep(0) to sched_yield().

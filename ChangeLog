@@ -15,6 +15,24 @@ Fri May 14 12:13:18 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 	* attr.c (pthread_attr_setdetachstate): Fix logic bug
 	- Mike Russo <miker@eai.com>.
 
+Sat May  8 09:42:30 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.def (sem_open): Add.
+	(sem_close): Add.
+	(sem_unlink): Add.
+	(sem_getvalue): Add.
+
+	* FAQ (Question 3): Add.
+
+Thu Apr  8 01:16:23 1999  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* semaphore.c (sem_open): New function; returns an error (ENOSYS).
+	(sem_close): ditto.
+	(sem_unlink): ditto.
+	(sem_getvalue): ditto.
+
+	* semaphore.h (_POSIX_SEMAPHORES): define.
+	
 Wed Apr  7 14:09:52 1999  Ross Johnson  <rpj@swan.canberra.edu.au>
 
 	* errno.c (_REENTRANT || _MT): Invert condition.
