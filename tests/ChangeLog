@@ -1,4 +1,32 @@
+2002-02-28  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* exception3.c (terminateFunction): For MSVC++, call
+	exit() rather than pthread_exit(). Add comments to explain
+	why.
+	   * Notes from the MSVC++ manual:
+	   *       1) A term_func() should call exit(), otherwise
+	   *          abort() will be called on return to the caller.
+	   *          abort() raises SIGABRT. The default signal handler
+	   *          for all signals terminates the calling program with
+	   *          exit code 3.
+	   *       2) A term_func() must not throw an exception. Therefore
+	   *          term_func() should not call pthread_exit() if an
+	   *          an exception-using version of pthreads-win32 library
+	   *          is being used (i.e. either pthreadVCE or pthreadVSE).
+
+
 2002-02-23  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* rwlock2_t.c: New test.
+	* rwlock3_t.c: New test.
+	* rwlock4_t.c: New test.
+	* rwlock5_t.c: New test.
+	* rwlock6_t.c: New test.
+	* rwlock6_t2.c: New test.
+	* rwlock6.c (main): Swap thread and result variables
+	to correspond to actual thread functions.
+	* rwlock1.c: Change test description comment to correspond
+	to the actual test.
 
 	* condvar1_2.c: Loop over the test many times in the hope
 	of detecting any intermittent deadlocks. This is to

@@ -77,6 +77,7 @@ TESTS	= loadfree \
 	  condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 rwlock7 \
+	  rwlock2_t rwlock3_t rwlock4_t rwlock5_t rwlock6_t rwlock6_t2 \
 	  context1 cancel3 cancel4 cancel5 cancel6a cancel6d \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
@@ -91,17 +92,18 @@ BENCHTESTS = \
 PASSES		= $(TESTS:%=%.pass)
 BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
 
-default:
+help:
 	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) nmake clean GCE   (to test using GCE dll with C++ (EH) applications)
 	@ $(ECHO) nmake clean GC    (to test using GC dll with C (no EH) applications)
 	@ $(ECHO) nmake clean GCX   (to test using GC dll with C++ (EH) applications)
-	@ $(ECHO) nmake clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)
+	@ $(ECHO) nmake clean GCE   (to test using GCE dll with C++ (EH) applications)
 	@ $(ECHO) nmake clean GC-bench	  (to benchtest using GNU C dll with C cleanup code)
+	@ $(ECHO) nmake clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)
 
-auto:
-	@ $(MAKE) clean GCE
+all:
 	@ $(MAKE) clean GC
+	@ $(MAKE) clean GCX
+	@ $(MAKE) clean GCE
 
 GC:
 	$(MAKE) GCX=GC XXCFLAGS="-x c -D__CLEANUP_C" all-pass
@@ -212,6 +214,12 @@ rwlock4.pass: rwlock3.pass
 rwlock5.pass: rwlock4.pass
 rwlock6.pass: rwlock5.pass
 rwlock7.pass: rwlock6.pass
+rwlock2_t.pass: rwlock2.pass
+rwlock3_t.pass: rwlock2_t.pass
+rwlock4_t.pass: rwlock3_t.pass
+rwlock5_t.pass: rwlock4_t.pass
+rwlock6_t.pass: rwlock5_t.pass
+rwlock6_t2.pass: rwlock6_t.pass
 self1.pass:
 self2.pass: create1.pass
 spin1.pass:
@@ -264,3 +272,4 @@ clean:
 	- $(RM) *.exe
 	- $(RM) *.pass
 	- $(RM) *.bench
+	- $(RM) *.log

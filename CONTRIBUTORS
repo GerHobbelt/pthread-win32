@@ -4,34 +4,97 @@ Contributors (in approximate order of appearance)
 attributed in log entries. Likewise in the FAQ file.]
 
 Ben Elliston		bje@cygnus.com
+					Initiated the project;
+					setup the project infrastructure (CVS, web page, etc.);
+					early prototype routines.
 Ross Johnson		rpj@ise.canberra.edu.au
-Robert Colquhoun	rjc@trump.net.au
+					early prototype routines;
+					ongoing project coordination/maintenance;
+					implementation of spin locks and barriers;
+					bug fixes;
+					documentation;
+					testsuite.
+Robert Colquhoun		rjc@trump.net.au
+					Early bug fixes.
 John E. Bossom		John.Bossom@cognos.com
-Anders Norlander	anorland@hem2.passagen.se
+					Contributed substantial original working implementation;
+					bug fixes;
+					ongoing guidance and standards interpretation.
+Anders Norlander		anorland@hem2.passagen.se
+					Early enhancements and runtime checking for supported
+					Win32 routines.
 Tor Lillqvist		tml@iki.fi
+					General enhancements;
+					early bug fixes to condition variables.
+Scott Lightner		scott@curriculum.com
+					Bug fix.
 Kevin Ruland		Kevin.Ruland@anheuser-busch.com
-Mike Russo		miker@eai.com
-Mark E. Armstrong	avail@pacbell.net
+					Various bug fixes.
+Mike Russo			miker@eai.com
+					Bug fix.
+Mark E. Armstrong		avail@pacbell.net
+					Bug fixes.
 Lorin Hochstein		lmh@xiphos.ca
+					general bug fixes; bug fixes to condition variables.
 Peter Slacik		Peter.Slacik@tatramed.sk
-Mumit Khan		khan@xraylith.wisc.edu
-Aurelio Medina		aureliom@crt.com
+					Bug fixes.
+Mumit Khan			khan@xraylith.wisc.edu
+					Fixes to work with Mingw32.
 Milan Gardian		mg@tatramed.sk
-Graham Dumpleton	Graham.Dumpleton@ra.pad.otc.telstra.com.au
-Tristan Savatier	tristan@mpegtv.com
+					Bug fixes and reports/analyses of obscure problems.
+Aurelio Medina		aureliom@crt.com
+					First implementation of read-write locks.
+Graham Dumpleton		Graham.Dumpleton@ra.pad.otc.telstra.com.au
+					Bug fix in condition variables.
+Tristan Savatier		tristan@mpegtv.com
+					WinCE port.
 Erik Hensema		erik@hensema.xs4all.nl
-Rich Peters		rpeters@micro-magic.com
-Todd Owen		towen@lucidcalm.dropbear.id.au
-Jason Nye		jnye@nbnet.nb.ca
+					Bug fixes.
+Rich Peters			rpeters@micro-magic.com
+Todd Owen			towen@lucidcalm.dropbear.id.au
+					Bug fixes to dll loading.
+Jason Nye			jnye@nbnet.nb.ca
+					Implementation of async cancelation.
 Fred Forester		fforest@eticomm.net
 Kevin D. Clark		kclark@cabletron.com
-David Baggett	        dmb@itasoftware.com
-Paul Redondo	        paul@matchvision.com
-Scott McCaskill	        scott@3dfx.om
-Thomas Pfaff            tpfaff@gmx.net
-Franco Bez              franco.bez@gmx.de
-Alexander Terekhov      TEREKHOV@de.ibm.com
+David Baggett		dmb@itasoftware.com
+					Bug fixes.
+Paul Redondo		paul@matchvision.com
+Scott McCaskill		scott@3dfx.om
+					Bug fixes.
+Jef Gearhart		jgearhart@tpssys.com
+					Bug fix.
+Arthur Kantor		akantor@bexusa.com
+					Mutex enhancements.
+Steven Reddie		smr@essemer.com.au
+					Bug fix.
+Alexander Terekhov	TEREKHOV@de.ibm.com
+					Re-implemented and improved read-write locks;
+					(with Louis Thomas) re-implemented and improved
+					condition variables;
+					enhancements to semaphores;
+					system clock change handling re CV timeouts;
+					bug fixes.
+Thomas Pfaff		tpfaff@gmx.net
+					Changes to make C version usable with C++ applications;
+					re-implemented mutex routines to avoid Win32 mutexes
+					and TryEnterCriticalSection;
+					procedure to fix Mingw32 thread-safety issues.
+Franco Bez			franco.bez@gmx.de
+					procedure to fix Mingw32 thread-safety issues.
 Louis Thomas		lthomas@arbitrade.com
-David Korn		dgk@research.att.com
-Phil Frisbie, Jr.	phil@hawksoft.com
-
+					(with Alexander Terekhov) re-implemented and improved
+					condition variables.
+David Korn			dgk@research.att.com
+					Ported to UWIN.
+Phil Frisbie, Jr.		phil@hawksoft.com
+					Bug fix.
+Ralf Brese			Ralf.Brese@pdb4.siemens.de
+					Bug fix.
+prionx@juno.com		prionx@juno.com
+					Bug fixes.
+Max Woodbury		mtew@cds.duke.edu
+					POSIX versioning conditionals;
+					reduced namespace pollution;
+					idea to separate routines to reduce statically
+					linked image sizes.

@@ -1104,7 +1104,7 @@ PTW32_DLLPORT int pthreadCancelableTimedWait (HANDLE waitHandle,
  * Thread-Safe C Runtime Library Mappings.
  */
 #ifndef _UWIN
-#if (! defined(HAVE_ERRNO)) && (! defined(_REENTRANT)) && (! defined(_MT)) && (! defined(_MD))
+#if (! defined(HAVE_ERRNO)) && (! defined(_REENTRANT)) && (! defined(_MT))
 PTW32_DLLPORT int * _errno( void );
 #endif
 #endif

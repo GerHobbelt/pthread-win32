@@ -40,7 +40,7 @@ ECHO	= @echo
 
 CPHDR	= pthread.h semaphore.h sched.h
 
-OPTIM	= /O2
+OPTIM	= /O2 /Ob0
 
 # C++ Exceptions
 VCEFLAGS	= /GX /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
@@ -89,6 +89,7 @@ PASSES= loadfree.pass \
 	  condvar7.pass  condvar8.pass  condvar9.pass  \
 	  errno1.pass  \
 	  rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  rwlock5.pass  rwlock6.pass  rwlock7.pass  \
+	  rwlock2_t.pass  rwlock3_t.pass  rwlock4_t.pass  rwlock5_t.pass  rwlock6_t.pass  rwlock6_t2.pass  \
 	  context1.pass  \
 	  cancel3.pass  cancel4.pass  cancel5.pass  cancel6a.pass  cancel6d.pass  \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
@@ -101,22 +102,22 @@ PASSES= loadfree.pass \
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
 
-all:
+help:
 	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) nmake clean VCE   (to test using the VCE dll with VC++ EH applications)
-	@ $(ECHO) nmake clean VSE   (to test using VSE dll with VC (SEH) applications)
 	@ $(ECHO) nmake clean VC    (to test using VC dll with VC (no EH) applications)
 	@ $(ECHO) nmake clean VCX   (to test using VC dll with VC++ (EH) applications)
-	@ $(ECHO) nmake clean VCE-bench   (to benchtest using VCE dll with C++ bench app)
-	@ $(ECHO) nmake clean VSE-bench   (to benchtest using VSE dll with SEH bench app)
+	@ $(ECHO) nmake clean VCE   (to test using the VCE dll with VC++ EH applications)
+	@ $(ECHO) nmake clean VSE   (to test using VSE dll with VC (SEH) applications)
 	@ $(ECHO) nmake clean VC-bench    (to benchtest using VC dll with C bench app)
 	@ $(ECHO) nmake clean VCX-bench   (to benchtest using VC dll with C++ bench app)
+	@ $(ECHO) nmake clean VCE-bench   (to benchtest using VCE dll with C++ bench app)
+	@ $(ECHO) nmake clean VSE-bench   (to benchtest using VSE dll with SEH bench app)
 
-auto:
-	@ nmake clean VCE
-	@ nmake clean VSE
+all:
 	@ nmake clean VC
 	@ nmake clean VCX
+	@ nmake clean VCE
+	@ nmake clean VSE
 	@ nmake clean VC-bench
 
 tests: $(CPLIB) $(CPDLL) $(CPHDR) $(PASSES)
@@ -190,6 +191,7 @@ clean:
 	- $(RM) *.exe
 	- $(RM) *.pass
 	- $(RM) *.bench
+	- $(RM) *.log
 
 benchtest1.bench:
 benchtest2.bench:
@@ -277,6 +279,12 @@ rwlock4.pass: rwlock3.pass
 rwlock5.pass: rwlock4.pass
 rwlock6.pass: rwlock5.pass
 rwlock7.pass: rwlock6.pass
+rwlock2_t.pass: rwlock2.pass
+rwlock3_t.pass: rwlock2_t.pass
+rwlock4_t.pass: rwlock3_t.pass
+rwlock5_t.pass: rwlock4_t.pass
+rwlock6_t.pass: rwlock5_t.pass
+rwlock6_t2.pass: rwlock6_t.pass
 self1.pass:
 self2.pass: create1.pass
 spin1.pass:

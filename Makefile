@@ -15,8 +15,8 @@ INLINED_STAMPS	= pthreadVCE.stamp pthreadVSE.stamp pthreadVC.stamp
 
 OPTIM	= /O2
 
-#CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H /DTEST_ICE
-CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
+#CFLAGS	= /W3 /MD /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H /DTEST_ICE
+CFLAGS	= /W3 /MD /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
 
 # C++ Exceptions
 VCEFLAGS	= /GX /TP /D__CLEANUP_CXX $(CFLAGS)
@@ -94,7 +94,7 @@ SMALL_STATIC_OBJS	= \
 		create.obj \
 		dll.obj \
 		errno.obj \
-		exit.obj \
+		pthread_exit.obj \
 		fork.obj \
 		global.obj \
 		pthread_mutex_init.obj \
@@ -224,6 +224,9 @@ CONDVAR_SRCS	= \
 		pthread_cond_signal.c \
 		pthread_cond_wait.c
 
+EXIT_SRCS	= \
+		pthread_exit.c
+
 MISC_SRCS	= \
 		pthread_equal.c \
 		pthread_getconcurrency.c \
@@ -338,7 +341,7 @@ TSD_SRCS	= \
 		pthread_getspecific.c
 
 
-all:
+help:
 	@ echo Run one of the following command lines:
 	@ echo nmake clean VCE   (to build the MSVC dll with C++ exception handling)
 	@ echo nmake clean VSE   (to build the MSVC dll with structured exception handling)
@@ -347,10 +350,10 @@ all:
 	@ echo nmake clean VSE-inlined   (to build the MSVC inlined dll with structured exception handling)
 	@ echo nmake clean VC-inlined    (to build the MSVC inlined dll with C cleanup code)
 
-auto:
-	@ nmake clean VCE
-	@ nmake clean VSE
-	@ nmake clean VC
+all:
+	@ nmake clean VCE-inlined
+	@ nmake clean VSE-inlined
+	@ nmake clean VC-inlined
 
 VCE:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCEFLAGS)" pthreadVCE.dll
@@ -408,6 +411,7 @@ attr.obj:	attr.c $(ATTR_SRCS) $(INCL)
 barrier.obj:	barrier.c $(BARRIER_SRCS) $(INCL)
 cancel.obj:	cancel.c $(CANCEL_SRCS) $(INCL)
 condvar.obj:	condvar.c $(CONDVAR_SRCS) $(INCL)
+exit.obj:	exit.c $(EXIT_SRCS) $(INCL)
 misc.obj:	misc.c $(MISC_SRCS) $(INCL)
 mutex.obj:	mutex.c $(MUTEX_SRCS) $(INCL)
 nonportable.obj:	nonportable.c $(NONPORTABLE_SRCS) $(INCL)

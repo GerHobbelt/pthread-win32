@@ -35,12 +35,10 @@
  *
  * --------------------------------------------------------------------------
  *
- * Create a simple rwlock object, lock it, and then unlock it again.
+ * Create a simple rwlock object and then destroy it.
  *
  * Depends on API functions:
  * 	pthread_rwlock_init()
- *	pthread_rwlock_lock()
- *	pthread_rwlock_unlock()
  *	pthread_rwlock_destroy()
  */
 

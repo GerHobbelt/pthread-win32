@@ -35,9 +35,9 @@
  *
  * --------------------------------------------------------------------------
  *
- * Check that writer locks have priority.
+ * Check writer and reader locking
  *
- * Depends on API functions: 
+ * Depends on API functions:
  *      pthread_rwlock_rdlock()
  *      pthread_rwlock_wrlock()
  *      pthread_rwlock_unlock()
@@ -51,23 +51,25 @@ static int bankAccount = 0;
 
 void * wrfunc(void * arg)
 {
+  int ba;
+
   assert(pthread_rwlock_wrlock(&rwlock1) == 0);
   Sleep(2000);
   bankAccount += 10;
+  ba = bankAccount;
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
-  return ((void *) bankAccount);
+  return ((void *) ba);
 }
 
 void * rdfunc(void * arg)
 {
-  int ba = 0;
+  int ba;
 
   assert(pthread_rwlock_rdlock(&rwlock1) == 0);
   ba = bankAccount;
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
-  ba += 10;
   return ((void *) ba);
 }
 
@@ -85,17 +87,17 @@ main()
 
   assert(pthread_create(&wrt1, NULL, wrfunc, NULL) == 0);
   Sleep(500);
-  assert(pthread_create(&wrt2, NULL, rdfunc, NULL) == 0);
+  assert(pthread_create(&rdt, NULL, rdfunc, NULL) == 0);
   Sleep(500);
-  assert(pthread_create(&rdt, NULL, wrfunc, NULL) == 0);
+  assert(pthread_create(&wrt2, NULL, wrfunc, NULL) == 0);
 
   assert(pthread_join(wrt1, (void **) &wr1Result) == 0);
-  assert(pthread_join(wrt2, (void **) &wr2Result) == 0);
   assert(pthread_join(rdt, (void **) &rdResult) == 0);
+  assert(pthread_join(wrt2, (void **) &wr2Result) == 0);
 
   assert(wr1Result == 10);
+  assert(rdResult == 10);
   assert(wr2Result == 20);
-  assert(rdResult == 20);
 
   return 0;
 }

@@ -180,10 +180,6 @@ SOURCE=.\tsd.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\acconfig.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\config.h
 # End Source File
 # Begin Source File
@@ -212,8 +208,5 @@ SOURCE=.\semaphore.h
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # Begin Source File
 
-SOURCE=.\pthread.def
-# End Source File
-# End Group
-# End Target
-# End Project
+
+
