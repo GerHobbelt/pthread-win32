@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 typedef HANDLE pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
 typedef DWORD pthread_key_t;
-typedef unsigned short pthread_once_t;
 
 typedef struct {
   enum { SIGNAL, BROADCAST, NUM_EVENTS };
@@ -43,8 +42,10 @@ typedef struct {
 typedef struct { void * ptr; } pthread_condattr_t;
 typedef struct { void * ptr; } pthread_mutexattr_t;
 
-/* Initialisers. */
-#define PTHREAD_ONCE_INIT 0
+typedef struct {
+  unsigned short flag;
+  pthread_mutex_t lock;
+} pthread_once_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,6 +63,8 @@ pthread_t pthread_self(void);
 int pthread_equal(pthread_t t1, pthread_t t2);
 
 int pthread_join(pthread_t thread, void ** valueptr);
+
+int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
 
 /* Functions for manipulating thread attribute objects. */
 
