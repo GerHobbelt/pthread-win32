@@ -1,5 +1,7 @@
 1998-10-05  Ben Elliston  <bje@cygnus.com>
 
+	* misc.c (pthread_equal): Correct inverted logic bug.
+
 	* global.c (PTHREAD_MUTEX_INITIALIZER): Move to pthread.h.
 
 	* pthread.h (PTHREAD_MUTEX_INITIALIZER): Define.
@@ -17,6 +19,12 @@
 
 	* tests/mutex3.c: New file; test for the static initialisation
 	macro. Passes.
+
+	* tests/create1.c: New file; test pthread_create(). Passes.
+	
+	* tests/equal.c: Poor test; remove.
+	
+	* tests/equal1.c New file; test pthread_equal(). Passes.
 	
 1998-10-04  Ben Elliston  <bje@cygnus.com>
 
