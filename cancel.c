@@ -30,29 +30,7 @@
 static void 
 ptw32_cancel_self(void)
 {
-#if defined(_MSC_VER) && !defined(__cplusplus)
-
-  DWORD exceptionInformation[3];
-
-  exceptionInformation[0] = (DWORD) (_PTHREAD_EPS_CANCEL);
-  exceptionInformation[1] = (DWORD) (0);
-  exceptionInformation[2] = (DWORD) (0);
-
-  RaiseException (
-		  EXCEPTION_PTHREAD_SERVICES,
-		  0,
-		  3,
-		  exceptionInformation);
-
-#else /* _MSC_VER && ! __cplusplus */
-
-# ifdef __cplusplus
-
-  throw Pthread_exception_cancel();
-
-# endif /* __cplusplus */
-
-#endif /* _MSC_VER && ! __cplusplus */
+  ptw32_throw(PTW32_EPS_CANCEL);
 
   /* Never reached */
 }
@@ -62,7 +40,7 @@ ptw32_cancel_self(void)
  * ptw32_cancel_thread implements asynchronous cancellation.
  */
 static void 
-ptw32_ancel_thread(pthread_t thread)
+ptw32_cancel_thread(pthread_t thread)
 {
   HANDLE threadH = thread->threadH;
 
@@ -158,7 +136,7 @@ pthread_setcancelstate (int state, int *oldstate)
     {
       ResetEvent(self->cancelEvent);
       (void) pthread_mutex_unlock(&self->cancelLock);
-      ptw32_cancel_self();
+      ptw32_throw(PTW32_EPS_CANCEL);
 
       /* Never reached */
     }
@@ -242,7 +220,7 @@ pthread_setcanceltype (int type, int *oldtype)
     {
       ResetEvent(self->cancelEvent);
       (void) pthread_mutex_unlock(&self->cancelLock);
-      ptw32_cancel_self();
+      ptw32_throw(PTW32_EPS_CANCEL);
 
       /* Never reached */
     }
@@ -293,31 +271,7 @@ pthread_testcancel (void)
       /*
        * Canceling!
        */
-
-#if defined(_MSC_VER) && !defined(__cplusplus)
-
-      DWORD exceptionInformation[3];
-
-      exceptionInformation[0] = (DWORD) (_PTHREAD_EPS_CANCEL);
-      exceptionInformation[1] = (DWORD) (0);
-      exceptionInformation[2] = (DWORD) (0);
-
-      RaiseException (
-		      EXCEPTION_PTHREAD_SERVICES,
-		      0,
-		      3,
-		      exceptionInformation);
-
-#else /* _MSC_VER && ! __cplusplus */
-
-#ifdef __cplusplus
-
-      throw Pthread_exception_cancel();
-
-#endif /* __cplusplus */
-
-#endif /* _MSC_VER && ! __cplusplus */
-
+      ptw32_throw(PTW32_EPS_CANCEL);
     }
 }				/* pthread_testcancel */
 
@@ -384,7 +338,7 @@ pthread_cancel (pthread_t thread)
       if (cancel_self)
 	{
 	  (void) pthread_mutex_unlock(&self->cancelLock);
-	  ptw32_cancel_self();
+	  ptw32_throw(PTW32_EPS_CANCEL);
 
 	  /* Never reached */
 	}

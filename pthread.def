@@ -1,5 +1,5 @@
 ; pthread.def
-; Last updated: $Date: 2000/08/17 10:18:36 $
+; Last updated: $Date: 2000/08/18 08:02:29 $
 
 ; Currently unimplemented functions are commented out.
 
@@ -102,6 +102,7 @@ pthread_rwlock_unlock
 ; Non-portable but useful
 ;
 pthread_mutexattr_setforcecs_np
+pthread_getw32threadhandle_np
 pthreadCancelableWait
 pthreadCancelableTimedWait
 ;

@@ -26,19 +26,14 @@ Change Summary (since the last snapshot)
 (See the ChangeLog file for details.)
 
 New:
--	Renamed DLL and LIB files:
-		pthreadVSE.dll	(MS VC++/Structured EH)
-		pthreadVSE.lib
-		pthreadVCE.dll	(MS VC++/C++ EH)
-		pthreadVCE.lib
-		pthreadGCE.dll	(GNU G++/C++ EH)
-		libpthreadw32.a
-
-	Both your application and the pthread dll should use the
-	same exception handling scheme.
+-	New non-portable function (see the README file):
+		pthread_getw32threadhandle_np
 
 Bugs fixed:
--	MSVC++ C++ exception handling.
+-	TSD key creation race condition;
+-	Other potential race conditions
+	associated with initialising various
+	pthreads objects.
 
 Some new tests have been added.
 
@@ -46,15 +41,18 @@ Some new tests have been added.
 Known bugs in this snapshot
 ---------------------------
 
-1. Running the test "join1.c" with the library built with Mingw32
+1. Asynchronous cancelation only works on Intel X86 machines.
+
+2. Running the test "join1.c" with the library built with Mingw32
 and the GNUmakefile included, the test fails with a segmentation (invalid
 page access) exception. The fault appears to be in the assembler code
 emmitted by the compiler [to handle exception contexts] at the
 end of the try block in ptw32_threadStart().
 
-2. There are problems using the libpthreadw32.a stub archive derived
+3. There are problems using the libpthreadw32.a stub archive derived
 from either of pthreadVSE.dll or pthreadVCE.dll. The cleanup1.c test
-fails.
+fails. This is now an expected result of having different EH and cleanup
+handler schemes in the library and application.
 
 
 Caveats
@@ -206,6 +204,12 @@ The following functions are implemented:
       Signals
       ---------------------------
       pthread_sigmask
+
+      ---------------------------
+      Non-portable routines (see the README file for usage)
+      ---------------------------
+      pthread_mutexattr_setforcecs_np
+      pthread_getw32threadhandle_np
 
       ---------------------------
       Static Initializers (macros)
