@@ -732,7 +732,7 @@ pthread_mutexattr_settype (pthread_mutexattr_t * attr,
       *          return with an error.
       *
       * PTHREAD_MUTEX_DEFAULT
-      *          Same as PTHREAD_MUTEX_ERRORCHECK.
+      *          Same as PTHREAD_MUTEX_RECURSIVE.
       * 
       * PTHREAD_MUTEX_RECURSIVE
       *          A thread attempting to relock this  mutex  without
@@ -851,7 +851,6 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
           ptw32_EnterCriticalSection(&mx->cs);
         }
       break;
-    case PTHREAD_MUTEX_DEFAULT:
     case PTHREAD_MUTEX_ERRORCHECK:
       if (pthread_equal(mx->ownerThread, self))
         {
@@ -862,6 +861,7 @@ pthread_mutex_lock(pthread_mutex_t *mutex)
           ptw32_EnterCriticalSection(&mx->cs);
         }
       break;
+    case PTHREAD_MUTEX_DEFAULT:
     case PTHREAD_MUTEX_RECURSIVE:
       ptw32_EnterCriticalSection(&mx->cs);
       break;

@@ -27,20 +27,51 @@ Change Summary (since the last snapshot)
 
 New:
 -       New functions (no-ops) for source code compatibility:
-                pthread_getconcurrency
+                pthread_getconcurrency()
                         (Only returns the value '0' to indicate
                         that the system default concurrency is
                         used)
-                pthread_setconcurrency
+                pthread_setconcurrency()
                         (Accepts any value >= 0 but does not
                         have any effect; always returns '0' or
                         EINVAL if arg < 0)
-                pthread_attr_getscope
-                pthread_attr_setscope
+                pthread_attr_getscope()
+                pthread_attr_setscope()
                         (Currently only return ENOSYS)
 
+-       The following mutex types and related functions are now
+        supported:
+                pthread_mutexattr_gettype()
+                pthread_mutexattr_settype()
+                PTHREAD_MUTEX_DEFAULT
+                PTHREAD_MUTEX_NORMAL
+                PTHREAD_MUTEX_ERRORCHECK
+                PTHREAD_MUTEX_RECURSIVE
+        In this implementation PTHREAD_MUTEX_DEFAULT is
+        mapped to PTHREAD_MUTEX_RECURSIVE for backward
+        compatibility. Note that this mapping is allowed
+        by the Open Group description but that behaviour
+        considered as "undefined" in manual descriptions may
+        be different to some other implementations, eg
+        Solaris.
+
+        PTHREAD_MUTEX_NORMAL will simulate thread deadlock
+        if the owner of a mutex tries to relock it without
+        first unlocking it, however the lock will be released
+        if the owner thread is async-canceled.
+
+-       Pthreads-win32 mutexes are now always based on
+        Win32 critical sections. We no longer use Win32
+        mutexes when TryEnterCriticalSection isn't
+        supported.
+        - Thomas Pfaff <tpfaff@gmx.net>
+
 Bugs fixed:
--       
+-       The condition variable and read-write lock functions
+        have been improved. For details re the [fixed] problems
+        in the CV implementation see the file README.CV
+        - Alexander Terekhov <TEREKHOV@de.ibm.com>
+
 
 Known bugs in this snapshot
 ---------------------------
@@ -147,6 +178,11 @@ The following functions are implemented:
       pthread_mutexattr_destroy
       pthread_mutexattr_getpshared
       pthread_mutexattr_setpshared
+      pthread_mutexattr_gettype
+      pthread_mutexattr_settype (types: PTHREAD_MUTEX_DEFAULT
+                                        PTHREAD_MUTEX_NORMAL
+                                        PTHREAD_MUTEX_ERRORCHECK
+                                        PTHREAD_MUTEX_RECURSIVE  )
 
       pthread_mutex_init
       pthread_mutex_destroy
@@ -200,10 +236,10 @@ The following functions are implemented:
       pthread_attr_setschedparam  
       pthread_getschedparam
       pthread_setschedparam
-      pthread_getconcurrency
-      pthread_getconcurrency
-      pthread_attr_getscope
-      pthread_attr_setscope
+      pthread_getconcurrency (always returns '0' indicating system default)
+      pthread_setconcurrency (accepts any value >= 0 but is ignored)
+      pthread_attr_getscope  (returns an error ENOSYS)
+      pthread_attr_setscope  (returns an error ENOSYS)
       sched_get_priority_max (POSIX 1b)
       sched_get_priority_min (POSIX 1b)
       sched_yield            (POSIX 1b)
@@ -214,15 +250,15 @@ The following functions are implemented:
       pthread_sigmask
 
       ---------------------------
-      Non-portable routines (see the README file for usage)
+      Non-portable routines (see the README.NONPORTABLE file for usage)
       ---------------------------
       pthread_mutexattr_setforcecs_np
       pthread_getw32threadhandle_np
-	pthread_delay_np
-	pthread_win32_process_attach_np
-	pthread_win32_process_detach_np
-	pthread_win32_thread_attach_np
-	pthread_win32_thread_detach_np
+      pthread_delay_np
+      pthread_win32_process_attach_np
+      pthread_win32_process_detach_np
+      pthread_win32_thread_attach_np
+      pthread_win32_thread_detach_np
 
       ---------------------------
       Static Initializers (macros)

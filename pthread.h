@@ -363,10 +363,10 @@ typedef struct pthread_rwlockattr_t_ *pthread_rwlockattr_t;
 /*
  * pthread_attr_(get,set}scope
  *
- * PTHREAD_SCOPE_PROCESS is the only scope supported.
+ * PTHREAD_SCOPE_SYSTEM is currently the only scope supported.
  */
-#define PTHREAD_SCOPE_SYSTEM  0
-#define PTHREAD_SCOPE_PROCESS 1
+#define PTHREAD_SCOPE_SYSTEM            0
+#define PTHREAD_SCOPE_PROCESS           1
 
 /*
  * ====================

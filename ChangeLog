@@ -1,3 +1,9 @@
+2001-02-07  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* mutex.c (pthread_mutex_lock): Map default type
+	PTHREAD_MUTEX_DEFAULT to PTHREAD_MUTEX_RECURSIVE
+	for backward compatibility.
+
 2001-02-07  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* rwlock.c: Revamped.
