@@ -65,7 +65,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
    pointer to an object in memory. */
 #define PTHREAD_CANCELED            ((void *) 1)
 
-typedef HANDLE pthread_t;
+typedef struct _pthread * pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
 typedef DWORD pthread_key_t;
 

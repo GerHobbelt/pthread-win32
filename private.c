@@ -23,16 +23,17 @@
  */
 
 int
-_pthread_new_thread_entry(pthread_t thread, _pthread_threads_thread_t * entry)
+_pthread_new_thread_entry(_pthread_t * entry)
 {
-  _pthread_threads_thread_t * new;
+  _pthread_t new;
 
   if (_pthread_threads_count >= PTHREAD_THREADS_MAX)
     {
       return EAGAIN;
     }
 
-  new = &_pthread_threads_table[_PTHREAD_HASH_INDEX(thread)];
+  /* Use a preloaded reuse stack of pthread_t. */
+  new = 
 
   while (new->thread != NULL)
     {
