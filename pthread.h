@@ -31,6 +31,8 @@ int pthread_create(pthread_t *thread,
 		   void * (*start_routine) (void *),
 		   void * arg);
 
+void pthread_exit(void *value);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
