@@ -1,3 +1,8 @@
+1998-09-13  Ben Elliston  <bje@cygnus.com>
+
+	* eyal1.c: New file; contributed by Eyal Lebedinsky
+	<eyal@eyal.emu.id.au>.
+
 1998-09-12  Ben Elliston  <bje@cygnus.com>
 
 	* exit2.c (func): Return a value.
