@@ -1,6 +1,6 @@
 Last updated: $Date$
 
-Completion:	58 out of 61 functions	[ 95%]
+Completion:	60 out of 61 functions	[ 98%]
 
 U = unimplemented
 * = practically completed
@@ -23,7 +23,7 @@ no.	name					status
 15	pthread_attr_setscope			U
 16	pthread_attr_setstackaddr		*
 17	pthread_attr_setstacksize		*
-18	pthread_cancel
+18	pthread_cancel				*
 19	pthread_cleanup_pop			*
 20	pthread_cleanup_push			*
 21	pthread_condattr_destroy		*
@@ -66,4 +66,4 @@ no.	name					status
 58	pthread_setschedparam			*
 59	pthread_setspecific			*
 60	pthread_sigmask				*	
-61	pthread_testcancel
+61	pthread_testcancel			*
