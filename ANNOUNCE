@@ -1,4 +1,3 @@
-
                  PTHREADS-WIN32 SNAPSHOT 2001-06-04
                  ----------------------------------
        Web Site: http://sources.redhat.com/pthreads-win32/
@@ -34,26 +33,28 @@ New:
 	on the following processors: IX86, MIPS, ALPHA, PPC.
 	- contributors name misplaced (please contact me if it's you)
  
--     New functions (no-ops) for source code compatibility:
+-       New functions (no-ops) for source code compatibility:
                 pthread_getconcurrency()
                   	Returns the value previously set by
-				pthread_setconcurrency() or 0 (zero)
-				if no value was previously set.
-				The implementation does not currently use
-				this value.
+			pthread_setconcurrency(), or 0 (zero)
+			if no value was previously set.
+			The implementation does not currently use
+			this value.
                 pthread_setconcurrency()
                         Accepts any value >= 0 but does not
-                        have any effect; returns '0' or
+                        have any effect; returns '0', or
                         EINVAL if the value is < 0
                 pthread_attr_getscope()
                 pthread_attr_setscope()
                         Currently only return ENOSYS
 
--     The following mutex types and related functions are now
-      supported:
+-       The following mutex types and related functions are now
+        supported:
 
                 pthread_mutexattr_gettype()
                 pthread_mutexattr_settype()
+                pthread_mutexattr_setkind_np()
+                pthread_mutexattr_getkind_np()
                 PTHREAD_MUTEX_DEFAULT
                 PTHREAD_MUTEX_NORMAL or PTHREAD_MUTEX_FAST_NP
                 PTHREAD_MUTEX_ERRORCHECK or PTHREAD_MUTEX_ERRORCHECK_NP
@@ -61,9 +62,9 @@ New:
 
 	The *_NP versions are for Linux portability.
 
-      In this implementation PTHREAD_MUTEX_DEFAULT is
-      mapped to PTHREAD_MUTEX_NORMAL for compatibility
-	with major Unix vendors. This is also the default
+        In this implementation PTHREAD_MUTEX_DEFAULT is
+        mapped to PTHREAD_MUTEX_NORMAL for compatibility
+        with major Unix vendors. This is also the default
 	if no type is specified.
 
 	Please note that the default behaviour in previous
@@ -73,14 +74,14 @@ New:
 	explicitly set the type of any mutexes that are, or
 	could be, locked recursively.
 
-      PTHREAD_MUTEX_NORMAL will cause thread deadlock
-      if the owner of a mutex tries to relock it without
-      first unlocking it. It has slightly less overhead
+        PTHREAD_MUTEX_NORMAL will cause thread deadlock
+        if the owner of a mutex tries to relock it without
+        first unlocking it. It has slightly less overhead
 	that other types.
         - Thomas Pfaff <tpfaff@gmx.net>
 
--     Pthreads-win32 mutexes are now based on Win32
-      critical sections for all Windows versions. The
+-       Pthreads-win32 mutexes are now based on Win32
+        critical sections for all Windows versions. The
 	implementation no longer depends on
 	TryEnterCriticalSection.
         - Thomas Pfaff <tpfaff@gmx.net>
@@ -427,17 +428,24 @@ send email to:
 
 Application Development Environments
 ------------------------------------
+
+See the README file for more information.
       
 MSVC:
 MSVC using SEH works. Distribute pthreadVSE.dll with your application.
 MSVC using C++ EH works. Distribute pthreadVCE.dll with your application.
+MSVC using C setjmp/longjmp works. Distribute pthreadVC.dll with your application.
+
 
 Mingw32:
 You need gcc-2.95.2-1 modified as per pthreads-win32 FAQ answer (6), with
 binutils-19990818-1 and msvcrt runtime-2000-03-27. Mingw32 must use
 the thread-safe MSVCRT library (see the FAQ). You need to distribute
-the gcc.dll DLL from Mingw32 with your application (as well as
-pthreadGCE.dll of course).
+the gcc.dll DLL from Mingw32 with your application.
+
+Mingw using C++ EH works. Distribute pthreadGCE.dll with your application.
+Mingw using C setjmp/longjmp works. Distribute pthreadGC.dll with your application.
+
 
 Cygwin: (http://sourceware.cygnus.com/cygwin/)
 Cygwin aims to provide a complete POSIX environment on top of Win32, including
@@ -445,6 +453,7 @@ threads. When this is complete, developers using Cygwin will not need
 pthreads-win32. At this time, Cygwin has preliminary support for multithreaded
 development, however, this is not turned on by default. We have not tested
 pthreads-win32 against Cygwin.
+
 
 UWIN:
 UWIN is a complete Unix-like environment for Windows from AT&T. Pthreads-win32
@@ -455,48 +464,25 @@ Generally:
 For convenience, the following pre-built files are available on the FTP site
 (see Availability above):
 
-	pthread.h		- for POSIX 1c threads
-	semaphore.h		- for POSIX 1b semaphores
+	pthread.h	- for POSIX 1c threads
+	semaphore.h	- for POSIX 1b semaphores
 	sched.h		- for POSIX 1b scheduling
 	pthreadVCE.dll	- built with MSVC++ compiler using C++ EH
 	pthreadVCE.lib
+	pthreadVC.dll	- built with MSVC compiler using C setjmp/longjmp
+	pthreadVC.lib
 	pthreadVSE.dll	- built with MSVC compiler using SEH
 	pthreadVSE.lib
-	pthreadGCE.dll	- built with Mingw32 G++ 2.95.2-1 
-	libpthreadw32.a	- derived from pthreadGCE.dll
+	pthreadGCE.dll	- built with Mingw32 G++ 2.95.2-1
+	pthreadGC.dll	- built with Mingw32 GCC 2.95.2-1 using setjmp/longjmp
+	libpthreadGCE.a	- derived from pthreadGCE.dll
+	libpthreadGC.a	- derived from pthreadGC.dll
+        gcc.dll         - needed if distributing applications that use pthreadGCE.dll
 
 These are the only files you need in order to build POSIX threads
 applications for Win32 using either MSVC or Mingw32.
       
 See the FAQ file in the source tree for additional information.
-
-
-Building the library with MSVC from source
-------------------------------------------
-
-A simple makefile for building the library with MSVC is available. Just
-run nmake in a command shell in the pthreads source directory for targets
-to make either the VSE or VCE version of the library. Eg:
-
-	cd <PTHREADS_ROOT>\pthreads
-	nmake clean VSE
-or
-	nmake clean VCE
-
-There are currently no nmake targets to make statically linked
-versions of the library.
-
-Building the library with MinGW32 from source
----------------------------------------------
-
-Run make in the pthreads source directory. Ie:
-
-	cd <PTHREADS_ROOT>\pthreads
-	make clean
-	make
-
-The GNU make utility will find the GNUmakefile in the pthreads source
-directory.
 
 
 Documentation
@@ -515,7 +501,11 @@ available:
         Pthreads Programming
         By Bradford Nichols, Dick Buttlar & Jacqueline Proulx Farrell
         O'Reilly (pub)
-      
+
+On the web: see the links at the bottom of the pthreads-win32 site:
+
+        http://sources.redhat.com/pthreads-win32/
+
 
 Acknowledgements
 ----------------
@@ -523,14 +513,24 @@ Acknowledgements
 This library is based substantially on a Win32 pthreads
 implementation contributed by John Bossom <John.Bossom@cognos.com>.
       
-The implementation of condition variables is derived from the work
-of Douglas Schmidt et al
-(http://www.cs.wustl.edu/~schmidt/win32-cv-1.html).
+The implementation of Condition Variables uses algorithms developed
+by Alexander Terekhov and Louis Thomas.
+
+The implementation of POSIX mutexes has been improved by Thomas Pfaff.
+
+The implementation of read/write locks was contributed by
+Aurelio Medina and improved by Alexander Terekhov.
+
+Many others have contributed significant time and effort to solve critical
+problems in order to make the library workable, robust and reliable.
 
 There is also a separate CONTRIBUTORS file. This file and others are
 on the web site:
 
         http://sources.redhat.com/pthreads-win32
+
+As much as possible, the ChangeLog file acknowledges contributions to the
+code base in more detail.
 
 Enjoy!
 
