@@ -632,7 +632,7 @@ pthread_rwlock_wrlock(pthread_rwlock_t * rwlock)
 
 	    pthread_cleanup_pop ((result != 0) ? 1 : 0);
 #ifdef _MSC_VER
-#pragma inline_depth(8)
+#pragma inline_depth()
 #endif
 
 	    if (result == 0)
