@@ -61,7 +61,7 @@ _cond_check_need_init(pthread_cond_t *cond)
    * re-initialise it only by calling pthread_cond_init()
    * explicitly.
    */
-  if (*cond == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
+  if (*cond == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
     {
       result = pthread_cond_init(cond, NULL);
     }
@@ -464,7 +464,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
       return EINVAL;
     }
 
-  if (*cond != (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
+  if (*cond != (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
     {
       cv = *cond;
 
@@ -492,12 +492,12 @@ pthread_cond_destroy (pthread_cond_t * cond)
       /*
        * See notes in _cond_check_need_init() above also.
        */
-      EnterCriticalSection(&ptw32_ond_test_init_lock);
+      EnterCriticalSection(&ptw32_cond_test_init_lock);
 
       /*
        * Check again.
        */
-      if (*cond == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
+      if (*cond == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
         {
           /*
            * This is all we need to do to destroy a statically
@@ -604,7 +604,7 @@ cond_timedwait (pthread_cond_t * cond,
    * again inside the guarded section of _cond_check_need_init()
    * to avoid race conditions.
    */
-  if (*cond == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
+  if (*cond == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
     {
       result = _cond_check_need_init(cond);
     }
@@ -855,7 +855,7 @@ pthread_cond_signal (pthread_cond_t * cond)
    * No-op if the CV is static and hasn't been initialised yet.
    * Assuming that race conditions are harmless.
    */
-  if (cv == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
+  if (cv == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
     {
       return 0;
     }
@@ -926,7 +926,7 @@ pthread_cond_broadcast (pthread_cond_t * cond)
    * No-op if the CV is static and hasn't been initialised yet.
    * Assuming that any race condition is harmless.
    */
-  if (cv == (pthread_cond_t) _PTHREAD_OBJECT_AUTO_INIT)
+  if (cv == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
     {
       return 0;
     }

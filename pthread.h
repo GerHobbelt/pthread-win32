@@ -821,9 +821,6 @@ int pthread_mutexattr_getpshared (const pthread_mutexattr_t
 int pthread_mutexattr_setpshared (pthread_mutexattr_t * attr,
 				  int pshared);
 
-int pthread_mutexattr_setforcecs_np(pthread_mutexattr_t *attr,
-				    int forcecs);
-
 /*
  * Mutex Functions
  */
@@ -873,7 +870,6 @@ int pthread_cond_broadcast (pthread_cond_t * cond);
 /*
  * Scheduling
  */
-
 int pthread_setschedparam (pthread_t thread,
 			   int policy,
 			   const struct sched_param *param);
@@ -891,7 +887,6 @@ int pthread_attr_setschedparam (pthread_attr_t *attr,
 /*
  * Read-Write Lock Functions
  */
-
 int pthread_rwlock_init(pthread_rwlock_t *lock,
                                const pthread_rwlockattr_t *attr);
 
@@ -906,6 +901,15 @@ int pthread_rwlock_rdlock(pthread_rwlock_t *lock);
 int pthread_rwlock_wrlock(pthread_rwlock_t *lock);
 
 int pthread_rwlock_unlock(pthread_rwlock_t *lock);
+
+/*
+ * Non-portable functions
+ */
+int pthread_mutexattr_setforcecs_np(pthread_mutexattr_t *attr,
+				    int forcecs);
+
+HANDLE pthread_getw32threadhandle_np(pthread_t thread);
+
 
 /*
  * Protected Methods
@@ -966,8 +970,21 @@ int * _errno( void );
 	rand()
 
 
-/* FIXME: This is only required if the library was built using SEH */
+#ifdef __cplusplus
+
 /*
+ * Internal exceptions
+ */
+class ptw32_exception {};
+class ptw32_exception_cancel : public ptw32_exception {};
+class ptw32_exception_exit   : public ptw32_exception {};
+
+#endif
+
+#ifndef PTW32_BUILD
+
+/* FIXME: This is only required if the library was built using SEH */
+ *
  * Get internal SEH tag
  */
 DWORD ptw32_get_exception_services_code(void);
@@ -987,13 +1004,6 @@ DWORD ptw32_get_exception_services_code(void);
 #ifdef __cplusplus
 
 /*
- * Internal exceptions
- */
-class Pthread_exception {};
-class Pthread_exception_cancel : public Pthread_exception {};
-class Pthread_exception_exit   : public Pthread_exception {};
-
-/*
  * Redefine the C++ catch keyword to ensure that applications
  * propagate our internal exceptions up to the library's internal handlers.
  */
@@ -1002,21 +1012,30 @@ class Pthread_exception_exit   : public Pthread_exception {};
          * WARNING: Replace any 'catch( ... )' with 'PtW32CatchAll'
          * if you want Pthread-Win32 cancelation and pthread_exit to work.
          */
+
 #ifndef PtW32NoCatchWarn
+
 #pragma message("When compiling applications with MSVC++ and C++ exception handling:")
 #pragma message("  Replace any 'catch( ... )' with 'PtW32CatchAll' in POSIX threads")
 #pragma message("  if you want POSIX thread cancelation and pthread_exit to work.")
-#endif
-#define PtW32CatchAll \
-        catch( Pthread_exception & ) { throw; } \
-        catch( ... )
-#else
-#define catch( E ) \
-        catch( Pthread_exception & ) { throw; } \
-        catch( E )
-#endif
 
 #endif
+
+#define PtW32CatchAll \
+        catch( ptw32_exception & ) { throw; } \
+        catch( ... )
+
+#else /* _MSC_VER */
+
+#define catch( E ) \
+        catch( ptw32_exception & ) { throw; } \
+        catch( E )
+
+#endif /* _MSC_VER */
+
+#endif /* __cplusplus */
+
+#endif /* ! PTW32_BUILD */
 
 #ifdef __cplusplus
 }				/* End of extern "C" */

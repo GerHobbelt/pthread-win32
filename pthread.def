@@ -102,6 +102,7 @@ pthread_rwlock_unlock
 ; Non-portable but useful
 ;
 pthread_mutexattr_setforcecs_np
+pthread_getw32threadhandle_np
 pthreadCancelableWait
 pthreadCancelableTimedWait
 ;

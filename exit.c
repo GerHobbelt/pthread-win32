@@ -53,12 +53,6 @@ pthread_exit (void *value_ptr)
 {
   pthread_t self;
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
-
-  DWORD exceptionInformation[3];
-
-#endif
-
   /* If the current thread is implicit it was not started through
      pthread_create(), therefore we cleanup and end the thread
      here. Otherwise we raise an exception to unwind the exception
@@ -70,7 +64,7 @@ pthread_exit (void *value_ptr)
 
   if (self == NULL || self->implicit)
     {
-      ptw32_allUserDestroyRoutines(self);
+      ptw32_callUserDestroyRoutines(self);
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)
       _endthreadex ((unsigned) value_ptr);
@@ -83,39 +77,7 @@ pthread_exit (void *value_ptr)
 
   self->exitStatus = value_ptr;
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
-
-  exceptionInformation[0] = (DWORD) (_PTHREAD_EPS_EXIT);
-  exceptionInformation[1] = (DWORD) (value_ptr);
-  exceptionInformation[2] = (DWORD) (0);
-
-  RaiseException (
-		  EXCEPTION_PTHREAD_SERVICES,
-		  0,
-		  3,
-		  exceptionInformation);
-
-#else /* ! _MSC_VER */
-
-#ifdef __cplusplus
-
-  throw Pthread_exception_exit();
-
-#else /* ! __cplusplus */
-
-  (void) pthread_pop_cleanup( 1 );
-
-  ptw32_callUserDestroyRoutines(self);
-
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
-  _endthreadex ((unsigned) value_ptr);
-#else
-  _endthread ();
-#endif
-
-#endif /* __cplusplus */
-
-#endif /* _MSC_VER */
+  ptw32_throw(PTW32_EPS_EXIT);
 
   /* Never reached. */
 

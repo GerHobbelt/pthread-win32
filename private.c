@@ -62,7 +62,7 @@ ptw32_processInitialize (void)
       * ------------------------------------------------------
       */
 {
-	if (ptw32_rocessInitialized) {
+	if (ptw32_processInitialized) {
 		/* 
 		 * ignore if already initialized. this is useful for 
 		 * programs that uses a non-dll pthread
@@ -184,6 +184,7 @@ ptw32_threadStart (ThreadParms * threadParms)
   pthread_t self;
   void *(*start) (void *);
   void *arg;
+
 #ifdef _MSC_VER
   DWORD ei[] = {0,0,0};
 #endif
@@ -221,21 +222,21 @@ ptw32_threadStart (ThreadParms * threadParms)
     /*
      * Run the caller's routine;
      */
-    status = (*start) (arg);
+    status = self->exitStatus = (*start) (arg);
   }
   __except (ExceptionFilter(GetExceptionInformation(), ei))
   {
     DWORD ec = GetExceptionCode();
 
-    if (ec == EXCEPTION_PTHREAD_SERVICES)
+    if (ec == EXCEPTION_PTW32_SERVICES)
       {
 	switch (ei[0])
 	  {
-	  case _PTHREAD_EPS_CANCEL:
+	  case PTW32_EPS_CANCEL:
 	    status = PTHREAD_CANCELED;
 	    break;
-	  case _PTHREAD_EPS_EXIT:
-	    status = (void *) ei[1];
+	  case PTW32_EPS_EXIT:
+	    status = self->exitStatus;
 	    break;
 	  default:
 	    status = PTHREAD_CANCELED;
@@ -247,7 +248,7 @@ ptw32_threadStart (ThreadParms * threadParms)
 	/*
 	 * A system unexpected exception had occurred running the user's
 	 * routine. We get control back within this block because
-         * we can't allow the exception out of thread scope.
+         * we can't allow the exception to pass out of thread scope.
 	 */
 	status = PTHREAD_CANCELED;
       }
@@ -264,14 +265,14 @@ ptw32_threadStart (ThreadParms * threadParms)
      */
     status = self->exitStatus = (*start) (arg);
   }
-  catch (Pthread_exception_cancel)
+  catch (ptw32_exception_cancel)
     {
       /*
        * Thread was cancelled.
        */
       status = self->exitStatus = PTHREAD_CANCELED;
     }
-  catch (Pthread_exception_exit)
+  catch (ptw32_exception_exit)
     {
       /*
        * Thread was exited via pthread_exit().
@@ -294,7 +295,7 @@ ptw32_threadStart (ThreadParms * threadParms)
    * Run the caller's routine; no cancelation or other exceptions will
    * be honoured.
    */
-  status = (*start) (arg);
+  status = self->exitStatus = (*start) (arg);
 
 #endif /* __cplusplus */
 
@@ -800,11 +801,57 @@ ptw32_get_exception_services_code(void)
 {
 #if defined(_MSC_VER) && !defined(__cplusplus)
 
-  return EXCEPTION_PTHREAD_SERVICES;
+  return EXCEPTION_PTW32_SERVICES;
 
 #else
 
   return (DWORD) NULL;
 
 #endif
+}
+
+
+void
+ptw32_throw(DWORD exception)
+{
+  if (exception != PTW32_EPS_CANCEL ||
+      exception != PTW32_EPS_EXIT)
+    {
+      /* Should never enter here */
+      exit(1);
+    }
+
+#if defined(_MSC_VER) && !defined(__cplusplus)
+
+  DWORD exceptionInformation[3];
+
+  exceptionInformation[0] = (DWORD) (exception);
+  exceptionInformation[1] = (DWORD) (0);
+  exceptionInformation[2] = (DWORD) (0);
+
+  RaiseException (
+		  EXCEPTION_PTW32_SERVICES,
+		  0,
+		  3,
+		  exceptionInformation);
+
+#else /* _MSC_VER && ! __cplusplus */
+
+# ifdef __cplusplus
+
+  switch (exception)
+    {
+    case PTW32_EPS_CANCEL:
+      throw ptw32_exception_cancel();
+      break;
+    case PTW32_EPS_EXIT:
+      throw ptw32_exception_exit();
+      break;
+    }
+
+# endif /* __cplusplus */
+
+#endif /* _MSC_VER && ! __cplusplus */
+
+  /* Never reached */
 }

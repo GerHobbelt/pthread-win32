@@ -35,7 +35,7 @@ is_attr(const pthread_attr_t *attr)
 
   return (attr == NULL || 
 	  *attr == NULL || 
-	  (*attr)->valid != _PTHREAD_ATTR_VALID);
+	  (*attr)->valid != PTW32_ATTR_VALID);
 }
 
 
@@ -346,7 +346,7 @@ pthread_attr_init(pthread_attr_t *attr)
   /* Priority uses Win32 priority values. */
   attr_result->priority = THREAD_PRIORITY_NORMAL;
 
-  attr_result->valid = _PTHREAD_ATTR_VALID;
+  attr_result->valid = PTW32_ATTR_VALID;
 
   *attr = attr_result;
 

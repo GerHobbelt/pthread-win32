@@ -82,7 +82,7 @@ DllMain (
       /*
        * The DLL is being mapped into the process's address space
        */
-      result = ptw32_rocessInitialize ();
+      result = ptw32_processInitialize ();
 
       /* Load KERNEL32 and try to get address of TryEnterCriticalSection */
       ptw32_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));

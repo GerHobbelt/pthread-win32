@@ -34,7 +34,7 @@ is_attr(const pthread_attr_t *attr)
 {
   return (attr == NULL || 
 	  *attr == NULL || 
-	  (*attr)->valid != _PTHREAD_ATTR_VALID) ? 1 : 0;
+	  (*attr)->valid != PTW32_ATTR_VALID) ? 1 : 0;
 }
 
 int

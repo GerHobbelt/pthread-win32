@@ -96,7 +96,7 @@ struct pthread_t_ {
 /* 
  * Special value to mark attribute objects as valid.
  */
-#define _PTHREAD_ATTR_VALID ((unsigned long) 0xC4C0FFEE)
+#define PTW32_ATTR_VALID ((unsigned long) 0xC4C0FFEE)
 
 struct pthread_attr_t_ {
   unsigned long valid;
@@ -118,8 +118,8 @@ struct pthread_attr_t_ {
  * ====================
  */
 
-#define _PTHREAD_OBJECT_AUTO_INIT ((void *) -1)
-#define _PTHREAD_OBJECT_INVALID   NULL
+#define PTW32_OBJECT_AUTO_INIT ((void *) -1)
+#define PTW32_OBJECT_INVALID   NULL
 
 struct pthread_mutex_t_ {
   HANDLE mutex;
@@ -282,51 +282,29 @@ struct ThreadKeyAssoc {
  * We store our actual component and error code within
  * the optional information array.
  */
-#define EXCEPTION_PTHREAD_SERVICES	\
+#define EXCEPTION_PTW32_SERVICES	\
      MAKE_SOFTWARE_EXCEPTION( SE_ERROR, \
-			      _PTHREAD_SERVICES_FACILITY, \
-			      _PTHREAD_SERVICES_ERROR )
+			      PTW32_SERVICES_FACILITY, \
+			      PTW32_SERVICES_ERROR )
 
-#define _PTHREAD_SERVICES_FACILITY		0xBAD
-#define _PTHREAD_SERVICES_ERROR			0xDEED
-
-/*
- * Services available through EXCEPTION_PTHREAD_SERVICES
- */
-#define _PTHREAD_EPS_CANCEL       0
-#define _PTHREAD_EPS_EXIT         1
+#define PTW32_SERVICES_FACILITY		0xBAD
+#define PTW32_SERVICES_ERROR	       	0xDEED
 
 /*
- * '__except' was redefined in pthread.h. We use the real one internally.
+ * Services available through EXCEPTION_PTW32_SERVICES
  */
-#ifdef __except
-#undef __except
-#endif
-
-#else
-
-#ifdef __cplusplus
-/*
- * 'catch' was redefined in pthread.h. We use the real one internally.
- */
-#ifdef catch
-#undef catch
-#endif
-
-#else /* __cplusplus */
-
-#warning File __FILE__, Line __LINE__: Cancellation not supported if library compiled as C.
-
-#endif /* __cplusplus */
+#define PTW32_EPS_CANCEL       0
+#define PTW32_EPS_EXIT         1
 
 #endif /* _MSC_VER */
+
 
 /* Function pointer to TryEnterCriticalSection if it exists; otherwise NULL */
 extern BOOL (WINAPI *ptw32_try_enter_critical_section)(LPCRITICAL_SECTION);
 
 /* Declared in global.c */
 extern int ptw32_processInitialized;
-extern pthread_key_t ptw32_elfThreadKey;
+extern pthread_key_t ptw32_selfThreadKey;
 extern pthread_key_t ptw32_cleanupKey;
 extern CRITICAL_SECTION ptw32_mutex_test_init_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
@@ -338,6 +316,8 @@ extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
 void *ptw32_calloc(size_t n, size_t s);
 #endif
 
+/* Declared in private.c */
+void ptw32_throw(DWORD exception);
 
 #ifdef __cplusplus
 extern "C" {

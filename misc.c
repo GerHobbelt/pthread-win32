@@ -195,7 +195,7 @@ pthread_self (void)
 #endif
 	}
 
-      pthread_setspecific (ptw32_elfThreadKey, self);
+      pthread_setspecific (ptw32_selfThreadKey, self);
     }
 
   return (self);
@@ -327,30 +327,7 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
               /*
                * Thread started with pthread_create
                */
-
-#if defined(_MSC_VER) && !defined(__cplusplus)
-
-              DWORD exceptionInformation[3];
-
-              exceptionInformation[0] = (DWORD) (_PTHREAD_EPS_CANCEL);
-              exceptionInformation[1] = (DWORD) (0);
-              exceptionInformation[2] = (DWORD) (0);
-
-              RaiseException (
-                               EXCEPTION_PTHREAD_SERVICES,
-                               0,
-                               3,
-                               exceptionInformation);
-
-#else /* _MSC_VER */
-
-#ifdef __cplusplus
-
-	      throw Pthread_exception_cancel();
-
-#endif /* __cplusplus */
-
-#endif /* _MSC_VER */
+	      ptw32_throw(PTW32_EPS_CANCEL);
             }
 
          /* Should never get to here. */

@@ -30,7 +30,7 @@
 
 int ptw32_processInitialized = FALSE;
 pthread_key_t ptw32_selfThreadKey = NULL;
-pthread_key_t ptw32_leanupKey = NULL;
+pthread_key_t ptw32_cleanupKey = NULL;
 
 /*
  * Global lock for testing internal state of PTHREAD_MUTEX_INITIALIZER

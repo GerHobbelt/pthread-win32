@@ -69,7 +69,7 @@ pthread_pop_cleanup (int execute)
 {
   ptw32_cleanup_t *cleanup = NULL;
   
-  cleanup = (ptw32_leanup_t *) pthread_getspecific (ptw32_leanupKey);
+  cleanup = (ptw32_cleanup_t *) pthread_getspecific (ptw32_cleanupKey);
 
   if (cleanup != NULL)
     {
@@ -105,7 +105,7 @@ pthread_pop_cleanup (int execute)
 	       */
 	      (*cleanup->routine) (cleanup->arg);
 	    }
-      catch(...)
+	  catch(...)
 	    {
 	      /*
 	       * A system unexpected exception had occurred

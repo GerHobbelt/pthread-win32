@@ -18,7 +18,7 @@ VCEFLAGS	= /GX /TP /DPtW32NoCatchWarn
 #Structured Exceptions
 VSEFLAGS	= 
 
-CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400
+CFLAGS	= /W3 /MT /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DPTW32_BUILD
 
 OBJ=attr.obj \
 	cancel.obj \
@@ -32,6 +32,7 @@ OBJ=attr.obj \
 	global.obj \
 	misc.obj \
 	mutex.obj \
+	nonportable.obj \
 	private.obj \
 	rwlock.obj \
 	sched.obj \

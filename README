@@ -52,15 +52,18 @@ The GNU library archive file name has changed to:
 Known bugs in this snapshot
 ---------------------------
 
-1. Running the test "join1.c" with the library built with Mingw32
+1. Asynchronous cancelation only works on Intel X86 machines.
+
+2. Running the test "join1.c" with the library built with Mingw32
 and the GNUmakefile included, the test fails with a segmentation (invalid
 page access) exception. The fault appears to be in the assembler code
 emmitted by the compiler [to handle exception contexts] at the
 end of the try block in ptw32_threadStart().
 
-2. There are problems using the libpthreadw32.a stub archive derived
+3. There are problems using the libpthreadw32.a stub archive derived
 from either of pthreadVSE.dll or pthreadVCE.dll. The cleanup1.c test
-fails.
+fails. This is now an expected result of having different EH and cleanup
+handler schemes in the library and application.
 
 
 Caveats
@@ -83,6 +86,39 @@ then you will need to replace the "catch(...)" with the macro
 
 Otherwise neither pthreads cancelation nor pthread_exit() will work
 reliably.
+
+
+Non-portable functions included in the library
+----------------------------------------------
+
+void
+pthread_mutexattr_setforcecs_np(pthread_mutexattr_t *attr,
+				int forcecs);
+
+	Allows an application to force the library to use
+	critical sections rather than win32 mutexes as
+	the basis for any mutex that uses "attr".
+	Critical sections are significantly faster than
+	mutexes.
+
+	Values for "forcecs" are:
+	PTHREAD_MUTEX_AUTO_CS_NP
+		- allow the library to decide based on
+		  availability of tryEnterCriticalSection()
+	PTHREAD_MUTEX_FORCE_CS_NP
+		- force use of critical sections, but you'd
+		  better not try to use pthread_mutex_trylock()
+		  on that mutex if you want your application
+		  to work on all versions of Windows.
+
+HANDLE
+pthread_getw32threadhandle_np(pthread_t thread);
+
+	Returns the win32 thread handle that the POSIX
+	thread "thread" is running as.
+
+	Applications can use the win32 handle to set
+	win32 specific attributes of the thread.
 
 
 Building under VC++ using either C++ EH or Structured EH
