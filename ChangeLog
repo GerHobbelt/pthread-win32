@@ -1,26 +1,26 @@
 1998-09-13  Ben Elliston  <bje@cygnus.com>
 
- * configure.in: Test for required system features.
+	* configure.in: Test for required system features.
 
- * configure: Generate. 
+	* configure: Generate. 
 
- * acconfig.h: New file.
+	* acconfig.h: New file.
 
- * config.h.in: Generate.
+	* config.h.in: Generate.
 
- * Makefile.in: Renamed from Makefile.
+	* Makefile.in: Renamed from Makefile.
 
- * COPYING: Import from a recent GNU package.
+	* COPYING: Import from a recent GNU package.
 
- * config.guess: Likewise.
+	* config.guess: Likewise.
 
- * config.sub: Likewise.
+	* config.sub: Likewise.
 
- * install-sh: Likewise.
+	* install-sh: Likewise.
 
- * config.h: Remove.  
+	* config.h: Remove.  
 
- * Makefile: Likewise.
+	* Makefile: Likewise.
 
 1998-09-12  Ben Elliston  <bje@cygnus.com>
 
