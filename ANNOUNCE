@@ -1,5 +1,5 @@
 
-                 PTHREADS-WIN32 SNAPSHOT ????-??-??
+                 PTHREADS-WIN32 SNAPSHOT 2001-06-04
                  ----------------------------------
        Web Site: http://sources.redhat.com/pthreads-win32/
       FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -34,13 +34,13 @@ New:
 	on the following processors: IX86, MIPS, ALPHA, PPC.
 	- contributors name misplaced (please contact me if it's you)
  
--       New functions (no-ops) for source code compatibility:
+-     New functions (no-ops) for source code compatibility:
                 pthread_getconcurrency()
-                        Returns the value previously set by
-			pthread_setconcurrency() or 0 (zero)
-			if no value was previously set.
-			The implementation does not currently use
-			this value.
+                  	Returns the value previously set by
+				pthread_setconcurrency() or 0 (zero)
+				if no value was previously set.
+				The implementation does not currently use
+				this value.
                 pthread_setconcurrency()
                         Accepts any value >= 0 but does not
                         have any effect; returns '0' or
@@ -49,8 +49,8 @@ New:
                 pthread_attr_setscope()
                         Currently only return ENOSYS
 
--       The following mutex types and related functions are now
-        supported:
+-     The following mutex types and related functions are now
+      supported:
 
                 pthread_mutexattr_gettype()
                 pthread_mutexattr_settype()
@@ -61,8 +61,8 @@ New:
 
 	The *_NP versions are for Linux portability.
 
-        In this implementation PTHREAD_MUTEX_DEFAULT is
-        mapped to PTHREAD_MUTEX_NORMAL for compatibility
+      In this implementation PTHREAD_MUTEX_DEFAULT is
+      mapped to PTHREAD_MUTEX_NORMAL for compatibility
 	with major Unix vendors. This is also the default
 	if no type is specified.
 
@@ -73,16 +73,23 @@ New:
 	explicitly set the type of any mutexes that are, or
 	could be, locked recursively.
 
-        PTHREAD_MUTEX_NORMAL will cause thread deadlock
-        if the owner of a mutex tries to relock it without
-        first unlocking it. It has slightly less overhead
+      PTHREAD_MUTEX_NORMAL will cause thread deadlock
+      if the owner of a mutex tries to relock it without
+      first unlocking it. It has slightly less overhead
 	that other types.
 
--       Pthreads-win32 mutexes are now based on Win32
-        critical sections for all Windows versions. The
+-     Pthreads-win32 mutexes are now based on Win32
+      critical sections for all Windows versions. The
 	implementation no longer depends on
 	TryEnterCriticalSection.
         - Thomas Pfaff <tpfaff@gmx.net>
+
+-	New implementation of condition variables which attempts to
+	correct problems of spurious wakeups, unfairness, and
+	broadcast deadlock. See README.CV for details of the
+	discussion.
+	  - Alexander Terekhov <TEREKHOV@de.ibm.com>
+	  - Louis Thomas <lthomas@arbitrade.com>
 
 Bugs fixed:
 -       Pthread_mutex_trylock() now properly returns EBUSY
