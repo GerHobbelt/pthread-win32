@@ -1,3 +1,9 @@
+1998-10-04  Ben Elliston  <bje@cygnus.com>
+
+	* attr.c (pthread_attr_setstackaddr): Remove FIXME comment. Win32
+	does know about ENOSYS after all.
+	(pthread_attr_setstackaddr): Likewise.
+
 1998-10-03  Ben Elliston  <bje@cygnus.com>
 
 	* configure.in: Test for the `_stdcall' keyword.  Define `STDCALL'

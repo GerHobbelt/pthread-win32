@@ -67,8 +67,6 @@ pthread_attr_setstackaddr(pthread_attr_t *attr,
     {
       return EINVAL;
     }
-
-  /* FIXME: it does not look like Win32 permits this. */
   return ENOSYS;
 }
 
@@ -80,8 +78,6 @@ pthread_attr_getstackaddr(const pthread_attr_t *attr,
     {
       return EINVAL;
     }
-  
-  /* FIXME: it does not look like Win32 permits this. */
   return ENOSYS;
 }
 
