@@ -161,7 +161,6 @@ struct pthread_mutex_t_ {
   int kind;
   pthread_t ownerThread;
   HANDLE wait_sema;
-  CRITICAL_SECTION try_lock_cs;
 };
 
 struct pthread_mutexattr_t_ {

@@ -135,12 +135,10 @@ pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
               ? PTHREAD_MUTEX_DEFAULT
               : (*attr)->kind);
   mx->ownerThread = NULL;
-  InitializeCriticalSection( &mx->try_lock_cs );
   mx->wait_sema = CreateSemaphore( NULL, 0, 1, NULL );
 
   if( NULL == mx->wait_sema )
     {
-      DeleteCriticalSection( &mx->try_lock_cs );
       result = EAGAIN;
     }
 
@@ -203,7 +201,6 @@ pthread_mutex_destroy(pthread_mutex_t *mutex)
 
           if (result == 0)
             {
-              DeleteCriticalSection( &mx->try_lock_cs );
               CloseHandle( mx->wait_sema );
               free(mx);
             }
@@ -702,16 +699,12 @@ pthread_mutex_unlock(pthread_mutex_t *mutex)
 	    {
 	      mx->ownerThread = NULL;
 	      
-              EnterCriticalSection( &mx->try_lock_cs );
-
-              if( InterlockedDecrement( &mx->lock_idx ) >= 0 )
-		{
-                  /* Someone is waiting on that mutex */
-                  ReleaseSemaphore( mx->wait_sema, 1, NULL );
-		}
-
-              LeaveCriticalSection( &mx->try_lock_cs );
-	    }
+          if( InterlockedDecrement( &mx->lock_idx ) >= 0 )
+          {
+             /* Someone is waiting on that mutex */
+             ReleaseSemaphore( mx->wait_sema, 1, NULL );
+          }
+        }
 	}
       else
 	{
@@ -752,30 +745,35 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
 
   if (result == 0)
     {
-      /* Try to lock only if mutex seems available */
-      if( PTW32_MUTEX_LOCK_IDX_INIT == mx->lock_idx )
-	{
-          EnterCriticalSection( &mx->try_lock_cs );
 
-          if( 0 == InterlockedIncrement( &mx->lock_idx ) )
-	    {
-              mx->recursive_count = 1;
-              mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
-                                 ? pthread_self()
-                                 : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
-	    }
-          else
-            {
-              (void) InterlockedDecrement( &mx->lock_idx );
-              result = EBUSY;
-            }
+      if( PTW32_MUTEX_LOCK_IDX_INIT == ptw32_InterlockedCompareExchange(
+             &mx->lock_idx, 0, PTW32_MUTEX_LOCK_IDX_INIT ) )
+      {
+         mx->recursive_count = 1;
+         mx->ownerThread = (mx->kind != PTHREAD_MUTEX_FAST_NP
+                            ? pthread_self()
+                            : (pthread_t) PTW32_MUTEX_OWNER_ANONYMOUS);
+      }
 
-          LeaveCriticalSection( &mx->try_lock_cs );
-        }
       else
-        {
-          result = EBUSY;
-        }
+      {
+         if( mx->kind != PTHREAD_MUTEX_FAST_NP &&
+             pthread_equal( mx->ownerThread, pthread_self() ) )
+         {
+            if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP )
+            {
+               mx->recursive_count++;
+            }
+            else
+            {
+               result = EDEADLK;
+            }
+         }
+         else
+         {
+            result = EBUSY;
+         }
+      }
     }
 
   return(result);
