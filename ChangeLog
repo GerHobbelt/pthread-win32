@@ -1,3 +1,20 @@
+1998-07-14  Ben Elliston  <bje@cygnus.com>
+
+	* attr.c (pthread_attr_setstacksize): Implement.
+	(pthread_attr_getstacksize): Likewise.
+	(pthread_attr_setstackaddr): Likewise.
+	(pthread_attr_getstackaddr): Likewise.
+	(pthread_attr_init): Likewise.
+	(pthread_attr_destroy): Likewise.
+	
+	* condvar.c (pthread_condattr_init): Add `_cond' to function name.
+
+	* mutex.c (pthread_mutex_lock): Add `_mutex' to function name.
+	(pthread_mutex_trylock): Likewise.
+	(pthread_mutex_unlock): Likewise.
+
+	* pthread.h (pthread_condattr_setpshared): Fix typo.
+
 Mon Jul 13 01:09:55 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* implement.h: Wrap in #ifndef _IMPLEMENT_H
