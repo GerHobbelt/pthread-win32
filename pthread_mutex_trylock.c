@@ -76,22 +76,15 @@ pthread_mutex_trylock(pthread_mutex_t *mutex)
 	}
       else
 	{
-	  if( mx->kind != PTHREAD_MUTEX_FAST_NP &&
-	      pthread_equal( mx->ownerThread, pthread_self() ) )
-	    {
-	      if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP )
-		{
-		  mx->recursive_count++;
-		}
-	      else
-		{
-		  result = EDEADLK;
-		}
-	    }
-	  else
-	    {
-	      result = EBUSY;
-	    }
+          if( mx->kind == PTHREAD_MUTEX_RECURSIVE_NP &&
+              pthread_equal( mx->ownerThread, pthread_self() ) )
+            {
+              mx->recursive_count++;
+            }
+          else
+            {
+              result = EBUSY;
+            }
 	}
     }
 
