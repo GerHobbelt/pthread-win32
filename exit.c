@@ -28,6 +28,21 @@ _pthread_vacuum(void)
 
   _pthread_handler_pop_all(_PTHREAD_FORKCHILD_STACK,
 			   _PTHREAD_HANDLER_NOEXECUTE);
+
+  /* CRITICAL SECTION */
+  pthread_mutex_lock(&_pthread_table_mutex);
+
+  /* Remove the thread entry on exit only if pthread_detach()
+     was called and there are no waiting joins. */
+
+  if (us->detach == TRUE
+      && us->join_count == 0)
+    {
+      _pthread_delete_thread_entry(us);
+    }
+
+  pthread_mutex_lock(&_pthread_table_mutex);
+  /* END CRITICAL SECTION */
 }
 
 void
@@ -35,13 +50,17 @@ pthread_exit(void * value)
 {
   _pthread_threads_thread_t * us = _PTHREAD_THIS;
 
+  /* CRITICAL SECTION */
+  pthread_mutex_lock(&_pthread_table_mutex);
+
   /* Copy value into the thread entry so it can be given
      to any joining threads. */
-  if (us->joinvalueptr != NULL)
-    {
-      us->joinvalueptr = value;
-    }
+  us->joinvalueptr = value;
 
-  /* Teleport back to _pthread_start_call() to cleanup and exit. */
-  longjmp(us->call.env, 1);
+  pthread_mutex_lock(&_pthread_table_mutex);
+  /* END CRITICAL SECTION */
+
+  _pthread_vacuum();
+
+  _endthreadex(0);
 }
