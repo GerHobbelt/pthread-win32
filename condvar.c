@@ -375,7 +375,7 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
   cv->waiters = 0;
   cv->wasBroadcast = FALSE;
 
-  if (_pthread_sem_init (&(cv->sema), 0, 0) != 0)
+  if (sem_init (&(cv->sema), 0, 0) != 0)
     {
       goto FAIL0;
     }
@@ -408,7 +408,7 @@ FAIL2:
   (void) pthread_mutex_destroy (&(cv->waitersLock));
 
 FAIL1:
-  (void) _pthread_sem_destroy (&(cv->sema));
+  (void) sem_destroy (&(cv->sema));
 
 FAIL0:
 DONE:
@@ -468,7 +468,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
 	  return EBUSY;
 	}
 
-      (void) _pthread_sem_destroy (&(cv->sema));
+      (void) sem_destroy (&(cv->sema));
       (void) pthread_mutex_destroy (&(cv->waitersLock));
       (void) CloseHandle (cv->waitersDone);
 
@@ -522,7 +522,7 @@ cond_timedwait (pthread_cond_t * cond,
    * We keep the lock held just long enough to increment the count of
    * waiters by one (above).
    * Note that we can't keep it held across the
-   * call to _pthread_sem_wait since that will deadlock other calls
+   * call to sem_wait since that will deadlock other calls
    * to pthread_cond_signal
    */
   if ((result = pthread_mutex_unlock (mutex)) == 0)
@@ -541,7 +541,10 @@ cond_timedwait (pthread_cond_t * cond,
        */
       pthread_cleanup_push (pthread_mutex_lock, mutex);
 
-      result = _pthread_sem_timedwait (&(cv->sema), abstime);
+      if (_pthread_sem_timedwait (&(cv->sema), abstime) == -1)
+	{
+	  result = errno;
+	}
 
       pthread_cleanup_pop (0);
     }
@@ -772,7 +775,7 @@ pthread_cond_signal (pthread_cond_t * cond)
    */
   if (cv->waiters > 0)
     {
-      result = _pthread_sem_post (&(cv->sema));
+      result = sem_post (&(cv->sema));
     }
 
   return (result);
@@ -843,7 +846,7 @@ pthread_cond_broadcast (pthread_cond_t * cond)
    */
   for (i = cv->waiters; i > 0 && result == 0; i--)
     {
-      result = _pthread_sem_post (&(cv->sema));
+      result = sem_post (&(cv->sema));
     }
 
   if (cv->waiters > 0 && result == 0)

@@ -73,6 +73,17 @@ pthread_setspecific
 ;pthread_sigmask
 pthread_testcancel
 ;
+; POSIX 1.b
+;
+sched_get_priority_min
+sched_get_priority_max
+sched_yield
+sem_init
+sem_destroy
+sem_trywait
+sem_wait
+sem_post
+;
 ; Non-portable but useful
 ;
 pthread_mutexattr_setforcecs_np

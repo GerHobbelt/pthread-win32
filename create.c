@@ -27,10 +27,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-/*
- * Code contributed by John E. Bossom <JEB>.
- */
-
 int
 pthread_create (pthread_t * tid,
 		const pthread_attr_t * attr,
@@ -167,6 +163,4 @@ FAIL0:
   return (result);
 
 }				/* pthread_create */
-
-/* </JEB> */
 

@@ -59,8 +59,6 @@ enum {
 void *
 mythread(void * arg)
 {
-  Sleep(1);
-
   assert(pthread_mutex_lock(&mutex) == 0);
 
   shared++;

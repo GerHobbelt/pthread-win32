@@ -2,38 +2,47 @@
 
 REM Usage: runtest cl|gcc testname testarg ...
 
-echo y | erase /s tmp > nul:
-rmdir tmp
-mkdir tmp
-cd tmp
+if EXIST %2.pass goto bypass
 
 REM Make sure we start with only those files we expect to need
-if exist pthread.dll erase pthread.dll > nul:
-if exist pthread.h erase pthread.h > nul:
-if exist test.h erase test.h > nul:
-if exist pthread.lib erase pthread.lib > nul:
-if exist libpthread32.a erase libpthread32.a > nul:
-copy ..\..\pthread.dll . > nul:
-copy ..\..\pthread.h . > nul:
-copy ..\test.h . > nul:
-copy ..\..\pthread.lib . > nul:
-copy ..\..\libpthread32.a . > nul:
+if exist tmp\*.* echo y | erase tmp\*.* > nul:
+rmdir tmp
+mkdir tmp
+
+copy ..\pthread.dll tmp > nul:
+copy ..\pthread.h tmp > nul:
+copy ..\semaphore.h tmp > nul:
+copy ..\sched.h tmp > nul:
+copy test.h tmp > nul:
+copy ..\pthread.lib tmp > nul:
+copy ..\libpthread32.a tmp > nul:
+
+cd tmp
 
 REM Compile the test case
 REM  produces aout.exe using the compiler given as %1
-call ..\c%1.bat %2 > nul:
+call ..\c%1.bat %2 > ..\%2.%1log
 
-echo TEST: %2 [%1] > ..\%2.result
+if ERRORLEVEL 1 goto cleanup
+
+REM erase ..\%2.%1log
+
+echo TEST: %2 [%1]
 
 REM Run the test case
-aout.exe %3 %4 %5 %6 %7 %8 %9 >> ..\%2.result
+aout.exe %3 %4 %5 %6 %7 %8 %9
+
+set RESULT=%ERRORLEVEL%
+
+if %RESULT% EQU 0 echo Passed [%RESULT%] > ..\%2.pass
+
+:cleanup
+
+cd ..
 
 REM Clean up
-erase aout.exe > nul:
-if exist pthread.dll erase pthread.dll > nul:
-if exist pthread.h erase pthread.h > nul:
-if exist pthread.lib erase pthread.lib > nul:
-if exist libpthread32.a erase libpthread32.a > nul:
-cd ..
-more < %2.result
+if exist tmp\*.* echo y | erase tmp\*.* > nul:
 
+if EXIST %2.pass echo Passed [%RESULT%]
+
+:bypass
