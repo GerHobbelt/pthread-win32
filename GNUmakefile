@@ -29,7 +29,7 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
-DLL_VER	= 2
+DLL_VER	= 1
 
 DEVROOT	= C:\PTHREADS
 
@@ -427,6 +427,7 @@ GCE_INLINED_STAMP = pthreadGCE$(DLL_VER).stamp
 GC_DLL 	= pthreadGC$(DLL_VER).dll
 GC_LIB	= libpthreadGC$(DLL_VER).a
 GC_INLINED_STAMP = pthreadGC$(DLL_VER).stamp
+GC_STATIC_STAMP = libpthreadGC$(DLL_VER).stamp
 
 PTHREAD_DEF	= pthread.def
 
@@ -436,6 +437,7 @@ help:
 	@ echo "make clean GC            (to build the GNU C dll with C cleanup code)"
 	@ echo "make clean GCE-inlined   (to build the GNU C inlined dll with C++ exception handling)"
 	@ echo "make clean GC-inlined    (to build the GNU C inlined dll with C cleanup code)"
+	@ echo "make clean GC-static     (to build the GNU C inlined static lib with C cleanup code)"
 
 all:
 	@ $(MAKE) clean GCE
@@ -452,6 +454,9 @@ GC-inlined:
 
 GCE-inlined:
 		$(MAKE) CC=g++ XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
+
+GC-static:
+		$(MAKE) CC=gcc XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_STATIC_STAMP)
 
 tests:
 	@ cd tests
@@ -492,6 +497,11 @@ $(GCE_INLINED_STAMP): $(DLL_INLINED_OBJS)
 	dlltool -z pthread.def $(DLL_INLINED_OBJS)
 	dlltool -k --dllname $(GCE_DLL) --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
 	echo touched > $(GCE_INLINED_STAMP)
+
+$(GC_STATIC_STAMP): $(DLL_INLINED_OBJS)
+	$(RM) $(GC_LIB)
+	$(AR) -rv $(GC_LIB) $(DLL_INLINED_OBJS)
+	echo touched > $(GC_STATIC_STAMP)
 
 clean:
 	-$(RM) *~

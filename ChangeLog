@@ -1,3 +1,9 @@
+2005-04-01  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* GNUmakefile: Add target to build libpthreadGC1.a as a static link
+	library.
+	* Makefile: Likewise for pthreadGC1.lib.
+
 2005-04-01  Kevin Lussier <Kevin at codegreennetworks.com>
 
 	* sem_timedwait.c (sem_timedwait): Increase size of temp variables to

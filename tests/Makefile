@@ -120,6 +120,9 @@ PASSES= sizes.pass  loadfree.pass \
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
 
+STATICRESULTS = \
+	  self1.pass
+
 help:
 	@ $(ECHO) Run one of the following command lines:
 	@ $(ECHO) nmake clean VC    (to test using VC dll with VC (no EH) applications)
@@ -130,6 +133,7 @@ help:
 	@ $(ECHO) nmake clean VCX-bench   (to benchtest using VC dll with C++ bench app)
 	@ $(ECHO) nmake clean VCE-bench   (to benchtest using VCE dll with C++ bench app)
 	@ $(ECHO) nmake clean VSE-bench   (to benchtest using VSE dll with SEH bench app)
+	@ $(ECHO) nmake clean VC-static   (to test using VC static lib with VC (no EH) applications)
 
 all:
 	@ nmake clean VC
@@ -147,6 +151,11 @@ tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) $(PASSES)
 
 benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(XXLIBS) $(BENCHRESULTS)
 	@ $(ECHO) ALL BENCH TESTS DONE.
+
+statictests: $(CPLIB) $(CPDLL) $(CPHDR) $(STATICRESULTS)
+	@ $(ECHO) ALL STATIC TESTS DONE.
+	@ $(ECHO) Build and test the DLL to run all tests.
+	@ $(ECHO) The static test only confirms that the .lib links correctly.
 
 sizes.pass: sizes.exe
 	@ $(ECHO) ... Running $(TEST)$(DLL_VER) test: $*.exe
@@ -190,6 +199,9 @@ VC-bench:
 
 VCX-bench:
 	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" benchtests
+
+VC-static:
+	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
 .c.exe:
 	@ $(ECHO) $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
