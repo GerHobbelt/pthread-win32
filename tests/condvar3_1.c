@@ -56,7 +56,7 @@ static int awoken = 0;
 static int waiting = 0;
 
 enum {
-  NUMTHREADS = 60
+  NUMTHREADS = 30
 };
 
 void *
@@ -146,7 +146,6 @@ main()
     {
       fprintf(stderr, "Result = %s\n", error_string[result]);
         fprintf(stderr, "\tWaitersBlocked = %ld\n", cv->nWaitersBlocked);
-        fprintf(stderr, "\tWaitersUnblocked = %ld\n", cv->nWaitersUnblocked);
         fprintf(stderr, "\tWaitersGone = %ld\n", cv->nWaitersGone);
         fprintf(stderr, "\tWaitersToUnblock = %ld\n", cv->nWaitersToUnblock);
         fflush(stderr);

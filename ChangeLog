@@ -1,3 +1,17 @@
+2001-10-25  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* GNUmakefile (libwsock32): Add to linker flags for
+	WSAGetLastError() and WSASetLastError().
+	* Makefile (wsock32.lib): Likewise.
+	* create.c: Minor mostly inert changes.
+	* implement.h (PTW32_MAX): Move into here and renamed
+	from sched.h.
+	(PTW32_MIN): Likewise.
+	* GNUmakefile (TEST_ICE): Define if testing internal
+	implementation of InterlockedCompareExchange.
+	* Makefile (TEST_ICE): Likewise.
+	* private.c (TEST_ICE): Likewise.
+	
 2001-10-24  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* attr.c (pthread_attr_setstacksize): Quell warning

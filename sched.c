@@ -240,10 +240,6 @@ pthread_getschedparam(pthread_t thread, int *policy,
  */
 
 
-#define sched_Max(a,b)  ((a)<(b)?(b):(a))
-#define sched_Min(a,b)  ((a)>(b)?(b):(a))
-
-
 int
 sched_get_priority_max(int policy)
 {
@@ -254,10 +250,10 @@ sched_get_priority_max(int policy)
 
 #if (THREAD_PRIORITY_LOWEST > THREAD_PRIORITY_NORMAL)
   /* WinCE? */
-  return sched_Max(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
+  return PTW32_MAX(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
 #else
   /* This is independent of scheduling policy in Win32. */
-  return sched_Max(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL)
+  return PTW32_MAX(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
 #endif
 }
 
@@ -272,10 +268,10 @@ sched_get_priority_min(int policy)
 
 #if (THREAD_PRIORITY_LOWEST > THREAD_PRIORITY_NORMAL)
   /* WinCE? */
-  return sched_Min(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
+  return PTW32_MIN(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
 #else
   /* This is independent of scheduling policy in Win32. */
-  return sched_Min(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
+  return PTW32_MIN(THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
 #endif
 }
 

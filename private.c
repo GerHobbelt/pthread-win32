@@ -1033,8 +1033,8 @@ ptw32_pop_cleanup_all(int execute)
  * This can't be inlined because we need to know it's address so that
  * we can call it through a pointer.
  */
-PTW32_INTERLOCKED_LONG
-ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG ptr,
+PTW32_INTERLOCKED_LONG WINAPI
+ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG location,
                                  PTW32_INTERLOCKED_LONG   value,
                                  PTW32_INTERLOCKED_LONG   comparand)
 {
@@ -1042,13 +1042,13 @@ ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG ptr,
 
 #if defined(_M_IX86) || defined(_X86_)
 
-#if defined(__MSVCRT__)
+#if defined(_MSC_VER)
 
   _asm {
     PUSH         ecx
     PUSH         edx
-    MOV          ecx,dword ptr [ptr]        ; Load ECX with plTarget
-    MOV          edx,dword ptr [value]      ; Load EDX with lValue
+    MOV          ecx,dword ptr [location]
+    MOV          edx,dword ptr [value]
     MOV          eax,dword ptr [comparand]
     LOCK CMPXCHG dword ptr [ecx],edx        ; if (EAX == [ECX]), 
                                             ;   [ECX] = EDX
@@ -1064,12 +1064,12 @@ ptw32_InterlockedCompareExchange(PTW32_INTERLOCKED_LPLONG ptr,
   __asm__
     (
      "lock\n\t"
-     "cmpxchgl       %3,(%0)"    /* if (EAX == [ptr]), */
-                                 /*   [ptr] = value    */
-                                 /* else               */
-                                 /*   EAX = [ptr]      */
-     :"=r" (ptr), "=a" (result)
-     :"0"  (ptr), "q" (value), "a" (comparand)
+     "cmpxchgl       %3,(%0)"    /* if (EAX == [location]), */
+                                 /*   [location] = value    */
+                                 /* else                    */
+                                 /*   EAX = [location]           */
+     :"=r" (location), "=a" (result)
+     :"0"  (location), "q" (value), "a" (comparand)
      : "memory" );
 
 #endif

@@ -160,7 +160,7 @@ pthread_create (pthread_t * tid,
        */
       if (attr != NULL && *attr != NULL)
         {
-          (void) SetThreadPriority(thread->threadH,
+          (void) SetThreadPriority(threadH,
                                    PTHREAD_INHERIT_SCHED == (*attr)->inheritsched
                                    ? GetThreadPriority(GetCurrentThread())
                                    : (*attr)->param.sched_priority );
@@ -176,7 +176,7 @@ pthread_create (pthread_t * tid,
 
   /*
    * This lock will force pthread_threadStart() to wait until we have
-   * the thread handle.
+   * the thread handle and have set the priority.
    */
   (void) pthread_mutex_lock(&thread->cancelLock);
 
@@ -214,7 +214,7 @@ pthread_create (pthread_t * tid,
        */
       if (attr != NULL && *attr != NULL)
         {
-          (void) SetThreadPriority(thread->threadH,
+          (void) SetThreadPriority(threadH,
                                    PTHREAD_INHERIT_SCHED == (*attr)->inheritsched
                                    ? GetThreadPriority(GetCurrentThread())
                                    : (*attr)->param.sched_priority );

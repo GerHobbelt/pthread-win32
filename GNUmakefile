@@ -32,7 +32,10 @@ CXX	= g++
 AR	= ar
 
 OPT	= -O3
+#OPT	= -O3 -DTEST_ICE
 #OPT	= -O2 -DNDEBUG -finline-functions
+
+LFLAGS		= -lwsock32
 
 GC_CFLAGS	= -D__CLEANUP_C
 GCE_CFLAGS	= -D__CLEANUP_CXX -x c++ -mthreads
@@ -88,11 +91,11 @@ tests:
 
 
 $(GC_DLL): $(OBJS)
-	$(CC) $(OPT) -shared -o $@ $^
+	$(CC) $(OPT) -shared -o $@ $^ $(LFLAGS)
 	dlltool -k --dllname $@ --output-lib $(GC_LIB) --def pthread.def
 
 $(GCE_DLL): $(OBJS)
-	$(CXX) $(OPT) -mthreads -shared -o $@ $^
+	$(CXX) $(OPT) -mthreads -shared -o $@ $^  $(LFLAGS)
 	dlltool -k --dllname $@ --output-lib $(GCE_LIB) --def pthread.def
 
 clean:

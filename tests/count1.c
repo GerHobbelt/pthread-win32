@@ -7,11 +7,7 @@
 
 #include "test.h"
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
-#define NUMTHREADS (60)
-#else
-#define NUMTHREADS (59)
-#endif
+#define NUMTHREADS (30)
 
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t threads[NUMTHREADS];
