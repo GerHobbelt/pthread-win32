@@ -338,7 +338,7 @@ pthread_condattr_getpshared (const pthread_condattr_t * attr, int *pshared)
       *
       * RESULTS
       *              0               successfully retrieved attribute,
-      *              EINVAL          'attr' is invalid,
+      *              EINVAL          'attr' or 'pshared' is invalid,
       *
       * ------------------------------------------------------
       */
@@ -352,7 +352,6 @@ pthread_condattr_getpshared (const pthread_condattr_t * attr, int *pshared)
     }
   else
     {
-      *pshared = PTHREAD_PROCESS_PRIVATE;
       result = EINVAL;
     }
 

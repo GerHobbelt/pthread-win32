@@ -1,9 +1,17 @@
 2001-07-18  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
+	Contributed by - "Scott McCaskill" <scott@magruder.org>
+
 	* mutex.c (pthread_mutexattr_init): Return ENOMEM
 	immediately and don't dereference the NULL pointer
 	if calloc fails.
-	- "Scott McCaskill" <scott@magruder.org>
+	(pthread_mutexattr_getpshared): Don't dereference
+	a pointer that is possibly NULL.
+	* barrier.c (pthread_barrierattr_init): Likewise
+	(pthread_barrierattr_getpshared): Don't dereference
+	a pointer that is possibly NULL.
+	* condvar.c (pthread_condattr_getpshared): Don't dereference
+	a pointer that is possibly NULL.
 
 2001-07-10  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 

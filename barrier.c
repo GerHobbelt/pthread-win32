@@ -221,13 +221,14 @@ pthread_barrierattr_init (pthread_barrierattr_t * attr)
     {
       result = ENOMEM;
     }
- 
-  ba->pshared = PTHREAD_PROCESS_PRIVATE;
- 
+  else
+    {
+      ba->pshared = PTHREAD_PROCESS_PRIVATE;
+    }
+
   *attr = ba;
- 
+
   return (result);
- 
 }                               /* pthread_barrierattr_init */
  
  
@@ -270,12 +271,9 @@ pthread_barrierattr_destroy (pthread_barrierattr_t * attr)
  
       *attr = NULL;
       free (ba);
- 
-      result = 0;
     }
  
   return (result);
- 
 }                               /* pthread_barrierattr_destroy */
 
 
@@ -330,12 +328,10 @@ pthread_barrierattr_getpshared (const pthread_barrierattr_t * attr,
     }
   else
     {
-      *pshared = PTHREAD_PROCESS_PRIVATE;
       result = EINVAL;
     }
  
   return (result);
- 
 }                               /* pthread_barrierattr_getpshared */
 
 

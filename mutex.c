@@ -290,9 +290,9 @@ pthread_mutexattr_init (pthread_mutexattr_t * attr)
     {
       ma->pshared = PTHREAD_PROCESS_PRIVATE;
       ma->kind = PTHREAD_MUTEX_DEFAULT;
-
-      *attr = ma;
     }
+
+  *attr = ma;
 
   return(result);
 }                               /* pthread_mutexattr_init */
@@ -384,16 +384,16 @@ pthread_mutexattr_getpshared (const pthread_mutexattr_t * attr,
       * ------------------------------------------------------
       */
 {
-  int result = 0;
+  int result;
 
   if ((attr != NULL && *attr != NULL) &&
       (pshared != NULL))
     {
       *pshared = (*attr)->pshared;
+      result = 0;
     }
   else
     {
-      *pshared = PTHREAD_PROCESS_PRIVATE;
       result = EINVAL;
     }
 
