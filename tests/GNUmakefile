@@ -16,11 +16,11 @@ MAKE	= make
 #
 # Mingw32
 #
-GLANG   = c++
+GLANG	= c++
 CC	= gcc
 XXCFLAGS	= 
-#CFLAGS	= -g -O0 -mthreads -UNDEBUG -Wall -x $(GLANG)
-#CFLAGS	= -O3 -mthreads -UNDEBUG -Wall -x $(GLANG)
+#CFLAGS = -g -O0 -mthreads -UNDEBUG -Wall -x $(GLANG)
+#CFLAGS = -O3 -mthreads -UNDEBUG -Wall -x $(GLANG)
 CFLAGS	= -g -O0 -UNDEBUG -Wall $(XXCFLAGS)
 BUILD_DIR	= ..
 INCLUDES	= -I.
@@ -40,13 +40,13 @@ TESTS	= loadfree \
 	  condvar1 condvar2 condvar2_1 exit1 create1 equal1 \
 	  exit2 exit3 \
 	  join0 join1 join2 mutex2 mutex3 mutex4 mutex6 mutex6n mutex6e mutex6r \
-	  mutex7 mutex7n mutex7e mutex7r \
+	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
 	  count1 once1 tsd1 self2 cancel1 cancel2 eyal1 \
 	  condvar3 condvar3_1 condvar3_2 condvar3_3 \
 	  condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
 	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 rwlock7 \
-	  context1 cancel3 cancel4 cancel5 \
+	  context1 cancel3 cancel4 cancel5 cancel6a cancel6d \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
@@ -65,7 +65,7 @@ default:
 	@ $(ECHO) nmake clean GC    (to test using GC dll with C (no EH) applications)
 	@ $(ECHO) nmake clean GCX   (to test using GC dll with C++ (EH) applications)
 	@ $(ECHO) nmake clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)
-	@ $(ECHO) nmake clean GC-bench    (to benchtest using GNU C dll with C cleanup code)
+	@ $(ECHO) nmake clean GC-bench	  (to benchtest using GNU C dll with C cleanup code)
 
 auto:
 	@ $(MAKE) clean GCE
@@ -109,6 +109,8 @@ cancel2_1.pass: cancel2.pass
 cancel3.pass: context1.pass
 cancel4.pass: cancel3.pass
 cancel5.pass: cancel3.pass
+cancel6a.pass: cancel3.pass
+cancel6d.pass: cancel3.pass
 cleanup0.pass: cancel5.pass
 cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
@@ -159,6 +161,10 @@ mutex7.pass: mutex6.pass
 mutex7n.pass: mutex6n.pass
 mutex7e.pass: mutex6e.pass
 mutex7r.pass: mutex6r.pass
+mutex8.pass: mutex7.pass
+mutex8n.pass: mutex7n.pass
+mutex8e.pass: mutex7e.pass
+mutex8r.pass: mutex7r.pass
 once1.pass: create1.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass

@@ -121,12 +121,18 @@ mythread(void * arg)
    * pthread_cond_timedwait is a cancelation point and we
    * going to cancel one deliberately.
    */
+#ifdef _MSC_VER
+#pragma inline_depth(0)
+#endif
   pthread_cleanup_push(pthread_mutex_unlock, (void *) &cvthing.lock);
 
   while (! (cvthing.shared > 0))
     assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == 0);
 
   pthread_cleanup_pop(0);
+#ifdef _MSC_VER
+#pragma inline_depth(8)
+#endif
 
   assert(cvthing.shared > 0);
 
@@ -218,9 +224,9 @@ main()
       failed = !threadbag[i].started;
 
       if (failed)
-        {
-          fprintf(stderr, "Thread %d: started %d\n", i, threadbag[i].started);
-        }
+	{
+	  fprintf(stderr, "Thread %d: started %d\n", i, threadbag[i].started);
+	}
     }
 
   /* 

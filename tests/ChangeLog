@@ -1,3 +1,19 @@
+2002-02-02  Ross Johnson  <rpj@special.ise.canberra.edu.au>
+
+	* mutex8: New test.
+	* mutex8n: New test.
+	* mutex8e: New test.
+	* mutex8r: New test.
+	* cancel6a: New test.
+	* cancel6d: New test.
+	* cleanup0.c: Add pragmas for inline optimisation control.
+	* cleanup1.c: Add pragmas for inline optimisation control.
+	* cleanup2.c: Add pragmas for inline optimisation control.
+	* cleanup3.c: Add pragmas for inline optimisation control.
+	* condvar7.c: Add pragmas for inline optimisation control.
+	* condvar8.c: Add pragmas for inline optimisation control.
+	* condvar9.c: Add pragmas for inline optimisation control.
+
 2002-01-30  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
 	* cleanup1.c (): Must be declared __cdecl when compiled

@@ -272,6 +272,8 @@ ptw32_threadStart (void * vthreadParms)
 
   pthread_setspecific (ptw32_selfThreadKey, self);
 
+  self->state = PThreadStateRunning;
+
 #ifdef __CLEANUP_SEH
 
   __try
@@ -366,7 +368,7 @@ ptw32_threadStart (void * vthreadParms)
 	* We want to run the user's terminate function if supplied.
 	* That function may call pthread_exit() or be canceled, which will
 	* be handled by the outer try block.
-	* 
+	*
 	* ptw32_terminate() will be called if there is no user
 	* supplied function.
 	*/
@@ -408,6 +410,9 @@ ptw32_threadStart (void * vthreadParms)
        * and release the exception out of thread scope.
        */
       status = self->exitStatus = PTHREAD_CANCELED;
+      (void) pthread_mutex_lock(&self->cancelLock);
+      self->state = PThreadStateException;
+      (void) pthread_mutex_unlock(&self->cancelLock);
       (void) pthread_mutex_destroy(&self->cancelLock);
       (void) set_terminate(ptw32_oldTerminate);
       ptw32_callUserDestroyRoutines(self);
@@ -427,6 +432,10 @@ ptw32_threadStart (void * vthreadParms)
 #endif /* __CLEANUP_CXX */
 #endif /* __CLEANUP_C */
 #endif /* __CLEANUP_SEH */
+
+  (void) pthread_mutex_lock(&self->cancelLock);
+  self->state = PThreadStateLast;
+  (void) pthread_mutex_unlock(&self->cancelLock);
 
 
   (void) pthread_mutex_destroy(&self->cancelLock);

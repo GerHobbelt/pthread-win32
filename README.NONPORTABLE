@@ -65,9 +65,9 @@ int
 pthread_num_processors_np
 
         This routine (found on HPUX systems) returns the number of processors
-        in the system. This implementations actually returns the number of
-        processors available to the process, which can be a different (lower)
-        value depending on the process's affinity mask.
+        in the system. This implementation actually returns the number of
+        processors available to the process, which can be a lower number
+        than the system's number, depending on the process's affinity mask.
 
 BOOL
 pthread_win32_process_attach_np (void);

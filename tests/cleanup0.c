@@ -109,11 +109,17 @@ mythread(void * arg)
 
   assert(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL) == 0);
 
+#ifdef _MSC_VER
+#pragma inline_depth(0)
+#endif
   pthread_cleanup_push(increment_pop_count, (void *) &pop_count);
 
   Sleep(100);
 
   pthread_cleanup_pop(1);
+#ifdef _MSC_VER
+#pragma inline_depth(8)
+#endif
 
   return (void *) result;
 }
@@ -176,7 +182,7 @@ main()
 	  fprintf(stderr, "Thread %d: started %d: result %d\n",
 		  i,
 		  threadbag[i].started,
-	        result);
+		result);
 	  fflush(stderr);
 	}
       failed = (failed || fail);
