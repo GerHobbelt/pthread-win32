@@ -314,7 +314,7 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
 
               DWORD exceptionInformation[3];
 
-              exceptionInformation[0] = (DWORD) (0);
+              exceptionInformation[0] = (DWORD) (_PTHREAD_EPS_CANCEL);
               exceptionInformation[1] = (DWORD) (0);
               exceptionInformation[2] = (DWORD) (0);
 
@@ -328,7 +328,7 @@ CancelableWait (HANDLE waitHandle, DWORD timeout)
 
 #ifdef __cplusplus
 
-	      throw Pthread_exception();
+	      throw Pthread_exception_cancel();
 
 #endif /* __cplusplus */
 

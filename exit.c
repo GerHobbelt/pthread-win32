@@ -51,7 +51,60 @@ pthread_exit (void *value_ptr)
       * ------------------------------------------------------
       */
 {
-  _pthread_callUserDestroyRoutines((pthread_t) pthread_getspecific(_pthread_selfThreadKey));
+  pthread_t self = pthread_self();
 
-  _endthreadex ((unsigned) value_ptr);
+  /* If the current thread is implicit it was not started through
+     pthread_create(), therefore we cleanup and end the thread
+     here. Otherwise we raise an exception to unwind the exception
+     stack. The exception will be caught by _pthread_threadStart(),
+     which will cleanup and end the thread for us.
+   */
+
+  if (self->implicit)
+    {
+      _pthread_callUserDestroyRoutines(self);
+
+      _endthreadex ((unsigned) value_ptr);
+      
+      /* Never reached */
+    }
+  else
+    {
+#ifdef _MSC_VER
+ 
+      DWORD exceptionInformation[3];
+
+      exceptionInformation[0] = (DWORD) (_PTHREAD_EPS_EXIT);
+      exceptionInformation[1] = (DWORD) (value_ptr);
+      exceptionInformation[2] = (DWORD) (0);
+
+      RaiseException (
+		      EXCEPTION_PTHREAD_SERVICES,
+		      0,
+		      3,
+		      exceptionInformation);
+
+#else /* ! _MSC_VER */
+
+#ifdef __cplusplus
+
+      self->exceptionInformation = value_ptr;
+      throw Pthread_exception_exit();
+
+#else /* ! __cplusplus */
+
+      (void) pthread_pop_cleanup( 1 );
+
+      _pthread_callUserDestroyRoutines(self);
+
+      _endthreadex ((unsigned) value_ptr);
+
+#endif /* __cplusplus */
+
+#endif /* _MSC_VER */
+
+    }
+    
+  /* Never reached. */
+
 }

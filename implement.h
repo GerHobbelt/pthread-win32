@@ -77,6 +77,9 @@ struct pthread_t_ {
   sigset_t sigmask;
 #endif /* HAVE_SIGSET_T */
   int implicit:1;
+#ifdef __cplusplus
+  void * exceptionInformation;
+#endif
   void *keys;
 };
 
@@ -256,18 +259,27 @@ struct ThreadKeyAssoc {
  */
 #define EXCEPTION_PTHREAD_SERVICES	\
      MAKE_SOFTWARE_EXCEPTION( SE_ERROR, \
-			      PTHREAD_SERVICES_FACILITY, \
-			      PTHREAD_SERVICES_ERROR )
+			      _PTHREAD_SERVICES_FACILITY, \
+			      _PTHREAD_SERVICES_ERROR )
 
+#define _PTHREAD_SERVICES_FACILITY		0xBAD
+#define _PTHREAD_SERVICES_ERROR			0xDEED
 
-#define PTHREAD_SERVICES_FACILITY		0xBAD
-#define PTHREAD_SERVICES_ERROR			0xDEED
+/*
+ * Services available through EXCEPTION_PTHREAD_SERVICES
+ */
+#define _PTHREAD_EPS_CANCEL       0
+#define _PTHREAD_EPS_EXIT         1
 
 #else
 
 #ifdef __cplusplus
 
-class Pthread_exception {};
+/*
+ * Exceptions similar to the SEH exceptions above.
+ */
+class Pthread_exception_cancel {};
+class Pthread_exception_exit {};
 
 #else /* __cplusplus */
 
