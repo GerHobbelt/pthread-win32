@@ -85,15 +85,32 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
     POP          ecx
   }
 
+#elif defined(__BORLANDC__)
+
+  _asm {
+    PUSH	 ecx
+    PUSH	 edx
+    MOV 	 ecx,dword ptr [location]
+    MOV 	 edx,dword ptr [value]
+    MOV 	 eax,dword ptr [comparand]
+    LOCK CMPXCHG dword ptr [ecx],edx	    /* if (EAX == [ECX]) */
+                                            /*  [ECX] = EDX      */
+					    /* else              */
+					    /*  EAX = [ECX]      */
+    MOV 	 dword ptr [result], eax
+    POP 	 edx
+    POP 	 ecx
+  }
+
 #elif defined(__GNUC__)
 
   __asm__
     (
      "lock\n\t"
-     "cmpxchgl       %3,(%0)"    /* if (EAX == [location]), */
+     "cmpxchgl       %3,(%0)"    /* if (EAX == [location])  */
                                  /*   [location] = value    */
                                  /* else                    */
-                                 /*   EAX = [location]           */
+                                 /*   EAX = [location]      */
      :"=r" (location), "=a" (result)
      :"0"  (location), "q" (value), "a" (comparand)
      : "memory" );

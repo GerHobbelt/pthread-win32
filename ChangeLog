@@ -1,3 +1,10 @@
+2004-06-29  Will Bryant  <will.bryant at ecosm.com>
+
+	* README.Borland: New; description of Borland changes.
+	* Bmakefile: New makefile for the Borland make utility.
+	* ptw32_InterlockedCompareExchange.c:
+	Add Borland compatible asm code.
+
 2004-06-26  Jason Bard  <BardJA at Npt.NUWC.Navy.Mil>
 
 	* pthread.h (HAVE_STRUCT_TIMESPEC): If undefined, define it
