@@ -38,8 +38,8 @@ pthread_setcanceltype(int type, int *oldtype)
   pthread_t us = pthread_self();
 
   /* Validate the new cancellation type. */
-  if (type != PTHREAD_CANCEL_DEFERRED 
-      || type != PTHREAD_CANCEL_ASYNCHRONOUS)
+  if (type == PTHREAD_CANCEL_ASYNCHRONOUS ||
+      type != PTHREAD_CANCEL_DEFERRED)
     {
       return EINVAL;
     }
@@ -69,9 +69,7 @@ pthread_cancel(pthread_t thread)
 void
 pthread_testcancel(void)
 {
-  pthread_t thread;
-
-  thread = pthread_self();
+  pthread_t thread = pthread_self();
 
   if (thread->cancelstate == PTHREAD_CANCEL_DISABLE)
     {
@@ -81,7 +79,6 @@ pthread_testcancel(void)
   if (thread->cancel_pending == TRUE)
     {
       pthread_exit(PTHREAD_CANCELED);
-
-      /* Never reached. */
     }
+  /* Never reached. */
 }
