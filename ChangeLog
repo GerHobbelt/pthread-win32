@@ -1,3 +1,18 @@
+Fri Jul 24 00:21:21 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* create.c (pthread_create): Arg to _pthread_new_thread_entry()
+	changed. See next entry. Move mutex locks out. Changes made yesterday
+	and today allow us to start the new thread running rather than
+	temporarily suspended.
+
+	* private.c (_pthread_new_thread_entry): _pthread_thread_table
+	was changed back to a table of thread structures rather than pointers.
+	As such we're trading storage for increaded speed. This routine
+	was modified to work with the new table. Mutex lock put in around
+	global data accesses.
+	(_pthread_find_thread_entry): Ditto
+	(_pthread_delete_thread_entry): Ditto
+
 Thu Jul 23 23:25:30 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
 
 	* global.c: New. Global data objects declared here. These moved from
