@@ -1,3 +1,13 @@
+Sun Jul 26 13:06:12 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* exit.c (_pthread_vacuum): Add thread entry deletion code
+	moved from _pthread_start_call(). See next item.
+	(pthread_exit): Remove longjmp(). Add mutex lock around thread table
+	manipulation code. This routine now calls _enthreadex().
+
+	* create.c (_pthread_start_call): Remove setjmp() call and move
+	cleanup code out. Call pthread_exit(NULL) to terminate the thread.
+
 1998-07-26  Ben Elliston  <bje@cygnus.com>
 
 	* tsd.c (pthread_getspecific): Update comments.

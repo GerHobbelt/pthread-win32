@@ -38,58 +38,10 @@ _pthread_start_call(void * us_arg)
   func = us->call.routine;
   arg = us->call.arg;
 
-  /* FIXME: Should we be using sigsetjmp() here instead. */
-  from = setjmp(us->call.env);
+  ret = (*func)(arg);
 
-  if (from == 0)
-    {
-      /* Normal return from setjmp(). */
-      ret = (*func)(arg);
-
-      _pthread_vacuum();
-
-      /* Remove the thread entry on exit only if pthread_detach()
-	 was called and there are no waiting joins. */
-
-      /* CRITICAL SECTION */
-      pthread_mutex_lock(&_pthread_table_mutex);
-
-      if (us->detach == TRUE
-	  && us->join_count == 0)
-	{
-	  _pthread_delete_thread_entry(us);
-	}
-
-      pthread_mutex_lock(&_pthread_table_mutex);
-      /* END CRITICAL SECTION */
-    }
-  else
-    {
-      /* longjmp() teleported us here.
-	 func() called pthread_exit() which called longjmp(). */
-      _pthread_vacuum();
-
-      /* Remove the thread entry on exit only if pthread_detach()
-	 was called and there are no waiting joins. */
-
-      /* CRITICAL SECTION */
-      pthread_mutex_lock(&_pthread_table_mutex);
-
-      if (us->detach == TRUE
-	  && us->join_count == 0)
-	{
-	  _pthread_delete_thread_entry(us);
-	}
-
-      pthread_mutex_lock(&_pthread_table_mutex);
-      /* END CRITICAL SECTION */
-
-      ret = 0;
-    }
-
-  /* From Win32's point of view we always return naturally from our
-     start routine and so it should clean up it's own thread residue. */
-  return ret;
+  pthread_exit(NULL);
+  /* Never Reached */
 }
 
 int
