@@ -59,9 +59,9 @@ ptw32_decrease_semaphore(sem_t * sem)
     {
       s->value--;
       if (s->value != 0)
-	{
-	  SetEvent(s->event);
-	}
+				{
+					SetEvent(s->event);
+				}
     }
   else
     {

@@ -160,11 +160,106 @@
  * }
  * -------------------------------------------------------------
  *
+ *     Algorithm 9 / IMPL_SEM,UNBLOCK_STRATEGY == UNBLOCK_ALL
+ * 
+ * presented below in pseudo-code; basically 8a...
+ *                                      ...BUT W/O "spurious wakes" prevention:
+ *
+ *
+ * given:
+ * semBlockLock - bin.semaphore
+ * semBlockQueue - semaphore
+ * mtxExternal - mutex or CS
+ * mtxUnblockLock - mutex or CS
+ * nWaitersGone - int
+ * nWaitersBlocked - int
+ * nWaitersToUnblock - int
+ * 
+ * wait( timeout ) {
+ * 
+ *   [auto: register int result          ]     // error checking omitted
+ *   [auto: register int nSignalsWasLeft ]
+ * 
+ *   sem_wait( semBlockLock );
+ *   ++nWaitersBlocked;
+ *   sem_post( semBlockLock );
+ * 
+ *   unlock( mtxExternal );
+ *   bTimedOut = sem_wait( semBlockQueue,timeout );
+ * 
+ *   lock( mtxUnblockLock );
+ *   if ( 0 != (nSignalsWasLeft = nWaitersToUnblock) ) {
+ *     --nWaitersToUnblock;
+ *   }
+ *   else if ( INT_MAX/2 == ++nWaitersGone ) { // timeout/canceled or
+ *                                             // spurious semaphore :-)
+ *     sem_wait( semBlockLock );
+ *     nWaitersBlocked -= nWaitersGone;        // something is going on here
+ *                                             //  - test of timeouts? :-)
+ *     sem_post( semBlockLock );
+ *     nWaitersGone = 0;
+ *   }
+ *   unlock( mtxUnblockLock );
+ * 
+ *   if ( 1 == nSignalsWasLeft ) {
+ *     sem_post( semBlockLock );               // open the gate
+ *   }
+ * 
+ *   lock( mtxExternal );
+ * 
+ *   return ( bTimedOut ) ? ETIMEOUT : 0;
+ * }
+ * 
+ * signal(bAll) {
+ * 
+ *   [auto: register int result         ]
+ *   [auto: register int nSignalsToIssue]
+ * 
+ *   lock( mtxUnblockLock );
+ * 
+ *   if ( 0 != nWaitersToUnblock ) {        // the gate is closed!!!
+ *     if ( 0 == nWaitersBlocked ) {        // NO-OP
+ *       return unlock( mtxUnblockLock );
+ *     }
+ *     if (bAll) {
+ *       nWaitersToUnblock += nSignalsToIssue=nWaitersBlocked;
+ *       nWaitersBlocked = 0;
+ *     }
+ *     else {
+ *       nSignalsToIssue = 1;
+ *       ++nWaitersToUnblock;
+ *       --nWaitersBlocked;
+ *     }
+ *   }
+ *   else if ( nWaitersBlocked > nWaitersGone ) { // HARMLESS RACE CONDITION!
+ *     sem_wait( semBlockLock );                  // close the gate
+ *     if ( 0 != nWaitersGone ) {
+ *       nWaitersBlocked -= nWaitersGone;
+ *       nWaitersGone = 0;
+ *     }
+ *     if (bAll) {
+ *       nSignalsToIssue = nWaitersToUnblock = nWaitersBlocked;
+ *       nWaitersBlocked = 0;
+ *     }
+ *     else {
+ *       nSignalsToIssue = nWaitersToUnblock = 1;
+ *       --nWaitersBlocked;
+ *     }
+ *   }
+ *   else { // NO-OP
+ *     return unlock( mtxUnblockLock );
+ *   }
+ *
+ *   unlock( mtxUnblockLock );
+ *   sem_post( semBlockQueue,nSignalsToIssue );
+ *   return result;
+ * }
+ * -------------------------------------------------------------
+ *
  */
 
 #include "pthread.h"
 #include "implement.h"
-
 
 /*
  * Arguments for cond_wait_cleanup, since we can only pass a
@@ -184,7 +279,6 @@ ptw32_cond_wait_cleanup(void * args)
   pthread_cond_t cv = cleanup_args->cv;
   int * resultPtr = cleanup_args->resultPtr;
   int nSignalsWasLeft;
-  int nWaitersWasGone = 0; /* Initialised to quell warnings. */
   int result;
 
   /*
@@ -201,38 +295,7 @@ ptw32_cond_wait_cleanup(void * args)
 
   if ( 0 != (nSignalsWasLeft = cv->nWaitersToUnblock) )
     {
-      if ( !cleanup_args->signaled )
-        {
-          if ( 0 != cv->nWaitersBlocked )
-            {
-              (cv->nWaitersBlocked)--;
-            }
-          else
-            {
-              (cv->nWaitersGone)++;
-            }
-        }
-      if ( 0 == --(cv->nWaitersToUnblock) )
-        {
-          if ( 0 != cv->nWaitersBlocked )
-            {
-              if (sem_post( &(cv->semBlockLock) ) != 0)
-                {
-                  *resultPtr = errno;
-                  /*
-                   * This is a fatal error for this CV,
-                   * so we deliberately don't unlock
-                   * cv->mtxUnblockLock before returning.
-                   */
-                  return;
-                }
-              nSignalsWasLeft = 0;
-            }
-          else if ( 0 != (nWaitersWasGone = cv->nWaitersGone) )
-            {
-              cv->nWaitersGone = 0;
-            }
-        }
+      --(cv->nWaitersToUnblock);
     }
   else if ( INT_MAX/2 == ++(cv->nWaitersGone) )
     {
@@ -268,18 +331,6 @@ ptw32_cond_wait_cleanup(void * args)
 
   if ( 1 == nSignalsWasLeft )
     {
-      if ( 0 != nWaitersWasGone )
-        {
-          // sem_adjust( &(cv->semBlockQueue), -nWaitersWasGone );
-          while ( nWaitersWasGone-- ) 
-            {
-              if (sem_wait( &(cv->semBlockQueue)) != 0 )
-                {
-                  *resultPtr = errno;
-                  return;
-                }
-            }
-        }
       if (sem_post(&(cv->semBlockLock)) != 0)
         {
           *resultPtr = errno;
@@ -335,7 +386,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
       return errno;
     }
 
-  cv->nWaitersBlocked++;
+  ++(cv->nWaitersBlocked);
 
   if (sem_post(&(cv->semBlockLock)) != 0)
     {
