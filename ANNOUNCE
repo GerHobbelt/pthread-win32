@@ -181,9 +181,9 @@ For source code portability only - rwlocks cannot be process shared yet.
 As defined in the new POSIX standard, and the Single Unix Spec version 3:
 
         sem_timedwait()
-        pthread_mutex_timedlock()
-        pthread_rwlock_timedrdlock()
-        pthread_rwlock_timedwrlock()
+        pthread_mutex_timedlock()    - Alexander Terekhov and Thomas Pfaff
+        pthread_rwlock_timedrdlock() - adapted from pthread_rwlock_rdlock()
+        pthread_rwlock_timedwrlock() - adapted from pthread_rwlock_wrlock()
 
 
 New non-portable routine
@@ -292,7 +292,7 @@ Known bugs in this snapshot
      pthread_cleanup_pop(0);
    #pragma inline_depth()
 
-   Note the empty () value after the pop macro. This resets depth to the
+   Note the empty () pragma value after the pop macro. This resets depth to the
    default. Or you can specify a non-zero depth here.
 
    The pragma is also needed (and now used) within the library itself wherever
@@ -348,9 +348,12 @@ Known bugs in this snapshot
 Caveats
 -------
 
-1. Due to what is believed to be a C++ compliance error in VC++,
-if your application contains catch(...) blocks in your POSIX threads
-then you will need to replace the "catch(...)" with the macro
+1. [See also the discussion in the FAQ file - Q2, Q4, and Q5]
+
+Due to what is believed to be a C++ compliance error in VC++ whereby
+you may not have multiple handlers for the same exception in the same
+try/catch block, if your application contains catch(...) blocks in your POSIX
+threads then you will need to replace the "catch(...)" with the macro
 "PtW32Catch", eg.
 
 	#ifdef PtW32Catch
@@ -364,13 +367,14 @@ then you will need to replace the "catch(...)" with the macro
 	#endif
 
 Otherwise neither pthreads cancelation nor pthread_exit() will work
-reliably.
+reliably when using versions of the library that use C++ exceptions
+for cancelation and thread exit.
 
 
 Level of standards conformance
 ------------------------------
 
-The following POSIX 1003.1c/1b/1j options are defined:
+The following POSIX 1003.1 2001 options are defined:
 
       _POSIX_THREADS
       _POSIX_THREAD_SAFE_FUNCTIONS
@@ -382,7 +386,7 @@ The following POSIX 1003.1c/1b/1j options are defined:
       _POSIX_BARRIERS
 
 
-The following POSIX 1003.1c options are not defined:
+The following POSIX 1003.1 2001 options are not defined:
 
       _POSIX_THREAD_ATTR_STACKADDR
       _POSIX_THREAD_PRIO_INHERIT
@@ -462,7 +466,7 @@ The following functions are implemented:
       pthread_cond_broadcast  
 
       ---------------------------
-      Read/Write Locks - POSIX 1j
+      Read/Write Locks
       ---------------------------
       pthread_rwlock_init
       pthread_rwlock_destroy
@@ -479,7 +483,7 @@ The following functions are implemented:
       pthread_rwlockattr_setpshared
 
       ---------------------------
-      Spin Locks - POSIX 1j
+      Spin Locks
       ---------------------------
       pthread_spin_init
       pthread_spin_destroy
@@ -488,7 +492,7 @@ The following functions are implemented:
       pthread_spin_trylock
 
       ---------------------------
-      Barriers - POSIX 1j
+      Barriers
       ---------------------------
       pthread_barrier_init
       pthread_barrier_destroy
@@ -499,7 +503,7 @@ The following functions are implemented:
       pthread_barrierattr_setpshared
 
       ---------------------------
-      Semaphores - POSIX 1b
+      Semaphores
       ---------------------------
       sem_init
       sem_destroy
@@ -527,12 +531,12 @@ The following functions are implemented:
       pthread_setconcurrency
       pthread_attr_getscope
       pthread_attr_setscope  (only supports PTHREAD_SCOPE_SYSTEM)
-      sched_get_priority_max (POSIX 1b)
-      sched_get_priority_min (POSIX 1b)
-      sched_rr_get_interval  (POSIX 1b  - returns an error ENOTSUP)
-      sched_setscheduler     (POSIX 1b  - only supports SCHED_OTHER)
-      sched_getscheduler     (POSIX 1b  - only supports SCHED_OTHER)
-      sched_yield            (POSIX 1b)
+      sched_get_priority_max
+      sched_get_priority_min
+      sched_rr_get_interval  (returns an error ENOTSUP)
+      sched_setscheduler     (only supports SCHED_OTHER)
+      sched_getscheduler     (only supports SCHED_OTHER)
+      sched_yield
 
       ---------------------------
       Signals
