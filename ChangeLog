@@ -1,5 +1,7 @@
 1998-07-26  Ben Elliston  <bje@cygnus.com>
 
+	* tsd.c (pthread_getspecific): Update comments.
+
 	* mutex.c (pthread_mutexattr_setpshared): Not supported; remove.
 	(pthread_mutexattr_getpshared): Likewise.
 
