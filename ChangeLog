@@ -1,3 +1,12 @@
+2001-10-24  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
+
+	* attr.c (pthread_attr_setstacksize): Quell warning
+	from LCC by conditionally compiling the stacksize
+	validity check. LCC correctly warns that the condition
+	(stacksize < PTHREAD_STACK_MIN) is suspicious
+	because STACK_MIN is 0 and stacksize is of type
+	size_t (or unsigned int).
+
 2001-10-15  Ross Johnson  <rpj@setup1.ise.canberra.edu.au>
 
 	* spin.c (pthread_spin_lock): PTHREAD_SPINLOCK_INITIALIZER
