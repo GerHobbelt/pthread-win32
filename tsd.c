@@ -81,7 +81,7 @@ pthread_key_create(pthread_key_t *key, void (*destructor)(void *))
 int
 pthread_setspecific(pthread_key_t key, void *value)
 {
-  void * keys[];
+  void ** keys;
   int inuse;
 
   /* CRITICAL SECTION */
@@ -104,7 +104,7 @@ pthread_setspecific(pthread_key_t key, void *value)
 void *
 pthread_getspecific(pthread_key_t key)
 {
-  void * keys[];
+  void ** keys;
   int inuse;
 
   /* CRITICAL SECTION */
@@ -116,7 +116,7 @@ pthread_getspecific(pthread_key_t key)
   /* END CRITICAL SECTION */
 
   if (! inuse)
-    return EINVAL;
+    return (void *) NULL;
 
   keys = (void **) TlsGetValue(_pthread_TSD_keys_TlsIndex);
   return keys[key];
