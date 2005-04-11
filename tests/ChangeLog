@@ -1,3 +1,7 @@
+2005-04-11  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+        * once4.c: New test; tries to test priority adjustments.
+
 2005-04-06  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* cleanup0.c: Fix unguarded global variable accesses.

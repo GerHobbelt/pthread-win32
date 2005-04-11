@@ -34,6 +34,74 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+/*
+ * NOTES:
+ * pthread_once() performs a very simple task. So why is this implementation
+ * so complicated?
+ *
+ * The original implementation WAS very simple, but it relied on Windows random
+ * priority boosting to resolve starvation problems. Windows priority boosting
+ * does not occur for realtime priority classes (levels 16 to 31).
+ *
+ * You can check back to previous versions of code in the CVS repository or
+ * search the mailing list archives for discussion.
+ *
+ * Version A
+ * ---------
+ * Waiting threads would resume and suspend again using Sleep(0) until the
+ * init_routine had completed, but a higher priority waiter could hog the CPU and
+ * starve the initter thread until Windows randomly boosted it's priority, or forever
+ * for realtime applications.
+ *
+ * Version B
+ * ---------
+ * This was fixed by introducing a per once_control manual-reset event that is
+ * created and destroyed dynamically only if there are waiters. The design did not
+ * need global critical sections. Each once_control remained independent. A waiter
+ * could be confident that if the event was not null then it did not need to create
+ * the event.
+ *
+ * Version C
+ * ---------
+ * Since a change in ABI would result from version B, it was decided to take
+ * the opportunity and make pthread_once() fully compliant with the Single Unix
+ * Specification (version 3 at the time). This required allowing the init_routine
+ * to be a cancelation point. A cancelation meant that at least some waiting threads
+ * if any had to be woken so that one might become the new initter thread.
+ * Waiters could no longer simply assume that, if the event was not null, it did
+ * not need to create an event. Some real critical sections were needed, and in the
+ * current library, a global CRITICAL_SECTION is probably more efficient than a per
+ * once_control PTHREAD_MUTEX_INITIALIZER that should be somehow destroyed on exit from
+ * pthread_once(). Also, the cancelled init thread needed to set the event, and the
+ * new init thread (the winner of the race between any newly arriving threads and
+ * waking waiters) would need to reset it again. In the meantime, threads could be
+ * happily looping around until they either suspended on the reset event, or exited
+ * because the init thread had completed. It was also once again possible for a higher
+ * priority waiter to starve the init thread.
+ * 
+ * Version D
+ * ---------
+ * There were now two options considered:
+ * - use an auto-reset event; OR
+ * - add our own priority boosting.
+ *
+ * An auto-reset event would stop threads from looping ok, but it makes threads
+ * dependent on earlier threads to successfully set the event in turn when it's time
+ * to wake up, and this serialises threads unecessarily on MP systems. It also adds
+ * an extra kernel call for each waking thread. If one waiter wakes and dies (async
+ * cancelled or killed) before it can set the event, then all remaining waiters are
+ * stranded.
+ *
+ * Priority boosting is a standard method for solving priority inversion and
+ * starvation problems. Furthermore, all of the priority boost logic can
+ * be restricted to the post cancellation tracks. That is, it need not slow
+ * the normal cancel-free behaviour. Threads remain independent of other threads.
+ *
+ * The implementation below adds only a few local (to the thread) integer comparisons
+ * to the normal track through the routine and additional bus locking/cache line
+ * syncing operations have been avoided altogether in the uncontended track.
+ */
+
 #include "pthread.h"
 #include "implement.h"
 
@@ -99,6 +167,9 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	 */
 {
   int result;
+  LONG state;
+  pthread_t self;
+  HANDLE w32Thread = 0;
 
   if (once_control == NULL || init_routine == NULL)
     {
@@ -112,21 +183,40 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
       result = 0;
     }
 
-  while (!(InterlockedExchangeAdd((LPLONG)&once_control->state, 0L) /* Atomic Read */
+  while (!((state = InterlockedExchangeAdd((LPLONG)&once_control->state, 0L)) /* Atomic Read */
 	   & (LONG)PTW32_ONCE_DONE))
     {
+      LONG cancelled = (state & PTW32_ONCE_CANCELLED);
+
+      if (cancelled)
+	{
+	  /* Boost priority momentarily */
+	  if (!w32Thread)
+	    {
+	      self = pthread_self();
+	      w32Thread = pthread_getw32threadhandle_np(self);
+	    }
+	  /*
+	   * Prevent pthread_setschedparam() from changing our priority while we're boosted.
+	   */
+	  pthread_mutex_lock(&((ptw32_thread_t *)self.p)->threadLock);
+	  SetThreadPriority(w32Thread, THREAD_PRIORITY_HIGHEST);
+	}
+
       if (!PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->started, (LONG)PTW32_TRUE))
 	{
 	  /*
 	   * Clear residual state from a cancelled init_routine
 	   * (and DONE still hasn't been set of course).
 	   */
-	  if (PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_CLEAR)
-	      & PTW32_ONCE_CANCELLED)
+	  if (cancelled)
 	    {
 	      /*
 	       * The previous initter was cancelled.
 	       * We now have a new initter (us) and we need to make the rest wait again.
+	       * Furthermore, we're running at max priority until after we've reset the event
+	       * so we will not be starved by any other threads that may now be looping
+	       * around.
 	       */
 	      EnterCriticalSection(&ptw32_once_event_lock);
 	      if (once_control->event)
@@ -137,10 +227,18 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 
 	      /*
 	       * Any threads entering the wait section and getting out again before
-	       * the CANCELLED state can be cleared and the event is reset will, at worst, just go
-	       * around again or, if they suspend and we (the initter) completes before they resume,
-	       * they will see state == DONE and leave immediately.
+	       * the event is reset and the CANCELLED state is cleared will, at worst,
+	       * just go around again or, if they suspend and we (the initter) completes before
+	       * they resume, they will see state == DONE and leave immediately.
 	       */
+	      PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_CLEAR);
+
+	      /*
+	       * Restore priority. We catch any changes to this thread's priority
+	       * only if they were done through the POSIX API (i.e. pthread_setschedparam)
+	       */
+	      SetThreadPriority(w32Thread, ((ptw32_thread_t *)self.p)->sched_priority);
+	      pthread_mutex_unlock(&((ptw32_thread_t *)self.p)->threadLock);
 	    }
 
 	  pthread_cleanup_push(ptw32_once_init_routine_cleanup, (void *) once_control);
@@ -153,15 +251,23 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	   * we didn't create the event.
 	   * it is only there if there is someone waiting
 	   */
-	  EnterCriticalSection(&ptw32_once_event_lock);
 	  if (once_control->event)
 	    {
 	      SetEvent(once_control->event);
 	    }
-	  LeaveCriticalSection(&ptw32_once_event_lock);
 	}
       else
 	{
+	  if (cancelled)
+	    {
+	      /*
+	       * Restore priority. We catch any changes to this thread's priority
+	       * only if they were done through the POSIX API (i.e. pthread_setschedparam.
+	       */
+	      SetThreadPriority(w32Thread, ((ptw32_thread_t *)self.p)->sched_priority);
+	      pthread_mutex_unlock(&((ptw32_thread_t *)self.p)->threadLock);
+	    }
+
 	  /*
 	   * wait for init.
 	   * while waiting, create an event to wait on
@@ -176,15 +282,18 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	   * while we're suspended at this point in the code:-
 	   * - state will not get set to PTW32_ONCE_DONE;
 	   * - cleanup will not see an event and cannot set it;
-	   * - therefore, we will eventually resume, create an event and wait on it, maybe forever;
-	   * Remedy: cleanup must set state == CANCELLED before checking for an event, so that
+	   * - therefore, we will eventually resume, create an event and wait on it;
+	   * cleanup will set state == CANCELLED before checking for an event, so that
 	   * we will see it and avoid waiting (as for state == DONE). We will go around again and
-	   * we may become the initter.
+	   * we may then become the initter.
 	   * If we are still the only other thread when we get to the end of this block, we will
 	   * have closed the event (good). If another thread beats us to be initter, then we will
 	   * re-enter here (good). In case the old event is reused, the event is always reset by
-	   * the new initter after clearing the CANCELLED state, causing any threads that are
+	   * the new initter before clearing the CANCELLED state, causing any threads that are
 	   * cycling around the loop to wait again.
+	   * The initter thread is guaranteed to be at equal or higher priority than any waiters
+	   * so no waiters will starve the initter, which might otherwise cause us to loop
+	   * forever.
 	   */
 
 	  if (!once_control->event)
@@ -194,7 +303,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	  LeaveCriticalSection(&ptw32_once_event_lock);
 
 	  /*
-	   * check 'state' again in case the initting thread has finished or cancelled
+	   * Check 'state' again in case the initting thread has finished or cancelled
 	   * and left before seeing that there was an event to trigger.
 	   * (Now that the event IS created, if init gets finished AFTER this,
 	   * then the event handle is guaranteed to be seen and triggered).
