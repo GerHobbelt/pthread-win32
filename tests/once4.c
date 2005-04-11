@@ -149,6 +149,11 @@ main()
   printf("once thrd  prio  error\n");
 #endif
 
+  /*
+   * Set the priority class to realtime - otherwise normal
+   * Windows random priority boosting will obscure any problems.
+   */
+  SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
   /* Set main thread to lower prio than threads */
   SetThreadPriority(GetCurrentThread(), -2);
 
