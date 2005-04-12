@@ -194,7 +194,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	  if (!w32Thread)
 	    {
 	      self = pthread_self();
-	      w32Thread = pthread_getw32threadhandle_np(self);
+	      w32Thread = ((ptw32_thread_t *)self.p)->threadH;
 	    }
 	  /*
 	   * Prevent pthread_setschedparam() from changing our priority while we're boosted.
@@ -205,10 +205,6 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 
       if (!PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->started, (LONG)PTW32_TRUE))
 	{
-	  /*
-	   * Clear residual state from a cancelled init_routine
-	   * (and DONE still hasn't been set of course).
-	   */
 	  if (cancelled)
 	    {
 	      /*
@@ -241,9 +237,17 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	      pthread_mutex_unlock(&((ptw32_thread_t *)self.p)->threadLock);
 	    }
 
+#ifdef _MSC_VER
+#pragma inline_depth(0)
+#endif
+
 	  pthread_cleanup_push(ptw32_once_init_routine_cleanup, (void *) once_control);
 	  (*init_routine)();
 	  pthread_cleanup_pop(0);
+
+#ifdef _MSC_VER
+#pragma inline_depth()
+#endif
 
 	  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_DONE);
 
@@ -273,8 +277,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	   * while waiting, create an event to wait on
 	   */
 
-	  EnterCriticalSection(&ptw32_once_event_lock);
-	  once_control->eventUsers++;
+	  InterlockedIncrement((LPLONG) &once_control->eventUsers);
 
 	  /*
 	   * RE CANCELLATION:
@@ -296,6 +299,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	   * forever.
 	   */
 
+	  EnterCriticalSection(&ptw32_once_event_lock);
 	  if (!once_control->event)
 	    {
 	      once_control->event = CreateEvent(NULL, PTW32_TRUE, PTW32_FALSE, NULL);
@@ -309,21 +313,21 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	   * then the event handle is guaranteed to be seen and triggered).
 	   */
 
-	  if (!InterlockedExchangeAdd((LPLONG)&once_control->state, 0L)) /* Atomic Read */
+	  if (!InterlockedExchangeAdd((LPLONG)&once_control->state, 0L))
 	    {
 	      /* Neither DONE nor CANCELLED */
 	      (void) WaitForSingleObject(once_control->event, INFINITE);
 	    }
 
 	  /* last one out shut off the lights */
-	  EnterCriticalSection(&ptw32_once_event_lock);
-	  if (0 == --once_control->eventUsers)
+	  if (0 == InterlockedDecrement((LPLONG)&once_control->eventUsers))
 	    {
 	      /* we were last */
+	      EnterCriticalSection(&ptw32_once_event_lock);
 	      CloseHandle(once_control->event);
 	      once_control->event = 0;
+	      LeaveCriticalSection(&ptw32_once_event_lock);
 	    }
-	  LeaveCriticalSection(&ptw32_once_event_lock);
 	}
     }
 

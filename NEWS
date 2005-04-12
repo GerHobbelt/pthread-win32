@@ -1,3 +1,34 @@
+RELEASE 2.3.0^M
+-------------^M
+(2005-04-12)^M
+^M
+General
+-------
+
+Release 1.7.0 is a backport of features and bug fixes new in
+this release. See earlier notes under Release 2.0.0/General.
+
+Bugs fixed
+----------
+
+* Fixed pthread_once potential for post once_routine cancellation
+hanging due to starvation. See comments in pthread_once.c.
+Momentary priority boosting is used to ensure that, after a
+once_routine is cancelled, the thread that will run the
+once_routine is not starved by higher priority waiting threads at
+critical times. Priority boosting occurs only AFTER a once_routine 
+cancellation, and is applied only to that once_control. The
+once_routine is run at the thread's normal base priority.
+
+New tests
+---------
+
+* once4.c: Aggressively tests pthread_once() under realtime
+conditions using threads with varying priorities. Windows'
+random priority boosting does not occur for threads with realtime
+priority levels.
+
+
 RELEASE 2.2.0
 -------------
 (2005-04-04)
