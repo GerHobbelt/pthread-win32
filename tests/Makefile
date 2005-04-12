@@ -95,7 +95,7 @@ PASSES= sizes.pass  loadfree.pass \
 	  mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
 	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
 	  mutex8.pass  mutex8n.pass  mutex8e.pass  mutex8r.pass  \
-	  count1.pass  once1.pass  once2.pass  once3.pass  tsd1.pass  \
+	  count1.pass  once1.pass  once2.pass  once3.pass  once4.pass  tsd1.pass  \
 	  self2.pass  \
 	  cancel1.pass  cancel2.pass  \
 	  semaphore4.pass  semaphore4t.pass  \
@@ -332,6 +332,7 @@ mutex8r.pass: mutex7r.pass
 once1.pass: create1.pass
 once2.pass: once1.pass
 once3.pass: once2.pass
+once4.pass: once3.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass barrier3.pass
 reuse1.pass: create2.pass

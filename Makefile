@@ -441,8 +441,8 @@ VC-static-debug:
 	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCFLAGSD) /DPTW32_BUILD_INLINED /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).static
 
 realclean: clean
-	if exist *.dll del *.dll
-	if exist *.lib del *.lib
+	if exist pthread*.dll del pthread*.dll
+	if exist pthread*.lib del pthread*.lib
 	if exist *.stamp del *.stamp
 
 clean:

@@ -1,3 +1,8 @@
+2005-04-11  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* pthread_once.c: Add priority boosting to prevent init_routine
+	thread starvation post cancellation.
+
 2005-04-06  Kevin Lussier <Kevin at codegreennetworks.com>
 
 	* Makefile: Added debug targets for all versions of the library.

@@ -1,9 +1,43 @@
+RELEASE 1.7.0
+-------------
+(2005-04-12)
+
+General
+-------
+
+This release is a backport of features and bug fixes new in
+release 2.3.0. See earlier notes under Release 1.4.0/General.
+
+Bugs fixed
+----------
+
+* Fixed pthread_once potential for post once_routine cancellation
+hanging due to starvation. See comments in pthread_once.c.
+Momentary priority boosting is used to ensure that, after a
+once_routine is cancelled, the thread that will run the
+once_routine is not starved by higher priority waiting threads at
+critical times. Priority boosting occurs only AFTER a once_routine
+cancellation, and is applied only to that once_control. The
+once_routine is run at the thread's normal base priority.
+
+New tests
+---------
+
+* once4.c: Aggressively tests pthread_once() under realtime
+conditions using threads with varying priorities. Windows'
+random priority boosting does not occur for threads with realtime
+priority levels.
+
+
 RELEASE 1.6.0
 -------------
 (2005-04-04)
 
 General
 -------
+
+This release is a backport of features and bug fixes new in
+release 2.2.0. See earlier notes under Release 1.4.0/General.
 
 * Added makefile targets to build static link versions of the library.
 Both MinGW and MSVC. Please note that this does not imply any change
@@ -23,6 +57,12 @@ Dimitar Panayotov
 RELEASE 1.5.0
 -------------
 (2005-03-16)
+
+General
+-------
+
+This release is a backport of features and bug fixes new in
+release 2.1.0. See earlier notes under Release 1.4.0/General.
 
 Bugs fixed
 ----------
