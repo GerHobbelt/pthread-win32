@@ -1,8 +1,8 @@
 2005-04-11  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
-        * once4.c: New test; tries to test priority adjustments;
-	set priority class to realtime so that any failures can be
-	seen.
+        * once4.c: New test; tries to test priority adjustments
+        in pthread_once(); set priority class to realtime so that
+        any failures can be seen.
 
 2005-04-06  Ross Johnson  <rpj@callisto.canberra.edu.au>
 

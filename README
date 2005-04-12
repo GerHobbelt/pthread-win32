@@ -43,7 +43,9 @@ QueueUserAPCEx by Panagiotis E. Hadjidoukas
 	Pthreads-win32 will automatically detect if the QueueUserAPCEx DLL
 	QuserEx.DLL is available and whether the driver AlertDrv.sys is
 	loaded. If it is not available, pthreads-win32 will simulate async
-	cancelation, which means that it cannot pre-empt blocked threads.
+	cancelation, which means that it can async cancel only threads that
+	are runnable. The simulated async cancellation cannot cancel blocked
+	threads.
 
 
 Library naming
@@ -95,12 +97,19 @@ where:
 		  any snapshot with the same compatibility number.
 		  See 'Version numbering' below.
 
+The name may also be suffixed by a 'd' to indicate a debugging version
+of the library. E.g. pthreadVC2d.lib. Debugging versions contain
+additional information for debugging (symbols etc) and are often not
+optimised in any way (compiled with optimisation turned off).
+
 For example:
 	pthreadVSE.dll	(MSVC/SEH)
 	pthreadGCE.dll	(GNUC/C++ EH)
 	pthreadGC.dll	(GNUC/not dependent on exceptions)
 	pthreadVC1.dll	(MSVC/not dependent on exceptions - not binary
 			compatible with pthreadVC.dll)
+	pthreadVC2.dll	(MSVC/not dependent on exceptions - not binary
+			compatible with pthreadVC1.dll or pthreadVC.dll)
 
 The GNU library archive file names have correspondingly changed to:
 
@@ -315,37 +324,52 @@ you use. Or at least this is the hope.
 Building under VC++ using C++ EH, Structured EH, or just C
 ----------------------------------------------------------
 
-From the source directory run one of the following:
+From the source directory run nmake without any arguments to list
+help information. E.g.
 
-nmake clean VC-inlined	(builds the VC setjmp/longjmp version of
-pthreadVC.dll)
+$ nmake
 
-or:
+Microsoft (R) Program Maintenance Utility   Version 6.00.8168.0
+Copyright (C) Microsoft Corp 1988-1998. All rights reserved.
 
-nmake clean VCE-inlined (builds the VC++ C++ EH version pthreadVCE.dll)
+Run one of the following command lines:
+nmake clean VCE (to build the MSVC dll with C++ exception handling)
+nmake clean VSE (to build the MSVC dll with structured exception handling)
+nmake clean VC (to build the MSVC dll with C cleanup code)
+nmake clean VCE-inlined (to build the MSVC inlined dll with C++ exception handling)
+nmake clean VSE-inlined (to build the MSVC inlined dll with structured exception handling)
+nmake clean VC-inlined (to build the MSVC inlined dll with C cleanup code)
+nmake clean VC-static (to build the MSVC static lib with C cleanup code)
+nmake clean VCE-debug (to build the debug MSVC dll with C++ exception handling)
+nmake clean VSE-debug (to build the debug MSVC dll with structured exception handling)
+nmake clean VC-debug (to build the debug MSVC dll with C cleanup code)
+nmake clean VCE-inlined-debug (to build the debug MSVC inlined dll with C++ exception handling)
+nmake clean VSE-inlined-debug (to build the debug MSVC inlined dll with structured exception handling)
+nmake clean VC-inlined-debug (to build the debug MSVC inlined dll with C cleanup code)
+nmake clean VC-static-debug (to build the debug MSVC static lib with C cleanup code)
 
-or:
 
-nmake clean VSE-inlined (builds the VC++ structured EH version
-pthreadVSE.dll)
+The pre-built dlls are normally built using the *-inlined targets.
 
 You can run the testsuite by changing to the "tests" directory and
-running the target corresponding to the DLL version you built:
+running nmake. E.g.:
 
-nmake clean VC
+$ cd tests
+$ nmake
 
-or:
+Microsoft (R) Program Maintenance Utility   Version 6.00.8168.0
+Copyright (C) Microsoft Corp 1988-1998. All rights reserved.
 
-nmake clean VCE
-
-or:
-
-nmake clean VSE
-
-or:
-
-nmake clean VCX (tests the VC version of the library with C++ (EH)
-			 applications)
+Run one of the following command lines:
+nmake clean VC (to test using VC dll with VC (no EH) applications)
+nmake clean VCX (to test using VC dll with VC++ (EH) applications)
+nmake clean VCE (to test using the VCE dll with VC++ EH applications)
+nmake clean VSE (to test using VSE dll with VC (SEH) applications)
+nmake clean VC-bench (to benchtest using VC dll with C bench app)
+nmake clean VCX-bench (to benchtest using VC dll with C++ bench app)
+nmake clean VCE-bench (to benchtest using VCE dll with C++ bench app)
+nmake clean VSE-bench (to benchtest using VSE dll with SEH bench app)
+nmake clean VC-static (to test using VC static lib with VC (no EH) applications)
 
 
 Building under Mingw32
@@ -355,43 +379,61 @@ The dll can be built easily with recent versions of Mingw32.
 (The distributed versions are built using Mingw32 and MsysDTK
 from www.mingw32.org.)
 
-From the source directory, run
+From the source directory, run make for help information. E.g.:
 
-make clean GC-inlined
+$ make
+Run one of the following command lines:
+make clean GC            (to build the GNU C dll with C cleanup code)
+make clean GCE           (to build the GNU C dll with C++ exception handling)
+make clean GC-inlined    (to build the GNU C inlined dll with C cleanup code)
+make clean GCE-inlined   (to build the GNU C inlined dll with C++ exception handling)
+make clean GC-static     (to build the GNU C inlined static lib with C cleanup code)
+make clean GC-debug      (to build the GNU C debug dll with C cleanup code)
+make clean GCE-debug     (to build the GNU C debug dll with C++ exception handling)
+make clean GC-inlined-debug    (to build the GNU C inlined debug dll with C cleanup code)
+make clean GCE-inlined-debug   (to build the GNU C inlined debug dll with C++ exception handling)
+make clean GC-static-debug     (to build the GNU C inlined static debug lib with C cleanup code)
 
-or:
 
-make clean GCE-inlined
+The pre-built dlls are normally built using the *-inlined targets.
 
 You can run the testsuite by changing to the "tests" directory and
-running
+running make for help information. E.g.:
 
-make clean GC
-
-or:
-
-make clean GCE
-
-or:
-
-make clean GCX	(tests the GC version of the library with C++ (EH)
-			 applications)
+$ cd tests
+$ make
+Run one of the following command lines:
+make clean GC    (to test using GC dll with C (no EH) applications)
+make clean GCX   (to test using GC dll with C++ (EH) applications)
+make clean GCE   (to test using GCE dll with C++ (EH) applications)
+make clean GC-bench       (to benchtest using GNU C dll with C cleanup code)
+make clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)
+make clean GC-static   (to test using GC static lib with C (no EH) applications)
 
 
 Building the library as a statically linkable library
 -----------------------------------------------------
 
 General: PTW32_STATIC_LIB must be defined for both the library build and the
-application build. The following 'make' command lines define this for the
-library build.
+application build. The following 'make' command lines will define this for the
+static library builds.
 
-MSVC (creates pthreadVCn.lib as a static link lib):
+MSVC (creates pthreadVCnd.lib as a static link lib):
+
 nmake clean VC-static
 
+
 MinGW32 (creates libpthreadGCn.a as a static link lib):
+
 make clean GC-static
 
+
 Define PTW32_STATIC_LIB when building your application.
+
+The tests makefiles have the same targets but only check that the
+static library is statically linkable. They don't run the full
+testsuite. To run the full testsuite, build the dlls and run the
+dll test targets.
 
 
 Building the library under Cygwin
