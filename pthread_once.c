@@ -119,7 +119,7 @@ ptw32_once_init_routine_cleanup(void * arg)
     {
       /*
        * There are waiters, wake some up
-       * We're deliberately not using PulseEvent. It's iffy, and deprecated.
+       * We're deliberately not using PulseEvent. It's deprecated.
        */
       SetEvent(once_control->event);
     }
@@ -173,10 +173,8 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 
   if (once_control == NULL || init_routine == NULL)
     {
-
       result = EINVAL;
       goto FAIL0;
-
     }
   else
     {
@@ -277,7 +275,8 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	   * while waiting, create an event to wait on
 	   */
 
-	  InterlockedIncrement((LPLONG) &once_control->eventUsers);
+	  EnterCriticalSection(&ptw32_once_event_lock);
+	  once_control->eventUsers++;
 
 	  /*
 	   * RE CANCELLATION:
@@ -299,7 +298,6 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	   * forever.
 	   */
 
-	  EnterCriticalSection(&ptw32_once_event_lock);
 	  if (!once_control->event)
 	    {
 	      once_control->event = CreateEvent(NULL, PTW32_TRUE, PTW32_FALSE, NULL);
@@ -320,14 +318,14 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	    }
 
 	  /* last one out shut off the lights */
-	  if (0 == InterlockedDecrement((LPLONG)&once_control->eventUsers))
+	  EnterCriticalSection(&ptw32_once_event_lock);
+	  if (0 == --once_control->eventUsers)
 	    {
 	      /* we were last */
-	      EnterCriticalSection(&ptw32_once_event_lock);
 	      CloseHandle(once_control->event);
 	      once_control->event = 0;
-	      LeaveCriticalSection(&ptw32_once_event_lock);
 	    }
+	  LeaveCriticalSection(&ptw32_once_event_lock);
 	}
     }
 
