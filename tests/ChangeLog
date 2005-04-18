@@ -1,3 +1,18 @@
+2005-04-18  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* condvar3.c: Remove locks from around signalling calls - should not
+	be required for normal operation and only serve to mask deficiencies;
+	ensure that CV destruction is not premature after removing guards.
+	* condvar3_1.c: Likewise.
+	* condvar3_2.c: Likewise.
+	* condvar3_3.c: Likewise.
+	* condvar4.c: Likewise.
+	* condvar5.c: Likewise.
+	* condvar6.c: Likewise.
+	* condvar7.c: Likewise.
+	* condvar8.c: Likewise.
+	* condvar9.c: Likewise.
+
 2005-04-11  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
         * once4.c: New test; tries to test priority adjustments

@@ -112,11 +112,11 @@ int main()
       threads waiting on it. The signal should be lost and
       the next pthread_cond_timedwait should time out too. */
 
-   assert(pthread_mutex_lock(&mtx) == 0);
+//   assert(pthread_mutex_lock(&mtx) == 0);
 
    assert((rc = pthread_cond_signal(&cnd)) == 0);
 
-   assert(pthread_mutex_unlock(&mtx) == 0);
+//   assert(pthread_mutex_unlock(&mtx) == 0);
 
    assert(pthread_mutex_lock(&mtx) == 0);
 

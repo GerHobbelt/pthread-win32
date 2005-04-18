@@ -94,8 +94,8 @@ mythread(void * arg)
   int result = 0;
 
   assert(pthread_mutex_lock(&mutex) == 0);
-
   shared++;
+  assert(pthread_mutex_unlock(&mutex) == 0);
 
   if ((result = pthread_cond_signal(&cv)) != 0)
     {
@@ -103,7 +103,6 @@ mythread(void * arg)
     }
   assert(result == 0);
 
-  assert(pthread_mutex_unlock(&mutex) == 0);
 
   return (void *) 0;
 }
@@ -111,14 +110,10 @@ mythread(void * arg)
 int
 main()
 {
-  pthread_attr_t attr;
   pthread_t t[NUMTHREADS];
   struct timespec abstime = { 0, 0 };
   struct _timeb currSysTime;
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
-
-  assert(pthread_attr_init(&attr) == 0);
-  assert(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) == 0);
 
   assert((t[0] = pthread_self()).p != NULL);
 
@@ -134,7 +129,7 @@ main()
   abstime.tv_sec = currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
-  assert(pthread_create(&t[1], &attr, mythread, (void *) 1) == 0);
+  assert(pthread_create(&t[1], NULL, mythread, (void *) 1) == 0);
 
   abstime.tv_sec += 5;
 
@@ -144,6 +139,8 @@ main()
   assert(shared > 0);
 
   assert(pthread_mutex_unlock(&mutex) == 0);
+
+  assert(pthread_join(t[1], NULL) == 0);
 
   assert(pthread_cond_destroy(&cv) == 0);
 
