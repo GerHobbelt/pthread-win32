@@ -99,12 +99,10 @@ void *
 mythread(void * arg)
 {
   assert(pthread_mutex_lock(&cvthing.lock) == 0);
-
   cvthing.shared++;
+  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
   assert(pthread_cond_signal(&cvthing.notbusy) == 0);
-
-  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
   return (void *) 0;
 }
@@ -156,6 +154,8 @@ main()
   assert(cvthing.shared > 0);
 
   assert(pthread_mutex_unlock(&cvthing.lock) == 0);
+
+  assert(pthread_join(t[1], NULL) == 0);
 
   assert(pthread_mutex_destroy(&cvthing.lock) == 0);
 
