@@ -106,7 +106,7 @@
 #include "implement.h"
 
 
-static void
+static void PTW32_CDECL
 ptw32_once_init_routine_cleanup(void * arg)
 {
   pthread_once_t * once_control = (pthread_once_t *) arg;
@@ -114,16 +114,22 @@ ptw32_once_init_routine_cleanup(void * arg)
   (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_CANCELLED);
   (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->started, (LONG)PTW32_FALSE);
 
-  EnterCriticalSection(&ptw32_once_event_lock);
-  if (once_control->event)
+//  EnterCriticalSection(&ptw32_once_event_lock);
+  if (InterlockedExchangeAdd((LPLONG)&once_control->event, 0L)) /* MBR fence */
     {
+      int lasterror = GetLastError ();
+      int lastWSAerror = WSAGetLastError ();
+
       /*
-       * There are waiters, wake some up
-       * We're deliberately not using PulseEvent. It's deprecated.
+       * There are waiters, wake some up.
        */
-      SetEvent(once_control->event);
+      if (!SetEvent(once_control->event))
+	{
+	  SetLastError (lasterror);
+	  WSASetLastError (lastWSAerror);
+	}
     }
-  LeaveCriticalSection(&ptw32_once_event_lock);
+//  LeaveCriticalSection(&ptw32_once_event_lock);
 }
 
 
@@ -167,6 +173,9 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	 */
 {
   int result;
+  int lasterror;
+  int lastWSAerror;
+  int restoreLastError;
   LONG state;
   pthread_t self;
   HANDLE w32Thread = 0;
@@ -180,6 +189,13 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
     {
       result = 0;
     }
+
+  /*
+   * We want to be invisible to GetLastError() outside of this routine.
+   */
+  lasterror = GetLastError ();
+  lastWSAerror = WSAGetLastError ();
+  restoreLastError = PTW32_FALSE;
 
   while (!((state = InterlockedExchangeAdd((LPLONG)&once_control->state, 0L)) /* Atomic Read */
 	   & (LONG)PTW32_ONCE_DONE))
@@ -212,12 +228,15 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	       * so we will not be starved by any other threads that may now be looping
 	       * around.
 	       */
-	      EnterCriticalSection(&ptw32_once_event_lock);
-	      if (once_control->event)
+//	      EnterCriticalSection(&ptw32_once_event_lock);
+	      if (InterlockedExchangeAdd((LPLONG)&once_control->event, 0L)) /* MBR fence */
 		{
-		  ResetEvent(once_control->event);
+		  if (!ResetEvent(once_control->event))
+		    {
+		      restoreLastError = PTW32_TRUE;
+		    }
 		}
-	      LeaveCriticalSection(&ptw32_once_event_lock);
+//	      LeaveCriticalSection(&ptw32_once_event_lock);
 
 	      /*
 	       * Any threads entering the wait section and getting out again before
@@ -251,15 +270,23 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 
 	  /*
 	   * we didn't create the event.
-	   * it is only there if there is someone waiting
+	   * it is only there if there is someone waiting.
+	   * Avoid using the global event_lock but still prevent SetEvent
+	   * from overwriting any 'lasterror' if the event is closed before we
+	   * are done with it.
 	   */
-	  if (once_control->event)
+	  if (InterlockedExchangeAdd((LPLONG)&once_control->event, 0L)) /* MBR fence */
 	    {
-	      SetEvent(once_control->event);
+	      if (!SetEvent(once_control->event))
+		{
+		  restoreLastError = PTW32_TRUE;
+		}
 	    }
 	}
       else
 	{
+	  HANDLE tmpEvent;
+
 	  if (cancelled)
 	    {
 	      /*
@@ -275,64 +302,95 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	   * while waiting, create an event to wait on
 	   */
 
-	  EnterCriticalSection(&ptw32_once_event_lock);
-	  once_control->eventUsers++;
-
-	  /*
-	   * RE CANCELLATION:
-	   * If we are the first thread after the initter thread, and the init_routine is cancelled
-	   * while we're suspended at this point in the code:-
-	   * - state will not get set to PTW32_ONCE_DONE;
-	   * - cleanup will not see an event and cannot set it;
-	   * - therefore, we will eventually resume, create an event and wait on it;
-	   * cleanup will set state == CANCELLED before checking for an event, so that
-	   * we will see it and avoid waiting (as for state == DONE). We will go around again and
-	   * we may then become the initter.
-	   * If we are still the only other thread when we get to the end of this block, we will
-	   * have closed the event (good). If another thread beats us to be initter, then we will
-	   * re-enter here (good). In case the old event is reused, the event is always reset by
-	   * the new initter before clearing the CANCELLED state, causing any threads that are
-	   * cycling around the loop to wait again.
-	   * The initter thread is guaranteed to be at equal or higher priority than any waiters
-	   * so no waiters will starve the initter, which might otherwise cause us to loop
-	   * forever.
-	   */
-
-	  if (!once_control->event)
+//	  EnterCriticalSection(&ptw32_once_event_lock);
+	  if (1 == InterlockedIncrement((LPLONG)&once_control->eventUsers))
 	    {
-	      once_control->event = CreateEvent(NULL, PTW32_TRUE, PTW32_FALSE, NULL);
+	      /*
+	       * RE CANCELLATION:
+	       * If we are the first thread after the initter thread, and the init_routine is cancelled
+	       * while we're suspended at this point in the code:-
+	       * - state will not get set to PTW32_ONCE_DONE;
+	       * - cleanup will not see an event and cannot set it;
+	       * - therefore, we will eventually resume, create an event and wait on it;
+	       * cleanup will set state == CANCELLED before checking for an event, so that
+	       * we will see it and avoid waiting (as for state == DONE). We will go around again and
+	       * we may then become the initter.
+	       * If we are still the only other thread when we get to the end of this block, we will
+	       * have closed the event (good). If another thread beats us to be initter, then we will
+	       * re-enter here (good). In case the old event is reused, the event is always reset by
+	       * the new initter before clearing the CANCELLED state, causing any threads that are
+	       * cycling around the loop to wait again.
+	       * The initter thread is guaranteed to be at equal or higher priority than any waiters
+	       * so no waiters will starve the initter, which might otherwise cause us to loop
+	       * forever.
+	       */
+	      tmpEvent = CreateEvent(NULL, PTW32_TRUE, PTW32_FALSE, NULL);
+	      if (PTW32_INTERLOCKED_COMPARE_EXCHANGE((PTW32_INTERLOCKED_LPLONG)&once_control->event,
+						     (PTW32_INTERLOCKED_LONG)tmpEvent,
+						     (PTW32_INTERLOCKED_LONG)0))
+		{
+		  CloseHandle(tmpEvent);
+		}
 	    }
-	  LeaveCriticalSection(&ptw32_once_event_lock);
+//	  LeaveCriticalSection(&ptw32_once_event_lock);
 
 	  /*
 	   * Check 'state' again in case the initting thread has finished or cancelled
 	   * and left before seeing that there was an event to trigger.
-	   * (Now that the event IS created, if init gets finished AFTER this,
-	   * then the event handle is guaranteed to be seen and triggered).
 	   */
 
-	  if (!InterlockedExchangeAdd((LPLONG)&once_control->state, 0L))
+	  switch (InterlockedExchangeAdd((LPLONG)&once_control->state, 0L))
 	    {
-	      /* Neither DONE nor CANCELLED */
-	      (void) WaitForSingleObject(once_control->event, INFINITE);
+	    case PTW32_ONCE_CLEAR:
+	      {
+		/* Neither DONE nor CANCELLED */
+		if (WAIT_FAILED == WaitForSingleObject(once_control->event, INFINITE))
+		  {
+		    restoreLastError = PTW32_TRUE;
+		    /*
+		     * If the wait failed it's probably because the event is invalid.
+		     * That's possible after a cancellation (but rare) if we got through the
+		     * event create block above while a woken thread was suspended between
+		     * the decrement and exchange below and then resumed before we could wait.
+		     * So we'll yield.
+		     */
+		    Sleep(0);
+		  }
+		break;
+	      }
+	    case PTW32_ONCE_CANCELLED:
+	      {
+		if (once_control->started)
+		  {
+		    /* The new initter hasn't cleared the cancellation yet, so give the
+		     * processor to a more productive thread. */
+		    Sleep(0);
+		  }
+		break;
+	      }
 	    }
 
 	  /* last one out shut off the lights */
-	  EnterCriticalSection(&ptw32_once_event_lock);
-	  if (0 == --once_control->eventUsers)
+//	  EnterCriticalSection(&ptw32_once_event_lock);
+	  if (0 == InterlockedDecrement((LPLONG)&once_control->eventUsers))
 	    {
 	      /* we were last */
-	      CloseHandle(once_control->event);
-	      once_control->event = 0;
+	      if ((tmpEvent = (HANDLE)
+		   PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->event,
+					      (LONG)0)))
+		{
+		  CloseHandle(tmpEvent);
+		}
 	    }
-	  LeaveCriticalSection(&ptw32_once_event_lock);
+//	  LeaveCriticalSection(&ptw32_once_event_lock);
 	}
     }
 
-
-  /*
-   * Fall through Intentionally
-   */
+  if (restoreLastError)
+    {
+      SetLastError (lasterror);
+      WSASetLastError (lastWSAerror);
+    }
 
   /*
    * ------------
