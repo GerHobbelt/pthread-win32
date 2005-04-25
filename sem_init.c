@@ -103,33 +103,30 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
       else
 	{
 
+	  s->value = value;
+	  if (pthread_mutex_init(&s->lock, NULL) == 0)
+	    {
+
 #ifdef NEED_SEM
 
-	  s->value = value;
-	  s->event = CreateEvent (NULL, PTW32_FALSE,	/* manual reset */
-				  PTW32_FALSE,	/* initial state */
-				  NULL);
+	  s->sem = CreateEvent (NULL,
+				PTW32_FALSE,	/* auto (not manual) reset */
+				PTW32_FALSE,	/* initial state is unset */
+				NULL);
 
-	  if (0 == s->event)
+	  if (0 == s->sem)
 	    {
 	      free (s);
+	      (void) pthread_mutex_destroy(&s->lock);
 	      result = ENOSPC;
 	    }
 	  else
 	    {
-	      if (value != 0)
-		{
-		  SetEvent (s->event);
-		}
-
-	      InitializeCriticalSection (&s->sem_lock_cs);
+	      s->leftToUnblock = 0;
 	    }
 
 #else /* NEED_SEM */
 
-	  s->value = value;
-	  if (pthread_mutex_init(&s->lock, NULL) == 0)
-	    {
 	      if ((s->sem = CreateSemaphore (NULL,	/* Always NULL */
 					     (long) 0,	/* Force threads to wait */
 					     (long) _POSIX_SEM_VALUE_MAX,	/* Maximum value */
@@ -138,6 +135,9 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 		  (void) pthread_mutex_destroy(&s->lock);
 		  result = ENOSPC;
 		}
+
+#endif /* NEED_SEM */
+
 	    }
 	  else
 	    {
@@ -148,9 +148,6 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 	    {
 	      free(s);
 	    }
-
-#endif /* NEED_SEM */
-
 	}
     }
 

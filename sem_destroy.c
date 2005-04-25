@@ -84,20 +84,6 @@ sem_destroy (sem_t * sem)
       s = *sem;
       *sem = NULL;
 
-#ifdef NEED_SEM
-
-      if (!CloseHandle (s->event))
-	{
-	  *sem = s;
-	  result = EINVAL;
-	}
-      else
-	{
-	  DeleteCriticalSection (&s->sem_lock_cs);
-	}
-
-#else /* NEED_SEM */
-
       if ((result = pthread_mutex_trylock (&s->lock)) == 0)
         {
           if (s->value >= 0)
@@ -111,10 +97,19 @@ sem_destroy (sem_t * sem)
 	        }
               else if ((result = pthread_mutex_destroy (&s->lock)) != 0)
                 {
+
+#ifdef NEED_SEM
+		  s->sem = CreateEvent (NULL,
+					PTW32_FALSE,    /* manual reset is false */
+					PTW32_FALSE,    /* initial state is unset */
+					NULL);
+#else
                   s->sem = CreateSemaphore (NULL,      /* Always NULL */
                                             (long) 0,  /* Force threads to wait */
                                             (long) _POSIX_SEM_VALUE_MAX,       /* Maximum value */
                                             NULL);     /* Name */
+#endif
+
                   if (s->sem == 0)
                     {
                       /* We just have to pretend that we've destroyed the semaphore
@@ -136,9 +131,6 @@ sem_destroy (sem_t * sem)
               result = EBUSY;
             }
         }
-
-#endif /* NEED_SEM */
-
     }
 
   if (result != 0)

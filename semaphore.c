@@ -67,7 +67,3 @@
 #include "sem_open.c"
 #include "sem_close.c"
 #include "sem_unlink.c"
-#ifdef NEED_SEM
-#include "ptw32_decrease_semaphore.c"
-#include "ptw32_increase_semaphore.c"
-#endif
