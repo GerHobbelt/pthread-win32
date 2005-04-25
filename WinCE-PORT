@@ -1,3 +1,12 @@
+NOTE: The comments in this file relate to the original WinCE port
+done by Tristan Savatier. The semaphore routines have been 
+completely rewritten since (2005-04-25), having been progressively
+broken more and more by changes to the library. All of the semaphore
+routines implemented for W9x/WNT/2000 and up should now also work for
+WinCE. Also, pthread_mutex_timedlock should now work. [RPJ]
+
+----
+
 Some interesting news:
 
 I have been able to port pthread-win32 to Windows-CE,

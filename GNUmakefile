@@ -219,6 +219,7 @@ SMALL_STATIC_OBJS	= \
 		ptw32_new.o \
 		ptw32_reuse.o \
 		ptw32_semwait.o \
+		ptw32_relmillisecs.o \
 		ptw32_rwlock_check_need_init.o \
 		sched_get_priority_max.o \
 		sched_get_priority_min.o \
@@ -236,8 +237,6 @@ SMALL_STATIC_OBJS	= \
 		sem_open.o \
 		sem_close.o \
 		sem_unlink.o \
-		ptw32_increase_semaphore.o \
-		ptw32_decrease_semaphore.o \
 		signal.o \
 		pthread_kill.o \
 		ptw32_spinlock_check_need_init.o \
@@ -349,6 +348,7 @@ PRIVATE_SRCS	= \
 		ptw32_tkAssocDestroy.c \
 		ptw32_callUserDestroyRoutines.c \
 		ptw32_semwait.c \
+		ptw32_relmillisecs.c \
 		ptw32_timespec.c \
 		ptw32_throw.c \
 		ptw32_InterlockedCompareExchange.c \
@@ -397,9 +397,7 @@ SEMAPHORE_SRCS = \
 		sem_getvalue.c \
 		sem_open.c \
 		sem_close.c \
-		sem_unlink.c \
-		ptw32_increase_semaphore.c \
-		ptw32_decrease_semaphore.c
+		sem_unlink.c
 
 SPIN_SRCS	= \
 		ptw32_spinlock_check_need_init.c \

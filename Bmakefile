@@ -7,7 +7,7 @@
 #
 
 
-DLL_VER	= 2
+DLL_VER	= 1
 
 DEVROOT	= .
 
@@ -139,6 +139,7 @@ PRIVATE_SRCS	= \
 		ptw32_tkAssocDestroy.c \
 		ptw32_callUserDestroyRoutines.c \
 		ptw32_timespec.c \
+		ptw32_relmillisecs.c \
 		ptw32_throw.c \
 		ptw32_InterlockedCompareExchange.c \
 		ptw32_getprocessors.c
@@ -186,9 +187,7 @@ SEMAPHORE_SRCS = \
 		sem_getvalue.c \
 		sem_open.c \
 		sem_close.c \
-		sem_unlink.c \
-		ptw32_increase_semaphore.c \
-		ptw32_decrease_semaphore.c
+		sem_unlink.c
 
 SPIN_SRCS	= \
 		ptw32_spinlock_check_need_init.c \

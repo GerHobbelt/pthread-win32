@@ -1,3 +1,33 @@
+2005-04-25  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* ptw32_relmillisecs.c: New module; converts future abstime to 
+	milliseconds relative to 'now'.
+	* pthread_mutex_timedlock.c: Use new ptw32_relmillisecs routine in
+	place of internal code; remove the NEED_SEM code - this routine is now
+	implemented for builds that define NEED_SEM (WinCE etc)
+	* sem_timedwait.c: Likewise; after timeout or cancellation,
+	re-attempt to acquire the semaphore in case one has been posted since
+	the timeout/cancel occurred. Thanks to 
+	* Makefile: Add ptw32_relmillisecs.c module; remove
+	ptw32_{in,de}crease_semaphore.c modules.
+	* GNUmakefile: Likewise.
+	* Bmakefile: Likewise.
+
+	* sem_init.c: Re-write the NEED_SEM code to be consistent with the
+	non-NEED_SEM code, but retaining use of an event in place of the w32 sema
+	for w32 systems that don't include semaphores (WinCE);
+	the NEED_SEM versions of semaphores has been broken for a long time but is
+	now fixed and supports all of the same routines as the non-NEED_SEM case.
+	* sem_destroy.c: Likewise.
+	* sem_wait.c: Likewise.
+	* sem_post.c: Likewise.
+	* sem_post_multple.c: Likewise.
+	* implement.h: Likewise.
+	* sem_timedwait.c: Likewise; this routine is now
+	implemented for builds that define NEED_SEM (WinCE etc).
+	* sem_trywait.c: Likewise.
+	* sem_getvalue.c: Likewise.
+
 2005-04-11  Ross Johnson  <ross at callisto.canberra.edu.au>
 
 	* pthread_once.c: Add priority boosting to prevent init_routine
