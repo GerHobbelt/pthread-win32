@@ -48,9 +48,10 @@
 
 #include "benchtest.h"
 
-#define ITERATIONS      10000000L
+#define ITERATIONS      1000000L
 
 sem_t sema;
+HANDLE w32sema;
 
 struct _timeb currSysTimeStart;
 struct _timeb currSysTimeStop;
@@ -112,13 +113,31 @@ main (int argc, char *argv[])
   /*
    * Now we can start the actual tests
    */
+  assert((w32sema = CreateSemaphore(NULL, (long) 0, (long) ITERATIONS, NULL)) != 0);
+  TESTSTART
+  assert(ReleaseSemaphore(w32sema, 1, NULL) != zero);
+  TESTSTOP
+  assert(CloseHandle(w32sema) != 0);
+
+  reportTest("W32 Post with no waiters");
+
+
+  assert((w32sema = CreateSemaphore(NULL, (long) ITERATIONS, (long) ITERATIONS, NULL)) != 0);
+  TESTSTART
+  assert(WaitForSingleObject(w32sema, INFINITE) == WAIT_OBJECT_0);
+  TESTSTOP
+  assert(CloseHandle(w32sema) != 0);
+
+  reportTest("W32 Wait without blocking");
+
+
   assert(sem_init(&sema, 0, 0) == 0);
   TESTSTART
   assert(sem_post(&sema) == zero);
   TESTSTOP
   assert(sem_destroy(&sema) == 0);
 
-  reportTest("Post");
+  reportTest("POSIX Post with no waiters");
 
 
   assert(sem_init(&sema, 0, ITERATIONS) == 0);
@@ -127,43 +146,8 @@ main (int argc, char *argv[])
   TESTSTOP
   assert(sem_destroy(&sema) == 0);
 
-  reportTest("Wait without blocking");
+  reportTest("POSIX Wait without blocking");
 
-
-  /*
-   * Time the loop overhead so we can subtract it from the actual test times.
-   */
-
-  TESTSTART
-  assert(1 == one);
-  assert(1 == one);
-  TESTSTOP
-
-  durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
-  overHeadMilliSecs = durationMilliSecs;
-
-
-  /*
-   * Now we can start the actual tests
-   */
-  assert(sem_init(&sema, 0, 0) == 0);
-  TESTSTART
-  assert(sem_post(&sema) == zero);
-  assert(sem_wait(&sema) == zero);
-  TESTSTOP
-  assert(sem_destroy(&sema) == 0);
-
-  reportTest("Post then Wait without blocking");
-
-
-  assert(sem_init(&sema, 0, 1) == 0);
-  TESTSTART
-  assert(sem_wait(&sema) == zero);
-  assert(sem_post(&sema) == zero);
-  TESTSTOP
-  assert(sem_destroy(&sema) == 0);
-
-  reportTest("Wait then Post without blocking");
 
   printf( "=============================================================================\n");
 

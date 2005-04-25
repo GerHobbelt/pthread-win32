@@ -48,7 +48,7 @@
 #ifdef NEED_SEM
 
 INLINE BOOL
-ptw32_increase_semaphore (sem_t * sem, unsigned int n)
+ptw32_increase_semaphore (sem_t * sem, int n)
 {
   BOOL result;
   register sem_t s = *sem;

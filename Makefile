@@ -174,6 +174,7 @@ SMALL_STATIC_OBJS	= \
 		ptw32_cond_check_need_init.obj \
 		ptw32_mutex_check_need_init.obj \
 		ptw32_semwait.obj \
+		ptw32_relmillisecs.obj \
 		sched_get_priority_max.obj \
 		sched_get_priority_min.obj \
 		sched_setscheduler.obj \
@@ -190,8 +191,6 @@ SMALL_STATIC_OBJS	= \
 		sem_open.obj \
 		sem_close.obj \
 		sem_unlink.obj \
-		ptw32_increase_semaphore.obj \
-		ptw32_decrease_semaphore.obj \
 		signal.obj \
 		pthread_kill.obj \
 		ptw32_spinlock_check_need_init.obj \
@@ -262,6 +261,7 @@ MISC_SRCS	= \
 		ptw32_calloc.c \
 		ptw32_new.c \
 		ptw32_reuse.c \
+		ptw32_relmillisecs.c \
 		w32_CancelableWait.c
 
 MUTEX_SRCS	= \
@@ -346,9 +346,7 @@ SEMAPHORE_SRCS = \
 		sem_getvalue.c \
 		sem_open.c \
 		sem_close.c \
-		sem_unlink.c \
-		ptw32_increase_semaphore.c \
-		ptw32_decrease_semaphore.c
+		sem_unlink.c
 
 SPIN_SRCS	= \
 		ptw32_spinlock_check_need_init.c \

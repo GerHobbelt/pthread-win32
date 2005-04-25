@@ -155,8 +155,8 @@ main (int argc, char *argv[])
 
 
   TESTSTART
-  assert((InterlockedIncrement(&i), 1) == one);
-  assert((InterlockedDecrement(&i), 1) == one);
+  assert((InterlockedIncrement((LPLONG)&i), 1) == (LONG)one);
+  assert((InterlockedDecrement((LPLONG)&i), 1) == (LONG)one);
   TESTSTOP
 
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
@@ -244,5 +244,6 @@ main (int argc, char *argv[])
 
   pthread_mutexattr_destroy(&ma);
 
+  one = i; /* Dummy assignment to avoid 'variable unused' warning */
   return 0;
 }

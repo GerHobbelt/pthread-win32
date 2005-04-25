@@ -34,12 +34,6 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#ifndef _UWIN
-//#   include <process.h>
-#endif
-#ifndef NEED_FTIME
-#include <sys/timeb.h>
-#endif
 #include "pthread.h"
 #include "implement.h"
 
@@ -69,18 +63,6 @@ ptw32_timed_eventwait (HANDLE event, const struct timespec *abstime)
       */
 {
 
-#ifdef NEED_FTIME
-
-  struct timespec currSysTime;
-
-#else /* NEED_FTIME */
-
-  struct _timeb currSysTime;
-
-#endif /* NEED_FTIME */
-
-  const DWORD NANOSEC_PER_MILLISEC = 1000000;
-  const DWORD MILLISEC_PER_SEC = 1000;
   DWORD milliseconds;
   DWORD status;
 
@@ -99,53 +81,7 @@ ptw32_timed_eventwait (HANDLE event, const struct timespec *abstime)
 	  /* 
 	   * Calculate timeout as milliseconds from current system time. 
 	   */
-
-	  /* get current system time */
-
-#ifdef NEED_FTIME
-
-	  {
-	    FILETIME ft;
-	    SYSTEMTIME st;
-
-	    GetSystemTime (&st);
-	    SystemTimeToFileTime (&st, &ft);
-	    /*
-	     * GetSystemTimeAsFileTime(&ft); would be faster,
-	     * but it does not exist on WinCE
-	     */
-
-	    ptw32_filetime_to_timespec (&ft, &currSysTime);
-	  }
-
-	  /*
-	   * subtract current system time from abstime
-	   */
-	  milliseconds =
-	    (abstime->tv_sec - currSysTime.tv_sec) * MILLISEC_PER_SEC;
-	  milliseconds +=
-	    ((abstime->tv_nsec - currSysTime.tv_nsec) +
-	     (NANOSEC_PER_MILLISEC / 2)) / NANOSEC_PER_MILLISEC;
-
-#else /* NEED_FTIME */
-	  _ftime (&currSysTime);
-
-	  /*
-	   * subtract current system time from abstime
-	   */
-	  milliseconds =
-	    (abstime->tv_sec - currSysTime.time) * MILLISEC_PER_SEC;
-	  milliseconds +=
-	    ((abstime->tv_nsec +
-	      (NANOSEC_PER_MILLISEC / 2)) / NANOSEC_PER_MILLISEC) -
-	    currSysTime.millitm;
-
-#endif /* NEED_FTIME */
-
-	  if (((int) milliseconds) < 0)
-	    {
-	      return ETIMEDOUT;
-	    }
+	  milliseconds = ptw32_relmillisecs (abstime);
 	}
 
       status = WaitForSingleObject (event, milliseconds);
@@ -175,11 +111,6 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 {
   int result;
   pthread_mutex_t mx;
-
-#ifdef NEED_SEM
-  errno = ENOTSUP;
-  return -1;
-#endif
 
   /*
    * Let the system deal with invalid pointers.
