@@ -181,15 +181,12 @@ struct pthread_attr_t_
 
 struct sem_t_
 {
-#ifdef NEED_SEM
-  unsigned int value;
-  CRITICAL_SECTION sem_lock_cs;
-  HANDLE event;
-#else				/* NEED_SEM */
   int value;
   pthread_mutex_t lock;
   HANDLE sem;
-#endif				/* NEED_SEM */
+#ifdef NEED_SEM
+  int leftToUnblock;
+#endif
 };
 
 #define PTW32_OBJECT_AUTO_INIT ((void *) -1)
@@ -563,10 +560,7 @@ extern "C"
 
   int ptw32_semwait (sem_t * sem);
 
-#ifdef NEED_SEM
-  void ptw32_decrease_semaphore (sem_t * sem);
-  BOOL ptw32_increase_semaphore (sem_t * sem, unsigned int n);
-#endif				/* NEED_SEM */
+  DWORD ptw32_relmillisecs (const struct timespec * abstime);
 
 #ifdef NEED_FTIME
   void ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft);

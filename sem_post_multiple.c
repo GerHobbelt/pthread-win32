@@ -76,40 +76,39 @@ sem_post_multiple (sem_t * sem, int count)
       */
 {
   int result = 0;
-#ifndef NEED_SEM
   long waiters;
   sem_t s = *sem;
-#endif
 
   if (s == NULL || count <= 0)
     {
       result = EINVAL;
     }
-
-#ifdef NEED_SEM
-
-  else if (!ptw32_increase_semaphore (sem, count))
-    {
-      result = EINVAL;
-    }
-
-#else /* NEED_SEM */
-
   else if ((result = pthread_mutex_lock (&s->lock)) == 0)
     {
       waiters = -s->value;
       s->value += count;
       if (waiters > 0)
         {
+#ifdef NEED_SEM
+	  if (SetEvent(s->sem))
+	    {
+	      waiters--;
+	      s->leftToUnblock += count - 1;
+	      if (s->leftToUnblock > waiters)
+		{
+		  s->leftToUnblock = waiters;
+		}
+	    }
+	  else
+#else
           if (!ReleaseSemaphore (s->sem,  (waiters<=count)?waiters:count, 0))
+#endif
             {
               result = EINVAL;
             }
         }
       (void) pthread_mutex_unlock (&s->lock);
     }
-
-#endif /* NEED_SEM */
 
   if (result != 0)
     {

@@ -54,7 +54,18 @@ ptw32_sem_wait_cleanup(void * sem)
   if (pthread_mutex_lock (&s->lock) == 0)
     {
       ++s->value;
-      /* Don't release the W32 sema, it should always == 0. */
+#ifdef NEED_SEM
+          
+      if (s->value > 0)
+	{
+	  s->leftToUnblock = 0;
+	}   
+#else 
+      /*
+       * Don't release the W32 sema, it doesn't need adjustment
+       * because it doesn't record the number of waiters.
+       */
+#endif /* NEED_SEM */
       (void) pthread_mutex_unlock (&s->lock);
     }
 }
@@ -100,16 +111,7 @@ sem_wait (sem_t * sem)
   else
     {
 
-#ifdef NEED_SEM
-
-      result = pthreadCancelableWait (s->event);
-
-#else /* NEED_SEM */
-
-      /*
-       * sem_wait is a cancelation point and it's easy to test before
-       * modifying the sem value
-       */
+      /* Faster to test before adjusting the count */
       pthread_testcancel();
 
       if ((result = pthread_mutex_lock (&s->lock)) == 0)
@@ -120,20 +122,32 @@ sem_wait (sem_t * sem)
 
 	  if (v < 0)
 	    {
-	      /* Must wait */
 #ifdef _MSC_VER
 #pragma inline_depth(0)
 #endif
+	      /* Must wait */
 	      pthread_cleanup_push(ptw32_sem_wait_cleanup, (void *) s);
 	      result = pthreadCancelableWait (s->sem);
-	      pthread_cleanup_pop(result != 0);
+	      pthread_cleanup_pop(result);
 #ifdef _MSC_VER
 #pragma inline_depth()
 #endif
 	    }
-	}
+#ifdef NEED_SEM
+
+	  if (!result && pthread_mutex_lock (&s->lock) == 0)
+	    {
+	      if (s->leftToUnblock > 0)
+		{
+		  --s->leftToUnblock;
+		  SetEvent(s->sem);
+		}
+	      (void) pthread_mutex_unlock (&s->lock);
+	    }
 
 #endif /* NEED_SEM */
+
+	}
 
     }
 
@@ -142,12 +156,6 @@ sem_wait (sem_t * sem)
       errno = result;
       return -1;
     }
-
-#ifdef NEED_SEM
-
-  ptw32_decrease_semaphore (sem);
-
-#endif /* NEED_SEM */
 
   return 0;
 

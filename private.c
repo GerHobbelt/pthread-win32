@@ -51,5 +51,6 @@
 #include "ptw32_callUserDestroyRoutines.c"
 #include "ptw32_semwait.c"
 #include "ptw32_timespec.c"
+#include "ptw32_relmillisecs.c"
 #include "ptw32_throw.c"
 #include "ptw32_getprocessors.c"

@@ -73,36 +73,33 @@ sem_post (sem_t * sem)
       */
 {
   int result = 0;
-#ifndef NEED_SEM
   sem_t s = *sem;
-#endif
 
   if (s == NULL)
     {
       result = EINVAL;
     }
-
-#ifdef NEED_SEM
-
-  else if (!ptw32_increase_semaphore (sem, 1))
-    {
-      result = EINVAL;
-    }
-
-#else /* NEED_SEM */
-
   else if ((result = pthread_mutex_lock (&s->lock)) == 0)
     {
+#ifdef NEED_SEM
+
+      if (++s->value <= 0)
+	{
+	  if (!SetEvent(s->sem))
+	    {
+	      result = EINVAL;
+	    }
+	}
+#else
       if (++s->value <= 0
 	  && !ReleaseSemaphore (s->sem, 1, NULL))
 	{
 	  result = EINVAL;
 	}
+#endif /* NEED_SEM */
       
       (void) pthread_mutex_unlock (&s->lock);
     }
-
-#endif /* NEED_SEM */
 
   if (result != 0)
     {
