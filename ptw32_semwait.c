@@ -67,7 +67,6 @@ ptw32_semwait (sem_t * sem)
       */
 {
   int result = 0;
-  DWORD status;
   sem_t s = *sem;
 
   if (s == NULL)
@@ -76,13 +75,6 @@ ptw32_semwait (sem_t * sem)
     }
   else
     {
-
-#ifdef NEED_SEM
-
-      status = WaitForSingleObject (s->event, INFINITE);
-
-#else /* NEED_SEM */
-
       if ((result = pthread_mutex_lock (&s->lock)) == 0)
         {
           int v = --s->value;
@@ -92,38 +84,27 @@ ptw32_semwait (sem_t * sem)
           if (v < 0)
             {
               /* Must wait */
-              status = WaitForSingleObject (s->sem, INFINITE);
+              if (WaitForSingleObject (s->sem, INFINITE) == WAIT_OBJECT_0)
+		{
+#ifdef NEED_SEM
+		  if (pthread_mutex_lock (&s->lock) == 0)
+		    {
+		      if (s->leftToUnblock > 0)
+			{
+			  --s->leftToUnblock;
+			  SetEvent(s->sem);
+			}
+		      (void) pthread_mutex_unlock (&s->lock);
+		    }
+#endif
+		  return 0;
+		}
             }
           else
 	    {
 	      return 0;
 	    }
         }
-      else
-        {
-          return result;
-        }
-
-#endif
-
-      if (status == WAIT_OBJECT_0)
-	{
-
-#ifdef NEED_SEM
-
-	  ptw32_decrease_semaphore (sem);
-
-#endif /* NEED_SEM */
-
-	  return 0;
-	}
-      else
-	{
-#ifndef NEED_SEM
-	  (void) InterlockedIncrement((LPLONG) &s->value);
-#endif
-	  result = EINVAL;
-	}
     }
 
   if (result != 0)
