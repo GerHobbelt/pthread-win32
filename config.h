@@ -34,7 +34,7 @@
 /* Define if you don't have Win32 ftime. (eg. WinCE)  */
 #undef NEED_FTIME
 
-/* Define if you don't have Win32 semaphores. (eg. WinCE)  */
+/* Define if you don't have Win32 semaphores. (eg. WinCE 2.1 or earlier)  */
 #undef NEED_SEM
 
 /* Define if you need to convert string parameters to unicode. (eg. WinCE)  */
@@ -100,7 +100,7 @@
 #define NEED_ERRNO
 #define NEED_CALLOC
 #define NEED_FTIME
-#define NEED_SEM
+//#define NEED_SEM
 #define NEED_UNICODE_CONSTS
 #define NEED_PROCESS_AFFINITY_MASK
 #endif
