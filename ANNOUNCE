@@ -211,10 +211,10 @@ The following functions are implemented:
       sem_wait
       sem_trywait
       sem_timedwait
+      sem_getvalue	     (# free if +ve, # of waiters if -ve)
       sem_open		     (returns an error ENOSYS)
       sem_close 	     (returns an error ENOSYS)
       sem_unlink	     (returns an error ENOSYS)
-      sem_getvalue	     (returns an error ENOSYS)
 
       ---------------------------
       RealTime Scheduling
