@@ -11,7 +11,7 @@ will still be investigated for a possible future release in an attempt
 to reduce the current implementation's complexity.
 
 All of the bug fixes and new features in this release have been
-back-ported for relese 1.8.0.
+back-ported for release 1.8.0.
 
 Bugs fixed
 ----------
@@ -31,7 +31,7 @@ ENOSUP when NEED_SEM is defined - it is supported (NEED_SEM is only
 required for WinCE versions prior to 3.0).
 
 * Fix timeout bug in sem_timedwait().
-- Thanks to Stephan Mueller for reporting, providing diagnositic output
+- Thanks to Stephan Mueller for reporting, providing diagnostic output
 and test code.
 
 * Fix several problems in the NEED_SEM conditionally included code.
