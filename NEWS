@@ -1,3 +1,70 @@
+RELEASE 2.4.0
+-------------
+(2005-04-26)
+
+General
+-------
+
+There is now no plan to release a version 3.0.0 to fix problems in
+pthread_once(). Other possible implementations of pthread_once
+will still be investigated for a possible future release in an attempt
+to reduce the current implementation's complexity.
+
+All of the bug fixes and new features in this release have been
+back-ported for relese 1.8.0.
+
+Bugs fixed
+----------
+
+* Fixed pthread_once race (failures on an MP system). Thanks to
+Tim Theisen for running exhaustive pre-release testing on his MP system
+using a range of compilers:
+  VC++ 6
+  VC++ 7.1
+  Intel C++ version 8.0
+All tests passed.
+Some minor speed improvements were also done.
+
+* Fix integer overrun error in pthread_mutex_timedlock() - missed when
+sem_timedwait() was fixed in release 2.2.0. This rouitne no longer returns
+ENOSUP when NEED_SEM is defined - it is supported (NEED_SEM is only
+required for WinCE versions prior to 3.0).
+
+* Fix timeout bug in sem_timedwait().
+- Thanks to Stephan Mueller for reporting, providing diagnositic output
+and test code.
+
+* Fix several problems in the NEED_SEM conditionally included code.
+NEED_SEM included code is provided for systems that don't implement W32
+semaphores, such as WinCE prior to version 3.0. An alternate implementation
+of POSIX semaphores is built using W32 events for these systems when
+NEED_SEM is defined. This code has been completely rewritten in this
+release to reuse most of the default POSIX semaphore code, and particularly,
+to implement all of the sem_* routines supported by pthreads-win32. Tim
+Theisen also run the test suite over the NEED_SEM code on his MP system. All
+tests passed.
+
+* The library now builds without errors for the Borland Builder 5.5 compiler.
+
+New features
+------------
+
+* pthread_mutex_timedlock() and all sem_* routines provided by
+pthreads-win32 are now implemented for WinCE versions prior to 3.0. Those
+versions did not implement W32 semaphores. Define NEED_SEM in config.h when
+building the library for these systems.
+
+Known issues in this release
+----------------------------
+
+* pthread_once is too complicated - but it works as far as testing can
+determine..
+
+* The Borland version of the dll fails some of the tests with a memory read
+exception. The cause is not yet known but a compiler bug has not been rules
+out.
+
+
 RELEASE 2.3.0
 -------------
 (2005-04-12)
