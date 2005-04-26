@@ -294,7 +294,7 @@ main (int argc, char *argv[])
       assert((tcs[i].stat = 
 	      pthread_create (&tcs[i].thread,
 			      NULL,
-                  (void *(*)(void *))&print_server,
+                  (void *(*)(void *))print_server,
                 (void *) &tcs[i])
 	      ) == 0);
 
