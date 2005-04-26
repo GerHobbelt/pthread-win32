@@ -1,3 +1,58 @@
+RELEASE 1.8.0
+-------------
+(2005-04-26)
+
+General
+-------
+
+This release back-ports all relevant bug fixes and new features of
+release 2.4.0. The two releases thus far remain functionally the same.
+The key difference is the efficiency of pthread_once where this routine
+may be heavily used.
+
+Bugs fixed
+----------
+
+* Fix integer overrun error in pthread_mutex_timedlock() - missed when
+sem_timedwait() was fixed in release 2.2.0. This rouitne no longer returns
+ENOSUP when NEED_SEM is defined - it is supported (NEED_SEM is only
+required for WinCE versions prior to 3.0).
+
+* Fix timeout bug in sem_timedwait().
+- Thanks to Stephan Mueller for reporting, providing diagnostic output
+and test code.
+
+* Fix several problems in the NEED_SEM conditionally included code.
+NEED_SEM included code is provided for systems that don't implement W32
+semaphores, such as WinCE prior to version 3.0. An alternate implementation
+of POSIX semaphores is built using W32 events for these systems when
+NEED_SEM is defined. This code has been completely rewritten in this
+release to reuse most of the default POSIX semaphore code, and particularly,
+to implement all of the sem_* routines supported by pthreads-win32. Tim
+Theisen also run the test suite over the NEED_SEM code on his MP system. All
+tests passed.
+
+* The library now builds without errors for the Borland Builder 5.5 compiler.
+
+New features
+------------
+
+* pthread_mutex_timedlock() and all sem_* routines provided by
+pthreads-win32 are now implemented for WinCE versions prior to 3.0. Those
+versions did not implement W32 semaphores. Define NEED_SEM in config.h when
+building the library for these systems.
+
+Known issues in this release
+----------------------------
+
+* pthread_once is too complicated - but it works as far as testing can
+determine..
+
+* The Borland version of the dll fails some of the tests with a memory read
+exception. The cause is not yet known but a compiler bug has not been ruled
+out.
+
+
 RELEASE 1.7.0
 -------------
 (2005-04-12)

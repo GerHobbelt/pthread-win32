@@ -112,3 +112,5 @@ Known bugs
    creation of production code is highly unreliable for the current version of
    the pthreads library.
 
+3. The Borland Builder 5.5 version of the library produces memory read exceptions
+in some tests.
