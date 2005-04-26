@@ -92,6 +92,8 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 
 #if defined(__MINGW32__)
 #include <stdint.h>
+#elif defined(__BORLANDC__) || defined(__WATCOMC__)
+#define int64_t ULONGLONG
 #else
 #define int64_t _int64
 #endif
@@ -567,6 +569,8 @@ extern "C"
   void ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
   int ptw32_semwait (sem_t * sem);
+
+  DWORD ptw32_relmillisecs (const struct timespec * abstime);
 
 #ifdef NEED_FTIME
   void ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft);

@@ -43,12 +43,9 @@ pthreadVC's errno from a Borland C++-compiled host application
 correctly - I imagine there are other potential problems from the RTL
 mismatch too.)
 
-[RPJ: There are still problems with errno under Borland and the DLL
-will not pass the testsuite yet because of it. Setting and then reading
-errno from within the same DLL, or the same application module is fine,
-but DLL and application modules do not seem to be looking at the same
-location for errno, even though they are logically running in the same
-thread.]
+[RPJ: Make sure you use the same RTL in both dll and application builds.
+The dll and tests Bmakefiles use cw32mti.lib. Having some trouble with
+memory read exceptions running the test suite using BCC55.]
 
 Best regards,
 Will
