@@ -107,11 +107,6 @@ CRITICAL_SECTION ptw32_spinlock_test_init_lock;
  */
 CRITICAL_SECTION ptw32_cond_list_lock;
 
-/*
- * Global lock to serialise once_control event management.
- */
-CRITICAL_SECTION ptw32_once_event_lock;
-
 #ifdef _UWIN
 /*
  * Keep a count of the number of threads.

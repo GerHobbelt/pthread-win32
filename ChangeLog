@@ -1,3 +1,9 @@
+2005-04-27  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* sem_wait.c (ptw32_sem_wait_cleanup): after cancellation re-attempt
+	to acquire the semaphore to avoid a race with a late sem_post.
+	* sem_timedwait.c: Modify comments.
+
 2005-04-25  Ross Johnson  <ross at callisto.canberra.edu.au>
 
 	* ptw32_relmillisecs.c: New module; converts future abstime to 
@@ -7,7 +13,7 @@
 	implemented for builds that define NEED_SEM (WinCE etc)
 	* sem_timedwait.c: Likewise; after timeout or cancellation,
 	re-attempt to acquire the semaphore in case one has been posted since
-	the timeout/cancel occurred. Thanks to 
+	the timeout/cancel occurred. Thanks to Stefan Mueller.
 	* Makefile: Add ptw32_relmillisecs.c module; remove
 	ptw32_{in,de}crease_semaphore.c modules.
 	* GNUmakefile: Likewise.
