@@ -488,7 +488,6 @@ extern CRITICAL_SECTION ptw32_cond_list_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
 extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
 extern CRITICAL_SECTION ptw32_spinlock_test_init_lock;
-extern CRITICAL_SECTION ptw32_once_event_lock;
 
 #ifdef _UWIN
 extern int pthread_count;

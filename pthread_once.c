@@ -69,10 +69,9 @@
  * to be a cancelation point. A cancelation meant that at least some waiting threads
  * if any had to be woken so that one might become the new initter thread.
  * Waiters could no longer simply assume that, if the event was not null, it did
- * not need to create an event. Some real critical sections were needed, and in the
- * current library, a global CRITICAL_SECTION is probably more efficient than a per
- * once_control PTHREAD_MUTEX_INITIALIZER that should be somehow destroyed on exit from
- * pthread_once(). Also, the cancelled init thread needed to set the event, and the
+ * not need to create an event.
+ *
+ * Also, the cancelled init thread needed to set the event, and the
  * new init thread (the winner of the race between any newly arriving threads and
  * waking waiters) would need to reset it again. In the meantime, threads could be
  * happily looping around until they either suspended on the reset event, or exited
@@ -114,7 +113,6 @@ ptw32_once_init_routine_cleanup(void * arg)
   (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_CANCELLED);
   (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->started, (LONG)PTW32_FALSE);
 
-//  EnterCriticalSection(&ptw32_once_event_lock);
   if (InterlockedExchangeAdd((LPLONG)&once_control->event, 0L)) /* MBR fence */
     {
       int lasterror = GetLastError ();
@@ -129,7 +127,6 @@ ptw32_once_init_routine_cleanup(void * arg)
 	  WSASetLastError (lastWSAerror);
 	}
     }
-//  LeaveCriticalSection(&ptw32_once_event_lock);
 }
 
 
@@ -228,7 +225,6 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	       * so we will not be starved by any other threads that may now be looping
 	       * around.
 	       */
-//	      EnterCriticalSection(&ptw32_once_event_lock);
 	      if (InterlockedExchangeAdd((LPLONG)&once_control->event, 0L)) /* MBR fence */
 		{
 		  if (!ResetEvent(once_control->event))
@@ -236,7 +232,6 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 		      restoreLastError = PTW32_TRUE;
 		    }
 		}
-//	      LeaveCriticalSection(&ptw32_once_event_lock);
 
 	      /*
 	       * Any threads entering the wait section and getting out again before
@@ -302,7 +297,6 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	   * while waiting, create an event to wait on
 	   */
 
-//	  EnterCriticalSection(&ptw32_once_event_lock);
 	  if (1 == InterlockedIncrement((LPLONG)&once_control->eventUsers))
 	    {
 	      /*
@@ -332,7 +326,6 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 		  CloseHandle(tmpEvent);
 		}
 	    }
-//	  LeaveCriticalSection(&ptw32_once_event_lock);
 
 	  /*
 	   * Check 'state' again in case the initting thread has finished or cancelled
@@ -371,7 +364,6 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	    }
 
 	  /* last one out shut off the lights */
-//	  EnterCriticalSection(&ptw32_once_event_lock);
 	  if (0 == InterlockedDecrement((LPLONG)&once_control->eventUsers))
 	    {
 	      /* we were last */
@@ -382,7 +374,6 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 		  CloseHandle(tmpEvent);
 		}
 	    }
-//	  LeaveCriticalSection(&ptw32_once_event_lock);
 	}
     }
 

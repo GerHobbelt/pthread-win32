@@ -96,7 +96,6 @@ ptw32_processInitialize (void)
   InitializeCriticalSection (&ptw32_cond_test_init_lock);
   InitializeCriticalSection (&ptw32_rwlock_test_init_lock);
   InitializeCriticalSection (&ptw32_spinlock_test_init_lock);
-  InitializeCriticalSection (&ptw32_once_event_lock);
 
   return (ptw32_processInitialized);
 
