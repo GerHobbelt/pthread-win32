@@ -62,7 +62,7 @@ ptw32_sem_timedwait_cleanup (void * args)
     {
       /*
        * We either timed out or were cancelled.
-       * If someone posted since then we try to take the semaphore.
+       * If someone has posted between then and now we try to take the semaphore.
        * Otherwise the semaphore count may be wrong after we
        * return. In the case of a cancellation, it is as if we
        * were cancelled just before we return (after taking the semaphore)

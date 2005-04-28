@@ -53,19 +53,27 @@ ptw32_sem_wait_cleanup(void * sem)
 
   if (pthread_mutex_lock (&s->lock) == 0)
     {
-      ++s->value;
-#ifdef NEED_SEM
-          
-      if (s->value > 0)
-	{
-	  s->leftToUnblock = 0;
-	}   
-#else 
       /*
-       * Don't release the W32 sema, it doesn't need adjustment
-       * because it doesn't record the number of waiters.
+       * If the sema is posted between us being cancelled and us locking
+       * the sema again above then we need to consume that post but cancel
+       * anyway. If we don't get the semaphore we indicate that we're no
+       * longer waiting.
        */
+      if (!(WaitForSingleObject(s->sem, 0) == WAIT_OBJECT_0))
+	{
+	  ++s->value;
+#ifdef NEED_SEM
+	  if (s->value > 0)
+	    {
+	      s->leftToUnblock = 0;
+	    }
+#else
+	  /*
+	   * Don't release the W32 sema, it doesn't need adjustment
+	   * because it doesn't record the number of waiters.
+	   */
 #endif /* NEED_SEM */
+	}
       (void) pthread_mutex_unlock (&s->lock);
     }
 }
