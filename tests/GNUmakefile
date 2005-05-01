@@ -104,6 +104,9 @@ TESTS	= sizes loadfree \
 	  exception1 exception2 exception3 \
 	  cancel9 create3
 
+STRESSTESTS = \
+	stress1
+
 BENCHTESTS = \
 	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
 
@@ -112,6 +115,7 @@ STATICTESTS = \
 
 PASSES		= $(TESTS:%=%.pass)
 BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
+STRESSRESULTS	= $(STRESSTESTS:%=%.pass)
 STATICRESULTS	= $(STATICTESTS:%=%.pass)
 
 help:
@@ -121,6 +125,8 @@ help:
 	@ $(ECHO) "make clean GCE   (to test using GCE dll with C++ (EH) applications)"
 	@ $(ECHO) "make clean GC-bench	  (to benchtest using GNU C dll with C cleanup code)"
 	@ $(ECHO) "make clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "make clean GC-stress	  (to stresstest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "make clean GCE-stress   (to stresstest using GNU C dll with C++ exception handling)"
 	@ $(ECHO) "make clean GC-static   (to test using GC static lib with C (no EH) applications)"
 
 all:
@@ -146,11 +152,23 @@ GCE-bench:
 GC-static:
 	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
 
+GC-stress:
+	$(ECHO) Stress tests can take a long time since they are trying to
+	$(ECHO) expose weaknesses that may be intermittant or statistically rare.
+	$(ECHO) A pass does not prove correctness, but may give greater confidence.
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" all-stress
+
+GCE-stress:
+	$(MAKE) TEST=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-stress
+
 all-pass: $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
 all-bench: $(BENCHRESULTS)
 	@ $(ECHO) BENCH TESTS COMPLETED.
+
+all-stress: $(STRESSRESULTS)
+	@ $(ECHO) STRESS TESTS COMPLETED.
 
 all-static: $(STATICRESULTS)
 	@ $(ECHO) ALL STATIC TESTS PASSED! Congratulations!
@@ -162,6 +180,8 @@ benchtest2.bench:
 benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
+
+stress1.pass:
 
 barrier1.pass:
 barrier2.pass: barrier1.pass
@@ -178,6 +198,7 @@ cancel6a.pass: cancel3.pass
 cancel6d.pass: cancel3.pass
 cancel7.pass: kill1.pass
 cancel8.pass: cancel7.pass
+cancel9.pass: cancel8.pass
 cleanup0.pass: cancel5.pass
 cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
@@ -286,7 +307,6 @@ spin4.pass: spin3.pass
 tsd1.pass: join1.pass
 valid1.pass: join1.pass
 valid2.pass: valid1.pass
-cancel9.pass: cancel8.pass
 
 sizes.pass: sizes.exe
 	@ $(ECHO) Running $*
