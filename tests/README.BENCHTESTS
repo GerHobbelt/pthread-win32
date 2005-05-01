@@ -2,7 +2,7 @@
 ------------
 Benchmarking
 ------------
-There is a new but growing set a benchmarking programs in the
+There is a set a benchmarking programs in the
 "tests" directory. These should be runnable using the
 following command-lines corresponding to each of the possible
 library builds:
@@ -62,36 +62,13 @@ irrespective of the Windows variant, and should therefore
 have consistent performance.
 
 
+Semaphore benchtests
+--------------------
+
+benchtest5 - Timing for various uncontended cases.
+
+
 In all benchtests, the operation is repeated a large
 number of times and an average is calculated. Loop
 overhead is measured and subtracted from all test times.
 
-Comment on the results
-----------------------
-The gain in performance for Win9x systems is enormous - up to
-40 times faster for unlocked mutexes (2 times faster for locked
-mutexes).
-
-Pthread_mutex_trylock also appears to be faster for locked mutexes.
-
-The price for the new consistency between WinNT and Win9x is
-slower performance (up to twice as long) across a lock/unlock
-sequence. It is difficult to get a good split timing for lock
-and unlock operations, but by code inspection, it is the unlock
-operation that is slowing the pair down in comparison with the
-old-style CS mutexes, even for the fast PTHREAD_MUTEX_NORMAL mutex
-type with no other waiting threads. However, comparitive
-performance for operations on already locked mutexes is very close.
-
-When this is translated to real-world applications, the overall
-camparitive performance should be almost identical on NT class
-systems. That is, applications with heavy mutex contention should
-have almost equal performance, while applications with only light
-mutex contention should also have almost equal performance because
-the most critical operation in this case is the lock operation.
-
-Overall, the newer pthreads-win32 mutex routines are only slower
-(on NT class systems) where and when it is least critical.
-
-Thanks go to Thomas Pfaff for the current implementation of mutex
-routines.
