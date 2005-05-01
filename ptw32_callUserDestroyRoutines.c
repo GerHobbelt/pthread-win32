@@ -74,7 +74,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
       /*
        * Run through all Thread<-->Key associations
        * for the current thread.
-       * If the pthread_key_t still exits (ie the assoc->key
+       * If the pthread_key_t still exists (ie the assoc->key
        * is not NULL) then call the user's TSD destroy routine.
        * Notes:
        *      If assoc->key is NULL, then the user previously called
