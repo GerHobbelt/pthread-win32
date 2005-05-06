@@ -68,6 +68,7 @@ sem_post (sem_t * sem)
       * ERRNO
       *              EINVAL          'sem' is not a valid semaphore,
       *              ENOSYS          semaphores are not supported,
+      *              ERANGE          semaphore count is too big
       *
       * ------------------------------------------------------
       */
@@ -81,23 +82,29 @@ sem_post (sem_t * sem)
     }
   else if ((result = pthread_mutex_lock (&s->lock)) == 0)
     {
-#ifdef NEED_SEM
-
-      if (++s->value <= 0)
+      if (s->value < _POSIX_SEM_VALUE_MAX)
 	{
-	  if (!SetEvent(s->sem))
+#ifdef NEED_SEM
+	  if (++s->value <= 0
+	      && !SetEvent(s->sem))
 	    {
+	      s->value--;
 	      result = EINVAL;
 	    }
-	}
 #else
-      if (++s->value <= 0
-	  && !ReleaseSemaphore (s->sem, 1, NULL))
-	{
-	  result = EINVAL;
-	}
+	  if (++s->value <= 0
+	      && !ReleaseSemaphore (s->sem, 1, NULL))
+	    {
+	      s->value--;
+	      result = EINVAL;
+	    }
 #endif /* NEED_SEM */
-      
+	}
+      else
+	{
+	  result = ERANGE;
+	}
+
       (void) pthread_mutex_unlock (&s->lock);
     }
 

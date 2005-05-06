@@ -71,6 +71,7 @@ sem_post_multiple (sem_t * sem, int count)
       * ERRNO
       *              EINVAL          'sem' is not a valid semaphore
       *                              or count is less than or equal to zero.
+      *              ERANGE          semaphore count is too big
       *
       * ------------------------------------------------------
       */
@@ -85,28 +86,39 @@ sem_post_multiple (sem_t * sem, int count)
     }
   else if ((result = pthread_mutex_lock (&s->lock)) == 0)
     {
-      waiters = -s->value;
-      s->value += count;
-      if (waiters > 0)
-        {
-#ifdef NEED_SEM
-	  if (SetEvent(s->sem))
+      if (s->value <= (_POSIX_SEM_VALUE_MAX - count))
+	{
+	  waiters = -s->value;
+	  s->value += count;
+	  if (waiters > 0)
 	    {
-	      waiters--;
-	      s->leftToUnblock += count - 1;
-	      if (s->leftToUnblock > waiters)
+#ifdef NEED_SEM
+	      if (SetEvent(s->sem))
 		{
-		  s->leftToUnblock = waiters;
+		  waiters--;
+		  s->leftToUnblock += count - 1;
+		  if (s->leftToUnblock > waiters)
+		    {
+		      s->leftToUnblock = waiters;
+		    }
+		}
+#else
+	      if (ReleaseSemaphore (s->sem,  (waiters<=count)?waiters:count, 0))
+		{
+		  /* No action */
+		}
+#endif
+	      else
+		{
+		  s->value -= count;
+		  result = EINVAL;
 		}
 	    }
-	  else
-#else
-          if (!ReleaseSemaphore (s->sem,  (waiters<=count)?waiters:count, 0))
-#endif
-            {
-              result = EINVAL;
-            }
-        }
+	}
+      else
+	{
+	  result = ERANGE;
+	}
       (void) pthread_mutex_unlock (&s->lock);
     }
 

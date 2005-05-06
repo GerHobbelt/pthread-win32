@@ -1,4 +1,4 @@
-	     PTHREADS-WIN32 RELEASE 2.4.0 (2005-04-26)
+	     PTHREADS-WIN32 RELEASE 2.5.0 (2005-05-06)
 	     -----------------------------------------
 	 Web Site: http://sources.redhat.com/pthreads-win32/
 	FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
@@ -39,6 +39,13 @@ Aurelio Medina and improved by Alexander Terekhov.
 
 Many others have contributed significant time and effort to solve crutial
 problems in order to make the library workable, robust and reliable.
+
+Thanks to Xavier Leroy for granting permission to use and modify his
+LinuxThreads manual pages.
+
+Thanks to The Open Group for making the Single Unix Specification
+publicly available - many of the manual pages included in the package
+were extracted from it.
 
 There is also a separate CONTRIBUTORS file. This file and others are
 on the web site:

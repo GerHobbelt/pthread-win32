@@ -64,100 +64,84 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
       * -------------------------------------------------------------------
       */
 {
-  ThreadKeyAssoc **
-    nextP;
-  ThreadKeyAssoc *
-    assoc;
+  ThreadKeyAssoc * next;
+  ThreadKeyAssoc * assoc;
 
   if (thread.p != NULL)
     {
+      ptw32_thread_t * sp = (ptw32_thread_t *) thread.p;
+
       /*
        * Run through all Thread<-->Key associations
        * for the current thread.
-       * If the pthread_key_t still exists (ie the assoc->key
-       * is not NULL) then call the user's TSD destroy routine.
-       * Notes:
-       *      If assoc->key is NULL, then the user previously called
-       *      PThreadKeyDestroy. The association is now only referenced
-       *      by the current thread and must be released; otherwise
-       *      the assoc will be destroyed when the key is destroyed.
        */
-      nextP = (ThreadKeyAssoc **) &((ptw32_thread_t *)thread.p)->keys;
-      assoc = *nextP;
+      assoc = next = (ThreadKeyAssoc *) sp->keys;
 
       while (assoc != NULL)
 	{
+	  pthread_key_t k;
 
-	  if (pthread_mutex_lock (&(assoc->lock)) == 0)
+	  if ((k = assoc->key) != NULL
+	      && pthread_mutex_lock(&(k->keyLock)) == 0)
 	    {
-	      pthread_key_t k;
-	      pthread_t nil = {NULL, 0};
+	      /*
+	       * Key still active; pthread_key_delete
+	       * will block on this same mutex before
+	       * it can release actual key; therefore,
+	       * key is valid and we can call the destroy
+	       * routine;
+	       */
+	      void * value = NULL;
 
-	      if ((k = assoc->key) != NULL)
+	      value = pthread_getspecific (k);
+	      if (value != NULL && k->destructor != NULL)
 		{
-		  /*
-		   * Key still active; pthread_key_delete
-		   * will block on this same mutex before
-		   * it can release actual key; therefore,
-		   * key is valid and we can call the destroy
-		   * routine;
-		   */
-		  void * value = NULL;
-
-		  value = pthread_getspecific (k);
-		  if (value != NULL && k->destructor != NULL)
-		    {
 
 #ifdef __cplusplus
 
-		      try
-		      {
-			/*
-			 * Run the caller's cleanup routine.
-			 */
-			(*(k->destructor)) (value);
-		      }
-		      catch (...)
-		      {
-			/*
-			 * A system unexpected exception has occurred
-			 * running the user's destructor.
-			 * We get control back within this block in case
-			 * the application has set up it's own terminate
-			 * handler. Since we are leaving the thread we
-			 * should not get any internal pthreads
-			 * exceptions.
-			 */
-			terminate ();
-		      }
-
-#else /* __cplusplus */
-
+		  try
+		    {
 		      /*
 		       * Run the caller's cleanup routine.
 		       */
 		      (*(k->destructor)) (value);
+		    }
+		  catch (...)
+		    {
+		      /*
+		       * A system unexpected exception has occurred
+		       * running the user's destructor.
+		       * We get control back within this block in case
+		       * the application has set up it's own terminate
+		       * handler. Since we are leaving the thread we
+		       * should not get any internal pthreads
+		       * exceptions.
+		       */
+		      (void) pthread_mutex_unlock(&(k->keyLock));
+		      terminate ();
+		    }
+
+#else /* __cplusplus */
+
+		  /*
+		   * Run the caller's cleanup routine.
+		   */
+		  (*(k->destructor)) (value);
 
 #endif /* __cplusplus */
-		    }
 		}
 
 	      /*
-	       * mark assoc->thread as NULL to indicate the
-	       * thread no longer references this association
+	       * Remove association from both the key and thread chains
 	       */
-	      assoc->thread = nil;
-
-	      /*
-	       * Remove association from the pthread_t chain
-	       */
-	      *nextP = assoc->nextKey;
-
-	      pthread_mutex_unlock (&(assoc->lock));
-
+	      (void) pthread_mutex_lock(&(sp->threadLock));
+	      next = assoc->nextKey;
 	      ptw32_tkAssocDestroy (assoc);
+	      (void) pthread_mutex_unlock(&(sp->threadLock));
 
-	      assoc = *nextP;
+	      assoc = next;
+
+	      (void) pthread_mutex_unlock(&(k->keyLock));
 	    }
 	}
     }

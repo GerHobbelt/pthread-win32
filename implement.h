@@ -266,7 +266,7 @@ struct pthread_key_t_
 {
   DWORD key;
   void (*destructor) (void *);
-  pthread_mutex_t threadsLock;
+  pthread_mutex_t keyLock;
   void *threads;
 };
 
@@ -339,26 +339,67 @@ struct ThreadKeyAssoc
 {
   /*
    * Purpose:
-   *      This structure creates an association between a
-   *      thread and a key.
-   *      It is used to implement the implicit invocation
-   *      of a user defined destroy routine for thread
-   *      specific data registered by a user upon exiting a
-   *      thread.
+   *      This structure creates an association between a thread and a key.
+   *      It is used to implement the implicit invocation of a user defined
+   *      destroy routine for thread specific data registered by a user upon
+   *      exiting a thread.
+   *
+   *      Graphically, the arrangement is as follows, where:
+   *
+   *         K - Key with destructor
+   *            (head of chain is key->threads)
+   *         T - Thread that has called pthread_setspecific(Kn)
+   *            (head of chain is thread->keys)
+   *         A - Association. Each association is a node at the
+   *             intersection of two doubly-linked lists.
+   *
+   *                 T1    T2    T3
+   *                 |     |     |
+   *                 |     |     |
+   *         K1 -----+-----A-----A----->
+   *                 |     |     |
+   *                 |     |     |
+   *         K2 -----A-----A-----+----->
+   *                 |     |     |
+   *                 |     |     |
+   *         K3 -----A-----+-----A----->
+   *                 |     |     |
+   *                 |     |     |
+   *                 V     V     V
+   *
+   *      Access to the association is guarded by two locks: the key's
+   *      general lock (guarding the row) and the thread's general
+   *      lock (guarding the column). This avoids the need for a
+   *      dedicated lock for each association, which not only consumes
+   *      more handles but requires that: before the lock handle can
+   *      be released - both the key must be deleted and the thread
+   *      must have called the destructor. The two-lock arrangement
+   *      allows the resources to be freed as soon as either thread or
+   *      key is concluded.
+   *
+   *      To avoid deadlock: whenever both locks are required, the key
+   *      and thread locks are always applied in the order: key lock
+   *      then thread lock.
+   *
+   *      An association is created when a thread first calls
+   *      pthread_setspecific() on a key that has a specified
+   *      destructor.
+   *
+   *      An association is destroyed either immediately after the
+   *      thread calls the key destructor function on thread exit, or
+   *      when the key is deleted.
    *
    * Attributes:
-   *      lock
-   *              protects access to the rest of the structure
-   *
    *      thread
-   *              reference to the thread that owns the association.
-   *              As long as this is not NULL, the association remains
-   *              referenced by the pthread_t.
+   *              reference to the thread that owns the
+   *              association. This is actually the pointer to the
+   *              thread struct itself. Since the association is
+   *              destroyed before the thread exits, this can never
+   *              point to a different logical thread to the one that
+   *              created the assoc, i.e. after thread struct reuse.
    *
    *      key
    *              reference to the key that owns the association.
-   *              As long as this is not NULL, the association remains
-   *              referenced by the pthread_key_t.
    *
    *      nextKey
    *              The pthread_t->keys attribute is the head of a
@@ -366,6 +407,9 @@ struct ThreadKeyAssoc
    *              link. This chain provides the 1 to many relationship
    *              between a pthread_t and all pthread_key_t on which
    *              it called pthread_setspecific.
+   *
+   *      prevKey
+   *              Similarly.
    *
    *      nextThread
    *              The pthread_key_t->threads attribute is the head of
@@ -375,11 +419,13 @@ struct ThreadKeyAssoc
    *              PThreads that have called pthread_setspecific for
    *              this pthread_key_t.
    *
+   *      prevThread
+   *              Similarly.
    *
    * Notes:
-   *      1)      As long as one of the attributes, thread or key, is
-   *              not NULL, the association is being referenced; once
-   *              both are NULL, the association must be released.
+   *      1)      As soon as either the key or the thread is no longer
+   *              referencing the association, it can be destroyed. The
+   *              association will be removed from both chains.
    *
    *      2)      Under WIN32, an association is only created by
    *              pthread_setspecific if the user provided a
@@ -387,11 +433,12 @@ struct ThreadKeyAssoc
    *
    *
    */
-  pthread_mutex_t lock;
-  pthread_t thread;
+  ptw32_thread_t * thread;
   pthread_key_t key;
   ThreadKeyAssoc *nextKey;
   ThreadKeyAssoc *nextThread;
+  ThreadKeyAssoc *prevKey;
+  ThreadKeyAssoc *prevThread;
 };
 
 
@@ -555,7 +602,7 @@ extern "C"
   void ptw32_callUserDestroyRoutines (pthread_t thread);
 
   int ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
-			   pthread_t thread, pthread_key_t key);
+			   ptw32_thread_t * thread, pthread_key_t key);
 
   void ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
