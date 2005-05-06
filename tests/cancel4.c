@@ -112,10 +112,10 @@ mythread(void * arg)
   assert(pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL) == 0);
 
   /*
-   * We wait up to 10 seconds, waking every 0.1 seconds,
+   * We wait up to 2 seconds, waking every 0.1 seconds,
    * for a cancelation to be applied to us.
    */
-  for (bag->count = 0; bag->count < 100; bag->count++)
+  for (bag->count = 0; bag->count < 20; bag->count++)
     Sleep(100);
 
   return (void *) result;

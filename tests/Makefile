@@ -95,11 +95,12 @@ PASSES= sizes.pass  loadfree.pass \
 	  mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
 	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
 	  mutex8.pass  mutex8n.pass  mutex8e.pass  mutex8r.pass  \
-	  count1.pass  once1.pass  once2.pass  once3.pass  once4.pass  tsd1.pass  \
+	  count1.pass  once1.pass  once2.pass  once3.pass  once4.pass  \
 	  self2.pass  \
 	  cancel1.pass  cancel2.pass  \
 	  semaphore4.pass  semaphore4t.pass  \
-	  delay1.pass  delay2.pass  eyal1.pass  \
+	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  \
+	  tsd1.pass  delay1.pass  delay2.pass  eyal1.pass  \
 	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  \
 	  condvar4.pass  condvar5.pass  condvar6.pass  \
 	  condvar7.pass  condvar8.pass  condvar9.pass  \
@@ -113,27 +114,33 @@ PASSES= sizes.pass  loadfree.pass \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
-	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  \
 	  exception1.pass  exception2.pass  exception3.pass  \
-	  cancel9.pass create3.pass
+	  cancel9.pass  create3.pass
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
+
+STRESSRESULTS = \
+	  stress1.pass
 
 STATICRESULTS = \
 	  self1.pass
 
 help:
 	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) nmake clean VC    (to test using VC dll with VC (no EH) applications)
-	@ $(ECHO) nmake clean VCX   (to test using VC dll with VC++ (EH) applications)
-	@ $(ECHO) nmake clean VCE   (to test using the VCE dll with VC++ EH applications)
-	@ $(ECHO) nmake clean VSE   (to test using VSE dll with VC (SEH) applications)
-	@ $(ECHO) nmake clean VC-bench    (to benchtest using VC dll with C bench app)
-	@ $(ECHO) nmake clean VCX-bench   (to benchtest using VC dll with C++ bench app)
-	@ $(ECHO) nmake clean VCE-bench   (to benchtest using VCE dll with C++ bench app)
-	@ $(ECHO) nmake clean VSE-bench   (to benchtest using VSE dll with SEH bench app)
-	@ $(ECHO) nmake clean VC-static   (to test using VC static lib with VC (no EH) applications)
+	@ $(ECHO) nmake clean VC          (to test using VC dll with VC (no EH) apps)
+	@ $(ECHO) nmake clean VC-bench    (to benchtest using VC dll with C bench apps)
+	@ $(ECHO) nmake clean VC-stress   (to stresstest using VC dll with C stress apps)
+	@ $(ECHO) nmake clean VC-static   (to test using VC static lib with VC (no EH) apps)
+	@ $(ECHO) nmake clean VCX         (to test using VC dll with VC++ (EH) applications)
+	@ $(ECHO) nmake clean VCX-bench   (to benchtest using VC dll with C++ bench apps)
+	@ $(ECHO) nmake clean VCX-stress  (to stresstest using VC dll with C++ stress apps)
+	@ $(ECHO) nmake clean VCE         (to test using the VCE dll with VC++ EH applications)
+	@ $(ECHO) nmake clean VCE-bench   (to benchtest using VCE dll with C++ bench apps)
+	@ $(ECHO) nmake clean VCE-stress  (to stresstest using VCE dll with C++ stress apps)
+	@ $(ECHO) nmake clean VSE         (to test using VSE dll with VC (SEH) apps)
+	@ $(ECHO) nmake clean VSE-bench   (to benchtest using VSE dll with SEH bench apps)
+	@ $(ECHO) nmake clean VSE-stress  (to stresstest using VSE dll with SEH stress apps)
 
 all:
 	@ nmake clean VC
@@ -141,6 +148,7 @@ all:
 	@ nmake clean VCE
 	@ nmake clean VSE
 	@ nmake clean VC-bench
+	@ nmake clean VC-stress
 
 # This allows an individual test application to be made using the default lib.
 # e.g. nmake clean test cancel3.exe
@@ -151,6 +159,9 @@ tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) $(PASSES)
 
 benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(XXLIBS) $(BENCHRESULTS)
 	@ $(ECHO) ALL BENCH TESTS DONE.
+
+stresstests: $(CPLIB) $(CPDLL) $(CPHDR) $(STRESSRESULTS)
+	@ $(ECHO) ALL STRESS TESTS DONE.
 
 statictests: $(CPLIB) $(CPDLL) $(CPHDR) $(STATICRESULTS)
 	@ $(ECHO) ALL STATIC TESTS DONE.
@@ -176,17 +187,26 @@ $(BENCHRESULTS): $*.exe
 	@ $(ECHO) ...... Done
 	@ $(TOUCH) $*.bench
 
+$(STRESSRESULTS): $*.exe
+	@ $(ECHO) ... Running $(TEST) stresstest: $*.exe
+	@ .\$*.exe
+	@ $(ECHO) ...... Done
+	@ $(TOUCH) $*.pass
+
+VC:
+	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
+
 VCE:
 	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
 
 VSE:	
 	@ nmake TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" tests
 
-VC:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
-
 VCX:
 	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
+
+VC-bench:
+	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VCE-bench:
 	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" benchtests
@@ -194,11 +214,20 @@ VCE-bench:
 VSE-bench:
 	@ nmake TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" benchtests
 
-VC-bench:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" benchtests
-
 VCX-bench:
 	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" benchtests
+
+VC-stress:
+	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" stresstests
+
+VCE-stress:
+	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" stresstests
+
+VSE-stress:
+	@ nmake TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" stresstests
+
+VCX-stress:
+	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" stresstests
 
 VC-static:
 	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
@@ -244,7 +273,10 @@ benchtest2.bench:
 benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
-barrier1.pass:
+
+stress1.pass:
+
+barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass
 barrier3.pass: barrier2.pass
 barrier4.pass: barrier3.pass
@@ -258,6 +290,7 @@ cancel6a.pass: cancel3.pass
 cancel6d.pass: cancel3.pass
 cancel7.pass: kill1.pass
 cancel8.pass: cancel7.pass
+cancel9.pass: cancel8.pass
 cleanup0.pass: cancel5.pass
 cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
@@ -363,7 +396,6 @@ spin1.pass:
 spin2.pass: spin1.pass
 spin3.pass: spin2.pass
 spin4.pass: spin3.pass
-tsd1.pass: join1.pass
+tsd1.pass: barrier5.pass join1.pass
 valid1.pass: join1.pass
 valid2.pass: valid1.pass
-cancel9.pass: cancel8.pass

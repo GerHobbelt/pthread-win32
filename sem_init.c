@@ -72,7 +72,8 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
       *              0               successfully created semaphore,
       *              -1              failed, error in errno
       * ERRNO
-      *              EINVAL          'sem' is not a valid semaphore,
+      *              EINVAL          'sem' is not a valid semaphore, or
+      *                              'value' >= _POSIX_SEM_VALUE_MAX
       *              ENOMEM          out of memory,
       *              ENOSPC          a required resource has been exhausted,
       *              ENOSYS          semaphores are not supported,
@@ -91,6 +92,10 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
        * processes
        */
       result = EPERM;
+    }
+  else if (value > (unsigned int)_POSIX_SEM_VALUE_MAX)
+    {
+      result = EINVAL;
     }
   else
     {

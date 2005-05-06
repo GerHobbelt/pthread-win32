@@ -102,7 +102,7 @@ main()
   abstime.tv_sec = currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
-  abstime.tv_sec += 5;
+  abstime.tv_sec += 1;
 
   assert(pthread_cond_timedwait(&cv, &mutex, &abstime) == ETIMEDOUT);
   

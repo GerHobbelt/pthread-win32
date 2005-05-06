@@ -47,6 +47,15 @@
 
 #define PTW32_THREAD_NULL_ID {NULL,0}
 
+#if defined(__MINGW32__)
+#include <stdint.h>
+#elif defined(__BORLANDC__)
+#define int64_t ULONGLONG
+#else
+#define int64_t _int64
+#endif
+
+
 char * error_string[] = {
   "ZERO_or_EOK",
   "EPERM",
@@ -109,13 +118,8 @@ char * error_string[] = {
 # define ASSERT_TRACE 1
 #endif
 
-/*
- * Trick to force the compiler to not optimise out dead or obvious expressions.
- */
-int ptw32_assert_force = 1;
-
 # define assert(e) \
-   (ptw32_assert_force && (e) ? ((ASSERT_TRACE) ? fprintf(stderr, \
+   ((e) ? ((ASSERT_TRACE) ? fprintf(stderr, \
                                     "Assertion succeeded: (%s), file %s, line %d\n", \
 			            #e, __FILE__, (int) __LINE__), \
 	                            fflush(stderr) : \
@@ -125,7 +129,7 @@ int ptw32_assert_force = 1;
 
 int assertE;
 # define assert_e(e, o, r) \
-   (ptw32_assert_force && ((assertE = e) o (r)) ? ((ASSERT_TRACE) ? fprintf(stderr, \
+   (((assertE = e) o (r)) ? ((ASSERT_TRACE) ? fprintf(stderr, \
                                     "Assertion succeeded: (%s), file %s, line %d\n", \
 			            #e, __FILE__, (int) __LINE__), \
 	                            fflush(stderr) : \

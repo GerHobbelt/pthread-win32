@@ -1,3 +1,39 @@
+2005-05-06  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* signal.c (sigwait): Add a cancellation point to this otherwise
+	no-op.
+	* sem_init.c (sem_init): Check for and return ERANGE error.
+	* sem_post.c (sem_post): Likewise.
+	* sem_post_multiple.c (sem_post_multiple): Likewise.
+	* manual (directory): Added; see ChangeLog inside.
+
+2005-05-02  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* implement.h (struct pthread_key_t_): Change threadsLock to keyLock
+	so as not to be confused with the per thread lock 'threadlock';
+	change all references to it.
+	* implement.h (struct ThreadKeyAssoc): Remove lock; add prevKey
+	and prevThread pointers; re-implemented all routines that use this
+	struct. The effect of this is to save one handle per association,
+	which could potentially equal the number of keys multiplied by the
+	number of threads, accumulating over time - and to free the
+	association memory as soon as it is no longer referenced by either
+	the key or the thread. Previously, the handle and memory were
+	released only after BOTH key and thread no longer referenced the
+	association. That is, often no association resources were released
+	until the process itself exited. In addition, at least one race
+	condition has been removed - where two threads could attempt to
+	release the association resources simultaneously - one via
+	ptw32_callUserDestroyRoutines and the other via
+	pthread_key_delete.
+	- thanks to Richard Hughes at Aculab for discovering the problem.
+	* pthread_key_create.c: See above.
+	* pthread_key_delete.c: See above.
+	* pthread_setspecific.c: See above.
+	* ptw32_callUserDestroyRoutines.c: See above.
+	* ptw32_tkAssocCreate.c: See above.
+	* ptw32_tkAssocDestroy.c: See above.
+
 2005-04-27  Ross Johnson  <ross at callisto.canberra.edu.au>
 
 	* sem_wait.c (ptw32_sem_wait_cleanup): after cancellation re-attempt

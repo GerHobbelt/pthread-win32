@@ -92,6 +92,7 @@ pthread_create (pthread_t * tid,
   ThreadParms *parms = NULL;
   long stackSize;
   int priority;
+  pthread_t self;
 
   /*
    * Before doing anything, check that tid can be stored through
@@ -128,17 +129,22 @@ pthread_create (pthread_t * tid,
   parms->start = start;
   parms->arg = arg;
 
+#if defined(HAVE_SIGSET_T)
+
+  /*
+   * Threads inherit their initial sigmask from their creator thread.
+   */
+  self = pthread_self();
+  tp->sigmask = ((ptw32_thread_t *)self.p)->sigmask;
+
+#endif /* HAVE_SIGSET_T */
+
+
   if (a != NULL)
     {
       stackSize = a->stacksize;
       tp->detachState = a->detachstate;
       priority = a->param.sched_priority;
-
-#if HAVE_SIGSET_T
-
-      tp->sigmask = a->sigmask;
-
-#endif /* HAVE_SIGSET_T */
 
 #if (THREAD_PRIORITY_LOWEST > THREAD_PRIORITY_NORMAL)
       /* WinCE */
@@ -164,7 +170,9 @@ pthread_create (pthread_t * tid,
 	   * then the inherited priority could be the result of a temporary
 	   * system adjustment. This is not the case for POSIX threads.
 	   */
-	  pthread_t self = pthread_self ();
+#if ! defined(HAVE_SIGSET_T)
+	  self = pthread_self ();
+#endif
 	  priority = ((ptw32_thread_t *) self.p)->sched_priority;
 	}
 
