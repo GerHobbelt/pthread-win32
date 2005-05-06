@@ -1,5 +1,10 @@
 2005-05-06  Ross Johnson  <ross at callisto.canberra.edu.au>
 
+	* PortabilityIssues.html: Was nonPortableIssues.html.
+	* index.html: Updated.
+
+2005-05-06  Ross Johnson  <ross at callisto.canberra.edu.au>
+
 	* index.html: New.
 	* nonPortableIssues.html: New.
 	* pthread_attr_init.html: New.
