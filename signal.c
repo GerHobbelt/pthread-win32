@@ -167,6 +167,8 @@ pthread_sigmask (int how, sigset_t const *set, sigset_t * oset)
 int
 sigwait (const sigset_t * set, int *sig)
 {
+  /* This routine is a cancellation point */
+  pthread_test_cancel();
 }
 
 int

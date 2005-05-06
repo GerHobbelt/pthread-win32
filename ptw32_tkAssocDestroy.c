@@ -56,10 +56,47 @@ ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
       */
 {
 
-  if ((assoc != NULL) && (assoc->key == NULL && assoc->thread.p == NULL))
+  /*
+   * Both key->keyLock and thread->threadLock are locked on
+   * entry to this routine.
+   */
+  if (assoc != NULL)
     {
+      ThreadKeyAssoc * prev, * next;
 
-      pthread_mutex_destroy (&(assoc->lock));
+      prev = assoc->prevKey;
+      next = assoc->nextKey;
+      if (prev != NULL)
+	{
+	  prev->nextKey = next;
+	}
+      if (next != NULL)
+	{
+	  next->prevKey = prev;
+	}
+
+      if (assoc->key->threads == assoc)
+	{
+	  /* We're at the head of the threads chain */
+	  assoc->key->threads = next;
+	}
+
+      prev = assoc->prevThread;
+      next = assoc->nextThread;
+      if (prev != NULL)
+	{
+	  prev->nextThread = next;
+	}
+      if (next != NULL)
+	{
+	  next->prevThread = prev;
+	}
+
+      if (assoc->thread->keys == assoc)
+	{
+	  /* We're at the head of the keys chain */
+	  assoc->thread->keys = next;
+	}
 
       free (assoc);
     }

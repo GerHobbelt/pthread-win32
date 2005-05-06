@@ -1,3 +1,46 @@
+RELEASE 2.5.0
+-------------
+(2005-05-06)
+
+General
+-------
+
+The package now includes a reference documentation set consisting of
+HTML formatted Unix-style manual pages that have been edited for
+consistency with Pthreads-w32. The set can also be read online at:
+http://sources.redhat.com/pthreads-win32/manual/index.html
+
+All of the bug fixes and new features in this release have been
+back-ported in release 1.9.0.
+
+Bugs fixed
+----------
+
+* Thread Specific Data (TSD) key management has been altered to
+eliminate a source of resource leakage (HANDLEs plus memory).
+Thanks to Richard Hughes at Aculab for identifying the leak.
+
+* Fix a semaphore accounting race between sem_post/sem_post_multiple
+and sem_wait cancellation. This is the same issue as with
+sem_timedwait that was fixed in the last release.
+
+* sem_init, sem_post, and sem_post_multiple now check that the
+semaphore count never exceeds _POSIX_SEM_VALUE_MAX.
+
+* Although sigwait() is nothing more than a no-op, it should at least
+be a cancellation point to be consistent with the standard.
+
+New tests
+---------
+
+* stress1.c - attempts to expose problems in condition variable
+and semaphore timed wait logic. This test was inspired by Stephan
+Mueller's sample test code used to identify the sem_timedwait bug
+from the last release. It's not a part of the regular test suite
+because it can take awhile to run. To run it:
+nmake clean VC-stress
+
+
 RELEASE 2.4.0
 -------------
 (2005-04-26)

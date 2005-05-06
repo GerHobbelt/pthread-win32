@@ -44,7 +44,7 @@ pthread_key_delete (pthread_key_t key)
       * ------------------------------------------------------
       * DOCPUBLIC
       *      This function deletes a thread-specific data key. This
-      *      does not change the value of the thread spcific data key
+      *      does not change the value of the thread specific data key
       *      for any thread and does not run the key's destructor
       *      in any thread so it should be used with caution.
       *
@@ -55,7 +55,7 @@ pthread_key_delete (pthread_key_t key)
       *
       * DESCRIPTION
       *      This function deletes a thread-specific data key. This
-      *      does not change the value of the thread spcific data key
+      *      does not change the value of the thread specific data key
       *      for any thread and does not run the key's destructor
       *      in any thread so it should be used with caution.
       *
@@ -72,7 +72,7 @@ pthread_key_delete (pthread_key_t key)
     {
       if (key->threads != NULL &&
 	  key->destructor != NULL &&
-	  pthread_mutex_lock (&(key->threadsLock)) == 0)
+	  pthread_mutex_lock (&(key->keyLock)) == 0)
 	{
 	  /*
 	   * Run through all Thread<-->Key associations
@@ -93,28 +93,31 @@ pthread_key_delete (pthread_key_t key)
 
 	  while (assoc != NULL)
 	    {
-	      if (pthread_mutex_lock (&(assoc->lock)) == 0)
+	      ThreadKeyAssoc *next;
+	      ptw32_thread_t * thread = assoc->thread;
+
+	      if (thread != NULL
+		  && pthread_mutex_lock (&(thread->threadLock)) == 0)
 		{
-		  ThreadKeyAssoc *next;
-
-		  assoc->key = NULL;
 		  next = assoc->nextThread;
-		  assoc->nextThread = NULL;
-
-		  pthread_mutex_unlock (&(assoc->lock));
-
 		  ptw32_tkAssocDestroy (assoc);
-
-		  assoc = next;
+		  (void) pthread_mutex_unlock (&(thread->threadLock));
 		}
+	      else
+		{
+		  /* Thread or lock is no longer valid */
+		  next = assoc->nextThread;
+		  ptw32_tkAssocDestroy (assoc);
+		}
+	      assoc = next;
 	    }
-	  pthread_mutex_unlock (&(key->threadsLock));
+	  pthread_mutex_unlock (&(key->keyLock));
 	}
 
       TlsFree (key->key);
       if (key->destructor != NULL)
 	{
-	  pthread_mutex_destroy (&(key->threadsLock));
+	  pthread_mutex_destroy (&(key->keyLock));
 	}
 
 #if defined( _DEBUG )

@@ -86,7 +86,7 @@ thr(void * arg)
   if ( result == -1 )
   {
     int err = errno;
-    perror("thread: sem_trywait 1: expected error"); // No error
+    perror("thread: sem_trywait 1: expect an EAGAIN error"); // No error
     assert(err == EAGAIN);
   }
   else
@@ -131,7 +131,7 @@ main()
   if ( result == -1 )
   {
     int err = errno;
-    perror("main: sem_trywait 1: expected error"); // No error
+    perror("main: sem_trywait 1: expect an EAGAIN error"); // No error
     assert(err == EAGAIN);
   }
   else
