@@ -1,7 +1,9 @@
 2005-05-06  Ross Johnson  <ross at callisto.canberra.edu.au>
 
 	* PortabilityIssues.html: Was nonPortableIssues.html.
-	* index.html: Updated.
+	* index.html: Updated; add table of contents at top.
+	* *.html: Add Pthreads-win32 header info; add link back to the
+	index page 'index.html'.
 
 2005-05-06  Ross Johnson  <ross at callisto.canberra.edu.au>
 
