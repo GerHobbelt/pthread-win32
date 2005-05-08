@@ -32,7 +32,7 @@
 #
 
 
-DLL_VER	= 1
+DLL_VER	= 2
 
 .EXTENSIONS:
 

@@ -90,7 +90,7 @@ TESTS	= sizes loadfree \
 	  cancel1 cancel2 \
 	  semaphore4 semaphore4t \
 	  barrier1 barrier2 barrier3 barrier4 barrier5 \
-	  tsd1 delay1 delay2 eyal1 \
+	  tsd1 tsd2 delay1 delay2 eyal1 \
 	  condvar3 condvar3_1 condvar3_2 condvar3_3 \
 	  condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
@@ -148,6 +148,9 @@ GC-bench:
 
 GCE-bench:
 	$(MAKE) TEST=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
+
+GC-debug:
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" DLL_VER="$(DLL_VER)d" all-pass
 
 GC-static:
 	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
@@ -305,6 +308,7 @@ spin2.pass: spin1.pass
 spin3.pass: spin2.pass
 spin4.pass: spin3.pass
 tsd1.pass: barrier5.pass join1.pass
+tsd2.pass: tsd1.pass
 valid1.pass: join1.pass
 valid2.pass: valid1.pass
 

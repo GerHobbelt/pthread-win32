@@ -150,6 +150,7 @@ struct ptw32_thread_t_
 #endif				/* HAVE_SIGSET_T */
   int implicit:1;
   void *keys;
+  void *nextAssoc;
 };
 
 
@@ -386,8 +387,10 @@ struct ThreadKeyAssoc
    *      key is concluded.
    *
    *      To avoid deadlock: whenever both locks are required, the key
-   *      and thread locks are always applied in the order: key lock
-   *      then thread lock.
+   *      and thread locks are always acquired in the order: key lock
+   *      then thread lock. An exception to this exists when a thread
+   *      calls the destructors, however this is done carefully to
+   *      avoid deadlock.
    *
    *      An association is created when a thread first calls
    *      pthread_setspecific() on a key that has a specified
@@ -610,8 +613,7 @@ extern "C"
 
   void ptw32_callUserDestroyRoutines (pthread_t thread);
 
-  int ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
-			   ptw32_thread_t * thread, pthread_key_t key);
+  int ptw32_tkAssocCreate (ptw32_thread_t * thread, pthread_key_t key);
 
   void ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc);
 

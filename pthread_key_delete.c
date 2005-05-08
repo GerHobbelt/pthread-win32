@@ -74,42 +74,41 @@ pthread_key_delete (pthread_key_t key)
 	  key->destructor != NULL &&
 	  pthread_mutex_lock (&(key->keyLock)) == 0)
 	{
+	  ThreadKeyAssoc *assoc;
 	  /*
 	   * Run through all Thread<-->Key associations
 	   * for this key.
-	   * If the pthread_t still exists (ie the assoc->thread
-	   * is not NULL) then leave the assoc for the thread to
-	   * destroy.
-	   * Notes:
-	   *      If assoc->thread is NULL, then the associated thread
-	   *      is no longer referencing this assoc.
-	   *      The association is only referenced
-	   *      by this key and must be released; otherwise
-	   *      the assoc will be destroyed when the thread is destroyed.
+	   *
+	   * While we hold at least one of the locks guarding
+	   * the assoc, we know that the assoc pointed to by
+	   * key->threads is valid.
 	   */
-	  ThreadKeyAssoc *assoc;
-
-	  assoc = (ThreadKeyAssoc *) key->threads;
-
-	  while (assoc != NULL)
+	  while ((assoc = (ThreadKeyAssoc *) key->threads) != NULL)
 	    {
-	      ThreadKeyAssoc *next;
 	      ptw32_thread_t * thread = assoc->thread;
 
-	      if (thread != NULL
-		  && pthread_mutex_lock (&(thread->threadLock)) == 0)
+	      if (assoc == NULL)
 		{
-		  next = assoc->nextThread;
+		  /* Finished */
+		  break;
+		}
+
+	      if (pthread_mutex_lock (&(thread->threadLock)) == 0)
+		{
+		  /*
+		   * Since we are starting at the head of the key's threads
+		   * chain, this will also point key->threads at the next assoc.
+		   * While we hold key->keyLock, no other thread can insert
+		   * a new assoc via pthread_setspecific.
+		   */
 		  ptw32_tkAssocDestroy (assoc);
 		  (void) pthread_mutex_unlock (&(thread->threadLock));
 		}
 	      else
 		{
-		  /* Thread or lock is no longer valid */
-		  next = assoc->nextThread;
+		  /* Thread or lock is no longer valid? */
 		  ptw32_tkAssocDestroy (assoc);
 		}
-	      assoc = next;
 	    }
 	  pthread_mutex_unlock (&(key->keyLock));
 	}
@@ -117,7 +116,11 @@ pthread_key_delete (pthread_key_t key)
       TlsFree (key->key);
       if (key->destructor != NULL)
 	{
-	  pthread_mutex_destroy (&(key->keyLock));
+	  /* A thread could be holding the keyLock */
+	  while (EBUSY == pthread_mutex_destroy (&(key->keyLock)))
+	    {
+	      Sleep(1); // Ugly.
+	    }
 	}
 
 #if defined( _DEBUG )
