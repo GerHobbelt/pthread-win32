@@ -1,5 +1,5 @@
 /*
- * tsd1.c
+ * tsd2.c
  *
  * Test Thread Specific Data (TSD) key creation and destruction.
  *
@@ -96,7 +96,11 @@ destroy_key(void * arg)
 
   (*j)++;
 
-  assert(*j == 2);
+  /* Set TSD key from the destructor to test destructor iteration */
+  if (*j == 2)
+    assert(pthread_setspecific(key, arg) == 0);
+  else
+    assert(*j == 3);
 
   thread_destroyed[j - accesscount] = 1;
 }
@@ -197,7 +201,7 @@ main()
 	 * NULL and the destroy function will not be called, and
 	 * hence accesscount will not equal 2.
 	 */
-	if (accesscount[i] != 2)
+	if (accesscount[i] != 3)
 	  {
 	    fail++;
 	    fprintf(stderr, "Thread %d key, set = %d, destroyed = %d\n",

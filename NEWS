@@ -1,6 +1,6 @@
 RELEASE 2.5.0
 -------------
-(2005-05-06)
+(2005-05-09)
 
 General
 -------
@@ -10,15 +10,22 @@ HTML formatted Unix-style manual pages that have been edited for
 consistency with Pthreads-w32. The set can also be read online at:
 http://sources.redhat.com/pthreads-win32/manual/index.html
 
+Thanks again to Tim Theisen for pre-release running the testing suite
+on an MP system.
+
 All of the bug fixes and new features in this release have been
 back-ported in release 1.9.0.
 
 Bugs fixed
 ----------
 
-* Thread Specific Data (TSD) key management has been altered to
-eliminate a source of resource leakage (HANDLEs plus memory).
-Thanks to Richard Hughes at Aculab for identifying the leak.
+* Thread Specific Data (TSD) key management has been ammended to
+eliminate a source of (what is effectively) resource leakage (HANDLEs
+plus memory).
+Thanks to Richard Hughes at Aculab for identifying and locating the leak.
+
+* TSD key destructors are now processed up to PTHREAD_DESTRUCTOR_ITERATIONS
+times (was always in pthread.h) instead of just once.
 
 * Fix a semaphore accounting race between sem_post/sem_post_multiple
 and sem_wait cancellation. This is the same issue as with
@@ -39,6 +46,11 @@ Mueller's sample test code used to identify the sem_timedwait bug
 from the last release. It's not a part of the regular test suite
 because it can take awhile to run. To run it:
 nmake clean VC-stress
+
+* tsd2.c - tests that key destructors are re-run if the tsd key value is
+not NULL after the destructor routine has run. Also tests that
+pthread_setspecific() and pthread_getspecific() are callable from
+destructors.
 
 
 RELEASE 2.4.0

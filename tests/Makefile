@@ -100,7 +100,7 @@ PASSES= sizes.pass  loadfree.pass \
 	  cancel1.pass  cancel2.pass  \
 	  semaphore4.pass  semaphore4t.pass  \
 	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  \
-	  tsd1.pass  delay1.pass  delay2.pass  eyal1.pass  \
+	  tsd1.pass  tsd2.pass  delay1.pass  delay2.pass  eyal1.pass  \
 	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  \
 	  condvar4.pass  condvar5.pass  condvar6.pass  \
 	  condvar7.pass  condvar8.pass  condvar9.pass  \
@@ -397,5 +397,6 @@ spin2.pass: spin1.pass
 spin3.pass: spin2.pass
 spin4.pass: spin3.pass
 tsd1.pass: barrier5.pass join1.pass
+tsd2.pass: tsd1.pass
 valid1.pass: join1.pass
 valid2.pass: valid1.pass
