@@ -147,7 +147,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
 	       */
 	      if (assoc == NULL)
 		{
-		  result = ptw32_tkAssocCreate (&assoc, sp, key);
+		  result = ptw32_tkAssocCreate (sp, key);
 		}
 
 	      (void) pthread_mutex_unlock(&(sp->threadLock));

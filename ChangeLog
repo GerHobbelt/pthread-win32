@@ -1,3 +1,12 @@
+2005-05-09  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* ptw32_callUserDestroyRoutines.c: Run destructor process (i.e.
+	loop over all keys calling destructors) up to
+	PTHREAD_DESTRUCTOR_ITERATIONS times if TSD value isn't NULL yet;
+	modify assoc management.
+	* pthread_key_delete.c: Modify assoc management.
+	* ptw32_tkAssocDestroy.c: Fix error in assoc removal from chains.
+
 2005-05-06  Ross Johnson  <ross at callisto.canberra.edu.au>
 
 	* signal.c (sigwait): Add a cancellation point to this otherwise

@@ -49,6 +49,10 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
   /*
    * Let the system deal with invalid pointers.
    */
+  if (*mutex == NULL)
+    {
+      return EINVAL;
+    }
 
   /*
    * We do a quick check to see if we need to do more work

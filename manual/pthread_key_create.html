@@ -70,7 +70,7 @@ might, however, re-associate non- <B>NULL</B> values to that key or
 some other key. To deal with this, if after all the destructors have
 been called for all non- <B>NULL</B> values, there are still some
 non- <B>NULL</B> values with associated destructors, then the process
-is repeated. The LinuxThreads implementation stops the process after
+is repeated. The <B>Pthreads-w32</B> implementation stops the process after
 <B>PTHREAD_DESTRUCTOR_ITERATIONS</B> iterations, even if some non-
 <B>NULL</B> values with associated descriptors remain. Other
 implementations may loop indefinitely. 

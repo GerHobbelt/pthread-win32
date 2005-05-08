@@ -34,7 +34,6 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-//#include "../QueueUserAPCEx/User/QueueUserAPCEx.h"
 #include "pthread.h"
 #include "implement.h"
 

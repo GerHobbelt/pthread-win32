@@ -40,8 +40,7 @@
 
 
 int
-ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
-		     ptw32_thread_t * sp, pthread_key_t key)
+ptw32_tkAssocCreate (ptw32_thread_t * sp, pthread_key_t key)
      /*
       * -------------------------------------------------------------------
       * This routine creates an association that
@@ -61,8 +60,6 @@ ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
       *      2)      
       *
       * Parameters:
-      *              assocP
-      *                      address into which the association is returned.
       *              thread
       *                      current running thread.
       *              key
@@ -97,26 +94,24 @@ ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
   /*
    * Register assoc with key
    */
-  if (key->threads != NULL)
-    {
-      ((ThreadKeyAssoc *)key->threads)->prevThread = assoc;
-    }
-  assoc->nextThread = (ThreadKeyAssoc *) key->threads;
   assoc->prevThread = NULL;
+  assoc->nextThread = (ThreadKeyAssoc *) key->threads;
+  if (assoc->nextThread != NULL)
+    {
+      assoc->nextThread->prevThread = assoc;
+    }
   key->threads = (void *) assoc;
 
   /*
    * Register assoc with thread
    */
-  if (sp->keys != NULL)
-    {
-      ((ThreadKeyAssoc *)sp->keys)->prevKey = assoc;
-    }
-  assoc->nextKey = (ThreadKeyAssoc *) sp->keys;
   assoc->prevKey = NULL;
+  assoc->nextKey = (ThreadKeyAssoc *) sp->keys;
+  if (assoc->nextKey != NULL)
+    {
+      assoc->nextKey->prevKey = assoc;
+    }
   sp->keys = (void *) assoc;
-
-  *assocP = assoc;
 
   return (0);
 
