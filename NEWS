@@ -17,8 +17,17 @@ Bugs fixed
 ----------
 
 * Thread Specific Data (TSD) key management has been ammended to
-eliminate a source of (what was effectively) resource leakage (HANDLEs
-plus memory).
+eliminate a source of (what was effectively) resource leakage (a HANDLE
+plus memory for each key destruct routine/thread association). This was
+not a true leak because these resources were eventually reclaimed when
+pthread_key_delete was run AND each thread referencing the key had exited.
+The problem was that these two conditions are often not met until very
+late, and often not until the process is about to exit.
+
+The ammended implementation avoids the need for the problematic HANDLE
+and reclaims the memory as soon as either the key is deleted OR the
+thread exits, whichever is first.
+
 Thanks to Richard Hughes at Aculab for identifying and locating the leak.
 
 * TSD key destructors are now processed up to PTHREAD_DESTRUCTOR_ITERATIONS
