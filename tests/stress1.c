@@ -155,7 +155,8 @@ masterThread (void * arg)
        * We are attempting to send the signal close to when the slave
        * is due to timeout. We feel around by adding some [non-random] dither.
        *
-       * with dither added, sleep time range is 2*timeout peak-to-peak centred on timeout,
+       * dither is in the range 2*timeout peak-to-peak
+       * sleep time is the average of timeout plus dither.
        * e.g.
        * if timeout = 10 then dither = 20 and
        * sleep millisecs is: 5 <= ms <= 15
@@ -163,6 +164,8 @@ masterThread (void * arg)
        * The bias value attempts to apply some negative feedback to keep
        * the ratio of timeouts to signals taken close to 1:1.
        * bias changes more slowly than dither so as to average more.
+       *
+       * Finally, if abs(bias) exceeds timeout then timeout is incremented.
        */
       if (signalsSent % timeout == 0)
 	{
