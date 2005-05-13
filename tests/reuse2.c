@@ -153,10 +153,14 @@ main()
     if (t[i].p != NULL)
       totalHandles++;
 
+  /*
+   * pthread_t reuse counts start at 0, so we need to add 1
+   * to the max and min values derived above.
+   */
   printf("For %d total threads:\n", NUMTHREADS);
   printf("Non-unique IDs = %d\n", notUnique);
-  printf("Reuse maximum  = %d\n", reuseMax);
-  printf("Reuse minimum  = %d\n", reuseMin);
+  printf("Reuse maximum  = %d\n", reuseMax + 1);
+  printf("Reuse minimum  = %d\n", reuseMin + 1);
   printf("Total handles  = %d\n", totalHandles);
 
   return 0;
