@@ -58,12 +58,10 @@ pthread_detach (pthread_t thread)
       *
       *
       * DESCRIPTION
-      *      This function detaches the given thread. You may
-      *      detach the main thread or to detach a joinable thread
-      *      (You should have used pthread_attr_t to create the
-      *      thread as detached!)
-      *      NOTE:   detached threads cannot be joined nor canceled;
-      *                      storage is freed immediately on termination.
+      *      This function detaches the given thread. You may use it to
+      *      detach the main thread or to detach a joinable thread.
+      *      NOTE:   detached threads cannot be joined;
+      *              storage is freed immediately on termination.
       *
       * RESULTS
       *              0               successfully detached the thread,
@@ -75,23 +73,66 @@ pthread_detach (pthread_t thread)
       */
 {
   int result;
+  BOOL destroyIt = PTW32_FALSE;
   ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
 
-  result = pthread_kill (thread, 0);
+  EnterCriticalSection (&ptw32_thread_reuse_lock);
 
-  if (0 != result)
+  if (NULL == tp
+      || thread.x != tp->ptHandle.x)
     {
-      return result;
+      result = ESRCH;
     }
-
-  if (tp->detachState == PTHREAD_CREATE_DETACHED)
+  else if (PTHREAD_CREATE_DETACHED == tp->detachState)
     {
       result = EINVAL;
     }
   else
     {
+      /*
+       * Joinable ptw32_thread_t structs are not scavenged until
+       * a join or detach is done. The thread may have exited already,
+       * but all of the state and locks etc are still there.
+       */
       result = 0;
-      tp->detachState = PTHREAD_CREATE_DETACHED;
+
+      if (pthread_mutex_lock (&tp->cancelLock) == 0)
+	{
+	  if (tp->state != PThreadStateLast)
+	    {
+	      tp->detachState = PTHREAD_CREATE_DETACHED;
+	    }
+	  else if (tp->detachState != PTHREAD_CREATE_DETACHED)
+	    {
+	      /*
+	       * Thread is joinable and has exited or is exiting.
+	       */
+	      destroyIt = PTW32_TRUE;
+	    }
+	  (void) pthread_mutex_unlock (&tp->cancelLock);
+	}
+      else
+	{
+	  /* cancelLock shouldn't fail, but if it does ... */
+	  result = ESRCH;
+	}
+    }
+
+  LeaveCriticalSection (&ptw32_thread_reuse_lock);
+
+  if (result == 0)
+    {
+      /* Thread is joinable */
+
+      if (destroyIt)
+	{
+	  /* The thread has exited or is exiting but has not been joined or
+	   * detached. Need to wait if it's still running - shouldn't have
+	   * to wait long.
+	   */
+	  (void) WaitForSingleObject(tp->threadH, INFINITE);
+	  ptw32_threadDestroy (thread);
+	}
     }
 
   return (result);

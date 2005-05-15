@@ -1,3 +1,21 @@
+RELEASE 2.6.0
+-------------
+(Not released yet)
+
+Bugs fixed
+----------
+
+* pthread_detach() now reclaims remaining thread resources when called after
+the target thread has terminated. Previously, this thread did nothing in
+this case.
+
+New tests
+---------
+
+* detach1.c - tests that pthread_detach properly invalidates the target
+thread, which indicates that the thread resources have been reclaimed.
+
+
 RELEASE 2.5.0
 -------------
 (2005-05-09)

@@ -1,3 +1,35 @@
+2005-05-13  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* pthread_win32_attach_detach_np.c (pthread_win32_thread_detach_np):
+	Move on-exit-only stuff from ptw32_threadDestroy() to here.
+	* ptw32_threadDestroy.c: It's purpose is now only to reclaim thread
+	resources for detached threads, or via pthread_join() or
+	pthread_detach() on joinable threads.
+	* ptw32_threadStart.c: Calling user destruct routines has moved to
+	pthread_win32_thread_detach_np(); call pthread_win32_thread_detach_np()
+	directly if statically linking, otherwise do so via dllMain; store
+	thread return value in thread struct for all cases, including
+	cancellation and exception exits; thread abnormal exits	go via
+	pthread_win32_thread_detach_np.
+	* pthread_join.c (pthread_join): Don't try to get return code from
+	Win32 thread - always get it from he thread struct.
+	* pthread_detach.c (pthread_detach): reduce extent of the thread
+	existence check since we now don't care if the Win32 thread HANDLE has
+	been closed; reclaim thread resources if the thread has exited already.
+	* ptw32_throw.c (ptw32_throw): For Win32 threads that are not implicit,
+	only Call thread cleanup if statically linking, otherwise leave it to
+	dllMain.
+	* sem_post.c (_POSIX_SEM_VALUE_MAX): Change to SEM_VALUE_MAX.
+	* sem_post_multiple.c: Likewise.
+	* sem_init.c: Likewise.
+
+2005-05-10  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* pthread_join.c (pthread_join): Add missing check for thread ID
+	reference count in thread existence test; reduce extent of the
+	existence test since we don't care if the Win32 thread HANDLE has
+	been closed.
+
 2005-05-09  Ross Johnson  <ross at callisto.canberra.edu.au>
 
 	* ptw32_callUserDestroyRoutines.c: Run destructor process (i.e.

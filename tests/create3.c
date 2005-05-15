@@ -92,7 +92,7 @@ threadFunc(void * arg)
 }
 
 int
-main(int argc, char argv[])
+main(int argc, char * argv[])
 {
   int i;
   pthread_t mt;

@@ -109,12 +109,8 @@ static terminate_function
 void
 ptw32_terminate ()
 {
-  pthread_t self = pthread_self ();
-  ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
-
   set_terminate (ptw32_oldTerminate);
-  (void) pthread_mutex_destroy (&sp->cancelLock);
-  ptw32_callUserDestroyRoutines (self);
+  (void) pthread_win32_thread_detach_np ();
   terminate ();
 }
 
@@ -193,7 +189,7 @@ ptw32_threadStart (void *vthreadParms)
     switch (ei[0])
       {
       case PTW32_EPS_CANCEL:
-	status = PTHREAD_CANCELED;
+	status = sp->exitStatus = PTHREAD_CANCELED;
 #ifdef _UWIN
 	if (--pthread_count <= 0)
 	  exit (0);
@@ -203,7 +199,7 @@ ptw32_threadStart (void *vthreadParms)
 	status = sp->exitStatus;
 	break;
       default:
-	status = PTHREAD_CANCELED;
+	status = sp->exitStatus = PTHREAD_CANCELED;
 	break;
       }
   }
@@ -227,13 +223,13 @@ ptw32_threadStart (void *vthreadParms)
       switch (setjmp_rc)
 	{
 	case PTW32_EPS_CANCEL:
-	  status = PTHREAD_CANCELED;
+	  status = sp->exitStatus = PTHREAD_CANCELED;
 	  break;
 	case PTW32_EPS_EXIT:
 	  status = sp->exitStatus;
 	  break;
 	default:
-	  status = PTHREAD_CANCELED;
+	  status = sp->exitStatus = PTHREAD_CANCELED;
 	  break;
 	}
     }
@@ -310,9 +306,8 @@ ptw32_threadStart (void *vthreadParms)
     (void) pthread_mutex_lock (&sp->cancelLock);
     sp->state = PThreadStateException;
     (void) pthread_mutex_unlock (&sp->cancelLock);
-    (void) pthread_mutex_destroy (&sp->cancelLock);
+    (void) pthread_win32_thread_detach_np ();
     (void) set_terminate (ptw32_oldTerminate);
-    ptw32_callUserDestroyRoutines (self);
     throw;
 
     /*
@@ -330,27 +325,23 @@ ptw32_threadStart (void *vthreadParms)
 #endif /* __CLEANUP_C */
 #endif /* __CLEANUP_SEH */
 
-  if (sp->detachState == PTHREAD_CREATE_DETACHED)
-    {
-      /*
-       * We need to cleanup the pthread now in case we have
-       * been statically linked, in which case the cleanup
-       * in dllMain won't get done. Joinable threads will
-       * be cleaned up by pthread_join().
-       *
-       * Note that implicitly created pthreads (those created
-       * for Win32 threads which have called pthreads routines)
-       * must be cleaned up explicitly by the application
-       * (by calling pthread_win32_thread_detach_np()) if
-       * this library has been statically linked. For the dll,
-       * dllMain will do the cleanup automatically.
-       */
-      (void) pthread_win32_thread_detach_np ();
-    }
-  else
-    {
-      ptw32_callUserDestroyRoutines (self);
-    }
+#if defined(PTW32_STATIC_LIB)
+  /*
+   * We need to cleanup the pthread now if we have
+   * been statically linked, in which case the cleanup
+   * in dllMain won't get done. Joinable threads will
+   * only be partially cleaned up and must be fully cleaned
+   * up by pthread_join() or pthread_detach().
+   *
+   * Note: if this library has been statically linked,
+   * implicitly created pthreads (those created
+   * for Win32 threads which have called pthreads routines)
+   * must be cleaned up explicitly by the application
+   * (by calling pthread_win32_thread_detach_np()).
+   * For the dll, dllMain will do the cleanup automatically.
+   */
+  (void) pthread_win32_thread_detach_np ();
+#endif
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
   _endthreadex ((unsigned) status);

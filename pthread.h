@@ -37,8 +37,8 @@
  * See the README file for an explanation of the pthreads-win32 version
  * numbering scheme and how the DLL is named etc.
  */
-#define PTW32_VERSION 2,5,0,0
-#define PTW32_VERSION_STRING "2, 5, 0, 0\0"
+#define PTW32_VERSION 2,6,0,0
+#define PTW32_VERSION_STRING "2, 6, 0, 0\0"
 
 /* There are three implementations of cancel cleanup.
  * Note that pthread.h is included in both application
@@ -510,40 +510,49 @@ extern "C"
  *                      Maximum number of threads supported per
  *                      process (must be at least 64).
  *
- * _POSIX_SEM_NSEMS_MAX
- *      The maximum number of semaphores a process can have.
- *      (only defined if not already defined)
+ * SEM_NSEMS_MAX
+ *                      The maximum number of semaphores a process can have.
+ *                      (must be at least 256)
  *
- * _POSIX_SEM_VALUE_MAX
- *      The maximum value a semaphore can have.
- *      (only defined if not already defined)
+ * SEM_VALUE_MAX
+ *                      The maximum value a semaphore can have.
+ *                      (must be at least 32767)
  *
  */
+#undef _POSIX_THREAD_DESTRUCTOR_ITERATIONS
+#define _POSIX_THREAD_DESTRUCTOR_ITERATIONS     4
+
 #undef PTHREAD_DESTRUCTOR_ITERATIONS
-#define PTHREAD_DESTRUCTOR_ITERATIONS                          4
+#define PTHREAD_DESTRUCTOR_ITERATIONS           _POSIX_THREAD_DESTRUCTOR_ITERATIONS
+
+#undef _POSIX_THREAD_KEYS_MAX
+#define _POSIX_THREAD_KEYS_MAX                  128
 
 #undef PTHREAD_KEYS_MAX
-#define PTHREAD_KEYS_MAX                        64
+#define PTHREAD_KEYS_MAX                        _POSIX_THREAD_KEYS_MAX
 
 #undef PTHREAD_STACK_MIN
-#define PTHREAD_STACK_MIN                        0
+#define PTHREAD_STACK_MIN                       0
 
-#if PTW32_LEVEL < 2
-  /* Arbitrary value */
-#  undef PTHREAD_THREADS_MAX
-#  define PTHREAD_THREADS_MAX                   2019
-#endif
-
-  /* Arbitrary value */
 #undef _POSIX_THREAD_THREADS_MAX
-#define _POSIX_THREAD_THREADS_MAX               2019
+#define _POSIX_THREAD_THREADS_MAX               64
 
   /* Arbitrary value */
+#undef PTHREAD_THREADS_MAX
+#define PTHREAD_THREADS_MAX                     2019
+
 #undef _POSIX_SEM_NSEMS_MAX
-#define _POSIX_SEM_NSEMS_MAX                    1024
+#define _POSIX_SEM_NSEMS_MAX                    256
+
+  /* Arbitrary value */
+#undef SEM_NSEMS_MAX
+#define SEM_NSEMS_MAX                           1024
 
 #undef _POSIX_SEM_VALUE_MAX
-#define _POSIX_SEM_VALUE_MAX                    (INT_MAX/2)
+#define _POSIX_SEM_VALUE_MAX                    32767
+
+#undef SEM_VALUE_MAX
+#define SEM_VALUE_MAX                           INT_MAX
 
 
 #if __GNUC__ && ! defined (__declspec)
