@@ -1,3 +1,13 @@
+2005-05-15  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* detach1.c: New test.
+	* join1.c: Reduce sleep times.
+	* join0.c: Remove MSVCRT conditional compile - join should always
+	return the thread exit code.
+	* join1.c: Likewise.
+	* join2.c: Likewise.
+	* join3.c: Likewise.
+
 2005-04-18  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* condvar3.c: Remove locks from around signalling calls - should not

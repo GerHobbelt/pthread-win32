@@ -82,7 +82,7 @@ sem_post (sem_t * sem)
     }
   else if ((result = pthread_mutex_lock (&s->lock)) == 0)
     {
-      if (s->value < _POSIX_SEM_VALUE_MAX)
+      if (s->value < SEM_VALUE_MAX)
 	{
 #ifdef NEED_SEM
 	  if (++s->value <= 0
