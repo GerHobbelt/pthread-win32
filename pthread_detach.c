@@ -127,8 +127,7 @@ pthread_detach (pthread_t thread)
       if (destroyIt)
 	{
 	  /* The thread has exited or is exiting but has not been joined or
-	   * detached. Need to wait if it's still running - shouldn't have
-	   * to wait long.
+	   * detached. Need to wait in case it's still exiting.
 	   */
 	  (void) WaitForSingleObject(tp->threadH, INFINITE);
 	  ptw32_threadDestroy (thread);
