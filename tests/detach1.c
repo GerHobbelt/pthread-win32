@@ -1,5 +1,5 @@
 /*
- * Test for pthread_join() returning return value from threads.
+ * Test for pthread_detach().
  *
  *
  * --------------------------------------------------------------------------
@@ -33,7 +33,7 @@
  *
  * --------------------------------------------------------------------------
  *
- * Depends on API functions: pthread_create().
+ * Depends on API functions: pthread_create(), pthread_detach(), pthread_exit().
  */
 
 #include "test.h"
@@ -41,8 +41,14 @@
 void *
 func(void * arg)
 {
-	Sleep(1000);
-	return arg;
+    int i = (int) arg;
+
+    Sleep(i * 100);
+
+    pthread_exit(arg);
+
+    /* Never reached. */
+    exit(1);
 }
 
 int
@@ -50,7 +56,6 @@ main(int argc, char * argv[])
 {
 	pthread_t id[4];
 	int i;
-	int result;
 
 	/* Create a few threads and then exit. */
 	for (i = 0; i < 4; i++)
@@ -58,10 +63,24 @@ main(int argc, char * argv[])
 	    assert(pthread_create(&id[i], NULL, func, (void *) i) == 0);
 	  }
 
+	/* Some threads will finish before they are detached, some after. */
+	Sleep(2 * 100 + 50);
+
 	for (i = 0; i < 4; i++)
 	  {
-	    assert(pthread_join(id[i], (void **) &result) == 0);
-	    assert(result == i);
+	    assert(pthread_detach(id[i]) == 0);
+	  }
+
+	Sleep(6 * 100);
+
+	/*
+	 * Check that all threads are now invalid.
+	 * This relies on unique thread IDs - e.g. works with
+	 * pthreads-w32 or Solaris, but may not work for Linux, BSD etc.
+	 */
+	for (i = 0; i < 4; i++)
+	  {
+	    assert(pthread_kill(id[i], 0) == ESRCH);
 	  }
 
 	/* Success. */

@@ -86,7 +86,7 @@ sem_post_multiple (sem_t * sem, int count)
     }
   else if ((result = pthread_mutex_lock (&s->lock)) == 0)
     {
-      if (s->value <= (_POSIX_SEM_VALUE_MAX - count))
+      if (s->value <= (SEM_VALUE_MAX - count))
 	{
 	  waiters = -s->value;
 	  s->value += count;

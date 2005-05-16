@@ -90,7 +90,7 @@ PASSES= sizes.pass  loadfree.pass \
 	  exit1.pass  create1.pass  create2.pass  reuse1.pass  reuse2.pass  equal1.pass  \
 	  kill1.pass  valid1.pass  valid2.pass  \
 	  exit2.pass  exit3.pass  exit4.pass  exit5.pass  \
-	  join0.pass  join1.pass  join2.pass join3.pass  \
+	  join0.pass  join1.pass  detach1.pass  join2.pass join3.pass  \
 	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
 	  mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
 	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
@@ -115,13 +115,13 @@ PASSES= sizes.pass  loadfree.pass \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  exception1.pass  exception2.pass  exception3.pass  \
-	  cancel9.pass  create3.pass
+	  cancel9.pass  create3.pass  stress1.pass
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
 
 STRESSRESULTS = \
-	  stress1.pass
+	  stress1.stress
 
 STATICRESULTS = \
 	  self1.pass
@@ -274,8 +274,6 @@ benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
 
-stress1.pass:
-
 barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass
 barrier3.pass: barrier2.pass
@@ -317,6 +315,7 @@ create2.pass: create1.pass
 create3.pass:
 delay1.pass:
 delay2.pass: delay1.pass
+detach1.pass: join0.pass
 equal1.pass: create1.pass
 errno1.pass: mutex3.pass
 exception1.pass: cancel4.pass
@@ -396,6 +395,7 @@ spin1.pass:
 spin2.pass: spin1.pass
 spin3.pass: spin2.pass
 spin4.pass: spin3.pass
+stress1.pass: condvar9.pass barrier5.pass
 tsd1.pass: barrier5.pass join1.pass
 tsd2.pass: tsd1.pass
 valid1.pass: join1.pass

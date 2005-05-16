@@ -81,7 +81,7 @@ TESTS	= sizes loadfree \
 	  create1 create2 reuse1 reuse2 equal1 \
 	  kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
-	  join0 join1 join2 join3 \
+	  join0 join1 detach1 join2 join3 \
 	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
@@ -102,7 +102,7 @@ TESTS	= sizes loadfree \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
 	  exception1 exception2 exception3 \
-	  cancel9 create3
+	  cancel9 create3 stress1
 
 STRESSTESTS = \
 	stress1
@@ -184,8 +184,6 @@ benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
 
-stress1.pass:
-
 barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass
 barrier3.pass: barrier2.pass
@@ -228,6 +226,7 @@ create2.pass: create1.pass
 create3.pass:
 delay1.pass: cancel2.pass
 delay2.pass: delay1.pass
+detach1.pass: join0.pass
 equal1.pass: create1.pass
 errno1.pass: mutex3.pass
 exception1.pass: cancel4.pass
@@ -307,6 +306,7 @@ spin1.pass:
 spin2.pass: spin1.pass
 spin3.pass: spin2.pass
 spin4.pass: spin3.pass
+stress1.pass:
 tsd1.pass: barrier5.pass join1.pass
 tsd2.pass: tsd1.pass
 valid1.pass: join1.pass
