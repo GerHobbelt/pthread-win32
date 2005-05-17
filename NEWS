@@ -6,7 +6,7 @@ Bugs fixed
 ----------
 
 * pthread_detach() now reclaims remaining thread resources when called after
-the target thread has terminated. Previously, this thread did nothing in
+the target thread has terminated. Previously, this routine did nothing in
 this case.
 
 New tests
