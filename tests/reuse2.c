@@ -84,27 +84,15 @@ enum {
 };
 
 
-static int dummy = 19;
 static long done = 0;
 
 void * func(void * arg)
 {
-  int i;
-  int j;
-
   sched_yield();
-
-  for (i = 1; i < 10000; i++)
-    {
-      if (i * dummy % dummy == 0)
-	{
-	  j = dummy;
-        }
-    }
 
   InterlockedIncrement(&done);
 
-  return (void *) j; 
+  return (void *) 0; 
 }
  
 int
@@ -126,7 +114,7 @@ main()
       assert(pthread_create(&t[i], &attr, func, NULL) == 0);
     }
 
-  while (NUMTHREADS > done)
+  while (NUMTHREADS > InterlockedExchangeAdd((LPLONG)&done, 0L))
     Sleep(100);
 
   Sleep(100);
