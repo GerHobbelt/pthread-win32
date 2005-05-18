@@ -263,8 +263,6 @@ pthread_win32_thread_detach_np ()
 
       if (sp != NULL) // otherwise Win32 thread with no implicit POSIX handle.
 	{
-	  HANDLE threadH = sp->threadH;
-
 	  ptw32_callUserDestroyRoutines (sp->ptHandle);
 
 	  (void) pthread_mutex_lock (&sp->cancelLock);
@@ -278,11 +276,6 @@ pthread_win32_thread_detach_np ()
 	  if (sp->detachState == PTHREAD_CREATE_DETACHED)
 	    {
 	      ptw32_threadDestroy (sp->ptHandle);
-
-	      if (threadH != 0)
-	        {
-	          CloseHandle (threadH);
-	        }
 
 	      TlsSetValue (ptw32_selfThreadKey->key, NULL);
 	    }
