@@ -38,12 +38,17 @@
 
 #include "test.h"
 
+
+enum {
+  NUMTHREADS = 100
+};
+
 void *
 func(void * arg)
 {
     int i = (int) arg;
 
-    Sleep(i * 100);
+    Sleep(i * 10);
 
     pthread_exit(arg);
 
@@ -54,31 +59,31 @@ func(void * arg)
 int
 main(int argc, char * argv[])
 {
-	pthread_t id[4];
+	pthread_t id[NUMTHREADS];
 	int i;
 
 	/* Create a few threads and then exit. */
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < NUMTHREADS; i++)
 	  {
 	    assert(pthread_create(&id[i], NULL, func, (void *) i) == 0);
 	  }
 
 	/* Some threads will finish before they are detached, some after. */
-	Sleep(2 * 100 + 50);
+	Sleep(NUMTHREADS/2 * 10 + 50);
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < NUMTHREADS; i++)
 	  {
 	    assert(pthread_detach(id[i]) == 0);
 	  }
 
-	Sleep(6 * 100);
+	Sleep(NUMTHREADS * 10 + 100);
 
 	/*
 	 * Check that all threads are now invalid.
 	 * This relies on unique thread IDs - e.g. works with
 	 * pthreads-w32 or Solaris, but may not work for Linux, BSD etc.
 	 */
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < NUMTHREADS; i++)
 	  {
 	    assert(pthread_kill(id[i], 0) == ESRCH);
 	  }
