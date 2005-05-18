@@ -1,11 +1,11 @@
 RELEASE 1.10.0
 -------------
-(Not released yet)
+(2005-05-19)
 
 Bugs fixed
 ----------
 
-* pthread_detach() now reclaims remaining thread resources when called after
+* pthread_detach() now reclaims remaining thread resources if called after
 the target thread has terminated. Previously, this routine did nothing in
 this case.
 
