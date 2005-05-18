@@ -38,6 +38,15 @@
         modify assoc management.
         * pthread_key_delete.c: Modify assoc management.
         * ptw32_tkAssocDestroy.c: Fix error in assoc removal from chains.
+	* pthread.h
+	(_POSIX_THREAD_DESTRUCTOR_ITERATIONS): Define to value specified by
+	POSIX.
+	(_POSIX_THREAD_KEYS_MAX): Define to value specified by POSIX.
+	(PTHREAD_KEYS_MAX): Redefine [upward] to minimum required by POSIX.
+	(SEM_NSEMS_MAX): Define to implementation value.
+	(SEM_VALUE_MAX): Define to implementation value.
+	(_POSIX_SEM_NSEMS_MAX): Redefine to value specified by POSIX.
+	(_POSIX_SEM_VALUE_MAX): Redefine to value specified by POSIX.
 
 2005-05-06  Ross Johnson  <ross at callisto.canberra.edu.au>
 
