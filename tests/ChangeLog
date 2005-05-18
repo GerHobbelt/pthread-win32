@@ -1,3 +1,8 @@
+2005-05-18  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* reuse2.c (main): Must use a read with memory barrier semantics
+	when polling 'done' to force the cache into coherence on MP systems.
+
 2005-05-15  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* detach1.c: New test.
