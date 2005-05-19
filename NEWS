@@ -2,6 +2,21 @@ RELEASE 1.10.0
 -------------
 (2005-05-19)
 
+General
+-------
+This release is a back-port of the bug fixes and new features in release
+2.6.0. To date, version 1 releases remain fully functionally equivalent to
+version 2 releases, including all bug fixes and enhanced compliance. The
+difference is that the version 1 pthread_once routine may be significantly
+less efficient in some situations.
+
+Testing and verification
+------------------------
+This release has been tested (passed the test suite) on both uni-processor
+and multi-processor systems. Thanks to Tim Theisen at TomoTherapy for
+exhaustively running the MP tests and for providing crutial observations
+and data when faults are detected.
+
 Bugs fixed
 ----------
 
