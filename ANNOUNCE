@@ -90,15 +90,19 @@ The following POSIX 1003.1 2001 options are defined and set to -1:
       _POSIX_THREAD_PROCESS_SHARED
 
 
-The following POSIX 1003.1 2001 options are defined and set:
+The following POSIX 1003.1 2001 limits are defined and set:
 
       _POSIX_THREAD_THREADS_MAX
       _POSIX_SEM_VALUE_MAX
       _POSIX_SEM_NSEMS_MAX
-      PTHREAD_DESTRUCTOR_ITERATIONS
-      PTHREAD_KEYS_MAX
+      _POSIX_THREAD_KEYS_MAX
+      _POSIX_THREAD_DESTRUCTOR_ITERATIONS
       PTHREAD_STACK_MIN
       PTHREAD_THREADS_MAX
+      SEM_VALUE_MAX
+      SEM_NSEMS_MAX
+      PTHREAD_KEYS_MAX
+      PTHREAD_DESTRUCTOR_ITERATIONS
       
 
 The following functions are implemented:
