@@ -2,6 +2,18 @@ RELEASE 2.6.0
 -------------
 (2005-05-19)
 
+General
+-------
+All of the bug fixes and new features in this release have been
+back-ported in release 1.10.0.
+
+Testing and verification
+------------------------
+This release has been tested (passed the test suite) on both uni-processor
+and multi-processor systems. Thanks to Tim Theisen at TomoTherapy for
+exhaustively running the MP tests and for providing crutial observations
+and data when faults are detected.
+
 Bugs fixed
 ----------
 
