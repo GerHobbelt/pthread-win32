@@ -1,3 +1,14 @@
+2005-05-24  Mikael Magnusson <mikaelmagnusson at glocalnet.net>
+
+	* GNUmakefile: Patched to allow cross-compile with mingw32 on Linux.
+	It uses macros instead of referencing dlltool, gcc and g++ directly;
+	added a call to ranlib. For example the GC static library can be
+	built with:
+	make CC=i586-mingw32msvc-gcc RC=i586-mingw32msvc-windres \
+	RANLIB=i586-mingw32msvc-ranlib clean GC-static
+	* ptw32_relmillisecs.c (ptw32_relmillisecs): Remove INLINE qualifier
+	macro to link the GCE library.
+
 2005-05-13  Ross Johnson  <ross at callisto.canberra.edu.au>
 
 	* pthread_win32_attach_detach_np.c (pthread_win32_thread_detach_np):
