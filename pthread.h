@@ -191,15 +191,6 @@
 
 /* Try to avoid including windows.h */
 #if defined(__MINGW32__) && defined(__cplusplus)
-/*
- * FIXME: The pthreadGCE.dll build gets linker unresolved errors
- * on pthread_key_create() unless windows.h is included here.
- * It appears to have something to do with an argument type mismatch.
- * Looking at tsd.o with 'nm' shows this line:
- * 00000000 T _pthread_key_create__FPP14pthread_key_t_PFPv_v
- * instead of
- * 00000000 T _pthread_key_create
- */
 #define PTW32_INCLUDE_WINDOWS_H
 #endif
 
@@ -222,26 +213,6 @@ typedef unsigned long DWORD_PTR;
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
-
-#if PTW32_LEVEL >= PTW32_LEVEL_MAX
-
-/* Try to avoid including windows.h */
-#if defined(__MINGW32__) && defined(__cplusplus)
-/*
- * FIXME: The pthreadGCE.dll build gets linker unresolved errors
- * on pthread_key_create() unless windows.h is included here.
- * It appears to have something to do with an argument type mismatch.
- * Looking at tsd.o with 'nm' shows this line:
- * 00000000 T _pthread_key_create__FPP14pthread_key_t_PFPv_v
- * instead of
- * 00000000 T _pthread_key_create
- */
-#define PTW32_INCLUDE_WINDOWS_H
-#endif
-
-#ifdef PTW32_INCLUDE_WINDOWS_H
-#include <windows.h>
-#endif
 
 #ifndef NEED_FTIME
 #include <time.h>
@@ -331,8 +302,6 @@ enum {
 # define DWORD unsigned long
 #endif
 #endif
-
-#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
 #ifndef HAVE_STRUCT_TIMESPEC
 #define HAVE_STRUCT_TIMESPEC 1
@@ -684,14 +653,14 @@ enum {
  * ====================
  * ====================
  */
-#define PTHREAD_ONCE_INIT       { 0, PTW32_FALSE, 0, 0}
+#define PTHREAD_ONCE_INIT       { PTW32_FALSE, PTW32_FALSE, 0, 0}
 
 struct pthread_once_t_
 {
-  int          state;        /* indicates if user function has been executed, or cancelled  */
+  int          done;        /* indicates if user function has been executed */
   int          started;
-  int          eventUsers;
-  HANDLE       event;
+  int          numSemaphoreUsers;
+  HANDLE       semaphore;
 };
 
 

@@ -96,9 +96,13 @@
  * be restricted to the post cancellation tracks. That is, it need not slow
  * the normal cancel-free behaviour. Threads remain independent of other threads.
  *
- * The implementation below adds only a few local (to the thread) integer comparisons
- * to the normal track through the routine and additional bus locking/cache line
- * syncing operations have been avoided altogether in the uncontended track.
+ * Version E
+ * ---------
+ * Substituting a semaphore in place of the event achieves the same effect as an
+ * auto-reset event in the post cancellation phase, and a manual-reset event in the
+ * normal exit phase. The new initter thread does not need to do any post-cancellation
+ * operations, and waiters only need to check that there is a new initter running
+ * before starting to wait. All priority issues and adjustments disappear.
  */
 
 #include "pthread.h"
@@ -110,72 +114,55 @@ ptw32_once_init_routine_cleanup(void * arg)
 {
   pthread_once_t * once_control = (pthread_once_t *) arg;
 
-  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_CANCELLED);
   (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->started, (LONG)PTW32_FALSE);
 
-  if (InterlockedExchangeAdd((LPLONG)&once_control->event, 0L)) /* MBR fence */
+  if (InterlockedExchangeAdd((LPLONG)&once_control->semaphore, 0L)) /* MBR fence */
     {
-      int lasterror = GetLastError ();
-      int lastWSAerror = WSAGetLastError ();
-
-      /*
-       * There are waiters, wake some up.
-       */
-      if (!SetEvent(once_control->event))
-	{
-	  SetLastError (lasterror);
-	  WSASetLastError (lastWSAerror);
-	}
+      ReleaseSemaphore(once_control->semaphore, 1, NULL);
     }
 }
 
-
 int
 pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
-	/*
-	 * ------------------------------------------------------
-	 * DOCPUBLIC
-	 *      If any thread in a process  with  a  once_control  parameter
-	 *      makes  a  call to pthread_once(), the first call will summon
-	 *      the init_routine(), but  subsequent  calls  will  not. The
-	 *      once_control  parameter  determines  whether  the associated
-	 *      initialization routine has been called.  The  init_routine()
-	 *      is complete upon return of pthread_once().
-	 *      This function guarantees that one and only one thread
-	 *      executes the initialization routine, init_routine when
-	 *      access is controlled by the pthread_once_t control
-	 *      key.
-	 *
-	 *      pthread_once() is not a cancelation point, but the init_routine
-	 *      can be. If it's cancelled then the effect on the once_control is
-	 *      as if pthread_once had never been entered.
-	 *
-	 *
-	 * PARAMETERS
-	 *      once_control
-	 *              pointer to an instance of pthread_once_t
-	 *
-	 *      init_routine
-	 *              pointer to an initialization routine
-	 *
-	 *
-	 * DESCRIPTION
-	 *      See above.
-	 *
-	 * RESULTS
-	 *              0               success,
-	 *              EINVAL          once_control or init_routine is NULL
-	 *
-	 * ------------------------------------------------------
-	 */
+     /*
+      * ------------------------------------------------------
+      * DOCPUBLIC
+      *      If any thread in a process  with  a  once_control  parameter
+      *      makes  a  call to pthread_once(), the first call will summon
+      *      the init_routine(), but  subsequent  calls  will  not. The
+      *      once_control  parameter  determines  whether  the associated
+      *      initialization routine has been called.  The  init_routine()
+      *      is complete upon return of pthread_once().
+      *      This function guarantees that one and only one thread
+      *      executes the initialization routine, init_routine when
+      *      access is controlled by the pthread_once_t control
+      *      key.
+      *
+      *      pthread_once() is not a cancelation point, but the init_routine
+      *      can be. If it's cancelled then the effect on the once_control is
+      *      as if pthread_once had never been entered.
+      *
+      *
+      * PARAMETERS
+      *      once_control
+      *              pointer to an instance of pthread_once_t
+      *
+      *      init_routine
+      *              pointer to an initialization routine
+      *
+      *
+      * DESCRIPTION
+      *      See above.
+      *
+      * RESULTS
+      *              0               success,
+      *              EINVAL          once_control or init_routine is NULL
+      *
+      * ------------------------------------------------------
+      */
 {
   int result;
-  int lasterror;
-  int lastWSAerror;
-  int restoreLastError;
-  LONG state;
-  pthread_t self;
-  HANDLE w32Thread = 0;
+  HANDLE sema;
 
   if (once_control == NULL || init_routine == NULL)
     {
@@ -187,67 +174,10 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
       result = 0;
     }
 
-  /*
-   * We want to be invisible to GetLastError() outside of this routine.
-   */
-  lasterror = GetLastError ();
-  lastWSAerror = WSAGetLastError ();
-  restoreLastError = PTW32_FALSE;
-
-  while (!((state = InterlockedExchangeAdd((LPLONG)&once_control->state, 0L)) /* Atomic Read */
-	   & (LONG)PTW32_ONCE_DONE))
+  while (!InterlockedExchangeAdd((LPLONG)&once_control->done, 0L)) /* Atomic Read */
     {
-      LONG cancelled = (state & PTW32_ONCE_CANCELLED);
-
-      if (cancelled)
-	{
-	  /* Boost priority momentarily */
-	  if (!w32Thread)
-	    {
-	      self = pthread_self();
-	      w32Thread = ((ptw32_thread_t *)self.p)->threadH;
-	    }
-	  /*
-	   * Prevent pthread_setschedparam() from changing our priority while we're boosted.
-	   */
-	  pthread_mutex_lock(&((ptw32_thread_t *)self.p)->threadLock);
-	  SetThreadPriority(w32Thread, THREAD_PRIORITY_HIGHEST);
-	}
-
       if (!PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->started, (LONG)PTW32_TRUE))
 	{
-	  if (cancelled)
-	    {
-	      /*
-	       * The previous initter was cancelled.
-	       * We now have a new initter (us) and we need to make the rest wait again.
-	       * Furthermore, we're running at max priority until after we've reset the event
-	       * so we will not be starved by any other threads that may now be looping
-	       * around.
-	       */
-	      if (InterlockedExchangeAdd((LPLONG)&once_control->event, 0L)) /* MBR fence */
-		{
-		  if (!ResetEvent(once_control->event))
-		    {
-		      restoreLastError = PTW32_TRUE;
-		    }
-		}
-
-	      /*
-	       * Any threads entering the wait section and getting out again before
-	       * the event is reset and the CANCELLED state is cleared will, at worst,
-	       * just go around again or, if they suspend and we (the initter) completes before
-	       * they resume, they will see state == DONE and leave immediately.
-	       */
-	      PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_CLEAR);
-
-	      /*
-	       * Restore priority. We catch any changes to this thread's priority
-	       * only if they were done through the POSIX API (i.e. pthread_setschedparam)
-	       */
-	      SetThreadPriority(w32Thread, ((ptw32_thread_t *)self.p)->sched_priority);
-	      pthread_mutex_unlock(&((ptw32_thread_t *)self.p)->threadLock);
-	    }
 
 #ifdef _MSC_VER
 #pragma inline_depth(0)
@@ -261,126 +191,52 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 #pragma inline_depth()
 #endif
 
-	  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_DONE);
+	  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->done, (LONG)PTW32_TRUE);
 
 	  /*
-	   * we didn't create the event.
+	   * we didn't create the semaphore.
 	   * it is only there if there is someone waiting.
-	   * Avoid using the global event_lock but still prevent SetEvent
-	   * from overwriting any 'lasterror' if the event is closed before we
-	   * are done with it.
 	   */
-	  if (InterlockedExchangeAdd((LPLONG)&once_control->event, 0L)) /* MBR fence */
+	  if (InterlockedExchangeAdd((LPLONG)&once_control->semaphore, 0L)) /* MBR fence */
 	    {
-	      if (!SetEvent(once_control->event))
-		{
-		  restoreLastError = PTW32_TRUE;
-		}
+	      ReleaseSemaphore(once_control->semaphore, once_control->numSemaphoreUsers, NULL);
 	    }
 	}
       else
 	{
-	  HANDLE tmpEvent;
+	  InterlockedIncrement((LPLONG)&once_control->numSemaphoreUsers);
 
-	  if (cancelled)
+	  if (!InterlockedExchangeAdd((LPLONG)&once_control->semaphore, 0L)) /* MBR fence */
 	    {
-	      /*
-	       * Restore priority. We catch any changes to this thread's priority
-	       * only if they were done through the POSIX API (i.e. pthread_setschedparam.
-	       */
-	      SetThreadPriority(w32Thread, ((ptw32_thread_t *)self.p)->sched_priority);
-	      pthread_mutex_unlock(&((ptw32_thread_t *)self.p)->threadLock);
-	    }
+	      sema = CreateSemaphore(NULL, 0, INT_MAX, NULL);
 
-	  /*
-	   * wait for init.
-	   * while waiting, create an event to wait on
-	   */
-
-	  if (1 == InterlockedIncrement((LPLONG)&once_control->eventUsers))
-	    {
-	      /*
-	       * RE CANCELLATION:
-	       * If we are the first thread after the initter thread, and the init_routine is cancelled
-	       * while we're suspended at this point in the code:-
-	       * - state will not get set to PTW32_ONCE_DONE;
-	       * - cleanup will not see an event and cannot set it;
-	       * - therefore, we will eventually resume, create an event and wait on it;
-	       * cleanup will set state == CANCELLED before checking for an event, so that
-	       * we will see it and avoid waiting (as for state == DONE). We will go around again and
-	       * we may then become the initter.
-	       * If we are still the only other thread when we get to the end of this block, we will
-	       * have closed the event (good). If another thread beats us to be initter, then we will
-	       * re-enter here (good). In case the old event is reused, the event is always reset by
-	       * the new initter before clearing the CANCELLED state, causing any threads that are
-	       * cycling around the loop to wait again.
-	       * The initter thread is guaranteed to be at equal or higher priority than any waiters
-	       * so no waiters will starve the initter, which might otherwise cause us to loop
-	       * forever.
-	       */
-	      tmpEvent = CreateEvent(NULL, PTW32_TRUE, PTW32_FALSE, NULL);
-	      if (PTW32_INTERLOCKED_COMPARE_EXCHANGE((PTW32_INTERLOCKED_LPLONG)&once_control->event,
-						     (PTW32_INTERLOCKED_LONG)tmpEvent,
+	      if (PTW32_INTERLOCKED_COMPARE_EXCHANGE((PTW32_INTERLOCKED_LPLONG)&once_control->semaphore,
+						     (PTW32_INTERLOCKED_LONG)sema,
 						     (PTW32_INTERLOCKED_LONG)0))
 		{
-		  CloseHandle(tmpEvent);
+		  CloseHandle(sema);
 		}
 	    }
 
 	  /*
-	   * Check 'state' again in case the initting thread has finished or cancelled
-	   * and left before seeing that there was an event to trigger.
+	   * Check 'done' and 'started' again in case the initting thread has finished or cancelled
+	   * and left before seeing that there was a semaphore to release.
 	   */
-
-	  switch (InterlockedExchangeAdd((LPLONG)&once_control->state, 0L))
+	  if (InterlockedExchangeAdd((LPLONG)&once_control->done, 0L) /* Done immediately, or */
+	      || !InterlockedExchangeAdd((LPLONG)&once_control->started, 0L) /* No initter yet, or */
+	      || WaitForSingleObject(once_control->semaphore, INFINITE)) /* Done or Cancelled */
 	    {
-	    case PTW32_ONCE_CLEAR:
-	      {
-		/* Neither DONE nor CANCELLED */
-		if (WAIT_FAILED == WaitForSingleObject(once_control->event, INFINITE))
-		  {
-		    restoreLastError = PTW32_TRUE;
-		    /*
-		     * If the wait failed it's probably because the event is invalid.
-		     * That's possible after a cancellation (but rare) if we got through the
-		     * event create block above while a woken thread was suspended between
-		     * the decrement and exchange below and then resumed before we could wait.
-		     * So we'll yield.
-		     */
-		    Sleep(0);
-		  }
-		break;
-	      }
-	    case PTW32_ONCE_CANCELLED:
-	      {
-		if (once_control->started)
-		  {
-		    /* The new initter hasn't cleared the cancellation yet, so give the
-		     * processor to a more productive thread. */
-		    Sleep(0);
-		  }
-		break;
-	      }
-	    }
-
-	  /* last one out shut off the lights */
-	  if (0 == InterlockedDecrement((LPLONG)&once_control->eventUsers))
-	    {
-	      /* we were last */
-	      if ((tmpEvent = (HANDLE)
-		   PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->event,
-					      (LONG)0)))
+	      if (0 == InterlockedDecrement((LPLONG)&once_control->numSemaphoreUsers))
 		{
-		  CloseHandle(tmpEvent);
+		  /* we were last */
+		  if ((sema = (HANDLE) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->semaphore,
+								  (LONG)0)))
+		    {
+		      CloseHandle(sema);
+		    }
 		}
 	    }
 	}
-    }
-
-  if (restoreLastError)
-    {
-      SetLastError (lasterror);
-      WSASetLastError (lastWSAerror);
     }
 
   /*
@@ -390,5 +246,4 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
    */
 FAIL0:
   return (result);
-
-}				/* pthread_once */
+}                                               /* pthread_once */ 
