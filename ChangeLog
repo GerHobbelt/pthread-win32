@@ -1,4 +1,12 @@
-2005-05-24  Mikael Magnusson <mikaelmagnusson at glocalnet.net>
+2005-05-25  Vladimir Kliatchko  <vladimir at kliatchko.com>
+
+	* pthread_once.c: Eliminate all priority operations and other
+	complexity by replacing the event with a semaphore. The advantage
+	of the change is the ability to release just one waiter if the
+	init_routine thread is cancelled yet still release all waiters when
+	done.
+
+2005-05-24  Mikael Magnusson  <mikaelmagnusson at glocalnet.net>
 
 	* GNUmakefile: Patched to allow cross-compile with mingw32 on Linux.
 	It uses macros instead of referencing dlltool, gcc and g++ directly;
