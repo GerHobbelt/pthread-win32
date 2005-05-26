@@ -411,6 +411,20 @@ make clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling
 make clean GC-static   (to test using GC static lib with C (no EH) applications)
 
 
+Building under Linux using the Mingw32 cross development tools
+--------------------------------------------------------------
+
+You can build the library without leaving Linux by using the Mingw32 cross
+development toolchain. See http://www.libsdl.org/extras/win32/cross/ for
+tools and info. The GNUmakefile contains some support for this, for example:
+
+make CROSS=i386-mingw32msvc- clean GC-inlined
+
+will build pthreadGCn.dll and libpthreadGCn.a (n=version#), provided your
+cross-tools/bin directory is in your PATH (or use the cross-make.sh script
+at the URL above).
+
+
 Building the library as a statically linkable library
 -----------------------------------------------------
 

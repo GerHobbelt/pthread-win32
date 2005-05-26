@@ -41,18 +41,22 @@ LIBDEST	= $(DEVROOT)\DLL
 RM	= rm -f
 MV	= mv -f
 CP	= cp -f
-RC	= windres
 
 # If not.
 #RM	= erase
 #MV	= rename
 #CP	= copy
 
-AR	= ar
-DLLTOOL = dlltool
-CC      = gcc
-CXX     = g++
-RANLIB  = ranlib
+# For cross compiling use e.g.
+# make CROSS=i386-mingw32msvc- clean GC-inlined
+CROSS	= 
+
+AR	= $(CROSS)ar
+DLLTOOL = $(CROSS)dlltool
+CC      = $(CROSS)gcc
+CXX     = $(CROSS)g++
+RANLIB  = $(CROSS)ranlib
+RC	= $(CROSS)windres
 
 OPT	= $(CLEANUP) -O3 -finline-functions
 DOPT	= $(CLEANUP) -g -O0
