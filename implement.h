@@ -325,9 +325,9 @@ struct pthread_rwlockattr_t_
 };
 
 enum ptw32_once_state {
-  PTW32_ONCE_CLEAR     = 0x0,
-  PTW32_ONCE_DONE      = 0x1,
-  PTW32_ONCE_CANCELLED = 0x2
+  PTW32_ONCE_INIT      = 0x0,
+  PTW32_ONCE_STARTED   = 0x1,
+  PTW32_ONCE_DONE      = 0x2
 };
 
 typedef struct {
