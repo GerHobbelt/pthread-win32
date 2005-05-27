@@ -11,6 +11,12 @@ complexity to improve robustness and efficiency.
 All other bug fixes and new features in this release have been
 back-ported in release 1.11.0.
 
+Testing and verification
+------------------------
+This release has been tested (passed the test suite) on both uni-processor
+and multi-processor systems.
+- Tim Theisen
+
 New features
 ------------
 * Support for Mingw cross development tools added to GNUmakefile.
