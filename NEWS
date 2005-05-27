@@ -10,6 +10,12 @@ version 2 releases, including all bug fixes and enhanced compliance. The
 difference is that the version 1 pthread_once routine may be significantly
 less efficient in some situations.
 
+Testing and verification
+------------------------
+This release has been tested (passed the test suite) on both uni-processor
+and multi-processor systems.
+- Tim Theisen
+
 New features
 ------------
 * Support for Mingw cross development tools added to GNUmakefile.

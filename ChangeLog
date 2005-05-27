@@ -1,3 +1,8 @@
+2005-05-27  Alexander Gottwald <alexander.gottwald at s1999.tu-chemnitz.de>
+
+	* pthread.h: Some things, like HANDLE, were only defined if
+	PTW32_LEVEL was >= 3. They should always be defined.
+
 2005-05-24  Mikael Magnusson <mikaelmagnusson at glocalnet.net>
 
 	* GNUmakefile: Patched to allow cross-compile with mingw32 on Linux.

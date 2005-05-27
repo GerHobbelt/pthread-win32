@@ -37,8 +37,8 @@
  * See the README file for an explanation of the pthreads-win32 version
  * numbering scheme and how the DLL is named etc.
  */
-#define PTW32_VERSION 1,10,0,0
-#define PTW32_VERSION_STRING "1, 10, 0, 0\0"
+#define PTW32_VERSION 1,11,0,0
+#define PTW32_VERSION_STRING "1, 11, 0, 0\0"
 
 /* There are three implementations of cancel cleanup.
  * Note that pthread.h is included in both application
@@ -191,15 +191,6 @@
 
 /* Try to avoid including windows.h */
 #if defined(__MINGW32__) && defined(__cplusplus)
-/*
- * FIXME: The pthreadGCE.dll build gets linker unresolved errors
- * on pthread_key_create() unless windows.h is included here.
- * It appears to have something to do with an argument type mismatch.
- * Looking at tsd.o with 'nm' shows this line:
- * 00000000 T _pthread_key_create__FPP14pthread_key_t_PFPv_v
- * instead of
- * 00000000 T _pthread_key_create
- */
 #define PTW32_INCLUDE_WINDOWS_H
 #endif
 
@@ -222,26 +213,6 @@ typedef unsigned long DWORD_PTR;
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
-
-#if PTW32_LEVEL >= PTW32_LEVEL_MAX
-
-/* Try to avoid including windows.h */
-#if defined(__MINGW32__) && defined(__cplusplus)
-/*
- * FIXME: The pthreadGCE.dll build gets linker unresolved errors
- * on pthread_key_create() unless windows.h is included here.
- * It appears to have something to do with an argument type mismatch.
- * Looking at tsd.o with 'nm' shows this line:
- * 00000000 T _pthread_key_create__FPP14pthread_key_t_PFPv_v
- * instead of
- * 00000000 T _pthread_key_create
- */
-#define PTW32_INCLUDE_WINDOWS_H
-#endif
-
-#ifdef PTW32_INCLUDE_WINDOWS_H
-#include <windows.h>
-#endif
 
 #ifndef NEED_FTIME
 #include <time.h>
@@ -318,8 +289,7 @@ enum {
 
 /*
  * To avoid including windows.h we define only those things that we
- * actually need from it. I don't like the potential incompatibility that
- * this creates with future versions of windows.
+ * actually need from it.
  */
 #ifndef PTW32_INCLUDE_WINDOWS_H
 #ifndef HANDLE
@@ -331,8 +301,6 @@ enum {
 # define DWORD unsigned long
 #endif
 #endif
-
-#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
 #ifndef HAVE_STRUCT_TIMESPEC
 #define HAVE_STRUCT_TIMESPEC 1
