@@ -653,12 +653,12 @@ enum {
  * ====================
  * ====================
  */
-#define PTHREAD_ONCE_INIT       { PTW32_FALSE, PTW32_FALSE, 0, 0}
+#define PTHREAD_ONCE_INIT       { 0, 0, 0, 0}
 
 struct pthread_once_t_
 {
-  int          done;        /* indicates if user function has been executed */
-  int          started;
+  int          state;        /* indicates if user function has been executed */
+  int          reserved;
   int          numSemaphoreUsers;
   HANDLE       semaphore;
 };
