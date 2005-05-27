@@ -121,3 +121,6 @@ Anuj Goyal		anuj dot goyal at gmail dot com
 Gottlob Frege		gottlobfrege at  gmail dot com
 					re-implemented pthread_once (version 2)
 					(pthread_once cancellation added by rpj).
+Vladimir Kliatchko	vladimir at kliatchko dot com
+					improvements to pthread_once (version 2)
+

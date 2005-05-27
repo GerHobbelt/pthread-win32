@@ -1,3 +1,23 @@
+RELEASE 2.7.0
+-------------
+(in CVS)
+
+General
+-------
+Improvements to pthread_once remove priority boosting and other
+complexity to improve robustness and efficiency.
+- Vladimir Kliatchko
+
+All other bug fixes and new features in this release have been
+back-ported in release 1.11.0.
+
+New features
+------------
+* Support for Mingw cross development tools added to GNUmakefile.
+Mingw cross tools allow building the libraries on Linux.
+- Mikael Magnusson
+
+
 RELEASE 2.6.0
 -------------
 (2005-05-19)
