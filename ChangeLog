@@ -1,10 +1,16 @@
+2005-05-27  Alexander Gottwald <alexander.gottwald at s1999.tu-chemnitz.de>
+
+	* pthread.h: Some things, like HANDLE, were only defined if
+	PTW32_LEVEL was >= 3 - they should always be defined.
+
 2005-05-25  Vladimir Kliatchko  <vladimir at kliatchko.com>
 
 	* pthread_once.c: Eliminate all priority operations and other
 	complexity by replacing the event with a semaphore. The advantage
 	of the change is the ability to release just one waiter if the
 	init_routine thread is cancelled yet still release all waiters when
-	done.
+	done. Simplify once_control state checks to improve efficiency
+	further.
 
 2005-05-24  Mikael Magnusson  <mikaelmagnusson at glocalnet.net>
 
