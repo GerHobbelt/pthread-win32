@@ -1,3 +1,22 @@
+RELEASE 1.11.0
+-------------
+(in CVS)
+
+General
+-------
+This release is a back-port of the bug fixes and new features in release
+2.7.0. To date, version 1 releases remain fully functionally equivalent to
+version 2 releases, including all bug fixes and enhanced compliance. The
+difference is that the version 1 pthread_once routine may be significantly
+less efficient in some situations.
+
+New features
+------------
+* Support for Mingw cross development tools added to GNUmakefile.
+Mingw cross tools allow building the libraries on Linux.
+- Mikael Magnusson
+
+
 RELEASE 1.10.0
 -------------
 (2005-05-19)
