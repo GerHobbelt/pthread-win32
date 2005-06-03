@@ -324,16 +324,21 @@ struct pthread_rwlockattr_t_
   int pshared;
 };
 
-enum ptw32_once_state {
-  PTW32_ONCE_INIT      = 0x0,
-  PTW32_ONCE_STARTED   = 0x1,
-  PTW32_ONCE_DONE      = 0x2
+/*
+ * MCS lock queue node - see ptw32_MCS_lock.c
+ */
+struct ptw32_mcs_node_t_
+{
+  struct ptw32_mcs_node_t_ **lock;        /* ptr to tail of queue */
+  struct ptw32_mcs_node_t_  *next;        /* ptr to successor in queue */
+  LONG                       readyFlag;   /* set after lock is released by
+                                             predecessor */
+  LONG                       nextFlag;    /* set after 'next' ptr is set by
+                                             successor */
 };
 
-typedef struct {
-  pthread_cond_t cond;
-  pthread_mutex_t mtx;
-} ptw32_once_control_t;
+typedef struct ptw32_mcs_node_t_   ptw32_mcs_local_node_t;
+typedef struct ptw32_mcs_node_t_  *ptw32_mcs_lock_t;
 
 
 struct ThreadKeyAssoc
@@ -611,6 +616,10 @@ extern "C"
   int ptw32_semwait (sem_t * sem);
 
   DWORD ptw32_relmillisecs (const struct timespec * abstime);
+
+  void ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node);
+
+  void ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node);
 
 #ifdef NEED_FTIME
   void ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft);

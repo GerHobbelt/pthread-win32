@@ -175,6 +175,7 @@ SMALL_STATIC_OBJS	= \
 		ptw32_mutex_check_need_init.obj \
 		ptw32_semwait.obj \
 		ptw32_relmillisecs.obj \
+		ptw32_MCS_lock.obj \
 		sched_get_priority_max.obj \
 		sched_get_priority_min.obj \
 		sched_setscheduler.obj \
@@ -259,6 +260,7 @@ MISC_SRCS	= \
 		pthread_self.c \
 		pthread_setconcurrency.c \
 		ptw32_calloc.c \
+		ptw32_MCS_lock.c \
 		ptw32_new.c \
 		ptw32_reuse.c \
 		ptw32_relmillisecs.c \

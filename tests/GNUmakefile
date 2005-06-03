@@ -86,7 +86,8 @@ TESTS	= sizes loadfree \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
-	  count1 once1 once2 once3 once4 self2 \
+	  count1 \
+	  once1 once2 once3 once4 self2 \
 	  cancel1 cancel2 \
 	  semaphore4 semaphore4t \
 	  barrier1 barrier2 barrier3 barrier4 barrier5 \
