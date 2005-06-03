@@ -657,7 +657,7 @@ enum {
 struct pthread_once_t_
 {
   void * lock;
-  int    done;   /* indicates if user function has been executed or cancelled  */
+  int    init;   /* indicates if user function needs executing  */
 };
 
 

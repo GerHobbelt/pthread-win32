@@ -54,13 +54,13 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
       return EINVAL;
     }
   
-  if (InterlockedExchangeAdd((LPLONG)&once_control->done, 0L)) /* MBR fence */
+  if (InterlockedExchangeAdd((LPLONG)&once_control->init, 0L)) /* MBR fence */
     {
       ptw32_mcs_local_node_t node;
 
       ptw32_mcs_lock_acquire((ptw32_mcs_lock_t *)&once_control->lock, &node);
 
-      if (InterlockedExchangeAdd((LPLONG)&once_control->done, 0L))
+      if (once_control->init)
 	{
 
 #ifdef _MSC_VER
@@ -75,7 +75,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 #pragma inline_depth()
 #endif
 
-	  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->done, 0L);
+	  once_control->init = 0;
 	}
 
 	ptw32_mcs_lock_release(&node);
