@@ -60,7 +60,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 
       ptw32_mcs_lock_acquire((ptw32_mcs_lock_t *)&once_control->lock, &node);
 
-      if (!InterlockedExchangeAdd((LPLONG)&once_control->done, 0L))
+      if (!once_control->done)
 	{
 
 #ifdef _MSC_VER
@@ -75,7 +75,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 #pragma inline_depth()
 #endif
 
-	  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->done, (LONG)PTW32_TRUE);
+	  once_control->done = PTW32_TRUE;
 	}
 
 	ptw32_mcs_lock_release(&node);
