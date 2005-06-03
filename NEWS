@@ -1,21 +1,32 @@
 RELEASE 2.7.0
 -------------
-(in CVS)
+(2005-06-04)
 
 General
 -------
-Improvements to pthread_once remove priority boosting and other
-complexity to improve robustness and efficiency.
-- Vladimir Kliatchko
-
-All other bug fixes and new features in this release have been
-back-ported in release 1.11.0.
+All new features in this release have been back-ported in release 1.11.0,
+including the incorporation of MCS locks in pthread_once, however, versions
+1 and 2 remain incompatible even though they are now identical in
+performance and functionality.
 
 Testing and verification
 ------------------------
 This release has been tested (passed the test suite) on both uni-processor
 and multi-processor systems.
 - Tim Theisen
+
+Bug fixes
+---------
+Pthread_once has been re-implemented to remove priority boosting and other
+complexity to improve robustness. Races for Win32 handles that are not
+recycle-unique have been removed. The general form of pthread_once is now
+the same as that suggested earlier by Alexander Terekhov, but instead of the
+'named mutex', a queue-based lock has been implemented which has the required
+properties of dynamic self initialisation and destruction. This lock is also
+efficient. The ABI is unaffected in as much as the size of pthread_once_t has
+not changed and PTHREAD_ONCE_INIT has not changed, however, applications that
+peek inside pthread_once_t, which is supposed to be opaque, will break.
+- Vladimir Kliatchko
 
 New features
 ------------

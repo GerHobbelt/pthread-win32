@@ -41,6 +41,7 @@
 /* Must be first to define HAVE_INLINABLE_INTERLOCKED_CMPXCHG */
 #include "ptw32_InterlockedCompareExchange.c"
 
+#include "ptw32_MCS_lock.c"
 #include "ptw32_is_attr.c"
 #include "ptw32_processInitialize.c"
 #include "ptw32_processTerminate.c"

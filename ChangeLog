@@ -1,3 +1,26 @@
+2005-05-13  Ross Johnson  <ross at callisto.canberra.edu.au>
+
+	* pthread_kill.c (pthread_kill): Remove check for Win32 thread
+	priority (to confirm HANDLE validity). Useless since thread HANDLEs
+	a not recycle-unique.
+
+2005-05-30  Vladimir Kliatchko  <vladimir at kliatchko.com>
+
+	* pthread_once.c: Re-implement using an MCS queue-based lock. The form
+	of pthread_once is as proposed by Alexander Terekhov (see entry of
+	2005-03-13). The MCS lock implementation does not require a unique
+	'name' to identify the lock between threads. Attempts to get the Event
+	or Semaphore based versions of pthread_once to a satisfactory level
+	of robustness have thus far failed. The last problem (avoiding races
+	involving non recycle-unique Win32 HANDLEs) was giving everyone
+	grey hair trying to solve it.
+
+	* ptw32_MCS_lock.c: New MCS queue-based lock implementation. These
+	locks are efficient: they have very low overhead in the uncontended case;
+	are efficient in contention and minimise cache-coherence updates in
+	managing the user level FIFO queue; do not require an ABI change in the
+	library.
+
 2005-05-27  Alexander Gottwald <alexander.gottwald at s1999.tu-chemnitz.de>
 
 	* pthread.h: Some things, like HANDLE, were only defined if
@@ -20,8 +43,6 @@
 	built with:
 	make CC=i586-mingw32msvc-gcc RC=i586-mingw32msvc-windres \
 	RANLIB=i586-mingw32msvc-ranlib clean GC-static
-	* ptw32_relmillisecs.c (ptw32_relmillisecs): Remove INLINE qualifier
-	macro to link the GCE library.
 
 2005-05-13  Ross Johnson  <ross at callisto.canberra.edu.au>
 

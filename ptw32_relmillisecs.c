@@ -44,7 +44,7 @@
 #endif
 
 
-DWORD
+INLINE DWORD
 ptw32_relmillisecs (const struct timespec * abstime)
 {
   const int64_t NANOSEC_PER_MILLISEC = 1000000;

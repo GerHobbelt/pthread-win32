@@ -76,6 +76,8 @@ Alexander Terekhov	TEREKHOV at de dot ibm dot com
 					enhancements to semaphores;
 					enhancements to mutexes;
 					new mutex implementation in 'futex' style;
+					suggested a robust implementation of pthread_once
+					similar to that implemented by V.Kliathcko;
 					system clock change handling re CV timeouts;
 					bug fixes.
 Thomas Pfaff		tpfaff at gmx dot net
@@ -122,5 +124,6 @@ Gottlob Frege		gottlobfrege at  gmail dot com
 					re-implemented pthread_once (version 2)
 					(pthread_once cancellation added by rpj).
 Vladimir Kliatchko	vladimir at kliatchko dot com
-					improvements to pthread_once (version 2)
-
+					reimplemented pthread_once with the same form
+					as described by A.Terekhov (later version 2);
+					implementation of MCS (Mellor-Crummey/Scott) locks.

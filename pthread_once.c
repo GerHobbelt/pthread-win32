@@ -39,147 +39,48 @@
 
 
 static void PTW32_CDECL
-ptw32_once_init_routine_cleanup(void * arg)
+ptw32_once_on_init_cancel (void * arg)
 {
-  pthread_once_t * once_control = (pthread_once_t *) arg;
-
-  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, (LONG)PTW32_ONCE_INIT);
-
-  if (InterlockedExchangeAdd((LPLONG)&once_control->semaphore, 0L)) /* MBR fence */
-    {
-      ReleaseSemaphore(once_control->semaphore, 1, NULL);
-    }
+  /* when the initting thread is cancelled we have to release the lock */
+  ptw32_mcs_local_node_t *node = (ptw32_mcs_local_node_t *)arg;
+  ptw32_mcs_lock_release(node);
 }
 
 int
 pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
-     /*
-      * ------------------------------------------------------
-      * DOCPUBLIC
-      *      If any thread in a process  with  a  once_control  parameter
-      *      makes  a  call to pthread_once(), the first call will summon
-      *      the init_routine(), but  subsequent  calls  will  not. The
-      *      once_control  parameter  determines  whether  the associated
-      *      initialization routine has been called.  The  init_routine()
-      *      is complete upon return of pthread_once().
-      *      This function guarantees that one and only one thread
-      *      executes the initialization routine, init_routine when
-      *      access is controlled by the pthread_once_t control
-      *      key.
-      *
-      *      pthread_once() is not a cancelation point, but the init_routine
-      *      can be. If it's cancelled then the effect on the once_control is
-      *      as if pthread_once had never been entered.
-      *
-      *
-      * PARAMETERS
-      *      once_control
-      *              pointer to an instance of pthread_once_t
-      *
-      *      init_routine
-      *              pointer to an initialization routine
-      *
-      *
-      * DESCRIPTION
-      *      See above.
-      *
-      * RESULTS
-      *              0               success,
-      *              EINVAL          once_control or init_routine is NULL
-      *
-      * ------------------------------------------------------
-      */
 {
-  int result;
-  int state;
-  HANDLE sema;
-
   if (once_control == NULL || init_routine == NULL)
     {
-      result = EINVAL;
-      goto FAIL0;
+      return EINVAL;
     }
-  else
+  
+  if (!InterlockedExchangeAdd((LPLONG)&once_control->done, 0)) /* MBR fence */
     {
-      result = 0;
-    }
+      ptw32_mcs_local_node_t node;
 
-  while ((state =
-	  PTW32_INTERLOCKED_COMPARE_EXCHANGE((PTW32_INTERLOCKED_LPLONG)&once_control->state,
-					     (PTW32_INTERLOCKED_LONG)PTW32_ONCE_STARTED,
-					     (PTW32_INTERLOCKED_LONG)PTW32_ONCE_INIT))
-	 != PTW32_ONCE_DONE)
-    {
-      if (PTW32_ONCE_INIT == state)
-        {
+      ptw32_mcs_lock_acquire((ptw32_mcs_lock_t *)&once_control->lock, &node);
+
+      if (!InterlockedExchangeAdd((LPLONG)&once_control->done, 0L))
+	{
 
 #ifdef _MSC_VER
 #pragma inline_depth(0)
 #endif
 
-          pthread_cleanup_push(ptw32_once_init_routine_cleanup, (void *) once_control);
-          (*init_routine)();
-          pthread_cleanup_pop(0);
+	  pthread_cleanup_push(ptw32_once_on_init_cancel, (void *)&node);
+	  (*init_routine)();
+	  pthread_cleanup_pop(0);
 
 #ifdef _MSC_VER
 #pragma inline_depth()
 #endif
 
-          (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->state, 
-                                            (LONG)PTW32_ONCE_DONE);
+	  (void) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->done, (LONG)PTW32_TRUE);
+	}
 
-          /*
-           * we didn't create the semaphore.
-           * it is only there if there is someone waiting.
-           */
-          if (InterlockedExchangeAdd((LPLONG)&once_control->semaphore, 0L)) /* MBR fence */
-            {
-              ReleaseSemaphore(once_control->semaphore, 
-                               once_control->numSemaphoreUsers, NULL);
-            }
-        }
-      else
-        {
-          InterlockedIncrement((LPLONG)&once_control->numSemaphoreUsers);
-
-          if (!InterlockedExchangeAdd((LPLONG)&once_control->semaphore, 0L)) /* MBR fence */
-            {
-              sema = CreateSemaphore(NULL, 0, INT_MAX, NULL);
-
-              if (PTW32_INTERLOCKED_COMPARE_EXCHANGE((PTW32_INTERLOCKED_LPLONG)&once_control->semaphore,
-						     (PTW32_INTERLOCKED_LONG)sema,
-						     (PTW32_INTERLOCKED_LONG)0))
-                {
-                  CloseHandle(sema);
-                }
-            }
-
-          /*
-           * Check 'state' again in case the initting thread has finished or
-	   * cancelled and left before seeing that there was a semaphore.
-           */
-          if (InterlockedExchangeAdd((LPLONG)&once_control->state, 0L) == PTW32_ONCE_STARTED)
-            {
-              WaitForSingleObject(once_control->semaphore, INFINITE);
-            }
-
-          if (0 == InterlockedDecrement((LPLONG)&once_control->numSemaphoreUsers))
-            {
-              /* we were last */
-              if ((sema =
-		   (HANDLE) PTW32_INTERLOCKED_EXCHANGE((LPLONG)&once_control->semaphore, (LONG)0)))
-                {
-                  CloseHandle(sema);
-                }
-            }
-        }
+	ptw32_mcs_lock_release(&node);
     }
 
-  /*
-   * ------------
-   * Failure Code
-   * ------------
-   */
-FAIL0:
-  return (result);
-}                               /* pthread_once */
+  return 0;
+
+}				/* pthread_once */

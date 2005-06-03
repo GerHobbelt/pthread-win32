@@ -24,6 +24,7 @@ main()
   printf("%30s %4d\n", "pthread_rwlockattr_t_", sizeof(struct pthread_rwlockattr_t_));
   printf("%30s %4d\n", "pthread_once_t_", sizeof(struct pthread_once_t_));
   printf("%30s %4d\n", "ptw32_cleanup_t", sizeof(struct ptw32_cleanup_t));
+  printf("%30s %4d\n", "ptw32_mcs_node_t_", sizeof(struct ptw32_mcs_node_t_));
   printf("%30s %4d\n", "sched_param", sizeof(struct sched_param));
   printf("-------------------------------\n");
 
