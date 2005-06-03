@@ -92,7 +92,7 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 
 #if defined(__MINGW32__)
 #include <stdint.h>
-#elif defined(__BORLANDC__) || defined(__WATCOMC__)
+#elif defined(__BORLANDC__)
 #define int64_t ULONGLONG
 #else
 #define int64_t _int64
@@ -325,23 +325,20 @@ struct pthread_rwlockattr_t_
 };
 
 /*
- * Values stored in once_control->done.
- * 'done' use to be just true or false, but we can add cancellability
- * of the init_routine by re-using 'done' to store multiple flags
- * without changing the ABI. Previously, the initial value of 'done'
- * was FALSE (0), and the new initial value is still zero (0).
+ * MCS lock queue node - see ptw32_MCS_lock.c
  */
-enum {
-  PTW32_ONCE_CLEAR = 0x0,
-  PTW32_ONCE_DONE = 0x1,
-  PTW32_ONCE_CANCELLED = 0x2
+struct ptw32_mcs_node_t_
+{
+  struct ptw32_mcs_node_t_ **lock;        /* ptr to tail of queue */
+  struct ptw32_mcs_node_t_  *next;        /* ptr to successor in queue */
+  LONG                       readyFlag;   /* set after lock is released by
+                                             predecessor */
+  LONG                       nextFlag;    /* set after 'next' ptr is set by
+                                             successor */
 };
 
-/* Global cond+mutex for once_control management */
-typedef struct {
-  pthread_cond_t cond;
-  pthread_mutex_t mtx;
-} ptw32_once_control_t;
+typedef struct ptw32_mcs_node_t_   ptw32_mcs_local_node_t;
+typedef struct ptw32_mcs_node_t_  *ptw32_mcs_lock_t;
 
 
 struct ThreadKeyAssoc
@@ -546,7 +543,6 @@ extern CRITICAL_SECTION ptw32_cond_list_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
 extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
 extern CRITICAL_SECTION ptw32_spinlock_test_init_lock;
-extern ptw32_once_control_t ptw32_once_control;
 
 #ifdef _UWIN
 extern int pthread_count;
@@ -620,6 +616,10 @@ extern "C"
   int ptw32_semwait (sem_t * sem);
 
   DWORD ptw32_relmillisecs (const struct timespec * abstime);
+
+  void ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node);
+
+  void ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node);
 
 #ifdef NEED_FTIME
   void ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft);

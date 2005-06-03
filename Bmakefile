@@ -102,6 +102,7 @@ MISC_SRCS	= \
 		pthread_self.c \
 		pthread_setconcurrency.c \
 		ptw32_calloc.c \
+		ptw32_MCS_lock.c \
 		ptw32_new.c \
 		w32_CancelableWait.c
 
@@ -211,8 +212,8 @@ TSD_SRCS	= \
 all: clean $(DLLS)
 
 realclean: clean
-	if exist *.dll del *.dll
-	if exist *.lib del *.lib
+	if exist pthread*.dll del pthread*.dll
+	if exist pthread*.lib del pthread*.lib
 	if exist *.stamp del *.stamp
 
 clean:

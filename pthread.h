@@ -656,8 +656,8 @@ enum {
 
 struct pthread_once_t_
 {
-  volatile int done;        /* indicates if user function has been executed or cancelled  */
-  int          started;
+  void * lock;
+  int    done;   /* indicates if user function has been executed or cancelled  */
 };
 
 

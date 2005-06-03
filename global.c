@@ -107,15 +107,6 @@ CRITICAL_SECTION ptw32_spinlock_test_init_lock;
  */
 CRITICAL_SECTION ptw32_cond_list_lock;
 
-/*
- * Global condition variable and mutex for once_control management.
- */
-ptw32_once_control_t ptw32_once_control =
-  {
-    PTHREAD_COND_INITIALIZER,
-    PTHREAD_MUTEX_INITIALIZER
-  };
-
 #ifdef _UWIN
 /*
  * Keep a count of the number of threads.

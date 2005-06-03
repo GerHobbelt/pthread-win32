@@ -213,6 +213,7 @@ SMALL_STATIC_OBJS	= \
 		pthread_timechange_handler_np.o \
 		ptw32_is_attr.o \
 		ptw32_cond_check_need_init.o \
+		ptw32_MCS_lock.o \
 		ptw32_mutex_check_need_init.o \
 		ptw32_processInitialize.o \
 		ptw32_processTerminate.o \
@@ -320,6 +321,7 @@ MISC_SRCS	= \
 		pthread_self.c \
 		pthread_setconcurrency.c \
 		ptw32_calloc.c \
+		ptw32_MCS_lock.c \
 		ptw32_new.c \
 		ptw32_reuse.c \
 		w32_CancelableWait.c
@@ -501,7 +503,7 @@ tests:
 	$(CC) -E -o $@ $(CFLAGS) $^
 
 %.s: %.c
-	$(CC) -c $(CFLAGS) -Wa,-ahl $^ > $@
+	$(CC) -c $(CFLAGS) -DPTW32_BUILD_INLINED -Wa,-ahl $^ > $@
 
 %.o: %.rc
 	$(RC) $(RCFLAGS) $(CLEANUP) -o $@ $<
