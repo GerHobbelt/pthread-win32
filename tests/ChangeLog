@@ -1,8 +1,3 @@
-2005-06-02  Ross Johnson  <rpj@callisto.canberra.edu.au>
-
-	* mcs1.c: New test for MCS queue-based locks.
-	* mcs2.c: Likewise.
-
 2005-05-18  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* reuse2.c (main): Must use a read with memory barrier semantics
