@@ -1,3 +1,9 @@
+2005-06-12  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* stress1.c (millisecondsFromNow): Remove limit 0 <= millisecs < 1000;
+	now works for -INT_MAX <= millisecs <= INT_MAX; not needed for
+	stress1.c but should be general anyway.
+
 2005-05-18  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* reuse2.c (main): Must use a read with memory barrier semantics

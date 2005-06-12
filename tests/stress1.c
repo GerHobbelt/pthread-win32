@@ -117,15 +117,17 @@ millisecondsFromNow (struct timespec * time, int millisecs)
   /* get current system time and add millisecs */
   _ftime(&currSysTime);
 
-  nanosecs = ((int64_t) (millisecs + currSysTime.millitm)) * NANOSEC_PER_MILLISEC;
+  secs = (int64_t)(currSysTime.time + (millisecs / 1000));
+  nanosecs = ((int64_t) (millisecs%1000 + currSysTime.millitm)) * NANOSEC_PER_MILLISEC;
   if (nanosecs >= NANOSEC_PER_SEC)
     {
-      secs = currSysTime.time + 1;
-      nanosecs %= NANOSEC_PER_SEC;
+      secs++;
+      nanosecs -= NANOSEC_PER_SEC;
     }
-  else
+  else if (nanosecs < 0)
     {
-      secs = currSysTime.time;
+      secs--;
+      nanosecs += NANOSEC_PER_SEC;
     }
 
   time->tv_nsec = (long)nanosecs;
