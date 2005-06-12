@@ -105,6 +105,8 @@ enum {
 
 /*
  * Returns abstime 'milliseconds' from 'now'.
+ *
+ * Works for: -INT_MAX <= millisecs <= INT_MAX
  */
 struct timespec *
 millisecondsFromNow (struct timespec * time, int millisecs)
@@ -117,7 +119,7 @@ millisecondsFromNow (struct timespec * time, int millisecs)
   /* get current system time and add millisecs */
   _ftime(&currSysTime);
 
-  secs = (int64_t)(currSysTime.time + (millisecs / 1000));
+  secs = (int64_t)(currSysTime.time) + (millisecs / 1000);
   nanosecs = ((int64_t) (millisecs%1000 + currSysTime.millitm)) * NANOSEC_PER_MILLISEC;
   if (nanosecs >= NANOSEC_PER_SEC)
     {
