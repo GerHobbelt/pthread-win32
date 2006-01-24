@@ -41,6 +41,10 @@
 #define PTW32_PROGCTR(Context)  ((Context).Eip)
 #endif
 
+#if defined (_M_IA64)
+#define PTW32_PROGCTR(Context)  ((Context).StIIP)
+#endif
+
 #if defined(_MIPS_)
 #define PTW32_PROGCTR(Context)  ((Context).Fir)
 #endif

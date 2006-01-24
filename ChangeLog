@@ -1,3 +1,7 @@
+2006-01-25  Prashant Thakre <prashant.thakre at gmail.com>
+
+	* pthread_cancel.c: Added _M_IA64 register context support.
+
 2005-05-13  Ross Johnson  <ross at callisto.canberra.edu.au>
 
 	* pthread_kill.c (pthread_kill): Remove check for Win32 thread
