@@ -6,7 +6,7 @@ This file is Copyrighted
 
     This file is covered under the following Copyright:
 
-	Copyright (C) 2001 Ross P. Johnson
+	Copyright (C) 2001,2006 Ross P. Johnson
 	All rights reserved.
 
 	Everyone is permitted to copy and distribute verbatim copies
@@ -45,9 +45,9 @@ Pthreads-win32 is covered by the GNU Lesser General Public License
 
     The contact addresses for pthreads-win32 is as follows:
 
-	Web:	http://sources.redhat.com/pthreads-win32
-        Email:  Ross Johnson <rpj@ise.canberra.edu.au>, or
-                Ross.Johnson@canberra.edu.au
+        Web:	http://sources.redhat.com/pthreads-win32
+        Email:  Ross Johnson
+                Please use: Firstname.Lastname@homemail.com.au
 
 
 
@@ -60,7 +60,7 @@ Pthreads-win32 copyrights and exception files
 
 	Pthreads-win32 - POSIX Threads Library for Win32
 	Copyright(C) 1998 John E. Bossom
-	Copyright(C) 1999,2002 Pthreads-win32 contributors
+	Copyright(C) 1999,2006 Pthreads-win32 contributors
 
 	The current list of contributors is contained
         in the file CONTRIBUTORS included with the source
@@ -68,7 +68,8 @@ Pthreads-win32 copyrights and exception files
 	can also be seen at the following WWW location:
         http://sources.redhat.com/pthreads-win32/contributors.html
 
-	Contact Email: rpj@ise.canberra.edu.au
+    Contact Email: Ross Johnson
+                   Please use: Firstname.Lastname@homemail.com.au
 
     These files are not covered under one of the Copyrights listed above:
 
