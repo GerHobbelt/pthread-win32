@@ -134,7 +134,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 
 	      if ((s->sem = CreateSemaphore (NULL,	/* Always NULL */
 					     (long) 0,	/* Force threads to wait */
-					     (long) _POSIX_SEM_VALUE_MAX,	/* Maximum value */
+					     (long) SEM_VALUE_MAX,	/* Maximum value */
 					     NULL)) == 0)	/* Name */
 		{
 		  (void) pthread_mutex_destroy(&s->lock);

@@ -89,7 +89,7 @@ TESTS	= sizes loadfree \
 	  count1 \
 	  once1 once2 once3 once4 self2 \
 	  cancel1 cancel2 \
-	  semaphore4 semaphore4t \
+	  semaphore4 semaphore4t semaphore5 \
 	  barrier1 barrier2 barrier3 barrier4 barrier5 \
 	  tsd1 tsd2 delay1 delay2 eyal1 \
 	  condvar3 condvar3_1 condvar3_2 condvar3_3 \
@@ -302,6 +302,7 @@ semaphore2.pass:
 semaphore3.pass: semaphore2.pass
 semaphore4.pass: semaphore3.pass cancel1.pass
 semaphore4t.pass: semaphore4.pass
+semaphore5.pass: semaphore4.pass
 sizes.pass:
 spin1.pass:
 spin2.pass: spin1.pass

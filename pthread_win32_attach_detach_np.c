@@ -91,10 +91,21 @@ pthread_win32_process_attach_np ()
 
 #endif
 
+#ifdef WINCE
+
+  /*
+   * Load COREDLL and try to get address of InterlockedCompareExchange
+   */
+  ptw32_h_kernel32 = LoadLibrary (TEXT ("COREDLL.DLL"));
+
+#else
+
   /*
    * Load KERNEL32 and try to get address of InterlockedCompareExchange
    */
   ptw32_h_kernel32 = LoadLibrary (TEXT ("KERNEL32.DLL"));
+
+#endif
 
   ptw32_interlocked_compare_exchange =
     (PTW32_INTERLOCKED_LONG (WINAPI *)

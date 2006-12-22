@@ -1,3 +1,28 @@
+RELEASE 2.8.0
+-------------
+(2006-12-22)
+
+General
+-------
+New bug fixes in this release since 2.7.0 have not been applied to the
+version 1.x.x series. It is probably time to drop version 1.
+
+Testing and verification
+------------------------
+This release has not yet been tested on SMP architechtures. All tests pass
+on a uni-processor system.
+
+Bug fixes
+---------
+Sem_destroy could return EBUSY even though no threads were waiting on the 
+semaphore. Other races around invalidating semaphore structs (internally)
+have been removed as well.
+
+New tests
+---------
+semaphore5.c - tests the bug fix referred to above.
+
+
 RELEASE 2.7.0
 -------------
 (2005-06-04)

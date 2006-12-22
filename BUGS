@@ -126,3 +126,8 @@ implement all the same safeguards as condition variables, making them much
 
 The workaround is to ensure that no more than "count" threads attempt to wait
 at the barrier.
+
+5. Canceling a thread blocked on pthread_once appears not to work in the MSVC++
+version of the library "pthreadVCE.dll". The test case "once3.c" hangs. I have no
+clues on this at present. All other versions pass this test ok - pthreadsVC.dll,
+pthreadsVSE.dll, pthreadsGC.dll and pthreadsGCE.dll. 
