@@ -1,3 +1,24 @@
+2006-12-20  Ross Johnson <ross.johnson@homemail.com.au>
+
+        * sem_destroy.c: Fix the race involving invalidation of the sema;
+        fix incorrect return of EBUSY resulting from the mutex trylock
+        on the private mutex guard.
+        * sem_wait.c: Add check for invalid sem_t after acquiring the
+        sem_t state guard mutex and before affecting changes to sema state.
+        * sem_trywait.c: Likewise.
+        * sem_timedwait.c: Likewise.
+        * sem_getvalue.c: Likewise.
+        * sem_post.c: Similar.
+        * sem_post_multiple.c: Likewise.
+        * sem_init.c: Set max Win32 semaphore count to SEM_VALUE_MAX (was
+        _POSIX_SEM_VALUE_MAX, which is a lower value - the minimum).
+
+	* pthread_win32_attach_detach_np.c (pthread_win32_process_attach_np):
+	Load COREDLL.DLL under WINCE to check existence of
+	InterlockedCompareExchange() routine. This used to be done to test
+	for TryEnterCriticalSection() but was removed when this was no
+	longer needed.
+
 2006-01-25  Prashant Thakre <prashant.thakre at gmail.com>
 
 	* pthread_cancel.c: Added _M_IA64 register context support.

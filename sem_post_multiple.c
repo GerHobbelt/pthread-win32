@@ -86,6 +86,15 @@ sem_post_multiple (sem_t * sem, int count)
     }
   else if ((result = pthread_mutex_lock (&s->lock)) == 0)
     {
+      /* See sem_destroy.c
+       */
+      if (*sem == NULL)
+        {
+          (void) pthread_mutex_unlock (&s->lock);
+          result = EINVAL;
+          return -1;
+        }
+
       if (s->value <= (SEM_VALUE_MAX - count))
 	{
 	  waiters = -s->value;

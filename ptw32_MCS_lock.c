@@ -50,8 +50,8 @@
  * operations required to add or remove nodes from the queue do not trigger
  * cache-coherence updates.
  *
- * Like 'named' mutexes, MCS locks consume system recourses transiently -
- * they are able to acquire and free recourses automatically - but MCS
+ * Like 'named' mutexes, MCS locks consume system resources transiently -
+ * they are able to acquire and free resources automatically - but MCS
  * locks do not require any unique 'name' to identify the lock to all
  * threads using it.
  *

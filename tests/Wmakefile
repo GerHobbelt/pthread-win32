@@ -95,7 +95,7 @@ PASSES	= sizes.pass  loadfree.pass &
 	  once1.pass  once2.pass  once3.pass  once4.pass  tsd1.pass  &
 	  self2.pass  &
 	  cancel1.pass  cancel2.pass  &
-	  semaphore4.pass semaphore4t.pass  &
+	  semaphore4.pass semaphore4t.pass semaphore5.pass &
 	  delay1.pass  delay2.pass  eyal1.pass  &
 	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  &
 	  condvar4.pass  condvar5.pass  condvar6.pass  &
@@ -333,6 +333,7 @@ semaphore2.pass:
 semaphore3.pass: semaphore2.pass
 semaphore4.pass: semaphore3.pass cancel1.pass
 semaphore4t.pass: semaphore4.pass
+semaphore5.pass: semaphore4.pass
 sizes.pass:
 spin1.pass:
 spin2.pass: spin1.pass
