@@ -1,4 +1,20 @@
-2006-12-20  Ross Johnson <ross.johnson@homemail.com.au>
+2007-01-04  Ross Johnson <ross.johnson at homemail dot com dot au>
+
+        * ptw32_InterlockedCompareExchange.c: Conditionally skip for
+        Win64 as not required.
+        * pthread_win32_attach_detach_np.c (pthread_win32_process_attach_np):
+        Test for InterlockedCompareExchange is not required for Win64.
+        * context.h: New file. Included by pthread_cancel.h and any tests
+        that need it (e.g. context1.c).
+        * pthread_cancel.c: Architecture-dependent context macros moved
+        to context.h.
+
+2007-01-04  Kip Streithorst <KSTREITH at ball dot com>
+
+        * implement.h (PTW32_INTERLOCKED_COMPARE_EXCHANGE): Add Win64
+        support.
+        
+2006-12-20  Ross Johnson <ross.johnson at homemail dot com dot au>
 
         * sem_destroy.c: Fix the race involving invalidation of the sema;
         fix incorrect return of EBUSY resulting from the mutex trylock

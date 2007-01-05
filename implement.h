@@ -667,7 +667,11 @@ extern "C"
  * See ptw32_InterlockedCompareExchange.c
  */
 #ifndef PTW32_INTERLOCKED_COMPARE_EXCHANGE
+#ifdef _WIN64
+#define PTW32_INTERLOCKED_COMPARE_EXCHANGE _InterlockedCompareExchange
+#else
 #define PTW32_INTERLOCKED_COMPARE_EXCHANGE ptw32_interlocked_compare_exchange
+#endif
 #endif
 
 #ifndef PTW32_INTERLOCKED_EXCHANGE
