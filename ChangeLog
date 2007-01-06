@@ -1,3 +1,47 @@
+2007-01-06  Ross Johnson <ross.johnson at homemail dot com dot au>
+
+        * ptw32_semwait.c: Add check for invalid sem_t after acquiring the
+        sem_t state guard mutex and before affecting changes to sema state.
+                
+2007-01-06  Marcel Ruff <mr at marcelruff dot info>
+
+        * error.c: Fix reference to pthread handle exitStatus member for
+        builds that use NEED_ERRNO (i.e. WINCE).
+        * context.h: Add support for ARM processor (WinCE).
+        * mutex.c (process.h): Exclude for WINCE.
+        * create.c: Likewise.
+        * exit.c: Likewise.
+        * implement.h: Likewise.
+        * pthread_detach.c (signal.h): Exclude for WINCE.
+        * pthread_join.c: Likewise.
+        * pthread_kill.c: Likewise.
+        * pthread_rwlock_init.c (errno.h): Remove - included by pthread.h.
+        * pthread_rwlock_destroy.c: Likewise.
+        * pthread_rwlock_rdlock.c: Likewise.
+        * pthread_rwlock_timedrdlock.c: Likewise.
+        * pthread_rwlock_timedwrlock.c: Likewise.
+        * pthread_rwlock_tryrdlock.c: Likewise.
+        * pthread_rwlock_trywrlock.c: likewise.
+        * pthread_rwlock_unlock.c: Likewise.
+        * pthread_rwlock_wrlock.c: Likewise.
+        * pthread_rwlockattr_destroy.c: Likewise.
+        * pthread_rwlockattr_getpshared.c: Likewise.
+        * pthread_rwlockattr_init.c: Likewise.
+        * pthread_rwlockattr_setpshared.c: Likewise.
+
+2007-01-06  Romano Paolo Tenca <rotenca at telvia dot it>
+
+        * pthread_cond_destroy.c: Replace sem_wait() with non-cancelable
+        ptw32_semwait() since pthread_cond_destroy() is not a cancelation
+        point.
+        * implement.h (ptw32_spinlock_check_need_init): Add prototype.
+        * ptw32_MCS_lock.c: Reverse order of includes.
+
+2007-01-06  Eric Berge <eric dot berge at quantum dot com>
+
+        * pthread_cond_destroy.c: Add LeaveCriticalSection before returning
+        after errors.
+
 2007-01-04  Ross Johnson <ross.johnson at homemail dot com dot au>
 
         * ptw32_InterlockedCompareExchange.c: Conditionally skip for

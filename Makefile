@@ -27,7 +27,7 @@ STATIC_STAMPS	= pthreadVCE$(DLL_VER).static pthreadVSE$(DLL_VER).static pthreadV
 OPTIM	= /O2 /Ob2
 OPTIMD	=
 
-CFLAGS	= /W3 /MD /nologo /Yd /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
+CFLAGS	= /W3 /MD /nologo /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
 CFLAGSD	= /Zi $(CFLAGS)
 
 

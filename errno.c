@@ -84,7 +84,7 @@ _errno (void)
     }
   else
     {
-      result = &(self->ptErrno);
+      result = (int *)(&self.p->exitStatus);
     }
 
   return (result);

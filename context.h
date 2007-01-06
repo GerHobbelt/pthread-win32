@@ -47,7 +47,7 @@
 #define PTW32_PROGCTR(Context)  ((Context).StIIP)
 #endif
 
-#if defined(_MIPS_)
+#if defined(_MIPS_) || defined(MIPS)
 #define PTW32_PROGCTR(Context)  ((Context).Fir)
 #endif
 
@@ -61,6 +61,10 @@
 
 #if defined(_AMD64_) || defined(__amd64__)
 #define PTW32_PROGCTR(Context)  ((Context).Rip)
+#endif
+
+#if defined(_ARM_) || defined(ARM)
+#define PTW32_PROGCTR(Context)  ((Context).Pc)
 #endif
 
 #if !defined(PTW32_PROGCTR)
