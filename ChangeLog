@@ -1,3 +1,8 @@
+2007-01-07  Sinan Kaya <sinan.kaya at siemens dot com>
+
+        * need_errno.h: Fix declaration of _errno - the local version of
+        _errno() is used, e.g. by WinCE.
+
 2007-01-06  Ross Johnson <ross.johnson at homemail dot com dot au>
 
         * ptw32_semwait.c: Add check for invalid sem_t after acquiring the
