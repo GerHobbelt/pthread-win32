@@ -124,7 +124,7 @@ pthread_delay_np (const struct timespec *interval);
         [EINVAL]   The value specified by interval is invalid. 
 
 int
-pthread_num_processors_np
+pthread_num_processors_np (void)
 
         This routine (found on HPUX systems) returns the number of processors
         in the system. This implementation actually returns the number of
