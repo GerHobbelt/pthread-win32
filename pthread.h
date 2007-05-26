@@ -1184,6 +1184,10 @@ PTW32_DLLPORT void * PTW32_CDECL pthread_timechange_handler_np(void *);
  * Returns the Win32 HANDLE for the POSIX thread.
  */
 PTW32_DLLPORT HANDLE PTW32_CDECL pthread_getw32threadhandle_np(pthread_t thread);
+/*
+ * Returns the win32 thread ID for POSIX thread.
+ */
+PTW32_DLLPORT DWORD PTW32_CDECL pthread_getw32threadid_np (pthread_t thread);
 
 
 /*
