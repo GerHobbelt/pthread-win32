@@ -305,7 +305,7 @@ enum {
 #ifndef HAVE_STRUCT_TIMESPEC
 #define HAVE_STRUCT_TIMESPEC 1
 struct timespec {
-        long tv_sec;
+        time_t tv_sec;
         long tv_nsec;
 };
 #endif /* HAVE_STRUCT_TIMESPEC */
@@ -1249,13 +1249,19 @@ PTW32_DLLPORT int PTW32_CDECL pthreadCancelableTimedWait (HANDLE waitHandle,
         ( strcpy( (_buf), ctime( (_clock) ) ),  \
           (_buf) )
 
+/*
+ * gmtime(tm) and localtime(tm) return 0 if tm represents
+ * a time prior to 1/1/1970.
+ */
 #define gmtime_r( _clock, _result ) \
-        ( *(_result) = *gmtime( (_clock) ), \
-          (_result) )
+        ( gmtime( (_clock) ) \
+             ? (*(_result) = *gmtime( (_clock) ), (_result) ) \
+             : (0) )
 
 #define localtime_r( _clock, _result ) \
-        ( *(_result) = *localtime( (_clock) ), \
-          (_result) )
+        ( localtime( (_clock) ) \
+             ? (*(_result) = *localtime( (_clock) ), (_result) ) \
+             : (0) )
 
 #define rand_r( _seed ) \
         ( _seed == _seed? rand() : rand() )

@@ -74,7 +74,7 @@ _errno (void)
   pthread_t self;
   int *result;
 
-  if ((self = pthread_self ()) == NULL)
+  if ((self = pthread_self ()).p == NULL)
     {
       /*
        * Yikes! unable to allocate a thread!
