@@ -72,8 +72,7 @@ extern "C" {
 
 /* declare reference to errno */
 
-#if     (defined(_MT) || defined(_MD) || defined(_DLL)) &&
-!defined(_MAC)
+#if     (defined(_MT) || defined(_MD) || defined(_DLL)) && !defined(_MAC)
 PTW32_DLLPORT int * __cdecl _errno(void);
 #define errno   (*_errno())
 #else   /* ndef _MT && ndef _MD && ndef _DLL */

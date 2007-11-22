@@ -1,3 +1,18 @@
+2007-11-22  Ivan Pizhenko  <ivanp4 at ua dot fm>
+
+        * pthread.h (gmtime_r) gmtime returns 0 if tm represents a time
+        prior to 1/1/1970. Notice this to prevent raising an exception.
+        * pthread.h (localtime_r) Likewise for localtime.
+
+2007-07-14  Marcel Ruff  <mr at marcelruff dot info>
+
+        * errno.c (_errno): Fix test for pthread_self() success.
+        * need_errno.h: Remove unintentional line wrap from #if line.
+
+2007-07-14  Mike Romanchuk  <mromanchuk at empirix dot com>
+
+        * pthread.h (timespec): Fix tv_sec type.
+
 2007-01-07  Sinan Kaya <sinan.kaya at siemens dot com>
 
         * need_errno.h: Fix declaration of _errno - the local version of
