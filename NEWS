@@ -42,6 +42,9 @@ Various fixes to the QueueUserAPCEx async cancellation helper DLL
 and pthreads code cleanups.
 - Sebastian Gottschalk
 
+Removed potential NULL pointer reference.
+- Robert Kindred
+
 
 RELEASE 2.8.0
 -------------
