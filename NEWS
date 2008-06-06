@@ -1,12 +1,14 @@
 RELEASE 2.9.0
 -------------
-(2007-??-??)
+(2008-??-??)
 
 General
 -------
 New bug fixes in this release since 2.8.0 have NOT been applied to the
 1.x.x series.
 
+Version 1 no longer maintained
+------------------------------
 The 1.x.x series is no longer maintained. However, if you really need a
 version 1, the differences between 1.11.0 and 2.7.0 are very small, mainly
 revolving around the pthread_once_t_ struct. Those differences applied
@@ -35,7 +37,11 @@ Remove potential deadlock condition from pthread_cond_destroy().
 
 Various modifications to build and test for Win64.
 - Kip Streithorst
-        
+
+Various fixes to the QueueUserAPCEx async cancellation helper DLL
+and pthreads code cleanups.
+- Sebastian Gottschalk
+
 
 RELEASE 2.8.0
 -------------

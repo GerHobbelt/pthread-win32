@@ -1,8 +1,19 @@
+2008-06-06  Robert Kindred  <RKindred at SwRI dot edu>
+
+        * ptw32_throw.c (ptw32_throw): Remove possible reference to NULL
+        pointer. (At the same time made the switch block conditionally
+        included only if exitCode is needed - RPJ.)
+
+2008-02-21  Sebastian Gottschalk  <seppig_relay at gmx dot de>
+
+        * pthread_attr_getdetachstate.c (pthread_attr_getdetachstate):
+        Remove potential and superfluous null pointer assignment.
+
 2007-11-22  Ivan Pizhenko  <ivanp4 at ua dot fm>
 
-        * pthread.h (gmtime_r) gmtime returns 0 if tm represents a time
+        * pthread.h (gmtime_r): gmtime returns 0 if tm represents a time
         prior to 1/1/1970. Notice this to prevent raising an exception.
-        * pthread.h (localtime_r) Likewise for localtime.
+        * pthread.h (localtime_r): Likewise for localtime.
 
 2007-07-14  Marcel Ruff  <mr at marcelruff dot info>
 
