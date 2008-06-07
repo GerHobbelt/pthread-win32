@@ -3,6 +3,8 @@
         * ptw32_throw.c (ptw32_throw): Remove possible reference to NULL
         pointer. (At the same time made the switch block conditionally
         included only if exitCode is needed - RPJ.)
+        * pthread_testcancel.c (pthread_testcancel): Remove duplicate and
+        misplaced pthread_mutex_unlock().
 
 2008-02-21  Sebastian Gottschalk  <seppig_relay at gmx dot de>
 
