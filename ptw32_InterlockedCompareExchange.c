@@ -140,7 +140,8 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
    * unsupported processor or compiler.
    */
 
-  result = 0;
+#error Unsupported platform or compiler!
+#endif
 
 #endif
 
@@ -275,7 +276,8 @@ L1:	MOV          eax,dword ptr [ecx]
    * unsupported processor or compiler.
    */
 
-  result = 0;
+#error Unsupported platform or compiler!
+#endif
 
 #endif
 
