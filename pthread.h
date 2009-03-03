@@ -104,7 +104,7 @@
 
 #define PTW32_LEVEL_MAX 3
 
-#if !defined(PTW32_LEVEL)
+#if ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112 )  || !defined(PTW32_LEVEL)
 #define PTW32_LEVEL PTW32_LEVEL_MAX
 /* Include everything */
 #endif
@@ -899,13 +899,13 @@ PTW32_DLLPORT int PTW32_CDECL pthread_attr_setschedparam (pthread_attr_t *attr,
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_setschedpolicy (pthread_attr_t *,
                                          int);
 
-PTW32_DLLPORT int PTW32_CDECL pthread_attr_getschedpolicy (pthread_attr_t *,
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_getschedpolicy (const pthread_attr_t *,
                                          int *);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_setinheritsched(pthread_attr_t * attr,
                                          int inheritsched);
 
-PTW32_DLLPORT int PTW32_CDECL pthread_attr_getinheritsched(pthread_attr_t * attr,
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_getinheritsched(const pthread_attr_t * attr,
                                          int * inheritsched);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_setscope (pthread_attr_t *,
@@ -984,7 +984,7 @@ PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_setpshared (pthread_mutexattr_t 
                                           int pshared);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_settype (pthread_mutexattr_t * attr, int kind);
-PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_gettype (pthread_mutexattr_t * attr, int *kind);
+PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_gettype (const pthread_mutexattr_t * attr, int *kind);
 
 /*
  * Barrier Attribute Functions
