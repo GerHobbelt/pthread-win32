@@ -1,3 +1,11 @@
+2009-03-03  Stephan O'Farrill <stephan dot ofarrill at gmail dot com>
+
+	* pthread_attr_getschedpolicy.c: Add "const" to function parameter
+	in accordance with SUSv3 (POSIX).
+	* pthread_attr_getinheritsched.c: Likewise.
+	* pthread_mutexattr_gettype.c: Likewise.
+
+
 2008-06-06  Robert Kindred  <RKindred at SwRI dot edu>
 
         * ptw32_throw.c (ptw32_throw): Remove possible reference to NULL
