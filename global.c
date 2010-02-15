@@ -49,7 +49,7 @@ pthread_cond_t ptw32_cond_list_tail = NULL;
 
 int ptw32_concurrency = 0;
 
-/* What features have been auto-detaected */
+/* What features have been auto-detected */
 int ptw32_features = 0;
 
 BOOL ptw32_smp_system = PTW32_TRUE;  /* Safer if assumed true initially. */
