@@ -283,7 +283,7 @@ pthread_win32_thread_detach_np ()
        */
       ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
-      if (sp != NULL) // otherwise Win32 thread with no implicit POSIX handle.
+      if (sp != NULL)
 	{
 	  ptw32_callUserDestroyRoutines (sp->ptHandle);
 
@@ -291,10 +291,16 @@ pthread_win32_thread_detach_np ()
 	  sp->state = PThreadStateLast;
 	  /*
 	   * If the thread is joinable at this point then it MUST be joined
-	   * or detached explicitly by the application.
+	   * or detached explicitly by the application because it's
+	   * detachState cannot be changed from this point on.
 	   */
 	  (void) pthread_mutex_unlock (&sp->cancelLock);
 
+	  /*
+	   * No race condition here because detachState will not be changed
+	   * elsewhere now that thread state is PThreadStateLast (set above
+	   * behind mutex).
+	   */
 	  if (sp->detachState == PTHREAD_CREATE_DETACHED)
 	    {
 	      ptw32_threadDestroy (sp->ptHandle);

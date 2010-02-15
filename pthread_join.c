@@ -104,7 +104,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 
   LeaveCriticalSection (&ptw32_thread_reuse_lock);
 
-  if (result == 0)
+  if (0 == result)
     {
       /* 
        * The target thread is joinable and can't be reused before we join it.
@@ -124,7 +124,7 @@ pthread_join (pthread_t thread, void **value_ptr)
 	  /*
 	   * Pthread_join is a cancelation point.
 	   * If we are canceled then our target thread must not be
-	   * detached (destroyed). This is guarranteed because
+	   * detached (destroyed) by us. This is guarranteed because
 	   * pthreadCancelableWait will not return if we
 	   * are canceled.
 	   */

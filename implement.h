@@ -151,6 +151,9 @@ struct ptw32_thread_t_
   int implicit:1;
   void *keys;
   void *nextAssoc;
+#ifdef _POSIX_CXX09_EXTENSIONS
+  int refs;			/* C++ Thread Support Library extension */
+#endif
 };
 
 
