@@ -204,8 +204,6 @@ stresstests: $(CPLIB) $(CPDLL) $(CPHDR) $(STRESSRESULTS)
 
 statictests: $(CPLIB) $(CPDLL) $(CPHDR) $(STATICRESULTS)
 	@ $(ECHO) ALL STATIC TESTS DONE.
-	@ $(ECHO) Build and test the DLL to run all tests.
-	@ $(ECHO) The static test only confirms that the .lib links correctly.
 
 sizes.pass: sizes.exe
 	@ $(ECHO) ... Running $(TEST)$(DLL_VER) test: $*.exe

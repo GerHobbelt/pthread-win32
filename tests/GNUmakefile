@@ -52,7 +52,7 @@ MAKE	= make -k
 XXCFLAGS	= 
 XXLIBS	= -lws2_32 -lgomp
 #CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
-CFLAGS	= -O3 -fopenmp -UNDEBUG -Wall $(XXCFLAGS)
+CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
 BUILD_DIR	= ..
 INCLUDES	= -I.
 
@@ -167,13 +167,13 @@ all:
 	@ $(MAKE) clean GCE
 
 GC:
-	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" all-pass
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-fopenmp -D__CLEANUP_C" all-pass
 
 GCE:
-	$(MAKE) TEST=GCE CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-pass
+	$(MAKE) TEST=GCE CC=g++ XXCFLAGS="-fopenmp -mthreads -D__CLEANUP_CXX" all-pass
 
 GCX:
-	$(MAKE) TEST=GC CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
+	$(MAKE) TEST=GC CC=g++ XXCFLAGS="-fopenmp -mthreads -D__CLEANUP_C" all-pass
 
 GC-bench:
 	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
@@ -182,19 +182,19 @@ GCE-bench:
 	$(MAKE) TEST=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
 
 GC-debug:
-	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" DLL_VER="$(DLL_VER)d" all-pass
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-fopenmp -D__CLEANUP_C" DLL_VER="$(DLL_VER)d" all-pass
 
 GC-static:
-	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" XXLIBS="-lws2_32" DLL="" all-static
 
 GC-stress:
 	$(ECHO) Stress tests can take a long time since they are trying to
 	$(ECHO) expose weaknesses that may be intermittant or statistically rare.
 	$(ECHO) A pass does not prove correctness, but may give greater confidence.
-	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" all-stress
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" XXLIBS="" all-stress
 
 GCE-stress:
-	$(MAKE) TEST=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-stress
+	$(MAKE) TEST=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="" all-stress
 
 all-pass: $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
@@ -207,8 +207,6 @@ all-stress: $(STRESSRESULTS)
 
 all-static: $(STATICRESULTS)
 	@ $(ECHO) ALL STATIC TESTS PASSED! Congratulations!
-	@ $(ECHO) Build and test the DLL to run all tests.
-	@ $(ECHO) This test only confirms that the static lib links correctly.
 
 benchtest1.bench:
 benchtest2.bench:
