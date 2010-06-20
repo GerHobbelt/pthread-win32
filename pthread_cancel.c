@@ -113,16 +113,8 @@ pthread_cancel (pthread_t thread)
     };
 
   /*
-   * FIXME!!
-   *
-   * Can a thread cancel itself?
-   *
-   * The standard doesn't
-   * specify an error to be returned if the target
-   * thread is itself.
-   *
-   * If it may, then we need to ensure that a thread can't
-   * deadlock itself trying to cancel itself asyncronously
+   * For self cancellation we need to ensure that a thread can't
+   * deadlock itself trying to cancel itself asynchronously
    * (pthread_cancel is required to be an async-cancel
    * safe function).
    */

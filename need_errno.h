@@ -59,8 +59,7 @@ extern "C" {
 #endif
 #endif
 
-/* declare reference to errno */
-#ifndef PTW32_STATIC_LIB
+#if !defined(PTW32_STATIC_LIB)
 #  ifdef PTW32_BUILD
 #    define PTW32_DLLPORT __declspec (dllexport)
 #  else

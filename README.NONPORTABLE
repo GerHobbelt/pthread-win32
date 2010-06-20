@@ -156,18 +156,23 @@ pthread_win32_thread_detach_np (void);
 	These functions contain the code normally run via dllMain
 	when the library is used as a dll but which need to be
 	called explicitly by an application when the library
-	is statically linked.
+	is statically linked. As of version 2.9.0 of the library, static
+	builds using either MSC or GCC will call pthread_win32_process_*
+	automatically at application startup and exit respectively.
 
-	You will need to call pthread_win32_process_attach_np() before
-	you can call any pthread routines when statically linking.
+	Otherwise, you will need to call pthread_win32_process_attach_np()
+	before you can call any pthread routines when statically linking.
 	You should call pthread_win32_process_detach_np() before
 	exiting your application to clean up.
 
 	pthread_win32_thread_attach_np() is currently a no-op, but
 	pthread_win32_thread_detach_np() is needed to clean up
 	the implicit pthread handle that is allocated to a Win32 thread if
-	it calls certain pthreads routines. Call this routine when the
+	it calls any pthreads routines. Call this routine when the
 	Win32 thread exits.
+
+	Threads created through pthread_create() do not	need to call
+	pthread_win32_thread_detach_np().
 
 	These functions invariably return TRUE except for
 	pthread_win32_process_attach_np() which will return FALSE
