@@ -33,47 +33,36 @@
  *
  * --------------------------------------------------------------------------
  *
- * Declare a single barrier object, set up a sequence of
- * barrier points to prove lockstepness, and then destroy it.
- *
+ * Set up a series of barriers at different heights and test various numbers
+ * of threads accessing, especially cases where there are more threads than the
+ * barrier height (count), i.e. test contention when the barrier is released.
  */
 
 #include "test.h"
 
 enum {
-  NUMTHREADS = 16,
-  BARRIERS = 10000
+  NUMTHREADS = 15,
+  HEIGHT = 10,
+  BARRIERMULTIPLE = 1000
 };
  
 pthread_barrier_t barrier = NULL;
 pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;
-
-int barrierReleases[BARRIERS + 1];
+LONG totalThreadCrossings;
 
 void *
-func(void * barrierHeight)
+func(void * crossings)
 {
-  int i;
   int result;
   int serialThreads = 0;
 
-  for (i = 1; i < BARRIERS; i++)
+  while ((LONG)crossings >= (LONG)InterlockedIncrement((LPLONG)&totalThreadCrossings))
     {
       result = pthread_barrier_wait(&barrier);
 
-      assert(pthread_mutex_lock(&mx) == 0);
-      barrierReleases[i]++;
-      assert(pthread_mutex_unlock(&mx) == 0);
-      /*
-       * Confirm the correct number of releases from the previous
-       * barrier. We can't do the current barrier yet because there may
-       * still be threads waking up.
-       */
       if (result == PTHREAD_BARRIER_SERIAL_THREAD)
         {
           serialThreads++;
-          assert(barrierReleases[i - 1] == (int) barrierHeight);
-          barrierReleases[i + 1] = 0;
         }
       else if (result != 0)
         {
@@ -92,20 +81,23 @@ main()
   int i, j;
   int result;
   int serialThreadsTotal;
+  LONG Crossings;
   pthread_t t[NUMTHREADS + 1];
 
   for (j = 1; j <= NUMTHREADS; j++)
     {
-      printf("Barrier height = %d\n", j);
+      int height = j<HEIGHT?j:HEIGHT;
 
-      barrierReleases[0] = j;
-      barrierReleases[1] = 0;
+      totalThreadCrossings = 0;
+      Crossings = height * BARRIERMULTIPLE;
 
-      assert(pthread_barrier_init(&barrier, NULL, j) == 0);
+      printf("Threads=%d, Barrier height=%d\n", j, height);
+
+      assert(pthread_barrier_init(&barrier, NULL, height) == 0);
 
       for (i = 1; i <= j; i++)
         {
-          assert(pthread_create(&t[i], NULL, func, (void *) j) == 0);
+          assert(pthread_create(&t[i], NULL, func, (void *) Crossings) == 0);
         }
 
       serialThreadsTotal = 0;
@@ -115,9 +107,7 @@ main()
           serialThreadsTotal += result;
         }
 
-      assert(serialThreadsTotal == BARRIERS - 1);
-      assert(barrierReleases[BARRIERS - 1] == j);
-      assert(barrierReleases[BARRIERS] == 0);
+      assert(serialThreadsTotal == BARRIERMULTIPLE);
 
       assert(pthread_barrier_destroy(&barrier) == 0);
     }
