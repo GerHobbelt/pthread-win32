@@ -64,31 +64,6 @@ attribute_section(".dtors") void *gcc_dtor = on_process_exit;
 attribute_section(".CRT$XCU") void *msc_ctor = on_process_init;
 attribute_section(".CRT$XPU") void *msc_dtor = on_process_exit;
 
-#else
-# warning ==================================================================
-# warning STATIC LINK LIBRARY BUILD
-# warning Auto Initialization/Termination of PTHREADS-WIN32
-# warning
-# warning This compiler is not supported (yet) for auto initialization
-# warning when pthreads-win32 is statically linked. Any linked code must
-# warning call pthread_win32_process_attach_np() and
-# warning pthread_win32_process_detach_np() explicitly.
-# warning See README.NONPORTABLE for the description of those routines.
-# warning ==================================================================
 #endif /* defined(__MINGW32__) || defined(_MSC_VER) */
-
-#warning ==================================================================
-#warning STATIC LINK LIBRARY BUILD
-#warning Auto-reclaiming of POSIX resources acquired by Windows threads
-#warning
-#warning If code linked with this library includes Windows threads that
-#warning explicitly interact with POSIX threads, i.e. by calling POSIX API
-#warning routines, then those threads will acquire POSIX resources and
-#warning should call pthread_win32_thread_detach_np() on thread exit (see
-#warning README.NONPORTABLE), especially if the linked code depends on
-#warning reclaimed resources or the running of POSIX TSD destructors.
-#warning NOTE 1: Otherwise this will occur only when the process exits.
-#warning NOTE 2: Threads created via pthread_create() always auto-reclaim.
-#warning ==================================================================
 
 #endif /* PTW32_STATIC_LIB */
