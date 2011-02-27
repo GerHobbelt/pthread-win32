@@ -1228,46 +1228,6 @@ PTW32_DLLPORT int PTW32_CDECL pthreadCancelableTimedWait (HANDLE waitHandle,
 #endif
 
 /*
- * WIN32 C runtime library had been made thread-safe
- * without affecting the user interface. Provide
- * mappings from the UNIX thread-safe versions to
- * the standard C runtime library calls.
- * Only provide function mappings for functions that
- * actually exist on WIN32.
- */
-
-#if !defined(__MINGW32__)
-#define strtok_r( _s, _sep, _lasts ) \
-        ( *(_lasts) = strtok( (_s), (_sep) ) )
-#endif /* !__MINGW32__ */
-
-#define asctime_r( _tm, _buf ) \
-        ( strcpy( (_buf), asctime( (_tm) ) ), \
-          (_buf) )
-
-#define ctime_r( _clock, _buf ) \
-        ( strcpy( (_buf), ctime( (_clock) ) ),  \
-          (_buf) )
-
-/*
- * gmtime(tm) and localtime(tm) return 0 if tm represents
- * a time prior to 1/1/1970.
- */
-#define gmtime_r( _clock, _result ) \
-        ( gmtime( (_clock) ) \
-             ? (*(_result) = *gmtime( (_clock) ), (_result) ) \
-             : (0) )
-
-#define localtime_r( _clock, _result ) \
-        ( localtime( (_clock) ) \
-             ? (*(_result) = *localtime( (_clock) ), (_result) ) \
-             : (0) )
-
-#define rand_r( _seed ) \
-        ( _seed == _seed? rand() : rand() )
-
-
-/*
  * Some compiler environments don't define some things.
  */
 #if defined(__BORLANDC__)
