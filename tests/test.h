@@ -47,6 +47,12 @@
 
 #define PTW32_THREAD_NULL_ID {NULL,0}
 
+/*
+ * Some non-thread POSIX API substitutes
+ */
+#define rand_r( _seed ) \
+        ( _seed == _seed? rand() : rand() )
+
 #if defined(__MINGW32__)
 #include <stdint.h>
 #elif defined(__BORLANDC__)
