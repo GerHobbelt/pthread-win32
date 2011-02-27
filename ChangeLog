@@ -1,3 +1,26 @@
+2011-02-27  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* sched_setscheduler: Ensure the handle is closed after use.
+	* sched_getscheduler: Likewise.
+
+2011-02-13  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* pthread_self: Add comment re returning 'nil' value to
+	indicate failure only to win32 threads that call us.
+	* pthread_attr_setstackaddr: Fix comments; note this
+	function and it's compliment are now removed from SUSv4.
+
+2011-02-12  Ross Johnson <ross.johnson at homemail.com.au>
+
+	README.NONPORTABLE: Record a description of an obvious
+	method for nulling/comparing/hashing pthread_t using a
+	union; plus and investigation of a change of type for
+	pthread_t (to a union) to neutralise any padding bits and
+	bytes if they occur in pthread_t (the current pthread_t struct
+	does not contain padding AFAIK, but porting the library to a
+	future architecture may introduce them). Padding affects
+	byte-by-byte copies and compare operations.
+
 2010-11-16  Ross Johnson <ross.johnson at homemail.com.au>
 
 	* ChangeLog: Add this entry ;-)
