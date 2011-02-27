@@ -2,6 +2,7 @@
 
 	* sched_setscheduler: Ensure the handle is closed after use.
 	* sched_getscheduler: Likewise.
+	* pthread.h: Remove POSIX compatibility macros.
 
 2011-02-13  Ross Johnson <ross.johnson at homemail.com.au>
 
