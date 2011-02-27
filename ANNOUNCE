@@ -291,18 +291,16 @@ The following functions are implemented:
       PTHREAD_RWLOCK_INITIALIZER
       PTHREAD_SPINLOCK_INITIALIZER
 
-      ---------------------------
-      Thread-Safe C Runtime Library (macros)
-      ---------------------------
-      strtok_r
-      asctime_r
-      ctime_r
-      gmtime_r
-      localtime_r
-      rand_r
-
 
 The following functions are not implemented:
+
+      ---------------------------
+      Mutexes
+      ---------------------------
+      pthread_mutexattr_getrobust
+      pthread_mutexattr_setrobust
+
+      pthread_mutex_consistent
       
       ---------------------------
       RealTime Scheduling
@@ -350,6 +348,17 @@ The following functions are not implemented:
       General
       ---------------------------
       sysconf      
+
+      ---------------------------
+      Thread-Safe C Runtime Library (macros)
+      ---------------------------
+      strtok_r
+      asctime_r
+      ctime_r
+      gmtime_r
+      localtime_r
+      rand_r
+
 
 The library includes two non-API functions for creating cancellation
 points in applications and libraries:
