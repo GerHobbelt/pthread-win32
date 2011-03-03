@@ -304,10 +304,13 @@ enum {
 
 #ifndef HAVE_STRUCT_TIMESPEC
 #define HAVE_STRUCT_TIMESPEC 1
+#ifndef _TIMESPEC_DEFINED
+#define _TIMESPEC_DEFINED
 struct timespec {
         time_t tv_sec;
         long tv_nsec;
 };
+#endif /* _TIMESPEC_DEFINED */
 #endif /* HAVE_STRUCT_TIMESPEC */
 
 #ifndef SIG_BLOCK

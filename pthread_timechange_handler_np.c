@@ -103,5 +103,5 @@ pthread_timechange_handler_np (void *arg)
 
   LeaveCriticalSection (&ptw32_cond_list_lock);
 
-  return (void *) (result != 0 ? EAGAIN : 0);
+  return (void *) (size_t) (result != 0 ? EAGAIN : 0);
 }

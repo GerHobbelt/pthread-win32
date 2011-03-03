@@ -117,7 +117,7 @@ millisecondsFromNow (struct timespec * time, int millisecs)
   const int64_t NANOSEC_PER_SEC = 1000000000;
 
   /* get current system time and add millisecs */
-  _ftime(&currSysTime);
+  PTW32_FTIME(&currSysTime);
 
   secs = (int64_t)(currSysTime.time) + (millisecs / 1000);
   nanosecs = ((int64_t) (millisecs%1000 + currSysTime.millitm)) * NANOSEC_PER_MILLISEC;

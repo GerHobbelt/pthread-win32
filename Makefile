@@ -28,7 +28,7 @@ OPTIM	= /O2 /Ob2
 OPTIMD	=
 
 CFLAGS	= /W3 /MD /nologo /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
-CFLAGSD	= /Zi $(CFLAGS)
+CFLAGSD	= /Z7 $(CFLAGS)
 
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
 #XLIBS = wsock32.lib
@@ -37,8 +37,8 @@ CFLAGSD	= /Zi $(CFLAGS)
 CLEANUP	= __CLEANUP_C
 
 # C++ Exceptions
-VCEFLAGS	= /GX /TP $(CFLAGS)
-VCEFLAGSD	= /GX /TP $(CFLAGSD)
+VCEFLAGS	= /EHsc /TP $(CFLAGS)
+VCEFLAGSD	= /EHsc /TP $(CFLAGSD)
 #Structured Exceptions
 VSEFLAGS	= $(CFLAGS)
 VSEFLAGSD	= $(CFLAGSD)

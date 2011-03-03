@@ -1,8 +1,37 @@
+2011-03-04  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* implement.h (PTW32_INTERLOCKED_*): Mingw32 does not provide
+	the __sync_* intrinsics so implemented them here as macro
+	assembler routines. MSVS Interlocked* are emmitted as intrinsics
+	wherever possible, so we want mingw to match it; Extended to
+	include all interlocked routines used by the library; implemented
+	x86_64 versions also.
+	* ptw32_InterlockedCompareExchange.c: No code remaining here.
+	* ptw32_MCS_lock.c: Converted interlocked calls to use new macros.
+	* pthread_barrier_wait.c: Likewise.
+	* pthread_once.c: Likewise.
+
+2011-02-28  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* ptw32_relmillisecs.c: If possible, use _ftime64_s or _ftime64
+	before resorting to _ftime.
+
 2011-02-27  Ross Johnson <ross.johnson at homemail.com.au>
 
-	* sched_setscheduler: Ensure the handle is closed after use.
-	* sched_getscheduler: Likewise.
-	* pthread.h: Remove POSIX compatibility macros.
+	* sched_setscheduler.c: Ensure the handle is closed after use.
+	* sched_getscheduler.c: Likewise.
+	* pthread.h: Remove POSIX compatibility macros; don't define
+	timespec if already defined.
+	* context.h: Changes for 64 bit.
+	* pthread_cancel.c: Likewise.
+	* pthread_exit.c: Likewise.
+	* pthread_spin_destroy.c: Likewise.
+	* pthread_timechange_handler_np.c: Likewise.
+	* ptw32_MCS_lock.c: Likewise; some of these changes may
+	not be compatible with pre Windows 2000 systems; reverse the order of
+	the includes.
+	* ptw32_threadStart.c: Likewise.
+	* ptw32_throw.c: Likewise.
 
 2011-02-13  Ross Johnson <ross.johnson at homemail.com.au>
 

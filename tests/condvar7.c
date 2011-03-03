@@ -167,7 +167,7 @@ main()
 
   assert(pthread_mutex_lock(&start_flag) == 0);
 
-  _ftime(&currSysTime);
+  PTW32_FTIME(&currSysTime);
 
   abstime.tv_sec = currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;

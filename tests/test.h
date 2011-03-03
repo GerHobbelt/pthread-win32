@@ -61,6 +61,14 @@
 #define int64_t _int64
 #endif
 
+#ifdef _MSC_VER
+  #define PTW32_FTIME(x) _ftime64_s(x);
+#elif defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601
+  #define PTW32_FTIME(x) _ftime64(x);
+#else
+  #define PTW32_FTIME(x) _ftime(x);
+#endif
+
 
 const char * error_string[] = {
   "ZERO_or_EOK",
