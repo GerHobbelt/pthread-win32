@@ -127,7 +127,7 @@ main()
   assert(cvthing.lock != PTHREAD_MUTEX_INITIALIZER);
 
   /* get current system time */
-  _ftime(&currSysTime);
+  PTW32_FTIME(&currSysTime);
 
   abstime.tv_sec = currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
@@ -140,7 +140,7 @@ main()
 
   assert(pthread_create(&t[1], NULL, mythread, (void *) 1) == 0);
 
-  _ftime(&currSysTime);
+  PTW32_FTIME(&currSysTime);
 
   abstime.tv_sec = currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;

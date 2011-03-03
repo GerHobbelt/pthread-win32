@@ -111,7 +111,7 @@ STRESSTESTS = \
 	stress1
 
 BENCHTESTS = \
-	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5 benchtest6
+	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
 
 STATICTESTS = \
 	  sizes \
@@ -213,7 +213,6 @@ benchtest2.bench:
 benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
-benchtest6.bench:
 
 barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass

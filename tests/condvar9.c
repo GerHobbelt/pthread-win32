@@ -172,7 +172,7 @@ main()
 
   assert(cvthing.lock == PTHREAD_MUTEX_INITIALIZER);
 
-  _ftime(&currSysTime);
+  PTW32_FTIME(&currSysTime);
 
   abstime.tv_sec = currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;

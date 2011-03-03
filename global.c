@@ -55,17 +55,6 @@ int ptw32_features = 0;
 BOOL ptw32_smp_system = PTW32_TRUE;  /* Safer if assumed true initially. */
 
 /* 
- * Function pointer to InterlockedCompareExchange if it exists, otherwise
- * it will be set at runtime to a substitute local version with the same
- * functionality but may be architecture specific.
- */
-PTW32_INTERLOCKED_LONG
-  (WINAPI * ptw32_interlocked_compare_exchange) (PTW32_INTERLOCKED_LPLONG,
-						 PTW32_INTERLOCKED_LONG,
-						 PTW32_INTERLOCKED_LONG) =
-  NULL;
-
-/* 
  * Function pointer to QueueUserAPCEx if it exists, otherwise
  * it will be set at runtime to a substitute routine which cannot unblock
  * blocked threads.

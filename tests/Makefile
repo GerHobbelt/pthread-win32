@@ -50,7 +50,7 @@ OPTIM	= /O2 /Ob0
 XXLIBS	= ws2_32.lib
 
 # C++ Exceptions
-VCEFLAGS	= /GX /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
+VCEFLAGS	= /EHsc /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
 VCELIB	= pthreadVCE$(DLL_VER).lib
 VCEDLL	= pthreadVCE$(DLL_VER).dll
 # Structured Exceptions
@@ -62,13 +62,13 @@ VCFLAGS	= /D__CLEANUP_C
 VCLIB	= pthreadVC$(DLL_VER).lib
 VCDLL	= pthreadVC$(DLL_VER).dll
 # C++ Exceptions in application - using VC version of pthreads dll
-VCXFLAGS	= /GX /TP /D__CLEANUP_C
+VCXFLAGS	= /EHsc /TP /D__CLEANUP_C
 
 # Defaults
 CPLIB	= $(VCLIB)
 CPDLL	= $(VCDLL)
 
-CFLAGS= $(OPTIM) /W3 /MD /nologo /Yd /Zi
+CFLAGS= $(OPTIM) /W3 /MD /nologo /Z7
 LFLAGS= /INCREMENTAL:NO
 INCLUDES=-I.
 BUILD_DIR=..
@@ -120,8 +120,7 @@ PASSES= sizes.pass  loadfree.pass \
 	  cancel9.pass  create3.pass  stress1.pass
 
 BENCHRESULTS = \
-	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench \
-	  benchtest6.bench
+	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
 
 STRESSRESULTS = \
 	  stress1.stress
@@ -310,7 +309,6 @@ benchtest2.bench:
 benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
-benchtest6.bench:
 
 barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass

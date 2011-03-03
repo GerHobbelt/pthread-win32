@@ -89,8 +89,8 @@
  * }
  */
 
-#include "implement.h"
 #include "pthread.h"
+#include "implement.h"
 
 /*
  * ptw32_mcs_flag_set -- notify another thread about an event.
@@ -101,10 +101,10 @@
 INLINE void 
 ptw32_mcs_flag_set (LONG * flag)
 {
-  HANDLE e = (HANDLE)PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+  HANDLE e = (HANDLE)(size_t)PTW32_INTERLOCKED_COMPARE_EXCHANGE(
 						(PTW32_INTERLOCKED_LPLONG)flag,
-						(PTW32_INTERLOCKED_LONG)-1,
-						(PTW32_INTERLOCKED_LONG)0);
+						(PTW32_INTERLOCKED_LONG)(size_t)-1,
+						(PTW32_INTERLOCKED_LONG)(size_t)0);
   if ((HANDLE)0 != e)
     {
       /* another thread has already stored an event handle in the flag */
@@ -121,7 +121,7 @@ ptw32_mcs_flag_set (LONG * flag)
 INLINE void 
 ptw32_mcs_flag_wait (LONG * flag)
 {
-  if (0 == InterlockedExchangeAdd((LPLONG)flag, 0)) /* MBR fence */
+  if (0 == PTW32_INTERLOCKED_EXCHANGE_ADD((LPLONG)flag, 0)) /* MBR fence */
     {
       /* the flag is not set. create event. */
 
@@ -129,8 +129,8 @@ ptw32_mcs_flag_wait (LONG * flag)
 
       if (0 == PTW32_INTERLOCKED_COMPARE_EXCHANGE(
 			                  (PTW32_INTERLOCKED_LPLONG)flag,
-			                  (PTW32_INTERLOCKED_LONG)e,
-			                  (PTW32_INTERLOCKED_LONG)0))
+			                  (PTW32_INTERLOCKED_LONG)(size_t)e,
+			                  (PTW32_INTERLOCKED_LONG)(size_t)0))
 	{
 	  /* stored handle in the flag. wait on it now. */
 	  WaitForSingleObject(e, INFINITE);
@@ -159,8 +159,8 @@ ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node)
   node->next = 0; /* initially, no successor */
   
   /* queue for the lock */
-  pred = (ptw32_mcs_local_node_t *)PTW32_INTERLOCKED_EXCHANGE((PTW32_INTERLOCKED_LPLONG)lock,
-						              (PTW32_INTERLOCKED_LONG)node);
+  pred = (ptw32_mcs_local_node_t *)PTW32_INTERLOCKED_EXCHANGE_PTR((PVOID volatile *)lock,
+								  (void*)node);
 
   if (0 != pred)
     {
@@ -184,17 +184,20 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
 {
   ptw32_mcs_lock_t *lock = node->lock;
   ptw32_mcs_local_node_t *next = (ptw32_mcs_local_node_t *)
-    InterlockedExchangeAdd((LPLONG)&node->next,
-                           (LONG)0); /* MBR fence */
+#ifndef _WIN64
+  PTW32_INTERLOCKED_EXCHANGE_ADD((LPLONG)&node->next, 0); /* MBR fence */
+#else
+  PTW32_INTERLOCKED_EXCHANGE_ADD64((LONG64 *)&node->next, 0); /* MBR fence */
+#endif
 
   if (0 == next)
     {
       /* no known successor */
 
       if (node == (ptw32_mcs_local_node_t *)
-	  PTW32_INTERLOCKED_COMPARE_EXCHANGE((PTW32_INTERLOCKED_LPLONG)lock,
-					     (PTW32_INTERLOCKED_LONG)0,
-					     (PTW32_INTERLOCKED_LONG)node))
+	  PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR((LPVOID volatile *)lock,
+						 (PVOID)0,
+						 (PVOID)node))
 	{
 	  /* no successor, lock is free now */
 	  return;
@@ -203,7 +206,11 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
       /* wait for successor */
       ptw32_mcs_flag_wait(&node->nextFlag);
       next = (ptw32_mcs_local_node_t *)
-	InterlockedExchangeAdd((LPLONG)&node->next, 0); /* MBR fence */
+#ifndef _WIN64
+	PTW32_INTERLOCKED_EXCHANGE_ADD((LPLONG)&node->next, 0); /* MBR fence */
+#else
+	PTW32_INTERLOCKED_EXCHANGE_ADD64((LONG64 *)&node->next, 0); /* MBR fence */
+#endif
     }
 
   /* pass the lock */

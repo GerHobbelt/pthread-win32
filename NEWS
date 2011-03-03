@@ -1,12 +1,16 @@
 CURRENT CVS HEAD Version
 RELEASE 2.9.0 pending
 -------------
-(2010-??-??)
+(2011-??-??)
 
 General
 -------
 New bug fixes in this release since 2.8.0 have NOT been applied to the
 1.x.x series.
+
+Version 2.8.0 may be the last release for some older Windows systems.
+Some changes post 2011-02-26 in CVS may not be compatible with pre
+Windows 2000 systems.
 
 Version 1 no longer maintained
 ------------------------------
@@ -47,6 +51,9 @@ See README.NONPORTABLE for descriptions of these routines.
 
 Bug fixes
 ---------
+Many more changes for 64 bit systems.
+- Kai Tietz
+
 Various modifications and fixes to build and test for WinCE.
 - Marcel Ruff, Sinan Kaya
 
@@ -74,6 +81,14 @@ contention between barrier_wait and barrier_destroy. This change will
 have slowed barriers down slightly but halves the number of semaphores
 consumed per barrier to one.
 - Ross Johnson
+
+Fixed a handle leak in sched_[gs]etscheduler.
+- Mark Pizzolato
+
+Removed all of the POSIX re-entrant function compatibility macros from pthread.h.
+Some were simply not semanticly correct.
+- Igor Lubashev
+
 
 RELEASE 2.8.0
 -------------

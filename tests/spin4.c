@@ -51,11 +51,11 @@ static int washere = 0;
 
 void * func(void * arg)
 {
-  _ftime(&currSysTimeStart);
+  PTW32_FTIME(&currSysTimeStart);
   washere = 1;
   assert(pthread_spin_lock(&lock) == 0);
   assert(pthread_spin_unlock(&lock) == 0);
-  _ftime(&currSysTimeStop);
+  PTW32_FTIME(&currSysTimeStop);
 
   return (void *) GetDurationMilliSecs(currSysTimeStart, currSysTimeStop);
 }
@@ -86,7 +86,7 @@ main()
   do
     {
       sched_yield();
-      _ftime(&sysTime);
+      PTW32_FTIME(&sysTime);
     }
   while (GetDurationMilliSecs(currSysTimeStart, sysTime) <= 1000);
 

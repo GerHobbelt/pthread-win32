@@ -1,3 +1,13 @@
+2011-03-04  Ross Johnson <Ross dot Johnson at homemail dot com dot au>
+
+	* condvar3_2.c: abstime.tv_sec operation warning fixed.
+
+2011-02-28  Ross Johnson <Ross dot Johnson at homemail dot com dot au>
+
+	* test.h: Define FTIME to be _ftime64_s or _ftime64 or _ftime
+	in that order of preference where supported.
+	* several: Replace calls to _ftime with the FTIME macro.
+
 2010-06-19  Ross Johnson <Ross dot Johnson at homemail dot com dot au>
 
 	* Makefile (STATICRESULTS): Add all tests into suite for static

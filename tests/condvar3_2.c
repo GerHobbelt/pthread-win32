@@ -136,9 +136,9 @@ main()
   assert(pthread_mutex_init(&mutex, NULL) == 0);
 
   /* get current system time */
-  _ftime(&currSysTime);
+  PTW32_FTIME(&currSysTime);
 
-  abstime.tv_sec = abstime.tv_sec = currSysTime.time + 5;
+  abstime.tv_sec = abstime2.tv_sec = currSysTime.time + 5;
   abstime.tv_nsec = abstime2.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
   assert(pthread_mutex_lock(&mutex) == 0);

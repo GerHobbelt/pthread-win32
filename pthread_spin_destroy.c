@@ -59,9 +59,9 @@ pthread_spin_destroy (pthread_spinlock_t * lock)
 	       PTW32_INTERLOCKED_COMPARE_EXCHANGE ((PTW32_INTERLOCKED_LPLONG)
 						   & (s->interlock),
 						   (PTW32_INTERLOCKED_LONG)
-						   PTW32_OBJECT_INVALID,
+						   (size_t)PTW32_OBJECT_INVALID,
 						   (PTW32_INTERLOCKED_LONG)
-						   PTW32_SPIN_UNLOCKED))
+						   (size_t)PTW32_SPIN_UNLOCKED))
 	{
 	  result = EINVAL;
 	}

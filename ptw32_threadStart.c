@@ -344,7 +344,7 @@ ptw32_threadStart (void *vthreadParms)
 #endif
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
-  _endthreadex ((unsigned) status);
+  _endthreadex ((unsigned)(size_t) status);
 #else
   _endthread ();
 #endif
@@ -354,7 +354,7 @@ ptw32_threadStart (void *vthreadParms)
    */
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
-  return (unsigned) status;
+  return (unsigned)(size_t) status;
 #endif
 
 }				/* ptw32_threadStart */

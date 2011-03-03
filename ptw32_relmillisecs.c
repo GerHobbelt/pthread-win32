@@ -34,9 +34,6 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#ifndef _UWIN
-/*#include <process.h> */
-#endif
 #include "pthread.h"
 #include "implement.h"
 #ifndef NEED_FTIME
@@ -94,7 +91,13 @@ ptw32_relmillisecs (const struct timespec * abstime)
 
 #else /* ! NEED_FTIME */
 
+#ifdef _MSC_VER
+  _ftime64_s(&currSysTime);
+#elif defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601
+  _ftime64(&currSysTime);
+#else
   _ftime(&currSysTime);
+#endif
 
   tmpCurrMilliseconds = (int64_t) currSysTime.time * MILLISEC_PER_SEC;
   tmpCurrMilliseconds += (int64_t) currSysTime.millitm;

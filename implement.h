@@ -668,26 +668,229 @@ extern "C"
 
 
 /*
- * Defaults. Could be overridden when building the inlined version of the dll.
- * See ptw32_InterlockedCompareExchange.c
+ * Use intrinsic versions wherever possible. VC will do this
+ * automatically where possible and GCC define these if available:
+ * __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1
+ * __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2
+ * __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+ * __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
+ * __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16
+ *
+ * The full set of Interlocked intrinsics in GCC are (check versions):
+ * type __sync_fetch_and_add (type *ptr, type value, ...)
+ * type __sync_fetch_and_sub (type *ptr, type value, ...)
+ * type __sync_fetch_and_or (type *ptr, type value, ...)
+ * type __sync_fetch_and_and (type *ptr, type value, ...)
+ * type __sync_fetch_and_xor (type *ptr, type value, ...)
+ * type __sync_fetch_and_nand (type *ptr, type value, ...)
+ * type __sync_add_and_fetch (type *ptr, type value, ...)
+ * type __sync_sub_and_fetch (type *ptr, type value, ...)
+ * type __sync_or_and_fetch (type *ptr, type value, ...)
+ * type __sync_and_and_fetch (type *ptr, type value, ...)
+ * type __sync_xor_and_fetch (type *ptr, type value, ...)
+ * type __sync_nand_and_fetch (type *ptr, type value, ...)
+ * bool __sync_bool_compare_and_swap (type *ptr, type oldval type newval, ...)
+ * type __sync_val_compare_and_swap (type *ptr, type oldval type newval, ...)
+ * __sync_synchronize (...) // Full memory barrier
+ * type __sync_lock_test_and_set (type *ptr, type value, ...) // Acquire barrier
+ * void __sync_lock_release (type *ptr, ...) // Release barrier
+ *
+ * These are all overloaded and take 1,2,4,8 byte scalar or pointer types.
+ *
+ * The above aren't available in Mingw32 as of gcc 4.5.2 so define our own.
  */
-#ifndef PTW32_INTERLOCKED_COMPARE_EXCHANGE
-#    define PTW32_INTERLOCKED_COMPARE_EXCHANGE ptw32_interlocked_compare_exchange
-#  endif
-
-#ifndef PTW32_INTERLOCKED_EXCHANGE
-#define PTW32_INTERLOCKED_EXCHANGE InterlockedExchange
+#if defined(__GNUC__)
+# define PTW32_INTERLOCKED_COMPARE_EXCHANGE(location, value, comparand)    \
+    ({                                                                     \
+      __typeof (value) _result;                                            \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "lock\n\t"                                                         \
+        "cmpxchgl       %2,(%1)"                                           \
+        :"=a" (_result)                                                    \
+        :"r"  (location), "r" (value), "a" (comparand)                     \
+        :"memory", "cc");                                                  \
+      _result;                                                             \
+    })
+/*
+ * Faster version of XCHG for uni-processor systems because
+ * it doesn't lock the bus. If an interrupt or context switch
+ * occurs between the movl and the cmpxchgl then the value in
+ * 'location' may have changed, in which case we will loop
+ * back to do the movl again.
+ *
+ * Tests show that this routine has almost identical timing
+ * to Win32's InterlockedExchange(), and is much faster than
+ * using an inlined 'xchg' instruction, so Win32 is probably
+ * doing something similar to this (on UP systems).
+ */
+# define PTW32_INTERLOCKED_EXCHANGE(location, value)                       \
+    ({                                                                     \
+      __typeof (value) _result;                                            \
+      (ptw32_smp_system) ? ({                                              \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "xchgl	 %0,(%1)"                                                  \
+        :"=r" (_result)                                                    \
+        :"r" (location), "0" (value)                                       \
+        :"memory", "cc");                                                  \
+      }) : ({                                                              \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "0:\n\t"                                                           \
+        "movl           %1,%%eax\n\t"                                      \
+        "cmpxchgl       %2,(%1)\n\t"                                       \
+        "jnz            0b"                                                \
+        :"=&a" (_result)                                                   \
+        :"r"  (location), "r" (value)                                      \
+        :"memory", "cc");                                                  \
+      });                                                                  \
+      _result;                                                             \
+    })
+# define PTW32_INTERLOCKED_EXCHANGE_ADD(location, value)                   \
+    ({                                                                     \
+      __typeof (value) _result;                                            \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "lock\n\t"                                                         \
+        "xaddl	 %0,(%1)"                                                  \
+        :"=r" (_result)                                                    \
+        :"r" (location), "0" (value)                                       \
+        :"memory", "cc");                                                  \
+      _result;                                                             \
+    })
+# define PTW32_INTERLOCKED_INCREMENT(location)                             \
+    ({                                                                     \
+      long _temp = 1;                                                      \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "lock\n\t"                                                         \
+        "xaddl	 %0,(%1)"                                                  \
+        :"+r" (_temp)                                                      \
+        :"r" (location)                                                    \
+        :"memory", "cc");                                                  \
+      _temp + 1;                                                           \
+    })
+# define PTW32_INTERLOCKED_DECREMENT(location)                             \
+    ({                                                                     \
+      long _temp = -1;                                                     \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "lock\n\t"                                                         \
+        "xaddl	 %0,(%1)"                                                  \
+        :"+r" (_temp)                                                      \
+        :"r" (location)                                                    \
+        :"memory", "cc");                                                  \
+      _temp - 1;                                                           \
+    })
+# if defined(_WIN64)
+# define PTW32_INTERLOCKED_COMPARE_EXCHANGE64(location, value, comparand)  \
+    ({                                                                     \
+      __typeof (value) _result;                                            \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "lock\n\t"                                                         \
+        "cmpxchgq      %2,(%1)"                                            \
+        :"=a" (_result)                                                    \
+        :"r"  (location), "r" (value), "a" (comparand)                     \
+        :"memory", "cc");                                                  \
+      _result;                                                             \
+    })
+/*
+ * Faster version of XCHG for uni-processor systems because
+ * it doesn't lock the bus. If an interrupt or context switch
+ * occurs between the movl and the cmpxchgl then the value in
+ * 'location' may have changed, in which case we will loop
+ * back to do the movl again.
+ *
+ * Tests show that this routine has almost identical timing
+ * to Win32's InterlockedExchange(), and is much faster than
+ * using an inlined 'xchg' instruction, so Win32 is probably
+ * doing something similar to this (on UP systems).
+ */
+# define PTW32_INTERLOCKED_EXCHANGE64(location, value)                     \
+    ({                                                                     \
+      __typeof (value) _result;                                            \
+      (ptw32_smp_system) ? ({                                              \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "xchgq	 %0,(%1)"                                                  \
+        :"=r" (_result)                                                    \
+        :"r" (location), "0" (value)                                       \
+        :"memory", "cc");                                                  \
+      }) : ({                                                              \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "0:\n\t"                                                           \
+        "movq           %1,%%eax\n\t"                                      \
+        "cmpxchgq       %2,(%1)\n\t"                                       \
+        "jnz            0b"                                                \
+        :"=&a" (_result)                                                   \
+        :"r"  (location), "r" (value)                                      \
+        :"memory", "cc");                                                  \
+      });                                                                  \
+      _result;                                                             \
+    })
+# define PTW32_INTERLOCKED_EXCHANGE_ADD64(location, value)                 \
+    ({                                                                     \
+      __typeof (value) _result;                                            \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "lock\n\t"                                                         \
+        "xaddq	 %0,(%1)"                                                  \
+        :"=r" (_result)                                                    \
+        :"r" (location), "0" (value)                                       \
+        :"memory", "cc");                                                  \
+      _result;                                                             \
+    })
+# define PTW32_INTERLOCKED_INCREMENT64(location)                           \
+    ({                                                                     \
+      long _temp = 1;                                                      \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "lock\n\t"                                                         \
+        "xaddq	 %0,(%1)"                                                  \
+        :"+r" (_temp)                                                      \
+        :"r" (location)                                                    \
+        :"memory", "cc");                                                  \
+      _temp + 1;                                                           \
+    })
+# define PTW32_INTERLOCKED_DECREMENT64(location)                           \
+    ({                                                                     \
+      long _temp = -1;                                                     \
+      __asm__ __volatile__                                                 \
+      (                                                                    \
+        "lock\n\t"                                                         \
+        "xaddq	 %0,(%1)"                                                  \
+        :"+r" (_temp)                                                      \
+        :"r" (location)                                                    \
+        :"memory", "cc");                                                  \
+      _temp - 1;                                                           \
+    })
+#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR PTW32_INTERLOCKED_COMPARE_EXCHANGE64
+#   define PTW32_INTERLOCKED_EXCHANGE_PTR PTW32_INTERLOCKED_EXCHANGE64
+# else
+#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR PTW32_INTERLOCKED_COMPARE_EXCHANGE
+#   define PTW32_INTERLOCKED_EXCHANGE_PTR PTW32_INTERLOCKED_EXCHANGE
+# endif
+#else
+# define PTW32_INTERLOCKED_COMPARE_EXCHANGE InterlockedCompareExchange
+# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchangePointer
+# define PTW32_INTERLOCKED_EXCHANGE InterlockedExchange
+# define PTW32_INTERLOCKED_EXCHANGE_PTR InterlockedExchangePointer
+# define PTW32_INTERLOCKED_EXCHANGE_ADD InterlockedExchangeAdd
+# define PTW32_INTERLOCKED_INCREMENT InterlockedIncrement
+# define PTW32_INTERLOCKED_DECREMENT InterlockedDecrement
+# if defined(_WIN64)
+#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE64 InterlockedCompareExchange64
+#   define PTW32_INTERLOCKED_EXCHANGE64 InterlockedExchange64
+#   define PTW32_INTERLOCKED_EXCHANGE_ADD64 InterlockedExchangeAdd64
+#   define PTW32_INTERLOCKED_INCREMENT64 InterlockedIncrement64
+#   define PTW32_INTERLOCKED_DECREMENT64 InterlockedDecrement64
+# endif
 #endif
 
-
-/*
- * Check for old and new versions of cygwin. See the FAQ file:
- *
- * Question 1 - How do I get pthreads-win32 to link under Cygwin or Mingw32?
- *
- * Patch by Anders Norlander <anorland@hem2.passagen.se>
- */
-#if defined(__CYGWIN32__) || defined(__CYGWIN__) || defined(NEED_CREATETHREAD)
+#if defined(NEED_CREATETHREAD)
 
 /* 
  * Macro uses args so we can cast start_proc to LPTHREAD_START_ROUTINE
@@ -709,7 +912,7 @@ extern "C"
 
 #define _endthreadex ExitThread
 
-#endif				/* __CYGWIN32__ || __CYGWIN__ || NEED_CREATETHREAD */
+#endif				/* NEED_CREATETHREAD */
 
 
 #endif				/* _IMPLEMENT_H */
