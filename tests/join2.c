@@ -60,7 +60,7 @@ main(int argc, char * argv[])
 
 	for (i = 0; i < 4; i++)
 	  {
-	    assert(pthread_join(id[i], (void **) &result) == 0);
+	    assert(pthread_join(id[i], (void *) &result) == 0);
 	    assert(result == i);
 	  }
 

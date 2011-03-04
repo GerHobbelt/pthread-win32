@@ -139,7 +139,7 @@ main()
   /* get current system time */
   PTW32_FTIME(&currSysTime);
 
-  abstime.tv_sec = currSysTime.time;
+  abstime.tv_sec = (long)currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
   abstime.tv_sec += 5;
@@ -168,7 +168,7 @@ main()
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
-      assert(pthread_join(t[i], (void **) &result) == 0);
+      assert(pthread_join(t[i], (void *) &result) == 0);
         assert(result == i);
     }
 

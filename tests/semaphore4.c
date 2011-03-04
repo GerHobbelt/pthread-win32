@@ -114,7 +114,7 @@ main()
 	assert(pthread_cancel(t[50]) == 0);
 	  {
 	    int result;
-	    assert(pthread_join(t[50], (void **) &result) == 0);
+	    assert(pthread_join(t[50], (void *) &result) == 0);
 //	    printf("result = %d\n", result); fflush(stdout);
 	  }
 	assert(sem_getvalue(&s, &value) == 0);

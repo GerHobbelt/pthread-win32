@@ -57,7 +57,7 @@ void * func(void * arg)
   assert(pthread_spin_unlock(&lock) == 0);
   PTW32_FTIME(&currSysTimeStop);
 
-  return (void *) GetDurationMilliSecs(currSysTimeStart, currSysTimeStop);
+  return (void *) (size_t)GetDurationMilliSecs(currSysTimeStart, currSysTimeStop);
 }
  
 int
@@ -92,7 +92,7 @@ main()
 
   assert(pthread_spin_unlock(&lock) == 0);
 
-  assert(pthread_join(t, (void **) &result) == 0);
+  assert(pthread_join(t, (void *) &result) == 0);
   assert(result > 1000);
 
   assert(pthread_spin_destroy(&lock) == 0);

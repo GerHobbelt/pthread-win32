@@ -122,7 +122,7 @@ main()
   int result;
 
   assert(pthread_create(&t, NULL, thr, NULL) == 0);
-  assert(pthread_join(t, (void **)&result) == 0);
+  assert(pthread_join(t, (void *)&result) == 0);
   assert(result == 0);
 
   assert(sem_init(&s, PTHREAD_PROCESS_PRIVATE, 0) == 0);

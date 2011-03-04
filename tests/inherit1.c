@@ -89,7 +89,7 @@ void * func(void * arg)
   struct sched_param param;
 
   assert(pthread_getschedparam(pthread_self(), &policy, &param) == 0);
-  return (void *) param.sched_priority;
+  return (void *) (size_t)param.sched_priority;
 }
 
 

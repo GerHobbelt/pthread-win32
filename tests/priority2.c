@@ -95,7 +95,7 @@ void * func(void * arg)
   assert(policy == SCHED_OTHER);
   result = pthread_barrier_wait(&endBarrier);
   assert(result == 0 || result == PTHREAD_BARRIER_SERIAL_THREAD);
-  return (void *) param.sched_priority;
+  return (void *) (size_t)param.sched_priority;
 }
 
 

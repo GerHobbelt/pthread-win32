@@ -41,7 +41,6 @@
  * If using the default (no __CLEANUP_* defined), pthread.h will define it
  * as __CLEANUP_C.
  */
-
 #ifdef PTW32_RC_MSC
 #  if defined(__CLEANUP_C)
 #    define PTW32_VERSIONINFO_NAME "pthreadVC\0"
@@ -51,7 +50,7 @@
 #    define PTW32_VERSIONINFO_COMMENT "MS C++ build -- C++ exception thread exiting\0"
 #  elif defined(__CLEANUP_SEH)
 #    define PTW32_VERSIONINFO_NAME "pthreadVSE\0"
-#    define PTW32_VERSIONINFO_COMMENT "MS C build -- structured exception thread exiting\0"
+#    define PTW32_VERSIONINFO_COMMENT "MS C build -- SEH exception thread exiting\0"
 #  else
 #    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
@@ -102,15 +101,15 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "POSIX Threads for Windows32 Library\0"
+            VALUE "FileDescription", "POSIX Threads for Windows Library\0"
             VALUE "ProductVersion", PTW32_VERSION_STRING
             VALUE "FileVersion", PTW32_VERSION_STRING
             VALUE "InternalName", PTW32_VERSIONINFO_NAME
             VALUE "OriginalFilename", PTW32_VERSIONINFO_NAME
             VALUE "CompanyName", "Open Source Software community project\0"
-            VALUE "LegalCopyright", "Copyright (C) Project contributors 1998-2004\0"
+            VALUE "LegalCopyright", "Copyright (C) Project contributors 1998-2011\0"
             VALUE "Licence", "LGPL\0"
-            VALUE "Info", "http://sources.redhat.com/pthreads-win32/\0"
+            VALUE "Info", "http://sourceware.org/pthreads-win32/\0"
 	    VALUE "Comment", PTW32_VERSIONINFO_COMMENT
         END
     END

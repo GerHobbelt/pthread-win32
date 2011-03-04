@@ -109,7 +109,7 @@ mythread(void * arg)
       pthread_testcancel();
     }
 
-  return (void *) result;
+  return (void *) (size_t)result;
 }
 
 int
@@ -167,7 +167,7 @@ main()
       int fail = 0;
       int result = 0;
 
-      assert(pthread_join(t[i], (void **) &result) == 0);
+      assert(pthread_join(t[i], (void *) &result) == 0);
 
       fail = (result != (int) PTHREAD_CANCELED);
 

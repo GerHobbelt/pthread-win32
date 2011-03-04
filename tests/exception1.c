@@ -98,7 +98,7 @@ exceptionedThread(void * arg)
 #if defined(_MSC_VER) && !defined(__cplusplus)
   __try
   {
-    int zero = (int) arg; /* Passed in from arg to avoid compiler error */
+    int zero = (int) (size_t)arg; /* Passed in from arg to avoid compiler error */
     int one = 1;
     /*
      * The deliberate exception condition (zero divide) is
@@ -133,7 +133,7 @@ exceptionedThread(void * arg)
   }
 #endif
 
-  return (void *) result;
+  return (void *) (size_t)result;
 }
 
 void *
@@ -184,7 +184,7 @@ canceledThread(void * arg)
   }
 #endif
 
-  return (void *) result;
+  return (void *) (size_t)result;
 }
 
 int
@@ -229,13 +229,13 @@ main()
       int result = 0;
 
 	/* Canceled thread */
-      assert(pthread_join(ct[i], (void **) &result) == 0);
+      assert(pthread_join(ct[i], (void *) &result) == 0);
       assert(!(fail = (result != (int) PTHREAD_CANCELED)));
 
       failed = (failed || fail);
 
       /* Exceptioned thread */
-      assert(pthread_join(et[i], (void **) &result) == 0);
+      assert(pthread_join(et[i], (void *) &result) == 0);
       assert(!(fail = (result != ((int) PTHREAD_CANCELED + 2))));
 
       failed = (failed || fail);

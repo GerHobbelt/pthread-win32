@@ -116,7 +116,7 @@ mythread (void *arg)
   for (bag->count = 0; bag->count < 100; bag->count++)
     Sleep (100);
 
-  return (void *) result;
+  return (void *) (size_t)result;
 }
 
 int
@@ -180,7 +180,7 @@ main ()
        * a return value of PTHREAD_CANCELED confirms that async
        * cancelation succeeded.
        */
-      assert (pthread_join (t[i], (void **) &result) == 0);
+      assert (pthread_join (t[i], (void *) &result) == 0);
 
       fail = (result != (int) PTHREAD_CANCELED);
 

@@ -54,7 +54,7 @@ void * wrfunc(void * arg)
   int result;
 
   result = pthread_rwlock_timedwrlock(&rwlock1, &abstime);
-  if ((int) arg == 1)
+  if ((int) (size_t)arg == 1)
     {
       assert(result == 0);
       Sleep(2000);
@@ -62,7 +62,7 @@ void * wrfunc(void * arg)
       assert(pthread_rwlock_unlock(&rwlock1) == 0);
       return ((void *) bankAccount);
     }
-  else if ((int) arg == 2)
+  else if ((int) (size_t)arg == 2)
     {
       assert(result == ETIMEDOUT);
       return ((void *) 100);
@@ -94,7 +94,7 @@ main()
 
   PTW32_FTIME(&currSysTime);
 
-  abstime.tv_sec = currSysTime.time;
+  abstime.tv_sec = (long)currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
   abstime.tv_sec += 1;
@@ -107,9 +107,9 @@ main()
   Sleep(100);
   assert(pthread_create(&wrt2, NULL, wrfunc, (void *) 2) == 0);
 
-  assert(pthread_join(wrt1, (void **) &wr1Result) == 0);
-  assert(pthread_join(rdt, (void **) &rdResult) == 0);
-  assert(pthread_join(wrt2, (void **) &wr2Result) == 0);
+  assert(pthread_join(wrt1, (void *) &wr1Result) == 0);
+  assert(pthread_join(rdt, (void *) &rdResult) == 0);
+  assert(pthread_join(wrt2, (void *) &wr2Result) == 0);
 
   assert(wr1Result == 10);
   assert(rdResult == 0);

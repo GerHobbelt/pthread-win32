@@ -72,7 +72,7 @@ func(void * crossings)
         }
     }
 
-  return (void *) serialThreads;
+  return (void *) (size_t)serialThreads;
 }
 
 int
@@ -103,7 +103,7 @@ main()
       serialThreadsTotal = 0;
       for (i = 1; i <= j; i++)
         {
-          assert(pthread_join(t[i], (void **) &result) == 0);
+          assert(pthread_join(t[i], (void *) &result) == 0);
           serialThreadsTotal += result;
         }
 
