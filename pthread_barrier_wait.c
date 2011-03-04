@@ -61,7 +61,7 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
        * Move our MCS local node to the global scope barrier handle so that the
        * last thread out (not necessarily us) can release the lock.
        */
-      ptw32_mcs_node_substitute(&b->proxynode, &node);
+      ptw32_mcs_node_transfer(&b->proxynode, &node);
 
       /*
        * Any threads that have not quite entered sem_wait below when the
@@ -90,12 +90,12 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
   if ((PTW32_INTERLOCKED_LONG)PTW32_INTERLOCKED_INCREMENT((LPLONG)&b->nCurrentBarrierHeight)
 		  == (PTW32_INTERLOCKED_LONG)b->nInitialBarrierHeight)
     {
-  /*
+      /*
        * We are the last thread to cross this barrier
-   */
+       */
       ptw32_mcs_lock_release(&b->proxynode);
-  if (0 == result)
-    {
+      if (0 == result)
+        {
           result = PTHREAD_BARRIER_SERIAL_THREAD;
         }
     }

@@ -236,7 +236,7 @@ ptw32_mcs_lock_try_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * no
 }
 
 /*
- * ptw32_mcs_node_substitute -- move an MCS lock local node, usually from thread
+ * ptw32_mcs_node_transfer -- move an MCS lock local node, usually from thread
  * space to, for example, global space so that another thread can release
  * the lock on behalf of the current lock owner.
  *
@@ -247,7 +247,7 @@ ptw32_mcs_lock_try_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * no
  * Should only be called by the thread that has the lock.
  */
 INLINE void
-ptw32_mcs_node_substitute (ptw32_mcs_local_node_t * new_node, ptw32_mcs_local_node_t * old_node)
+ptw32_mcs_node_transfer (ptw32_mcs_local_node_t * new_node, ptw32_mcs_local_node_t * old_node)
 {
   new_node->lock = old_node->lock;
   new_node->nextFlag = 0; /* Not needed - used only in initial Acquire */

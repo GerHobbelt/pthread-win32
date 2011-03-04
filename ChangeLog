@@ -10,6 +10,8 @@
 	* ptw32_MCS_lock.c: Converted interlocked calls to use new macros.
 	* pthread_barrier_wait.c: Likewise.
 	* pthread_once.c: Likewise.
+	* ptw32_MCS_lock.c (ptw32_mcs_node_substitute): Name changed to
+	ptw32_mcs_node_transfer.
 
 2011-02-28  Ross Johnson <ross.johnson at homemail.com.au>
 
