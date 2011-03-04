@@ -67,17 +67,17 @@ void * rdfunc(void * arg)
 
   PTW32_FTIME(&currSysTime);
 
-  abstime.tv_sec = currSysTime.time;
+  abstime.tv_sec = (long)currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
 
-  if ((int) arg == 1)
+  if ((int) (size_t)arg == 1)
     {
       abstime.tv_sec += 1;
       assert(pthread_rwlock_timedrdlock(&rwlock1, &abstime) == ETIMEDOUT);
       ba = 0;
     }
-  else if ((int) arg == 2)
+  else if ((int) (size_t)arg == 2)
     {
       abstime.tv_sec += 3;
       assert(pthread_rwlock_timedrdlock(&rwlock1, &abstime) == 0);
@@ -110,10 +110,10 @@ main()
   Sleep(500);
   assert(pthread_create(&rdt2, NULL, rdfunc, (void *) 2) == 0);
 
-  assert(pthread_join(wrt1, (void **) &wr1Result) == 0);
-  assert(pthread_join(rdt1, (void **) &rd1Result) == 0);
-  assert(pthread_join(wrt2, (void **) &wr2Result) == 0);
-  assert(pthread_join(rdt2, (void **) &rd2Result) == 0);
+  assert(pthread_join(wrt1, (void *) &wr1Result) == 0);
+  assert(pthread_join(rdt1, (void *) &rd1Result) == 0);
+  assert(pthread_join(wrt2, (void *) &wr2Result) == 0);
+  assert(pthread_join(rdt2, (void *) &rd2Result) == 0);
 
   assert(wr1Result == 10);
   assert(rd1Result == 0);

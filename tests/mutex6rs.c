@@ -78,7 +78,7 @@ main()
 
   assert(pthread_create(&t, NULL, locker, NULL) == 0);
 
-  assert(pthread_join(t, (void **) &result) == 0);
+  assert(pthread_join(t, (void *) &result) == 0);
   assert(result == 555);
 
   assert(lockCount == 2);

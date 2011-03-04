@@ -96,7 +96,7 @@ int main()
    /* get current system time */
    PTW32_FTIME(&currSysTime);
 
-   abstime.tv_sec = currSysTime.time;
+   abstime.tv_sec = (long)currSysTime.time;
    abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
    abstime.tv_sec += 1;
 
@@ -120,7 +120,7 @@ int main()
 
    assert(pthread_mutex_lock(&mtx) == 0);
 
-   abstime.tv_sec = currSysTime.time;
+   abstime.tv_sec = (long)currSysTime.time;
    abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
    abstime.tv_sec += 1;
 

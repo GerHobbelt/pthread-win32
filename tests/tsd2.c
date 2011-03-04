@@ -185,7 +185,7 @@ main()
     {
 	int result = 0;
 
-	assert(pthread_join(thread[i], (void **) &result) == 0);
+	assert(pthread_join(thread[i], (void *) &result) == 0);
     }
 
   assert(pthread_key_delete(key) == 0);

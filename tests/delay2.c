@@ -74,7 +74,7 @@ main(int argc, char * argv[])
 
   assert(pthread_mutex_unlock(&mx) == 0);
 
-  assert(pthread_join(t, (void **) &result) == 0);
+  assert(pthread_join(t, (void *) &result) == 0);
   assert(result == (int) PTHREAD_CANCELED);
 
   return 0;

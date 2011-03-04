@@ -91,7 +91,7 @@ func(void * arg)
 
   assert(pthread_getschedparam(threadID, &policy, &param) == 0);
   assert(policy == SCHED_OTHER);
-  return (void *) (param.sched_priority);
+  return (void *) (size_t)(param.sched_priority);
 }
 
 void *

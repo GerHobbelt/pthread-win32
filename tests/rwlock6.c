@@ -89,9 +89,9 @@ main()
   Sleep(500);
   assert(pthread_create(&wrt2, NULL, wrfunc, NULL) == 0);
 
-  assert(pthread_join(wrt1, (void **) &wr1Result) == 0);
-  assert(pthread_join(rdt, (void **) &rdResult) == 0);
-  assert(pthread_join(wrt2, (void **) &wr2Result) == 0);
+  assert(pthread_join(wrt1, (void *) &wr1Result) == 0);
+  assert(pthread_join(rdt, (void *) &rdResult) == 0);
+  assert(pthread_join(wrt2, (void *) &wr2Result) == 0);
 
   assert(wr1Result == 10);
   assert(rdResult == 10);

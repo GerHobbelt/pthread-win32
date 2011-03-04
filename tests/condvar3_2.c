@@ -100,7 +100,7 @@ mythread(void * arg)
 
   abstime2.tv_sec = abstime.tv_sec;
 
-  if ((int) arg % 3 == 0)
+  if ((int) (size_t)arg % 3 == 0)
     {
       abstime2.tv_sec += 2;
     }
@@ -138,7 +138,7 @@ main()
   /* get current system time */
   PTW32_FTIME(&currSysTime);
 
-  abstime.tv_sec = abstime2.tv_sec = currSysTime.time + 5;
+  abstime.tv_sec = abstime2.tv_sec = (long)currSysTime.time + 5;
   abstime.tv_nsec = abstime2.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
   assert(pthread_mutex_lock(&mutex) == 0);
@@ -152,7 +152,7 @@ main()
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
-      assert(pthread_join(t[i], (void **) &result) == 0);
+      assert(pthread_join(t[i], (void *) &result) == 0);
 	assert(result == i);
       /*
        * Approximately 2/3rds of the threads are expected to time out.

@@ -131,7 +131,7 @@ mythread(void * arg)
 #pragma inline_depth()
 #endif
 
-  return (void *) result;
+  return (void *) (size_t)result;
 }
 
 int
@@ -180,7 +180,7 @@ main()
       int fail = 0;
       int result = 0;
 
-      assert(pthread_join(t[i], (void **) &result) == 0);
+      assert(pthread_join(t[i], (void *) &result) == 0);
 
       fail = (result != 0);
 
