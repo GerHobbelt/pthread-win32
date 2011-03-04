@@ -624,7 +624,7 @@ extern "C"
 
   void ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node);
 
-  void ptw32_mcs_node_substitute (ptw32_mcs_local_node_t * new_node, ptw32_mcs_local_node_t * old_node);
+  void ptw32_mcs_node_transfer (ptw32_mcs_local_node_t * new_node, ptw32_mcs_local_node_t * old_node);
 
 #ifdef NEED_FTIME
   void ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft);
