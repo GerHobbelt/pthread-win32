@@ -1,6 +1,9 @@
 2011-03-04  Ross Johnson <Ross dot Johnson at homemail dot com dot au>
 
 	* condvar3_2.c: abstime.tv_sec operation warning fixed.
+	* several: Use correct casting on pthread_join result arg
+	and associated declaration and usage; assumed that 64 bit
+	gcc gave some warnings for it.
 
 2011-02-28  Ross Johnson <Ross dot Johnson at homemail dot com dot au>
 

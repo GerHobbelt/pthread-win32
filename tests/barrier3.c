@@ -41,7 +41,7 @@
 #include "test.h"
  
 pthread_barrier_t barrier = NULL;
-static int result = 1;
+static void* result = (void*)1;
 
 void * func(void * arg)
 {
@@ -62,7 +62,7 @@ main()
 
   assert(pthread_join(t, (void *) &result) == 0);
 
-  assert(result == PTHREAD_BARRIER_SERIAL_THREAD);
+  assert((int)(size_t)result == PTHREAD_BARRIER_SERIAL_THREAD);
 
   assert(pthread_barrier_destroy(&barrier) == 0);
   assert(pthread_barrierattr_destroy(&ba) == 0);

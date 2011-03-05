@@ -72,14 +72,14 @@ func(void * crossings)
         }
     }
 
-  return (void *) (size_t)serialThreads;
+  return (void*)(size_t)serialThreads;
 }
 
 int
 main()
 {
   int i, j;
-  int result;
+  void* result;
   int serialThreadsTotal;
   LONG Crossings;
   pthread_t t[NUMTHREADS + 1];
@@ -104,7 +104,7 @@ main()
       for (i = 1; i <= j; i++)
         {
           assert(pthread_join(t[i], (void *) &result) == 0);
-          serialThreadsTotal += result;
+          serialThreadsTotal += (int)(size_t)result;
         }
 
       assert(serialThreadsTotal == BARRIERMULTIPLE);

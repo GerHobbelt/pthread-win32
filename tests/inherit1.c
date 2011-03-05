@@ -169,7 +169,7 @@ main()
           assert(pthread_attr_setschedparam(&attr, &param) == 0);
           assert(pthread_create(&t, &attr, func, NULL) == 0);
           pthread_join(t, &result);
-          assert((int) result == mainParam.sched_priority);
+          assert((int)(size_t) result == mainParam.sched_priority);
         }
     }
 

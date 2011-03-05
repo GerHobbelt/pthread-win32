@@ -86,9 +86,9 @@ main()
   pthread_t wrt1;
   pthread_t wrt2;
   pthread_t rdt;
-  int wr1Result = 0;
-  int wr2Result = 0;
-  int rdResult = 0;
+  void* wr1Result = (void*)0;
+  void* wr2Result = (void*)0;
+  void* rdResult = (void*)0;
   struct _timeb currSysTime;
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
@@ -111,9 +111,9 @@ main()
   assert(pthread_join(rdt, (void *) &rdResult) == 0);
   assert(pthread_join(wrt2, (void *) &wr2Result) == 0);
 
-  assert(wr1Result == 10);
-  assert(rdResult == 0);
-  assert(wr2Result == 100);
+  assert((int)(size_t)wr1Result == 10);
+  assert((int)(size_t)rdResult == 0);
+  assert((int)(size_t)wr2Result == 100);
 
   return 0;
 }
