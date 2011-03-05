@@ -95,10 +95,10 @@ main()
   pthread_t wrt2;
   pthread_t rdt1;
   pthread_t rdt2;
-  int wr1Result = 0;
-  int wr2Result = 0;
-  int rd1Result = 0;
-  int rd2Result = 0;
+  void* wr1Result = (void*)0;
+  void* wr2Result = (void*)0;
+  void* rd1Result = (void*)0;
+  void* rd2Result = (void*)0;
 
   bankAccount = 0;
 
@@ -115,10 +115,10 @@ main()
   assert(pthread_join(wrt2, (void *) &wr2Result) == 0);
   assert(pthread_join(rdt2, (void *) &rd2Result) == 0);
 
-  assert(wr1Result == 10);
-  assert(rd1Result == 0);
-  assert(wr2Result == 20);
-  assert(rd2Result == 20);
+  assert((int)(size_t)wr1Result == 10);
+  assert((int)(size_t)rd1Result == 0);
+  assert((int)(size_t)wr2Result == 20);
+  assert((int)(size_t)rd2Result == 20);
 
   return 0;
 }

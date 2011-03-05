@@ -172,7 +172,7 @@ main ()
       Sleep (100);
       assert (pthread_cancel (t) == 0);
       assert (pthread_join (t, &result) == 0);
-      assert (result == PTHREAD_CANCELED && "test_sleep" != NULL);
+      assert ((int)(size_t)result == (int)PTHREAD_CANCELED && "test_sleep" != NULL);
 
       printf ("Cancel waiting thread.\n");
       assert (pthread_create (&t, NULL, test_wait, NULL) == 0);
@@ -180,7 +180,7 @@ main ()
       Sleep (100);
       assert (pthread_cancel (t) == 0);
       assert (pthread_join (t, &result) == 0);
-      assert (result == PTHREAD_CANCELED && "test_wait");
+      assert ((int)(size_t)result == (int)PTHREAD_CANCELED && "test_wait");
 
       printf ("Cancel blocked thread (blocked on network I/O).\n");
       assert (pthread_create (&t, NULL, test_udp, NULL) == 0);
@@ -188,7 +188,7 @@ main ()
       Sleep (100);
       assert (pthread_cancel (t) == 0);
       assert (pthread_join (t, &result) == 0);
-      assert (result == PTHREAD_CANCELED && "test_udp" != NULL);
+      assert ((int)(size_t)result == (int)PTHREAD_CANCELED && "test_udp" != NULL);
     }
   else
     {

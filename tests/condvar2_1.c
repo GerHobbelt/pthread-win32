@@ -105,7 +105,7 @@ main()
 {
   int i;
   pthread_t t[NUMTHREADS + 1];
-  int result = 0;
+  void* result = (void*)0;
   struct _timeb currSysTime;
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
@@ -133,7 +133,7 @@ main()
   for (i = 1; i <= NUMTHREADS; i++)
     {
       assert(pthread_join(t[i], (void *) &result) == 0);
-	assert(result == i);
+	assert((int)(size_t)result == i);
     }
 
   {

@@ -165,11 +165,11 @@ main()
   for (i = 1; i <= NUMTHREADS; i++)
     {
       int fail = 0;
-      int result = 0;
+      void* result = (void*)0;
 
       assert(pthread_join(t[i], (void *) &result) == 0);
 
-      fail = (result != (int) PTHREAD_CANCELED);
+      fail = ((int)(size_t)result != (int) PTHREAD_CANCELED);
 
       if (fail)
 	{

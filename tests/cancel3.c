@@ -173,7 +173,7 @@ main ()
   for (i = 1; i <= NUMTHREADS; i++)
     {
       int fail = 0;
-      int result = 0;
+      void* result = (void*)0;
 
       /*
        * The thread does not contain any cancelation points, so
@@ -182,7 +182,7 @@ main ()
        */
       assert (pthread_join (t[i], (void *) &result) == 0);
 
-      fail = (result != (int) PTHREAD_CANCELED);
+      fail = ((int)(size_t)result != (int) PTHREAD_CANCELED);
 
       if (fail)
 	{

@@ -183,18 +183,18 @@ main()
   for (i = 1; i <= NUMTHREADS; i++)
     {
       int fail = 0;
-      int result = 0;
+      void* result = (void*)0;
 
       assert(pthread_join(t[i], (void *) &result) == 0);
 
-      fail = (result != 0);
+      fail = ((int)(size_t)result != 0);
 
       if (fail)
 	{
 	  fprintf(stderr, "Thread %d: started %d: result: %d\n",
 		  i,
 		  threadbag[i].started,
-		  result);
+		  (int)(size_t)result);
 	}
       failed = (failed || fail);
     }

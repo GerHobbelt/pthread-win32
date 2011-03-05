@@ -226,17 +226,17 @@ main()
   for (i = 0; i < NUMTHREADS; i++)
     {
       int fail = 0;
-      int result = 0;
+      void* result = (void*)0;
 
 	/* Canceled thread */
       assert(pthread_join(ct[i], (void *) &result) == 0);
-      assert(!(fail = (result != (int) PTHREAD_CANCELED)));
+      assert(!(fail = ((int)(size_t)result != (int) PTHREAD_CANCELED)));
 
       failed = (failed || fail);
 
       /* Exceptioned thread */
       assert(pthread_join(et[i], (void *) &result) == 0);
-      assert(!(fail = (result != ((int) PTHREAD_CANCELED + 2))));
+      assert(!(fail = ((int)(size_t)result != ((int) PTHREAD_CANCELED + 2))));
 
       failed = (failed || fail);
     }

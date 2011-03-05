@@ -162,7 +162,7 @@ main()
       assert(GetThreadPriority(pthread_getw32threadhandle_np(t)) ==
 	  validPriorities[param.sched_priority+(PTW32TEST_MAXPRIORITIES/2)]);
       pthread_join(t, &result);
-      assert(param.sched_priority == (int)result);
+      assert(param.sched_priority == (int)(size_t)result);
     }
 
   return 0;

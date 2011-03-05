@@ -63,7 +63,7 @@ void * func(void * arg)
 int
 main()
 {
-  long result = 0;
+  void* result = (void*)0;
   pthread_t t;
   int CPUs;
   struct _timeb sysTime;
@@ -93,7 +93,7 @@ main()
   assert(pthread_spin_unlock(&lock) == 0);
 
   assert(pthread_join(t, (void *) &result) == 0);
-  assert(result > 1000);
+  assert((int)(size_t)result > 1000);
 
   assert(pthread_spin_destroy(&lock) == 0);
 
