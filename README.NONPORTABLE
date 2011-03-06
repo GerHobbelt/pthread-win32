@@ -75,11 +75,11 @@ pthread_getw32threadhandle_np(pthread_t thread);
 DWORD
 pthread_getw32threadid_np (pthread_t thread)
 
-	Returns the win32 thread ID that the POSIX
+	Returns the Windows native thread ID that the POSIX
 	thread "thread" is running as.
 
         Only valid when the library is built where
-        ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
+        ! (defined(__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__) || defined (__DMC__)
         and otherwise returns 0.
 
 

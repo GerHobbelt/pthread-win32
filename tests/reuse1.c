@@ -107,7 +107,7 @@ main()
   for (i = 1; i < NUMTHREADS; i++)
     {
       washere = 0;
-      assert(pthread_create(&t, &attr, func, (void *) i) == 0);
+      assert(pthread_create(&t, &attr, func, (void *)(size_t)i) == 0);
       pthread_join(t, &result);
       assert((int)(size_t) result == i);
       assert(washere == 1);

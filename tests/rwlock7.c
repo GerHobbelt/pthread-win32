@@ -108,8 +108,13 @@ main (int argc, char *argv[])
   int data_updates = 0;
   int seed = 1;
 
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTime1;
+  struct __timeb64 currSysTime2;
+#else
   struct _timeb currSysTime1;
   struct _timeb currSysTime2;
+#endif
 
   /*
    * Initialize the shared data.
@@ -135,7 +140,7 @@ main (int argc, char *argv[])
       threads[count].seed = 1 + rand_r (&seed) % 71;
 
       assert(pthread_create (&threads[count].thread_id,
-                             NULL, thread_routine, (void*)&threads[count]) == 0);
+                             NULL, thread_routine, (void*)(size_t)&threads[count]) == 0);
     }
 
   /*
@@ -190,8 +195,8 @@ main (int argc, char *argv[])
   PTW32_FTIME(&currSysTime2);
 
   printf( "\nstart: %ld/%d, stop: %ld/%d, duration:%ld\n",
-          currSysTime1.time,currSysTime1.millitm,
-          currSysTime2.time,currSysTime2.millitm,
+          (long)currSysTime1.time,currSysTime1.millitm,
+          (long)currSysTime2.time,currSysTime2.millitm,
           ((long)((currSysTime2.time*1000+currSysTime2.millitm) -
           (currSysTime1.time*1000+currSysTime1.millitm))));
 

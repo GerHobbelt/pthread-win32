@@ -119,7 +119,9 @@ Win32thread(void * arg)
   pthread_cond_wait(&CV, &CVLock);
   pthread_cleanup_pop(1);
 
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
   return 0;
+#endif
 }
 
 int
@@ -189,13 +191,13 @@ main()
       /*
        * Can't get a result code.
        */
-      result = (int) PTHREAD_CANCELED;
+      result = (int)(size_t)PTHREAD_CANCELED;
 #endif
 
       assert(threadbag[i].self.p != NULL);
       assert(pthread_kill(threadbag[i].self, 0) == ESRCH);
 
-      fail = (result != (int) PTHREAD_CANCELED);
+      fail = (result != (int)(size_t)PTHREAD_CANCELED);
 
       if (fail)
 	{

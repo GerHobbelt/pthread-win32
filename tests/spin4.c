@@ -41,8 +41,13 @@
 #include <sys/timeb.h>
  
 pthread_spinlock_t lock = PTHREAD_SPINLOCK_INITIALIZER;
-struct _timeb currSysTimeStart;
-struct _timeb currSysTimeStop;
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTimeStart;
+  struct __timeb64 currSysTimeStop;
+#else
+  struct _timeb currSysTimeStart;
+  struct _timeb currSysTimeStop;
+#endif
 
 #define GetDurationMilliSecs(_TStart, _TStop) ((_TStop.time*1000+_TStop.millitm) \
 					       - (_TStart.time*1000+_TStart.millitm))
@@ -57,7 +62,7 @@ void * func(void * arg)
   assert(pthread_spin_unlock(&lock) == 0);
   PTW32_FTIME(&currSysTimeStop);
 
-  return (void *) (size_t)GetDurationMilliSecs(currSysTimeStart, currSysTimeStop);
+  return (void *)(size_t)GetDurationMilliSecs(currSysTimeStart, currSysTimeStop);
 }
  
 int
@@ -66,7 +71,11 @@ main()
   void* result = (void*)0;
   pthread_t t;
   int CPUs;
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 sysTime;
+#else
   struct _timeb sysTime;
+#endif
 
   if ((CPUs = pthread_num_processors_np()) == 1)
     {
@@ -92,7 +101,7 @@ main()
 
   assert(pthread_spin_unlock(&lock) == 0);
 
-  assert(pthread_join(t, (void *) &result) == 0);
+  assert(pthread_join(t, &result) == 0);
   assert((int)(size_t)result > 1000);
 
   assert(pthread_spin_destroy(&lock) == 0);

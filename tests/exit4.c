@@ -111,7 +111,7 @@ Win32thread(void * arg)
   /*
    * Doesn't return and doesn't create an implicit POSIX handle.
    */
-  pthread_exit((void *) result);
+  pthread_exit((void *)(size_t)result);
 
   return 0;
 }

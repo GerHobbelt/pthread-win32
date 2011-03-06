@@ -55,14 +55,18 @@ void * wrfunc(void * arg)
   bankAccount += 10;
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
-  return ((void *) bankAccount);
+  return ((void *)(size_t)bankAccount);
 }
 
 void * rdfunc(void * arg)
 {
   int ba = -1;
   struct timespec abstime = { 0, 0 };
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTime;
+#else
   struct _timeb currSysTime;
+#endif
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   PTW32_FTIME(&currSysTime);
@@ -85,7 +89,7 @@ void * rdfunc(void * arg)
       assert(pthread_rwlock_unlock(&rwlock1) == 0);
     }
 
-  return ((void *) ba);
+  return ((void *)(size_t)ba);
 }
 
 int
@@ -104,11 +108,11 @@ main()
 
   assert(pthread_create(&wrt1, NULL, wrfunc, NULL) == 0);
   Sleep(500);
-  assert(pthread_create(&rdt1, NULL, rdfunc, (void *) 1) == 0);
+  assert(pthread_create(&rdt1, NULL, rdfunc, (void *)(size_t)1) == 0);
   Sleep(500);
   assert(pthread_create(&wrt2, NULL, wrfunc, NULL) == 0);
   Sleep(500);
-  assert(pthread_create(&rdt2, NULL, rdfunc, (void *) 2) == 0);
+  assert(pthread_create(&rdt2, NULL, rdfunc, (void *)(size_t)2) == 0);
 
   assert(pthread_join(wrt1, (void *) &wr1Result) == 0);
   assert(pthread_join(rdt1, (void *) &rd1Result) == 0);

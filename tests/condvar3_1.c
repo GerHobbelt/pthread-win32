@@ -127,7 +127,11 @@ main()
   int i;
   pthread_t t[NUMTHREADS + 1];
   void* result = (void*)0;
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTime;
+#else
   struct _timeb currSysTime;
+#endif
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   assert(pthread_cond_init(&cv, NULL) == 0);
@@ -148,7 +152,7 @@ main()
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
-      assert(pthread_create(&t[i], NULL, mythread, (void *) i) == 0);
+      assert(pthread_create(&t[i], NULL, mythread, (void *)(size_t)i) == 0);
     }
 
   do {

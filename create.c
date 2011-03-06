@@ -200,7 +200,7 @@ pthread_create (pthread_t * tid,
    * finished with it here.
    */
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__) 
+#if ! (defined (__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__) || defined (__DMC__) 
 
   tp->threadH =
     threadH =
@@ -225,7 +225,7 @@ pthread_create (pthread_t * tid,
 	}
     }
 
-#else /* __MINGW32__ && ! __MSVCRT__ */
+#else
 
   /*
    * This lock will force pthread_threadStart() to wait until we have
@@ -265,7 +265,7 @@ pthread_create (pthread_t * tid,
 
   (void) pthread_mutex_unlock (&tp->cancelLock);
 
-#endif /* __MINGW32__ && ! __MSVCRT__ */
+#endif
 
   result = (threadH != 0) ? 0 : EAGAIN;
 

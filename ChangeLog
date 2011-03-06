@@ -1,3 +1,9 @@
+2011-03-06  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* several (MINGW64): Cast and call fixups for 64 bit compatibility;
+	clean build via x86_64-w64-mingw32 cross toolchain on Linux i686
+	targeting x86_64 win64.
+
 2011-03-04  Ross Johnson <ross.johnson at homemail.com.au>
 
 	* implement.h (PTW32_INTERLOCKED_*): Mingw32 does not provide

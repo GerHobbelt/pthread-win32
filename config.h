@@ -130,7 +130,10 @@
 #define HAVE_C_INLINE
 #endif
 
-#ifdef __MINGW32__
+#if defined(__MINGW64__)
+#define HAVE_MODE_T
+#define HAVE_STRUCT_TIMESPEC
+#elif defined(__MINGW32__)
 #define HAVE_MODE_T
 #endif
 

@@ -73,7 +73,7 @@ ptw32_throw (DWORD exception)
        * explicit thread exit here after cleaning up POSIX
        * residue (i.e. cleanup handlers, POSIX thread handle etc).
        */
-#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! (defined(__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__) || defined (__DMC__)
       unsigned exitCode = 0;
 
       switch (exception)
@@ -96,7 +96,7 @@ ptw32_throw (DWORD exception)
 
 #endif
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! (defined(__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__) || defined (__DMC__)
       _endthreadex (exitCode);
 #else
       _endthread ();
@@ -166,7 +166,7 @@ ptw32_get_exception_services_code (void)
 
 #else
 
-  return (DWORD) NULL;
+  return (DWORD)0;
 
 #endif
 }

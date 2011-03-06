@@ -63,7 +63,11 @@ main()
 {
   pthread_t t;
   struct timespec abstime = { 0, 0 };
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTime;
+#else
   struct _timeb currSysTime;
+#endif
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   PTW32_FTIME(&currSysTime);

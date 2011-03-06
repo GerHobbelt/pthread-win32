@@ -54,7 +54,11 @@ ptw32_relmillisecs (const struct timespec * abstime)
   FILETIME ft;
   SYSTEMTIME st;
 #else /* ! NEED_FTIME */
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTime;
+#else
   struct _timeb currSysTime;
+#endif
 #endif /* NEED_FTIME */
 
 
@@ -93,7 +97,7 @@ ptw32_relmillisecs (const struct timespec * abstime)
 
 #ifdef _MSC_VER
   _ftime64_s(&currSysTime);
-#elif defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601
+#elif (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
   _ftime64(&currSysTime);
 #else
   _ftime(&currSysTime);
