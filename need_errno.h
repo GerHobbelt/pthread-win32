@@ -20,8 +20,8 @@
 #ifndef _INC_ERRNO
 #define _INC_ERRNO
 
-#if     !defined(_WIN32) && !defined(_MAC)
-#error ERROR: Only Mac or Win32 targets supported!
+#if     !defined(_WIN32)
+#error ERROR: Only Win32 targets supported!
 #endif
 
 #include <winsock.h>

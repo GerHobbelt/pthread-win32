@@ -47,7 +47,7 @@ ptw32_cancel_self (void)
 }
 
 static void CALLBACK
-ptw32_cancel_callback (DWORD unused)
+ptw32_cancel_callback (ULONG_PTR unused)
 {
   ptw32_throw (PTW32_EPS_CANCEL);
 

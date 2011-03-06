@@ -235,7 +235,7 @@ main()
       failed = (failed || fail);
 
       /* Exceptioned thread */
-      assert(pthread_join(et[i], (void *) &result) == 0);
+      assert(pthread_join(et[i], &result) == 0);
       assert(!(fail = (result != (void*)((int)(size_t)PTHREAD_CANCELED + 2))));
 
       failed = (failed || fail);

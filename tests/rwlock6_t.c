@@ -114,10 +114,10 @@ main()
   Sleep(500);
   assert(pthread_create(&rdt2, NULL, rdfunc, (void *)(size_t)2) == 0);
 
-  assert(pthread_join(wrt1, (void *) &wr1Result) == 0);
-  assert(pthread_join(rdt1, (void *) &rd1Result) == 0);
-  assert(pthread_join(wrt2, (void *) &wr2Result) == 0);
-  assert(pthread_join(rdt2, (void *) &rd2Result) == 0);
+  assert(pthread_join(wrt1, &wr1Result) == 0);
+  assert(pthread_join(rdt1, &rd1Result) == 0);
+  assert(pthread_join(wrt2, &wr2Result) == 0);
+  assert(pthread_join(rdt2, &rd2Result) == 0);
 
   assert((int)(size_t)wr1Result == 10);
   assert((int)(size_t)rd1Result == 0);

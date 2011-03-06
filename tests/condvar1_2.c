@@ -116,7 +116,7 @@ main()
         }
       while (j > 0);
 
-      assert(pthread_join(t, (void *) &result) == 0);
+      assert(pthread_join(t, &result) == 0);
       assert ((int)(size_t)result == 0);
     }
 
