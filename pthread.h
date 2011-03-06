@@ -190,7 +190,7 @@
  */
 
 /* Try to avoid including windows.h */
-#if defined(__MINGW32__) && defined(__cplusplus)
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && defined(__cplusplus)
 #define PTW32_INCLUDE_WINDOWS_H
 #endif
 
@@ -245,7 +245,10 @@ enum {
 #    define NEED_ERRNO
 #    define NEED_SEM
 #  endif
-#  if defined(_UWIN) || defined(__MINGW32__)
+#  if defined(__MINGW64__)
+#    define HAVE_STRUCT_TIMESPEC
+#    define HAVE_MODE_T
+#  elif defined(_UWIN) || defined(__MINGW32__)
 #    define HAVE_MODE_T
 #  endif
 #endif
@@ -303,7 +306,7 @@ enum {
 #endif
 
 #ifndef HAVE_STRUCT_TIMESPEC
-#define HAVE_STRUCT_TIMESPEC 1
+#define HAVE_STRUCT_TIMESPEC
 #ifndef _TIMESPEC_DEFINED
 #define _TIMESPEC_DEFINED
 struct timespec {

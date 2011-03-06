@@ -64,7 +64,7 @@ XOPT	=
 
 RCFLAGS		= --include-dir=.
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
-#LFLAGS		= -lwsock32
+#LFLAGS		= -lws2_32
 
 # ----------------------------------------------------------------------
 # The library can be built with some alternative behaviour to

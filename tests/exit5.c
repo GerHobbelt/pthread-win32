@@ -115,7 +115,7 @@ Win32thread(void * arg)
   /*
    * Doesn't return.
    */
-  pthread_exit((void *) result);
+  pthread_exit((void *)(size_t)result);
 
   return 0;
 }

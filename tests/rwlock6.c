@@ -57,7 +57,7 @@ void * wrfunc(void * arg)
   ba = bankAccount;
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
-  return ((void *) ba);
+  return ((void *)(size_t)ba);
 }
 
 void * rdfunc(void * arg)
@@ -68,7 +68,7 @@ void * rdfunc(void * arg)
   ba = bankAccount;
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
-  return ((void *) ba);
+  return ((void *)(size_t)ba);
 }
 
 int

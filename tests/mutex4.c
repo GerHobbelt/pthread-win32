@@ -49,7 +49,7 @@ static pthread_mutex_t mutex1;
  
 void * unlocker(void * arg)
 {
-  int expectedResult = (int) arg;
+  int expectedResult = (int)(size_t)arg;
 
   wasHere++;
   assert(pthread_mutex_unlock(&mutex1) == expectedResult);
@@ -72,7 +72,7 @@ main()
   /*
    * NORMAL (fast) mutexes don't check ownership.
    */
-  assert(pthread_create(&t, NULL, unlocker, (void *) 0) == 0);
+  assert(pthread_create(&t, NULL, unlocker, (void *)(size_t)0) == 0);
   assert(pthread_join(t, NULL) == 0);
   assert(pthread_mutex_unlock(&mutex1) == EPERM);
   assert(wasHere == 2);

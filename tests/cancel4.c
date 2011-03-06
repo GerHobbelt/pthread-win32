@@ -98,7 +98,7 @@ static bag_t threadbag[NUMTHREADS + 1];
 void *
 mythread(void * arg)
 {
-  int result = ((int)PTHREAD_CANCELED + 1);
+  void* result = (void*)((int)(size_t)PTHREAD_CANCELED + 1);
   bag_t * bag = (bag_t *) arg;
 
   assert(bag == &threadbag[bag->threadnum]);
@@ -118,7 +118,7 @@ mythread(void * arg)
   for (bag->count = 0; bag->count < 20; bag->count++)
     Sleep(100);
 
-  return (void *) (size_t)result;
+  return result;
 }
 
 int
@@ -180,9 +180,9 @@ main()
        * a return value of PTHREAD_CANCELED indicates that async
        * cancelation occurred.
        */
-      assert(pthread_join(t[i], (void *) &result) == 0);
+      assert(pthread_join(t[i], &result) == 0);
 
-      fail = ((int)(size_t)result == (int) PTHREAD_CANCELED);
+      fail = (result == PTHREAD_CANCELED);
 
       if (fail)
 	{

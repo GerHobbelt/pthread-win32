@@ -86,7 +86,7 @@ void *
 exceptionedThread(void * arg)
 {
   int dummy = 0;
-  int result = ((int)PTHREAD_CANCELED + 1);
+  void* result = (void*)((int)(size_t)PTHREAD_CANCELED + 1);
   /* Set to async cancelable */
 
   assert(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == 0);
@@ -110,7 +110,7 @@ exceptionedThread(void * arg)
   __except (EXCEPTION_EXECUTE_HANDLER)
   {
     /* Should get into here. */
-    result = ((int)PTHREAD_CANCELED + 2);
+    result = (void*)((int)(size_t)PTHREAD_CANCELED + 2);
   }
 #elif defined(__cplusplus)
   try
@@ -129,7 +129,7 @@ exceptionedThread(void * arg)
 #endif
   {
     /* Should get into here. */
-    result = ((int)PTHREAD_CANCELED + 2);
+    result = (void*)((int)(size_t)PTHREAD_CANCELED + 2);
   }
 #endif
 
@@ -139,7 +139,7 @@ exceptionedThread(void * arg)
 void *
 canceledThread(void * arg)
 {
-  int result = ((int)PTHREAD_CANCELED + 1);
+  void* result = (void*)((int)(size_t)PTHREAD_CANCELED + 1);
   int count;
 
   /* Set to async cancelable */
@@ -161,7 +161,7 @@ canceledThread(void * arg)
   __except (EXCEPTION_EXECUTE_HANDLER)
   {
     /* Should NOT get into here. */
-    result = ((int)PTHREAD_CANCELED + 2);
+    result = (void*)((int)(size_t)PTHREAD_CANCELED + 2);
   }
 #elif defined(__cplusplus)
   try
@@ -180,7 +180,7 @@ canceledThread(void * arg)
 #endif
   {
     /* Should NOT get into here. */
-    result = ((int)PTHREAD_CANCELED + 2);
+    result = (void*)((int)(size_t)PTHREAD_CANCELED + 2);
   }
 #endif
 
@@ -229,14 +229,14 @@ main()
       void* result = (void*)0;
 
 	/* Canceled thread */
-      assert(pthread_join(ct[i], (void *) &result) == 0);
-      assert(!(fail = ((int)(size_t)result != (int) PTHREAD_CANCELED)));
+      assert(pthread_join(ct[i], &result) == 0);
+      assert(!(fail = (result != PTHREAD_CANCELED)));
 
       failed = (failed || fail);
 
       /* Exceptioned thread */
       assert(pthread_join(et[i], (void *) &result) == 0);
-      assert(!(fail = ((int)(size_t)result != ((int) PTHREAD_CANCELED + 2))));
+      assert(!(fail = (result != (void*)((int)(size_t)PTHREAD_CANCELED + 2))));
 
       failed = (failed || fail);
     }

@@ -41,7 +41,7 @@
 void *
 func(void * arg)
 {
-    int i = (int) arg;
+    int i = (int)(size_t)arg;
 
     Sleep(i * 100);
 
@@ -61,7 +61,7 @@ main(int argc, char * argv[])
 	/* Create a few threads and then exit. */
 	for (i = 0; i < 4; i++)
 	  {
-	    assert(pthread_create(&id[i], NULL, func, (void *) i) == 0);
+	    assert(pthread_create(&id[i], NULL, func, (void *)(size_t)i) == 0);
 	  }
 
 	/* Some threads will finish before they are joined, some after. */

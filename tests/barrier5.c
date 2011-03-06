@@ -56,7 +56,7 @@ func(void * crossings)
   int result;
   int serialThreads = 0;
 
-  while ((LONG)crossings >= (LONG)InterlockedIncrement((LPLONG)&totalThreadCrossings))
+  while ((LONG)(size_t)crossings >= (LONG)InterlockedIncrement((LPLONG)&totalThreadCrossings))
     {
       result = pthread_barrier_wait(&barrier);
 
@@ -97,7 +97,7 @@ main()
 
       for (i = 1; i <= j; i++)
         {
-          assert(pthread_create(&t[i], NULL, func, (void *) Crossings) == 0);
+          assert(pthread_create(&t[i], NULL, func, (void *)(size_t)Crossings) == 0);
         }
 
       serialThreadsTotal = 0;

@@ -37,14 +37,20 @@ CP	= cp -f
 MV	= mv -f
 RM	= rm -f
 CAT	= cat
-#CP	= copy
-#MV	= rename
-#RM	= erase
-#CAT	= type
 MKDIR	= mkdir
 TOUCH	= echo Passed >
 ECHO	= @echo
 MAKE	= make -k
+
+# For cross compiling use e.g.
+# # make CROSS=i386-mingw32msvc- clean GC
+CROSS   =
+
+AR      = $(CROSS)ar
+DLLTOOL = $(CROSS)dlltool
+CC      = $(CROSS)gcc
+CXX     = $(CROSS)g++
+RANLIB  = $(CROSS)ranlib
 
 #
 # Mingw32
@@ -56,6 +62,9 @@ CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
 BUILD_DIR	= ..
 INCLUDES	= -I.
 
+.INTERMEDIATE: %.exe %.pass
+.SECONDARY: %.exe %.pass
+.PRECIOUS: %.exe %.pass
 
 TEST	= GC
 
@@ -145,6 +154,9 @@ STATICTESTS = \
 	  exception1 exception2 exception3 \
 	  cancel9 create3 stress1
 
+ALLTESTS = $(TESTS) $(BENCHTESTS)
+
+ASM		= $(ALLTESTS:%=%.s)
 PASSES		= $(TESTS:%=%.pass)
 BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
 STRESSRESULTS	= $(STRESSTESTS:%=%.pass)
@@ -167,34 +179,40 @@ all:
 	@ $(MAKE) clean GCE
 
 GC:
-	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-fopenmp -D__CLEANUP_C" all-pass
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-fopenmp -D__CLEANUP_C" all-pass
+
+GC-asm:
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-fopenmp -D__CLEANUP_C" all-asm
 
 GCE:
-	$(MAKE) TEST=GCE CC=g++ XXCFLAGS="-fopenmp -mthreads -D__CLEANUP_CXX" all-pass
+	$(MAKE) TEST=GCE CC=$(CXX) XXCFLAGS="-fopenmp -mthreads -D__CLEANUP_CXX" all-pass
 
 GCX:
-	$(MAKE) TEST=GC CC=g++ XXCFLAGS="-fopenmp -mthreads -D__CLEANUP_C" all-pass
+	$(MAKE) TEST=GC CC=$(CXX) XXCFLAGS="-fopenmp -mthreads -D__CLEANUP_C" all-pass
 
 GC-bench:
-	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
 
 GCE-bench:
-	$(MAKE) TEST=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
+	$(MAKE) TEST=GCE  CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
 
 GC-debug:
-	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-fopenmp -D__CLEANUP_C" DLL_VER="$(DLL_VER)d" all-pass
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-fopenmp -D__CLEANUP_C" DLL_VER="$(DLL_VER)d" all-pass
 
 GC-static:
-	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" XXLIBS="-lws2_32" DLL="" all-static
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" XXLIBS="-lws2_32" DLL="" all-static
 
 GC-stress:
 	$(ECHO) Stress tests can take a long time since they are trying to
 	$(ECHO) expose weaknesses that may be intermittant or statistically rare.
 	$(ECHO) A pass does not prove correctness, but may give greater confidence.
-	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" XXLIBS="" all-stress
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="" all-stress
 
 GCE-stress:
-	$(MAKE) TEST=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="" all-stress
+	$(MAKE) TEST=GCE  CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="" all-stress
+
+all-asm: $(ASM)
+	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
 all-pass: $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
@@ -347,20 +365,20 @@ valid2.pass: valid1.pass
 
 sizes.pass: sizes.exe
 	@ $(ECHO) Running $*
-	$< > SIZES.$(TEST)
+	./$< > SIZES.$(TEST)
 	@ $(CAT) SIZES.$(TEST)
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
 %.pass: %.exe
 	@ $(ECHO) Running $*
-	$*
+	./$*
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
 %.bench: $(LIB) $(DLL) $(HDR) $(QAPC) $(XXLIBS) %.exe
 	@ $(ECHO) Running $*
-	$*
+	./$*
 	@ $(ECHO) Done
 	@ $(TOUCH) $@
 
@@ -373,6 +391,7 @@ sizes.pass: sizes.exe
 	@ $(CC) -E $(CFLAGS) -o $@ $< $(INCLUDES)
 
 %.s: %.c $(HDR)
+	@ $(ECHO) Compiling $@
 	@ $(CC) -S $(CFLAGS) -o $@ $< $(INCLUDES)
 
 $(COPYFILES):
@@ -397,6 +416,7 @@ clean:
 	- $(RM) *.e
 	- $(RM) *.i
 	- $(RM) *.o
+	- $(RM) *.s
 	- $(RM) *.so
 	- $(RM) *.obj
 	- $(RM) *.pdb

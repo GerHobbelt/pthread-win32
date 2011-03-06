@@ -183,12 +183,8 @@ INLINE void
 ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
 {
   ptw32_mcs_lock_t *lock = node->lock;
-  ptw32_mcs_local_node_t *next = (ptw32_mcs_local_node_t *)
-#ifndef _WIN64
-  PTW32_INTERLOCKED_EXCHANGE_ADD((LPLONG)&node->next, 0); /* MBR fence */
-#else
-  PTW32_INTERLOCKED_EXCHANGE_ADD64((LONG64 *)&node->next, 0); /* MBR fence */
-#endif
+  ptw32_mcs_local_node_t *next = (ptw32_mcs_local_node_t *)(size_t)
+    PTW32_INTERLOCKED_EXCHANGE_ADD((LPLONG)&node->next, 0); /* MBR fence */
 
   if (0 == next)
     {
@@ -205,12 +201,8 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
   
       /* wait for successor */
       ptw32_mcs_flag_wait(&node->nextFlag);
-      next = (ptw32_mcs_local_node_t *)
-#ifndef _WIN64
+      next = (ptw32_mcs_local_node_t *)(size_t)
 	PTW32_INTERLOCKED_EXCHANGE_ADD((LPLONG)&node->next, 0); /* MBR fence */
-#else
-	PTW32_INTERLOCKED_EXCHANGE_ADD64((LONG64 *)&node->next, 0); /* MBR fence */
-#endif
     }
 
   /* pass the lock */
@@ -228,10 +220,10 @@ ptw32_mcs_lock_try_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * no
   node->readyFlag = 0;
   node->next = 0; /* initially, no successor */
 
-  return ((PTW32_INTERLOCKED_LPLONG)PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+  return ((PTW32_INTERLOCKED_LPLONG)PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR(
                                       (PTW32_INTERLOCKED_LPLONG)lock,
-                                      (PTW32_INTERLOCKED_LONG)node,
-                                      (PTW32_INTERLOCKED_LONG)0)
+                                      (PTW32_INTERLOCKED_LPLONG)node,
+                                      (PTW32_INTERLOCKED_LPLONG)0)
                == (PTW32_INTERLOCKED_LPLONG)0) ? 0 : EBUSY;
 }
 
@@ -254,9 +246,13 @@ ptw32_mcs_node_transfer (ptw32_mcs_local_node_t * new_node, ptw32_mcs_local_node
   new_node->readyFlag = 0; /* Not needed - we were waiting on this */
   new_node->next = 0;
 
+#if defined(_WIN64)
+  if ((ptw32_mcs_local_node_t *)PTW32_INTERLOCKED_COMPARE_EXCHANGE64((PTW32_INTERLOCKED_LPLONG)new_node->lock,
+#else
   if ((ptw32_mcs_local_node_t *)PTW32_INTERLOCKED_COMPARE_EXCHANGE((PTW32_INTERLOCKED_LPLONG)new_node->lock,
-                                                                   (PTW32_INTERLOCKED_LONG)new_node,
-                                                                   (PTW32_INTERLOCKED_LONG)old_node) != old_node)
+#endif
+                                                                   (size_t)(PTW32_INTERLOCKED_LPLONG)new_node,
+                                                                   (size_t)(PTW32_INTERLOCKED_LPLONG)old_node) != old_node)
     {
       /*
        * A successor has queued after us, so wait for them to link to us

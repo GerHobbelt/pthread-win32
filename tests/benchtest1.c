@@ -53,8 +53,13 @@
 
 pthread_mutex_t mx;
 pthread_mutexattr_t ma;
-struct _timeb currSysTimeStart;
-struct _timeb currSysTimeStop;
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTimeStart;
+  struct __timeb64 currSysTimeStop;
+#else
+  struct _timeb currSysTimeStart;
+  struct _timeb currSysTimeStop;
+#endif
 long durationMilliSecs;
 long overHeadMilliSecs = 0;
 int two = 2;
