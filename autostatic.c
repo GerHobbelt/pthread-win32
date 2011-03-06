@@ -1,8 +1,8 @@
 /*
- * pthread_barrier_wait.c
+ * autostatic.c
  *
  * Description:
- * This translation unit implements barrier primitives.
+ * This translation unit implements static auto-init and auto-exit logic.
  *
  * --------------------------------------------------------------------------
  *

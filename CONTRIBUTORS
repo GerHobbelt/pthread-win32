@@ -7,7 +7,7 @@ Ben Elliston		bje at cygnus dot com
 					Initiated the project;
 					setup the project infrastructure (CVS, web page, etc.);
 					early prototype routines.
-Ross Johnson		rpj at callisto dot canberra dot edu dot au
+Ross Johnson		Ross dot Johnson at  dot homemail dot com dot au
 					early prototype routines;
 					ongoing project coordination/maintenance;
 					implementation of spin locks and barriers;

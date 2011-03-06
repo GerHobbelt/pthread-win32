@@ -99,7 +99,7 @@ GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
 
 ## Mingw32
 MAKE		?= make
-CFLAGS	= $(OPT) $(XOPT) -I. -DHAVE_CONFIG_H -Wall
+CFLAGS	= $(OPT) $(XOPT) -I. -DHAVE_PTW32_CONFIG_H -Wall
 
 DLL_INLINED_OBJS	= \
 		pthread.o \

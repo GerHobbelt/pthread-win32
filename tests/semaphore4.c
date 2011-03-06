@@ -111,7 +111,7 @@ main()
 	assert(pthread_cancel(t[50]) == 0);
 	  {
 	    void* result;
-	    assert(pthread_join(t[50], (void *) &result) == 0);
+	    assert(pthread_join(t[50], &result) == 0);
 	  }
 	assert(sem_getvalue(&s, &value) == 0);
 	assert(-value == (MAX_COUNT - 1));

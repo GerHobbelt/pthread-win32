@@ -112,7 +112,7 @@
 #ifdef _UWIN
 #   define HAVE_STRUCT_TIMESPEC 1
 #   define HAVE_SIGNAL_H        1
-#   undef HAVE_CONFIG_H
+#   undef HAVE_PTW32_CONFIG_H
 #   pragma comment(lib, "pthread")
 #endif
 
@@ -210,9 +210,9 @@ typedef unsigned long DWORD_PTR;
  * -----------------
  */
 
-#if HAVE_CONFIG_H
+#if HAVE_PTW32_CONFIG_H
 #include "config.h"
-#endif /* HAVE_CONFIG_H */
+#endif /* HAVE_PTW32_CONFIG_H */
 
 #ifndef NEED_FTIME
 #include <time.h>

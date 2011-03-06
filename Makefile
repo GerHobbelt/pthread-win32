@@ -27,7 +27,7 @@ STATIC_STAMPS	= pthreadVCE$(DLL_VER).static pthreadVSE$(DLL_VER).static pthreadV
 OPTIM	= /O2 /Ob2
 OPTIMD	=
 
-CFLAGS	= /W3 /MD /nologo /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
+CFLAGS	= /W3 /MD /nologo /I. /D_WIN32_WINNT=0x400 /DHAVE_PTW32_CONFIG_H
 CFLAGSD	= /Z7 $(CFLAGS)
 
 # Uncomment this if config.h defines RETAIN_WSALASTERROR

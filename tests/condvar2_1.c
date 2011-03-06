@@ -136,7 +136,7 @@ main()
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
-      assert(pthread_join(t[i], (void *) &result) == 0);
+      assert(pthread_join(t[i], &result) == 0);
 	assert((int)(size_t)result == i);
     }
 
