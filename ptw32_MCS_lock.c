@@ -229,11 +229,10 @@ ptw32_mcs_lock_try_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * no
   node->readyFlag = 0;
   node->next = 0; /* initially, no successor */
 
-  return ((PTW32_INTERLOCKED_LPLONG)PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR(
-                                      (PTW32_INTERLOCKED_LPLONG)lock,
-                                      (PTW32_INTERLOCKED_LPLONG)node,
-                                      (PTW32_INTERLOCKED_LPLONG)0)
-               == (PTW32_INTERLOCKED_LPLONG)0) ? 0 : EBUSY;
+  return ((PVOID)PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR((LPVOID volatile *)lock,
+                                                        (PVOID)node,
+                                                        (PVOID)0)
+                                 == (PVOID)0) ? 0 : EBUSY;
 }
 
 /*
