@@ -299,20 +299,11 @@ ptw32_threadStart (void *vthreadParms)
   {
     /*
      * A system unexpected exception has occurred running the user's
-     * terminate routine. We get control back within this block - cleanup
-     * and release the exception out of thread scope.
+     * terminate routine. We get control back within this block
+     * and exit with a substitue status. If the thread was not
+     * cancelled then this indicates the unhandled exception.
      */
     status = sp->exitStatus = PTHREAD_CANCELED;
-    (void) pthread_mutex_lock (&sp->cancelLock);
-    sp->state = PThreadStateException;
-    (void) pthread_mutex_unlock (&sp->cancelLock);
-    (void) pthread_win32_thread_detach_np ();
-    (void) set_terminate (ptw32_oldTerminate);
-    throw;
-
-    /*
-     * Never reached.
-     */
   }
 
   (void) set_terminate (ptw32_oldTerminate);

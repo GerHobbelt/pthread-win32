@@ -82,12 +82,16 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #define INLINE
 #endif
 
-#if defined (__MINGW64__) || defined(__MINGW32__) || (_MSC_VER >= 1300)
-#define PTW32_INTERLOCKED_LONG long
-#define PTW32_INTERLOCKED_LPLONG long*
+#if defined (__MINGW64__) || defined(__MINGW32__) || defined(_MSC_VER)
+#define PTW32_INTERLOCKED_LONG unsigned long
+#define PTW32_INTERLOCKED_LPLONG volatile unsigned long*
+#define PTW32_INTERLOCKED_PVOID PVOID
+#define PTW32_INTERLOCKED_PVOID_PTR volatile PVOID*
 #else
 #define PTW32_INTERLOCKED_LONG PVOID
-#define PTW32_INTERLOCKED_LPLONG PVOID*
+#define PTW32_INTERLOCKED_LPLONG volatile PVOID*
+#define PTW32_INTERLOCKED_PVOID PVOID
+#define PTW32_INTERLOCKED_PVOID_PTR volatile PVOID*
 #endif
 
 #if defined(__MINGW64__) || defined(__MINGW32__)
@@ -594,7 +598,7 @@ extern "C"
 
   void ptw32_rwlock_cancelwrwait (void *arg);
 
-#if ! (defined (__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__)
+#if ! (defined (__MINGW64__) || defined(__MINGW32__)) || (defined (__MSVCRT__) && ! defined(__DMC__))
   unsigned __stdcall
 #else
   void
