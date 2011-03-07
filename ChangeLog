@@ -6,6 +6,9 @@
 	* ptw32_threadStart.c (ptw32_threadStart): Routine no longer attempts
 	to pass [unexpected C++] exceptions out of scope but ends the thread
 	normally setting EINTR as the exit status.
+	* ptw32_throw.c: Fix C++ exception throwing warnings; ignore
+	informational warning.
+	* implement.h: Likewise with the corresponding header definition.
 
 2011-03-04  Ross Johnson <ross.johnson at homemail.com.au>
 

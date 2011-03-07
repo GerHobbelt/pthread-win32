@@ -52,8 +52,8 @@
 #define NUM_THREADS 100 /* Targeting each once control */
 #define NUM_ONCE    10
 
-pthread_once_t o = PTHREAD_ONCE_INIT;
-pthread_once_t once[NUM_ONCE];
+static pthread_once_t o = PTHREAD_ONCE_INIT;
+static pthread_once_t once[NUM_ONCE];
 
 typedef struct {
   int i;
