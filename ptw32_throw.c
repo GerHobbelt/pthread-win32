@@ -46,8 +46,19 @@
  * 'implicit' POSIX threads for each of the possible language modes (C,
  * C++, and SEH).
  */
+#ifdef _MSC_VER
+/*
+ * Ignore the warning:
+ * "C++ exception specification ignored except to indicate that
+ * the function is not __declspec(nothrow)."
+ */
+#pragma warning(disable:4290)
+#endif
 void
 ptw32_throw (DWORD exception)
+#ifdef __CLEANUP_CXX
+  throw(ptw32_exception_cancel,ptw32_exception_exit)
+#endif
 {
   /*
    * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
