@@ -139,7 +139,7 @@ sem_wait (sem_t * sem)
 
 	  if (v < 0)
 	    {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 800
 #pragma inline_depth(0)
 #endif
 	      /* Must wait */
@@ -147,7 +147,7 @@ sem_wait (sem_t * sem)
 	      result = pthreadCancelableWait (s->sem);
 	      /* Cleanup if we're canceled or on any other error */
 	      pthread_cleanup_pop(result);
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 800
 #pragma inline_depth()
 #endif
 	    }

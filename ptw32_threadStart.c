@@ -268,7 +268,6 @@ ptw32_threadStart (void *vthreadParms)
        * ptw32_terminate() will be called if there is no user
        * supplied function.
        */
-
       terminate_function
 	term_func = set_terminate (0);
       set_terminate (term_func);
@@ -277,7 +276,6 @@ ptw32_threadStart (void *vthreadParms)
 	{
 	  term_func ();
 	}
-
       throw;
     }
   }
