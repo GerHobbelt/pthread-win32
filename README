@@ -31,6 +31,10 @@ MSVC or GNU C (MinGW32 MSys development kit)
 	To build from source.
 
 QueueUserAPCEx by Panagiotis E. Hadjidoukas
+	To support any thread cancelation in C++ library builds or
+	to support cancelation of blocked threads in any build.
+	This library is not required otherwise.
+
 	For true async cancelation of threads (including blocked threads).
 	This is a DLL and Windows driver that provides pre-emptive APC
 	by forcing threads into an alertable state when the APC is queued.
@@ -46,6 +50,10 @@ QueueUserAPCEx by Panagiotis E. Hadjidoukas
 	cancelation, which means that it can async cancel only threads that
 	are runnable. The simulated async cancellation cannot cancel blocked
 	threads.
+
+	QueueUserAPCEx is required in C++ builds to avoid longjmp-style
+	context switching in pthread_cancel(), which will otherwise affect
+	exception handling and proper application behaviour.
 
 
 Library naming

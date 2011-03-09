@@ -42,8 +42,8 @@ static void PTW32_CDECL
 ptw32_once_on_init_cancel (void * arg)
 {
   /* when the initing thread is cancelled we have to release the lock */
-  ptw32_mcs_local_node_t *node = (ptw32_mcs_local_node_t *)arg;
-  ptw32_mcs_lock_release(node);
+  ptw32_mcs_local_node_t* nodePtr = (ptw32_mcs_local_node_t *)arg;
+  ptw32_mcs_lock_release(nodePtr);
 }
 
 int
@@ -63,7 +63,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
       if (!once_control->done)
 	{
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 800
 #pragma inline_depth(0)
 #endif
 
@@ -71,7 +71,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	  (*init_routine)();
 	  pthread_cleanup_pop(0);
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 800
 #pragma inline_depth()
 #endif
 

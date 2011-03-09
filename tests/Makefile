@@ -41,7 +41,7 @@ TOUCH	= echo Passed >
 ECHO	= @echo
 
 # The next path is relative to $BUILD_DIR
-QAPC	= ..\QueueUserAPCEx\User\quserex.dll
+QAPC	= # ..\QueueUserAPCEx\User\quserex.dll
 
 CPHDR	= pthread.h semaphore.h sched.h
 

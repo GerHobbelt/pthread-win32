@@ -77,7 +77,7 @@ HDR	= pthread.h semaphore.h sched.h
 LIB	= libpthread$(GCX).a
 DLL	= pthread$(GCX).dll
 # The next path is relative to $BUILD_DIR
-QAPC	= ../QueueUserAPCEx/User/quserex.dll
+QAPC	=  # ../QueueUserAPCEx/User/quserex.dll
 
 COPYFILES	= $(HDR) $(LIB) $(DLL) $(QAPC)
 

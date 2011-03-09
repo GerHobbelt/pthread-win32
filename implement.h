@@ -229,7 +229,7 @@ struct pthread_mutexattr_t_
  * In this implementation, when a spinlock is initialised,
  * the number of cpus available to the process is checked.
  * If there is only one cpu then "interlock" is set equal to
- * PTW32_SPIN_USE_MUTEX and u.mutex is a initialised mutex.
+ * PTW32_SPIN_USE_MUTEX and u.mutex is an initialised mutex.
  * If the number of cpus is greater than 1 then "interlock"
  * is set equal to PTW32_SPIN_UNLOCKED and the number is
  * stored in u.cpus. This arrangement allows the spinlock
@@ -721,18 +721,6 @@ extern "C"
         :"memory", "cc");                                                  \
       _result;                                                             \
     })
-/*
- * Faster version of XCHG for uni-processor systems because
- * it doesn't lock the bus. If an interrupt or context switch
- * occurs between the movl and the cmpxchgl then the value in
- * 'location' may have changed, in which case we will loop
- * back to do the movl again.
- *
- * Tests show that this routine has almost identical timing
- * to Win32's InterlockedExchange(), and is much faster than
- * using an inlined 'xchg' instruction, so Win32 is probably
- * doing something similar to this (on UP systems).
- */
 # define PTW32_INTERLOCKED_EXCHANGE(location, value)                       \
     ({                                                                     \
       __typeof (value) _result;                                            \
@@ -793,18 +781,6 @@ extern "C"
         :"memory", "cc");                                                  \
       _result;                                                             \
     })
-/*
- * Faster version of XCHG for uni-processor systems because
- * it doesn't lock the bus. If an interrupt or context switch
- * occurs between the movl and the cmpxchgl then the value in
- * 'location' may have changed, in which case we will loop
- * back to do the movl again.
- *
- * Tests show that this routine has almost identical timing
- * to Win32's InterlockedExchange(), and is much faster than
- * using an inlined 'xchg' instruction, so Win32 is probably
- * doing something similar to this (on UP systems).
- */
 # define PTW32_INTERLOCKED_EXCHANGE64(location, value)                     \
     ({                                                                     \
       __typeof (value) _result;                                            \
