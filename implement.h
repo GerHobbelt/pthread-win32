@@ -131,7 +131,8 @@ struct ptw32_thread_t_
 #ifdef _UWIN
   DWORD dummy[5];
 #endif
-  DWORD thread;
+  UINT64 seqNumber;		/* Process-unique thread sequence number */
+  DWORD thread;			/* Win32 thread ID */
   HANDLE threadH;		/* Win32 thread handle - POSIX thread is invalid if threadH == 0 */
   pthread_t ptHandle;		/* This thread's permanent pthread_t handle */
   ptw32_thread_t * prevReuse;	/* Links threads on reuse stack */
@@ -535,12 +536,12 @@ extern int ptw32_concurrency;
 
 extern int ptw32_features;
 
-extern CRITICAL_SECTION ptw32_thread_reuse_lock;
-extern CRITICAL_SECTION ptw32_mutex_test_init_lock;
-extern CRITICAL_SECTION ptw32_cond_list_lock;
-extern CRITICAL_SECTION ptw32_cond_test_init_lock;
-extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
-extern CRITICAL_SECTION ptw32_spinlock_test_init_lock;
+extern ptw32_mcs_lock_t ptw32_thread_reuse_lock;
+extern ptw32_mcs_lock_t ptw32_mutex_test_init_lock;
+extern ptw32_mcs_lock_t ptw32_cond_list_lock;
+extern ptw32_mcs_lock_t ptw32_cond_test_init_lock;
+extern ptw32_mcs_lock_t ptw32_rwlock_test_init_lock;
+extern ptw32_mcs_lock_t ptw32_spinlock_test_init_lock;
 
 #ifdef _UWIN
 extern int pthread_count;

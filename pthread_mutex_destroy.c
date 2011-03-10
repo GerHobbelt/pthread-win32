@@ -71,10 +71,6 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
 	       * be too late invalidating the mutex below since another thread
 	       * may already have entered mutex_lock and the check for a valid
 	       * *mutex != NULL.
-	       *
-	       * Note that this would be an unusual situation because it is not
-	       * common that mutexes are destroyed while they are still in
-	       * use by other threads.
 	       */
 	      *mutex = NULL;
 
@@ -112,10 +108,13 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
     }
   else
     {
+      ptw32_mcs_local_node_t node;
+
       /*
        * See notes in ptw32_mutex_check_need_init() above also.
        */
-      EnterCriticalSection (&ptw32_mutex_test_init_lock);
+
+      ptw32_mcs_lock_acquire(&ptw32_mutex_test_init_lock, &node);
 
       /*
        * Check again.
@@ -138,8 +137,7 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
 	   */
 	  result = EBUSY;
 	}
-
-      LeaveCriticalSection (&ptw32_mutex_test_init_lock);
+      ptw32_mcs_lock_release(&node);
     }
 
   return (result);
