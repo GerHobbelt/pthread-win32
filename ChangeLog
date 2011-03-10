@@ -1,3 +1,26 @@
+2011-03-09  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* implement.h (ptw32_thread_t_): Add process unique sequence number.
+	* global.c: Replace global Critical Section objects with MCS
+	queue locks.
+	* implement.h: Likewise.
+	* pthread_cond_destroy.c: Likewise.
+	* pthread_cond_init.c: Likewise.
+	* pthread_detach.c: Likewise.
+	* pthread_join.c: Likewise.
+	* pthread_kill.c: Likewise.
+	* pthread_mutex_destroy.c: Likewise.
+	* pthread_rwlock_destroy.c: Likewise.
+	* pthread_spin_destroy.c: Likewise.
+	* pthread_timechange_handler_np.c: Likewise.
+	* ptw32_cond_check_need_init.c: Likewise.
+	* ptw32_mutex_check_need_init.c: Likewise.
+	* ptw32_processInitialize.c: Likewise.
+	* ptw32_processTerminate.c: Likewise.
+	* ptw32_reuse.c: Likewise.
+	* ptw32_rwlock_check_need_init.c: Likewise.
+	* ptw32_spinlock_check_need_init.c: Likewise.
+
 2011-03-06  Ross Johnson <ross.johnson at homemail.com.au>
 
 	* several (MINGW64): Cast and call fixups for 64 bit compatibility;

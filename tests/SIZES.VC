@@ -1,7 +1,7 @@
 Sizes of pthreads-win32 structs
 -------------------------------
                      pthread_t    8
-                ptw32_thread_t  140
+                ptw32_thread_t  152
                pthread_attr_t_   28
                         sem_t_   12
               pthread_mutex_t_   24
