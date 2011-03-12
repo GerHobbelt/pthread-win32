@@ -1,3 +1,9 @@
+2011-03-11  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* implement.h (PTW32_INTERLOCKED_*CREMENT macros): increment/decrement
+	using ++/-- instead of add/subtract 1.
+	* ptw32_MCS_lock.c: Make casts consistent.
+
 2011-03-09  Ross Johnson <ross.johnson at homemail.com.au>
 
 	* implement.h (ptw32_thread_t_): Add process unique sequence number.
