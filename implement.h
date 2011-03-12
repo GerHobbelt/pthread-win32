@@ -755,7 +755,7 @@ extern "C"
         :"+r" (_temp)                                                      \
         :"r" (location)                                                    \
         :"memory", "cc");                                                  \
-      _temp + 1;                                                           \
+      ++_temp;                                                             \
     })
 # define PTW32_INTERLOCKED_DECREMENT(location)                             \
     ({                                                                     \
@@ -767,7 +767,7 @@ extern "C"
         :"+r" (_temp)                                                      \
         :"r" (location)                                                    \
         :"memory", "cc");                                                  \
-      _temp - 1;                                                           \
+      --_temp;                                                             \
     })
 # if defined(_WIN64)
 # define PTW32_INTERLOCKED_COMPARE_EXCHANGE64(location, value, comparand)  \
@@ -815,7 +815,7 @@ extern "C"
         :"+r" (_temp)                                                      \
         :"r" (location)                                                    \
         :"memory", "cc");                                                  \
-      _temp + 1;                                                           \
+      ++_temp;                                                             \
     })
 # define PTW32_INTERLOCKED_DECREMENT64(location)                           \
     ({                                                                     \
@@ -827,7 +827,7 @@ extern "C"
         :"+r" (_temp)                                                      \
         :"r" (location)                                                    \
         :"memory", "cc");                                                  \
-      _temp - 1;                                                           \
+      --_temp;                                                             \
     })
 #   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR(location, value, comparand) \
       PTW32_INTERLOCKED_COMPARE_EXCHANGE64(location, (size_t)value, (size_t)comparand)
