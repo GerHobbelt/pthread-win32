@@ -90,6 +90,7 @@
  */
 
 #include "pthread.h"
+#include "sched.h"
 #include "implement.h"
 
 /*
@@ -163,7 +164,7 @@ ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node)
   
   /* queue for the lock */
   pred = (ptw32_mcs_local_node_t *)PTW32_INTERLOCKED_EXCHANGE_PTR((PVOID volatile *)lock,
-								  (void*)node);
+								  (PVOID) node);
 
   if (0 != pred)
     {
@@ -197,7 +198,7 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
       /* no known successor */
 
       if (node == (ptw32_mcs_local_node_t *)
-	  PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR((LPVOID volatile *)lock,
+	  PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR((PVOID volatile *)lock,
 						 (PVOID)0,
 						 (PVOID)node))
 	{
@@ -208,7 +209,7 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
       /* wait for successor */
       ptw32_mcs_flag_wait(&node->nextFlag);
       next = (ptw32_mcs_local_node_t *)(size_t)
-	PTW32_INTERLOCKED_EXCHANGE_ADD((LPLONG)&node->next, 0); /* MBR fence */
+	PTW32_INTERLOCKED_EXCHANGE_ADD((PTW32_INTERLOCKED_LPLONG)&node->next, 0); /* MBR fence */
     }
 
   /* pass the lock */
@@ -229,7 +230,7 @@ ptw32_mcs_lock_try_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * no
   node->readyFlag = 0;
   node->next = 0; /* initially, no successor */
 
-  return ((PVOID)PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR((LPVOID volatile *)lock,
+  return ((PVOID)PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR((PVOID volatile *)lock,
                                                         (PVOID)node,
                                                         (PVOID)0)
                                  == (PVOID)0) ? 0 : EBUSY;
@@ -257,20 +258,17 @@ ptw32_mcs_node_transfer (ptw32_mcs_local_node_t * new_node, ptw32_mcs_local_node
   new_node->readyFlag = 0; /* Not needed - we were waiting on this */
   new_node->next = 0;
 
-#if defined(_WIN64)
-  if ((ptw32_mcs_local_node_t *)PTW32_INTERLOCKED_COMPARE_EXCHANGE64((PTW32_INTERLOCKED_LPLONG)new_node->lock,
-#else
-  if ((ptw32_mcs_local_node_t *)PTW32_INTERLOCKED_COMPARE_EXCHANGE((PTW32_INTERLOCKED_LPLONG)new_node->lock,
-#endif
-                                                                   (size_t)(PTW32_INTERLOCKED_LPLONG)new_node,
-                                                                   (size_t)(PTW32_INTERLOCKED_LPLONG)old_node) != old_node)
+  if ((ptw32_mcs_local_node_t *)PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR((PVOID volatile *)new_node->lock,
+                                                                       (PVOID)new_node,
+                                                                       (PVOID)old_node)
+       != old_node)
     {
       /*
        * A successor has queued after us, so wait for them to link to us
        */
       while (old_node->next == 0)
         {
-          Sleep(0);
+          sched_yield();
         }
       new_node->next = old_node->next;
     }
