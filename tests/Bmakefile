@@ -92,6 +92,7 @@ PASSES=   loadfree.pass \
 	  mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
 	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
 	  mutex8.pass  mutex8n.pass  mutex8e.pass  mutex8r.pass  \
+	  robust1.pass  robust2.pass  robust3.pass  robust4.pass  robust5.pass  \
 	  count1.pass  \
 	  once1.pass  once2.pass  once3.pass  once4.pass  \
 	  self2.pass  \
@@ -310,6 +311,11 @@ mutex8.pass: mutex7.pass
 mutex8n.pass: mutex7n.pass
 mutex8e.pass: mutex7e.pass
 mutex8r.pass: mutex7r.pass
+robust1.pass: mutex8r.pass
+robust2.pass: mutex8r.pass
+robust3.pass: robust2.pass
+robust4.pass: robust3.pass
+robust5.pass: robust4.pass
 once1.pass: create1.pass
 once2.pass: once1.pass
 once3.pass: once2.pass

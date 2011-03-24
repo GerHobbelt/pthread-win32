@@ -190,15 +190,39 @@ pthread_win32_thread_detach_np ()
 
       if (sp != NULL) // otherwise Win32 thread with no implicit POSIX handle.
 	{
+          ptw32_mcs_local_node_t stateLock;
+          ptw32_mcs_local_node_t listLock;
 	  ptw32_callUserDestroyRoutines (sp->ptHandle);
 
-	  (void) pthread_mutex_lock (&sp->cancelLock);
+	  ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
 	  sp->state = PThreadStateLast;
 	  /*
 	   * If the thread is joinable at this point then it MUST be joined
 	   * or detached explicitly by the application.
 	   */
-	  (void) pthread_mutex_unlock (&sp->cancelLock);
+	  ptw32_mcs_lock_release (&stateLock);
+
+          /*
+           * Robust Mutexes
+           */
+          ptw32_mcs_lock_acquire(&sp->robustMxListLock, &listLock);
+          while (sp->robustMxList != NULL)
+            {
+              pthread_mutex_t mx = sp->robustMxList->mx;
+#if 1
+              ptw32_robust_mutex_quick_remove(&mx, sp);
+#else
+              ptw32_robust_mutex_quick_remove(&mx, sp);
+#endif
+              /*
+               * If there are no waiters then the next thread to block will
+               * sleep, wakeup immediately and then go back to sleep.
+               * See pthread_mutex_lock.c.
+               */
+              SetEvent(mx->event);
+            }
+          ptw32_mcs_lock_release(&listLock);
+
 
 	  if (sp->detachState == PTHREAD_CREATE_DETACHED)
 	    {

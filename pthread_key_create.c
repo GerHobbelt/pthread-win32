@@ -98,7 +98,7 @@ pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
        *
        * The mutex will only be created when it is first locked.
        */
-      newkey->keyLock = PTHREAD_MUTEX_INITIALIZER;
+      newkey->keyLock = 0;
       newkey->destructor = destructor;
     }
 

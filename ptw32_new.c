@@ -74,8 +74,10 @@ ptw32_new (void)
   tp->detachState = PTHREAD_CREATE_JOINABLE;
   tp->cancelState = PTHREAD_CANCEL_ENABLE;
   tp->cancelType = PTHREAD_CANCEL_DEFERRED;
-  tp->cancelLock = PTHREAD_MUTEX_INITIALIZER;
-  tp->threadLock = PTHREAD_MUTEX_INITIALIZER;
+  tp->stateLock = 0;
+  tp->threadLock = 0;
+  tp->robustMxListLock = 0;
+  tp->robustMxList = NULL;
   tp->cancelEvent = CreateEvent (0, (int) PTW32_TRUE,	/* manualReset  */
 				 (int) PTW32_FALSE,	/* setSignaled  */
 				 NULL);

@@ -132,6 +132,8 @@ ptw32_threadReusePush (pthread_t thread)
   tp->ptHandle.x++;
 #endif
 
+  tp->state = PThreadStateReuse;
+
   tp->prevReuse = PTW32_THREAD_REUSE_EMPTY;
 
   if (PTW32_THREAD_REUSE_EMPTY != ptw32_threadReuseBottom)

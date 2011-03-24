@@ -112,19 +112,24 @@ typedef enum
   PThreadStateInitial = 0,	/* Thread not running                   */
   PThreadStateRunning,		/* Thread alive & kicking               */
   PThreadStateSuspended,	/* Thread alive but suspended           */
-  PThreadStateCancelPending,	/* Thread alive but is                  */
-  /* has cancelation pending.        */
+  PThreadStateCancelPending,	/* Thread alive but                     */
+                                /* has cancelation pending.             */
   PThreadStateCanceling,	/* Thread alive but is                  */
-  /* in the process of terminating        */
-  /* due to a cancellation request        */
-  PThreadStateException,	/* Thread alive but exiting             */
-  /* due to an exception                  */
-  PThreadStateLast
+                                /* in the process of terminating        */
+                                /* due to a cancellation request        */
+  PThreadStateExiting,		/* Thread alive but exiting             */
+                                /* due to an exception                  */
+  PThreadStateLast,             /* All handlers have been run and now   */
+                                /* final cleanup can be done.           */
+  PThreadStateReuse             /* In reuse pool.                       */
 }
 PThreadState;
 
+typedef struct ptw32_mcs_node_t_     ptw32_mcs_local_node_t;
+typedef struct ptw32_mcs_node_t_*    ptw32_mcs_lock_t;
+typedef struct ptw32_robust_node_t_  ptw32_robust_node_t;
+typedef struct ptw32_thread_t_       ptw32_thread_t;
 
-typedef struct ptw32_thread_t_ ptw32_thread_t;
 
 struct ptw32_thread_t_
 {
@@ -141,9 +146,9 @@ struct ptw32_thread_t_
   void *parms;
   int ptErrno;
   int detachState;
-  pthread_mutex_t threadLock;	/* Used for serialised access to public thread state */
+  ptw32_mcs_lock_t threadLock;	/* Used for serialised access to public thread state */
   int sched_priority;		/* As set, not as currently is */
-  pthread_mutex_t cancelLock;	/* Used for async-cancel safety */
+  ptw32_mcs_lock_t stateLock;	/* Used for async-cancel safety */
   int cancelState;
   int cancelType;
   HANDLE cancelEvent;
@@ -156,6 +161,10 @@ struct ptw32_thread_t_
   int implicit:1;
   void *keys;
   void *nextAssoc;
+  ptw32_mcs_lock_t
+              robustMxListLock; /* robustMxList lock */
+  ptw32_robust_node_t*
+                  robustMxList; /* List of currenty held robust mutexes */
 };
 
 
@@ -215,12 +224,39 @@ struct pthread_mutex_t_
   pthread_t ownerThread;
   HANDLE event;			/* Mutex release notification to waiting
 				   threads. */
+  ptw32_robust_node_t*
+                    robustNode; /* Extra state for robust mutexes  */
+};
+
+enum ptw32_robust_state_t_
+{
+  PTW32_ROBUST_CONSISTENT,
+  PTW32_ROBUST_INCONSISTENT,
+  PTW32_ROBUST_NOTRECOVERABLE
+};
+
+typedef enum ptw32_robust_state_t_   ptw32_robust_state_t;
+
+/*
+ * Node used to manage per-thread lists of currently-held robust mutexes.
+ */
+struct ptw32_robust_node_t_
+{
+  pthread_mutex_t mx;
+  ptw32_mcs_lock_t lock;          /* Exclusive access to this robust mutex  */
+  ptw32_robust_state_t stateInconsistent;
+#if 0
+  int inList;
+#endif
+  ptw32_robust_node_t* prev;
+  ptw32_robust_node_t* next;
 };
 
 struct pthread_mutexattr_t_
 {
   int pshared;
   int kind;
+  int robustness;
 };
 
 /*
@@ -267,9 +303,6 @@ struct ptw32_mcs_node_t_
                                              successor */
 };
 
-typedef struct ptw32_mcs_node_t_   ptw32_mcs_local_node_t;
-typedef struct ptw32_mcs_node_t_  *ptw32_mcs_lock_t;
-
 
 struct pthread_barrier_t_
 {
@@ -277,7 +310,7 @@ struct pthread_barrier_t_
   unsigned int nInitialBarrierHeight;
   int pshared;
   sem_t semBarrierBreeched;
-  void * lock; /* MCS lock */
+  ptw32_mcs_lock_t lock;
   ptw32_mcs_local_node_t proxynode;
 };
 
@@ -290,7 +323,7 @@ struct pthread_key_t_
 {
   DWORD key;
   void (*destructor) (void *);
-  pthread_mutex_t keyLock;
+  ptw32_mcs_lock_t keyLock;
   void *threads;
 };
 
@@ -566,14 +599,16 @@ extern "C"
   int ptw32_mutex_check_need_init (pthread_mutex_t * mutex);
   int ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock);
 
-  PTW32_INTERLOCKED_LONG WINAPI
-    ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
-				      PTW32_INTERLOCKED_LONG value,
-				      PTW32_INTERLOCKED_LONG comparand);
-
-  LONG WINAPI
-    ptw32_InterlockedExchange (LPLONG location,
-			       LONG value);
+  int ptw32_robust_mutex_inherit(pthread_mutex_t * mutex, pthread_t self);
+#if 1
+  void ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self);
+  void ptw32_robust_mutex_remove(pthread_mutex_t* mutex);
+  void ptw32_robust_mutex_quick_remove(pthread_mutex_t* mutex, ptw32_thread_t* otp);
+#else
+  void ptw32_robust_mutex_add(pthread_mutex_t* mutex);
+  void ptw32_robust_mutex_remove(pthread_mutex_t* mutex, pthread_t self);
+  void ptw32_robust_mutex_quick_remove(pthread_mutex_t* mutex, ptw32_thread_t* tp);
+#endif
 
   DWORD
     ptw32_RegisterCancelation (PAPCFUNC callback,

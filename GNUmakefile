@@ -184,10 +184,13 @@ SMALL_STATIC_OBJS	= \
 		pthread_mutexattr_setpshared.o \
 		pthread_mutexattr_settype.o \
 		pthread_mutexattr_gettype.o \
+		pthread_mutexattr_setrobust.o \
+		pthread_mutexattr_getrobust.o \
 		pthread_mutex_lock.o \
 		pthread_mutex_timedlock.o \
 		pthread_mutex_unlock.o \
 		pthread_mutex_trylock.o \
+		pthread_mutex_consistent.o \
 		pthread_mutexattr_setkind_np.o \
 		pthread_mutexattr_getkind_np.o \
 		pthread_getw32threadhandle_np.o \
@@ -338,10 +341,13 @@ MUTEX_SRCS	= \
 		pthread_mutexattr_setpshared.c \
 		pthread_mutexattr_settype.c \
 		pthread_mutexattr_gettype.c \
+		pthread_mutexattr_setrobust.c \
+		pthread_mutexattr_getrobust.c \
 		pthread_mutex_lock.c \
 		pthread_mutex_timedlock.c \
 		pthread_mutex_unlock.c \
-		pthread_mutex_trylock.c
+		pthread_mutex_trylock.c \
+		pthread_mutex_consistent.c
 
 NONPORTABLE_SRCS = \
 		pthread_mutexattr_setkind_np.c \

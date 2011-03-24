@@ -43,8 +43,9 @@
 int
 pthread_mutex_lock (pthread_mutex_t * mutex)
 {
-  int result = 0;
+  int kind;
   pthread_mutex_t mx;
+  int result = 0;
 
   /*
    * Let the system deal with invalid pointers.
@@ -69,71 +70,226 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
     }
 
   mx = *mutex;
+  kind = mx->kind;
 
-  if (mx->kind == PTHREAD_MUTEX_NORMAL)
+  if (kind >= 0)
     {
-      if ((LONG) PTW32_INTERLOCKED_EXCHANGE(
-		   (LPLONG) &mx->lock_idx,
-		   (LONG) 1) != 0)
-	{
-	  while ((LONG) PTW32_INTERLOCKED_EXCHANGE(
-                          (LPLONG) &mx->lock_idx,
-			  (LONG) -1) != 0)
-	    {
-	      if (WAIT_OBJECT_0 != WaitForSingleObject (mx->event, INFINITE))
-	        {
-	          result = EINVAL;
-		  break;
-	        }
-	    }
-	}
-    }
-  else
-    {
-      pthread_t self = pthread_self();
-
-      if ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-                   (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
-		   (PTW32_INTERLOCKED_LONG) 1,
-		   (PTW32_INTERLOCKED_LONG) 0) == 0)
-	{
-	  mx->recursive_count = 1;
-	  mx->ownerThread = self;
-	}
-      else
-	{
-	  if (pthread_equal (mx->ownerThread, self))
-	    {
-	      if (mx->kind == PTHREAD_MUTEX_RECURSIVE)
-		{
-		  mx->recursive_count++;
-		}
-	      else
-		{
-		  result = EDEADLK;
-		}
-	    }
-	  else
+      /* Non-robust */
+      if (PTHREAD_MUTEX_NORMAL == kind)
+        {
+          if ((LONG) PTW32_INTERLOCKED_EXCHANGE(
+		       (LPLONG) &mx->lock_idx,
+		       (LONG) 1) != 0)
 	    {
 	      while ((LONG) PTW32_INTERLOCKED_EXCHANGE(
                               (LPLONG) &mx->lock_idx,
 			      (LONG) -1) != 0)
-		{
+	        {
 	          if (WAIT_OBJECT_0 != WaitForSingleObject (mx->event, INFINITE))
-		    {
+	            {
 	              result = EINVAL;
 		      break;
-		    }
-		}
-
-	      if (0 == result)
-		{
-		  mx->recursive_count = 1;
-		  mx->ownerThread = self;
-		}
+	            }
+	        }
 	    }
-	}
+        }
+      else
+        {
+          pthread_t self = pthread_self();
+
+          if ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                       (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+		       (PTW32_INTERLOCKED_LONG) 1,
+		       (PTW32_INTERLOCKED_LONG) 0) == 0)
+	    {
+	      mx->recursive_count = 1;
+	      mx->ownerThread = self;
+	    }
+          else
+	    {
+	      if (pthread_equal (mx->ownerThread, self))
+	        {
+	          if (kind == PTHREAD_MUTEX_RECURSIVE)
+		    {
+		      mx->recursive_count++;
+		    }
+	          else
+		    {
+		      result = EDEADLK;
+		    }
+	        }
+	      else
+	        {
+	          while ((LONG) PTW32_INTERLOCKED_EXCHANGE(
+                                  (LPLONG) &mx->lock_idx,
+			          (LONG) -1) != 0)
+		    {
+	              if (WAIT_OBJECT_0 != WaitForSingleObject (mx->event, INFINITE))
+		        {
+	                  result = EINVAL;
+		          break;
+		        }
+		    }
+
+	          if (0 == result)
+		    {
+		      mx->recursive_count = 1;
+		      mx->ownerThread = self;
+		    }
+	        }
+	    }
+        }
+    }
+  else
+    {
+      /*
+       * Robust types
+       * All types record the current owner thread.
+       * The mutex is added to a per thread list when ownership is acquired.
+       */
+      ptw32_robust_state_t* statePtr = &mx->robustNode->stateInconsistent;
+
+      if ((LONG)PTW32_ROBUST_NOTRECOVERABLE == PTW32_INTERLOCKED_EXCHANGE_ADD(
+                                                 (LPLONG)statePtr,
+                                                 0L))
+        {
+          result = ENOTRECOVERABLE;
+        }
+      else
+        {
+          pthread_t self = pthread_self();
+
+          kind = -kind - 1; /* Convert to non-robust range */
+    
+          if (PTHREAD_MUTEX_NORMAL == kind)
+            {
+              if ((LONG) PTW32_INTERLOCKED_EXCHANGE(
+                           (LPLONG) &mx->lock_idx,
+                           (LONG) 1) != 0)
+                {
+                  while (0 == (result = ptw32_robust_mutex_inherit(mutex, self))
+                           && (LONG) PTW32_INTERLOCKED_EXCHANGE(
+                                       (LPLONG) &mx->lock_idx,
+                                       (LONG) -1) != 0)
+                    {
+#if 0
+                      /*
+                       * Only need to add the mutex to the list kept by the owner thread
+                       * when a thread blocks on the mutex.
+                       */
+                      ptw32_robust_mutex_add(mutex);
+#endif
+                      if (WAIT_OBJECT_0 != WaitForSingleObject (mx->event, INFINITE))
+                        {
+                          result = EINVAL;
+                          break;
+                        }
+                      if ((LONG)PTW32_ROBUST_NOTRECOVERABLE ==
+                                  PTW32_INTERLOCKED_EXCHANGE_ADD(
+                                    (LPLONG)statePtr,
+                                    0L))
+                        {
+                          /* Unblock the next thread */
+                          SetEvent(mx->event);
+                          result = ENOTRECOVERABLE;
+                          break;
+                        }
+                    }
+                }
+              if (0 == result || EOWNERDEAD == result)
+                {
+#if 0
+                  mx->ownerThread = self;
+#else
+                  /*
+                   * Add mutex to the per-thread robust mutex currently-held list.
+                   * If the thread terminates, all mutexes in this list will be unlocked.
+                   */
+                  ptw32_robust_mutex_add(mutex, self);
+#endif
+                }
+            }
+          else
+            {
+              if ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                           (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
+                           (PTW32_INTERLOCKED_LONG) 1,
+                           (PTW32_INTERLOCKED_LONG) 0) == 0)
+                {
+                  mx->recursive_count = 1;
+#if 1
+                  /*
+                   * Add mutex to the per-thread robust mutex currently-held list.
+                   * If the thread terminates, all mutexes in this list will be unlocked.
+                   */
+                  ptw32_robust_mutex_add(mutex, self);
+#else
+                  mx->ownerThread = self;
+#endif
+                }
+              else
+                {
+                  if (pthread_equal (mx->ownerThread, self))
+                    {
+                      if (PTHREAD_MUTEX_RECURSIVE == kind)
+                        {
+                          mx->recursive_count++;
+                        }
+                      else
+                        {
+                          result = EDEADLK;
+                        }
+                    }
+                  else
+                    {
+                      while (0 == (result = ptw32_robust_mutex_inherit(mutex, self))
+                               && (LONG) PTW32_INTERLOCKED_EXCHANGE(
+                                           (LPLONG) &mx->lock_idx,
+                                           (LONG) -1) != 0)
+                        {
+#if 0
+                          /*
+                           * Only need to add the mutex to the list kept by the owner thread
+                           * when a thread blocks on the mutex.
+                           */
+                          ptw32_robust_mutex_add(mutex);
+#endif
+                          if (WAIT_OBJECT_0 != WaitForSingleObject (mx->event, INFINITE))
+                            {
+                              result = EINVAL;
+                              break;
+                            }
+                          if ((LONG)PTW32_ROBUST_NOTRECOVERABLE ==
+                                      PTW32_INTERLOCKED_EXCHANGE_ADD(
+                                        (LPLONG)statePtr,
+                                        0L))
+                            {
+                              /* Unblock the next thread */
+                              SetEvent(mx->event);
+                              result = ENOTRECOVERABLE;
+                              break;
+                            }
+                        }
+
+                      if (0 == result || EOWNERDEAD == result)
+                        {
+                          mx->recursive_count = 1;
+#if 1
+                          /*
+                           * Add mutex to the per-thread robust mutex currently-held list.
+                           * If the thread terminates, all mutexes in this list will be unlocked.
+                           */
+                          ptw32_robust_mutex_add(mutex, self);
+#else
+                          mx->ownerThread = self;
+#endif
+                        }
+                    }
+	        }
+            }
+        }
     }
 
   return (result);
 }
+

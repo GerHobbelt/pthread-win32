@@ -99,6 +99,7 @@ pthread_cancel (pthread_t thread)
   int cancel_self;
   pthread_t self;
   ptw32_thread_t * tp;
+  ptw32_mcs_local_node_t stateLock;
 
   result = pthread_kill (thread, 0);
 
@@ -125,7 +126,7 @@ pthread_cancel (pthread_t thread)
   /*
    * Lock for async-cancel safety.
    */
-  (void) pthread_mutex_lock (&tp->cancelLock);
+  ptw32_mcs_lock_acquire (&tp->stateLock, &stateLock);
 
   if (tp->cancelType == PTHREAD_CANCEL_ASYNCHRONOUS
       && tp->cancelState == PTHREAD_CANCEL_ENABLE
@@ -136,7 +137,7 @@ pthread_cancel (pthread_t thread)
 	  tp->state = PThreadStateCanceling;
 	  tp->cancelState = PTHREAD_CANCEL_DISABLE;
 
-	  (void) pthread_mutex_unlock (&tp->cancelLock);
+	  ptw32_mcs_lock_release (&stateLock);
 	  ptw32_throw (PTW32_EPS_CANCEL);
 
 	  /* Never reached */
@@ -158,7 +159,7 @@ pthread_cancel (pthread_t thread)
 	       * the threadH arg will be used.
 	       */
 	      ptw32_register_cancelation ((PAPCFUNC)ptw32_cancel_callback, threadH, 0);
-	      (void) pthread_mutex_unlock (&tp->cancelLock);
+	      ptw32_mcs_lock_release (&stateLock);
 	      ResumeThread (threadH);
 	    }
 	}
@@ -181,7 +182,7 @@ pthread_cancel (pthread_t thread)
 	  result = ESRCH;
 	}
 
-      (void) pthread_mutex_unlock (&tp->cancelLock);
+      ptw32_mcs_lock_release (&stateLock);
     }
 
   return (result);

@@ -57,8 +57,10 @@ RANLIB  = $(CROSS)ranlib
 #
 XXCFLAGS	= 
 XXLIBS	= -lws2_32 -lgomp
+OPT	= -O3
+DOPT	= -g -O0
 #CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
-CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
+CFLAGS	= ${OPT} -UNDEBUG -Wall $(XXCFLAGS)
 BUILD_DIR	= ..
 INCLUDES	= -I.
 
@@ -97,6 +99,7 @@ TESTS	= \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
+	  robust1 robust2 robust3 robust4 robust5 \
 	  count1 \
 	  once1 once2 once3 once4 self2 \
 	  cancel1 cancel2 \
@@ -135,6 +138,7 @@ STATICTESTS = \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
+	  robust1 robust2 robust3 robust4 robust5 \
 	  count1 \
 	  once1 once2 once3 once4 self2 \
 	  cancel1 cancel2 \
@@ -172,6 +176,7 @@ help:
 	@ $(ECHO) "make clean GC-stress	  (to stresstest using GNU C dll with C cleanup code)"
 	@ $(ECHO) "make clean GCE-stress   (to stresstest using GNU C dll with C++ exception handling)"
 	@ $(ECHO) "make clean GC-static   (to test using GC static lib with C (no EH) applications)"
+	@ $(ECHO) "make clean GC-debug    (to test using GC dll with C (no EH) applications)"
 
 all:
 	@ $(MAKE) clean GC
@@ -197,7 +202,10 @@ GCE-bench:
 	$(MAKE) TEST=GCE  CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
 
 GC-debug:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-fopenmp -D__CLEANUP_C" DLL_VER="$(DLL_VER)d" all-pass
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-fopenmp -D__CLEANUP_C" OPT="${DOPT}" DLL_VER="$(DLL_VER)d" all-pass
+
+GC-bench-debug:
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${OPT}" DLL_VER="$(DLL_VER)d" all-bench
 
 GC-static:
 	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" XXLIBS="-lws2_32" DLL="" all-static
@@ -321,6 +329,11 @@ mutex8.pass: mutex7.pass
 mutex8n.pass: mutex7n.pass
 mutex8e.pass: mutex7e.pass
 mutex8r.pass: mutex7r.pass
+robust1.pass: mutex8r.pass
+robust2.pass: mutex8r.pass
+robust3.pass: robust2.pass
+robust4.pass: robust3.pass
+robust5.pass: robust4.pass
 once1.pass: create1.pass
 once2.pass: once1.pass
 once3.pass: once2.pass

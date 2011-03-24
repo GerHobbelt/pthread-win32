@@ -183,13 +183,29 @@ main (int argc, char *argv[])
    * Now we can start the actual tests
    */
 #ifdef PTW32_MUTEX_TYPES
-  runTest("PTHREAD_MUTEX_DEFAULT (W9x,WNT)", PTHREAD_MUTEX_DEFAULT);
+  runTest("PTHREAD_MUTEX_DEFAULT", PTHREAD_MUTEX_DEFAULT);
 
-  runTest("PTHREAD_MUTEX_NORMAL (W9x,WNT)", PTHREAD_MUTEX_NORMAL);
+  runTest("PTHREAD_MUTEX_NORMAL", PTHREAD_MUTEX_NORMAL);
 
-  runTest("PTHREAD_MUTEX_ERRORCHECK (W9x,WNT)", PTHREAD_MUTEX_ERRORCHECK);
+  runTest("PTHREAD_MUTEX_ERRORCHECK", PTHREAD_MUTEX_ERRORCHECK);
 
-  runTest("PTHREAD_MUTEX_RECURSIVE (W9x,WNT)", PTHREAD_MUTEX_RECURSIVE);
+  runTest("PTHREAD_MUTEX_RECURSIVE", PTHREAD_MUTEX_RECURSIVE);
+#else
+  runTest("Non-blocking lock", 0);
+#endif
+
+  printf( ".............................................................................\n");
+
+  pthread_mutexattr_setrobust(&ma, PTHREAD_MUTEX_ROBUST);
+
+#ifdef PTW32_MUTEX_TYPES
+  runTest("PTHREAD_MUTEX_DEFAULT (Robust)", PTHREAD_MUTEX_DEFAULT);
+
+  runTest("PTHREAD_MUTEX_NORMAL (Robust)", PTHREAD_MUTEX_NORMAL);
+
+  runTest("PTHREAD_MUTEX_ERRORCHECK (Robust)", PTHREAD_MUTEX_ERRORCHECK);
+
+  runTest("PTHREAD_MUTEX_RECURSIVE (Robust)", PTHREAD_MUTEX_RECURSIVE);
 #else
   runTest("Non-blocking lock", 0);
 #endif

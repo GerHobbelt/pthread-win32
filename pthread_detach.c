@@ -92,6 +92,7 @@ pthread_detach (pthread_t thread)
     }
   else
     {
+      ptw32_mcs_local_node_t stateLock;
       /*
        * Joinable ptw32_thread_t structs are not scavenged until
        * a join or detach is done. The thread may have exited already,
@@ -99,26 +100,19 @@ pthread_detach (pthread_t thread)
        */
       result = 0;
 
-      if (pthread_mutex_lock (&tp->cancelLock) == 0)
-	{
-	  if (tp->state != PThreadStateLast)
-	    {
-	      tp->detachState = PTHREAD_CREATE_DETACHED;
-	    }
-	  else if (tp->detachState != PTHREAD_CREATE_DETACHED)
-	    {
-	      /*
-	       * Thread is joinable and has exited or is exiting.
-	       */
-	      destroyIt = PTW32_TRUE;
-	    }
-	  (void) pthread_mutex_unlock (&tp->cancelLock);
-	}
-      else
-	{
-	  /* cancelLock shouldn't fail, but if it does ... */
-	  result = ESRCH;
-	}
+      ptw32_mcs_lock_acquire (&tp->stateLock, &stateLock);
+      if (tp->state != PThreadStateLast)
+        {
+          tp->detachState = PTHREAD_CREATE_DETACHED;
+        }
+      else if (tp->detachState != PTHREAD_CREATE_DETACHED)
+        {
+          /*
+           * Thread is joinable and has exited or is exiting.
+           */
+          destroyIt = PTW32_TRUE;
+        }
+      ptw32_mcs_lock_release (&stateLock);
     }
 
   ptw32_mcs_lock_release(&node);

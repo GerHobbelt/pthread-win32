@@ -70,6 +70,8 @@ ptw32_throw (DWORD exception)
   DWORD exceptionInformation[3];
 #endif
 
+  sp->state = PThreadStateExiting;
+
   if (exception != PTW32_EPS_CANCEL && exception != PTW32_EPS_EXIT)
     {
       /* Should never enter here */

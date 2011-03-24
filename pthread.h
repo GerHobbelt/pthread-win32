@@ -273,7 +273,7 @@ enum {
 #endif
 
 #ifndef ETIMEDOUT
-#  define ETIMEDOUT 10060     /* This is the value in winsock.h. */
+#  define ETIMEDOUT 10060 /* Same as WSAETIMEDOUT */
 #endif
 
 #ifndef ENOSYS
@@ -286,6 +286,14 @@ enum {
 #  else
 #    define EDEADLK 36     /* This is the value in MSVC. */
 #  endif
+#endif
+
+/* POSIX 2008 - related to robust mutexes */
+#ifndef EOWNERDEAD
+#  define EOWNERDEAD 43
+#endif
+#ifndef ENOTRECOVERABLE
+#  define ENOTRECOVERABLE 44
 #endif
 
 #include <sched.h>
@@ -424,22 +432,22 @@ extern "C"
  * POSIX Options
  */
 #undef _POSIX_THREADS
-#define _POSIX_THREADS 200112L
+#define _POSIX_THREADS 200809L
 
 #undef _POSIX_READER_WRITER_LOCKS
-#define _POSIX_READER_WRITER_LOCKS 200112L
+#define _POSIX_READER_WRITER_LOCKS 200809L
 
 #undef _POSIX_SPIN_LOCKS
-#define _POSIX_SPIN_LOCKS 200112L
+#define _POSIX_SPIN_LOCKS 200809L
 
 #undef _POSIX_BARRIERS
-#define _POSIX_BARRIERS 200112L
+#define _POSIX_BARRIERS 200809L
 
 #undef _POSIX_THREAD_SAFE_FUNCTIONS
-#define _POSIX_THREAD_SAFE_FUNCTIONS 200112L
+#define _POSIX_THREAD_SAFE_FUNCTIONS 200809L
 
 #undef _POSIX_THREAD_ATTR_STACKSIZE
-#define _POSIX_THREAD_ATTR_STACKSIZE 200112L
+#define _POSIX_THREAD_ATTR_STACKSIZE 200809L
 
 /*
  * The following options are not supported
@@ -634,6 +642,12 @@ enum {
  */
   PTHREAD_PROCESS_PRIVATE       = 0,
   PTHREAD_PROCESS_SHARED        = 1,
+
+/*
+ * pthread_mutexattr_{get,set}robust
+ */
+  PTHREAD_MUTEX_STALLED         = 0,  /* Default */
+  PTHREAD_MUTEX_ROBUST          = 1,
 
 /*
  * pthread_barrier_wait
@@ -992,6 +1006,13 @@ PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_setpshared (pthread_mutexattr_t 
 PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_settype (pthread_mutexattr_t * attr, int kind);
 PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_gettype (const pthread_mutexattr_t * attr, int *kind);
 
+PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_setrobust(
+                                           pthread_mutexattr_t *attr,
+                                           int robust);
+PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_getrobust(
+                                           const pthread_mutexattr_t * attr,
+                                           int * robust);
+
 /*
  * Barrier Attribute Functions
  */
@@ -1016,12 +1037,14 @@ PTW32_DLLPORT int PTW32_CDECL pthread_mutex_destroy (pthread_mutex_t * mutex);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_mutex_lock (pthread_mutex_t * mutex);
 
-PTW32_DLLPORT int PTW32_CDECL pthread_mutex_timedlock(pthread_mutex_t *mutex,
+PTW32_DLLPORT int PTW32_CDECL pthread_mutex_timedlock(pthread_mutex_t * mutex,
                                     const struct timespec *abstime);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_mutex_trylock (pthread_mutex_t * mutex);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_mutex_unlock (pthread_mutex_t * mutex);
+
+PTW32_DLLPORT int PTW32_CDECL pthread_mutex_consistent (pthread_mutex_t * mutex);
 
 /*
  * Spinlock Functions

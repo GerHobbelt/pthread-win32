@@ -347,8 +347,6 @@ rewritten.]
 
 Doesn't the compiler take care of padding?
 
-Answer a question with two questions: Which compiler? Which language?
-
 The C89 and later standards only effectively guarrantee element-by-element
 equivalence following an assignment or pass by value of a struct or union,
 therefore undefined areas of any two otherwise equivalent pthread_t instances
@@ -396,11 +394,10 @@ pthread_null()
 pthread_compare()
 pthread_hash()
 
-However these are very specific and are unlikely to make it into the
-standard. A signle more general purpose function can be defined as a
-basis for all three of the above functions.
+A single more general purpose function could also be defined as a
+basis for at least the last two of the above functions.
 
-But first we need to list the freedoms and constraints with restpect
+First we need to list the freedoms and constraints with restpect
 to pthread_t so that we can be sure our solution is compatible with the
 standard.
 
@@ -414,13 +411,10 @@ itself.
 at compile-time and size-invariant, because it must be able to copy the object
 (i.e. through assignment and pass-by-value). Such copies must be genuine
 duplicates, not merely a copy of a pointer to a common instance such as
-would be the case if pthread_t were defined as an array. There is evidence that
-this is or was the intention also in the rationale, where it expects that
-pthread_t is hashable, and that is only possible if the application can
-determine the size of pthread_t (e.g. via sizeof() in C).
+would be the case if pthread_t were defined as an array.
 
 
-The following candidate function is proposed
+Suppose we define the following function:
 
 /* This function shall return it's argument */
 pthread_t* pthread_normalize(pthread_t* thread);
@@ -446,7 +440,7 @@ Advantages:
 1) In most existing implementations this function would reduce to a no-op that
 emits no additional instructions, i.e after in-lining or optimisation, or if
 defined as a macro:
-#define pthread_normalise(tptr) tptr
+#define pthread_normalise(tptr) (tptr)
 
 2) This single function allows an application to portably derive
 application-level versions of any of the other required functions.
@@ -633,7 +627,7 @@ t = null_tid;
 
 
 Note that we don't have to explicitly make use of the __size array at all. It's
-there just to alter the semantics of the compiler.
+there just to force the compiler behaviour we want.
 
 
 Partial solutions without a pthread_normalize function
