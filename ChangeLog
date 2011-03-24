@@ -1,3 +1,10 @@
+2011-03-25  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* (cancelLock): Convert to an MCS lock and rename to stateLock.
+	* (threadLock): Likewise.
+	* (keyLock): Likewise.
+	* pthread_mutex*.c: First working robust mutexes.
+
 2011-03-11  Ross Johnson <ross.johnson at homemail.com.au>
 
 	* implement.h (PTW32_INTERLOCKED_*CREMENT macros): increment/decrement
