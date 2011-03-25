@@ -243,11 +243,7 @@ typedef enum ptw32_robust_state_t_   ptw32_robust_state_t;
 struct ptw32_robust_node_t_
 {
   pthread_mutex_t mx;
-  ptw32_mcs_lock_t lock;          /* Exclusive access to this robust mutex  */
   ptw32_robust_state_t stateInconsistent;
-#if 0
-  int inList;
-#endif
   ptw32_robust_node_t* prev;
   ptw32_robust_node_t* next;
 };
@@ -600,15 +596,8 @@ extern "C"
   int ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock);
 
   int ptw32_robust_mutex_inherit(pthread_mutex_t * mutex);
-#if 1
   void ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self);
-  void ptw32_robust_mutex_remove(pthread_mutex_t* mutex);
-  void ptw32_robust_mutex_quick_remove(pthread_mutex_t* mutex, ptw32_thread_t* otp);
-#else
-  void ptw32_robust_mutex_add(pthread_mutex_t* mutex);
-  void ptw32_robust_mutex_remove(pthread_mutex_t* mutex, pthread_t self);
-  void ptw32_robust_mutex_quick_remove(pthread_mutex_t* mutex, ptw32_thread_t* tp);
-#endif
+  void ptw32_robust_mutex_remove(pthread_mutex_t* mutex, ptw32_thread_t* otp);
 
   DWORD
     ptw32_RegisterCancelation (PAPCFUNC callback,

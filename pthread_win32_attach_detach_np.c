@@ -191,7 +191,6 @@ pthread_win32_thread_detach_np ()
       if (sp != NULL) // otherwise Win32 thread with no implicit POSIX handle.
 	{
           ptw32_mcs_local_node_t stateLock;
-          ptw32_mcs_local_node_t listLock;
 	  ptw32_callUserDestroyRoutines (sp->ptHandle);
 
 	  ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
@@ -205,11 +204,10 @@ pthread_win32_thread_detach_np ()
           /*
            * Robust Mutexes
            */
-          ptw32_mcs_lock_acquire(&sp->robustMxListLock, &listLock);
           while (sp->robustMxList != NULL)
             {
               pthread_mutex_t mx = sp->robustMxList->mx;
-              ptw32_robust_mutex_quick_remove(&mx, sp);
+              ptw32_robust_mutex_remove(&mx, sp);
               (void) PTW32_INTERLOCKED_EXCHANGE(
                        (LPLONG)&mx->robustNode->stateInconsistent,
                        -1L);
@@ -220,7 +218,6 @@ pthread_win32_thread_detach_np ()
                */
               SetEvent(mx->event);
             }
-          ptw32_mcs_lock_release(&listLock);
 
 
 	  if (sp->detachState == PTHREAD_CREATE_DETACHED)

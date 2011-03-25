@@ -172,13 +172,6 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
                                        (LPLONG) &mx->lock_idx,
                                        (LONG) -1) != 0)
                     {
-#if 0
-                      /*
-                       * Only need to add the mutex to the list kept by the owner thread
-                       * when a thread blocks on the mutex.
-                       */
-                      ptw32_robust_mutex_add(mutex);
-#endif
                       if (WAIT_OBJECT_0 != WaitForSingleObject (mx->event, INFINITE))
                         {
                           result = EINVAL;
@@ -198,15 +191,11 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
                 }
               if (0 == result || EOWNERDEAD == result)
                 {
-#if 0
-                  mx->ownerThread = self;
-#else
                   /*
                    * Add mutex to the per-thread robust mutex currently-held list.
                    * If the thread terminates, all mutexes in this list will be unlocked.
                    */
                   ptw32_robust_mutex_add(mutex, self);
-#endif
                 }
             }
           else
@@ -217,15 +206,11 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
                            (PTW32_INTERLOCKED_LONG) 0) == 0)
                 {
                   mx->recursive_count = 1;
-#if 1
                   /*
                    * Add mutex to the per-thread robust mutex currently-held list.
                    * If the thread terminates, all mutexes in this list will be unlocked.
                    */
                   ptw32_robust_mutex_add(mutex, self);
-#else
-                  mx->ownerThread = self;
-#endif
                 }
               else
                 {
@@ -247,13 +232,6 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
                                            (LPLONG) &mx->lock_idx,
                                            (LONG) -1) != 0)
                         {
-#if 0
-                          /*
-                           * Only need to add the mutex to the list kept by the owner thread
-                           * when a thread blocks on the mutex.
-                           */
-                          ptw32_robust_mutex_add(mutex);
-#endif
                           if (WAIT_OBJECT_0 != WaitForSingleObject (mx->event, INFINITE))
                             {
                               result = EINVAL;
@@ -274,15 +252,11 @@ pthread_mutex_lock (pthread_mutex_t * mutex)
                       if (0 == result || EOWNERDEAD == result)
                         {
                           mx->recursive_count = 1;
-#if 1
                           /*
                            * Add mutex to the per-thread robust mutex currently-held list.
                            * If the thread terminates, all mutexes in this list will be unlocked.
                            */
                           ptw32_robust_mutex_add(mutex, self);
-#else
-                          mx->ownerThread = self;
-#endif
                         }
                     }
 	        }

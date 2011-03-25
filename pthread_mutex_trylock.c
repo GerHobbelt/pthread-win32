@@ -123,11 +123,7 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
             {
               mx->recursive_count = 1;
             }
-#if 1
           ptw32_robust_mutex_add(mutex, self);
-#else
-          mx->ownerThread = self;
-#endif
         }
       else
         {
@@ -141,11 +137,7 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
               if (EOWNERDEAD == (result = ptw32_robust_mutex_inherit(mutex)))
                 {
                   mx->recursive_count = 1;
-#if 1
                   ptw32_robust_mutex_add(mutex, self);
-#else
-                  mx->ownerThread = self;
-#endif
                 }
               else
                 {

@@ -125,18 +125,11 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
                                                  (LONG)PTW32_ROBUST_INCONSISTENT);
               if (PTHREAD_MUTEX_NORMAL == kind)
                 {
-#if 1
-                  ptw32_robust_mutex_remove(mutex);
-#else
-                  mx->ownerThread.p = NULL;
-#endif
+                  ptw32_robust_mutex_remove(mutex, NULL);
 
                   if ((LONG) PTW32_INTERLOCKED_EXCHANGE((LPLONG) &mx->lock_idx,
                                                           (LONG) 0) < 0)
                     {
-#if 0
-                      ptw32_robust_mutex_remove(mutex, self);
-#endif
                       /*
                        * Someone may be waiting on that mutex.
                        */
@@ -151,18 +144,11 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
                   if (kind != PTHREAD_MUTEX_RECURSIVE
                       || 0 == --mx->recursive_count)
                     {
-#if 1
-                      ptw32_robust_mutex_remove(mutex);
-#else
-                      mx->ownerThread.p = NULL;
-#endif
+                      ptw32_robust_mutex_remove(mutex, NULL);
 
                       if ((LONG) PTW32_INTERLOCKED_EXCHANGE((LPLONG) &mx->lock_idx,
                                                             (LONG) 0) < 0)
                         {
-#if 0
-                          ptw32_robust_mutex_remove(mutex, self);
-#endif
                           /*
                            * Someone may be waiting on that mutex.
                            */

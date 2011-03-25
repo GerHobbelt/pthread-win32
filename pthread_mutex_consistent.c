@@ -99,22 +99,16 @@ ptw32_robust_mutex_inherit(pthread_mutex_t * mutex)
   return result;
 }
 
-#if 1
 INLINE
 void
 ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self)
 {
-  ptw32_mcs_local_node_t listLock;
-  ptw32_mcs_local_node_t mx1Lock;
-  ptw32_mcs_local_node_t mx2Lock;
   ptw32_robust_node_t** list;
   pthread_mutex_t mx = *mutex;
   ptw32_thread_t* tp = self.p;
   ptw32_robust_node_t* robust = mx->robustNode;
 
-  ptw32_mcs_lock_acquire(&tp->robustMxListLock, &listLock);
   list = &tp->robustMxList;
-  ptw32_mcs_lock_acquire(&mx->robustNode->lock, &mx1Lock);
   mx->ownerThread = self;
   if (NULL == *list)
     {
@@ -126,164 +120,36 @@ ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self)
     {
       robust->prev = NULL;
       robust->next = *list;
-      ptw32_mcs_lock_acquire(&(*list)->lock, &mx2Lock);
       (*list)->prev = robust;
-      ptw32_mcs_lock_release(&mx2Lock);
       *list = robust;
     }
-  ptw32_mcs_lock_release(&mx1Lock);
-  ptw32_mcs_lock_release(&listLock);
-}
-#else
-INLINE
-void
-ptw32_robust_mutex_add(pthread_mutex_t* mutex)
-{
-  ptw32_mcs_local_node_t listLock;
-  ptw32_mcs_local_node_t mx1Lock;
-  ptw32_mcs_local_node_t mx2Lock;
-  ptw32_robust_node_t** list;
-  pthread_mutex_t mx = *mutex;
-  ptw32_robust_node_t* robust = mx->robustNode;
-  ptw32_thread_t* tp = mx->ownerThread.p;
-
-  if (NULL != tp)
-    {
-      ptw32_mcs_lock_acquire(&tp->robustMxListLock, &listLock);
-      if (0 == robust->inList)
-        {
-          list = &tp->robustMxList;
-          ptw32_mcs_lock_acquire(&mx->robustNode->lock, &mx1Lock);
-          if (NULL == *list)
-            {
-              robust->prev = NULL;
-              robust->next = NULL;
-              *list = robust;
-            }
-          else
-            {
-              robust->prev = NULL;
-              robust->next = *list;
-              ptw32_mcs_lock_acquire(&(*list)->lock, &mx2Lock);
-              (*list)->prev = robust;
-              ptw32_mcs_lock_release(&mx2Lock);
-              *list = robust;
-            }
-          ptw32_mcs_lock_release(&mx1Lock);
-          robust->inList = 1;
-        }
-      ptw32_mcs_lock_release(&listLock);
-    }
 }
 
-#endif
-
-#if 1
 INLINE
 void
-ptw32_robust_mutex_quick_remove(pthread_mutex_t* mutex, ptw32_thread_t* otp)
+ptw32_robust_mutex_remove(pthread_mutex_t* mutex, ptw32_thread_t* otp)
 {
-  ptw32_mcs_local_node_t mx1Lock;
-  ptw32_mcs_local_node_t mx2Lock;
   ptw32_robust_node_t** list;
   pthread_mutex_t mx = *mutex;
   ptw32_thread_t* tp = mx->ownerThread.p;
-
-  if (NULL != tp)
-    {
-      ptw32_robust_node_t* robust = mx->robustNode;
-
-      list = &tp->robustMxList;
-      if (list != NULL)
-        {
-          ptw32_mcs_lock_acquire(&robust->lock, &mx1Lock);
-          mx->ownerThread.p = otp;
-          if (NULL != robust->next)
-            {
-              ptw32_mcs_lock_acquire(&robust->next->lock, &mx2Lock);
-              robust->next->prev = robust->prev;
-              ptw32_mcs_lock_release(&mx2Lock);
-            }
-          if (NULL != robust->prev)
-            {
-              ptw32_mcs_lock_acquire(&robust->prev->lock, &mx2Lock);
-              robust->prev->next = robust->next;
-              ptw32_mcs_lock_release(&mx2Lock);
-            }
-          if (*list == robust)
-            {
-              *list = robust->next;
-            }
-          ptw32_mcs_lock_release(&mx1Lock);
-        }
-    }
-}
-
-INLINE
-void
-ptw32_robust_mutex_remove(pthread_mutex_t* mutex)
-{
-  ptw32_mcs_local_node_t listLock;
-  ptw32_thread_t* tp = (*mutex)->ownerThread.p;
-
-  if (NULL != tp)
-    {
-      ptw32_mcs_lock_acquire(&tp->robustMxListLock, &listLock);
-      ptw32_robust_mutex_quick_remove(mutex, NULL);
-      ptw32_mcs_lock_release(&listLock);
-    }
-}
-#else
-INLINE
-void
-ptw32_robust_mutex_quick_remove(pthread_mutex_t* mutex, ptw32_thread_t* tp)
-{
-  ptw32_mcs_local_node_t mx1Lock;
-  ptw32_mcs_local_node_t mx2Lock;
-  ptw32_robust_node_t** list;
-  pthread_mutex_t mx = *mutex;
   ptw32_robust_node_t* robust = mx->robustNode;
 
   list = &tp->robustMxList;
-  if (list != NULL)
+  mx->ownerThread.p = otp;
+  if (robust->next != NULL)
     {
-      ptw32_mcs_lock_acquire(&robust->lock, &mx1Lock);
-      if (NULL != robust->next)
-        {
-          ptw32_mcs_lock_acquire(&robust->next->lock, &mx2Lock);
-          robust->next->prev = robust->prev;
-          ptw32_mcs_lock_release(&mx2Lock);
-        }
-      if (NULL != robust->prev)
-        {
-          ptw32_mcs_lock_acquire(&robust->prev->lock, &mx2Lock);
-          robust->prev->next = robust->next;
-          ptw32_mcs_lock_release(&mx2Lock);
-        }
-      if (*list == robust)
-        {
-          *list = robust->next;
-        }
-      ptw32_mcs_lock_release(&mx1Lock);
+      robust->next->prev = robust->prev;
     }
-  robust->inList = 0;
+  if (robust->prev != NULL)
+    {
+      robust->prev->next = robust->next;
+    }
+  if (*list == robust)
+    {
+      *list = robust->next;
+    }
 }
 
-INLINE
-void
-ptw32_robust_mutex_remove(pthread_mutex_t* mutex, pthread_t self)
-{
-  ptw32_mcs_local_node_t listLock;
-  ptw32_thread_t* tp = self.p;
-
-  ptw32_mcs_lock_acquire(&tp->robustMxListLock, &listLock);
-  if (1 == (*mutex)->robustNode->inList)
-    {
-      ptw32_robust_mutex_quick_remove(mutex, tp);
-    }
-  ptw32_mcs_lock_release(&listLock);
-}
-#endif
 
 int
 pthread_mutex_consistent (pthread_mutex_t* mutex)
