@@ -223,7 +223,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 		           (LPLONG) &mx->lock_idx,
 		           (LONG) 1) != 0)
 	        {
-                  while (0 == (result = ptw32_robust_mutex_inherit(mutex, self))
+                  while (0 == (result = ptw32_robust_mutex_inherit(mutex))
                            && (LONG) PTW32_INTERLOCKED_EXCHANGE(
                                   (LPLONG) &mx->lock_idx,
 			          (LONG) -1) != 0)
@@ -296,7 +296,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 	            }
 	          else
 	            {
-                      while (0 == (result = ptw32_robust_mutex_inherit(mutex, self))
+                      while (0 == (result = ptw32_robust_mutex_inherit(mutex))
                                && (LONG) PTW32_INTERLOCKED_EXCHANGE(
                                           (LPLONG) &mx->lock_idx,
 			                  (LONG) -1) != 0)
