@@ -301,7 +301,7 @@ ptw32_threadStart (void *vthreadParms)
     /*
      * A system unexpected exception has occurred running the user's
      * terminate routine. We get control back within this block
-     * and exit with a substitue status. If the thread was not
+     * and exit with a substitute status. If the thread was not
      * cancelled then this indicates the unhandled exception.
      */
     status = sp->exitStatus = PTHREAD_CANCELED;
