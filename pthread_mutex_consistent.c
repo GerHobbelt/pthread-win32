@@ -83,7 +83,7 @@ ptw32_robust_mutex_inherit(pthread_mutex_t * mutex)
   switch (PTW32_INTERLOCKED_COMPARE_EXCHANGE(
             (LPLONG)&robust->stateInconsistent,
             (LONG)PTW32_ROBUST_INCONSISTENT,
-            -1L /* Terminating thread sets this */))
+            -1L /* The terminating thread sets this */))
     {
       case -1L:
           result = EOWNERDEAD;
@@ -98,6 +98,18 @@ ptw32_robust_mutex_inherit(pthread_mutex_t * mutex)
 
   return result;
 }
+
+/*
+ * The next two internal support functions depend on only being
+ * called by the thread that owns the robust mutex. This enables
+ * us to avoid additional locks.
+ * Any mutex currently in the thread's robust mutex list is held
+ * by the thread, again eliminating the need for locks.
+ * The forward/backward links allow the thread to unlock mutexes
+ * in any order, not necessarily the reverse locking order.
+ * This is all possible because it is an error if a thread that
+ * does not own the [robust] mutex attempts to unlock it.
+ */
 
 INLINE
 void
@@ -131,10 +143,9 @@ ptw32_robust_mutex_remove(pthread_mutex_t* mutex, ptw32_thread_t* otp)
 {
   ptw32_robust_node_t** list;
   pthread_mutex_t mx = *mutex;
-  ptw32_thread_t* tp = mx->ownerThread.p;
   ptw32_robust_node_t* robust = mx->robustNode;
 
-  list = &tp->robustMxList;
+  list = &(((ptw32_thread_t*)mx->ownerThread.p)->robustMxList);
   mx->ownerThread.p = otp;
   if (robust->next != NULL)
     {

@@ -92,7 +92,7 @@ TESTS	= \
 	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
 	  create1 create2 reuse1 reuse2 equal1 \
-	  kill1 valid1 valid2 \
+	  sequence1 kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
 	  join0 join1 detach1 join2 join3 \
 	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
@@ -131,7 +131,7 @@ STATICTESTS = \
 	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
 	  create1 create2 reuse1 reuse2 equal1 \
-	  kill1 valid1 valid2 \
+	  sequence1 kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
 	  join0 join1 detach1 join2 join3 \
 	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
@@ -329,11 +329,6 @@ mutex8.pass: mutex7.pass
 mutex8n.pass: mutex7n.pass
 mutex8e.pass: mutex7e.pass
 mutex8r.pass: mutex7r.pass
-robust1.pass: mutex8r.pass
-robust2.pass: mutex8r.pass
-robust3.pass: robust2.pass
-robust4.pass: robust3.pass
-robust5.pass: robust4.pass
 once1.pass: create1.pass
 once2.pass: once1.pass
 once3.pass: once2.pass
@@ -343,6 +338,11 @@ priority1.pass: join1.pass
 priority2.pass: priority1.pass barrier3.pass
 reuse1.pass: create2.pass
 reuse2.pass: reuse1.pass
+robust1.pass: mutex8r.pass
+robust2.pass: mutex8r.pass
+robust3.pass: robust2.pass
+robust4.pass: robust3.pass
+robust5.pass: robust4.pass
 rwlock1.pass: condvar6.pass
 rwlock2.pass: rwlock1.pass
 rwlock3.pass: rwlock2.pass
@@ -365,6 +365,7 @@ semaphore3.pass: semaphore2.pass
 semaphore4.pass: semaphore3.pass cancel1.pass
 semaphore4t.pass: semaphore4.pass
 semaphore5.pass: semaphore4.pass
+sequence1.pass: reuse2.pass
 sizes.pass:
 spin1.pass:
 spin2.pass: spin1.pass

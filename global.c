@@ -52,6 +52,11 @@ int ptw32_concurrency = 0;
 /* What features have been auto-detected */
 int ptw32_features = 0;
 
+/*
+ * Global [process wide] thread sequence Number
+ */
+unsigned long long ptw32_threadSeqNumber = 0;
+
 /* 
  * Function pointer to QueueUserAPCEx if it exists, otherwise
  * it will be set at runtime to a substitute routine which cannot unblock

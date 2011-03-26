@@ -1176,6 +1176,7 @@ PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_getkind_np(pthread_mutexattr_t *
  */
 PTW32_DLLPORT int PTW32_CDECL pthread_delay_np (struct timespec * interval);
 PTW32_DLLPORT int PTW32_CDECL pthread_num_processors_np(void);
+PTW32_DLLPORT unsigned long long PTW32_CDECL pthread_getsequence_np(pthread_t thread);
 
 /*
  * Useful if an application wants to statically link

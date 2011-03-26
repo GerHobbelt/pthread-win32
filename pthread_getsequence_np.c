@@ -1,5 +1,5 @@
 /*
- * nonportable.c
+ * pthread_getsequence_np.c
  *
  * Description:
  * This translation unit implements non-portable thread functions.
@@ -37,11 +37,11 @@
 #include "pthread.h"
 #include "implement.h"
 
-#include "pthread_mutexattr_setkind_np.c"
-#include "pthread_mutexattr_getkind_np.c"
-#include "pthread_getw32threadhandle_np.c"
-#include "pthread_getsequence_np.c"
-#include "pthread_delay_np.c"
-#include "pthread_num_processors_np.c"
-#include "pthread_win32_attach_detach_np.c"
-#include "pthread_timechange_handler_np.c"
+/*
+ *
+ */
+unsigned long long
+pthread_getsequence_np (pthread_t thread)
+{
+  return ((ptw32_thread_t*)thread.p)->seqNumber;
+}

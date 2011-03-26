@@ -194,6 +194,7 @@ SMALL_STATIC_OBJS	= \
 		pthread_mutexattr_setkind_np.o \
 		pthread_mutexattr_getkind_np.o \
 		pthread_getw32threadhandle_np.o \
+		pthread_getsequence_np.o \
 		pthread_delay_np.o \
 		pthread_num_processors_np.o \
 		pthread_win32_attach_detach_np.o \
@@ -353,6 +354,7 @@ NONPORTABLE_SRCS = \
 		pthread_mutexattr_setkind_np.c \
 		pthread_mutexattr_getkind_np.c \
 		pthread_getw32threadhandle_np.c \
+                pthread_getsequence_np.c \
 		pthread_delay_np.c \
 		pthread_num_processors_np.c \
 		pthread_win32_attach_detach_np.c \

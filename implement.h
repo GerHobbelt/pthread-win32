@@ -561,6 +561,8 @@ extern pthread_cond_t ptw32_cond_list_tail;
 
 extern int ptw32_mutex_default_kind;
 
+extern unsigned long long ptw32_threadSeqNumber;
+
 extern int ptw32_concurrency;
 
 extern int ptw32_features;

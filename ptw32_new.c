@@ -70,6 +70,7 @@ ptw32_new (void)
     }
 
   /* Set default state. */
+  tp->seqNumber = ++ptw32_threadSeqNumber;
   tp->sched_priority = THREAD_PRIORITY_NORMAL;
   tp->detachState = PTHREAD_CREATE_JOINABLE;
   tp->cancelState = PTHREAD_CANCEL_ENABLE;

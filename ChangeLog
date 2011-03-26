@@ -1,3 +1,12 @@
+2011-03-26  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* pthread_getsequence_np.c: New non-POSIX interface for compatibility
+	with some other implementations; returns a 64 bit sequence number
+	that is unique to each thread in the process.
+	* pthread.h (pthread_getsequence_np): Added.
+	* global.c: Add global sequence counter for above.
+	* implement.h: Likewise.
+
 2011-03-25  Ross Johnson <ross.johnson at homemail.com.au>
 
 	* (cancelLock): Convert to an MCS lock and rename to stateLock.
