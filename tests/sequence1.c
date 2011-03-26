@@ -96,7 +96,7 @@ static UINT64 seqmap[NUMTHREADS+2];
 void * func(void * arg)
 {
   sched_yield();
-  seqmap[(int)pthread_getsequence_np(pthread_self())] = 1;
+  seqmap[(int)pthread_getunique_np(pthread_self())] = 1;
   InterlockedIncrement(&done);
 
   return (void *) 0; 
@@ -122,7 +122,7 @@ main()
       if (NUMTHREADS/2 == i)
         {
           /* Include this main thread, which will be an implicit pthread_t */
-          seqmap[(int)pthread_getsequence_np(pthread_self())] = 1;
+          seqmap[(int)pthread_getunique_np(pthread_self())] = 1;
         }
       assert(pthread_create(&t[i], &attr, func, NULL) == 0);
     }
