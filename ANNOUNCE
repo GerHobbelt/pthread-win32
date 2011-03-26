@@ -266,7 +266,7 @@ The following functions are implemented:
       pthread_getw32threadhandle_np
       pthread_timechange_handler_np
       pthread_delay_np
-      pthread_getsequence_np
+      pthread_getunique_np
       pthread_mutexattr_getkind_np
       pthread_mutexattr_setkind_np	(types: PTHREAD_MUTEX_FAST_NP,
 						PTHREAD_MUTEX_ERRORCHECK_NP,

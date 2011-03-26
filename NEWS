@@ -56,7 +56,7 @@ types when the mutex is robust, whereas this does not occur for the
 "normal" non-robust mutex type.
 - Ross Johnson
 
-pthread_getsequence_np is implemented for source level compatibility
+pthread_getunique_np is implemented for source level compatibility
 with some other implementations. This routine returns a 64 bit
 sequence number that is uniquely associated with a thread. It can be
 used by applications to order or hash POSIX thread handles.

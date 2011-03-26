@@ -1,5 +1,5 @@
 /*
- * pthread_getsequence_np.c
+ * pthread_getunique_np.c
  *
  * Description:
  * This translation unit implements non-portable thread functions.
@@ -41,7 +41,7 @@
  *
  */
 unsigned long long
-pthread_getsequence_np (pthread_t thread)
+pthread_getunique_np (pthread_t thread)
 {
   return ((ptw32_thread_t*)thread.p)->seqNumber;
 }
