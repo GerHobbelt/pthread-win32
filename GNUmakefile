@@ -48,7 +48,7 @@ CP	= cp -f
 #CP	= copy
 
 # For cross compiling use e.g.
-# make CROSS=i386-mingw32msvc- clean GC-inlined
+# make CROSS=x86_64-w64-mingw32- clean GC-inlined
 CROSS	= 
 
 AR	= $(CROSS)ar
@@ -58,7 +58,7 @@ CXX     = $(CROSS)g++
 RANLIB  = $(CROSS)ranlib
 RC	= $(CROSS)windres
 
-OPT	= $(CLEANUP) -O3 -finline-functions
+OPT	= $(CLEANUP) -O3 # -finline-functions -findirect-inlining
 DOPT	= $(CLEANUP) -g -O0
 XOPT	=
 
@@ -556,6 +556,7 @@ $(GC_STATIC_STAMP) $(GCD_STATIC_STAMP): $(DLL_INLINED_OBJS)
 clean:
 	-$(RM) *~
 	-$(RM) *.i
+	-$(RM) *.s
 	-$(RM) *.o
 	-$(RM) *.obj
 	-$(RM) *.exe

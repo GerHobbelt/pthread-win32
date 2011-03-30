@@ -117,7 +117,7 @@ ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self)
 {
   ptw32_robust_node_t** list;
   pthread_mutex_t mx = *mutex;
-  ptw32_thread_t* tp = self.p;
+  ptw32_thread_t* tp = (ptw32_thread_t*)self.p;
   ptw32_robust_node_t* robust = mx->robustNode;
 
   list = &tp->robustMxList;
