@@ -44,16 +44,11 @@ POSIX TSD (TLS) destructors.
 See README.NONPORTABLE for descriptions of these routines.
 - Ramiro Polla
 
-Robust mutexes are implemented within the PROCESS_PRIVATE scope. Robust
-mutexes are mandatory (SUSv3 2008) for implementations that support
-PSHARED objects and discretionary for those that don't. We still don't
-have PSHARED support but wanted to be source code compatible and they
-will hopefully nevertheless be useful for some applications. NOTE that
-pthread_mutex_*() functions may return different values for robust
-mutexes than they otherwise do in normal usage, e.g.
-pthread_mutex_unlock() is required to check ownership for all mutex
-types when the mutex is robust, whereas this does not occur for the
-"normal" non-robust mutex type.
+Robust mutexes are implemented within the PROCESS_PRIVATE scope. NOTE that
+pthread_mutex_* functions may return different error codes for robust
+mutexes than they otherwise do in normal usage, e.g.  pthread_mutex_unlock
+is required to check ownership for all mutex types when the mutex is
+robust, whereas this does not occur for the "normal" non-robust mutex type.
 - Ross Johnson
 
 pthread_getunique_np is implemented for source level compatibility
@@ -88,11 +83,10 @@ Removed potential NULL pointer reference.
 - Robert Kindred
 
 Removed the requirement that applications restrict the number of threads
-calling pthread_barrier_wait() [on the same barrier] to just the barrier
-count in order to avoid contention and dead lock. Also reduced the
-contention between barrier_wait and barrier_destroy. This change will
-have slowed barriers down slightly but halves the number of semaphores
-consumed per barrier to one.
+calling pthread_barrier_wait to just the barrier count. Also reduced the
+contention between barrier_wait and barrier_destroy. This change will have
+slowed barriers down slightly but halves the number of semaphores consumed
+per barrier to one.
 - Ross Johnson
 
 Fixed a handle leak in sched_[gs]etscheduler.
@@ -115,7 +109,7 @@ WINCE is defined (because RJ is unsure of the dependency there).
 - Ramiro Polla
 
 Several static POSIX mutexes used for internal management were replaced by
-MCS queue-based locks to reduce resource overheads, particularly Win32
+MCS queue-based locks to reduce resource consumption, in particular use of Win32
 objects.
 - Ross Johnson
 
