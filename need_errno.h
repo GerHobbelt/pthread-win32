@@ -129,6 +129,10 @@ _CRTIMP extern int errno;
 
 #define EILSEQ          42
 
+/* POSIX 2008 - robust mutexes */
+#define EOWNERDEAD	43
+#define ENOTRECOVERABLE	44
+
 /*
  * Support EDEADLOCK for compatibiity with older MS-C versions.
  */

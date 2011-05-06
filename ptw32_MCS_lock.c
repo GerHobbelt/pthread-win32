@@ -72,18 +72,18 @@
  *   ptw32_mcs_local_node_t node;
  *
  *   ptw32_mcs_acquire (&lock1, &node);
- *   ptw32_mcs_release (&node);
+ *   ptw32_mcs_lock_release (&node);
  *
- *   ptw32_mcs_acquire (&lock2, &node);
- *   ptw32_mcs_release (&node);
+ *   ptw32_mcs_lock_acquire (&lock2, &node);
+ *   ptw32_mcs_lock_release (&node);
  *   {
  *      ptw32_mcs_local_node_t nodex;
  *
- *      ptw32_mcs_acquire (&lock1, &node);
- *      ptw32_mcs_acquire (&lock2, &nodex);
+ *      ptw32_mcs_lock_acquire (&lock1, &node);
+ *      ptw32_mcs_lock_acquire (&lock2, &nodex);
  *
- *      ptw32_mcs_release (&nodex);
- *      ptw32_mcs_release (&node);
+ *      ptw32_mcs_lock_release (&nodex);
+ *      ptw32_mcs_lock_release (&node);
  *   }
  *   return (void *)0;
  * }

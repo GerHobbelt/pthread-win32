@@ -61,7 +61,7 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
        * If trylock succeeded and the mutex is not recursively locked it
        * can be destroyed.
        */
-      if (result == 0)
+      if (0 == result || ENOTRECOVERABLE == result)
 	{
 	  if (mx->kind != PTHREAD_MUTEX_RECURSIVE || 1 == mx->recursive_count)
 	    {
@@ -74,10 +74,14 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
 	       */
 	      *mutex = NULL;
 
-	      result = pthread_mutex_unlock (&mx);
+	      result = (0 == result)?pthread_mutex_unlock(&mx):0;
 
-	      if (result == 0)
+	      if (0 == result)
 		{
+                  if (mx->robustNode != NULL)
+                    {
+                      free(mx->robustNode);
+                    }
 		  if (!CloseHandle (mx->event))
 		    {
 		      *mutex = mx;

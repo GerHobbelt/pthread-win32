@@ -53,7 +53,7 @@
 
 #include "test.h"
 
-static int lockCount = 0;
+static int lockCount;
 
 static pthread_mutex_t mutex;
 static pthread_mutexattr_t mxAttr;
@@ -65,7 +65,6 @@ void * locker(void * arg)
   assert(pthread_mutex_trylock(&mutex) == EBUSY);
   lockCount++;
   assert(pthread_mutex_unlock(&mutex) == 0);
-  assert(pthread_mutex_unlock(&mutex) == EPERM);
 
   return (void *) 555;
 }
@@ -78,6 +77,10 @@ main()
   int mxType = -1;
 
   assert(pthread_mutexattr_init(&mxAttr) == 0);
+
+  BEGIN_MUTEX_STALLED_ROBUST(mxAttr)
+
+  lockCount = 0;
   assert(pthread_mutexattr_settype(&mxAttr, PTHREAD_MUTEX_ERRORCHECK) == 0);
   assert(pthread_mutexattr_gettype(&mxAttr, &mxType) == 0);
   assert(mxType == PTHREAD_MUTEX_ERRORCHECK);
@@ -92,6 +95,9 @@ main()
   assert(lockCount == 2);
 
   assert(pthread_mutex_destroy(&mutex) == 0);
+
+  END_MUTEX_STALLED_ROBUST(mxAttr)
+
   assert(pthread_mutexattr_destroy(&mxAttr) == 0);
 
   exit(0);

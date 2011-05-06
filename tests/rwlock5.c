@@ -68,7 +68,7 @@ main()
 
   assert(pthread_create(&t, NULL, func, NULL) == 0);
 
-  Sleep(2000);
+  Sleep(20);
 
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 

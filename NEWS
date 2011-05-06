@@ -31,11 +31,6 @@ the full test suite, stress tests and benchmarks.
 
 New Features
 ------------
-Dependence on the winsock library is now discretionary via
-#define RETAIN_WSALASTERROR in config.h. It is undefined by default unless
-WINCE is defined (because I (RJ) am unsure of the dependency there).
-- Ramiro Polla
-
 (MSC and GNU builds) The statically linked library now automatically
 initialises and cleans up on program start/exit, i.e. statically linked
 applications need not call the routines pthread_win32_process_attach_np()
@@ -48,6 +43,19 @@ exit if the application depends on reclaimed POSIX resources or running
 POSIX TSD (TLS) destructors.
 See README.NONPORTABLE for descriptions of these routines.
 - Ramiro Polla
+
+Robust mutexes are implemented within the PROCESS_PRIVATE scope. NOTE that
+pthread_mutex_* functions may return different error codes for robust
+mutexes than they otherwise do in normal usage, e.g.  pthread_mutex_unlock
+is required to check ownership for all mutex types when the mutex is
+robust, whereas this does not occur for the "normal" non-robust mutex type.
+- Ross Johnson
+
+pthread_getunique_np is implemented for source level compatibility
+with some other implementations. This routine returns a 64 bit
+sequence number that is uniquely associated with a thread. It can be
+used by applications to order or hash POSIX thread handles.
+- Ross Johnson
 
 Bug fixes
 ---------
@@ -75,11 +83,10 @@ Removed potential NULL pointer reference.
 - Robert Kindred
 
 Removed the requirement that applications restrict the number of threads
-calling pthread_barrier_wait() [on the same barrier] to just the barrier
-count in order to avoid contention and dead lock. Also reduced the
-contention between barrier_wait and barrier_destroy. This change will
-have slowed barriers down slightly but halves the number of semaphores
-consumed per barrier to one.
+calling pthread_barrier_wait to just the barrier count. Also reduced the
+contention between barrier_wait and barrier_destroy. This change will have
+slowed barriers down slightly but halves the number of semaphores consumed
+per barrier to one.
 - Ross Johnson
 
 Fixed a handle leak in sched_[gs]etscheduler.
@@ -88,6 +95,34 @@ Fixed a handle leak in sched_[gs]etscheduler.
 Removed all of the POSIX re-entrant function compatibility macros from pthread.h.
 Some were simply not semanticly correct.
 - Igor Lubashev
+
+Threads no longer attempt to pass uncaught exceptions out of thread scope (C++
+and SEH builds only). Uncaught exceptions now cause the thread to exit with
+the return code PTHREAD_CANCELED.
+- Ross Johnson
+
+Other changes
+-------------
+Dependence on the winsock library is now discretionary via
+#define RETAIN_WSALASTERROR in config.h. It is undefined by default unless
+WINCE is defined (because RJ is unsure of the dependency there).
+- Ramiro Polla
+
+Several static POSIX mutexes used for internal management were replaced by
+MCS queue-based locks to reduce resource consumption, in particular use of Win32
+objects.
+- Ross Johnson
+
+New tests
+---------
+robust[1-5].c - Robust mutexes
+sequence1.c - per-thread unique sequence numbers
+
+Modified tests and benchtests
+-----------------------------
+All mutex*.c tests wherever appropriate have been modified to also test
+robust mutexes under the same conditions.
+Added robust mutex benchtests to benchtest*.c wherever appropriate.
 
 
 RELEASE 2.8.0
