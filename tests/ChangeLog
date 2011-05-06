@@ -1,3 +1,10 @@
+2011-05-05  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* openmp1.c: Add missing test; used to comfirm that this
+	library works with libgomp; if this test produces a segfault
+	then try upgrading your version of libgomp/gcc; gcc version
+	4.5.2 passes this test.
+
 2011-03-26  Ross Johnson <ross.johnson at homemail.com.au>
 
 	* sequence1.c: New test for new pthread_getsequence_np().
