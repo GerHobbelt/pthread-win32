@@ -69,7 +69,6 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
 	 */
 	pthread_t self = pthread_self ();
 
-	(void) pthread_mutex_destroy (&((ptw32_thread_t *)self.p)->cancelLock);
 	ptw32_callUserDestroyRoutines (self);
 
 	return EXCEPTION_CONTINUE_SEARCH;
@@ -139,6 +138,7 @@ ptw32_threadStart (void *vthreadParms)
   int setjmp_rc;
 #endif
 
+  ptw32_mcs_local_node_t stateLock;
   void * status = (void *) 0;
 
   self = threadParms->tid;
@@ -155,19 +155,19 @@ ptw32_threadStart (void *vthreadParms)
    */
   sp->thread = GetCurrentThreadId ();
   /*
-   * Here we're using cancelLock as a general-purpose lock
+   * Here we're using stateLock as a general-purpose lock
    * to make the new thread wait until the creating thread
    * has the new handle.
    */
-  if (pthread_mutex_lock (&sp->cancelLock) == 0)
-    {
-      (void) pthread_mutex_unlock (&sp->cancelLock);
-    }
+  ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
+  pthread_setspecific (ptw32_selfThreadKey, sp);
+#else
+  pthread_setspecific (ptw32_selfThreadKey, sp);
+  ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
 #endif
 
-  pthread_setspecific (ptw32_selfThreadKey, sp);
-
   sp->state = PThreadStateRunning;
+  ptw32_mcs_lock_release (&stateLock);
 
 #ifdef __CLEANUP_SEH
 
@@ -177,6 +177,7 @@ ptw32_threadStart (void *vthreadParms)
      * Run the caller's routine;
      */
     status = sp->exitStatus = (*start) (arg);
+    sp->state = PThreadStateExiting;
 
 #ifdef _UWIN
     if (--pthread_count <= 0)
@@ -217,6 +218,7 @@ ptw32_threadStart (void *vthreadParms)
        * Run the caller's routine;
        */
       status = sp->exitStatus = (*start) (arg);
+      sp->state = PThreadStateExiting;
     }
   else
     {
@@ -250,6 +252,7 @@ ptw32_threadStart (void *vthreadParms)
     try
     {
       status = sp->exitStatus = (*start) (arg);
+      sp->state = PThreadStateExiting;
     }
     catch (ptw32_exception &)
     {
@@ -298,7 +301,7 @@ ptw32_threadStart (void *vthreadParms)
     /*
      * A system unexpected exception has occurred running the user's
      * terminate routine. We get control back within this block
-     * and exit with a substitue status. If the thread was not
+     * and exit with a substitute status. If the thread was not
      * cancelled then this indicates the unhandled exception.
      */
     status = sp->exitStatus = PTHREAD_CANCELED;

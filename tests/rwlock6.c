@@ -52,7 +52,7 @@ void * wrfunc(void * arg)
   int ba;
 
   assert(pthread_rwlock_wrlock(&rwlock1) == 0);
-  Sleep(2000);
+  Sleep(200);
   bankAccount += 10;
   ba = bankAccount;
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
@@ -84,9 +84,9 @@ main()
   bankAccount = 0;
 
   assert(pthread_create(&wrt1, NULL, wrfunc, NULL) == 0);
-  Sleep(500);
+  Sleep(50);
   assert(pthread_create(&rdt, NULL, rdfunc, NULL) == 0);
-  Sleep(500);
+  Sleep(50);
   assert(pthread_create(&wrt2, NULL, wrfunc, NULL) == 0);
 
   assert(pthread_join(wrt1, &wr1Result) == 0);

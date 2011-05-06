@@ -1,6 +1,8 @@
-/* 
- * mutex1r.c
+/*
+ * pthread_getunique_np.c
  *
+ * Description:
+ * This translation unit implements non-portable thread functions.
  *
  * --------------------------------------------------------------------------
  *
@@ -30,49 +32,16 @@
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
- *
- * --------------------------------------------------------------------------
- *
- * As for mutex1.c but with type set to PTHREAD_MUTEX_RECURSIVE.
- *
- * Create a simple mutex object, lock it, unlock it, then destroy it.
- * This is the simplest test of the pthread mutex family that we can do.
- *
- * Depends on API functions:
- *	pthread_mutexattr_settype()
- * 	pthread_mutex_init()
- *	pthread_mutex_destroy()
  */
 
-#include "test.h"
+#include "pthread.h"
+#include "implement.h"
 
-pthread_mutex_t mutex = NULL;
-pthread_mutexattr_t mxAttr;
-
-int
-main()
+/*
+ *
+ */
+unsigned long long
+pthread_getunique_np (pthread_t thread)
 {
-  assert(pthread_mutexattr_init(&mxAttr) == 0);
-
-  BEGIN_MUTEX_STALLED_ROBUST(mxAttr)
-
-  assert(pthread_mutexattr_settype(&mxAttr, PTHREAD_MUTEX_RECURSIVE) == 0);
-
-  assert(mutex == NULL);
-
-  assert(pthread_mutex_init(&mutex, &mxAttr) == 0);
-
-  assert(mutex != NULL);
-
-  assert(pthread_mutex_lock(&mutex) == 0);
-
-  assert(pthread_mutex_unlock(&mutex) == 0);
-
-  assert(pthread_mutex_destroy(&mutex) == 0);
-
-  assert(mutex == NULL);
-
-  END_MUTEX_STALLED_ROBUST(mxAttr)
-
-  return 0;
+  return ((ptw32_thread_t*)thread.p)->seqNumber;
 }

@@ -113,7 +113,9 @@ const char * error_string[] = {
   "ENOLCK",
   "ENOSYS",
   "ENOTEMPTY",
-  "EILSEQ"
+  "EILSEQ",
+  "EOWNERDEAD",
+  "ENOTRECOVERABLE"
 };
 
 /*
@@ -152,3 +154,25 @@ int assertE;
                    #e,#o,#r, __FILE__, (int) __LINE__, error_string[assertE]), exit(1), 0))
 
 #endif
+
+# define BEGIN_MUTEX_STALLED_ROBUST(mxAttr) \
+  for(;;) \
+    { \
+      static int _i=0; \
+      static int _robust; \
+      pthread_mutexattr_getrobust(&(mxAttr), &_robust);
+
+# define END_MUTEX_STALLED_ROBUST(mxAttr) \
+      printf("Pass %s\n", _robust==PTHREAD_MUTEX_ROBUST?"Robust":"Non-robust"); \
+      if (++_i > 1) \
+        break; \
+      else \
+        { \
+          pthread_mutexattr_t *pma, *pmaEnd; \
+          for(pma = &(mxAttr), pmaEnd = pma + sizeof(mxAttr)/sizeof(pthread_mutexattr_t); \
+              pma < pmaEnd; \
+              pthread_mutexattr_setrobust(pma++, PTHREAD_MUTEX_ROBUST)); \
+        } \
+    }
+
+# define IS_ROBUST (_robust==PTHREAD_MUTEX_ROBUST)
