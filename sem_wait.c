@@ -63,7 +63,7 @@ ptw32_sem_wait_cleanup(void * sem)
       if (*((sem_t *)sem) != NULL && !(WaitForSingleObject(s->sem, 0) == WAIT_OBJECT_0))
 	{
 	  ++s->value;
-#ifdef NEED_SEM
+#if defined(NEED_SEM)
 	  if (s->value > 0)
 	    {
 	      s->leftToUnblock = 0;
@@ -151,7 +151,7 @@ sem_wait (sem_t * sem)
 #pragma inline_depth()
 #endif
 	    }
-#ifdef NEED_SEM
+#if defined(NEED_SEM)
 
 	  if (!result && pthread_mutex_lock (&s->lock) == 0)
 	    {

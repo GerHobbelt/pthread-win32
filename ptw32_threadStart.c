@@ -37,8 +37,9 @@
 
 #include "pthread.h"
 #include "implement.h"
+#include <stdio.h>
 
-#ifdef __CLEANUP_SEH
+#if defined(__CLEANUP_SEH)
 
 static DWORD
 ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
@@ -129,12 +130,12 @@ ptw32_threadStart (void *vthreadParms)
   void *(*start) (void *);
   void * arg;
 
-#ifdef __CLEANUP_SEH
+#if defined(__CLEANUP_SEH)
   DWORD
   ei[] = { 0, 0, 0 };
 #endif
 
-#ifdef __CLEANUP_C
+#if defined(__CLEANUP_C)
   int setjmp_rc;
 #endif
 
@@ -169,7 +170,7 @@ ptw32_threadStart (void *vthreadParms)
   sp->state = PThreadStateRunning;
   ptw32_mcs_lock_release (&stateLock);
 
-#ifdef __CLEANUP_SEH
+#if defined(__CLEANUP_SEH)
 
   __try
   {
@@ -179,7 +180,7 @@ ptw32_threadStart (void *vthreadParms)
     status = sp->exitStatus = (*start) (arg);
     sp->state = PThreadStateExiting;
 
-#ifdef _UWIN
+#if defined(_UWIN)
     if (--pthread_count <= 0)
       exit (0);
 #endif
@@ -191,7 +192,7 @@ ptw32_threadStart (void *vthreadParms)
       {
       case PTW32_EPS_CANCEL:
 	status = sp->exitStatus = PTHREAD_CANCELED;
-#ifdef _UWIN
+#if defined(_UWIN)
 	if (--pthread_count <= 0)
 	  exit (0);
 #endif
@@ -207,7 +208,7 @@ ptw32_threadStart (void *vthreadParms)
 
 #else /* __CLEANUP_SEH */
 
-#ifdef __CLEANUP_C
+#if defined(__CLEANUP_C)
 
   setjmp_rc = setjmp (sp->start_mark);
 
@@ -238,7 +239,7 @@ ptw32_threadStart (void *vthreadParms)
 
 #else /* __CLEANUP_C */
 
-#ifdef __CLEANUP_CXX
+#if defined(__CLEANUP_CXX)
 
   ptw32_oldTerminate = set_terminate (&ptw32_terminate);
 

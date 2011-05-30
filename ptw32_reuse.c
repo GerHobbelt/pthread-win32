@@ -126,7 +126,7 @@ ptw32_threadReusePush (pthread_t thread)
   tp->ptHandle = t;
 
   /* Bump the reuse counter now */
-#ifdef PTW32_THREAD_ID_REUSE_INCREMENT
+#if defined(PTW32_THREAD_ID_REUSE_INCREMENT)
   tp->ptHandle.x += PTW32_THREAD_ID_REUSE_INCREMENT;
 #else
   tp->ptHandle.x++;

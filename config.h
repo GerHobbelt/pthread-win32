@@ -108,7 +108,7 @@
  * If you find that these are incorrect or incomplete please report it
  * to the pthreads-win32 maintainer. Thanks.
  *********************************************************************/
-#ifdef WINCE
+#if defined(WINCE)
 #define NEED_DUPLICATEHANDLE
 #define NEED_CREATETHREAD
 #define NEED_ERRNO
@@ -121,12 +121,12 @@
 #define RETAIN_WSALASTERROR
 #endif
 
-#ifdef _UWIN
+#if defined(_UWIN)
 #define HAVE_MODE_T
 #define HAVE_STRUCT_TIMESPEC
 #endif
 
-#ifdef __GNUC__
+#if defined(__GNUC__)
 #define HAVE_C_INLINE
 #endif
 
@@ -137,13 +137,13 @@
 #define HAVE_MODE_T
 #endif
 
-#ifdef __BORLANDC__
+#if defined(__BORLANDC__)
 #endif
 
-#ifdef __WATCOMC__
+#if defined(__WATCOMC__)
 #endif
 
-#ifdef __DMC__
+#if defined(__DMC__)
 #define HAVE_SIGNAL_H
 #define HAVE_C_INLINE
 #endif

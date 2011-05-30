@@ -63,7 +63,7 @@ pthread_self (void)
   pthread_t nil = {NULL, 0};
   ptw32_thread_t * sp;
 
-#ifdef _UWIN
+#if defined(_UWIN)
   if (!ptw32_selfThreadKey)
     return nil;
 #endif
@@ -95,7 +95,7 @@ pthread_self (void)
 	  sp->detachState = PTHREAD_CREATE_DETACHED;
 	  sp->thread = GetCurrentThreadId ();
 
-#ifdef NEED_DUPLICATEHANDLE
+#if defined(NEED_DUPLICATEHANDLE)
 	  /*
 	   * DuplicateHandle does not exist on WinCE.
 	   *

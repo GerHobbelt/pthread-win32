@@ -39,7 +39,7 @@
 #include "implement.h"
 
 
-#ifdef NEED_FTIME
+#if defined(NEED_FTIME)
 
 /*
  * time between jan 1, 1601 and jan 1, 1970 in units of 100 nanoseconds

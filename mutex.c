@@ -37,7 +37,7 @@
 #if ! defined(_UWIN) && ! defined(WINCE)
 #   include <process.h>
 #endif
-#ifndef NEED_FTIME
+#if !defined(NEED_FTIME)
 #include <sys/timeb.h>
 #endif
 #include "pthread.h"

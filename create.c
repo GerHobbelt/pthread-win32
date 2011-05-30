@@ -299,7 +299,7 @@ FAIL0:
       *tid = thread;
     }
 
-#ifdef _UWIN
+#if defined(_UWIN)
   if (result == 0)
     pthread_count++;
 #endif
