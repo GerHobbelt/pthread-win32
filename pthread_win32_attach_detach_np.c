@@ -54,7 +54,7 @@ pthread_win32_process_attach_np ()
 
   result = ptw32_processInitialize ();
 
-#ifdef _UWIN
+#if defined(_UWIN)
   pthread_count++;
 #endif
 

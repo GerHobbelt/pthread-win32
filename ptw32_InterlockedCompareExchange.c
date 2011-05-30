@@ -36,7 +36,7 @@
  */
 
 #if 0
-#ifndef _WIN64
+#if !defined(_WIN64)
 
 #include "pthread.h"
 #include "implement.h"

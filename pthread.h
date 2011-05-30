@@ -81,7 +81,7 @@
 /*
  * Stop here if we are being included by the resource compiler.
  */
-#ifndef RC_INVOKED
+#if !defined(RC_INVOKED)
 
 #undef PTW32_LEVEL
 
@@ -109,7 +109,7 @@
 /* Include everything */
 #endif
 
-#ifdef _UWIN
+#if defined(_UWIN)
 #   define HAVE_STRUCT_TIMESPEC 1
 #   define HAVE_SIGNAL_H        1
 #   undef HAVE_PTW32_CONFIG_H
@@ -194,7 +194,7 @@
 #define PTW32_INCLUDE_WINDOWS_H
 #endif
 
-#ifdef PTW32_INCLUDE_WINDOWS_H
+#if defined(PTW32_INCLUDE_WINDOWS_H)
 #include <windows.h>
 #endif
 
@@ -210,17 +210,17 @@ typedef unsigned long DWORD_PTR;
  * -----------------
  */
 
-#if HAVE_PTW32_CONFIG_H
+#if defined(HAVE_PTW32_CONFIG_H)
 #include "config.h"
 #endif /* HAVE_PTW32_CONFIG_H */
 
-#ifndef NEED_FTIME
+#if !defined(NEED_FTIME)
 #include <time.h>
 #else /* NEED_FTIME */
 /* use native WIN32 time API */
 #endif /* NEED_FTIME */
 
-#if HAVE_SIGNAL_H
+#if defined(HAVE_SIGNAL_H)
 #include <signal.h>
 #endif /* HAVE_SIGNAL_H */
 
@@ -240,7 +240,7 @@ enum {
  * which is only used when building the pthread-win32 libraries.
  */
 
-#ifndef PTW32_CONFIG_H
+#if !defined(PTW32_CONFIG_H)
 #  if defined(WINCE)
 #    define NEED_ERRNO
 #    define NEED_SEM
@@ -258,7 +258,7 @@ enum {
  */
 
 #if PTW32_LEVEL >= PTW32_LEVEL_MAX
-#ifdef NEED_ERRNO
+#if defined(NEED_ERRNO)
 #include "need_errno.h"
 #else
 #include <errno.h>
@@ -268,20 +268,20 @@ enum {
 /*
  * Several systems don't define some error numbers.
  */
-#ifndef ENOTSUP
+#if !defined(ENOTSUP)
 #  define ENOTSUP 48   /* This is the value in Solaris. */
 #endif
 
-#ifndef ETIMEDOUT
+#if !defined(ETIMEDOUT)
 #  define ETIMEDOUT 10060 /* Same as WSAETIMEDOUT */
 #endif
 
-#ifndef ENOSYS
+#if !defined(ENOSYS)
 #  define ENOSYS 140     /* Semi-arbitrary value */
 #endif
 
-#ifndef EDEADLK
-#  ifdef EDEADLOCK
+#if !defined(EDEADLK)
+#  if defined(EDEADLOCK)
 #    define EDEADLK EDEADLOCK
 #  else
 #    define EDEADLK 36     /* This is the value in MSVC. */
@@ -289,10 +289,10 @@ enum {
 #endif
 
 /* POSIX 2008 - related to robust mutexes */
-#ifndef EOWNERDEAD
+#if !defined(EOWNERDEAD)
 #  define EOWNERDEAD 43
 #endif
-#ifndef ENOTRECOVERABLE
+#if !defined(ENOTRECOVERABLE)
 #  define ENOTRECOVERABLE 44
 #endif
 
@@ -302,20 +302,20 @@ enum {
  * To avoid including windows.h we define only those things that we
  * actually need from it.
  */
-#ifndef PTW32_INCLUDE_WINDOWS_H
-#ifndef HANDLE
+#if !defined(PTW32_INCLUDE_WINDOWS_H)
+#if !defined(HANDLE)
 # define PTW32__HANDLE_DEF
 # define HANDLE void *
 #endif
-#ifndef DWORD
+#if !defined(DWORD)
 # define PTW32__DWORD_DEF
 # define DWORD unsigned long
 #endif
 #endif
 
-#ifndef HAVE_STRUCT_TIMESPEC
+#if !defined(HAVE_STRUCT_TIMESPEC)
 #define HAVE_STRUCT_TIMESPEC
-#ifndef _TIMESPEC_DEFINED
+#if !defined(_TIMESPEC_DEFINED)
 #define _TIMESPEC_DEFINED
 struct timespec {
         time_t tv_sec;
@@ -324,19 +324,19 @@ struct timespec {
 #endif /* _TIMESPEC_DEFINED */
 #endif /* HAVE_STRUCT_TIMESPEC */
 
-#ifndef SIG_BLOCK
+#if !defined(SIG_BLOCK)
 #define SIG_BLOCK 0
 #endif /* SIG_BLOCK */
 
-#ifndef SIG_UNBLOCK 
+#if !defined(SIG_UNBLOCK)
 #define SIG_UNBLOCK 1
 #endif /* SIG_UNBLOCK */
 
-#ifndef SIG_SETMASK
+#if !defined(SIG_SETMASK)
 #define SIG_SETMASK 2
 #endif /* SIG_SETMASK */
 
-#ifdef __cplusplus
+#if defined(__cplusplus)
 extern "C"
 {
 #endif                          /* __cplusplus */
@@ -537,7 +537,7 @@ extern "C"
 #define SEM_VALUE_MAX                           INT_MAX
 
 
-#if __GNUC__ && ! defined (__declspec)
+#if defined(__GNUC__) && !defined(__declspec)
 # error Please upgrade your GNU compiler to one that supports __declspec.
 #endif
 
@@ -548,7 +548,7 @@ extern "C"
  * be imported correctly.
  */
 #if !defined(PTW32_STATIC_LIB)
-#  ifdef PTW32_BUILD
+#  if defined(PTW32_BUILD)
 #    define PTW32_DLLPORT __declspec (dllexport)
 #  else
 #    define PTW32_DLLPORT __declspec (dllimport)
@@ -746,7 +746,7 @@ struct ptw32_cleanup_t
   struct ptw32_cleanup_t *prev;
 };
 
-#ifdef __CLEANUP_SEH
+#if defined(__CLEANUP_SEH)
         /*
          * WIN32 SEH version of cancel cleanup.
          */
@@ -773,7 +773,7 @@ struct ptw32_cleanup_t
 
 #else /* __CLEANUP_SEH */
 
-#ifdef __CLEANUP_C
+#if defined(__CLEANUP_C)
 
         /*
          * C implementation of PThreads cancel cleanup
@@ -791,7 +791,7 @@ struct ptw32_cleanup_t
 
 #else /* __CLEANUP_C */
 
-#ifdef __CLEANUP_CXX
+#if defined(__CLEANUP_CXX)
 
         /*
          * C++ version of cancel cleanup.
@@ -1244,11 +1244,11 @@ PTW32_DLLPORT int PTW32_CDECL pthreadCancelableTimedWait (HANDLE waitHandle,
 /*
  * Thread-Safe C Runtime Library Mappings.
  */
-#ifndef _UWIN
+#if !defined(_UWIN)
 #  if defined(NEED_ERRNO)
      PTW32_DLLPORT int * PTW32_CDECL _errno( void );
 #  else
-#    ifndef errno
+#    if !defined(errno)
 #      if (defined(_MT) || defined(_DLL))
          __declspec(dllimport) extern int * __cdecl _errno(void);
 #        define errno   (*_errno())
@@ -1265,7 +1265,7 @@ PTW32_DLLPORT int PTW32_CDECL pthreadCancelableTimedWait (HANDLE waitHandle,
 #  define _timeb timeb
 #endif
 
-#ifdef __cplusplus
+#if defined(__cplusplus)
 
 /*
  * Internal exceptions
@@ -1286,9 +1286,9 @@ PTW32_DLLPORT DWORD PTW32_CDECL ptw32_get_exception_services_code(void);
 
 #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
-#ifndef PTW32_BUILD
+#if !defined(PTW32_BUILD)
 
-#ifdef __CLEANUP_SEH
+#if defined(__CLEANUP_SEH)
 
 /*
  * Redefine the SEH __except keyword to ensure that applications
@@ -1300,19 +1300,19 @@ PTW32_DLLPORT DWORD PTW32_CDECL ptw32_get_exception_services_code(void);
 
 #endif /* __CLEANUP_SEH */
 
-#ifdef __CLEANUP_CXX
+#if defined(__CLEANUP_CXX)
 
 /*
  * Redefine the C++ catch keyword to ensure that applications
  * propagate our internal exceptions up to the library's internal handlers.
  */
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
         /*
          * WARNING: Replace any 'catch( ... )' with 'PtW32CatchAll'
          * if you want Pthread-Win32 cancelation and pthread_exit to work.
          */
 
-#ifndef PtW32NoCatchWarn
+#if !defined(PtW32NoCatchWarn)
 
 #pragma message("Specify \"/DPtW32NoCatchWarn\" compiler flag to skip this message.")
 #pragma message("------------------------------------------------------------------")
@@ -1321,7 +1321,7 @@ PTW32_DLLPORT DWORD PTW32_CDECL ptw32_get_exception_services_code(void);
 #pragma message("  with 'PtW32CatchAll' or 'CATCHALL' if you want POSIX thread")
 #pragma message("  cancelation and pthread_exit to work. For example:")
 #pragma message("")
-#pragma message("    #ifdef PtW32CatchAll")
+#pragma message("    #if defined(PtW32CatchAll)")
 #pragma message("      PtW32CatchAll")
 #pragma message("    #else")
 #pragma message("      catch(...)")
@@ -1349,14 +1349,14 @@ PTW32_DLLPORT DWORD PTW32_CDECL ptw32_get_exception_services_code(void);
 
 #endif /* ! PTW32_BUILD */
 
-#ifdef __cplusplus
+#if defined(__cplusplus)
 }                               /* End of extern "C" */
 #endif                          /* __cplusplus */
 
-#ifdef PTW32__HANDLE_DEF
+#if defined(PTW32__HANDLE_DEF)
 # undef HANDLE
 #endif
-#ifdef PTW32__DWORD_DEF
+#if defined(PTW32__DWORD_DEF)
 # undef DWORD
 #endif
 

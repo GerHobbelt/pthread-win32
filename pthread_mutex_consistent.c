@@ -66,7 +66,7 @@
  * ■ If the thread that acquires the lock with EOWNERDEAD terminates without unlocking the
  * mutex, the next owner acquires the lock with an EOWNERDEAD return code.
  */
-#ifndef _UWIN
+#if !defined(_UWIN)
 /*#   include <process.h> */
 #endif
 #include "pthread.h"

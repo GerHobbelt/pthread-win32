@@ -27,6 +27,7 @@ STATIC_STAMPS	= pthreadVCE$(DLL_VER).static pthreadVSE$(DLL_VER).static pthreadV
 OPTIM	= /O2 /Ob2
 OPTIMD	=
 
+CC	= cl
 CFLAGS	= /W3 /MD /nologo /I. /D_WIN32_WINNT=0x400 /DHAVE_PTW32_CONFIG_H
 CFLAGSD	= /Z7 $(CFLAGS)
 
@@ -459,6 +460,7 @@ realclean: clean
 
 clean:
 	if exist *.obj del *.obj
+	if exist *.def del *.def
 	if exist *.ilk del *.ilk
 	if exist *.pdb del *.pdb
 	if exist *.exp del *.exp
@@ -476,12 +478,12 @@ install: $(DLLS)
 	copy semaphore.h $(HDRDEST)
 
 $(DLLS): $(DLL_OBJS)
-	cl /LDd /Zi /nologo $(DLL_OBJS) \
+	$(CC) /LDd /Zi /nologo $(DLL_OBJS) \
 		/link /nodefaultlib:libcmt /implib:$*.lib \
 		msvcrt.lib $(XLIBS) /out:$@
 
 $(INLINED_STAMPS): $(DLL_INLINED_OBJS)
-	cl /LDd /Zi /nologo $(DLL_INLINED_OBJS) \
+	$(CC) /LDd /Zi /nologo $(DLL_INLINED_OBJS) \
 		/link /nodefaultlib:libcmt /implib:$*.lib \
 		msvcrt.lib $(XLIBS) /out:$*.dll
 
@@ -490,13 +492,13 @@ $(STATIC_STAMPS): $(DLL_INLINED_OBJS)
 	lib $(DLL_INLINED_OBJS) /out:$*.lib
 
 .c.obj:
-	cl $(EHFLAGS) /D$(CLEANUP) -c $<
+	$(CC) $(EHFLAGS) /D$(CLEANUP) -c $<
 
 .rc.res:
 	rc /dPTW32_RC_MSC /d$(CLEANUP) $<
 
 .c.i:
-	cl /P /O2 /Ob1 $(VCFLAGS) $<
+	$(CC) /P /O2 /Ob1 $(VCFLAGS) $<
 
 attr.obj:	attr.c $(ATTR_SRCS) $(INCL)
 barrier.obj:	barrier.c $(BARRIER_SRCS) $(INCL)

@@ -39,7 +39,7 @@
 
 
 /* TLS_OUT_OF_INDEXES not defined on WinCE */
-#ifndef TLS_OUT_OF_INDEXES
+#if !defined(TLS_OUT_OF_INDEXES)
 #define TLS_OUT_OF_INDEXES 0xffffffff
 #endif
 

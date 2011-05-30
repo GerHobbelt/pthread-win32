@@ -149,7 +149,7 @@ ptw32_mcs_flag_wait (LONG * flag)
  * Algorithms for Scalable Synchronization on Shared-Memory Multiprocessors.
  * ACM Transactions on Computer Systems, 9(1):21-65, Feb. 1991.
  */
-#ifdef PTW32_BUILD_INLINED
+#if defined(PTW32_BUILD_INLINED)
 INLINE 
 #endif /* PTW32_BUILD_INLINED */
 void 
@@ -183,7 +183,7 @@ ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node)
  * Algorithms for Scalable Synchronization on Shared-Memory Multiprocessors.
  * ACM Transactions on Computer Systems, 9(1):21-65, Feb. 1991.
  */
-#ifdef PTW32_BUILD_INLINED
+#if defined(PTW32_BUILD_INLINED)
 INLINE 
 #endif /* PTW32_BUILD_INLINED */
 void 
@@ -219,7 +219,7 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
 /*
   * ptw32_mcs_lock_try_acquire
  */
-#ifdef PTW32_BUILD_INLINED
+#if defined(PTW32_BUILD_INLINED)
 INLINE 
 #endif /* PTW32_BUILD_INLINED */
 int 
@@ -247,7 +247,7 @@ ptw32_mcs_lock_try_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * no
  *
  * Should only be called by the thread that has the lock.
  */
-#ifdef PTW32_BUILD_INLINED
+#if defined(PTW32_BUILD_INLINED)
 INLINE 
 #endif /* PTW32_BUILD_INLINED */
 void 

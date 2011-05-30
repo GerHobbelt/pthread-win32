@@ -38,10 +38,20 @@
 #include "pthread.h"
 #include "implement.h"
 
-#ifdef __cplusplus
-# if ! defined (_MSC_VER) && ! (defined(__GNUC__) && __GNUC__ < 3) && ! defined(__WATCOMC__)
-using
-  std::terminate;
+#if defined(__CLEANUP_CXX)
+# if defined(_MSC_VER)
+#  include <eh.h>
+# elif defined(__WATCOMC__)
+#  include <eh.h>
+#  include <exceptio.h>
+# else
+#  if defined(__GNUC__) && __GNUC__ < 3
+#    include <new.h>
+#  else
+#    include <new>
+     using
+       std::terminate;
+#  endif
 # endif
 #endif
 
@@ -172,7 +182,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 
 		  assocsRemaining++;
 
-#ifdef __cplusplus
+#if defined(__cplusplus)
 
 		  try
 		    {

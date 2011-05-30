@@ -42,7 +42,7 @@
  * Not needed yet, but defining it should indicate clashes with build target
  * environment that should be fixed.
  */
-#ifndef WINCE
+#if !defined(WINCE)
 #  include <signal.h>
 #endif
 

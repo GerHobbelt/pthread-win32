@@ -34,7 +34,7 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#ifndef _UWIN
+#if !defined(_UWIN)
 /*#   include <process.h> */
 #endif
 #include "pthread.h"

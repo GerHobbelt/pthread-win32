@@ -1,3 +1,29 @@
+2011-05-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* *.[ch] (#ifdef): Extended cleanup to whole project.
+
+2011-05-29 Daniel Richard G. <skunk at iskunk dot org>
+
+	* Makefile (CC): Define  CC to allow use of other compatible
+	compilers such as the Intel compilter icl.
+	* implement.h (#if): Fix forms like #if HAVE_SOMETHING.
+	* pthread.h: Likewise.
+	* sched.h: Likewise; PTW32_LEVEL_* becomes PTW32_SCHED_LEVEL_*.
+	* semaphore.h: Likewise.
+
+2011-05-11  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* ptw32_callUserDestroyRoutines.c (terminate): Altered includes
+	to match ptw32_threadStart.c.
+	* GNUmakefile (GCE-inlined-debug, DOPT): Fixed.
+
+2011-04-31  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* (robust mutexes): Added this API. The API is not
+	mandatory for implementations that don't support PROCESS_SHARED
+	mutexes, nevertheless it was considered useful both functionally
+	and for source-level compatibility.
+	
 2011-03-26  Ross Johnson <ross.johnson at homemail.com.au>
 
 	* pthread_getunique_np.c: New non-POSIX interface for compatibility

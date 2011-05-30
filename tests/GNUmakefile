@@ -204,6 +204,9 @@ GCE-bench:
 GC-debug:
 	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-fopenmp -D__CLEANUP_C" OPT="${DOPT}" DLL_VER="$(DLL_VER)d" all-pass
 
+GCE-debug:
+	$(MAKE) TEST=GCE CC=$(CXX) XXCFLAGS="-fopenmp -D__CLEANUP_CXX" OPT="${DOPT}" DLL_VER="$(DLL_VER)d" all-pass
+
 GC-bench-debug:
 	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${OPT}" DLL_VER="$(DLL_VER)d" all-bench
 

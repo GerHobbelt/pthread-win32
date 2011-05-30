@@ -34,7 +34,7 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#ifdef PTW32_STATIC_LIB
+#if defined(PTW32_STATIC_LIB)
 
 #if defined(__MINGW64__) || defined(__MINGW32__) || defined(_MSC_VER)
 

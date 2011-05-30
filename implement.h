@@ -35,10 +35,10 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#ifndef _IMPLEMENT_H
+#if !defined(_IMPLEMENT_H)
 #define _IMPLEMENT_H
 
-#ifdef _WIN32_WINNT
+#if defined(_WIN32_WINNT)
 #undef _WIN32_WINNT
 #endif
 #define _WIN32_WINNT 0x400
@@ -48,7 +48,7 @@
 /*
  * In case windows.h doesn't define it (e.g. WinCE perhaps)
  */
-#ifdef WINCE
+#if defined(WINCE)
 typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #endif
 
@@ -60,7 +60,7 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 /*
  * In case ETIMEDOUT hasn't been defined above somehow.
  */
-#ifndef ETIMEDOUT
+#if !defined(ETIMEDOUT)
 #  define ETIMEDOUT 10060	/* This is the value in winsock.h. */
 #endif
 
@@ -82,7 +82,7 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #define INLINE
 #endif
 
-#if defined (__MINGW64__) || defined(__MINGW32__) || defined(_MSC_VER)
+#if defined(__MINGW64__) || defined(__MINGW32__) || defined(_MSC_VER)
 #define PTW32_INTERLOCKED_LONG unsigned long
 #define PTW32_INTERLOCKED_LPLONG volatile unsigned long*
 #define PTW32_INTERLOCKED_PVOID PVOID
@@ -133,7 +133,7 @@ typedef struct ptw32_thread_t_       ptw32_thread_t;
 
 struct ptw32_thread_t_
 {
-#ifdef _UWIN
+#if defined(_UWIN)
   DWORD dummy[5];
 #endif
   UINT64 seqNumber;		/* Process-unique thread sequence number */
@@ -152,10 +152,10 @@ struct ptw32_thread_t_
   int cancelState;
   int cancelType;
   HANDLE cancelEvent;
-#ifdef __CLEANUP_C
+#if defined(__CLEANUP_C)
   jmp_buf start_mark;
 #endif				/* __CLEANUP_C */
-#if HAVE_SIGSET_T
+#if defined(HAVE_SIGSET_T)
   sigset_t sigmask;
 #endif				/* HAVE_SIGSET_T */
   int implicit:1;
@@ -182,7 +182,7 @@ struct pthread_attr_t_
   struct sched_param param;
   int inheritsched;
   int contentionscope;
-#if HAVE_SIGSET_T
+#if defined(HAVE_SIGSET_T)
   sigset_t sigmask;
 #endif				/* HAVE_SIGSET_T */
 };
@@ -201,7 +201,7 @@ struct sem_t_
   int value;
   pthread_mutex_t lock;
   HANDLE sem;
-#ifdef NEED_SEM
+#if defined(NEED_SEM)
   int leftToUnblock;
 #endif
 };
@@ -485,7 +485,7 @@ struct ThreadKeyAssoc
 };
 
 
-#ifdef __CLEANUP_SEH
+#if defined(__CLEANUP_SEH)
 /*
  * --------------------------------------------------------------
  * MAKE_SOFTWARE_EXCEPTION
@@ -574,11 +574,11 @@ extern ptw32_mcs_lock_t ptw32_cond_test_init_lock;
 extern ptw32_mcs_lock_t ptw32_rwlock_test_init_lock;
 extern ptw32_mcs_lock_t ptw32_spinlock_test_init_lock;
 
-#ifdef _UWIN
+#if defined(_UWIN)
 extern int pthread_count;
 #endif
 
-#ifdef __cplusplus
+#if defined(__cplusplus)
 extern "C"
 {
 #endif				/* __cplusplus */
@@ -625,7 +625,7 @@ extern "C"
 
   void ptw32_rwlock_cancelwrwait (void *arg);
 
-#if ! (defined (__MINGW64__) || defined(__MINGW32__)) || (defined (__MSVCRT__) && ! defined(__DMC__))
+#if ! (defined (__MINGW64__) || defined(__MINGW32__)) || (defined(__MSVCRT__) && ! defined(__DMC__))
   unsigned __stdcall
 #else
   void
@@ -650,19 +650,19 @@ extern "C"
 
   void ptw32_mcs_node_transfer (ptw32_mcs_local_node_t * new_node, ptw32_mcs_local_node_t * old_node);
 
-#ifdef NEED_FTIME
+#if defined(NEED_FTIME)
   void ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft);
   void ptw32_filetime_to_timespec (const FILETIME * ft, struct timespec *ts);
 #endif
 
 /* Declared in misc.c */
-#ifdef NEED_CALLOC
+#if defined(NEED_CALLOC)
 #define calloc(n, s) ptw32_calloc(n, s)
   void *ptw32_calloc (size_t n, size_t s);
 #endif
 
 /* Declared in private.c */
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 /*
  * Ignore the warning:
  * "C++ exception specification ignored except to indicate that
@@ -671,19 +671,19 @@ extern "C"
 #pragma warning(disable:4290)
 #endif
   void ptw32_throw (DWORD exception)
-#ifdef __CLEANUP_CXX
+#if defined(__CLEANUP_CXX)
     throw(ptw32_exception_cancel,ptw32_exception_exit)
 #endif
 ;
 
-#ifdef __cplusplus
+#if defined(__cplusplus)
 }
 #endif				/* __cplusplus */
 
 
-#ifdef _UWIN_
-#   ifdef       _MT
-#       ifdef __cplusplus
+#if defined(_UWIN_)
+#   if defined(_MT)
+#       if defined(__cplusplus)
 extern "C"
 {
 #       endif
@@ -694,7 +694,7 @@ extern "C"
 						unsigned (__stdcall *) (void *),
 						void *, unsigned, unsigned *);
   _CRTIMP void __cdecl _endthreadex (unsigned);
-#       ifdef __cplusplus
+#       if defined(__cplusplus)
 }
 #       endif
 #   endif

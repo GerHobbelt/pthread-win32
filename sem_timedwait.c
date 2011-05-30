@@ -77,7 +77,7 @@ ptw32_sem_timedwait_cleanup (void * args)
 	{
 	  /* Indicate we're no longer waiting */
 	  s->value++;
-#ifdef NEED_SEM
+#if defined(NEED_SEM)
 	  if (s->value > 0)
 	    {
 	      s->leftToUnblock = 0;
@@ -177,7 +177,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 
 	  if (v < 0)
 	    {
-#ifdef NEED_SEM
+#if defined(NEED_SEM)
 	      int timedout;
 #endif
 	      sem_timedwait_cleanup_args_t cleanup_args;
@@ -190,7 +190,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 #endif
 	      /* Must wait */
               pthread_cleanup_push(ptw32_sem_timedwait_cleanup, (void *) &cleanup_args);
-#ifdef NEED_SEM
+#if defined(NEED_SEM)
 	      timedout =
 #endif
 	      result = pthreadCancelableTimedWait (s->sem, milliseconds);
@@ -199,7 +199,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 #pragma inline_depth()
 #endif
 
-#ifdef NEED_SEM
+#if defined(NEED_SEM)
 
 	      if (!timedout && pthread_mutex_lock (&s->lock) == 0)
 	        {

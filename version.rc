@@ -41,13 +41,13 @@
  * If using the default (no __CLEANUP_* defined), pthread.h will define it
  * as __CLEANUP_C.
  */
-#ifdef _WIN64
+#if defined(_WIN64)
 # define PTW32_ARCH "64 bit"
 #else
 # define PTW32_ARCH "32 bit"
 #endif
 
-#ifdef PTW32_RC_MSC
+#if defined(PTW32_RC_MSC)
 #  if defined(__CLEANUP_C)
 #    define PTW32_VERSIONINFO_NAME "pthreadVC\0"
 #    define PTW32_VERSIONINFO_DESCRIPTION "MS C " PTW32_ARCH "\0"

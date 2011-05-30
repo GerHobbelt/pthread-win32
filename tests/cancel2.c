@@ -80,7 +80,7 @@
  * Create NUMTHREADS threads in addition to the Main thread.
  */
 enum {
-  NUMTHREADS = 1
+  NUMTHREADS = 4
 };
 
 typedef struct bag_t_ bag_t;

@@ -46,7 +46,7 @@
  * 'implicit' POSIX threads for each of the possible language modes (C,
  * C++, and SEH).
  */
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 /*
  * Ignore the warning:
  * "C++ exception specification ignored except to indicate that
@@ -56,7 +56,7 @@
 #endif
 void
 ptw32_throw (DWORD exception)
-#ifdef __CLEANUP_CXX
+#if defined(__CLEANUP_CXX)
   throw(ptw32_exception_cancel,ptw32_exception_exit)
 #endif
 {
@@ -66,7 +66,7 @@ ptw32_throw (DWORD exception)
    */
   ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
-#ifdef __CLEANUP_SEH
+#if defined(__CLEANUP_SEH)
   DWORD exceptionInformation[3];
 #endif
 
@@ -117,7 +117,7 @@ ptw32_throw (DWORD exception)
 
     }
 
-#ifdef __CLEANUP_SEH
+#if defined(__CLEANUP_SEH)
 
 
   exceptionInformation[0] = (DWORD) (exception);
@@ -128,14 +128,14 @@ ptw32_throw (DWORD exception)
 
 #else /* __CLEANUP_SEH */
 
-#ifdef __CLEANUP_C
+#if defined(__CLEANUP_C)
 
   ptw32_pop_cleanup_all (1);
   longjmp (sp->start_mark, exception);
 
 #else /* __CLEANUP_C */
 
-#ifdef __CLEANUP_CXX
+#if defined(__CLEANUP_CXX)
 
   switch (exception)
     {
@@ -173,7 +173,7 @@ ptw32_pop_cleanup_all (int execute)
 DWORD
 ptw32_get_exception_services_code (void)
 {
-#ifdef __CLEANUP_SEH
+#if defined(__CLEANUP_SEH)
 
   return EXCEPTION_PTW32_SERVICES;
 
