@@ -69,10 +69,10 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
   if (kind >= 0)
     {
       /* Non-robust */
-      if (0 == (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE (
-		         (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
-		         (PTW32_INTERLOCKED_LONG) 1,
-		         (PTW32_INTERLOCKED_LONG) 0))
+      if (0 == (PTW32_INTERLOCKED_VALUE) PTW32_INTERLOCKED_COMPARE_EXCHANGE (
+		         (PTW32_INTERLOCKED_PTR) &mx->lock_idx,
+		         (PTW32_INTERLOCKED_VALUE) 1,
+		         (PTW32_INTERLOCKED_VALUE) 0))
         {
           if (kind != PTHREAD_MUTEX_NORMAL)
 	    {
@@ -103,10 +103,10 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
       pthread_t self;
       ptw32_robust_state_t* statePtr = &mx->robustNode->stateInconsistent;
 
-      if ((LONG)PTW32_ROBUST_NOTRECOVERABLE ==
+      if ((PTW32_INTERLOCKED_VALUE)PTW32_ROBUST_NOTRECOVERABLE ==
                   PTW32_INTERLOCKED_EXCHANGE_ADD(
-                    (LPLONG)statePtr,
-                    0L))
+                    (PTW32_INTERLOCKED_PTR)statePtr,
+                    (PTW32_INTERLOCKED_VALUE)0))
         {
           return ENOTRECOVERABLE;
         }
@@ -114,10 +114,10 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
       self = pthread_self();
       kind = -kind - 1; /* Convert to non-robust range */
 
-      if (0 == (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE (
-        	         (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
-        	         (PTW32_INTERLOCKED_LONG) 1,
-        	         (PTW32_INTERLOCKED_LONG) 0))
+      if (0 == (PTW32_INTERLOCKED_VALUE) PTW32_INTERLOCKED_COMPARE_EXCHANGE (
+        	         (PTW32_INTERLOCKED_PTR) &mx->lock_idx,
+        	         (PTW32_INTERLOCKED_VALUE) 1,
+        	         (PTW32_INTERLOCKED_VALUE) 0))
         {
           if (kind != PTHREAD_MUTEX_NORMAL)
             {

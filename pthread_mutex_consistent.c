@@ -80,10 +80,10 @@ ptw32_robust_mutex_inherit(pthread_mutex_t * mutex)
   pthread_mutex_t mx = *mutex;
   ptw32_robust_node_t* robust = mx->robustNode;
 
-  switch (PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-            (LPLONG)&robust->stateInconsistent,
-            (LONG)PTW32_ROBUST_INCONSISTENT,
-            -1L /* The terminating thread sets this */))
+  switch ((LONG)(size_t)PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+            (PTW32_INTERLOCKED_PTR)&robust->stateInconsistent,
+            (PTW32_INTERLOCKED_VALUE)PTW32_ROBUST_INCONSISTENT,
+            (PTW32_INTERLOCKED_VALUE)-1 /* The terminating thread sets this */))
     {
       case -1L:
           result = EOWNERDEAD;
@@ -177,10 +177,10 @@ pthread_mutex_consistent (pthread_mutex_t* mutex)
     }
 
   if (mx->kind >= 0
-        || (LONG)PTW32_ROBUST_INCONSISTENT != PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-                                                (LPLONG)&mx->robustNode->stateInconsistent,
-                                                (LONG)PTW32_ROBUST_CONSISTENT,
-                                                (LONG)PTW32_ROBUST_INCONSISTENT))
+        || (PTW32_INTERLOCKED_VALUE)PTW32_ROBUST_INCONSISTENT != PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+                                                (PTW32_INTERLOCKED_PTR)&mx->robustNode->stateInconsistent,
+                                                (PTW32_INTERLOCKED_VALUE)PTW32_ROBUST_CONSISTENT,
+                                                (PTW32_INTERLOCKED_VALUE)PTW32_ROBUST_INCONSISTENT))
     {
       result = EINVAL;
     }

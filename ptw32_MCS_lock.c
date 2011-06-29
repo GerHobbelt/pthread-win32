@@ -102,10 +102,10 @@
 INLINE void 
 ptw32_mcs_flag_set (LONG * flag)
 {
-  HANDLE e = (HANDLE)(size_t)PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-						(PTW32_INTERLOCKED_LPLONG)flag,
-						(PTW32_INTERLOCKED_LONG)(size_t)-1,
-						(PTW32_INTERLOCKED_LONG)(size_t)0);
+  HANDLE e = (HANDLE)(PTW32_INTERLOCKED_VALUE)PTW32_INTERLOCKED_COMPARE_EXCHANGE(
+						(PTW32_INTERLOCKED_PTR)flag,
+						(PTW32_INTERLOCKED_VALUE)-1,
+						(PTW32_INTERLOCKED_VALUE)0);
   if ((HANDLE)0 != e)
     {
       /* another thread has already stored an event handle in the flag */
@@ -122,16 +122,16 @@ ptw32_mcs_flag_set (LONG * flag)
 INLINE void 
 ptw32_mcs_flag_wait (LONG * flag)
 {
-  if (0 == PTW32_INTERLOCKED_EXCHANGE_ADD((LPLONG)flag, 0)) /* MBR fence */
+  if (0 == PTW32_INTERLOCKED_EXCHANGE_ADD((PTW32_INTERLOCKED_PTR)flag, (PTW32_INTERLOCKED_VALUE)0)) /* MBR fence */
     {
       /* the flag is not set. create event. */
 
       HANDLE e = CreateEvent(NULL, PTW32_FALSE, PTW32_FALSE, NULL);
 
       if (0 == PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-			                  (PTW32_INTERLOCKED_LPLONG)flag,
-			                  (PTW32_INTERLOCKED_LONG)(size_t)e,
-			                  (PTW32_INTERLOCKED_LONG)(size_t)0))
+			                  (PTW32_INTERLOCKED_PTR)flag,
+			                  (PTW32_INTERLOCKED_VALUE)e,
+			                  (PTW32_INTERLOCKED_VALUE)0))
 	{
 	  /* stored handle in the flag. wait on it now. */
 	  WaitForSingleObject(e, INFINITE);
@@ -191,7 +191,7 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
 {
   ptw32_mcs_lock_t *lock = node->lock;
   ptw32_mcs_local_node_t *next = (ptw32_mcs_local_node_t *)(size_t)
-    PTW32_INTERLOCKED_EXCHANGE_ADD((LPLONG)&node->next, 0); /* MBR fence */
+    PTW32_INTERLOCKED_EXCHANGE_ADD((PTW32_INTERLOCKED_PTR)&node->next, (PTW32_INTERLOCKED_VALUE)0); /* MBR fence */
 
   if (0 == next)
     {
@@ -209,7 +209,7 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
       /* wait for successor */
       ptw32_mcs_flag_wait(&node->nextFlag);
       next = (ptw32_mcs_local_node_t *)(size_t)
-	PTW32_INTERLOCKED_EXCHANGE_ADD((PTW32_INTERLOCKED_LPLONG)&node->next, 0); /* MBR fence */
+	PTW32_INTERLOCKED_EXCHANGE_ADD((PTW32_INTERLOCKED_PTR)&node->next, (PTW32_INTERLOCKED_VALUE)0); /* MBR fence */
     }
 
   /* pass the lock */
