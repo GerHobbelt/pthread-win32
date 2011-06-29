@@ -49,10 +49,10 @@
  * We now use this version wherever possible so we can inline it.
  */
 
-PTW32_INTERLOCKED_LONG WINAPI
-ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
-				  PTW32_INTERLOCKED_LONG value,
-				  PTW32_INTERLOCKED_LONG comparand)
+PTW32_INTERLOCKED_VALUE WINAPI
+ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_PTR location,
+				  PTW32_INTERLOCKED_VALUE value,
+				  PTW32_INTERLOCKED_VALUE comparand)
 {
 
 #if defined(__WATCOMC__)
@@ -60,7 +60,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 #pragma disable_message (200)
 #endif
 
-  PTW32_INTERLOCKED_LONG result;
+  PTW32_INTERLOCKED_VALUE result;
 
   /*
    * Using the LOCK prefix on uni-processor machines is significantly slower

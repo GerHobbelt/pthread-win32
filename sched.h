@@ -60,7 +60,7 @@
 
 #define PTW32_SCHED_LEVEL_MAX 3
 
-#if ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112 )  || !defined(PTW32_LEVEL)
+#if ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112 )  || !defined(PTW32_SCHED_LEVEL)
 #define PTW32_SCHED_LEVEL PTW32_SCHED_LEVEL_MAX
 /* Include everything */
 #endif
@@ -123,10 +123,10 @@
 /* Required by Unix 98 */
 #  include <time.h>
 # else
-  typedef int pid_t;
+   typedef int pid_t;
 # endif
 #else
-typedef int pid_t;
+ typedef int pid_t;
 #endif
 
 /* Thread scheduling policies */

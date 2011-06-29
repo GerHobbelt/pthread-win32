@@ -209,8 +209,8 @@ pthread_win32_thread_detach_np ()
               pthread_mutex_t mx = sp->robustMxList->mx;
               ptw32_robust_mutex_remove(&mx, sp);
               (void) PTW32_INTERLOCKED_EXCHANGE(
-                       (LPLONG)&mx->robustNode->stateInconsistent,
-                       -1L);
+                       (PTW32_INTERLOCKED_PTR)&mx->robustNode->stateInconsistent,
+                       (PTW32_INTERLOCKED_VALUE)-1);
               /*
                * If there are no waiters then the next thread to block will
                * sleep, wakeup immediately and then go back to sleep.

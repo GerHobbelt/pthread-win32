@@ -1,3 +1,11 @@
+2011-06-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* *.[ch] (PTW32_INTERLOCKED_*): These macros should now work for
+	both 32 and 64 bit builds. The MingW versions are all inlined asm
+	while the MSVC versions expand to their Interlocked* or Interlocked*64
+	counterparts appropriately. The argument type have also been changed
+	to cast to the appropriate value or pointer size for the architecture.
+
 2011-05-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* *.[ch] (#ifdef): Extended cleanup to whole project.
