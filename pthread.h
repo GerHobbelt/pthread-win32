@@ -203,6 +203,7 @@
  * VC++6.0 or early compiler's header has no DWORD_PTR type.
  */
 typedef unsigned long DWORD_PTR;
+typedef unsigned long ULONG_PTR;
 #endif
 /*
  * -----------------
