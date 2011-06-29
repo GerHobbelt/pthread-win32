@@ -136,7 +136,7 @@ struct ptw32_thread_t_
 #if defined(_UWIN)
   DWORD dummy[5];
 #endif
-  UINT64 seqNumber;		/* Process-unique thread sequence number */
+  unsigned __int64 seqNumber;	/* Process-unique thread sequence number */
   DWORD thread;			/* Win32 thread ID */
   HANDLE threadH;		/* Win32 thread handle - POSIX thread is invalid if threadH == 0 */
   pthread_t ptHandle;		/* This thread's permanent pthread_t handle */
@@ -561,7 +561,7 @@ extern pthread_cond_t ptw32_cond_list_tail;
 
 extern int ptw32_mutex_default_kind;
 
-extern unsigned long long ptw32_threadSeqNumber;
+extern unsigned __int64 ptw32_threadSeqNumber;
 
 extern int ptw32_concurrency;
 

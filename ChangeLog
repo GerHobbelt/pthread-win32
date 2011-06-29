@@ -1,3 +1,13 @@
+2011-06-29 Daniel Richard G. <skunk at iskunk dot org>
+
+	* ptw32_relmillisecs.c (ftime):
+	  _ftime64_s() is only available in MSVC 2005 or later;
+	  _ftime64() is available in MinGW or MSVC 2002 or later;
+	  _ftime() is always available.
+	* pthread.h (long long): Not defined in older MSVC 6.
+	* implement.h (long long): Likewise.
+	* pthread_getunique_np.c (long long): Likewise.
+
 2011-06-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* *.[ch] (PTW32_INTERLOCKED_*): These macros should now work for

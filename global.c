@@ -55,7 +55,7 @@ int ptw32_features = 0;
 /*
  * Global [process wide] thread sequence Number
  */
-unsigned long long ptw32_threadSeqNumber = 0;
+unsigned __int64 ptw32_threadSeqNumber = 0;
 
 /* 
  * Function pointer to QueueUserAPCEx if it exists, otherwise
