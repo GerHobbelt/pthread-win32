@@ -5,6 +5,7 @@
 	the superfluous static cleanup routine and call the release routine
 	directly if popped.
 	* create.c (stackSize): Now type size_t.
+	* pthread.h (struct ptw32_thread_t_): Rearrange to fix element alignments.
 
 2011-06-29 Daniel Richard G. <skunk at iskunk dot org>
 
