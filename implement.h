@@ -133,38 +133,39 @@ typedef struct ptw32_thread_t_       ptw32_thread_t;
 
 struct ptw32_thread_t_
 {
-#if defined(_UWIN)
-  DWORD dummy[5];
-#endif
   unsigned __int64 seqNumber;	/* Process-unique thread sequence number */
-  DWORD thread;			/* Win32 thread ID */
   HANDLE threadH;		/* Win32 thread handle - POSIX thread is invalid if threadH == 0 */
   pthread_t ptHandle;		/* This thread's permanent pthread_t handle */
   ptw32_thread_t * prevReuse;	/* Links threads on reuse stack */
   volatile PThreadState state;
+  ptw32_mcs_lock_t threadLock;	/* Used for serialised access to public thread state */
+  ptw32_mcs_lock_t stateLock;	/* Used for async-cancel safety */
+  HANDLE cancelEvent;
   void *exitStatus;
   void *parms;
-  int ptErrno;
-  int detachState;
-  ptw32_mcs_lock_t threadLock;	/* Used for serialised access to public thread state */
-  int sched_priority;		/* As set, not as currently is */
-  ptw32_mcs_lock_t stateLock;	/* Used for async-cancel safety */
-  int cancelState;
-  int cancelType;
-  HANDLE cancelEvent;
+  void *keys;
+  void *nextAssoc;
 #if defined(__CLEANUP_C)
-  jmp_buf start_mark;
+  jmp_buf start_mark;		/* Jump buffer follows void* so should be aligned */
 #endif				/* __CLEANUP_C */
 #if defined(HAVE_SIGSET_T)
   sigset_t sigmask;
 #endif				/* HAVE_SIGSET_T */
-  int implicit:1;
-  void *keys;
-  void *nextAssoc;
   ptw32_mcs_lock_t
               robustMxListLock; /* robustMxList lock */
   ptw32_robust_node_t*
                   robustMxList; /* List of currenty held robust mutexes */
+  int ptErrno;
+  int detachState;
+  int sched_priority;		/* As set, not as currently is */
+  int cancelState;
+  int cancelType;
+  int implicit:1;
+  DWORD thread;			/* Win32 thread ID */
+#if defined(_UWIN)
+  DWORD dummy[5];
+#endif
+  size_t align;			/* Force alignment if this struct is packed */
 };
 
 
