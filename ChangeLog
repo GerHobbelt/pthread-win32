@@ -1,3 +1,9 @@
+2011-06-30  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread_once.c: Tighten 'if' statement casting; fix interlocked
+	pointer cast for 64 bit compatibility (missed yesterday).
+	* create.c (stackSize): Now type size_t.
+
 2011-06-29 Daniel Richard G. <skunk at iskunk dot org>
 
 	* ptw32_relmillisecs.c (ftime):

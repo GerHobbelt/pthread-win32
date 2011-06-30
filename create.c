@@ -90,7 +90,7 @@ pthread_create (pthread_t * tid,
   int result = EAGAIN;
   int run = PTW32_TRUE;
   ThreadParms *parms = NULL;
-  long stackSize;
+  size_t stackSize;
   int priority;
   pthread_t self;
 
@@ -205,7 +205,7 @@ pthread_create (pthread_t * tid,
   tp->threadH =
     threadH =
     (HANDLE) _beginthreadex ((void *) NULL,	/* No security info             */
-			     (unsigned) stackSize,	/* default stack size   */
+			     stackSize,		/* default stack size   */
 			     ptw32_threadStart,
 			     parms,
 			     (unsigned)
@@ -238,7 +238,7 @@ pthread_create (pthread_t * tid,
 
     tp->threadH =
       threadH =
-      (HANDLE) _beginthread (ptw32_threadStart, (unsigned) stackSize,	/* default stack size   */
+      (HANDLE) _beginthread (ptw32_threadStart, stackSize,	/* default stack size   */
 			     parms);
 
     /*
