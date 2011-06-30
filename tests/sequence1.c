@@ -112,7 +112,7 @@ main()
   assert(pthread_attr_init(&attr) == 0);
   assert(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) == 0);
 
-  for (i = 0; i <= NUMTHREADS+2; i++)
+  for (i = 0; i < NUMTHREADS+2; i++)
     {
       seqmap[i] = 0;
     }

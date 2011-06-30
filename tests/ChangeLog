@@ -1,3 +1,7 @@
+2011-06-30  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* sequence1.c: Fix loop overrun.
+
 2011-05-11  Ross Johnson <ross.johnson at homemail.com.au>
 
 	* GNUmakefile (GCE-debug): New target; expects pthreadGCE2d.dll.
