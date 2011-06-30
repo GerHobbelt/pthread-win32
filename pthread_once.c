@@ -37,15 +37,6 @@
 #include "pthread.h"
 #include "implement.h"
 
-
-static void PTW32_CDECL
-ptw32_once_on_init_cancel (void * arg)
-{
-  /* when the initing thread is cancelled we have to release the lock */
-  ptw32_mcs_local_node_t* nodePtr = (ptw32_mcs_local_node_t *)arg;
-  ptw32_mcs_lock_release(nodePtr);
-}
-
 int
 pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 {
@@ -54,7 +45,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
       return EINVAL;
     }
   
-  if ((PTW32_INTERLOCKED_VALUE)0 ==
+  if ((PTW32_INTERLOCKED_VALUE)PTW32_FALSE ==
       (PTW32_INTERLOCKED_VALUE)PTW32_INTERLOCKED_EXCHANGE_ADD((PTW32_INTERLOCKED_PTR)&once_control->done,
                                                               (PTW32_INTERLOCKED_VALUE)0)) /* MBR fence */
     {
@@ -69,7 +60,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 #pragma inline_depth(0)
 #endif
 
-	  pthread_cleanup_push(ptw32_once_on_init_cancel, (void *)&node);
+	  pthread_cleanup_push(ptw32_mcs_lock_release, &node);
 	  (*init_routine)();
 	  pthread_cleanup_pop(0);
 
