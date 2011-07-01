@@ -128,7 +128,9 @@ Vladimir Kliatchko	vladimir at kliatchko dot com
 					reimplemented pthread_once with the same form
 					as described by A.Terekhov (later version 2);
 					implementation of MCS (Mellor-Crummey/Scott) locks.
-Ramiro Polla		ramiro.polla at gmail.com
+Ramiro Polla		ramiro.polla at gmail dot com
 					static library auto init/cleanup on application
 					start/exit via RT hooks (MSC and GCC compilers only).
-					
+John Kamp		john dot kamp at globalgraphics dot com
+					Patches to fix various problems on x64.
+
