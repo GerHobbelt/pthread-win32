@@ -38,11 +38,6 @@
 #include "implement.h"
 
 /*
- * Handle to kernel32.dll 
- */
-static HINSTANCE ptw32_h_kernel32;
-
-/*
  * Handle to quserex.dll 
  */
 static HINSTANCE ptw32_h_quserex;
@@ -67,7 +62,6 @@ pthread_win32_process_attach_np ()
   /*
    * Load QUSEREX.DLL and try to get address of QueueUserAPCEx
    */
-  SetDllDirectory(""); /* Don't search in current directory */
   ptw32_h_quserex = LoadLibrary (TEXT ("QUSEREX.DLL"));
 
   if (ptw32_h_quserex != NULL)
@@ -112,8 +106,6 @@ pthread_win32_process_attach_np ()
 	  ptw32_h_quserex = 0;
 	}
     }
-
-  SetDllDirectory(NULL); /* Reset DLL search path to default */
 
   if (ptw32_h_quserex)
     {
@@ -167,11 +159,6 @@ pthread_win32_process_detach_np ()
 	      (void) queue_user_apc_ex_fini ();
 	    }
 	  (void) FreeLibrary (ptw32_h_quserex);
-	}
-
-      if (ptw32_h_kernel32)
-	{
-	  (void) FreeLibrary (ptw32_h_kernel32);
 	}
     }
 
