@@ -11,7 +11,7 @@
 	* implement.h (MCS locks): nextFlag and waitFlag are now HANDLE type.
 	* ptw32_MCS_locks.c: Likewise.
 	* pthread_win32_attach_detach_np.c: Set the DLL search path to exclude
-	the "current idrectory".
+	the "current directory when loading quserex.dll".
 	* pthread.h (#include <setjmp.h>): Removed.
 	* ptw32_throw.c (#include <setjmp.h>): Added.
 	* ptw32_threadStart.c (#include <setjmp.h>): Added.
