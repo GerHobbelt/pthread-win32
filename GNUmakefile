@@ -229,7 +229,6 @@ SMALL_STATIC_OBJS	= \
 		ptw32_callUserDestroyRoutines.o \
 		ptw32_timespec.o \
 		ptw32_throw.o \
-		ptw32_InterlockedCompareExchange.o \
 		ptw32_getprocessors.o \
 		ptw32_calloc.o \
 		ptw32_new.o \
@@ -372,7 +371,6 @@ PRIVATE_SRCS	= \
 		ptw32_relmillisecs.c \
 		ptw32_timespec.c \
 		ptw32_throw.c \
-		ptw32_InterlockedCompareExchange.c \
 		ptw32_getprocessors.c
 
 RWLOCK_SRCS	= \

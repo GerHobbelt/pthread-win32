@@ -55,13 +55,10 @@ pthread_spin_destroy (pthread_spinlock_t * lock)
 	{
 	  result = pthread_mutex_destroy (&(s->u.mutex));
 	}
-      else if ((PTW32_INTERLOCKED_VALUE) PTW32_SPIN_UNLOCKED !=
-	       PTW32_INTERLOCKED_COMPARE_EXCHANGE ((PTW32_INTERLOCKED_PTR)
-						   & (s->interlock),
-						   (PTW32_INTERLOCKED_VALUE)
-						   (size_t)PTW32_OBJECT_INVALID,
-						   (PTW32_INTERLOCKED_VALUE)
-						   (size_t)PTW32_SPIN_UNLOCKED))
+      else if ((PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED !=
+	       PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG ((PTW32_INTERLOCKED_PTR) &s->interlock,
+						   (PTW32_INTERLOCKED_LONG) PTW32_SPIN_INVALID,
+						   (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED))
 	{
 	  result = EINVAL;
 	}

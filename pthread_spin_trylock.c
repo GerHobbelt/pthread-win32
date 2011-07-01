@@ -61,12 +61,9 @@ pthread_spin_trylock (pthread_spinlock_t * lock)
   s = *lock;
 
   switch ((long)
-	  PTW32_INTERLOCKED_COMPARE_EXCHANGE ((PTW32_INTERLOCKED_PTR) &
-					      (s->interlock),
-					      (PTW32_INTERLOCKED_VALUE)
-					      PTW32_SPIN_LOCKED,
-					      (PTW32_INTERLOCKED_VALUE)
-					      PTW32_SPIN_UNLOCKED))
+	  PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG ((PTW32_INTERLOCKED_PTR) &s->interlock,
+					           (PTW32_INTERLOCKED_LONG) PTW32_SPIN_LOCKED,
+					           (PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED))
     {
     case PTW32_SPIN_UNLOCKED:
       return 0;
