@@ -68,6 +68,10 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #include <malloc.h>
 #endif
 
+#if defined(__CLEANUP_C)
+# include <setjmp.h>
+#endif
+
 #if !defined(INT_MAX)
 #include <limits.h>
 #endif

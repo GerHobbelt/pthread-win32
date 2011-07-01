@@ -38,6 +38,10 @@
 #include "pthread.h"
 #include "implement.h"
 
+#if defined(__CLEANUP_C)
+# include <setjmp.h>
+#endif
+
 /*
  * ptw32_throw
  *

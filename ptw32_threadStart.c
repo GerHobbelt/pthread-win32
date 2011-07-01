@@ -39,6 +39,10 @@
 #include "implement.h"
 #include <stdio.h>
 
+#if defined(__CLEANUP_C)
+# include <setjmp.h>
+#endif
+
 #if defined(__CLEANUP_SEH)
 
 static DWORD

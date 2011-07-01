@@ -10,6 +10,12 @@
 	LONG for 32 bit systems and LONGLONG for 64 bit systems.
 	* implement.h (MCS locks): nextFlag and waitFlag are now HANDLE type.
 	* ptw32_MCS_locks.c: Likewise.
+	* pthread_win32_attach_detach_np.c: Set the DLL search path to exclude
+	the "current idrectory".
+	* pthread.h (#include <setjmp.h>): Removed.
+	* ptw32_throw.c (#include <setjmp.h>): Added.
+	* ptw32_threadStart.c (#include <setjmp.h>): Added.
+	* implement.h (#include <setjmp.h>): Added.
 
 2011-06-30  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
