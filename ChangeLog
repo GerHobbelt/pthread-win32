@@ -8,6 +8,8 @@
 	PTW32_INTERLOCKED_*_LONG which work only on 32 bit integer variables;
 	PTW32_INTERLOCKED_*_SIZE which work on size_t integer variables, i.e.
 	LONG for 32 bit systems and LONGLONG for 64 bit systems.
+	* implement.h (MCS locks): nextFlag and waitFlag are now HANDLE type.
+	* ptw32_MCS_locks.c: Likewise.
 
 2011-06-30  Ross Johnson <ross dot johnson at homemail dot com dot au>
 

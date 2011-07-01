@@ -84,7 +84,8 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 
 #define PTW32_INTERLOCKED_LONG long
 #define PTW32_INTERLOCKED_SIZE size_t
-#define PTW32_INTERLOCKED_PTR volatile size_t*
+#define PTW32_INTERLOCKED_LONGPTR volatile long*
+#define PTW32_INTERLOCKED_SIZEPTR volatile size_t*
 #define PTW32_INTERLOCKED_PVOID PVOID
 #define PTW32_INTERLOCKED_PVOID_PTR volatile PVOID*
 
@@ -94,7 +95,7 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #  define int64_t ULONGLONG
 #else
 #  define int64_t _int64
-#  if defined(_MSC_VER) && _MSC_VER <= 1300
+#  if defined(_MSC_VER) && _MSC_VER < 1300
      typedef long intptr_t;
 #  endif
 #endif
@@ -292,9 +293,9 @@ struct ptw32_mcs_node_t_
 {
   struct ptw32_mcs_node_t_ **lock;        /* ptr to tail of queue */
   struct ptw32_mcs_node_t_  *next;        /* ptr to successor in queue */
-  LONG                       readyFlag;   /* set after lock is released by
+  HANDLE                     readyFlag;   /* set after lock is released by
                                              predecessor */
-  LONG                       nextFlag;    /* set after 'next' ptr is set by
+  HANDLE                     nextFlag;    /* set after 'next' ptr is set by
                                              successor */
 };
 
@@ -856,9 +857,12 @@ extern "C"
       --_temp;                                                             \
     })
 # define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR(location, value, comparand) \
-    PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE(location, value, comparand)
+    PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE((PTW32_INTERLOCKED_SIZEPTR)location, \
+                                            (PTW32_INTERLOCKED_SIZE)value, \
+                                            (PTW32_INTERLOCKED_SIZE)comparand)
 # define PTW32_INTERLOCKED_EXCHANGE_PTR(location, value) \
-    PTW32_INTERLOCKED_EXCHANGE_SIZE(location, value)
+    PTW32_INTERLOCKED_EXCHANGE_SIZE((PTW32_INTERLOCKED_SIZEPTR)location, \
+                                    (PTW32_INTERLOCKED_SIZE)value)
 #else
 # if defined(_WIN64)
 #   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_64 InterlockedCompareExchange64
@@ -872,9 +876,11 @@ extern "C"
 # define PTW32_INTERLOCKED_EXCHANGE_ADD_LONG InterlockedExchangeAdd
 # define PTW32_INTERLOCKED_INCREMENT_LONG InterlockedIncrement
 # define PTW32_INTERLOCKED_DECREMENT_LONG InterlockedDecrement
-# if defined(_MSC_VER) &&  _MSC_VER <= 1300
-#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchange
-#  define PTW32_INTERLOCKED_EXCHANGE_PTR InterlockedExchange
+# if defined(_MSC_VER) &&  _MSC_VER < 1300
+#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR(location, value, comparand) \
+     InterlockedCompareExchange((LONG*)location, (LONG)value, (LONG)comparand)
+#  define PTW32_INTERLOCKED_EXCHANGE_PTR(location, value) \
+     InterlockedExchange((LONG*)location, (LONG)value)
 # else
 #  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchangePointer
 #  define PTW32_INTERLOCKED_EXCHANGE_PTR InterlockedExchangePointer

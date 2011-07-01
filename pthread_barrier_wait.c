@@ -87,7 +87,7 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
       result = ptw32_semwait (&(b->semBarrierBreeched));
     }
 
-  if ((PTW32_INTERLOCKED_LONG)PTW32_INTERLOCKED_INCREMENT_LONG((PTW32_INTERLOCKED_PTR)&b->nCurrentBarrierHeight)
+  if ((PTW32_INTERLOCKED_LONG)PTW32_INTERLOCKED_INCREMENT_LONG((PTW32_INTERLOCKED_LONGPTR)&b->nCurrentBarrierHeight)
 		  == (PTW32_INTERLOCKED_LONG)b->nInitialBarrierHeight)
     {
       /*

@@ -139,11 +139,11 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
       if (mx->kind == PTHREAD_MUTEX_NORMAL)
         {
           if ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-		       (PTW32_INTERLOCKED_PTR) &mx->lock_idx,
+		       (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
 		       (PTW32_INTERLOCKED_LONG) 1) != 0)
 	    {
               while ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-                              (PTW32_INTERLOCKED_PTR) &mx->lock_idx,
+                              (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
 			      (PTW32_INTERLOCKED_LONG) -1) != 0)
                 {
 	          if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
@@ -158,7 +158,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
           pthread_t self = pthread_self();
 
           if ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
-                       (PTW32_INTERLOCKED_PTR) &mx->lock_idx,
+                       (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
 		       (PTW32_INTERLOCKED_LONG) 1,
 		       (PTW32_INTERLOCKED_LONG) 0) == 0)
 	    {
@@ -181,7 +181,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 	      else
 	        {
                   while ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-                                  (PTW32_INTERLOCKED_PTR) &mx->lock_idx,
+                                  (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
 			          (PTW32_INTERLOCKED_LONG) -1) != 0)
                     {
 		      if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
@@ -206,7 +206,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
       ptw32_robust_state_t* statePtr = &mx->robustNode->stateInconsistent;
 
       if ((PTW32_INTERLOCKED_LONG)PTW32_ROBUST_NOTRECOVERABLE == PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(
-                                                 (PTW32_INTERLOCKED_PTR)statePtr,
+                                                 (PTW32_INTERLOCKED_LONGPTR)statePtr,
                                                  (PTW32_INTERLOCKED_LONG)0))
         {
           result = ENOTRECOVERABLE;
@@ -220,12 +220,12 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
           if (PTHREAD_MUTEX_NORMAL == kind)
             {
               if ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-		           (PTW32_INTERLOCKED_PTR) &mx->lock_idx,
+		           (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
 		           (PTW32_INTERLOCKED_LONG) 1) != 0)
 	        {
                   while (0 == (result = ptw32_robust_mutex_inherit(mutex))
                            && (PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-                                  (PTW32_INTERLOCKED_PTR) &mx->lock_idx,
+                                  (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
 			          (PTW32_INTERLOCKED_LONG) -1) != 0)
                     {
 	              if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
@@ -234,7 +234,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 		        }
                       if ((PTW32_INTERLOCKED_LONG)PTW32_ROBUST_NOTRECOVERABLE ==
                                   PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(
-                                    (PTW32_INTERLOCKED_PTR)statePtr,
+                                    (PTW32_INTERLOCKED_LONGPTR)statePtr,
                                     (PTW32_INTERLOCKED_LONG)0))
                         {
                           /* Unblock the next thread */
@@ -259,7 +259,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
               pthread_t self = pthread_self();
 
               if (0 == (PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
-                           (PTW32_INTERLOCKED_PTR) &mx->lock_idx,
+                           (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
 		           (PTW32_INTERLOCKED_LONG) 1,
 		           (PTW32_INTERLOCKED_LONG) 0))
 	        {
@@ -287,7 +287,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 	            {
                       while (0 == (result = ptw32_robust_mutex_inherit(mutex))
                                && (PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-                                          (PTW32_INTERLOCKED_PTR) &mx->lock_idx,
+                                          (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
 			                  (PTW32_INTERLOCKED_LONG) -1) != 0)
                         {
 		          if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
@@ -298,7 +298,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 
                       if ((PTW32_INTERLOCKED_LONG)PTW32_ROBUST_NOTRECOVERABLE ==
                                   PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(
-                                    (PTW32_INTERLOCKED_PTR)statePtr,
+                                    (PTW32_INTERLOCKED_LONGPTR)statePtr,
                                     (PTW32_INTERLOCKED_LONG)0))
                         {
                           /* Unblock the next thread */
