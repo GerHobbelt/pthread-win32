@@ -872,8 +872,13 @@ extern "C"
 # define PTW32_INTERLOCKED_EXCHANGE_ADD_LONG InterlockedExchangeAdd
 # define PTW32_INTERLOCKED_INCREMENT_LONG InterlockedIncrement
 # define PTW32_INTERLOCKED_DECREMENT_LONG InterlockedDecrement
-# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchangePointer
-# define PTW32_INTERLOCKED_EXCHANGE_PTR InterlockedExchangePointer
+# if defined(_MSC_VER) &&  _MSC_VER <= 1300
+#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchange
+#  define PTW32_INTERLOCKED_EXCHANGE_PTR InterlockedExchange
+# else
+#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchangePointer
+#  define PTW32_INTERLOCKED_EXCHANGE_PTR InterlockedExchangePointer
+# endif
 #endif
 #if defined(_WIN64)
 #   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE PTW32_INTERLOCKED_COMPARE_EXCHANGE_64
