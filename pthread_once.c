@@ -46,7 +46,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
     }
   
   if ((PTW32_INTERLOCKED_LONG)PTW32_FALSE ==
-      (PTW32_INTERLOCKED_LONG)PTW32_INTERLOCKED_EXCHANGE_ADD_LONG((PTW32_INTERLOCKED_PTR)&once_control->done,
+      (PTW32_INTERLOCKED_LONG)PTW32_INTERLOCKED_EXCHANGE_ADD_LONG((PTW32_INTERLOCKED_LONGPTR)&once_control->done,
                                                                   (PTW32_INTERLOCKED_LONG)0)) /* MBR fence */
     {
       ptw32_mcs_local_node_t node;

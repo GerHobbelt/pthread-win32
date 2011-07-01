@@ -50,7 +50,7 @@
  */
 
 PTW32_INTERLOCKED_VALUE WINAPI
-ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_PTR location,
+ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LONGPTR location,
 				  PTW32_INTERLOCKED_VALUE value,
 				  PTW32_INTERLOCKED_VALUE comparand)
 {

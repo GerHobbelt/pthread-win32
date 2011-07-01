@@ -81,7 +81,7 @@ ptw32_robust_mutex_inherit(pthread_mutex_t * mutex)
   ptw32_robust_node_t* robust = mx->robustNode;
 
   switch ((LONG)PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
-            (PTW32_INTERLOCKED_PTR)&robust->stateInconsistent,
+            (PTW32_INTERLOCKED_LONGPTR)&robust->stateInconsistent,
             (PTW32_INTERLOCKED_LONG)PTW32_ROBUST_INCONSISTENT,
             (PTW32_INTERLOCKED_LONG)-1 /* The terminating thread sets this */))
     {
@@ -178,7 +178,7 @@ pthread_mutex_consistent (pthread_mutex_t* mutex)
 
   if (mx->kind >= 0
         || (PTW32_INTERLOCKED_LONG)PTW32_ROBUST_INCONSISTENT != PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
-                                                (PTW32_INTERLOCKED_PTR)&mx->robustNode->stateInconsistent,
+                                                (PTW32_INTERLOCKED_LONGPTR)&mx->robustNode->stateInconsistent,
                                                 (PTW32_INTERLOCKED_LONG)PTW32_ROBUST_CONSISTENT,
                                                 (PTW32_INTERLOCKED_LONG)PTW32_ROBUST_INCONSISTENT))
     {
