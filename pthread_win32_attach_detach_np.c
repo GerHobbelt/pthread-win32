@@ -67,6 +67,7 @@ pthread_win32_process_attach_np ()
   /*
    * Load QUSEREX.DLL and try to get address of QueueUserAPCEx
    */
+  SetDllDirectory(""); /* Don't search in current directory */
   ptw32_h_quserex = LoadLibrary (TEXT ("QUSEREX.DLL"));
 
   if (ptw32_h_quserex != NULL)
@@ -111,6 +112,8 @@ pthread_win32_process_attach_np ()
 	  ptw32_h_quserex = 0;
 	}
     }
+
+  SetDllDirectory(NULL); /* Reset DLL search path to default */
 
   if (ptw32_h_quserex)
     {

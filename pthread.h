@@ -225,7 +225,6 @@ typedef unsigned long ULONG_PTR;
 #include <signal.h>
 #endif /* HAVE_SIGNAL_H */
 
-#include <setjmp.h>
 #include <limits.h>
 
 /*
