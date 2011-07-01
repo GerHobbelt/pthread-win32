@@ -15,6 +15,11 @@ pthread_win32_test_features_np(int mask)
 		PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE
 			Return TRUE if the native version of
 			InterlockedCompareExchange() is being used.
+			This feature is not meaningful in recent
+			library versions as MSVC builds only support
+			system implemented ICE. Note that all Mingw
+			builds use inlined asm versions of all the
+			Interlocked routines.
 		PTW32_ALERTABLE_ASYNC_CANCEL
 			Return TRUE is the QueueUserAPCEx package
 			QUSEREX.DLL is available and the AlertDrv.sys

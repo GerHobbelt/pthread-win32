@@ -1,3 +1,14 @@
+2011-07-01  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* *.[ch] (PTW32_INTERLOCKED_*): Redo 23 and 64 bit versions of these
+	macros and re-apply in code to undo the incorrect changes from
+	2011-06-29; remove some size_t casts which should not be required
+	and may be problematic.a
+	There are now two sets of macros:
+	PTW32_INTERLOCKED_*_LONG which work only on 32 bit integer variables;
+	PTW32_INTERLOCKED_*_SIZE which work on size_t integer variables, i.e.
+	LONG for 32 bit systems and LONGLONG for 64 bit systems.
+
 2011-06-30  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_once.c: Tighten 'if' statement casting; fix interlocked

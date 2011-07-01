@@ -58,7 +58,11 @@ pthread_win32_process_attach_np ()
   pthread_count++;
 #endif
 
+#if defined(__GNUC__)
   ptw32_features = 0;
+#else
+  ptw32_features = PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE;
+#endif
 
   /*
    * Load QUSEREX.DLL and try to get address of QueueUserAPCEx
@@ -208,9 +212,9 @@ pthread_win32_thread_detach_np ()
             {
               pthread_mutex_t mx = sp->robustMxList->mx;
               ptw32_robust_mutex_remove(&mx, sp);
-              (void) PTW32_INTERLOCKED_EXCHANGE(
+              (void) PTW32_INTERLOCKED_EXCHANGE_LONG(
                        (PTW32_INTERLOCKED_PTR)&mx->robustNode->stateInconsistent,
-                       (PTW32_INTERLOCKED_VALUE)-1);
+                       (PTW32_INTERLOCKED_LONG)-1);
               /*
                * If there are no waiters then the next thread to block will
                * sleep, wakeup immediately and then go back to sleep.

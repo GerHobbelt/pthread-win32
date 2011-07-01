@@ -145,7 +145,6 @@ PRIVATE_SRCS	= \
 		ptw32_timespec.c \
 		ptw32_relmillisecs.c \
 		ptw32_throw.c \
-		ptw32_InterlockedCompareExchange.c \
 		ptw32_getprocessors.c
 
 RWLOCK_SRCS	= \
