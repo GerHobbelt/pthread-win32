@@ -663,7 +663,7 @@ enum {
  * ====================
  * ====================
  */
-#define PTHREAD_CANCELED       ((void *) -1)
+#define PTHREAD_CANCELED       ((void *)(size_t) -1)
 
 
 /*
@@ -691,9 +691,9 @@ struct pthread_once_t_
  * ====================
  * ====================
  */
-#define PTHREAD_MUTEX_INITIALIZER ((pthread_mutex_t) -1)
-#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER ((pthread_mutex_t) -2)
-#define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER ((pthread_mutex_t) -3)
+#define PTHREAD_MUTEX_INITIALIZER ((pthread_mutex_t)(size_t) -1)
+#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER ((pthread_mutex_t)(size_t) -2)
+#define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER ((pthread_mutex_t)(size_t) -3)
 
 /*
  * Compatibility with LinuxThreads
@@ -701,11 +701,11 @@ struct pthread_once_t_
 #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP PTHREAD_RECURSIVE_MUTEX_INITIALIZER
 #define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP PTHREAD_ERRORCHECK_MUTEX_INITIALIZER
 
-#define PTHREAD_COND_INITIALIZER ((pthread_cond_t) -1)
+#define PTHREAD_COND_INITIALIZER ((pthread_cond_t)(size_t) -1)
 
-#define PTHREAD_RWLOCK_INITIALIZER ((pthread_rwlock_t) -1)
+#define PTHREAD_RWLOCK_INITIALIZER ((pthread_rwlock_t)(size_t) -1)
 
-#define PTHREAD_SPINLOCK_INITIALIZER ((pthread_spinlock_t) -1)
+#define PTHREAD_SPINLOCK_INITIALIZER ((pthread_spinlock_t)(size_t) -1)
 
 
 /*

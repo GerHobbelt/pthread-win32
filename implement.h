@@ -205,7 +205,7 @@ struct sem_t_
 #endif
 };
 
-#define PTW32_OBJECT_AUTO_INIT ((void *) -1)
+#define PTW32_OBJECT_AUTO_INIT ((void *)(size_t) -1)
 #define PTW32_OBJECT_INVALID   NULL
 
 struct pthread_mutex_t_
@@ -549,7 +549,7 @@ struct ThreadKeyAssoc
 extern DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD);
 
 /* Thread Reuse stack bottom marker. Must not be NULL or any valid pointer to memory. */
-#define PTW32_THREAD_REUSE_EMPTY ((ptw32_thread_t *) 1)
+#define PTW32_THREAD_REUSE_EMPTY ((ptw32_thread_t *)(size_t) 1)
 
 extern int ptw32_processInitialized;
 extern ptw32_thread_t * ptw32_threadReuseTop;

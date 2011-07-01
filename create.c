@@ -90,7 +90,7 @@ pthread_create (pthread_t * tid,
   int result = EAGAIN;
   int run = PTW32_TRUE;
   ThreadParms *parms = NULL;
-  size_t stackSize;
+  unsigned int stackSize;
   int priority;
   pthread_t self;
 
@@ -142,7 +142,7 @@ pthread_create (pthread_t * tid,
 
   if (a != NULL)
     {
-      stackSize = a->stacksize;
+      stackSize = (unsigned int)a->stacksize;
       tp->detachState = a->detachstate;
       priority = a->param.sched_priority;
 
