@@ -1,3 +1,14 @@
+2011-07-02  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* spin3.c: Unlock the unlocked spinlock now returns success.
+	* rwlock3.c: Join the thread to ensure it's completed.
+	* rwlock4.c: Likewise.
+	* rwlock5.c: Likewise.
+	* Makefile: Adjust prerequisites.
+	* GNUmakefile: Likewise.
+	* Bmakefile: Likewise.
+	* Wmakefile: Likewise.
+
 2011-07-02 Daniel Richard G. <skunk at iskunk dot org>
 
 	* *.[ch]: Cleanups around timeb struct, mainly centralising

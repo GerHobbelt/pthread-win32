@@ -85,21 +85,21 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #else
 #define INLINE
 #endif
+
 #if defined(_MSC_VER) && _MSC_VER < 1300
 /*
  * MSVC 6 does not use the "volatile" qualifier
  */
-#define VOLATILE
+#define PTW32_INTERLOCKED_VOLATILE
 #else
-#define VOLATILE volatile
+#define PTW32_INTERLOCKED_VOLATILE volatile
 #endif
-
 #define PTW32_INTERLOCKED_LONG long
 #define PTW32_INTERLOCKED_SIZE size_t
 #define PTW32_INTERLOCKED_PVOID PVOID
-#define PTW32_INTERLOCKED_LONGPTR VOLATILE long*
-#define PTW32_INTERLOCKED_SIZEPTR VOLATILE size_t*
-#define PTW32_INTERLOCKED_PVOID_PTR VOLATILE PVOID*
+#define PTW32_INTERLOCKED_LONGPTR PTW32_INTERLOCKED_VOLATILE long*
+#define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE size_t*
+#define PTW32_INTERLOCKED_PVOID_PTR PTW32_INTERLOCKED_VOLATILE PVOID*
 
 #if defined(__MINGW64__) || defined(__MINGW32__)
 #  include <stdint.h>
@@ -147,7 +147,7 @@ struct ptw32_thread_t_
   HANDLE threadH;		/* Win32 thread handle - POSIX thread is invalid if threadH == 0 */
   pthread_t ptHandle;		/* This thread's permanent pthread_t handle */
   ptw32_thread_t * prevReuse;	/* Links threads on reuse stack */
-  VOLATILE PThreadState state;
+  volatile PThreadState state;
   ptw32_mcs_lock_t threadLock;	/* Used for serialised access to public thread state */
   ptw32_mcs_lock_t stateLock;	/* Used for async-cancel safety */
   HANDLE cancelEvent;

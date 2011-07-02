@@ -326,7 +326,7 @@ robust4.pass: robust3.pass
 robust5.pass: robust4.pass
 rwlock1.pass: condvar6.pass
 rwlock2.pass: rwlock1.pass
-rwlock3.pass: rwlock2.pass
+rwlock3.pass: rwlock2.pass join2.pass
 rwlock4.pass: rwlock3.pass
 rwlock5.pass: rwlock4.pass
 rwlock6.pass: rwlock5.pass
