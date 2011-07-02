@@ -41,13 +41,8 @@
 #include <sys/timeb.h>
  
 pthread_spinlock_t lock = PTHREAD_SPINLOCK_INITIALIZER;
-#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
-  struct __timeb64 currSysTimeStart;
-  struct __timeb64 currSysTimeStop;
-#else
-  struct _timeb currSysTimeStart;
-  struct _timeb currSysTimeStop;
-#endif
+PTW32_STRUCT_TIMEB currSysTimeStart;
+PTW32_STRUCT_TIMEB currSysTimeStop;
 
 #define GetDurationMilliSecs(_TStart, _TStop) ((_TStop.time*1000+_TStop.millitm) \
 					       - (_TStart.time*1000+_TStart.millitm))

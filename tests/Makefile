@@ -81,7 +81,9 @@ EHFLAGS	=
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
-PASSES= sizes.pass  loadfree.pass \
+PASSES = sizes.pass $(REGULAR_PASSES)
+
+REGULAR_PASSES = loadfree.pass \
 	  self1.pass  mutex5.pass  \
 	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
 	  semaphore1.pass  semaphore2.pass  semaphore3.pass  \
@@ -213,7 +215,7 @@ sizes.pass: sizes.exe
 	@ $(ECHO) ...... Passed
 	@ $(TOUCH) $*.pass
 
-$(PASSES): $*.exe
+$(REGULAR_PASSES): $*.exe
 	@ $(ECHO) ... Running $(TEST) test: $*.exe
 	@ .\$*.exe
 	@ $(ECHO) ...... Passed

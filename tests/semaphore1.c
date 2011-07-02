@@ -86,8 +86,11 @@ thr(void * arg)
   if ( result == -1 )
   {
     int err = errno;
-    printf("thread: sem_trywait 1: expecting error %s: got %s\n",
-	   error_string[EAGAIN], error_string[err]); fflush(stdout);
+    if (err != EAGAIN)
+    {
+      printf("thread: sem_trywait 1: expecting error %s: got %s\n",
+	     error_string[EAGAIN], error_string[err]); fflush(stdout);
+    }
     assert(err == EAGAIN);
   }
   else
@@ -98,15 +101,6 @@ thr(void * arg)
   assert((result = sem_post(&s)) == 0);
 
   assert((result = sem_trywait(&s)) == 0);
-
-  if ( result == -1 )
-  {
-    perror("thread: sem_trywait 2");
-  }
-  else
-  {
-    printf("thread: ok 2\n");
-  }
 
   assert(sem_post(&s) == 0);
 
@@ -133,8 +127,11 @@ main()
   if (result2 == -1)
   {
     int err = errno;
-    printf("main: sem_trywait 1: expecting error %s: got %s\n",
-	   error_string[EAGAIN], error_string[err]); fflush(stdout);
+    if (err != EAGAIN)
+    {
+      printf("main: sem_trywait 1: expecting error %s: got %s\n",
+	     error_string[EAGAIN], error_string[err]); fflush(stdout);
+    }
     assert(err == EAGAIN);
   }
   else
@@ -145,15 +142,6 @@ main()
   assert((result2 = sem_post(&s)) == 0);
 
   assert((result2 = sem_trywait(&s)) == 0);
-
-  if ( result2 == -1 )
-  {
-    perror("main: sem_trywait 2");
-  }
-  else
-  {
-    printf("main: ok 2\n");
-  }
 
   assert(sem_post(&s) == 0);
 

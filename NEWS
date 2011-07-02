@@ -101,6 +101,10 @@ and SEH builds only). Uncaught exceptions now cause the thread to exit with
 the return code PTHREAD_CANCELED.
 - Ross Johnson
 
+Lots of casting fixes particularly for x64, Interlocked fixes and reworking
+for x64.
+- Daniel Richard G., John Kamp
+
 Other changes
 -------------
 Dependence on the winsock library is now discretionary via

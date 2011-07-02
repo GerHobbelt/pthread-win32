@@ -111,11 +111,7 @@ main()
 {
   pthread_t t[NUMTHREADS];
   struct timespec abstime = { 0, 0 };
-#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
-  struct __timeb64 currSysTime;
-#else
-  struct _timeb currSysTime;
-#endif
+  PTW32_STRUCT_TIMEB currSysTime;
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   cvthing.shared = 0;

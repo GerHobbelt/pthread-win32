@@ -163,11 +163,7 @@ main()
   int canceledThreads = 0;
   pthread_t t[NUMTHREADS + 1];
 
-#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
-  struct __timeb64 currSysTime;
-#else
-  struct _timeb currSysTime;
-#endif
+  PTW32_STRUCT_TIMEB currSysTime;
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   assert((t[0] = pthread_self()).p != NULL);

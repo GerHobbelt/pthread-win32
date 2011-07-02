@@ -60,13 +60,8 @@ CRITICAL_SECTION cs1, cs2;
 pthread_mutexattr_t ma;
 long durationMilliSecs;
 long overHeadMilliSecs = 0;
-#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
-  struct __timeb64 currSysTimeStart;
-  struct __timeb64 currSysTimeStop;
-#else
-  struct _timeb currSysTimeStart;
-  struct _timeb currSysTimeStop;
-#endif
+PTW32_STRUCT_TIMEB currSysTimeStart;
+PTW32_STRUCT_TIMEB currSysTimeStop;
 pthread_t worker;
 int running = 0;
 

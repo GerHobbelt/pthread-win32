@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef _OPENMP
-  #include <omp.h>
+#  include <omp.h>
 #endif
 #include <pthread.h>
 
@@ -20,17 +20,17 @@ void *_thread(void* Id) {
   int i;
   int x[Size];
 
-  #ifdef _OPENMP
-    #pragma omp parallel for
-  #endif
+#ifdef _OPENMP
+#  pragma omp parallel for
+#endif
   for ( i = 0; i < Size; i++ ) {
-    #ifdef _OPENMP
+#ifdef _OPENMP
     if (Verbose && i%1000==0) {
       int tid = omp_get_thread_num();
-      #pragma omp critical
+#  pragma omp critical
       printf("thread %d : tid %d handles %d\n",(int)Id,tid,i);
     }
-    #endif
+#endif
 
     x[i] = i;
   }
@@ -40,9 +40,9 @@ void *_thread(void* Id) {
     Sum += x[i];
   }
   if (Verbose) {
-  #ifdef _OPENMP
-    #pragma omp critical
-  #endif
+#ifdef _OPENMP
+#  pragma omp critical
+#endif
     printf("Id %d : %s : %d(should be %d)\n",(int)Id, __FUNCTION__, Sum,ShouldSum);
   }
   if (Sum == ShouldSum) ThreadOK[(int)Id] = 1;
@@ -53,16 +53,16 @@ void *_thread(void* Id) {
 void MainThread() {
   int i;
 
-  #ifdef _OPENMP
-    #pragma omp parallel for
-  #endif
+#ifdef _OPENMP
+#  pragma omp parallel for
+#endif
   for ( i = 0; i < 4; i++ ) {
-    #ifdef _OPENMP
+#ifdef _OPENMP
       int tid = omp_get_thread_num();
-      #pragma omp critical
+#  pragma omp critical
       printf("Main : tid %d\n",tid);
       _thread((void *)tid);
-    #endif
+#endif
   }
   return;
 }
@@ -117,11 +117,11 @@ int main(int argc, char *argv[]) {
     }
     printf("Joined thread2\n");
   }
-#endif
+#endif // SPAWN_THREADS
 
   short OK = 0;
   // Check that we have OpenMP before declaring things OK formally.
-  #ifdef _OPENMP
+#ifdef _OPENMP
     OK = 1;
     {
       short i;
@@ -129,9 +129,9 @@ int main(int argc, char *argv[]) {
     }
     if (OK) printf("OMP : All looks good\n");
     else printf("OMP : Error\n");
-  #else
+#else
     printf("OpenMP seems not enabled ...\n");
-  #endif
+#endif
 
   return OK?0:1;
 }
