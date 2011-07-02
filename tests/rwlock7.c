@@ -108,13 +108,8 @@ main (int argc, char *argv[])
   int data_updates = 0;
   int seed = 1;
 
-#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
-  struct __timeb64 currSysTime1;
-  struct __timeb64 currSysTime2;
-#else
-  struct _timeb currSysTime1;
-  struct _timeb currSysTime2;
-#endif
+  PTW32_STRUCT_TIMEB currSysTime1;
+  PTW32_STRUCT_TIMEB currSysTime2;
 
   /*
    * Initialize the shared data.

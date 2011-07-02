@@ -1,3 +1,9 @@
+2011-07-02 Daniel Richard G. <skunk at iskunk dot org>
+
+	* *.[ch]: Cleanups around timeb struct, mainly centralising
+	macro definitions in test.h.
+	* Makefile: Fix annoying nmake warning.
+
 2011-06-30  Ross Johnson <ross.johnson at homemail.com.au>
 
 	* sequence1.c: Fix loop overrun.

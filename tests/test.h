@@ -61,12 +61,16 @@
 #define int64_t _int64
 #endif
 
-#ifdef _MSC_VER
-  #define PTW32_FTIME(x) _ftime64_s(x);
-#elif defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601
-  #define PTW32_FTIME(x) _ftime64(x);
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#  define PTW32_FTIME(x) _ftime64_s(x)
+#  define PTW32_STRUCT_TIMEB struct __timeb64
+#elif ( defined(_MSC_VER) && _MSC_VER >= 1300 ) || \
+      ( defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601 )
+#  define PTW32_FTIME(x) _ftime64(x)
+#  define PTW32_STRUCT_TIMEB struct __timeb64
 #else
-  #define PTW32_FTIME(x) _ftime(x);
+#  define PTW32_FTIME(x) _ftime(x)
+#  define PTW32_STRUCT_TIMEB struct _timeb
 #endif
 
 

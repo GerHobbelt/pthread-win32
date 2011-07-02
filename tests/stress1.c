@@ -111,11 +111,7 @@ enum {
 struct timespec *
 millisecondsFromNow (struct timespec * time, int millisecs)
 {
-#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
-  struct __timeb64 currSysTime;
-#else
-  struct _timeb currSysTime;
-#endif
+  PTW32_STRUCT_TIMEB currSysTime;
   int64_t nanosecs, secs;
   const int64_t NANOSEC_PER_MILLISEC = 1000000;
   const int64_t NANOSEC_PER_SEC = 1000000000;

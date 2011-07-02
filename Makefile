@@ -13,9 +13,9 @@ DLL_VERD= $(DLL_VER)d
 
 DEVROOT	= C:\pthreads
 
-DLLDEST	= $(DEVROOT)\DLL
-LIBDEST	= $(DEVROOT)\LIB
-HDRDEST	= $(DEVROOT)\INCLUDE
+DLLDEST	= $(DEVROOT)\dll
+LIBDEST	= $(DEVROOT)\lib
+HDRDEST	= $(DEVROOT)\include
 
 DLLS	= pthreadVCE$(DLL_VER).dll pthreadVSE$(DLL_VER).dll pthreadVC$(DLL_VER).dll \
 		  pthreadVCE$(DLL_VERD).dll pthreadVSE$(DLL_VERD).dll pthreadVC$(DLL_VERD).dll
@@ -28,24 +28,28 @@ OPTIM	= /O2 /Ob2
 OPTIMD	=
 
 CC	= cl
-CFLAGS	= /W3 /MD /nologo /I. /D_WIN32_WINNT=0x400 /DHAVE_PTW32_CONFIG_H
+#CFLAGS	= /W3 /MD /nologo /I. /D_WIN32_WINNT=0x400 /DHAVE_PTW32_CONFIG_H
+CPPFLAGS = /I. /D_WIN32_WINNT=0x400 /DHAVE_PTW32_CONFIG_H
+CFLAGS	= /W3 /MD /nologo
 CFLAGSD	= /Z7 $(CFLAGS)
 
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
 #XLIBS = wsock32.lib
 
+CRTLIBS = /nodefaultlib:libcmt msvcrt.lib
+
 # Default cleanup style
 CLEANUP	= __CLEANUP_C
 
 # C++ Exceptions
-VCEFLAGS	= /EHsc /TP $(CFLAGS)
-VCEFLAGSD	= /EHsc /TP $(CFLAGSD)
+VCEFLAGS	= /EHsc /TP $(CPPFLAGS) $(CFLAGS)
+VCEFLAGSD	= /EHsc /TP $(CPPFLAGS) $(CFLAGSD)
 #Structured Exceptions
-VSEFLAGS	= $(CFLAGS)
-VSEFLAGSD	= $(CFLAGSD)
+VSEFLAGS	= $(CPPFLAGS) $(CFLAGS)
+VSEFLAGSD	= $(CPPFLAGS) $(CFLAGSD)
 #C cleanup code
-VCFLAGS	= $(CFLAGS)
-VCFLAGSD= $(CFLAGSD)
+VCFLAGS		= $(CPPFLAGS) $(CFLAGS)
+VCFLAGSD	= $(CPPFLAGS) $(CFLAGSD)
 
 DLL_INLINED_OBJS = \
 		pthread.obj \
@@ -468,7 +472,7 @@ clean:
 	if exist *.res del *.res
 
 
-install: $(DLLS)
+install:
 	copy pthread*.dll $(DLLDEST)
 	copy pthread*.lib $(LIBDEST)
 	copy pthread.h $(HDRDEST)
@@ -476,14 +480,10 @@ install: $(DLLS)
 	copy semaphore.h $(HDRDEST)
 
 $(DLLS): $(DLL_OBJS)
-	$(CC) /LDd /Zi /nologo $(DLL_OBJS) \
-		/link /nodefaultlib:libcmt /implib:$*.lib \
-		msvcrt.lib $(XLIBS) /out:$@
+	$(CC) /LDd /Zi /nologo $(DLL_OBJS) /link /implib:$*.lib $(CRTLIBS) $(XLIBS) /out:$@
 
 $(INLINED_STAMPS): $(DLL_INLINED_OBJS)
-	$(CC) /LDd /Zi /nologo $(DLL_INLINED_OBJS) \
-		/link /nodefaultlib:libcmt /implib:$*.lib \
-		msvcrt.lib $(XLIBS) /out:$*.dll
+	$(CC) /LDd /Zi /nologo $(DLL_INLINED_OBJS) /link /implib:$*.lib $(CRTLIBS) $(XLIBS) /out:$*.dll
 
 $(STATIC_STAMPS): $(DLL_INLINED_OBJS)
 	if exist $*.lib del $*.lib

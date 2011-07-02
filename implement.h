@@ -85,13 +85,21 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #else
 #define INLINE
 #endif
+#if defined(_MSC_VER) && _MSC_VER < 1300
+/*
+ * MSVC 6 does not use the "volatile" qualifier
+ */
+#define VOLATILE
+#else
+#define VOLATILE volatile
+#endif
 
 #define PTW32_INTERLOCKED_LONG long
 #define PTW32_INTERLOCKED_SIZE size_t
-#define PTW32_INTERLOCKED_LONGPTR volatile long*
-#define PTW32_INTERLOCKED_SIZEPTR volatile size_t*
 #define PTW32_INTERLOCKED_PVOID PVOID
-#define PTW32_INTERLOCKED_PVOID_PTR volatile PVOID*
+#define PTW32_INTERLOCKED_LONGPTR VOLATILE long*
+#define PTW32_INTERLOCKED_SIZEPTR VOLATILE size_t*
+#define PTW32_INTERLOCKED_PVOID_PTR VOLATILE PVOID*
 
 #if defined(__MINGW64__) || defined(__MINGW32__)
 #  include <stdint.h>
@@ -139,7 +147,7 @@ struct ptw32_thread_t_
   HANDLE threadH;		/* Win32 thread handle - POSIX thread is invalid if threadH == 0 */
   pthread_t ptHandle;		/* This thread's permanent pthread_t handle */
   ptw32_thread_t * prevReuse;	/* Links threads on reuse stack */
-  volatile PThreadState state;
+  VOLATILE PThreadState state;
   ptw32_mcs_lock_t threadLock;	/* Used for serialised access to public thread state */
   ptw32_mcs_lock_t stateLock;	/* Used for async-cancel safety */
   HANDLE cancelEvent;
@@ -875,16 +883,20 @@ extern "C"
 #   define PTW32_INTERLOCKED_INCREMENT_64 InterlockedIncrement64
 #   define PTW32_INTERLOCKED_DECREMENT_64 InterlockedDecrement64
 # endif
-# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG InterlockedCompareExchange
+# if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(_WIN64) /* MSVC 6 */
+#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand) \
+      ((LONG)InterlockedCompareExchange((PVOID *)(location), (PVOID)(value), (PVOID)(comparand)))
+# else
+#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG InterlockedCompareExchange
+# endif
 # define PTW32_INTERLOCKED_EXCHANGE_LONG InterlockedExchange
 # define PTW32_INTERLOCKED_EXCHANGE_ADD_LONG InterlockedExchangeAdd
 # define PTW32_INTERLOCKED_INCREMENT_LONG InterlockedIncrement
 # define PTW32_INTERLOCKED_DECREMENT_LONG InterlockedDecrement
-# if defined(_MSC_VER) &&  _MSC_VER < 1300
-#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR(location, value, comparand) \
-     InterlockedCompareExchange((LONG*)location, (LONG)value, (LONG)comparand)
+# if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(_WIN64) /* MSVC 6 */
+#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchange
 #  define PTW32_INTERLOCKED_EXCHANGE_PTR(location, value) \
-     InterlockedExchange((LONG*)location, (LONG)value)
+    ((PVOID)InterlockedExchange((LPLONG)(location), (LONG)(value)))
 # else
 #  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchangePointer
 #  define PTW32_INTERLOCKED_EXCHANGE_PTR InterlockedExchangePointer
