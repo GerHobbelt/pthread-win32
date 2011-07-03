@@ -139,7 +139,7 @@ main ()
   /*
    * Code to control or munipulate child threads should probably go here.
    */
-  Sleep (500);
+  Sleep (NUMTHREADS * 100);
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
@@ -147,7 +147,7 @@ main ()
     }
 
   /*
-   * Give threads time to run.
+   * Give threads time to complete.
    */
   Sleep (NUMTHREADS * 100);
 

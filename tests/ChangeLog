@@ -5,6 +5,8 @@
 	* cancel2.c: Ensure this test only runs for Structured or C++ EH.
 	* exit2.c: Shorten Sleep() time.
 	* exit3.c: Likewise.
+	* cancel1.c: Likewise.
+	* cancel3.c: Likewise.
 	* exception3.c: Likewise; make terminate routine consistent for all
 	build environments.
 
