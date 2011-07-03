@@ -8,7 +8,8 @@
 
 2011-07-03 Daniel Richard G. <skunk at iskunk dot org>
 
-	* Makefile (_WIN32_WINNT): Removed; duplicate definition in implement.h.
+	* Makefile (_WIN32_WINNT): Removed; duplicate definition in
+	implement.h; more cleanup and enhancements.
 
 2011-07-02 Daniel Richard G. <skunk at iskunk dot org>
 
