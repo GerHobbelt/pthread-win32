@@ -3,6 +3,8 @@
 	* pthread_spin_unlock.c (EPERM): Return success if unlocking a lock
 	that is not locked, because single CPU machines wrap a
 	PTHREAD_MUTEX_NORMAL mutex, which returns success in this case.
+	* pthread_win32_attach_detach_np.c (QUSEREX.DLL): Load from an
+	absolute path only which must be the Windows System folder.
 
 2011-07-03 Daniel Richard G. <skunk at iskunk dot org>
 

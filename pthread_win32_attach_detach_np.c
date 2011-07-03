@@ -45,6 +45,7 @@ static HINSTANCE ptw32_h_quserex;
 BOOL
 pthread_win32_process_attach_np ()
 {
+  TCHAR WindowsSystemDirBuf[1024];
   BOOL result = TRUE;
 
   result = ptw32_processInitialize ();
@@ -60,9 +61,18 @@ pthread_win32_process_attach_np ()
 #endif
 
   /*
-   * Load QUSEREX.DLL and try to get address of QueueUserAPCEx
+   * Load QUSEREX.DLL and try to get address of QueueUserAPCEx.
+   * Because QUSEREX.DLL requires a driver to be installed we will
+   * assume the DLL is in the system directory.
+   *
+   * This should take care of any security issues.
    */
-  ptw32_h_quserex = LoadLibrary (TEXT ("QUSEREX.DLL"));
+  if(GetSystemDirectory(WindowsSystemDirBuf, sizeof(WindowsSystemDirBuf)))
+  {
+    ptw32_h_quserex = LoadLibrary (TEXT (strncat(WindowsSystemDirBuf,
+                                                 "\\QUSEREX.DLL",
+                                                 sizeof(WindowsSystemDirBuf))));
+  }
 
   if (ptw32_h_quserex != NULL)
     {
