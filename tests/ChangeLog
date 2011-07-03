@@ -1,3 +1,8 @@
+2011-07-03  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* create3.c: Removed; testing a condition that is not in the library's
+	scope and was more trouble than it was worth.
+
 2011-07-02  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* spin3.c: Unlock the unlocked spinlock now returns success.

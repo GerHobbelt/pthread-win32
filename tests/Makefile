@@ -120,7 +120,7 @@ REGULAR_PASSES = loadfree.pass \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  exception1.pass  exception2.pass  exception3.pass  \
-	  cancel9.pass  create3.pass  stress1.pass
+	  cancel9.pass  stress1.pass
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
@@ -166,7 +166,7 @@ STATICRESULTS = \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  exception1.pass  exception2.pass  exception3.pass  \
-	  cancel9.pass  create3.pass  stress1.pass
+	  cancel9.pass  stress1.pass
 
 help:
 	@ $(ECHO) Run one of the following command lines:
@@ -353,7 +353,6 @@ context1.pass: cancel2.pass
 count1.pass: join1.pass
 create1.pass: mutex2.pass
 create2.pass: create1.pass
-create3.pass:
 delay1.pass:
 delay2.pass: delay1.pass
 detach1.pass: join0.pass
