@@ -117,7 +117,7 @@ TESTS	= \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
 	  exception1 exception2 exception3 \
-	  cancel9 create3 stress1
+	  cancel9 stress1
 
 STRESSTESTS = \
 	stress1
@@ -156,7 +156,7 @@ STATICTESTS = \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
 	  exception1 exception2 exception3 \
-	  cancel9 create3 stress1
+	  cancel9 stress1
 
 ALLTESTS = $(TESTS) $(BENCHTESTS)
 
@@ -283,7 +283,6 @@ context1.pass: cancel2.pass
 count1.pass: join1.pass
 create1.pass: mutex2.pass
 create2.pass: create1.pass
-create3.pass:
 delay1.pass: cancel2.pass
 delay2.pass: delay1.pass
 detach1.pass: join0.pass
