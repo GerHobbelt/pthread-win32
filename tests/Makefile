@@ -38,7 +38,7 @@ RM	= erase
 CAT	= type
 MKDIR	= mkdir
 TOUCH	= echo Passed >
-ECHO	= @echo
+ECHO	= echo
 
 # The next path is relative to $BUILD_DIR
 QAPC	= # ..\QueueUserAPCEx\User\quserex.dll
@@ -185,12 +185,12 @@ help:
 	@ $(ECHO) nmake clean VSE-stress  (to stresstest using VSE dll with SEH stress apps)
 
 all:
-	@ nmake clean VC
-	@ nmake clean VCX
-	@ nmake clean VCE
-	@ nmake clean VSE
-	@ nmake clean VC-bench
-	@ nmake clean VC-stress
+	@ $(MAKE) /E clean VC
+	@ $(MAKE) /E clean VCX
+	@ $(MAKE) /E clean VCE
+	@ $(MAKE) /E clean VSE
+	@ $(MAKE) /E clean VC-bench
+	@ $(MAKE) /E clean VC-stress
 
 # This allows an individual test application to be made using the default lib.
 # e.g. nmake clean test cancel3.exe
@@ -234,43 +234,43 @@ $(STRESSRESULTS): $*.exe
 	@ $(TOUCH) $*.pass
 
 VC:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
 
 VCE:
-	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
 
 VSE:	
-	@ nmake TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" tests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" tests
 
 VCX:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
 
 VC-bench:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VCE-bench:
-	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VSE-bench:
-	@ nmake TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VCX-bench:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VC-stress:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" stresstests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" stresstests
 
 VCE-stress:
-	@ nmake TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" stresstests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" stresstests
 
 VSE-stress:
-	@ nmake TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" stresstests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" stresstests
 
 VCX-stress:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" stresstests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" stresstests
 
 VC-static:
-	@ nmake TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
+	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
 .c.exe:
 	@ $(ECHO) $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
