@@ -1,8 +1,12 @@
-2011-07-02  Ross Johnson <ross dot johnson at homemail dot com dot au>
+2011-07-03  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_spin_unlock.c (EPERM): Return success if unlocking a lock
 	that is not locked, because single CPU machines wrap a
 	PTHREAD_MUTEX_NORMAL mutex, which returns success in this case.
+
+2011-07-03 Daniel Richard G. <skunk at iskunk dot org>
+
+	* Makefile (_WIN32_WINNT): Removed; duplicate definition in implement.h.
 
 2011-07-02 Daniel Richard G. <skunk at iskunk dot org>
 
