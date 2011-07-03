@@ -117,6 +117,10 @@ MCS queue-based locks to reduce resource consumption, in particular use of Win32
 objects.
 - Ross Johnson
 
+For security, the QuserEx.dll if used must now be installed in the Windows System
+folder.
+- Ross Johnson
+
 New tests
 ---------
 robust[1-5].c - Robust mutexes
