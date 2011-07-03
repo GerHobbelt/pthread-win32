@@ -2,6 +2,11 @@
 
 	* create3.c: Removed; testing a condition that is not in the library's
 	scope and was more trouble than it was worth.
+	* cancel2.c: Ensure this test only runs for Structured or C++ EH.
+	* exit2.c: Shorten Sleep() time.
+	* exit3.c: Likewise.
+	* exception3.c: Likewise; make terminate routine consistent for all
+	build environments.
 
 2011-07-02  Ross Johnson <ross dot johnson at homemail dot com dot au>
 

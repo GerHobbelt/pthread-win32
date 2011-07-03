@@ -72,7 +72,10 @@
  * - Process returns non-zero exit status.
  */
 
-#if defined(_MSC_VER) || defined(__cplusplus)
+/*
+ * EXCEPTION_CONTINUE_SEARCH is used to identify that we are using SEH
+ */
+#if defined(EXCEPTION_CONTINUE_SEARCH) || defined(__cplusplus)
 
 #include "test.h"
 
@@ -242,9 +245,12 @@ main()
 
 #else /* defined(_MSC_VER) || defined(__cplusplus) */
 
+#include <stdio.h>
+
 int
 main()
 {
+  fprintf(stderr, "Test N/A for this compiler environment.\n");
   return 0;
 }
 
