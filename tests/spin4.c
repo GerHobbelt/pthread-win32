@@ -66,11 +66,7 @@ main()
   void* result = (void*)0;
   pthread_t t;
   int CPUs;
-#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
-  struct __timeb64 sysTime;
-#else
-  struct _timeb sysTime;
-#endif
+  PTW32_STRUCT_TIMEB sysTime;
 
   if ((CPUs = pthread_num_processors_np()) == 1)
     {
