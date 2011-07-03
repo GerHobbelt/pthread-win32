@@ -251,7 +251,6 @@ barrier5.pass: barrier4.pass
 barrier6.pass: barrier5.pass
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
-cancel2_1.pass: cancel2.pass
 cancel3.pass: context1.pass
 cancel4.pass: cancel3.pass
 cancel5.pass: cancel3.pass
@@ -279,11 +278,11 @@ condvar6.pass: condvar5.pass
 condvar7.pass: condvar6.pass cleanup1.pass
 condvar8.pass: condvar7.pass
 condvar9.pass: condvar8.pass
-context1.pass: cancel2.pass
+context1.pass: cancel1.pass
 count1.pass: join1.pass
 create1.pass: mutex2.pass
 create2.pass: create1.pass
-delay1.pass: cancel2.pass
+delay1.pass:
 delay2.pass: delay1.pass
 detach1.pass: join0.pass
 equal1.pass: create1.pass

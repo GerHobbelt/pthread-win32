@@ -73,9 +73,9 @@
  */
 
 /*
- * EXCEPTION_CONTINUE_SEARCH is used to identify that we are using SEH
+ * Don't know how to identify if we are using SEH so it's only C++ for now
  */
-#if defined(EXCEPTION_CONTINUE_SEARCH) || defined(__cplusplus)
+#if defined(__cplusplus)
 
 #include "test.h"
 
@@ -123,7 +123,7 @@ mythread(void * arg)
       break;
     }
 
-#if defined(_MSC_VER) && !defined(__cplusplus)
+#if !defined(__cplusplus)
   __try
 #else
   try
@@ -139,7 +139,7 @@ mythread(void * arg)
 	  pthread_testcancel();
 	}
     }
-#if defined(_MSC_VER) && !defined(__cplusplus)
+#if !defined(__cplusplus)
   __except(EXCEPTION_EXECUTE_HANDLER)
 #else
 #if defined(PtW32CatchAll)
@@ -243,7 +243,7 @@ main()
   return 0;
 }
 
-#else /* defined(_MSC_VER) || defined(__cplusplus) */
+#else /* defined(__cplusplus) */
 
 #include <stdio.h>
 
@@ -254,4 +254,5 @@ main()
   return 0;
 }
 
-#endif /* defined(_MSC_VER) || defined(__cplusplus) */
+#endif /* defined(__cplusplus) */
+
