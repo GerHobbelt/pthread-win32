@@ -45,7 +45,7 @@ static HINSTANCE ptw32_h_quserex;
 BOOL
 pthread_win32_process_attach_np ()
 {
-  TCHAR WindowsSystemDirBuf[1024];
+  TCHAR QuserExDLLPathBuf[1024];
   BOOL result = TRUE;
 
   result = ptw32_processInitialize ();
@@ -57,6 +57,9 @@ pthread_win32_process_attach_np ()
 #if defined(__GNUC__)
   ptw32_features = 0;
 #else
+  /*
+   * This is obsolete now.
+   */
   ptw32_features = PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE;
 #endif
 
@@ -67,12 +70,22 @@ pthread_win32_process_attach_np ()
    *
    * This should take care of any security issues.
    */
-  if(GetSystemDirectory(WindowsSystemDirBuf, sizeof(WindowsSystemDirBuf)))
+#if defined(__GNUC__) || _MSC_VER < 1400
+  if(GetSystemDirectory(QuserExDLLPathBuf, sizeof(QuserExDLLPathBuf)))
   {
-    ptw32_h_quserex = LoadLibrary (TEXT (strncat(WindowsSystemDirBuf,
-                                                 "\\QUSEREX.DLL",
-                                                 sizeof(WindowsSystemDirBuf))));
+    (void) strncat(QuserExDLLPathBuf,
+                   "\\QUSEREX.DLL",
+                   sizeof(QuserExDLLPathBuf) - strlen(QuserExDLLPathBuf) - 1);
+    ptw32_h_quserex = LoadLibrary(QuserExDLLPathBuf);
   }
+#else
+  /* strncat is secure - this is just to avoid a warning */
+  if(GetSystemDirectory(QuserExDLLPathBuf, sizeof(QuserExDLLPathBuf)) &&
+     0 == strncat_s(QuserExDLLPathBuf, sizeof(QuserExDLLPathBuf), "\\QUSEREX.DLL", 12))
+  {
+    ptw32_h_quserex = LoadLibrary(QuserExDLLPathBuf);
+  }
+#endif
 
   if (ptw32_h_quserex != NULL)
     {

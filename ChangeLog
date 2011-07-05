@@ -1,3 +1,11 @@
+2011-07-05  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread_win32_attach_detach_np.c: Use strncat_s if available
+	to removei a compile warning; MingW supports this routine but we
+	continue to use strncat anyway there because it is secure if
+	given the correct parameters; fix strncat param 3 to avoid
+	buffer overrun exploitation potential.
+
 2011-07-03  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_spin_unlock.c (EPERM): Return success if unlocking a lock
