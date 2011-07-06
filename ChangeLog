@@ -1,3 +1,14 @@
+2011-07-06  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread_cond_wait.c (pragma inline_depth): this is almost redundant
+	now nevertheless fixed thei controlling MSC_VER from "< 800" to
+	"< 1400" (i.e. any prior to VC++ 8.0).
+	* pthread_once.ci (pragma inline_depth): Likewise.
+	* pthread_rwlock_timedwrlock.ci (pragma inline_depth): Likewise.
+	* pthread_rwlock_wrlock.ci (pragma inline_depth): Likewise.
+	* sem_timedwait.ci (pragma inline_depth): Likewise.
+	* sem_wait.ci (pragma inline_depth): Likewise.
+
 2011-07-05  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_win32_attach_detach_np.c: Use strncat_s if available
