@@ -56,7 +56,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
       if (!once_control->done)
 	{
 
-#if defined(_MSC_VER) && _MSC_VER < 800
+#if defined(_MSC_VER) && _MSC_VER < 1400
 #pragma inline_depth(0)
 #endif
 
@@ -64,7 +64,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 	  (*init_routine)();
 	  pthread_cleanup_pop(0);
 
-#if defined(_MSC_VER) && _MSC_VER < 800
+#if defined(_MSC_VER) && _MSC_VER < 1400
 #pragma inline_depth()
 #endif
 
