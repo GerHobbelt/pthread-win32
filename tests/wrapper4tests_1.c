@@ -113,7 +113,7 @@ int test_once1(void);
 int test_once2(void);
 int test_once3(void);
 int test_once4(void);
-int test_openmp1(void);
+int test_openmp1(int argc, char *argv[]);
 int test_priority1(void);
 int test_priority2(void);
 int test_reuse1(void);
@@ -318,7 +318,7 @@ int main(int argc, char **argv)
 	TEST_WRAPPER(test_once2);
 	TEST_WRAPPER(test_once3);
 	TEST_WRAPPER(test_once4);
-	TEST_WRAPPER(test_openmp1);
+	TEST_WRAPPER_W_ARGV(test_openmp1);
 	TEST_WRAPPER(test_priority1);
 	TEST_WRAPPER(test_priority2);
 	/* TEST_WRAPPER(test_reuse1); -- fails when run here; does not fail when run at start of run :-S */
