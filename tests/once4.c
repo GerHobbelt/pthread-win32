@@ -50,8 +50,8 @@
 #define NUM_THREADS 100 /* Targeting each once control */
 #define NUM_ONCE    10
 
-pthread_once_t o = PTHREAD_ONCE_INIT;
-pthread_once_t once[NUM_ONCE];
+static pthread_once_t o = PTHREAD_ONCE_INIT;
+static pthread_once_t once[NUM_ONCE];
 
 typedef struct {
   int i;
@@ -70,9 +70,9 @@ typedef struct {
 
 static bag_t threadbag[NUM_THREADS][NUM_ONCE];
 
-CRITICAL_SECTION print_lock;
+static CRITICAL_SECTION print_lock;
 
-void
+static void
 mycleanupfunc(void * arg)
 {
   bag_t * bag = (bag_t *) arg;
@@ -86,7 +86,7 @@ mycleanupfunc(void * arg)
   LeaveCriticalSection(&print_lock);
 }
 
-void
+static void
 myinitfunc(void)
 {
   EnterCriticalSection(&numOnce.cs);
@@ -98,7 +98,7 @@ myinitfunc(void)
   pthread_testcancel();
 }
 
-void *
+static void *
 mythread(void * arg)
 {
   bag_t * bag = (bag_t *) arg;
@@ -134,8 +134,13 @@ mythread(void * arg)
   return 0;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_once4(void)
+#endif
 {
   pthread_t t[NUM_THREADS][NUM_ONCE];
   int i, j;

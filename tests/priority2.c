@@ -7,25 +7,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -37,7 +37,7 @@
  * - Test thread priority setting after creation.
  *
  * Test Method (Validation or Falsification):
- * - 
+ * -
  *
  * Requirements Tested:
  * -
@@ -78,12 +78,12 @@ enum {
   PTW32TEST_MAXPRIORITIES = 512
 };
 
-int minPrio;
-int maxPrio;
-int validPriorities[PTW32TEST_MAXPRIORITIES];
-pthread_barrier_t startBarrier, endBarrier;
+static int minPrio;
+static int maxPrio;
+static int validPriorities[PTW32TEST_MAXPRIORITIES];
+static pthread_barrier_t startBarrier, endBarrier;
 
-void * func(void * arg)
+static void * func(void * arg)
 {
   int policy;
   int result;
@@ -99,7 +99,7 @@ void * func(void * arg)
 }
 
 
-void *
+static void *
 getValidPriorities(void * arg)
 {
   int prioSet;
@@ -125,8 +125,13 @@ getValidPriorities(void * arg)
 }
 
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else
+int
+test_priority2(void)
+#endif
 {
   pthread_t t;
   void * result = NULL;

@@ -89,7 +89,7 @@ static void * func(void * arg)
 }
 
 static void
-anotherEnding ()
+anotherEnding (void)
 {
   /*
    * Switched context
@@ -99,8 +99,13 @@ anotherEnding ()
   pthread_exit(0);
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_context1(void)
+#endif
 {
   pthread_t t;
   HANDLE hThread;

@@ -75,8 +75,13 @@
 
 #define MAX_COUNT 100
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_semaphore2(void)
+#endif
 {
   sem_t s;
 	int value = 0;

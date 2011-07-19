@@ -43,10 +43,15 @@
 
 #include "test.h"
  
-pthread_rwlock_t rwlock = PTHREAD_RWLOCK_INITIALIZER;
+static pthread_rwlock_t rwlock = PTHREAD_RWLOCK_INITIALIZER;
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_rwlock2(void)
+#endif
 {
   assert(rwlock == PTHREAD_RWLOCK_INITIALIZER);
 

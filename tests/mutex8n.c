@@ -44,12 +44,12 @@
 #include "test.h"
 #include <sys/timeb.h>
 
-static int lockCount;
+static int lockCount = 0;
 
 static pthread_mutex_t mutex;
 static pthread_mutexattr_t mxAttr;
 
-void * locker(void * arg)
+static void * locker(void * arg)
 {
   struct timespec abstime = { 0, 0 };
   PTW32_STRUCT_TIMEB currSysTime;
@@ -69,8 +69,13 @@ void * locker(void * arg)
   return 0;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else
+int
+test_mutex8n(void)
+#endif
 {
   pthread_t t;
   int mxType = -1;

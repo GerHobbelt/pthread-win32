@@ -7,25 +7,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -40,19 +40,19 @@
  * - Validation
  *
  * Requirements Tested:
- * - 
+ * -
  *
  * Features Tested:
- * - 
+ * -
  *
  * Cases Tested:
- * - 
+ * -
  *
  * Description:
  * - Test broadcast with NUMTHREADS (=5) waiting CVs, one is canceled while waiting.
  *
  * Environment:
- * - 
+ * -
  *
  * Input:
  * - None.
@@ -62,7 +62,7 @@
  * - No output on success.
  *
  * Assumptions:
- * - 
+ * -
  *
  * Pass Criteria:
  * - Process returns zero exit status.
@@ -110,7 +110,7 @@ static struct timespec abstime = { 0, 0 };
 
 static int awoken;
 
-void *
+static void *
 mythread(void * arg)
 {
   bag_t * bag = (bag_t *) arg;
@@ -147,8 +147,13 @@ mythread(void * arg)
   return (void *) 0;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else
+int
+test_condvar7(void)
+#endif
 {
   int failed = 0;
   int i;
@@ -217,10 +222,10 @@ main()
   for (i = 2; i <= NUMTHREADS; i++)
     assert(pthread_join(t[i], NULL) == 0);
 
-  /* 
+  /*
    * Cleanup the CV.
    */
-  
+
   assert(pthread_mutex_destroy(&cvthing.lock) == 0);
 
   assert(cvthing.lock == NULL);
@@ -233,7 +238,7 @@ main()
    * Standard check that all threads started.
    */
   for (i = 1; i <= NUMTHREADS; i++)
-    { 
+    {
       failed = !threadbag[i].started;
 
       if (failed)

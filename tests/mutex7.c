@@ -50,20 +50,25 @@ static int lockCount = 0;
 
 static pthread_mutex_t mutex;
 
-void * locker(void * arg)
+static void * locker(void * arg)
 {
   assert(pthread_mutex_lock(&mutex) == 0);
   lockCount++;
   assert(pthread_mutex_trylock(&mutex) == EBUSY);
   lockCount++;
   assert(pthread_mutex_unlock(&mutex) == 0);
-  assert(pthread_mutex_unlock(&mutex) == 0);
+  assert(pthread_mutex_unlock(&mutex) == EPERM);
 
   return 0;
 }
  
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_mutex7(void)
+#endif
 {
   pthread_t t;
 
@@ -75,8 +80,5 @@ main()
 
   assert(lockCount == 2);
 
-  exit(0);
-
-  /* Never reached */
   return 0;
 }

@@ -45,10 +45,15 @@
 
 #include "test.h"
 
-pthread_mutex_t mutex = NULL;
+static pthread_mutex_t mutex = NULL;
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_mutex1(void)
+#endif
 {
   assert(mutex == NULL);
 

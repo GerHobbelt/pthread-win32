@@ -269,8 +269,13 @@ dowork (void)
   dosync();
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main (int argc, char *argv[])
+main()
+#else 
+int
+test_eyal1(void)
+#endif
 {
   int		i;
 

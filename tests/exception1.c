@@ -7,25 +7,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -36,22 +36,22 @@
  * Test Synopsis: Test passing of exceptions back to the application.
  *
  * Test Method (Validation or Falsification):
- * - 
+ * -
  *
  * Requirements Tested:
  * -
  *
  * Features Tested:
- * - 
+ * -
  *
  * Cases Tested:
- * - 
+ * -
  *
  * Description:
- * - 
+ * -
  *
  * Environment:
- * - 
+ * -
  *
  * Input:
  * - None.
@@ -82,7 +82,7 @@ enum {
   NUMTHREADS = 4
 };
 
-void *
+static void *
 exceptionedThread(void * arg)
 {
   int dummy = 0;
@@ -120,6 +120,16 @@ exceptionedThread(void * arg)
      * wasn't being caught by the catch(...)
      * below under Mingw32. That could be a problem.
      */
+    /*
+	   [i_a]
+
+	   Addendum: C++ try/catch generally do not catch
+	   access violations of that sort, as division by
+	   zero is considered a 'floating point exception',
+	   even when the division is an integer one.
+
+	   So it may be caught by a custom SIGFPE handler instead.
+	*/
     throw dummy;
   }
 #if defined(PtW32CatchAll)
@@ -136,7 +146,7 @@ exceptionedThread(void * arg)
   return (void *) (size_t)result;
 }
 
-void *
+static void *
 canceledThread(void * arg)
 {
   void* result = (void*)((int)(size_t)PTHREAD_CANCELED + 1);
@@ -187,8 +197,13 @@ canceledThread(void * arg)
   return (void *) (size_t)result;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else
+int
+test_exception1(void)
+#endif
 {
   int failed = 0;
   int i;
@@ -253,8 +268,13 @@ main()
 
 #include <stdio.h>
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else
+int
+test_exception1(void)
+#endif
 {
   fprintf(stderr, "Test N/A for this compiler environment.\n");
   return 0;

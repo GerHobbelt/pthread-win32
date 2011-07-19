@@ -90,7 +90,7 @@ struct bag_t_ {
 
 static bag_t threadbag[NUMTHREADS + 1];
 
-void *
+static void *
 mythread(void * arg)
 {
   bag_t * bag = (bag_t *) arg;
@@ -122,8 +122,13 @@ mythread(void * arg)
   return 0;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_cancel1(void)
+#endif
 {
   int failed = 0;
   int i;
@@ -145,7 +150,7 @@ main()
   /*
    * Give threads time to run.
    */
-  Sleep(NUMTHREADS * 100);
+  Sleep(NUMTHREADS * 1000);
 
   /*
    * Standard check that all threads started.

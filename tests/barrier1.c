@@ -39,10 +39,15 @@
 
 #include "test.h"
 
-pthread_barrier_t barrier = NULL;
+static pthread_barrier_t barrier = NULL;
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_barrier1(void)
+#endif
 {
   assert(barrier == NULL);
 

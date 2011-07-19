@@ -43,10 +43,15 @@
 
 #include "test.h"
  
-pthread_mutex_t mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+static pthread_mutex_t mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_mutex2r(void)
+#endif
 {
   assert(mutex == PTHREAD_RECURSIVE_MUTEX_INITIALIZER);
 

@@ -57,7 +57,14 @@
 
 #include "test.h"
 
-int main() {
+#ifndef MONOLITHIC_PTHREAD_TESTS
+int
+main()
+#else 
+int
+test_loadfree(void)
+#endif
+{
   HINSTANCE hinst;
 
   assert((hinst = LoadLibrary("pthread")) != (HINSTANCE) 0);

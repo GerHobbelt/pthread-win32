@@ -42,10 +42,15 @@
 
 #include "test.h"
 
-pthread_rwlock_t rwlock = NULL;
+static pthread_rwlock_t rwlock = NULL;
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_rwlock1(void)
+#endif
 {
   assert(rwlock == NULL);
 

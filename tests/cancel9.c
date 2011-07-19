@@ -76,7 +76,7 @@
 #include <windows.h>
 
 
-void *
+static void *
 test_udp (void *arg)
 {
   struct sockaddr_in serverAddress;
@@ -130,7 +130,7 @@ test_udp (void *arg)
 }
 
 
-void *
+static void *
 test_sleep (void *arg)
 {
   pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
@@ -141,7 +141,7 @@ test_sleep (void *arg)
 
 }
 
-void *
+static void *
 test_wait (void *arg)
 {
   HANDLE hEvent;
@@ -158,8 +158,13 @@ test_wait (void *arg)
 }
 
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main ()
+main()
+#else 
+int
+test_cancel9(void)
+#endif
 {
   pthread_t t;
   void *result;

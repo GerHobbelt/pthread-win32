@@ -43,7 +43,7 @@ static data_t data[DATASIZE];
 /*
  * Thread start routine that uses read-write locks
  */
-void *thread_routine (void *arg)
+static void *thread_routine (void *arg)
 {
   thread_t *self = (thread_t*)arg;
   int iteration;
@@ -99,8 +99,13 @@ void *thread_routine (void *arg)
   return NULL;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main (int argc, char *argv[])
+main ()
+#else
+int
+test_rwlock7(void)
+#endif
 {
   int count;
   int data_count;

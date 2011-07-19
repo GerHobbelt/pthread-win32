@@ -7,25 +7,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -71,7 +71,7 @@
  * - unique sequence numbers are generated for every new thread.
  *
  * Fail Criteria:
- * - 
+ * -
  */
 
 #include "test.h"
@@ -89,21 +89,26 @@ static long done = 0;
  * seqmap should have 1 in every element except [0]
  * Thread sequence numbers start at 1 and we will also
  * include this main thread so we need NUMTHREADS+2
- * elements. 
+ * elements.
  */
 static UINT64 seqmap[NUMTHREADS+2];
 
-void * func(void * arg)
+static void * func(void * arg)
 {
   sched_yield();
   seqmap[(int)pthread_getunique_np(pthread_self())] = 1;
   InterlockedIncrement(&done);
 
-  return (void *) 0; 
+  return (void *) 0;
 }
- 
+
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else
+int
+test_sequence1(void)
+#endif
 {
   pthread_t t[NUMTHREADS];
   pthread_attr_t attr;

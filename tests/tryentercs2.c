@@ -41,11 +41,23 @@
 #include <process.h>
 #include <stdio.h>
 
+
+/* [i_a] */
+#ifndef WINBASEAPI
+#define WINBASEAPI
+#endif
+#ifndef WINAPI
+#define WINAPI
+#endif
+typedef WINBASEAPI BOOL WINAPI TryEnterCriticalSection_f(LPCRITICAL_SECTION lpCriticalSection);
+
+
+
 /*
  * Function pointer to TryEnterCriticalSection if it exists
  * - otherwise NULL
  */
-BOOL (WINAPI *_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
+static TryEnterCriticalSection_f *_try_enter_critical_section = NULL;
 
 /*
  * Handle to kernel32.dll
@@ -53,8 +65,13 @@ BOOL (WINAPI *_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
 static HINSTANCE _h_kernel32;
 
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_tryentercs2(void)
+#endif
 {
   LPCRITICAL_SECTION lpcs = NULL;
 
@@ -67,7 +84,7 @@ main()
    */
   _h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
   _try_enter_critical_section =
-        (BOOL (PT_STDCALL *)(LPCRITICAL_SECTION))
+        (TryEnterCriticalSection_f *)
         GetProcAddress(_h_kernel32,
                          (LPCSTR) "TryEnterCriticalSection");
 
@@ -75,7 +92,30 @@ main()
     {
       SetLastError(0);
 
-      (*_try_enter_critical_section)(lpcs);
+#if defined(_MSC_VER)
+  __try
+#else /* if defined(__cplusplus) */
+  try  /* this generally does not catch access violations, etc. */
+#endif
+    {
+		(*_try_enter_critical_section)(lpcs);
+    }
+#if defined(_MSC_VER)
+  __except(EXCEPTION_EXECUTE_HANDLER)
+#else /* if defined(__cplusplus) */
+#if defined(PtW32CatchAll)
+  PtW32CatchAll
+#else
+  catch(...)
+#endif
+#endif
+	  {
+		  printf("Expected an access violation and we got one!\n");
+		if (GetLastError() == 0)
+		{
+			SetLastError(ERROR_INVALID_PARAMETER);
+		}
+	  }
 
       printf("Last Error [try enter] %ld\n", (long) GetLastError());
     }

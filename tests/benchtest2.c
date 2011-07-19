@@ -7,25 +7,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -54,19 +54,20 @@
 #define PTW32_MUTEX_TYPES
 #define ITERATIONS      100000L
 
-pthread_mutex_t gate1, gate2;
-old_mutex_t ox1, ox2;
-CRITICAL_SECTION cs1, cs2;
-pthread_mutexattr_t ma;
-long durationMilliSecs;
-long overHeadMilliSecs = 0;
-PTW32_STRUCT_TIMEB currSysTimeStart;
-PTW32_STRUCT_TIMEB currSysTimeStop;
-pthread_t worker;
-int running = 0;
+static pthread_mutex_t gate1, gate2;
+static old_mutex_t ox1, ox2;
+static CRITICAL_SECTION cs1, cs2;
+static pthread_mutexattr_t ma;
+static long durationMilliSecs;
+static long overHeadMilliSecs = 0;
+static PTW32_STRUCT_TIMEB currSysTimeStart;
+static PTW32_STRUCT_TIMEB currSysTimeStop;
+static pthread_t worker;
+static int running = 0;
 
-#define GetDurationMilliSecs(_TStart, _TStop) ((long)((_TStop.time*1000+_TStop.millitm) \
-                                               - (_TStart.time*1000+_TStart.millitm)))
+/* [i_a] */
+#define GetDurationMilliSecs(_TStart, _TStop) ((long)((_TStop.time*1000LL+_TStop.millitm) \
+                                               - (_TStart.time*1000LL+_TStart.millitm)))
 
 /*
  * Dummy use of j, otherwise the loop may be removed by the optimiser
@@ -79,7 +80,7 @@ int running = 0;
   }; PTW32_FTIME(&currSysTimeStop); if (j + k == i) j++; }
 
 
-void *
+static void *
 overheadThread(void * arg)
 {
   do
@@ -92,7 +93,7 @@ overheadThread(void * arg)
 }
 
 
-void *
+static void *
 oldThread(void * arg)
 {
   do
@@ -108,7 +109,7 @@ oldThread(void * arg)
   return NULL;
 }
 
-void *
+static void *
 workerThread(void * arg)
 {
   do
@@ -124,7 +125,7 @@ workerThread(void * arg)
   return NULL;
 }
 
-void *
+static void *
 CSThread(void * arg)
 {
   do
@@ -140,7 +141,7 @@ CSThread(void * arg)
   return NULL;
 }
 
-void
+static void
 runTest (char * testNameString, int mType)
 {
 #ifdef PTW32_MUTEX_TYPES
@@ -152,13 +153,13 @@ runTest (char * testNameString, int mType)
   assert(pthread_mutex_lock(&gate2) == 0);
   running = 1;
   assert(pthread_create(&worker, NULL, workerThread, NULL) == 0);
-  TESTSTART
+  TESTSTART;
   (void) pthread_mutex_unlock(&gate1);
   sched_yield();
   (void) pthread_mutex_unlock(&gate2);
   (void) pthread_mutex_lock(&gate1);
   (void) pthread_mutex_lock(&gate2);
-  TESTSTOP
+  TESTSTOP;
   running = 0;
   assert(pthread_mutex_unlock(&gate2) == 0);
   assert(pthread_mutex_unlock(&gate1) == 0);
@@ -173,8 +174,13 @@ runTest (char * testNameString, int mType)
 }
 
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main (int argc, char *argv[])
+main ()
+#else
+int
+test_benchtest2(void)
+#endif
 {
   assert(pthread_mutexattr_init(&ma) == 0);
 
@@ -194,10 +200,10 @@ main (int argc, char *argv[])
 
   running = 1;
   assert(pthread_create(&worker, NULL, overheadThread, NULL) == 0);
-  TESTSTART
+  TESTSTART;
   sched_yield();
   sched_yield();
-  TESTSTOP
+  TESTSTOP;
   running = 0;
   assert(pthread_join(worker, NULL) == 0);
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
@@ -210,13 +216,13 @@ main (int argc, char *argv[])
   EnterCriticalSection(&cs2);
   running = 1;
   assert(pthread_create(&worker, NULL, CSThread, NULL) == 0);
-  TESTSTART
+  TESTSTART;
   LeaveCriticalSection(&cs1);
   sched_yield();
   LeaveCriticalSection(&cs2);
   EnterCriticalSection(&cs1);
   EnterCriticalSection(&cs2);
-  TESTSTOP
+  TESTSTOP;
   running = 0;
   LeaveCriticalSection(&cs2);
   LeaveCriticalSection(&cs1);
@@ -237,13 +243,13 @@ main (int argc, char *argv[])
   assert(old_mutex_lock(&ox2) == 0);
   running = 1;
   assert(pthread_create(&worker, NULL, oldThread, NULL) == 0);
-  TESTSTART
+  TESTSTART;
   (void) old_mutex_unlock(&ox1);
   sched_yield();
   (void) old_mutex_unlock(&ox2);
   (void) old_mutex_lock(&ox1);
   (void) old_mutex_lock(&ox2);
-  TESTSTOP
+  TESTSTOP;
   running = 0;
   assert(old_mutex_unlock(&ox1) == 0);
   assert(old_mutex_unlock(&ox2) == 0);
@@ -264,13 +270,13 @@ main (int argc, char *argv[])
   assert(old_mutex_lock(&ox2) == 0);
   running = 1;
   assert(pthread_create(&worker, NULL, oldThread, NULL) == 0);
-  TESTSTART
+  TESTSTART;
   (void) old_mutex_unlock(&ox1);
   sched_yield();
   (void) old_mutex_unlock(&ox2);
   (void) old_mutex_lock(&ox1);
   (void) old_mutex_lock(&ox2);
-  TESTSTOP
+  TESTSTOP;
   running = 0;
   assert(old_mutex_unlock(&ox1) == 0);
   assert(old_mutex_unlock(&ox2) == 0);

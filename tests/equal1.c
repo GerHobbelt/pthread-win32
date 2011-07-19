@@ -38,14 +38,19 @@
 
 #include "test.h"
 
-void * func(void * arg)
+static void * func(void * arg)
 {
   Sleep(2000);
   return 0;
 }
 
-int 
+#ifndef MONOLITHIC_PTHREAD_TESTS
+int
 main()
+#else 
+int
+test_equal1(void)
+#endif
 {
   pthread_t t1, t2;
 

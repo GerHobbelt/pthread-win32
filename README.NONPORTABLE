@@ -402,7 +402,7 @@ pthread_hash()
 A single more general purpose function could also be defined as a
 basis for at least the last two of the above functions.
 
-First we need to list the freedoms and constraints with restpect
+First we need to list the freedoms and constraints with respect
 to pthread_t so that we can be sure our solution is compatible with the
 standard.
 

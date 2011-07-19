@@ -45,8 +45,13 @@
 
 #include "test.h"
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main(int argc, char * argv[])
+main()
+#else 
+int
+test_self1(void)
+#endif
 {
 	/*
 	 * This should always succeed unless the system has no
@@ -54,7 +59,7 @@ main(int argc, char * argv[])
 	 */
 	pthread_t self;
 
-#if defined(PTW32_STATIC_LIB) && !(defined(_MSC_VER) || defined(__MINGW32__))
+#ifdef PTW32_STATIC_LIB
 	pthread_win32_process_attach_np();
 #endif
 
@@ -62,7 +67,7 @@ main(int argc, char * argv[])
 
 	assert(self.p != NULL);
 
-#if defined(PTW32_STATIC_LIB) && !(defined(_MSC_VER) || defined(__MINGW32__))
+#ifdef PTW32_STATIC_LIB
 	pthread_win32_process_detach_np();
 #endif
 	return 0;

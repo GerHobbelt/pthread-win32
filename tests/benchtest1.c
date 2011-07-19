@@ -7,25 +7,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -51,19 +51,20 @@
 #define PTW32_MUTEX_TYPES
 #define ITERATIONS      10000000L
 
-pthread_mutex_t mx;
-pthread_mutexattr_t ma;
-PTW32_STRUCT_TIMEB currSysTimeStart;
-PTW32_STRUCT_TIMEB currSysTimeStop;
-long durationMilliSecs;
-long overHeadMilliSecs = 0;
-int two = 2;
-int one = 1;
-int zero = 0;
-int iter;
+static pthread_mutex_t mx;
+static pthread_mutexattr_t ma;
+static PTW32_STRUCT_TIMEB currSysTimeStart;
+static PTW32_STRUCT_TIMEB currSysTimeStop;
+static long durationMilliSecs;
+static long overHeadMilliSecs = 0;
+static int two = 2;
+static int one = 1;
+static int zero = 0;
+static int iter;
 
-#define GetDurationMilliSecs(_TStart, _TStop) ((long)((_TStop.time*1000+_TStop.millitm) \
-                                               - (_TStart.time*1000+_TStart.millitm)))
+/* [i_a] */
+#define GetDurationMilliSecs(_TStart, _TStop) ((long)((_TStop.time*1000LL+_TStop.millitm) \
+                                               - (_TStart.time*1000LL+_TStart.millitm)))
 
 /*
  * Dummy use of j, otherwise the loop may be removed by the optimiser
@@ -76,7 +77,7 @@ int iter;
   }; PTW32_FTIME(&currSysTimeStop); if (j + k == i) j++; }
 
 
-void
+static void
 runTest (char * testNameString, int mType)
 {
 #ifdef PTW32_MUTEX_TYPES
@@ -84,10 +85,10 @@ runTest (char * testNameString, int mType)
 #endif
   assert(pthread_mutex_init(&mx, &ma) == 0);
 
-  TESTSTART
+  TESTSTART;
   assert((pthread_mutex_lock(&mx),1) == one);
   assert((pthread_mutex_unlock(&mx),2) == two);
-  TESTSTOP
+  TESTSTOP;
 
   assert(pthread_mutex_destroy(&mx) == 0);
 
@@ -100,8 +101,13 @@ runTest (char * testNameString, int mType)
 }
 
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main (int argc, char *argv[])
+main ()
+#else
+int
+test_benchtest1(void)
+#endif
 {
   int i = 0;
   CRITICAL_SECTION cs;
@@ -120,19 +126,19 @@ main (int argc, char *argv[])
   /*
    * Time the loop overhead so we can subtract it from the actual test times.
    */
-  TESTSTART
+  TESTSTART;
   assert(1 == one);
   assert(2 == two);
-  TESTSTOP
+  TESTSTOP;
 
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
   overHeadMilliSecs = durationMilliSecs;
 
 
-  TESTSTART
+  TESTSTART;
   assert((dummy_call(&i), 1) == one);
   assert((dummy_call(&i), 2) == two);
-  TESTSTOP
+  TESTSTOP;
 
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
 
@@ -142,10 +148,10 @@ main (int argc, char *argv[])
           (float) (durationMilliSecs * 1E3 / ITERATIONS));
 
 
-  TESTSTART
+  TESTSTART;
   assert((interlocked_inc_with_conditionals(&i), 1) == one);
   assert((interlocked_dec_with_conditionals(&i), 2) == two);
-  TESTSTOP
+  TESTSTOP;
 
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
 
@@ -155,10 +161,10 @@ main (int argc, char *argv[])
           (float) durationMilliSecs * 1E3 / ITERATIONS);
 
 
-  TESTSTART
+  TESTSTART;
   assert((InterlockedIncrement((LPLONG)&i), 1) == (LONG)one);
   assert((InterlockedDecrement((LPLONG)&i), 2) == (LONG)two);
-  TESTSTOP
+  TESTSTOP;
 
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
 
@@ -170,10 +176,10 @@ main (int argc, char *argv[])
 
   InitializeCriticalSection(&cs);
 
-  TESTSTART
+  TESTSTART;
   assert((EnterCriticalSection(&cs), 1) == one);
   assert((LeaveCriticalSection(&cs), 2) == two);
-  TESTSTOP
+  TESTSTOP;
 
   DeleteCriticalSection(&cs);
 
@@ -188,10 +194,10 @@ main (int argc, char *argv[])
   old_mutex_use = OLD_WIN32CS;
   assert(old_mutex_init(&ox, NULL) == 0);
 
-  TESTSTART
+  TESTSTART;
   assert(old_mutex_lock(&ox) == zero);
   assert(old_mutex_unlock(&ox) == zero);
-  TESTSTOP
+  TESTSTOP;
 
   assert(old_mutex_destroy(&ox) == 0);
 
@@ -206,10 +212,10 @@ main (int argc, char *argv[])
   old_mutex_use = OLD_WIN32MUTEX;
   assert(old_mutex_init(&ox, NULL) == 0);
 
-  TESTSTART
+  TESTSTART;
   assert(old_mutex_lock(&ox) == zero);
   assert(old_mutex_unlock(&ox) == zero);
-  TESTSTOP
+  TESTSTOP;
 
   assert(old_mutex_destroy(&ox) == 0);
 

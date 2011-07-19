@@ -43,14 +43,19 @@
 
 static int washere = 0;
 
-void * func(void * arg)
+static void * func(void * arg)
 {
   washere = 1;
   return 0; 
 }
  
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_create1(void)
+#endif
 {
   pthread_t t;
 

@@ -44,11 +44,11 @@
 
 #include "test.h"
  
-pthread_mutex_t mutex1 = PTHREAD_ERRORCHECK_MUTEX_INITIALIZER;
+static pthread_mutex_t mutex1 = PTHREAD_ERRORCHECK_MUTEX_INITIALIZER;
 
 static int washere = 0;
 
-void * func(void * arg)
+static void * func(void * arg)
 {
   assert(pthread_mutex_trylock(&mutex1) == EBUSY);
 
@@ -57,8 +57,13 @@ void * func(void * arg)
   return 0; 
 }
  
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_mutex3e(void)
+#endif
 {
   pthread_t t;
 

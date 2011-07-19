@@ -40,7 +40,7 @@
 
 #include "test.h"
 
-void *
+static void *
 func(void * arg)
 {
 	pthread_exit(arg);
@@ -51,14 +51,19 @@ func(void * arg)
 	return NULL;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main(int argc, char * argv[])
+main()
+#else 
+int
+test_exit2(void)
+#endif
 {
   pthread_t t;
 
   assert(pthread_create(&t, NULL, func, (void *) NULL) == 0);
 
-  Sleep(100);
+  Sleep(1000);
 
   return 0;
 }

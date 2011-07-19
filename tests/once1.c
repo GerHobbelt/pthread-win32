@@ -42,17 +42,17 @@
 
 #include "test.h"
 
-pthread_once_t once = PTHREAD_ONCE_INIT;
+static pthread_once_t once = PTHREAD_ONCE_INIT;
 
 static int washere = 0;
 
-void
+static void
 myfunc(void)
 {
   washere++;
 }
 
-void *
+static void *
 mythread(void * arg)
 {
    assert(pthread_once(&once, myfunc) == 0);
@@ -60,8 +60,13 @@ mythread(void * arg)
    return 0;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_once1(void)
+#endif
 {
   pthread_t t1, t2;
   

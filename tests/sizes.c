@@ -3,8 +3,13 @@
 #include "test.h"
 #include "../implement.h"
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else
+int
+test_sizes(void)
+#endif
 {
   printf("Sizes of pthreads-win32 structs\n");
   printf("-------------------------------\n");

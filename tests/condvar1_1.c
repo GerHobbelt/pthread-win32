@@ -83,8 +83,13 @@ enum {
 
 static pthread_cond_t cv[NUM_CV];
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_condvar1_1(void)
+#endif
 {
   int i, j;
 

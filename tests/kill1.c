@@ -74,8 +74,13 @@
 #include "test.h"
 
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_kill1(void)
+#endif
 {
   assert(pthread_kill(pthread_self(), 1) == EINVAL);
 

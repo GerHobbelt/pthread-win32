@@ -57,8 +57,13 @@ entry(void * arg)
   return arg;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_self2(void)
+#endif
 {
   pthread_t t;
 

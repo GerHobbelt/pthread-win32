@@ -40,11 +40,11 @@
 
 #include "test.h"
  
-pthread_spinlock_t lock = NULL;
+static pthread_spinlock_t lock = NULL;
 
 static int washere = 0;
 
-void * func(void * arg)
+static void * func(void * arg)
 {
   assert(pthread_spin_trylock(&lock) == EBUSY);
 
@@ -53,8 +53,13 @@ void * func(void * arg)
   return 0; 
 }
  
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_spin2(void)
+#endif
 {
   pthread_t t;
 

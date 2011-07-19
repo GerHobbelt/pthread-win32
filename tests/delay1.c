@@ -39,8 +39,13 @@
 
 #include "test.h"
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main(int argc, char * argv[])
+main()
+#else 
+int
+test_delay1(void)
+#endif
 {
   struct timespec interval = {1L, 500000000L};
 

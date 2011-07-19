@@ -44,12 +44,12 @@ enum {
   NUMTHREADS = 16
 };
  
-pthread_barrier_t barrier = NULL;
-pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;
+static pthread_barrier_t barrier = NULL;
+static pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;
 static int serialThreadCount = 0;
 static int otherThreadCount = 0;
 
-void *
+static void *
 func(void * arg)
 {
   int result = pthread_barrier_wait(&barrier);
@@ -75,8 +75,13 @@ func(void * arg)
   return NULL;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_barrier4(void)
+#endif
 {
   int i, j;
   pthread_t t[NUMTHREADS + 1];

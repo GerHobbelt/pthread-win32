@@ -80,8 +80,13 @@
 
 static pthread_cond_t cv = NULL;
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_condvar1(void)
+#endif
 {
   assert(cv == NULL);
 

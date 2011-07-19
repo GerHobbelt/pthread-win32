@@ -42,8 +42,13 @@
 
 pthread_spinlock_t lock;
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_spin1(void)
+#endif
 {
   assert(pthread_spin_init(&lock, PTHREAD_PROCESS_PRIVATE) == 0);
 

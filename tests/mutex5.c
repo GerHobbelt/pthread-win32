@@ -45,8 +45,13 @@ static pthread_mutexattr_t mxAttr;
 int _optimiseFoil;
 #define FOIL(x) (_optimiseFoil = x)
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_mutex5(void)
+#endif
 {
   int mxType = -1;
 

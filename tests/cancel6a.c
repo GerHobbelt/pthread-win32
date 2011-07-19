@@ -34,16 +34,16 @@
  * -
  *
  * Features Tested:
- * - 
+ * -
  *
  * Cases Tested:
- * - 
+ * -
  *
  * Description:
- * - 
+ * -
  *
  * Environment:
- * - 
+ * -
  *
  * Input:
  * - None.
@@ -82,7 +82,7 @@ struct bag_t_ {
 
 static bag_t threadbag[NUMTHREADS + 1];
 
-void *
+static void *
 mythread(void * arg)
 {
   void* result = (void*)((int)(size_t)PTHREAD_CANCELED + 1);
@@ -108,8 +108,13 @@ mythread(void * arg)
   return result;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else
+int
+test_cancel6a(void)
+#endif
 {
   int failed = 0;
   int i;

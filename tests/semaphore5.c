@@ -75,7 +75,7 @@
 
 #include "test.h"
 
-void *
+static void *
 thr(void * arg)
 {
   assert(sem_post((sem_t *)arg) == 0);
@@ -84,8 +84,13 @@ thr(void * arg)
 }
 
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_semaphore5(void)
+#endif
 {
   pthread_t t;
   sem_t s;

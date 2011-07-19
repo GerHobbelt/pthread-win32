@@ -7,25 +7,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -36,22 +36,22 @@
  * Test Synopsis: Test asynchronous cancelation (alertable or non-alertable).
  *
  * Test Method (Validation or Falsification):
- * - 
+ * -
  *
  * Requirements Tested:
  * - Async cancel if thread is not blocked (i.e. voluntarily resumes if blocked).
  *
  * Features Tested:
- * - 
+ * -
  *
  * Cases Tested:
- * - 
+ * -
  *
  * Description:
- * - 
+ * -
  *
  * Environment:
- * - 
+ * -
  *
  * Input:
  * - None.
@@ -93,7 +93,7 @@ struct bag_t_
 
 static bag_t threadbag[NUMTHREADS + 1];
 
-void *
+static void *
 mythread (void *arg)
 {
   void* result = (void*)((int)(size_t)PTHREAD_CANCELED + 1);
@@ -119,8 +119,13 @@ mythread (void *arg)
   return result;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main ()
+main()
+#else
+int
+test_cancel3(void)
+#endif
 {
   int failed = 0;
   int i;
@@ -139,7 +144,7 @@ main ()
   /*
    * Code to control or munipulate child threads should probably go here.
    */
-  Sleep (NUMTHREADS * 100);
+  Sleep (500);
 
   for (i = 1; i <= NUMTHREADS; i++)
     {

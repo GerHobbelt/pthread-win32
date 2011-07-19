@@ -50,7 +50,7 @@ static int lockCount = 0;
 
 static pthread_mutex_t mutex;
 
-void * locker(void * arg)
+static void * locker(void * arg)
 {
   assert(pthread_mutex_lock(&mutex) == 0);
   lockCount++;
@@ -63,8 +63,13 @@ void * locker(void * arg)
   return 0;
 }
  
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_mutex6(void)
+#endif
 {
   pthread_t t;
 
@@ -86,8 +91,5 @@ main()
 
   assert(lockCount == 2);
 
-  exit(0);
-
-  /* Never reached */
   return 0;
 }

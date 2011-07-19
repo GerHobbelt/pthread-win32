@@ -73,8 +73,13 @@
 
 #include "test.h"
  
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_valid2(void)
+#endif
 {
   pthread_t NullThread = PTW32_THREAD_NULL_ID;
 

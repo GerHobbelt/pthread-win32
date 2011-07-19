@@ -89,9 +89,9 @@ struct bag_t_ {
 
 static bag_t threadbag[NUMTHREADS + 1];
 
-pthread_mutex_t stop_here = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t stop_here = PTHREAD_MUTEX_INITIALIZER;
 
-void *
+static void *
 mythread(void * arg)
 {
   bag_t * bag = (bag_t *) arg;
@@ -115,8 +115,13 @@ mythread(void * arg)
   return 0;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_errno1(void)
+#endif
 {
   int failed = 0;
   int i;

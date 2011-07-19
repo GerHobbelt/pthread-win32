@@ -86,7 +86,7 @@ enum {
 
 static long done = 0;
 
-void * func(void * arg)
+static void * func(void * arg)
 {
   sched_yield();
 
@@ -95,8 +95,13 @@ void * func(void * arg)
   return (void *) 0; 
 }
  
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_reuse2(void)
+#endif
 {
   pthread_t t[NUMTHREADS];
   pthread_attr_t attr;
@@ -105,17 +110,36 @@ main()
 	       totalHandles = 0,
 	       reuseMax = 0,
 	       reuseMin = NUMTHREADS;
+  int actual_count = NUMTHREADS;
 
   assert(pthread_attr_init(&attr) == 0);
   assert(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED) == 0);
 
-  for (i = 0; i < NUMTHREADS; i++)
+  /*
+     [i_a] when running this code from the MSVC2005 debugger, the number of successfully created
+	 threads is lower than the initially configured 10K: 3132 on this system...
+
+	 Hence the stupid heuristics in there...
+   */
+  for (i = 0; i < actual_count; i++)
     {
-      while(pthread_create(&t[i], &attr, func, NULL) != 0)
-        Sleep(1);
+		int ret = pthread_create(&t[i], &attr, func, NULL);
+		if (i <= 2048)
+		{
+			assert(ret == 0);
+		}
+		else if (ret == EAGAIN)
+		{
+			actual_count = i;
+			break;
+		}
+		else
+		{
+			assert(ret == 0);
+		}
     }
 
-  while (NUMTHREADS > InterlockedExchangeAdd((LPLONG)&done, 0L))
+  while (actual_count > InterlockedExchangeAdd((LPLONG)&done, 0L))
     Sleep(100);
 
   Sleep(100);
@@ -124,19 +148,20 @@ main()
    * Analyse reuse by computing min and max number of times pthread_create()
    * returned the same pthread_t value.
    */
-  for (i = 0; i < NUMTHREADS; i++)
+  for (i = 0; i < actual_count; i++)
     {
       if (t[i].p != NULL)
         {
-          unsigned int j, thisMax;
+          int j;
+		  unsigned int thisMax;
 
           thisMax = t[i].x;
 
-          for (j = i+1; j < NUMTHREADS; j++)
+          for (j = i+1; j < actual_count; j++)
             if (t[i].p == t[j].p)
               {
-		if (t[i].x == t[j].x)
-		  notUnique++;
+				if (t[i].x == t[j].x)
+				  notUnique++;
                 if (thisMax < t[j].x)
                   thisMax = t[j].x;
                 t[j].p = NULL;
@@ -150,15 +175,19 @@ main()
         }
     }
 
-  for (i = 0; i < NUMTHREADS; i++)
+  for (i = 0; i < actual_count; i++)
+  {
     if (t[i].p != NULL)
-      totalHandles++;
+	{
+		totalHandles++;
+	}
+  }
 
   /*
    * pthread_t reuse counts start at 0, so we need to add 1
    * to the max and min values derived above.
    */
-  printf("For %d total threads:\n", NUMTHREADS);
+  printf("For %d total threads:\n", actual_count);
   printf("Non-unique IDs = %d\n", notUnique);
   printf("Reuse maximum  = %d\n", reuseMax + 1);
   printf("Reuse minimum  = %d\n", reuseMin + 1);

@@ -38,8 +38,13 @@
 
 #include "test.h"
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main(int argc, char * argv[])
+main()
+#else 
+int
+test_exit1(void)
+#endif
 {
 	/* A simple test first. */
 	pthread_exit((void *) 0);

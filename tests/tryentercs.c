@@ -41,12 +41,22 @@
 #include <process.h>
 #include <stdio.h>
 
+
+/* [i_a] */
+#ifndef WINBASEAPI
+#define WINBASEAPI
+#endif
+#ifndef WINAPI
+#define WINAPI
+#endif
+typedef WINBASEAPI BOOL WINAPI TryEnterCriticalSection_f(LPCRITICAL_SECTION lpCriticalSection);
+
+
 /*
  * Function pointer to TryEnterCriticalSection if it exists
  * - otherwise NULL
  */
-BOOL (WINAPI *_try_enter_critical_section)(LPCRITICAL_SECTION) =
-NULL;
+static TryEnterCriticalSection_f *_try_enter_critical_section = NULL;
 
 /*
  * Handle to kernel32.dll
@@ -54,8 +64,14 @@ NULL;
 static HINSTANCE _h_kernel32;
 
 
+
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_tryentercs(void)
+#endif
 {
   CRITICAL_SECTION cs;
 
@@ -68,7 +84,7 @@ main()
    */
   _h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
   _try_enter_critical_section =
-        (BOOL (PT_STDCALL *)(LPCRITICAL_SECTION))
+        (TryEnterCriticalSection_f *)
         GetProcAddress(_h_kernel32,
                          (LPCSTR) "TryEnterCriticalSection");
 

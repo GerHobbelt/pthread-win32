@@ -55,8 +55,13 @@ myfunc(void *arg)
   Sleep(1000);
   return 0;
 }
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_count1(void)
+#endif
 {
   int i;
   int maxThreads = sizeof(threads) / sizeof(pthread_t);

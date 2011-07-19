@@ -7,25 +7,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -36,22 +36,22 @@
  * Test Synopsis: Test running of user supplied terminate() function.
  *
  * Test Method (Validation or Falsification):
- * - 
+ * -
  *
  * Requirements Tested:
  * -
  *
  * Features Tested:
- * - 
+ * -
  *
  * Cases Tested:
- * - 
+ * -
  *
  * Description:
- * - 
+ * -
  *
  * Environment:
- * - 
+ * -
  *
  * Input:
  * - None.
@@ -93,10 +93,10 @@ enum {
   NUMTHREADS = 1
 };
 
-int caught = 0;
-pthread_mutex_t caughtLock;
+static int caught = 0;
+static pthread_mutex_t caughtLock;
 
-void
+static void
 terminateFunction ()
 {
   assert(pthread_mutex_lock(&caughtLock) == 0);
@@ -125,7 +125,7 @@ terminateFunction ()
   exit(0);
 }
 
-void *
+static void *
 exceptionedThread(void * arg)
 {
   int dummy = 0x1;
@@ -137,8 +137,13 @@ exceptionedThread(void * arg)
   return (void *) 0;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else
+int
+test_exception3(void)
+#endif
 {
   int i;
   pthread_t mt;
@@ -159,7 +164,7 @@ main()
       assert(pthread_create(&et[i], NULL, exceptionedThread, NULL) == 0);
     }
 
-  Sleep(NUMTHREADS * 100);
+  Sleep(5000);
 
   assert(caught == NUMTHREADS);
 
@@ -173,8 +178,13 @@ main()
 
 #include <stdio.h>
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else
+int
+test_exception3(void)
+#endif
 {
   fprintf(stderr, "Test N/A for this compiler environment.\n");
   return 0;

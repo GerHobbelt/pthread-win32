@@ -75,9 +75,9 @@
 
 #define MAX_COUNT 100
 
-sem_t s;
+static sem_t s;
 
-void *
+static void *
 thr (void * arg)
 {
   assert(sem_wait(&s) == 0);
@@ -85,8 +85,13 @@ thr (void * arg)
   return NULL;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_semaphore3(void)
+#endif
 {
 	int value = 0;
 	int i;
