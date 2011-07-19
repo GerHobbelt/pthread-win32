@@ -9,16 +9,17 @@ enum {
   Size = 10000
 };
 
-const int  ShouldSum = (Size-1)*Size/2;
+static const int  ShouldSum = (Size-1)*Size/2;
 
-short Verbose = 1;
+static short Verbose = 1;
 
-short ThreadOK[3] = {0,0,0}; // Main, Thread1, Thread2
+static short ThreadOK[3] = {0,0,0}; // Main, Thread1, Thread2
 
 // Thread
-void *_thread(void* Id) {
+static void *_thread(void* Id) {
   int i;
   int x[Size];
+  int Sum;
 
 #ifdef _OPENMP
 #  pragma omp parallel for
@@ -35,7 +36,7 @@ void *_thread(void* Id) {
     x[i] = i;
   }
 
-  int Sum=0;
+  Sum=0;
   for ( i = 0; i < Size; i++ ) {
     Sum += x[i];
   }
@@ -50,7 +51,7 @@ void *_thread(void* Id) {
 }
 
 // MainThread
-void MainThread() {
+static void MainThread() {
   int i;
 
 #ifdef _OPENMP
@@ -71,7 +72,15 @@ void MainThread() {
 #define SPAWN_THREADS
 
 // main
-int main(int argc, char *argv[]) {
+#ifndef MONOLITHIC_PTHREAD_TESTS
+int
+main(int argc, char *argv[])
+#else
+int
+test_openmp1(int argc, char *argv[])
+#endif
+{
+  short OK;
 
   if (argc>1) Verbose = 1;
 
@@ -87,6 +96,9 @@ int main(int argc, char *argv[]) {
     pthread_t a_thr;
     pthread_t b_thr;
     int status;
+
+	memset(&a_thr, 0, sizeof(a_thr)); /* [i_a] fix valid MSVC complaint about unitialized a_thr / b_thr */
+	memset(&b_thr, 0, sizeof(b_thr)); /* [i_a] fix valid MSVC complaint about unitialized a_thr / b_thr */
 
     printf("%s:%d - %s - a_thr:%p - b_thr:%p\n",
            __FILE__,__LINE__,__FUNCTION__,a_thr.p,b_thr.p);
@@ -119,7 +131,7 @@ int main(int argc, char *argv[]) {
   }
 #endif // SPAWN_THREADS
 
-  short OK = 0;
+  OK = 0;
   // Check that we have OpenMP before declaring things OK formally.
 #ifdef _OPENMP
     OK = 1;
