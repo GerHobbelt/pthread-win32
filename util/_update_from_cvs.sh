@@ -1,6 +1,6 @@
 #! /bin/bash
 
-pushd .
+pushd ..
 
 mkdir cvs
 cd cvs
