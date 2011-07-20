@@ -99,11 +99,7 @@ typedef struct {
 
 static sharedInt_t pop_count = {0, {0}};
 
-static void
-#ifdef __CLEANUP_C
-__cdecl
-#endif
-increment_pop_count(void * arg)
+static void PTW32_CDECL increment_pop_count(void * arg)  /* [i_a] matches type ptw32_cleanup_callback_t this way */
 {
   sharedInt_t * sI = (sharedInt_t *) arg;
 

@@ -99,7 +99,7 @@ typedef struct {
 
 static sharedInt_t pop_count = {0, {0}};
 
-static void
+static void PTW32_CDECL
 increment_pop_count(void * arg)
 {
   sharedInt_t * sI = (sharedInt_t *) arg;
