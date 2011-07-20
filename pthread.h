@@ -5,25 +5,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -755,7 +755,7 @@ struct ptw32_cleanup_t
         { \
             ptw32_cleanup_t     _cleanup; \
             \
-        _cleanup.routine        = (ptw32_cleanup_callback_t)(_rout); \
+        _cleanup.routine        = _rout; \
             _cleanup.arg        = (_arg); \
             __try \
               { \
@@ -783,7 +783,7 @@ struct ptw32_cleanup_t
         { \
             ptw32_cleanup_t     _cleanup; \
             \
-            ptw32_push_cleanup( &_cleanup, (ptw32_cleanup_callback_t) (_rout), (_arg) ); \
+            ptw32_push_cleanup( &_cleanup, _rout, (_arg) ); \
 
 #define pthread_cleanup_pop( _execute ) \
             (void) ptw32_pop_cleanup( _execute ); \
@@ -860,7 +860,7 @@ struct ptw32_cleanup_t
          */
 #define pthread_cleanup_push( _rout, _arg ) \
         { \
-            PThreadCleanup  cleanup((ptw32_cleanup_callback_t)(_rout), \
+            PThreadCleanup  cleanup(_rout, \
                                     (void *) (_arg) );
 
 #define pthread_cleanup_pop( _execute ) \
@@ -1114,7 +1114,7 @@ PTW32_DLLPORT int PTW32_CDECL pthread_getschedparam (pthread_t thread,
                                    struct sched_param *param);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_setconcurrency (int);
- 
+
 PTW32_DLLPORT int PTW32_CDECL pthread_getconcurrency (void);
 
 /*
