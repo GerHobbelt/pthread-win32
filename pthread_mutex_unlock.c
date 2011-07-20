@@ -81,6 +81,10 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 		        }
 		    }
 	        }
+	      else	/* [i_a] when unlocking an unlocked mutex, pthread_mutex_unlock() should always produce EPERM for any type of mutex -- see test mutex7.c */
+	        {
+	          result = EPERM;
+	        }
 	    }
           else
 	    {
