@@ -1180,6 +1180,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sequence2.c"
+				>
+			</File>
+			<File
 				RelativePath=".\sizes.c"
 				>
 			</File>

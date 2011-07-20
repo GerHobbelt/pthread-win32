@@ -97,7 +97,16 @@ ptw32_processTerminate (void)
 	  tp = tpNext;
 	}
 
+	  ptw32_threadReuseTop = PTW32_THREAD_REUSE_EMPTY;
+	  ptw32_threadReuseBottom = PTW32_THREAD_REUSE_EMPTY;
+
       ptw32_mcs_lock_release(&node);
+
+	  /* ptw32_cond_list_head = NULL; */
+	  /* ptw32_cond_list_tail = NULL; */
+
+	  /* reset the thread sequence number. */
+	  ptw32_threadSeqNumber = 0;
 
       ptw32_processInitialized = PTW32_FALSE;
     }
