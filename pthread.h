@@ -71,7 +71,25 @@
  * POSIX threads implementations.
  */
 #if !defined( __CLEANUP_SEH ) && !defined( __CLEANUP_CXX ) && !defined( __CLEANUP_C )
-# define __CLEANUP_C
+/*
+   [i_a] fix for apps using pthreads-Win32: when they do not define __CLEANUP_SEH themselves,
+         they're screwed as they'll receive the '__CLEANUP_C' macros which do NOT work when
+		 the pthreads library code itself has actually been build with __CLEANUP_SEH,
+		 which is the case when building this stuff in MSVC.
+
+		 Hence this section is made to 'sensibly autodetect' the cleanup mode, when it hasn't
+		 been hardwired in the makefiles / project files.
+
+		 After all, who expects he MUST define one of these __CLEANUP_XXX defines in his own
+		 code when using pthreads-Win32, for whatever reason.
+ */
+#if (defined(_MSC_VER) || defined(PTW32_RC_MSC))
+#define __CLEANUP_SEH
+#elif defined(__cplusplus)
+#define __CLEANUP_CXX
+#else
+#define __CLEANUP_C
+#endif
 #endif
 
 #if defined( __CLEANUP_SEH ) && ( !defined( _MSC_VER ) && !defined(PTW32_RC_MSC))
