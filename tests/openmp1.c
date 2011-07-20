@@ -142,6 +142,7 @@ test_openmp1(int argc, char *argv[])
     if (OK) printf("OMP : All looks good\n");
     else printf("OMP : Error\n");
 #else
+    OK = 1;
     printf("OpenMP seems not enabled ...\n");
 #endif
 

@@ -113,7 +113,7 @@ test_reuse1(void)
     {
       washere = 0;
       assert(pthread_create(&t, &attr, func, (void *)(size_t)i) == 0);
-	  assert(pthread_join(t, &result) == 0);      // pthread_join(t, &result);
+	  assert(pthread_join(t, &result) == 0);
       assert((int)(size_t) result == i);
       assert(washere == 1);
       /* thread IDs should be unique */

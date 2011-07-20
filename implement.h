@@ -630,8 +630,6 @@ extern "C"
 
   void ptw32_threadReusePush (pthread_t thread);
 
-  PTW32_DLLPORT void PTW32_CDECL ptw32_threadCleanReuseCache(void);
-
   int ptw32_getprocessors (int *count);
 
   int ptw32_setthreadpriority (pthread_t thread, int policy, int priority);
