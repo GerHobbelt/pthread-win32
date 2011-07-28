@@ -36,9 +36,8 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
-				Description="copy $(TargetFileName) to bin\$(PlatformName)_MSVC2008.$(ConfigurationName) directory"
-				CommandLine="if not exist &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot; mkdir &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
-				Outputs="$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -130,9 +129,8 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
-				Description="copy $(TargetFileName) to bin\$(PlatformName)_MSVC2008.$(ConfigurationName) directory"
-				CommandLine="if not exist &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot; mkdir &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
-				Outputs="$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -225,9 +223,8 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
-				Description="copy $(TargetFileName) to bin\$(PlatformName)_MSVC2008.$(ConfigurationName) directory"
-				CommandLine="if not exist &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot; mkdir &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
-				Outputs="$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -319,9 +316,8 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
-				Description="copy $(TargetFileName) to bin\$(PlatformName)_MSVC2008.$(ConfigurationName) directory"
-				CommandLine="if not exist &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot; mkdir &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
-				Outputs="$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -414,9 +410,8 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
-				Description="copy $(TargetFileName) to bin\$(PlatformName)_MSVC2008.$(ConfigurationName) directory"
-				CommandLine="if not exist &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot; mkdir &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
-				Outputs="$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -509,9 +504,8 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
-				Description="copy $(TargetFileName) to bin\$(PlatformName)_MSVC2008.$(ConfigurationName) directory"
-				CommandLine="if not exist &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot; mkdir &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
-				Outputs="$(SolutionDir)bin\$(PlatformName)_MSVC2008.$(ConfigurationName)\$(TargetFileName)"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
