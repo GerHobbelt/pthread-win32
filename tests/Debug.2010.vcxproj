@@ -129,11 +129,10 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
+      <Command>
+      </Command>
+      <Outputs>%(Outputs)</Outputs>
+      <Inputs>%(Inputs)</Inputs>
     </CustomBuildStep>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -144,10 +143,12 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BrowseInformation>true</BrowseInformation>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -174,11 +175,10 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
+      <Command>
+      </Command>
+      <Outputs>%(Outputs)</Outputs>
+      <Inputs>%(Inputs)</Inputs>
     </CustomBuildStep>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -194,10 +194,12 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BrowseInformation>true</BrowseInformation>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -224,11 +226,10 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">
     <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
+      <Command>
+      </Command>
+      <Outputs>%(Outputs)</Outputs>
+      <Inputs>%(Inputs)</Inputs>
     </CustomBuildStep>
     <Midl>
       <TargetEnvironment>Itanium</TargetEnvironment>
@@ -244,10 +245,12 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BrowseInformation>true</BrowseInformation>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -271,11 +274,10 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
+      <Command>
+      </Command>
+      <Outputs>%(Outputs)</Outputs>
+      <Inputs>%(Inputs)</Inputs>
     </CustomBuildStep>
     <Midl>
       <HeaderFileName>
@@ -294,8 +296,9 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -320,11 +323,10 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
+      <Command>
+      </Command>
+      <Outputs>%(Outputs)</Outputs>
+      <Inputs>%(Inputs)</Inputs>
     </CustomBuildStep>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -344,8 +346,9 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -370,11 +373,10 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">
     <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
+      <Command>
+      </Command>
+      <Outputs>%(Outputs)</Outputs>
+      <Inputs>%(Inputs)</Inputs>
     </CustomBuildStep>
     <Midl>
       <TargetEnvironment>Itanium</TargetEnvironment>
@@ -394,8 +396,9 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
