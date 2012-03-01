@@ -75,6 +75,9 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #include <limits.h>
 #endif
 
+/* _tcsncat_s() et al: mapping to the correct TCHAR prototypes: */
+#include <tchar.h>
+
 /* use local include files during development */
 #include "semaphore.h"
 #include "sched.h"
@@ -94,10 +97,10 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #define PTW32_INTERLOCKED_VOLATILE volatile
 #endif
 #define PTW32_INTERLOCKED_LONG long
-#define PTW32_INTERLOCKED_SIZE size_t
+#define PTW32_INTERLOCKED_SIZE LONG
 #define PTW32_INTERLOCKED_PVOID PVOID
 #define PTW32_INTERLOCKED_LONGPTR PTW32_INTERLOCKED_VOLATILE long*
-#define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE size_t*
+#define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE LONG*
 #define PTW32_INTERLOCKED_PVOID_PTR PTW32_INTERLOCKED_VOLATILE PVOID*
 
 #if defined(__MINGW64__) || defined(__MINGW32__)
