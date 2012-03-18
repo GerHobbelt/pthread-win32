@@ -1,3 +1,20 @@
+2012-03-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* create.c (pthread_create): add __cdecl attribute to thread routine
+	arg
+	* implement.h (pthread_key_t): add __cdecl attribute to destructor
+	element
+	(ThreadParms): likewise for start element
+	* pthread.h (pthread_create): add __cdecl to prototype start arg
+	(pthread_once): likewise for init_routine arg
+	(pthread_key_create): likewise for destructor arg
+	(ptw32_cleanup_push): replace type of routine arg with previously
+	defined ptw32_cleanup_callback_t
+	* pthread_key_create.c: add __cdecl attribute to destructor arg
+	* pthread_once.c: add __cdecl attribute to init_routine arg
+	* ptw32_threadStart.c (start): add __cdecl to start variable type
+
+
 2011-07-06  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_cond_wait.c (pragma inline_depth): this is almost redundant

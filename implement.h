@@ -329,7 +329,7 @@ struct pthread_barrierattr_t_
 struct pthread_key_t_
 {
   DWORD key;
-  void (*destructor) (void *);
+  void (PTW32_CDECL *destructor) (void *);
   ptw32_mcs_lock_t keyLock;
   void *threads;
 };
@@ -340,7 +340,7 @@ typedef struct ThreadParms ThreadParms;
 struct ThreadParms
 {
   pthread_t tid;
-  void *(*start) (void *);
+  void *(PTW32_CDECL *start) (void *);
   void *arg;
 };
 
