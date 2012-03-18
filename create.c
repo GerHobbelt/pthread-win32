@@ -44,7 +44,7 @@
 int
 pthread_create (pthread_t * tid,
 		const pthread_attr_t * attr,
-		void *(*start) (void *), void *arg)
+		void *(PTW32_CDECL *start) (void *), void *arg)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC

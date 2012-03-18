@@ -939,7 +939,7 @@ PTW32_DLLPORT int PTW32_CDECL pthread_attr_getscope (const pthread_attr_t *,
  */
 PTW32_DLLPORT int PTW32_CDECL pthread_create (pthread_t * tid,
                             const pthread_attr_t * attr,
-                            void *(*start) (void *),
+                            void *(PTW32_CDECL *start) (void *),
                             void *arg);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_detach (pthread_t tid);
@@ -965,13 +965,13 @@ PTW32_DLLPORT int PTW32_CDECL pthread_setcanceltype (int type,
 PTW32_DLLPORT void PTW32_CDECL pthread_testcancel (void);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_once (pthread_once_t * once_control,
-                          void (*init_routine) (void));
+                          void (PTW32_CDECL *init_routine) (void));
 
 #if PTW32_LEVEL >= PTW32_LEVEL_MAX
 PTW32_DLLPORT ptw32_cleanup_t * PTW32_CDECL ptw32_pop_cleanup (int execute);
 
 PTW32_DLLPORT void PTW32_CDECL ptw32_push_cleanup (ptw32_cleanup_t * cleanup,
-                                 void (*routine) (void *),
+                                 ptw32_cleanup_callback_t routine,
                                  void *arg);
 #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
@@ -979,7 +979,7 @@ PTW32_DLLPORT void PTW32_CDECL ptw32_push_cleanup (ptw32_cleanup_t * cleanup,
  * Thread Specific Data Functions
  */
 PTW32_DLLPORT int PTW32_CDECL pthread_key_create (pthread_key_t * key,
-                                void (*destructor) (void *));
+                                void (PTW32_CDECL *destructor) (void *));
 
 PTW32_DLLPORT int PTW32_CDECL pthread_key_delete (pthread_key_t key);
 

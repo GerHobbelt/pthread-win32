@@ -209,7 +209,7 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
 	  return;
 	}
   
-      /* wait for successor */
+      /* A successor has started enqueueing behind us so wait for them to link to us */
       ptw32_mcs_flag_wait(&node->nextFlag);
       next = (ptw32_mcs_local_node_t *)
 	PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE((PTW32_INTERLOCKED_SIZEPTR)&node->next, (PTW32_INTERLOCKED_SIZE)0); /* MBR fence */

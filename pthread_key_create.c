@@ -44,7 +44,7 @@
 #endif
 
 int
-pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
+pthread_key_create (pthread_key_t * key, void (PTW32_CDECL *destructor) (void *))
      /*
       * ------------------------------------------------------
       * DOCPUBLIC

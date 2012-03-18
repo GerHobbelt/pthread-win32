@@ -46,6 +46,10 @@ MAKE	= make -k
 # # make CROSS=i386-mingw32msvc- clean GC
 CROSS   =
 
+# For cross testing use e.g.
+# # make RUN=wine CROSS=i386-mingw32msvc- clean GC
+RUN     =
+
 AR      = $(CROSS)ar
 DLLTOOL = $(CROSS)dlltool
 CC      = $(CROSS)gcc
@@ -380,20 +384,20 @@ valid2.pass: valid1.pass
 
 sizes.pass: sizes.exe
 	@ $(ECHO) Running $*
-	./$< > SIZES.$(TEST)
+	@ $(RUN) ./$< > SIZES.$(TEST)
 	@ $(CAT) SIZES.$(TEST)
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
 %.pass: %.exe
 	@ $(ECHO) Running $*
-	./$*
+	@ $(RUN) ./$*
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
 %.bench: $(LIB) $(DLL) $(HDR) $(QAPC) $(XXLIBS) %.exe
 	@ $(ECHO) Running $*
-	./$*
+	@ $(RUN) ./$*
 	@ $(ECHO) Done
 	@ $(TOUCH) $@
 
