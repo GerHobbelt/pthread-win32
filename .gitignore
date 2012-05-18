@@ -6,5 +6,5 @@ cvs
 *.a
 *.lo
 *.la
-*.vcproj.user
+*.user
 
