@@ -1,43 +1,39 @@
-CURRENT CVS HEAD Version
-RELEASE 2.9.0 pending
+RELEASE 2.9.0
 -------------
-(2011-??-??)
+(2012-05-25)
 
 General
 -------
 New bug fixes in this release since 2.8.0 have NOT been applied to the
 1.x.x series.
 
-Version 2.8.0 may be the last release for some older Windows systems.
 Some changes post 2011-02-26 in CVS may not be compatible with pre
 Windows 2000 systems.
 
-Version 1 no longer maintained
-------------------------------
-The 1.x.x series is no longer maintained. However, if you really need a
-version 1, the differences between 1.11.0 and 2.7.0 are very small, mainly
-revolving around the pthread_once_t_ struct. Those differences applied
-as a patch to the current 2.x.x should work. Don't forget to change
-the version numbering in pthread.h before building. If you distribute
-such a version 1.x.x please bear in mind that your numbers may clash
-with those of others doing the same thing. Please consider also making
-identifying changes in version.rc to differentiate your build.
+Use of other than the "C" version of the library is now discouraged.
+That is, the "C++" version fails some tests and does not provide any
+additional functionality.
 
 Testing and verification
 ------------------------
-The current CVS head version has been tested on an SMP architecture
-(AMD Phenom 9750 Quad Core) by running the MinGW32 (GCC) builds against
-the full test suite, stress tests and benchmarks.
+This version has been tested on SMP architecture (Intel x64 Hex Core)
+by completing the included test suite, stress and bench tests.
 
 New Features
 ------------
+DLL properties now properly includes the target architecture, i.e.
+right-click on the file pthreadVC2.dll in explorer and choose the Detail
+tab will show the compiler and architecture in the description field, e.g.
+"MS C x64" or "MS C x86".
+- Ross Johnson
+
 (MSC and GNU builds) The statically linked library now automatically
 initialises and cleans up on program start/exit, i.e. statically linked
 applications need not call the routines pthread_win32_process_attach_np()
 and pthread_win32_process_detach_np() explicitly. The per-thread routine
 pthread_win32_thread_detach_np() is also called at program exit to cleanup
-POSIX resources acquired by the primary Windows native thread (if I (RJ)
-understand the process correctly). Other Windows native threads that call
+POSIX resources acquired by the primary Windows native thread, if I (RJ)
+understand the process correctly. Other Windows native threads that call
 POSIX API routines may need to call the thread detach routine on thread
 exit if the application depends on reclaimed POSIX resources or running
 POSIX TSD (TLS) destructors.

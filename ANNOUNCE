@@ -1,8 +1,8 @@
-	     PTHREADS-WIN32 RELEASE 2.9.0 (2007-??-??)
-	     -----------------------------------------
-	 Web Site: http://sources.redhat.com/pthreads-win32/
-	FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
-	 Maintainer: Ross Johnson <rpj@callisto.canberra.edu.au>
+PTHREADS-WIN32 RELEASE 2.9.0 (2012-05-25)
+-----------------------------------------
+Web Site: http://sourceware.org/pthreads-win32/
+FTP Site: ftp://sourceware.org/pub/pthreads-win32
+Maintainer: Ross Johnson <ross.johnson@loungebythelake.net>
 
 
 We are pleased to announce the availability of a new release of
@@ -23,7 +23,7 @@ General Public License (LGPL).
 Acknowledgements
 ----------------
 This library is based originally on a Win32 pthreads
-implementation contributed by John Bossom <John.Bossom@cognos.com>.
+implementation contributed by John Bossom.
 
 The implementation of Condition Variables uses algorithms developed
 by Alexander Terekhov and Louis Thomas.
@@ -50,7 +50,7 @@ were extracted from it.
 There is also a separate CONTRIBUTORS file. This file and others are
 on the web site:
 
-	http://sources.redhat.com/pthreads-win32
+	http://sourceware.org/pthreads-win32
 
 As much as possible, the ChangeLog file acknowledges contributions to the
 code base in more detail.
@@ -274,14 +274,15 @@ The following functions are implemented:
 						PTHREAD_MUTEX_ADAPTIVE_NP,
 						PTHREAD_MUTEX_TIMED_NP)
       pthread_num_processors_np
-      pthread_win32_process_attach_np	(Required when statically linking
-                                         the library)
-      pthread_win32_process_detach_np	(Required when statically linking
-                                         the library)
-      pthread_win32_thread_attach_np	(Required when statically linking
-                                         the library)
-      pthread_win32_thread_detach_np	(Required when statically linking
-                                         the library)
+      (The following four routines may be required when linking statically.
+       The process_* routines should not be needed for MSVC or GCC.)
+      pthread_win32_process_attach_np
+      pthread_win32_process_detach_np
+      (The following routines should only be needed to manage implicit
+       POSIX handles i.e. when Win native threads call POSIX thread routines
+       (other than pthread_create))
+      pthread_win32_thread_attach_np
+      pthread_win32_thread_detach_np
 
       ---------------------------
       Static Initializers
