@@ -46,6 +46,10 @@ MAKE	= make -k
 # # make CROSS=i386-mingw32msvc- clean GC
 CROSS   =
 
+# For cross testing use e.g.
+# # make RUN=wine CROSS=i386-mingw32msvc- clean GC
+RUN     =
+
 AR      = $(CROSS)ar
 DLLTOOL = $(CROSS)dlltool
 CC      = $(CROSS)gcc
@@ -91,7 +95,7 @@ TESTS	= \
 	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
-	  create1 create2 reuse1 reuse2 equal1 \
+	  create1 create2 create3 reuse1 reuse2 equal1 \
 	  sequence1 kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
 	  join0 join1 detach1 join2 join3 \
@@ -130,7 +134,7 @@ STATICTESTS = \
 	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
-	  create1 create2 reuse1 reuse2 equal1 \
+	  create1 create2 create3 reuse1 reuse2 equal1 \
 	  sequence1 kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
 	  join0 join1 detach1 join2 join3 \
@@ -282,6 +286,7 @@ context1.pass: cancel1.pass
 count1.pass: join1.pass
 create1.pass: mutex2.pass
 create2.pass: create1.pass
+create3.pass: create2.pass
 delay1.pass:
 delay2.pass: delay1.pass
 detach1.pass: join0.pass
@@ -337,7 +342,7 @@ once4.pass: once3.pass
 openmp1.pass: tsd2.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass barrier3.pass
-reuse1.pass: create2.pass
+reuse1.pass: create3.pass
 reuse2.pass: reuse1.pass
 robust1.pass: mutex8r.pass
 robust2.pass: mutex8r.pass
@@ -380,20 +385,20 @@ valid2.pass: valid1.pass
 
 sizes.pass: sizes.exe
 	@ $(ECHO) Running $*
-	./$< > SIZES.$(TEST)
+	@ $(RUN) ./$< > SIZES.$(TEST)
 	@ $(CAT) SIZES.$(TEST)
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
 %.pass: %.exe
 	@ $(ECHO) Running $*
-	./$*
+	@ $(RUN) ./$*
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
 %.bench: $(LIB) $(DLL) $(HDR) $(QAPC) $(XXLIBS) %.exe
 	@ $(ECHO) Running $*
-	./$*
+	@ $(RUN) ./$*
 	@ $(ECHO) Done
 	@ $(TOUCH) $@
 
