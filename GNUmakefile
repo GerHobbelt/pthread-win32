@@ -96,7 +96,7 @@ RCFLAGS		= --include-dir=.
 GC_CFLAGS	= $(PTW32_FLAGS) 
 GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
 
-## Mingw32
+## Mingw
 MAKE		?= make
 CFLAGS	= $(OPT) $(XOPT) -I. -DHAVE_PTW32_CONFIG_H -Wall
 
@@ -515,7 +515,7 @@ tests:
 	$(CC) -c $(CFLAGS) -DPTW32_BUILD_INLINED -Wa,-ahl $^ > $@
 
 %.o: %.rc
-	$(RC) $(RCFLAGS) $(CLEANUP) -o $@ $<
+	$(RC) $(RCFLAGS) $(CLEANUP) -o $@ -i $<
 
 .SUFFIXES: .dll .rc .c .o
 
