@@ -63,7 +63,8 @@ int test_context1(void);
 int test_count1(void);
 int test_create1(void);
 int test_create2(void);
-int test_create3(int argc, char **argv);
+int test_create3(void);
+int test_create3a(int argc, char **argv);
 int test_delay1(void);
 int test_delay2(void);
 int test_detach1(void);
@@ -300,6 +301,7 @@ int main(int argc, char **argv)
 	TEST_WRAPPER(test_count1);
 	TEST_WRAPPER(test_create1);
 	TEST_WRAPPER(test_create2);
+	TEST_WRAPPER(test_create3);
 	TEST_WRAPPER(test_delay1);
 	TEST_WRAPPER(test_delay2);
 	TEST_WRAPPER(test_detach1);
@@ -397,7 +399,7 @@ int main(int argc, char **argv)
 	TEST_WRAPPER(test_valid2);
 
 
-	TEST_WRAPPER_W_ARGV(test_create3);
+	TEST_WRAPPER_W_ARGV(test_create3a);
 	TEST_WRAPPER_W_ARGV(test_exception2);
 
 	/* test_exit1 should be the VERY LAST test of the bunch as it will exit the application before it returns! */

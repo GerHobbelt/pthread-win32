@@ -97,11 +97,19 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #define PTW32_INTERLOCKED_VOLATILE volatile
 #endif
 #define PTW32_INTERLOCKED_LONG long
+#if defined(_M_IA64)
+#define PTW32_INTERLOCKED_SIZE LONG64
+#elif defined(_M_AMD64)
+#define PTW32_INTERLOCKED_SIZE LONG64
+#else
 #define PTW32_INTERLOCKED_SIZE LONG
+#endif
 #define PTW32_INTERLOCKED_PVOID PVOID
 #define PTW32_INTERLOCKED_LONGPTR PTW32_INTERLOCKED_VOLATILE long*
-#if defined(_WIN64)
-#define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE LONGLONG*
+#if defined(_M_IA64)
+#define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE LONG64*
+#elif defined(_M_AMD64)
+#define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE LONG64*
 #else
 #define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE LONG*
 #endif
@@ -336,7 +344,7 @@ struct pthread_barrierattr_t_
 struct pthread_key_t_
 {
   DWORD key;
-  void (*destructor) (void *);
+  void (PTW32_CDECL *destructor) (void *);
   ptw32_mcs_lock_t keyLock;
   void *threads;
 };
@@ -347,7 +355,7 @@ typedef struct ThreadParms ThreadParms;
 struct ThreadParms
 {
   pthread_t tid;
-  void *(*start) (void *);
+  void *(PTW32_CDECL *start) (void *);
   void *arg;
 };
 

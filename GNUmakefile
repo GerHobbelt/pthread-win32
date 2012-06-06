@@ -515,7 +515,7 @@ tests:
 	$(CC) -c $(CFLAGS) -DPTW32_BUILD_INLINED -Wa,-ahl $^ > $@
 
 %.o: %.rc
-	$(RC) $(RCFLAGS) $(CLEANUP) -o $@ $<
+	$(RC) $(RCFLAGS) $(CLEANUP) -o $@ -i $<
 
 .SUFFIXES: .dll .rc .c .o
 

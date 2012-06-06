@@ -90,7 +90,7 @@ REGULAR_PASSES = loadfree.pass \
 	  mutex2.pass  mutex3.pass  \
 	  mutex2r.pass  mutex2e.pass  mutex3r.pass  mutex3e.pass  \
 	  condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
-	  exit1.pass  create1.pass  create2.pass  reuse1.pass  reuse2.pass  equal1.pass  \
+	  exit1.pass  create1.pass  create2.pass create3.pass creat3a.pass reuse1.pass  reuse2.pass  equal1.pass  \
 	  sequence1.pass  kill1.pass  valid1.pass  valid2.pass  \
 	  exit2.pass  exit3.pass  exit4.pass  exit5.pass  \
 	  join0.pass  join1.pass  detach1.pass  join2.pass join3.pass  \
@@ -105,7 +105,7 @@ REGULAR_PASSES = loadfree.pass \
 	  cancel1.pass  cancel2.pass  \
 	  semaphore4.pass  semaphore4t.pass  semaphore5.pass  \
 	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  barrier6.pass  \
-	  tsd1.pass  tsd2.pass  delay1.pass  delay2.pass  eyal1.pass  \
+	  tsd1.pass  tsd2.pass  openmp1.pass  delay1.pass  delay2.pass  eyal1.pass  \
 	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  \
 	  condvar4.pass  condvar5.pass  condvar6.pass  \
 	  condvar7.pass  condvar8.pass  condvar9.pass  \
@@ -120,7 +120,7 @@ REGULAR_PASSES = loadfree.pass \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  exception1.pass  exception2.pass  exception3.pass  \
-	  cancel9.pass  create3.pass  stress1.pass
+	  cancel9.pass  stress1.pass
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
@@ -136,7 +136,7 @@ STATICRESULTS = \
 	  mutex2.pass  mutex3.pass  \
 	  mutex2r.pass  mutex2e.pass  mutex3r.pass  mutex3e.pass  \
 	  condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
-	  exit1.pass  create1.pass  create2.pass  reuse1.pass  reuse2.pass  equal1.pass  \
+	  exit1.pass  create1.pass  create2.pass  create3.pass  creat3a.pass  reuse1.pass  reuse2.pass  equal1.pass  \
 	  sequence1.pass  kill1.pass  valid1.pass  valid2.pass  \
 	  exit2.pass  exit3.pass  exit4.pass  exit5.pass  \
 	  join0.pass  join1.pass  detach1.pass  join2.pass join3.pass  \
@@ -353,7 +353,8 @@ context1.pass: cancel1.pass
 count1.pass: join1.pass
 create1.pass: mutex2.pass
 create2.pass: create1.pass
-create3.pass:
+create3.pass: create2.pass
+create3a.pass: 
 delay1.pass:
 delay2.pass: delay1.pass
 detach1.pass: join0.pass
@@ -366,7 +367,7 @@ exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass
 exit4.pass:
-exit5.pass: kill1.pass
+exit5.pass: exit4.pass kill1.pass
 eyal1.pass: tsd1.pass
 inherit1.pass: join1.pass priority1.pass
 join0.pass: create1.pass
@@ -406,9 +407,10 @@ once1.pass: create1.pass
 once2.pass: once1.pass
 once3.pass: once2.pass
 once4.pass: once3.pass
+openmp1.pass: tsd2.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass barrier3.pass
-reuse1.pass: create2.pass
+reuse1.pass: create3.pass
 reuse2.pass: reuse1.pass
 robust1.pass: mutex8r.pass
 robust2.pass: mutex8r.pass

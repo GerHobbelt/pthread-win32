@@ -71,7 +71,7 @@ ptw32_throw (DWORD exception)
   ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
 #if defined(__CLEANUP_SEH)
-  DWORD exceptionInformation[3];
+  ULONG_PTR exceptionInformation[3];
 #endif
 
   sp->state = PThreadStateExiting;
@@ -124,9 +124,9 @@ ptw32_throw (DWORD exception)
 #if defined(__CLEANUP_SEH)
 
 
-  exceptionInformation[0] = (DWORD) (exception);
-  exceptionInformation[1] = (DWORD) (0);
-  exceptionInformation[2] = (DWORD) (0);
+  exceptionInformation[0] = (ULONG_PTR) (exception);
+  exceptionInformation[1] = (ULONG_PTR) (0);
+  exceptionInformation[2] = (ULONG_PTR) (0);
 
   RaiseException (EXCEPTION_PTW32_SERVICES, 0, 3, exceptionInformation);
 

@@ -1,31 +1,31 @@
 /*
- * File: create3.c
+ * File: create3a.c
  *
  *
  * --------------------------------------------------------------------------
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- *
+ *      Copyright(C) 1999,2003 Pthreads-win32 contributors
+ * 
  *      Contact Email: rpj@callisto.canberra.edu.au
- *
+ * 
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- *
+ * 
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- *
+ * 
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- *
+ * 
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -33,26 +33,25 @@
  *
  * --------------------------------------------------------------------------
  *
- * Test Synopsis:
- * - Test passing arg to thread function.
+ * Test Synopsis: Test passing NULL as thread id arg to pthread_create.
  *
  * Test Method (Validation or Falsification):
- * - Statistical, not absolute (depends on sample size).
+ * - 
  *
  * Requirements Tested:
  * -
  *
  * Features Tested:
- * -
+ * - 
  *
  * Cases Tested:
- * -
+ * - 
  *
  * Description:
- * -
+ * - 
  *
  * Environment:
- * -
+ * - 
  *
  * Input:
  * - None.
@@ -62,7 +61,7 @@
  * - No output on success.
  *
  * Assumptions:
- * -
+ * - 
  *
  * Pass Criteria:
  * - Process returns zero exit status.
@@ -71,44 +70,77 @@
  * - Process returns non-zero exit status.
  */
 
+
+#ifdef __GNUC__
+#include <stdlib.h>
+#endif
+
 #include "test.h"
 
+/*
+ * Create NUMTHREADS threads in addition to the Main thread.
+ */
 enum {
-  NUMTHREADS = 10000
+  NUMTHREADS = 1
 };
 
-static int washere = 0;
 
-void * func(void * arg)
+void *
+threadFunc(void * arg)
 {
-  washere = (int)(size_t)arg;
   return (void *) 0;
 }
 
 #ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main(int argc, char **argv)
-#else
+#else 
 int
-test_create3(int argc, char **argv)
+test_create3a(int argc, char **argv)
 #endif
 {
-  pthread_t t;
-  pthread_attr_t attr;
-  void * result = NULL;
   int i;
+  pthread_t mt;
 
-  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+  if (argc >= 2 && (!strcmp(argv[1], "-?") || !strcmp(argv[1], "-h")))
+    {
+      int result;
+
+      printf("You should see an application memory write error message\n");
+      fflush(stdout);
+      result = system("create3a.exe die");
+      exit(result);
+    }
+
+  assert((mt = pthread_self()).p != NULL);
 
   for (i = 0; i < NUMTHREADS; i++)
     {
-      washere = 0;
-      assert(pthread_create(&t, &attr, func, (void *)(size_t)1) == 0);
-      assert(pthread_join(t, &result) == 0);
-      assert((int)(size_t)result == 0);
-      assert(washere == 1);
+#if defined(_MSC_VER)
+  __try
+#else /* if defined(__cplusplus) */
+  try  /* this generally does not catch access violations, etc. */
+#endif
+    {
+	      assert(pthread_create(NULL, NULL, threadFunc, NULL) == 0);
+    }
+#if defined(_MSC_VER)
+  __except(EXCEPTION_EXECUTE_HANDLER)
+#else /* if defined(__cplusplus) */
+#if defined(PtW32CatchAll)
+  PtW32CatchAll
+#else
+  catch(...)
+#endif
+#endif
+	  {
+		  printf("Expected an access violation and we got one for thread %d - it has NOT been created!\n", i);
+	  }
     }
 
+  /*
+   * Success.
+   */
   return 0;
 }
+

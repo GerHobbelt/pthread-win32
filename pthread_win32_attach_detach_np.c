@@ -47,7 +47,7 @@ pthread_win32_process_attach_np ()
 {
   TCHAR QuserExDLLPathBuf[1024];
   BOOL result = TRUE;
-  const size_t QuserExDLLPathBufSize = sizeof(QuserExDLLPathBuf) / sizeof(QuserExDLLPathBuf[0]);
+  const UINT QuserExDLLPathBufSize = sizeof(QuserExDLLPathBuf) / sizeof(QuserExDLLPathBuf[0]);
 
   result = ptw32_processInitialize ();
 

@@ -494,6 +494,7 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
     <ClCompile Include="create1.c" />
     <ClCompile Include="create2.c" />
     <ClCompile Include="create3.c" />
+    <ClCompile Include="create3a.c" />
     <ClCompile Include="delay1.c" />
     <ClCompile Include="delay2.c" />
     <ClCompile Include="detach1.c" />

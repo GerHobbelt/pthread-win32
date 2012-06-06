@@ -489,6 +489,9 @@
       <Filter>TestSources</Filter>
     </ClCompile>
     <ClCompile Include="wrapper4tests_1.c" />
+    <ClCompile Include="create3a.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="benchtest.h">
