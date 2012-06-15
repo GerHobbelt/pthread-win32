@@ -130,13 +130,6 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
-    </CustomBuildStep>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -179,13 +172,6 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
-    </CustomBuildStep>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
       <HeaderFileName>
@@ -233,13 +219,6 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">
-    <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
-    </CustomBuildStep>
     <Midl>
       <TargetEnvironment>Itanium</TargetEnvironment>
       <HeaderFileName>
@@ -284,13 +263,6 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
-    </CustomBuildStep>
     <Midl>
       <HeaderFileName>
       </HeaderFileName>
@@ -336,13 +308,6 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
-    </CustomBuildStep>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
       <HeaderFileName>
@@ -389,13 +354,6 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">
-    <CustomBuildStep>
-      <Message>copy $(TargetFileName) to bin\$(Platform)_MSVC2008.$(Configuration) directory</Message>
-      <Command>if not exist "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)" mkdir "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)"
-copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName)"
-</Command>
-      <Outputs>$(SolutionDir)bin\$(Platform)_MSVC2008.$(Configuration)\$(TargetFileName);%(Outputs)</Outputs>
-    </CustomBuildStep>
     <Midl>
       <TargetEnvironment>Itanium</TargetEnvironment>
       <HeaderFileName>
