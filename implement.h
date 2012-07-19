@@ -607,6 +607,7 @@ extern "C"
   int ptw32_cond_check_need_init (pthread_cond_t * cond);
   int ptw32_mutex_check_need_init (pthread_mutex_t * mutex);
   int ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock);
+  int ptw32_spinlock_check_need_init (pthread_spinlock_t * lock);
 
   int ptw32_robust_mutex_inherit(pthread_mutex_t * mutex);
   void ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self);
