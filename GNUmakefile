@@ -99,7 +99,7 @@ GC_CFLAGS	= $(PTW32_FLAGS)
 GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
 
 ## Mingw
-MAKE		?= make
+#MAKE		?= make
 CFLAGS	= $(OPT) $(XOPT) -I. -DHAVE_PTW32_CONFIG_H -Wall
 
 OBJEXT = o
@@ -143,8 +143,9 @@ help:
 	@ echo "$(MAKE) clean GC-small-static-debug     (to build the GNU C small static debug lib with C cleanup code)"
 
 all:
-	@ $(MAKE) clean GCE
-	@ $(MAKE) clean GC
+	@ $(MAKE) clean GC-inlined
+	@ $(MAKE) clean GCE-inlined
+	@ $(MAKE) clean GC-static
 
 TEST_ENV = PTW32_FLAGS="$(PTW32_FLAGS) -DNO_ERROR_DIALOGS"
 
@@ -161,11 +162,11 @@ all-tests:
 	cd tests && $(MAKE) clean GC-static $(TEST_ENV)
 	$(MAKE) realclean GC-small-static
 	cd tests && $(MAKE) clean GC-small-static $(TEST_ENV)
-	@ echo "$@ completed successfully."
+	@ $(ECHO) "$@ completed successfully."
 
 all-tests-cflags:
 	$(MAKE) all-tests PTW32_FLAGS="-Wall -Wextra"
-	@ echo "$@ completed successfully."
+	@ $(ECHO) "$@ completed successfully."
 
 GC:
 		$(MAKE) CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_DLL)
