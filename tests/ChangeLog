@@ -1,3 +1,8 @@
+2012-07-19  Daniel Richard. G <danielg at teragram dot com>
+
+	* Makefile: Various fixes.
+	* GNUmakefile: Likewise.
+
 2011-07-03  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* create3.c: Removed; testing a condition that is not in the library's
