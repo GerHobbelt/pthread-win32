@@ -305,6 +305,10 @@ clean:
 	- $(RM) *.pass
 	- $(RM) *.bench
 	- $(RM) *.log
+	- $(RM) SIZES.VC
+	- $(RM) SIZES.VC-static
+	- $(RM) SIZES.VCE
+	- $(RM) SIZES.VSE
 
 benchtest1.bench:
 benchtest2.bench:
