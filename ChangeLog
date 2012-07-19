@@ -1,3 +1,11 @@
+2012-07-19  Daniel Richard. G <danielg at teragram dot com>
+
+	* common.mk: New; macros common to all build environment makefiles.
+	* Bmakefile: Include new common.mk
+	* Makefile: Likewise; various fixes; added normal and small objects
+	static build.
+	* GNUmakefile: Likewise.
+
 2012-03-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* create.c (pthread_create): add __cdecl attribute to thread routine
