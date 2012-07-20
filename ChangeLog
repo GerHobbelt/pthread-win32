@@ -1,5 +1,9 @@
 2012-03-19  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
+	* implement.h: Fix interlocked pointer casting under VC++ x64.
+
+2012-03-19  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
 	* implement.h (ptw32_spinlock_check_need_init): added missing
 	forward declaration.
 	
