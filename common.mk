@@ -5,8 +5,7 @@ RESOURCE_OBJS	= \
 
 # pthread.c aggregates all source into a single compilation unit for inlinability
 DLL_INLINED_OBJS = \
-		pthread.$(OBJEXT) \
-		$(RESOURCE_OBJS)
+		pthread.$(OBJEXT)
 
 # Aggregate modules for inlinability
 DLL_OBJS	= \
@@ -31,8 +30,7 @@ DLL_OBJS	= \
 		signal.$(OBJEXT) \
 		spin.$(OBJEXT) \
 		sync.$(OBJEXT) \
-		tsd.$(OBJEXT) \
-		$(RESOURCE_OBJS)
+		tsd.$(OBJEXT)
 
 # Separate modules for minimising the size of statically linked images
 SMALL_STATIC_OBJS	= \
@@ -173,8 +171,7 @@ SMALL_STATIC_OBJS	= \
 		sem_unlink.$(OBJEXT) \
 		sem_wait.$(OBJEXT) \
 		signal.$(OBJEXT) \
-		w32_CancelableWait.$(OBJEXT) \
-		$(RESOURCE_OBJS)
+		w32_CancelableWait.$(OBJEXT)
 
 INCL		= \
 		config.h \

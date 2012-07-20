@@ -107,6 +107,10 @@ RESEXT = o
  
 include common.mk
 
+DLL_INLINED_OBJS += $(RESOURCE_OBJS)
+DLL_OBJS += $(RESOURCE_OBJS)
+SMALL_STATIC_OBJS += $(RESOURCE_OBJS)
+
 GCE_DLL	= pthreadGCE$(DLL_VER).dll
 GCED_DLL= pthreadGCE$(DLL_VERD).dll
 GCE_LIB	= libpthreadGCE$(DLL_VER).a

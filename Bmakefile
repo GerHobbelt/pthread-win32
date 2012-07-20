@@ -59,7 +59,7 @@ install: $(DLLS)
 	copy pthread*.dll $(DLLDEST)
 	copy pthread*.lib $(LIBDEST)
 
-$(DLLS): $(DLL_OBJS) version.res
+$(DLLS): $(DLL_OBJS) $(RESOURCE_OBJS)
 	ilink32 /Tpd /Gi c0d32x.obj $(DLL_OBJS), \
 		$@, ,\
 		cw32mti.lib import32.lib, ,\

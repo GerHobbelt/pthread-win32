@@ -53,6 +53,10 @@ RESEXT = res
  
 include common.mk
 
+DLL_INLINED_OBJS	= $(DLL_INLINED_OBJS) $(RESOURCE_OBJS)
+DLL_OBJS	= $(DLL_OBJS) $(RESOURCE_OBJS)
+SMALL_STATIC_OBJS	= $(SMALL_STATIC_OBJS) $(RESOURCE_OBJS)
+
 help:
 	@ echo Run one of the following command lines:
 	@ echo nmake clean VCE   (to build the MSVC dll with C++ exception handling)
