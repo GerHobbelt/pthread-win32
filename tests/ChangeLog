@@ -1,3 +1,9 @@
+2011-07-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* cancel2.c (PTHREAD_CANCELED): Fix cast warning when compiling with g++.
+	* cleanup0.c (PTHREAD_CANCELED): Likewise.
+	* cleanup1.c (PTHREAD_CANCELED): Likewise.
+
 2012-07-19  Daniel Richard. G <danielg at teragram dot com>
 
 	* Makefile: Various fixes.

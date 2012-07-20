@@ -223,7 +223,7 @@ main()
       void* result = (void*)0;
 
       assert(pthread_join(t[i], &result) == 0);
-      fail = ((int)(size_t)result != (int) PTHREAD_CANCELED);
+      fail = ((int)(size_t)result != (int)(size_t) PTHREAD_CANCELED);
       if (fail)
 	{
 	  fprintf(stderr, "Thread %d: started %d: location %d: cancel type %s\n",

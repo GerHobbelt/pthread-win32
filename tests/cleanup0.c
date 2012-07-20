@@ -193,7 +193,7 @@ main()
 
       assert(pthread_join(t[i], &result) == 0);
 
-      fail = ((int)(size_t)result == (int) PTHREAD_CANCELED);
+      fail = ((int)(size_t)result == (int)(size_t) PTHREAD_CANCELED);
 
       if (fail)
 	{
