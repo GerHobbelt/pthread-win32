@@ -9,6 +9,8 @@
 	changes aimed at de-abstracting functionality.
 	* impliment.h (ptw32_autostatic_anchor): dummy reference to
 	ensure that autostatic.o is always linked into static applications.
+	* GNUmakefile: Various improvements.
+	* Makefile: Likewise.
 
 2012-03-19  Ross Johnson <ross dot johnson at homemail dot com dot au>
 

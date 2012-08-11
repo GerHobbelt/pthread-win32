@@ -64,9 +64,10 @@ XXCFLAGS	=
 XXLIBS	=
 OPT	= -O3
 DOPT	= -g -O0
-#CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
 CFLAGS	= ${OPT} -UNDEBUG -Wall $(XXCFLAGS)
 LFLAGS	= $(XXLFLAGS)
+# Uncomment to link the GCC/C++ runtime libraries statically
+#LFLAGS	+= -static-libgcc -static-libstdc++
 BUILD_DIR	= ..
 INCLUDES	= -I.
 
@@ -174,15 +175,15 @@ STATICRESULTS	= $(STATICTESTS:%=%.pass)
 
 help:
 	@ $(ECHO) "Run one of the following command lines:"
-	@ $(ECHO) "$(MAKE) clean GC    (to test using GC dll with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCX   (to test using GC dll with C++ (EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCE   (to test using GCE dll with C++ (EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GC-bench	  (to benchtest using GNU C dll with C cleanup code)"
-	@ $(ECHO) "$(MAKE) clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)"
-	@ $(ECHO) "$(MAKE) clean GC-stress	  (to stresstest using GNU C dll with C cleanup code)"
-	@ $(ECHO) "$(MAKE) clean GCE-stress   (to stresstest using GNU C dll with C++ exception handling)"
-	@ $(ECHO) "$(MAKE) clean GC-static   (to test using GC static lib with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GC-debug    (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC	        (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCX        (to test using GC dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCE   		(to test using GCE dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-bench	(to benchtest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "$(MAKE) clean GCE-bench  (to benchtest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "$(MAKE) clean GC-stress	(to stresstest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "$(MAKE) clean GCE-stress (to stresstest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "$(MAKE) clean GC-static  (to test using GC static lib with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-debug   (to test using GC dll with C (no EH) applications)"
 
 all:
 	@ $(MAKE) clean GC
@@ -217,12 +218,12 @@ GC-bench-debug:
 	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${OPT}" DLL_VER="$(DLL_VER)d" all-bench
 
 GC-static:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" XXLFLAGS="-static-libgcc" DLL="" all-static
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
 
 GC-stress:
-	$(ECHO) "Stress tests can take a long time since they are trying to"
-	$(ECHO) "expose weaknesses that may be intermittant or statistically rare."
-	$(ECHO) "A pass does not prove correctness, but may give greater confidence."
+	@ $(ECHO) "Stress tests can take a long time since they are trying to"
+	@ $(ECHO) "expose weaknesses that may be intermittant or statistically rare."
+	@ $(ECHO) "A pass does not prove correctness, but may give greater confidence."
 	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="" all-stress
 
 GCE-stress:
@@ -387,27 +388,27 @@ valid1.pass: join1.pass
 valid2.pass: valid1.pass
 
 sizes.pass: sizes.exe
-	@ $(ECHO) Running $*
+	@ $(ECHO) Running $(TEST) test $*
 	@ $(RUN) ./$< > SIZES.$(TEST)
 	@ $(CAT) SIZES.$(TEST)
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
 %.pass: %.exe
-	@ $(ECHO) Running $*
+	@ $(ECHO) Running $(TEST) test $*
 	@ $(RUN) ./$*
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
 %.bench: $(LIB) $(DLL) $(HDR) $(QAPC) $(XXLIBS) %.exe
-	@ $(ECHO) Running $*
+	@ $(ECHO) Running $(TEST) test $*
 	@ $(RUN) ./$*
 	@ $(ECHO) Done
 	@ $(TOUCH) $@
 
 %.exe: %.c $(LIB) $(DLL) $(HDR) $(QAPC)
 	@ $(ECHO) Compiling $@
-	$(CC) $(CFLAGS) $(LFLAGS) -o $@ $< $(INCLUDES) -L. -lpthread$(GCX) $(XLIBS) $(XXLIBS)
+	$(CC) $(CFLAGS) $(LFLAGS) -o $@ $< $(INCLUDES) -L. -lpthread$(GCX) $(XLIBS) $(XXLIBS)	
 
 %.pre: %.c $(HDR)
 	$(CC) -E $(CFLAGS) -o $@ $< $(INCLUDES)

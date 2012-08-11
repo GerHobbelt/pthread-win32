@@ -273,10 +273,10 @@ VC-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
 .c.exe:
-	 $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
+	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
 
 .c.o:
-	$(CC) $(EHFLAGS) $(CFLAGS) /c $(INCLUDES) $< /Fo$@
+	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) /c $< /Fo$@
 
 .c.i:
 	$(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<

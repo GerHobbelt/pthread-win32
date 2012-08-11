@@ -1,3 +1,8 @@
+2012-08-11  Daniel Richard. G <danielg at teragram dot com>
+
+	* Makefile: Various improvements.
+	* GNUmakefile: Likewise.
+
 2011-07-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* cancel2.c (PTHREAD_CANCELED): Fix cast warning when compiling with g++.

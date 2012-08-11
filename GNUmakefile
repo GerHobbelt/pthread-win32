@@ -64,8 +64,16 @@ OPT	= $(CLEANUP) -O3 # -finline-functions -findirect-inlining
 XOPT	=
 
 RCFLAGS		= --include-dir=.
+LFLAGS		=
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
-#LFLAGS		= -lws2_32
+#LFLAGS		+= -lws2_32
+# Uncomment this to link the GCC/C++ runtime libraries statically
+# (Note: Be sure to read about these options and their associated caveats
+# at http://gcc.gnu.org/onlinedocs/gcc/Link-Options.html)
+# PLEASE NOTE: If you do this DO NOT distribute your pthreads DLLs with
+# the official filenaming, i.e. pthreadVC2.dll, etc. Instead, change DLL_VER
+# above to "2slgcc" for example, to build "pthreadGC2slgcc.dll", etc.
+#LFLAGS		+= -static-libgcc -static-libstdc++
 
 # ----------------------------------------------------------------------
 # The library can be built with some alternative behaviour to
@@ -151,7 +159,7 @@ all:
 	@ $(MAKE) clean GCE-inlined
 	@ $(MAKE) clean GC-static
 
-TEST_ENV = PTW32_FLAGS="$(PTW32_FLAGS) -DNO_ERROR_DIALOGS"
+TEST_ENV = PTW32_FLAGS="$(PTW32_FLAGS) -DNO_ERROR_DIALOGS" DLL_VER=$(DLL_VER)
 
 all-tests:
 #	$(MAKE) realclean GC
@@ -284,5 +292,4 @@ realclean: clean
 	-$(RM) $(GCED_INLINED_STAMP)
 	-$(RM) $(GCD_STATIC_STAMP)
 	-$(RM) $(GCD_SMALL_STATIC_STAMP)
-	cd tests && $(MAKE) clean
-	
+	-cd tests && $(MAKE) clean
