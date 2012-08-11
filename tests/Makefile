@@ -290,25 +290,25 @@ pthread.dll: $(CPDLL)
 	@ $(CP) $(CPLIB) pthread.lib
 
 clean:
-	- $(RM) *.dll
-	- $(RM) *.lib
-	- $(RM) pthread.h
-	- $(RM) semaphore.h
-	- $(RM) sched.h
-	- $(RM) *.e
-	- $(RM) *.i
-	- $(RM) *.obj
-	- $(RM) *.pdb
-	- $(RM) *.o
-	- $(RM) *.asm
-	- $(RM) *.exe
-	- $(RM) *.pass
-	- $(RM) *.bench
-	- $(RM) *.log
-	- $(RM) SIZES.VC
-	- $(RM) SIZES.VC-static
-	- $(RM) SIZES.VCE
-	- $(RM) SIZES.VSE
+	- if exist *.dll $(RM) *.dll
+	- if exist *.lib $(RM) *.lib
+	- if exist pthread.h $(RM) pthread.h
+	- if exist semaphore.h $(RM) semaphore.h
+	- if exist sched.h $(RM) sched.h
+	- if exist *.e $(RM) *.e
+	- if exist *.i $(RM) *.i
+	- if exist *.obj $(RM) *.obj
+	- if exist *.pdb $(RM) *.pdb
+	- if exist *.o $(RM) *.o
+	- if exist *.asm $(RM) *.asm
+	- if exist *.exe $(RM) *.exe
+	- if exist *.pass $(RM) *.pass
+	- if exist *.bench $(RM) *.bench
+	- if exist *.log $(RM) *.log
+	- if exist SIZES.VC $(RM) SIZES.VC
+	- if exist SIZES.VC-static $(RM) SIZES.VC-static
+	- if exist SIZES.VCE $(RM) SIZES.VCE
+	- if exist SIZES.VSE $(RM) SIZES.VSE
 
 benchtest1.bench:
 benchtest2.bench:

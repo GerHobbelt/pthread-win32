@@ -341,6 +341,9 @@ TSD_SRCS	= \
 		pthread_setspecific.c \
 		pthread_getspecific.c
 
+# Output useful info if no target given. I.e. the first target that "make" sees is used in this case.
+default_target: help
+
 attr.$(OBJEXT):		attr.c $(ATTR_SRCS) $(INCL)
 barrier.$(OBJEXT):	barrier.c $(BARRIER_SRCS) $(INCL)
 cancel.$(OBJEXT):	cancel.c $(CANCEL_SRCS) $(INCL)

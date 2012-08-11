@@ -168,6 +168,7 @@ realclean: clean
 	if exist *.manifest del *.manifest
 	if exist *.stamp del *.stamp
 	if exist *.small_stamp del *.small_stamp
+	cd tests && $(MAKE) clean
 
 clean:
 	if exist *.obj del *.obj

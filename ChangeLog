@@ -1,3 +1,15 @@
+2012-08-11  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* common.mk (default_target): restore previous behaviour of outputing
+	useful help when "make" is run without a target argument.
+
+2012-08-11  Daniel Richard. G <danielg at teragram dot com>
+
+	* autostatic.c (ptw32_autostatic_anchor): new function; other
+	changes aimed at de-abstracting functionality.
+	* impliment.h (ptw32_autostatic_anchor): dummy reference to
+	ensure that autostatic.o is always linked into static applications.
+
 2012-03-19  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* implement.h: Fix interlocked pointer casting under VC++ x64.

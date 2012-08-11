@@ -93,6 +93,7 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #else
 #define PTW32_INTERLOCKED_VOLATILE volatile
 #endif
+
 #define PTW32_INTERLOCKED_LONG long
 #define PTW32_INTERLOCKED_SIZE size_t
 #define PTW32_INTERLOCKED_PVOID PVOID
@@ -109,6 +110,17 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #  if defined(_MSC_VER) && _MSC_VER < 1300
      typedef long intptr_t;
 #  endif
+#endif
+
+/*
+ * Don't allow the linker to optimize away autostatic.obj in static builds.
+ */
+#if defined(PTW32_STATIC_LIB)
+  void ptw32_autostatic_anchor(void);
+#   if defined(__MINGW64__) || defined(__MINGW32__)
+    __attribute__((unused, used))
+#   endif
+  static void (*local_autostatic_anchor)(void) = ptw32_autostatic_anchor;
 #endif
 
 typedef enum
