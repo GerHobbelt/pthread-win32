@@ -37,8 +37,8 @@ CP	= copy
 RM	= erase
 CAT	= type
 MKDIR	= mkdir
-TOUCH	= echo Passed >
 ECHO	= echo
+TOUCH	= $(ECHO) Passed >
 
 # The next path is relative to $BUILD_DIR
 QAPC	= # ..\QueueUserAPCEx\User\quserex.dll
@@ -170,19 +170,19 @@ STATICRESULTS = \
 
 help:
 	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) nmake clean VC          (to test using VC dll with VC (no EH) apps)
-	@ $(ECHO) nmake clean VC-bench    (to benchtest using VC dll with C bench apps)
-	@ $(ECHO) nmake clean VC-stress   (to stresstest using VC dll with C stress apps)
-	@ $(ECHO) nmake clean VC-static   (to test using VC static lib with VC (no EH) apps)
-	@ $(ECHO) nmake clean VCX         (to test using VC dll with VC++ (EH) applications)
-	@ $(ECHO) nmake clean VCX-bench   (to benchtest using VC dll with C++ bench apps)
-	@ $(ECHO) nmake clean VCX-stress  (to stresstest using VC dll with C++ stress apps)
-	@ $(ECHO) nmake clean VCE         (to test using the VCE dll with VC++ EH applications)
-	@ $(ECHO) nmake clean VCE-bench   (to benchtest using VCE dll with C++ bench apps)
-	@ $(ECHO) nmake clean VCE-stress  (to stresstest using VCE dll with C++ stress apps)
-	@ $(ECHO) nmake clean VSE         (to test using VSE dll with VC (SEH) apps)
-	@ $(ECHO) nmake clean VSE-bench   (to benchtest using VSE dll with SEH bench apps)
-	@ $(ECHO) nmake clean VSE-stress  (to stresstest using VSE dll with SEH stress apps)
+	@ $(ECHO) $(MAKE) clean VC          (to test using VC dll with VC (no EH) apps)
+	@ $(ECHO) $(MAKE) clean VC-bench    (to benchtest using VC dll with C bench apps)
+	@ $(ECHO) $(MAKE) clean VC-stress   (to stresstest using VC dll with C stress apps)
+	@ $(ECHO) $(MAKE) clean VC-static   (to test using VC static lib with VC (no EH) apps)
+	@ $(ECHO) $(MAKE) clean VCX         (to test using VC dll with VC++ (EH) applications)
+	@ $(ECHO) $(MAKE) clean VCX-bench   (to benchtest using VC dll with C++ bench apps)
+	@ $(ECHO) $(MAKE) clean VCX-stress  (to stresstest using VC dll with C++ stress apps)
+	@ $(ECHO) $(MAKE) clean VCE         (to test using the VCE dll with VC++ EH applications)
+	@ $(ECHO) $(MAKE) clean VCE-bench   (to benchtest using VCE dll with C++ bench apps)
+	@ $(ECHO) $(MAKE) clean VCE-stress  (to stresstest using VCE dll with C++ stress apps)
+	@ $(ECHO) $(MAKE) clean VSE         (to test using VSE dll with VC (SEH) apps)
+	@ $(ECHO) $(MAKE) clean VSE-bench   (to benchtest using VSE dll with SEH bench apps)
+	@ $(ECHO) $(MAKE) clean VSE-stress  (to stresstest using VSE dll with SEH stress apps)
 
 all:
 	@ $(MAKE) /E clean VC
@@ -234,54 +234,52 @@ $(STRESSRESULTS): $*.exe
 	@ $(TOUCH) $*.pass
 
 VC:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
 
 VCE:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
 
 VSE:	
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" tests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" tests
 
 VCX:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
 
 VC-bench:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VCE-bench:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VSE-bench:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VCX-bench:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" benchtests
 
 VC-stress:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" stresstests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" stresstests
 
 VCE-stress:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" stresstests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" stresstests
 
 VSE-stress:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" stresstests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" stresstests
 
 VCX-stress:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" stresstests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" stresstests
 
 VC-static:
-	@ $(MAKE) /E TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
 .c.exe:
-	@ $(ECHO) $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
-	@ $(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
+	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
 
 .c.o:
-	@ $(ECHO) $(CC) $(EHFLAGS) /c $(CFLAGS) $(INCLUDES) $< /Fo$@
-	@ $(CC) $(EHFLAGS) $(CFLAGS) /c $(INCLUDES) $< /Fo$@
+	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) /c $< /Fo$@
 
 .c.i:
-	@ $(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<
+	$(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<
 
 $(COPYFILES):
 	@ $(ECHO) Copying $(BUILD_DIR)\$@
@@ -292,21 +290,25 @@ pthread.dll: $(CPDLL)
 	@ $(CP) $(CPLIB) pthread.lib
 
 clean:
-	- $(RM) *.dll
-	- $(RM) *.lib
-	- $(RM) pthread.h
-	- $(RM) semaphore.h
-	- $(RM) sched.h
-	- $(RM) *.e
-	- $(RM) *.i
-	- $(RM) *.obj
-	- $(RM) *.pdb
-	- $(RM) *.o
-	- $(RM) *.asm
-	- $(RM) *.exe
-	- $(RM) *.pass
-	- $(RM) *.bench
-	- $(RM) *.log
+	- if exist *.dll $(RM) *.dll
+	- if exist *.lib $(RM) *.lib
+	- if exist pthread.h $(RM) pthread.h
+	- if exist semaphore.h $(RM) semaphore.h
+	- if exist sched.h $(RM) sched.h
+	- if exist *.e $(RM) *.e
+	- if exist *.i $(RM) *.i
+	- if exist *.obj $(RM) *.obj
+	- if exist *.pdb $(RM) *.pdb
+	- if exist *.o $(RM) *.o
+	- if exist *.asm $(RM) *.asm
+	- if exist *.exe $(RM) *.exe
+	- if exist *.pass $(RM) *.pass
+	- if exist *.bench $(RM) *.bench
+	- if exist *.log $(RM) *.log
+	- if exist SIZES.VC $(RM) SIZES.VC
+	- if exist SIZES.VC-static $(RM) SIZES.VC-static
+	- if exist SIZES.VCE $(RM) SIZES.VCE
+	- if exist SIZES.VSE $(RM) SIZES.VSE
 
 benchtest1.bench:
 benchtest2.bench:
