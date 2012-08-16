@@ -116,7 +116,7 @@
 #endif
 #endif /* PTW32_SCHED_LEVEL >= PTW32_SCHED_LEVEL_MAX */
 
-#if defined (PTW32_CONFIG_MINGW) || defined(_UWIN)
+#if (defined(__MINGW64__) || defined(__MINGW32__)) || defined(_UWIN)
 # if PTW32_SCHED_LEVEL >= PTW32_SCHED_LEVEL_MAX
 /* For pid_t */
 #  include <sys/types.h>
