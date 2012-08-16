@@ -116,6 +116,18 @@
 #   pragma comment(lib, "pthread")
 #endif
 
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#  define PTW32_CONFIG_MINGW
+#endif
+#if defined(_MSC_VER)
+#  if _MSC_VER < 1300
+#    define PTW32_CONFIG_MSVC6
+#  endif
+#  if _MSC_VER < 1400
+#    define PTW32_CONFIG_MSVC8
+#  endif
+#endif
+
 /*
  * -------------------------------------------------------------
  *
@@ -190,7 +202,7 @@
  */
 
 /* Try to avoid including windows.h */
-#if (defined(__MINGW64__) || defined(__MINGW32__)) && defined(__cplusplus)
+#if defined(PTW32_CONFIG_MINGW) && defined(__cplusplus)
 #define PTW32_INCLUDE_WINDOWS_H
 #endif
 
@@ -198,7 +210,7 @@
 #include <windows.h>
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER < 1300 || defined(__DMC__)
+#if defined(PTW32_CONFIG_MSVC6) || defined(__DMC__)
 /*
  * VC++6.0 or early compiler's header has no DWORD_PTR type.
  */

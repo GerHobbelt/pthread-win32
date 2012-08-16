@@ -56,7 +56,7 @@ pthread_once (pthread_once_t * once_control, void (PTW32_CDECL *init_routine) (v
       if (!once_control->done)
 	{
 
-#if defined(_MSC_VER) && _MSC_VER < 1400
+#if defined(PTW32_CONFIG_MSVC8)
 #pragma inline_depth(0)
 #endif
 
@@ -64,7 +64,7 @@ pthread_once (pthread_once_t * once_control, void (PTW32_CDECL *init_routine) (v
 	  (*init_routine)();
 	  pthread_cleanup_pop(0);
 
-#if defined(_MSC_VER) && _MSC_VER < 1400
+#if defined(PTW32_CONFIG_MSVC8)
 #pragma inline_depth()
 #endif
 

@@ -39,7 +39,7 @@
 #define _IMPLEMENT_H
 
 #if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x0400
+# define _WIN32_WINNT 0x0400
 #endif
 
 #include <windows.h>
@@ -60,11 +60,11 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
  * In case ETIMEDOUT hasn't been defined above somehow.
  */
 #if !defined(ETIMEDOUT)
-#  define ETIMEDOUT 10060	/* This is the value in winsock.h. */
+# define ETIMEDOUT 10060	/* This is the value in winsock.h. */
 #endif
 
 #if !defined(malloc)
-#include <malloc.h>
+# include <malloc.h>
 #endif
 
 #if defined(__CLEANUP_C)
@@ -72,7 +72,7 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #endif
 
 #if !defined(INT_MAX)
-#include <limits.h>
+# include <limits.h>
 #endif
 
 /* use local include files during development */
@@ -80,18 +80,15 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #include "sched.h"
 
 #if defined(HAVE_C_INLINE) || defined(__cplusplus)
-#define INLINE inline
+# define INLINE inline
 #else
-#define INLINE
+# define INLINE
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER < 1300
-/*
- * MSVC 6 does not use the "volatile" qualifier
- */
-#define PTW32_INTERLOCKED_VOLATILE
+#if defined(PTW32_CONFIG_MSVC6)
+# define PTW32_INTERLOCKED_VOLATILE
 #else
-#define PTW32_INTERLOCKED_VOLATILE volatile
+# define PTW32_INTERLOCKED_VOLATILE volatile
 #endif
 
 #define PTW32_INTERLOCKED_LONG long
@@ -101,13 +98,13 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE size_t*
 #define PTW32_INTERLOCKED_PVOID_PTR PTW32_INTERLOCKED_VOLATILE PVOID*
 
-#if defined(__MINGW64__) || defined(__MINGW32__)
+#if defined(PTW32_CONFIG_MINGW)
 #  include <stdint.h>
 #elif defined(__BORLANDC__)
 #  define int64_t ULONGLONG
 #else
 #  define int64_t _int64
-#  if defined(_MSC_VER) && _MSC_VER < 1300
+#  if defined(PTW32_CONFIG_MSVC6)
      typedef long intptr_t;
 #  endif
 #endif
@@ -117,9 +114,9 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
  */
 #if defined(PTW32_STATIC_LIB)
   void ptw32_autostatic_anchor(void);
-#   if defined(__MINGW64__) || defined(__MINGW32__)
+# if defined(PTW32_CONFIG_MINGW)
     __attribute__((unused, used))
-#   endif
+# endif
   static void (*local_autostatic_anchor)(void) = ptw32_autostatic_anchor;
 #endif
 
@@ -649,7 +646,7 @@ extern "C"
 
   void ptw32_rwlock_cancelwrwait (void *arg);
 
-#if ! (defined (__MINGW64__) || defined(__MINGW32__)) || (defined(__MSVCRT__) && ! defined(__DMC__))
+#if ! defined (PTW32_CONFIG_MINGW) || (defined(__MSVCRT__) && ! defined(__DMC__))
   unsigned __stdcall
 #else
   void
@@ -901,7 +898,7 @@ extern "C"
 #   define PTW32_INTERLOCKED_INCREMENT_64(p) InterlockedIncrement64(PTW32_TO_VLONG64PTR(p))
 #   define PTW32_INTERLOCKED_DECREMENT_64(p) InterlockedDecrement64(PTW32_TO_VLONG64PTR(p))
 # endif
-# if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(_WIN64) /* MSVC 6 */
+# if defined(PTW32_CONFIG_MSVC6) && !defined(_WIN64)
 #  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand) \
       ((LONG)InterlockedCompareExchange((PVOID *)(location), (PVOID)(value), (PVOID)(comparand)))
 # else
@@ -911,7 +908,7 @@ extern "C"
 # define PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(p,v) InterlockedExchangeAdd((p),(v))
 # define PTW32_INTERLOCKED_INCREMENT_LONG(p) InterlockedIncrement((p))
 # define PTW32_INTERLOCKED_DECREMENT_LONG(p) InterlockedDecrement((p))
-# if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(_WIN64) /* MSVC 6 */
+# if defined(PTW32_CONFIG_MSVC6) && !defined(_WIN64)
 #  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchange
 #  define PTW32_INTERLOCKED_EXCHANGE_PTR(location, value) \
     ((PVOID)InterlockedExchange((LPLONG)(location), (LONG)(value)))

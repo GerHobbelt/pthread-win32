@@ -1,3 +1,25 @@
+2012-08-16  Daniel Richard. G <danielg at teragram dot com>
+
+	* pthread.h (PTW32_CONFIG_MINGW): Defined to simplify complex macro combination.
+	* (PTW32_CONFIG_MSVC6): Likewise.
+	* (PTW32_CONFIG_MSVC8): Likewise.
+	* autostatic.c: Substitute new macros.
+	* create.c: Likewise.
+	* pthread_cond_wait.c: Likewise.
+	* pthread_exit.c: Likewise.
+	* pthread_once.c: Likewise.
+	* pthread_rwlock_timedwrlock.c: Likewise.
+	* pthread_rwlock_wrlock.c: Likewise.
+	* pthread_win32_attach_detach_np.c: Likewise.
+	* ptw32_relmillisecs.c: Likewise.
+	* ptw32_threadDestroy.c: Likewise.
+	* ptw32_threadStart.c: Likewise.
+	* ptw32_throw.c: Likewise.
+	* sem_timedwait.c: Likewise.
+	* sem_wait.c: Likewise.
+	* implement.h: Likewise.
+	* sched.h: Likewise.
+
 2012-08-11  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* common.mk (default_target): restore previous behaviour of outputing

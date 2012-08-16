@@ -39,7 +39,7 @@
 
 #if defined(PTW32_STATIC_LIB)
 
-#if defined(__MINGW64__) || defined(__MINGW32__) || defined(_MSC_VER)
+#if defined(PTW32_CONFIG_MINGW) || defined(_MSC_VER)
 
 /* For an explanation of this code (at least the MSVC parts), refer to
  *
@@ -70,7 +70,7 @@ static int on_process_exit(void)
     return 0;
 }
 
-#if defined(__MINGW64__) || defined(__MINGW32__)
+#if defined(PTW32_CONFIG_MINGW)
 __attribute__((section(".ctors"), used)) static int (*gcc_ctor)(void) = on_process_init;
 __attribute__((section(".dtors"), used)) static int (*gcc_dtor)(void) = on_process_exit;
 #elif defined(_MSC_VER)
@@ -88,7 +88,7 @@ static int (*msc_dtor)(void) = on_process_exit;
 #  endif
 #endif
 
-#endif /* defined(__MINGW64__) || defined(__MINGW32__) || defined(_MSC_VER) */
+#endif /* defined(PTW32_CONFIG_MINGW) || defined(_MSC_VER) */
 
 /* This dummy function exists solely to be referenced by other modules
  * (specifically, in implement.h), so that the linker can't optimize away
