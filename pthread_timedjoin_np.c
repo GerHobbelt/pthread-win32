@@ -181,4 +181,4 @@ pthread_timedjoin_np (pthread_t thread, void **value_ptr, const struct timespec 
 
   return (result);
 
-}                               /* pthread_join */
+}
