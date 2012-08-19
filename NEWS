@@ -1,3 +1,36 @@
+RELEASE 2.10.0
+--------------
+(2099-99-99)
+
+General
+-------
+New bug fixes in this release since 2.8.0 have NOT been applied to the
+1.x.x series.
+
+Some changes post 2011-02-26 in CVS may not be compatible with pre
+Windows 2000 systems.
+
+Use of other than the "C" version of the library is now discouraged.
+That is, the "C++" version fails some tests and does not provide any
+additional functionality.
+
+Testing and verification
+------------------------
+This version has been tested on SMP architecture (Intel x64 Hex Core)
+by completing the included test suite, stress and bench tests.
+
+New Features
+------------
+New routine pthread_timedjoin_np added for compatibility with Linux
+and BSD.
+
+Bug Fixes
+---------
+Small object file static linking now works. The autostatic.c code is
+required but nothing explicitly references this code so was getting
+optimised out.
+- Daniel Richard G.
+
 RELEASE 2.9.0
 -------------
 (2012-05-25)
