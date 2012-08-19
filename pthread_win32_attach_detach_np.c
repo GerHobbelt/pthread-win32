@@ -70,7 +70,7 @@ pthread_win32_process_attach_np ()
    *
    * This should take care of any security issues.
    */
-#if defined(__GNUC__) || defined(PTW32_CONFIG_MSVC8)
+#if defined(__GNUC__) || defined(PTW32_CONFIG_MSVC7)
   if(GetSystemDirectory(QuserExDLLPathBuf, sizeof(QuserExDLLPathBuf)))
   {
     (void) strncat(QuserExDLLPathBuf,

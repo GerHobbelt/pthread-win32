@@ -401,7 +401,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
   cleanup_args.cv = cv;
   cleanup_args.resultPtr = &result;
 
-#if defined(PTW32_CONFIG_MSVC8)
+#if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth(0)
 #endif
   pthread_cleanup_push (ptw32_cond_wait_cleanup, (void *) &cleanup_args);
@@ -438,7 +438,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
    * Always cleanup
    */
   pthread_cleanup_pop (1);
-#if defined(PTW32_CONFIG_MSVC8)
+#if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth()
 #endif
 

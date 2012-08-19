@@ -139,7 +139,7 @@ sem_wait (sem_t * sem)
 
 	  if (v < 0)
 	    {
-#if defined(PTW32_CONFIG_MSVC8)
+#if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth(0)
 #endif
 	      /* Must wait */
@@ -147,7 +147,7 @@ sem_wait (sem_t * sem)
 	      result = pthreadCancelableWait (s->sem);
 	      /* Cleanup if we're canceled or on any other error */
 	      pthread_cleanup_pop(result);
-#if defined(PTW32_CONFIG_MSVC8)
+#if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth()
 #endif
 	    }

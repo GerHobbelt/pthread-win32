@@ -124,7 +124,7 @@
 #    define PTW32_CONFIG_MSVC6
 #  endif
 #  if _MSC_VER < 1400
-#    define PTW32_CONFIG_MSVC8
+#    define PTW32_CONFIG_MSVC7
 #  endif
 #endif
 
