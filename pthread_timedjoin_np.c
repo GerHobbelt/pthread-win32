@@ -167,16 +167,12 @@ pthread_timedjoin_np (pthread_t thread, void **value_ptr, const struct timespec 
 
               /*
                * The result of making multiple simultaneous calls to
-               * pthread_join() or pthread_detach() specifying the same
-               * target is undefined.
+               * pthread_join() or pthread_timedjoin_np() or pthread_detach()
+               * specifying the same target is undefined.
                */
               result = pthread_detach (thread);
             }
-          else if (result == WAIT_TIMEOUT)
-            {
-              result = ETIMEDOUT;
-            }
-          else
+          else if (ETIMEDOUT != result)
             {
               result = ESRCH;
             }

@@ -1,3 +1,9 @@
+2012-08-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread_timedjoin_np.c: New non-portable function.
+	* common.mk (pthread_timedjoin_np): Add new function.
+	* nonportable.c (pthread_timedjoin_np): Likewise.
+
 2012-08-16  Daniel Richard. G <danielg at teragram dot com>
 
 	* pthread.h (PTW32_CONFIG_MINGW): Defined to simplify complex macro combination.

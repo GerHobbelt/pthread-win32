@@ -101,7 +101,7 @@ TESTS	= \
 	  create1 create2 create3 reuse1 reuse2 equal1 \
 	  sequence1 kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
-	  join0 join1 detach1 join2 join3 \
+	  join0 join1 detach1 join2 join3 join4 \
 	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
@@ -140,7 +140,7 @@ STATICTESTS = \
 	  create1 create2 create3 reuse1 reuse2 equal1 \
 	  sequence1 kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
-	  join0 join1 detach1 join2 join3 \
+	  join0 join1 detach1 join2 join3 join4 \
 	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
@@ -311,6 +311,7 @@ join0.pass: create1.pass
 join1.pass: create1.pass
 join2.pass: create1.pass
 join3.pass: join2.pass
+join4.pass: join3.pass
 kill1.pass:
 loadfree.pass: pthread.dll
 mutex1.pass: self1.pass

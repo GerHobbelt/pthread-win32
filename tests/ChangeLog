@@ -1,3 +1,11 @@
+2012-08-19  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* join4.c: Test for new pthread_timedjoin_np routine
+	* Makefile (join4): Added.
+	* GNUmakefile (join4): Added.
+	* Bmakefile (join4): Added.
+	* Wmakefile (join4): Added.
+
 2012-08-11  Daniel Richard. G <danielg at teragram dot com>
 
 	* Makefile: Various improvements.

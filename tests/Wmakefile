@@ -89,7 +89,7 @@ PASSES	= sizes.pass  loadfree.pass &
 	  exit1.pass  create1.pass  create2.pass  reuse1.pass  reuse2.pass  equal1.pass  &
 	  sequence1.pass  kill1.pass  valid1.pass  valid2.pass  &
 	  exit2.pass  exit3.pass  exit4  exit5  &
-	  join0.pass  join1.pass  detach1.pass  join2.pass join3.pass  &
+	  join0.pass  join1.pass  detach1.pass  join2.pass join3.pass join4.pass  &
 	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  &
 	  mutex6s.pass  mutex6es.pass  mutex6rs.pass  &
 	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  &
@@ -279,6 +279,7 @@ join0.pass: create1.pass
 join1.pass: create1.pass
 join2.pass: create1.pass
 join3.pass: join2.pass
+join4.pass: join3.pass
 kill1.pass: 
 loadfree.pass: pthread.dll
 mutex1.pass: self1.pass

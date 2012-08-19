@@ -1182,6 +1182,9 @@ PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_setkind_np(pthread_mutexattr_t *
                                          int kind);
 PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr,
                                          int *kind);
+PTW32_DLLPORT int PTW32_CDECL pthread_timedjoin_np(pthread_t thread,
+                                         void **value_ptr,
+                                         const struct timespec *abstime);
 
 /*
  * Possibly supported by other POSIX threads implementations
