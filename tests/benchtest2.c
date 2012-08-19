@@ -43,7 +43,6 @@
  */
 
 #include "test.h"
-#include <sys/timeb.h>
 
 #ifdef __GNUC__
 #include <stdlib.h>

@@ -44,6 +44,7 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <sys/timeb.h>
 
 #define PTW32_THREAD_NULL_ID {NULL,0}
 

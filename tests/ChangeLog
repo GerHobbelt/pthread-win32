@@ -5,6 +5,16 @@
 	* GNUmakefile (join4): Added.
 	* Bmakefile (join4): Added.
 	* Wmakefile (join4): Added.
+	* test.h (sys/timeb.h): Add #include.
+	* mutex8.c (sys/timeb.h): Remove #include.
+	* mutex8e.c (sys/timeb.h): Remove #include.
+	* mutex8n.c (sys/timeb.h): Remove #include.
+	* mutex8r.c (sys/timeb.h): Remove #include.
+	* benchtest1.c (sys/timeb.h): Remove #include.
+	* benchtest2.c (sys/timeb.h): Remove #include.
+	* benchtest3.c (sys/timeb.h): Remove #include.
+	* benchtest4.c (sys/timeb.h): Remove #include.
+	* benchtest5.c (sys/timeb.h): Remove #include.
 
 2012-08-11  Daniel Richard. G <danielg at teragram dot com>
 
