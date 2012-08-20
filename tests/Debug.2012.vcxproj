@@ -572,7 +572,7 @@
     <ClInclude Include="test.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\pthread.2010.vcxproj">
+    <ProjectReference Include="..\pthread.2012.vcxproj">
       <Project>{5d459ba0-5eeb-47d3-a1c4-6b55c8d37ec0}</Project>
     </ProjectReference>
   </ItemGroup>
