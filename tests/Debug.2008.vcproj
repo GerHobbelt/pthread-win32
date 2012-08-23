@@ -584,6 +584,10 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<ProjectReference
+			ReferencedProjectIdentifier="{5D459BA0-5EEB-47D3-A1C4-6B55C8D37EC0}"
+			RelativePathToProject="..\pthread-win32\pthread.2008.vcproj"
+		/>
 	</References>
 	<Files>
 		<Filter
