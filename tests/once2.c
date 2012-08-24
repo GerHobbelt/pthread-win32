@@ -96,7 +96,11 @@ test_once2(void)
       once[j] = o;
 
       for (i = 0; i < NUM_THREADS; i++)
-        assert(pthread_create(&t[i][j], NULL, mythread, (void *)(size_t)j) == 0);
+        {
+	  /* GCC build: create was failing with EAGAIN after 790 threads */
+          while (0 != pthread_create(&t[i][j], NULL, mythread, (void *)(size_t)j))
+	    sched_yield();
+        }
     }
 
   for (j = 0; j < NUM_ONCE; j++)
