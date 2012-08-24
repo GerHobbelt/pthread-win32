@@ -96,6 +96,7 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #else
 #define PTW32_INTERLOCKED_VOLATILE volatile
 #endif
+
 #define PTW32_INTERLOCKED_LONG long
 #if defined(_M_IA64)
 #define PTW32_INTERLOCKED_SIZE LONG64
@@ -124,6 +125,17 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #  if defined(_MSC_VER) && _MSC_VER < 1300
      typedef long intptr_t;
 #  endif
+#endif
+
+/*
+ * Don't allow the linker to optimize away autostatic.obj in static builds.
+ */
+#if defined(PTW32_STATIC_LIB)
+  void ptw32_autostatic_anchor(void);
+#   if defined(__MINGW64__) || defined(__MINGW32__)
+    __attribute__((unused, used))
+#   endif
+  static void (*local_autostatic_anchor)(void) = ptw32_autostatic_anchor;
 #endif
 
 typedef enum
@@ -622,6 +634,7 @@ extern "C"
   int ptw32_cond_check_need_init (pthread_cond_t * cond);
   int ptw32_mutex_check_need_init (pthread_mutex_t * mutex);
   int ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock);
+  int ptw32_spinlock_check_need_init (pthread_spinlock_t * lock);
 
   int ptw32_robust_mutex_inherit(pthread_mutex_t * mutex);
   void ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self);
@@ -761,6 +774,12 @@ extern "C"
  *
  * The above aren't available in Mingw32 as of gcc 4.5.2 so define our own.
  */
+#if defined(__cplusplus)
+# define PTW32_TO_VLONG64PTR(ptr) reinterpret_cast<volatile LONG64 *>(ptr)
+#else
+# define PTW32_TO_VLONG64PTR(ptr) (ptr)
+#endif
+
 #if defined(__GNUC__)
 # if defined(_WIN64)
 # define PTW32_INTERLOCKED_COMPARE_EXCHANGE_64(location, value, comparand)    \
@@ -891,11 +910,11 @@ extern "C"
                                     (PTW32_INTERLOCKED_SIZE)value)
 #else
 # if defined(_WIN64)
-#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_64 InterlockedCompareExchange64
-#   define PTW32_INTERLOCKED_EXCHANGE_64 InterlockedExchange64
-#   define PTW32_INTERLOCKED_EXCHANGE_ADD_64 InterlockedExchangeAdd64
-#   define PTW32_INTERLOCKED_INCREMENT_64 InterlockedIncrement64
-#   define PTW32_INTERLOCKED_DECREMENT_64 InterlockedDecrement64
+#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_64(p,v,c) InterlockedCompareExchange64(PTW32_TO_VLONG64PTR(p),(v),(c))
+#   define PTW32_INTERLOCKED_EXCHANGE_64(p,v) InterlockedExchange64(PTW32_TO_VLONG64PTR(p),(v))
+#   define PTW32_INTERLOCKED_EXCHANGE_ADD_64(p,v) InterlockedExchangeAdd64(PTW32_TO_VLONG64PTR(p),(v))
+#   define PTW32_INTERLOCKED_INCREMENT_64(p) InterlockedIncrement64(PTW32_TO_VLONG64PTR(p))
+#   define PTW32_INTERLOCKED_DECREMENT_64(p) InterlockedDecrement64(PTW32_TO_VLONG64PTR(p))
 # endif
 # if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(_WIN64) /* MSVC 6 */
 #  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand) \
@@ -903,31 +922,31 @@ extern "C"
 # else
 #  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG InterlockedCompareExchange
 # endif
-# define PTW32_INTERLOCKED_EXCHANGE_LONG InterlockedExchange
-# define PTW32_INTERLOCKED_EXCHANGE_ADD_LONG InterlockedExchangeAdd
-# define PTW32_INTERLOCKED_INCREMENT_LONG InterlockedIncrement
-# define PTW32_INTERLOCKED_DECREMENT_LONG InterlockedDecrement
+# define PTW32_INTERLOCKED_EXCHANGE_LONG(p,v) InterlockedExchange((p),(v))
+# define PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(p,v) InterlockedExchangeAdd((p),(v))
+# define PTW32_INTERLOCKED_INCREMENT_LONG(p) InterlockedIncrement((p))
+# define PTW32_INTERLOCKED_DECREMENT_LONG(p) InterlockedDecrement((p))
 # if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(_WIN64) /* MSVC 6 */
 #  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchange
 #  define PTW32_INTERLOCKED_EXCHANGE_PTR(location, value) \
     ((PVOID)InterlockedExchange((LPLONG)(location), (LONG)(value)))
 # else
-#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchangePointer
-#  define PTW32_INTERLOCKED_EXCHANGE_PTR InterlockedExchangePointer
+#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR(p,v,c) InterlockedCompareExchangePointer((p),(v),(c))
+#  define PTW32_INTERLOCKED_EXCHANGE_PTR(p,v) InterlockedExchangePointer((p),(v))
 # endif
 #endif
 #if defined(_WIN64)
-#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE PTW32_INTERLOCKED_COMPARE_EXCHANGE_64
-#   define PTW32_INTERLOCKED_EXCHANGE_SIZE PTW32_INTERLOCKED_EXCHANGE_64
-#   define PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE PTW32_INTERLOCKED_EXCHANGE_ADD_64
-#   define PTW32_INTERLOCKED_INCREMENT_SIZE PTW32_INTERLOCKED_INCREMENT_64
-#   define PTW32_INTERLOCKED_DECREMENT_SIZE PTW32_INTERLOCKED_DECREMENT_64
+#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE(p,v,c) PTW32_INTERLOCKED_COMPARE_EXCHANGE_64(PTW32_TO_VLONG64PTR(p),(v),(c))
+#   define PTW32_INTERLOCKED_EXCHANGE_SIZE(p,v) PTW32_INTERLOCKED_EXCHANGE_64(PTW32_TO_VLONG64PTR(p),(v))
+#   define PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE(p,v) PTW32_INTERLOCKED_EXCHANGE_ADD_64(PTW32_TO_VLONG64PTR(p),(v))
+#   define PTW32_INTERLOCKED_INCREMENT_SIZE(p) PTW32_INTERLOCKED_INCREMENT_64(PTW32_TO_VLONG64PTR(p))
+#   define PTW32_INTERLOCKED_DECREMENT_SIZE(p) PTW32_INTERLOCKED_DECREMENT_64(PTW32_TO_VLONG64PTR(p))
 #else
-#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG
-#   define PTW32_INTERLOCKED_EXCHANGE_SIZE PTW32_INTERLOCKED_EXCHANGE_LONG
-#   define PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE PTW32_INTERLOCKED_EXCHANGE_ADD_LONG
-#   define PTW32_INTERLOCKED_INCREMENT_SIZE PTW32_INTERLOCKED_INCREMENT_LONG
-#   define PTW32_INTERLOCKED_DECREMENT_SIZE PTW32_INTERLOCKED_DECREMENT_LONG
+#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE(p,v,c) PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG((p),(v),(c))
+#   define PTW32_INTERLOCKED_EXCHANGE_SIZE(p,v) PTW32_INTERLOCKED_EXCHANGE_LONG((p),(v))
+#   define PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE(p,v) PTW32_INTERLOCKED_EXCHANGE_ADD_LONG((p),(v))
+#   define PTW32_INTERLOCKED_INCREMENT_SIZE(p) PTW32_INTERLOCKED_INCREMENT_LONG((p))
+#   define PTW32_INTERLOCKED_DECREMENT_SIZE(p) PTW32_INTERLOCKED_DECREMENT_LONG((p))
 #endif
 
 #if defined(NEED_CREATETHREAD)
