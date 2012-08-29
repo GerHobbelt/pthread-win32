@@ -86,9 +86,6 @@ main()
 
   assert(pthread_mutex_destroy(&mutex) == 0);
 
-  exit(0);
-
-  /* Never reached */
   return 0;
 }
 

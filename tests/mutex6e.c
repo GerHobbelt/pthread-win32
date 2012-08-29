@@ -101,9 +101,6 @@ main()
 
   assert(pthread_mutexattr_destroy(&mxAttr) == 0);
 
-  exit(0);
-
-  /* Never reached */
   return 0;
 }
 
