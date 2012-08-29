@@ -10,6 +10,8 @@
 	(PTW32_INTERLOCKED_SIZEPTR): Define as long* or LONGLONG*.
 	* pthread_attr_getschedpolicy.c (SCHED_MAX): Fix cast.
 	* ptw32_mutex_check_need_init.c: Fix static mutexattr_t struct initializations.
+	* ptw32_threadStart.c (ExceptionFilter): Add cast.
+	* ptw32_throw.c: Add cast.
 
 2012-08-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
 

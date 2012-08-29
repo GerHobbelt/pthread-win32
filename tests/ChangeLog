@@ -1,3 +1,27 @@
+2012-08-29  Daniel Richard. G <danielg at teragram dot com>
+
+	* mutex6.c: Removed pointless exit(0) and never-reached comment.
+	* mutex6r.c: Likewise.
+	* mutex6rs.c: Likewise.
+	* mutex6s.c: Likewise.
+	* mutex6e.c: Likewise.
+	* mutex6es.c: Likewise.
+	* mutex7.c: Likewise.
+	* mutex7e.c: Likewise.
+	* mutex7n.c: Likewise.
+	* mutex7r.c: Likewise.
+	* mutex6n.c: Likewise; ensure operator precedence.
+	* once2.c (sharedInt_t): replace static initialization of struct with memset.
+	* once3.c: Likewise.
+	* once4.c: Likewise.
+	* cleanup0.c: Likewise.
+	* cleanup1.c: Likewise.
+	* cleanup2.c: Likewise.
+	* cleanup3.c: Likewise.
+	* openmp1.c: Fix casts.
+	* exit1.c: Remove assert statement that is never reached and return 1.
+	* exception2.c: Prevent displaying modal error dialog.
+
 2012-08-19  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* join4.c: Test for new pthread_timedjoin_np routine
