@@ -1,3 +1,16 @@
+2012-08-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* ptw32_MCS_lock.c (ptw32_mcs_flag_wait): Fix cast in first 'if' statement.
+	* pthread_mutex_consistent.c (comment): Fix awkward grammar.
+	* pthread_mutexattr_init.c: Initialize robustness element.
+
+2012-08-29  Daniel Richard. G <danielg at teragram dot com>
+
+	* implement.h (PTW32_INTERLOCKED_SIZE): Define as long or LONGLONG.
+	(PTW32_INTERLOCKED_SIZEPTR): Define as long* or LONGLONG*.
+	* pthread_attr_getschedpolicy.c (SCHED_MAX): Fix cast.
+	* ptw32_mutex_check_need_init.c: Fix static mutexattr_t struct initializations.
+
 2012-08-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_timedjoin_np.c: New non-portable function.
