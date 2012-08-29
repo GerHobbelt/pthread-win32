@@ -122,7 +122,7 @@ ptw32_mcs_flag_set (HANDLE * flag)
 INLINE void 
 ptw32_mcs_flag_wait (HANDLE * flag)
 {
-  if ((PTW32_INTERLOCKED_LONG)0 ==
+  if ((PTW32_INTERLOCKED_SIZE)0 ==
         PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE((PTW32_INTERLOCKED_SIZEPTR)flag,
                                             (PTW32_INTERLOCKED_SIZE)0)) /* MBR fence */
     {
