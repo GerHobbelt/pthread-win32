@@ -128,7 +128,7 @@ ptw32_throw (DWORD exception)
   exceptionInformation[1] = (DWORD) (0);
   exceptionInformation[2] = (DWORD) (0);
 
-  RaiseException (EXCEPTION_PTW32_SERVICES, 0, 3, exceptionInformation);
+  RaiseException (EXCEPTION_PTW32_SERVICES, 0, 3, (ULONG_PTR *) exceptionInformation);
 
 #else /* __CLEANUP_SEH */
 

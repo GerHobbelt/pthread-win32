@@ -59,7 +59,7 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
 
 	for (param = 0; param < numParams; param++)
 	  {
-	    ei[param] = ep->ExceptionRecord->ExceptionInformation[param];
+	    ei[param] = (DWORD) ep->ExceptionRecord->ExceptionInformation[param];
 	  }
 
 	return EXCEPTION_EXECUTE_HANDLER;
