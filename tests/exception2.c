@@ -123,11 +123,23 @@ main(int argc, char* argv[])
     {
       int result;
 
+#if !defined(NO_ERROR_DIALOGS)
       printf("You should see an \"abnormal termination\" message\n");
       fflush(stdout);
+#endif
+
       result = system("exception2.exe die");
+
+#if defined(NO_ERROR_DIALOGS)
+      exit(result == 1 ? 0 : 1);
+#else
       exit(0);
+#endif
     }
+
+#if defined(NO_ERROR_DIALOGS)
+  SetErrorMode(SEM_NOGPFAULTERRORBOX);
+#endif
 
   assert((mt = pthread_self()).p != NULL);
 
