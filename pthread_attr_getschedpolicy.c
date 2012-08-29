@@ -50,7 +50,7 @@ pthread_attr_getschedpolicy (const pthread_attr_t * attr, int *policy)
    * Validate the policy arg.
    * Check that a policy constant wasn't passed rather than &policy.
    */
-  if (policy <= (int *) SCHED_MAX)
+  if (policy <= (int *)(size_t) SCHED_MAX)
     {
       return EINVAL;
     }
