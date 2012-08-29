@@ -97,7 +97,7 @@ typedef struct {
   CRITICAL_SECTION cs;
 } sharedInt_t;
 
-static sharedInt_t pop_count = {0, {0}};
+static sharedInt_t pop_count;
 
 static void
 increment_pop_count(void * arg)
@@ -147,6 +147,8 @@ main()
   int i;
   pthread_t t[NUMTHREADS + 1];
 
+  memset(&pop_count, 0, sizeof(sharedInt_t));
+
   InitializeCriticalSection(&pop_count.cs);
 
   assert((t[0] = pthread_self()).p != NULL);
@@ -193,7 +195,7 @@ main()
 
       assert(pthread_join(t[i], &result) == 0);
 
-      fail = ((int)(size_t)result == (int)(size_t) PTHREAD_CANCELED);
+      fail = (result == PTHREAD_CANCELED);
 
       if (fail)
 	{
