@@ -86,18 +86,17 @@ ptw32_timed_eventwait (HANDLE event, const struct timespec *abstime)
 
       status = WaitForSingleObject (event, milliseconds);
 
-      if (status == WAIT_OBJECT_0)
-	{
-	  return 0;
-	}
-      else if (status == WAIT_TIMEOUT)
-	{
-	  return ETIMEDOUT;
-	}
-      else
-	{
-	  return EINVAL;
-	}
+      if (status != WAIT_OBJECT_0)
+        {
+          if (status == WAIT_TIMEOUT)
+            {
+              return ETIMEDOUT;
+            }
+          else
+            {
+              return EINVAL;
+            }
+        }
     }
 
   return 0;

@@ -79,7 +79,7 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #include "semaphore.h"
 #include "sched.h"
 
-#if defined(HAVE_C_INLINE) || defined(__cplusplus)
+#if ( defined(HAVE_C_INLINE) || defined(__cplusplus) ) && defined(PTW32_BUILD_INLINED)
 # define INLINE inline
 #else
 # define INLINE
