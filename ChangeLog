@@ -1,3 +1,16 @@
+2012-08-31  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread_attr_getschedpolicy.c: Remove pedantic arg check.
+	* pthread_getschedparam.c: Likewise.
+	* pthread_mutex_timelock.c: Restructure to address unreached final
+	return statement.
+
+2012-08-31  Daniel Richard. G <danielg at teragram dot com>
+
+	* implement.h (INLINE): only define if building the inlined make targets. G++
+	complained about undefined reference to ptw32_robust_mutex_remove() because it
+	appears in separate compilation units for "make GCE".
+
 2012-08-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* ptw32_MCS_lock.c (ptw32_mcs_flag_wait): Fix cast in first 'if' statement.
