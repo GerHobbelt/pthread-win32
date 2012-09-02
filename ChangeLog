@@ -1,3 +1,7 @@
+2012-09-02  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* All: correct spelling to 'cancellation'.
+
 2012-08-31  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_attr_getschedpolicy.c: Remove pedantic arg check.

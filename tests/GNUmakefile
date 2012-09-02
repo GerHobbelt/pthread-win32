@@ -184,6 +184,7 @@ help:
 	@ $(ECHO) "$(MAKE) clean GCE-stress (to stresstest using GNU C dll with C++ exception handling)"
 	@ $(ECHO) "$(MAKE) clean GC-static  (to test using GC static lib with C (no EH) applications)"
 	@ $(ECHO) "$(MAKE) clean GC-debug   (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCE-debug  (to test using GCE dll with C++ (EH) applications)"
 
 all:
 	@ $(MAKE) clean GC
