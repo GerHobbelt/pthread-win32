@@ -25,7 +25,7 @@ pthread_win32_test_features_np(int mask)
 			QUSEREX.DLL is available and the AlertDrv.sys
 			driver is loaded into Windows, providing
 			alertable (pre-emptive) asyncronous threads
-			cancelation. If this feature returns FALSE
+			cancellation. If this feature returns FALSE
 			then the default async cancel scheme is in
 			use, which cannot cancel blocked threads.
 
@@ -121,9 +121,9 @@ pthread_delay_np (const struct timespec *interval);
 
         Specifying an interval of zero (0) seconds and zero (0) nanoseconds is
         allowed and can be used to force the thread to give up the processor or to
-        deliver a pending cancelation request.
+        deliver a pending cancellation request.
 
-        This routine is a cancelation point.
+        This routine is a cancellation point.
 
         The timespec structure contains the following two fields:
 

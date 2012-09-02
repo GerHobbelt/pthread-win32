@@ -686,9 +686,9 @@ Sleep( 1 ); // @AT
       *              a timeout
       *
       * Note:
-      *      ptw32_sem_timedwait is a cancelation point,
+      *      ptw32_sem_timedwait is a cancellation point,
       *      hence providing the
-      *      mechanism for making pthread_cond_wait a cancelation
+      *      mechanism for making pthread_cond_wait a cancellation
       *      point. We use the cleanup mechanism to ensure we
       *      re-lock the mutex and decrement the waiters count
       *      if we are canceled.

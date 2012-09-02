@@ -136,7 +136,7 @@ typedef enum
   PThreadStateRunning,		/* Thread alive & kicking               */
   PThreadStateSuspended,	/* Thread alive but suspended           */
   PThreadStateCancelPending,	/* Thread alive but                     */
-                                /* has cancelation pending.             */
+                                /* has cancellation pending.             */
   PThreadStateCanceling,	/* Thread alive but is                  */
                                 /* in the process of terminating        */
                                 /* due to a cancellation request        */
@@ -571,7 +571,7 @@ struct ThreadKeyAssoc
 
 
 /* Declared in pthread_cancel.c */
-extern DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD);
+extern DWORD (*ptw32_register_cancellation) (PAPCFUNC, HANDLE, DWORD);
 
 /* Thread Reuse stack bottom marker. Must not be NULL or any valid pointer to memory. */
 #define PTW32_THREAD_REUSE_EMPTY ((ptw32_thread_t *)(size_t) 1)
@@ -628,7 +628,7 @@ extern "C"
   void ptw32_robust_mutex_remove(pthread_mutex_t* mutex, ptw32_thread_t* otp);
 
   DWORD
-    ptw32_RegisterCancelation (PAPCFUNC callback,
+    ptw32_Registercancellation (PAPCFUNC callback,
 			       HANDLE threadH, DWORD callback_arg);
 
   int ptw32_processInitialize (void);
