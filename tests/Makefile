@@ -176,22 +176,24 @@ STATICRESULTS = \
 
 help:
 	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) $(MAKE) clean VC          (to test using VC dll with VC (no EH) apps)
-	@ $(ECHO) $(MAKE) clean VC-bench    (to benchtest using VC dll with C bench apps)
-	@ $(ECHO) $(MAKE) clean VC-stress   (to stresstest using VC dll with C stress apps)
-	@ $(ECHO) $(MAKE) clean VC-static   (to test using VC static lib with VC (no EH) apps)
-	@ $(ECHO) $(MAKE) clean VC-debug    (to test using VC dll with VC (no EH) apps)
-	@ $(ECHO) $(MAKE) clean VCX         (to test using VC dll with VC++ (EH) applications)
-	@ $(ECHO) $(MAKE) clean VCX-bench   (to benchtest using VC dll with C++ bench apps)
-	@ $(ECHO) $(MAKE) clean VCX-stress  (to stresstest using VC dll with C++ stress apps)
-	@ $(ECHO) $(MAKE) clean VCE         (to test using the VCE dll with VC++ EH applications)
-	@ $(ECHO) $(MAKE) clean VCE-bench   (to benchtest using VCE dll with C++ bench apps)
-	@ $(ECHO) $(MAKE) clean VCE-stress  (to stresstest using VCE dll with C++ stress apps)
-	@ $(ECHO) $(MAKE) clean VCE-debug   (to test using the VCE dll with VC++ EH applications)
-	@ $(ECHO) $(MAKE) clean VSE         (to test using VSE dll with VC (SEH) apps)
-	@ $(ECHO) $(MAKE) clean VSE-bench   (to benchtest using VSE dll with SEH bench apps)
-	@ $(ECHO) $(MAKE) clean VSE-stress  (to stresstest using VSE dll with SEH stress apps)
-	@ $(ECHO) $(MAKE) clean VSE-debug   (to test using VSE dll with VC (SEH) apps)
+	@ $(ECHO) $(MAKE) clean VC                (to test using VC dll with VC (no EH) apps)
+	@ $(ECHO) $(MAKE) clean VC-bench          (to benchtest using VC dll with C bench apps)
+	@ $(ECHO) $(MAKE) clean VC-stress         (to stresstest using VC dll with C stress apps)
+	@ $(ECHO) $(MAKE) clean VC-static         (to test using VC static lib with VC (no EH) apps)
+	@ $(ECHO) $(MAKE) clean VC-debug          (to test using VC dll with VC (no EH) apps)
+	@ $(ECHO) $(MAKE) clean VCX               (to test using VC dll with VC++ (EH) applications)
+	@ $(ECHO) $(MAKE) clean VCX-bench         (to benchtest using VC dll with C++ bench apps)
+	@ $(ECHO) $(MAKE) clean VCX-stress        (to stresstest using VC dll with C++ stress apps)
+	@ $(ECHO) $(MAKE) clean VCE               (to test using the VCE dll with VC++ EH applications)
+	@ $(ECHO) $(MAKE) clean VCE-bench         (to benchtest using VCE dll with C++ bench apps)
+	@ $(ECHO) $(MAKE) clean VCE-stress        (to stresstest using VCE dll with C++ stress apps)
+	@ $(ECHO) $(MAKE) clean VCE-static        (to test using VCE static lib with VC++ EH apps)
+	@ $(ECHO) $(MAKE) clean VCE-debug         (to test using the VCE dll with VC++ EH applications)
+	@ $(ECHO) $(MAKE) clean VCE-static-debug  (to test using VCE static lib with VC++ EH apps)
+	@ $(ECHO) $(MAKE) clean VSE               (to test using VSE dll with VC (SEH) apps)
+	@ $(ECHO) $(MAKE) clean VSE-bench         (to benchtest using VSE dll with SEH bench apps)
+	@ $(ECHO) $(MAKE) clean VSE-stress        (to stresstest using VSE dll with SEH stress apps)
+	@ $(ECHO) $(MAKE) clean VSE-debug         (to test using VSE dll with VC (SEH) apps)
 
 all:
 	@ $(MAKE) /E clean VC
@@ -281,11 +283,20 @@ VCX-stress:
 VC-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
+VCE-static:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" statictests
+
 VC-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" tests
 
+VC-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS)" statictests
+
 VCE-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" tests
+
+VCE-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS)" statictests
 
 VSE-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" tests

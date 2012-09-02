@@ -1,3 +1,8 @@
+2012-09-03  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile (VCE-static): Add VC++ static build target
+	(VCE-static-debug): Likewise.
+
 2012-08-29  Daniel Richard. G <danielg at teragram dot com>
 
 	* mutex6.c: Removed pointless exit(0) and never-reached comment.

@@ -59,22 +59,24 @@ SMALL_STATIC_OBJS	= $(SMALL_STATIC_OBJS) $(RESOURCE_OBJS)
 
 help:
 	@ echo Run one of the following command lines:
-	@ echo nmake clean VCE               (to build the MSVC dll with C++ exception handling)
-	@ echo nmake clean VSE               (to build the MSVC dll with structured exception handling)
-	@ echo nmake clean VC                (to build the MSVC dll with C cleanup code)
-	@ echo nmake clean VCE-inlined       (to build the MSVC inlined dll with C++ exception handling)
-	@ echo nmake clean VSE-inlined       (to build the MSVC inlined dll with structured exception handling)
-	@ echo nmake clean VC-inlined        (to build the MSVC inlined dll with C cleanup code)
-	@ echo nmake clean VC-static         (to build the MSVC inlined static lib with C cleanup code)
-	@ echo nmake clean VC-small-static   (to build the MSVC small static lib with C cleanup code)
-	@ echo nmake clean VCE-debug         (to build the debug MSVC dll with C++ exception handling)
-	@ echo nmake clean VSE-debug         (to build the debug MSVC dll with structured exception handling)
-	@ echo nmake clean VC-debug          (to build the debug MSVC dll with C cleanup code)
-	@ echo nmake clean VCE-inlined-debug (to build the debug MSVC inlined dll with C++ exception handling)
-	@ echo nmake clean VSE-inlined-debug (to build the debug MSVC inlined dll with structured exception handling)
-	@ echo nmake clean VC-inlined-debug  (to build the debug MSVC inlined dll with C cleanup code)
-	@ echo nmake clean VC-static-debug   (to build the debug MSVC inlined static lib with C cleanup code)
-	@ echo nmake clean VC-small-debug    (to build the debug MSVC small static lib with C cleanup code)
+	@ echo nmake clean VC
+	@ echo nmake clean VC-inlined
+	@ echo nmake clean VC-static
+	@ echo nmake clean VC-small-static
+	@ echo nmake clean VC-debug
+	@ echo nmake clean VC-inlined-debug
+	@ echo nmake clean VC-static-debug
+	@ echo nmake clean VC-small-static-debug
+	@ echo nmake clean VCE
+	@ echo nmake clean VCE-inlined
+	@ echo nmake clean VCE-debug
+	@ echo nmake clean VCE-inlined-debug
+	@ echo nmake clean VCE-static-debug
+	@ echo nmake clean VCE-small-static-debug
+	@ echo nmake clean VSE
+	@ echo nmake clean VSE-inlined
+	@ echo nmake clean VSE-debug
+	@ echo nmake clean VSE-inlined-debug
 
 all:
 	$(MAKE) /E clean VCE-inlined
@@ -150,6 +152,10 @@ VC-inlined:
 VC-inlined-debug:
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).stamp
 
+#
+# Static builds
+#
+
 VC-static:
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGS) /DPTW32_BUILD_INLINED /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).static
 
@@ -161,6 +167,19 @@ VC-small-static:
 
 VC-small-static-debug:
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).small_stamp
+
+VCE-static:
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /DPTW32_BUILD_INLINED /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).static
+
+VCE-small-static:
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).small_stamp
+
+VCE-static-debug:
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /DPTW32_BUILD_INLINED /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).static
+
+VCE-small-static-debug:
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).small_stamp
+
 
 realclean: clean
 	if exist pthread*.dll del pthread*.dll

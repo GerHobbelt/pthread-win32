@@ -1,3 +1,13 @@
+2012-09-03  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile: Remove descriptive info from help target, just list the
+	available targets. Output tends to be poorly formatted and cluttered
+	otherwise.
+	(VCE-static): Add VC++ static build target.
+	(VCE-small-static): Likewise.
+	(VCE-small-static-debug): Likewise.
+	(VCE-small-static-debug): Likewise.
+
 2012-09-02  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* All: correct spelling to 'cancellation'.
