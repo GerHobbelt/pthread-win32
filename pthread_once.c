@@ -71,7 +71,7 @@ pthread_once (pthread_once_t * once_control, void (PTW32_CDECL *init_routine) (v
 	  once_control->done = PTW32_TRUE;
 	}
 
-	ptw32_mcs_lock_release(&node);
+      ptw32_mcs_lock_release(&node);
     }
 
   return 0;
