@@ -1,3 +1,8 @@
+2012-09-04  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile (VCEFLAGS): Changed from /EHsc to /EHs which fixed a problem
+	in tests/once3.c which was causing it to hang.
+
 2012-09-03  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* Makefile (VCE-static): Add VC++ static build target

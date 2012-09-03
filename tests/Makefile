@@ -50,7 +50,7 @@ OPTIM	= /O2 /Ob0
 XXLIBS	= ws2_32.lib
 
 # C++ Exceptions
-VCEFLAGS	= /EHsc /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
+VCEFLAGS	= /EHs /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
 VCELIB	= pthreadVCE$(DLL_VER).lib
 VCEDLL	= pthreadVCE$(DLL_VER).dll
 VCELIBD	= pthreadVCE$(DLL_VER)d.lib
