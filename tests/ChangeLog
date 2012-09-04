@@ -6,6 +6,9 @@
 	* cancel2.c: Rewrite to use a barrier for thread control; remove
 	asyncronous cancel type which was a massive bug in the test strategy
 	and cusing SEGFAULTs (access violations).
+	* eyal1.c: Remove unused variable 'i' to clear compiler warning.
+	* context1.c: Remove call to pthread_exit() in alternate ending to
+	quell error in GCE tests see when running x86 build on x64.
 
 2012-09-03  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
