@@ -1,7 +1,11 @@
 2012-09-04  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
-	* Makefile (VCEFLAGS): Changed from /EHsc to /EHs which fixed a problem
-	in tests/once3.c which was causing it to hang.
+	* Makefile (VCEFLAGS): Changed from /EHsc to /EHs which was causing
+	tests/once3.c to hang, suspect exceptions not being thrown from
+	extern C routines.
+	* cancel2.c: Rewrite to use a barrier for thread control; remove
+	asyncronous cancel type which was a massive bug in the test strategy
+	and cusing SEGFAULTs (access violations).
 
 2012-09-03  Ross Johnson <ross dot johnson at homemail dot com dot au>
 

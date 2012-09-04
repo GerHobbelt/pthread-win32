@@ -1,6 +1,4 @@
-# This makefile is compatible with MS nmake and can be used as a
-# replacement for buildlib.bat. I've changed the target from an ordinary dll
-# (/LD) to a debugging dll (/LDd).
+# This makefile is compatible with MS nmake
 # 
 # The variables $DLLDEST and $LIBDEST hold the destination directories for the
 # dll and the lib, respectively. Probably all that needs to change is $DEVROOT.

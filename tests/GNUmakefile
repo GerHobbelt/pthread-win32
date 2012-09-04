@@ -260,7 +260,7 @@ barrier4.pass: barrier3.pass
 barrier5.pass: barrier4.pass
 barrier6.pass: barrier5.pass
 cancel1.pass: create1.pass
-cancel2.pass: cancel1.pass
+cancel2.pass: barrier6.pass
 cancel3.pass: context1.pass
 cancel4.pass: cancel3.pass
 cancel5.pass: cancel3.pass
