@@ -102,7 +102,7 @@ all-tests:
 	$(MAKE) /E realclean VC-static
 	cd tests && $(MAKE) /E clean VC-static $(TEST_ENV)
 	$(MAKE) /E realclean VC-small-static
-	cd tests && $(MAKE) /E clean VC-small-static $(TEST_ENV)
+	cd tests && $(MAKE) /E clean VC-static $(TEST_ENV)
 	@ echo $@ completed successfully.
 
 all-tests-cflags:

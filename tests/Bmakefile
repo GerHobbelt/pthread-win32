@@ -214,6 +214,7 @@ clean:
 	- $(RM) *.o
 	- $(RM) *.asm
 	- $(RM) *.exe
+	- $(RM) *.manifest
 	- $(RM) *.pass
 	- $(RM) *.bench
 	- $(RM) *.log

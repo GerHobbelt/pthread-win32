@@ -445,6 +445,7 @@ clean:
 	- $(RM) *.obj
 	- $(RM) *.pdb
 	- $(RM) *.exe
+	- $(RM) *.manifest
 	- $(RM) *.pass
 	- $(RM) *.bench
 	- $(RM) *.static

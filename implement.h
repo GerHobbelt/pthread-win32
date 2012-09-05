@@ -651,7 +651,7 @@ extern "C"
 
   void ptw32_rwlock_cancelwrwait (void *arg);
 
-#if ! defined (PTW32_CONFIG_MINGW) || (defined(__MSVCRT__) && ! defined(__DMC__))
+#if ! defined (PTW32_CONFIG_MINGW) || (defined (__MSVCRT__) && ! defined (__DMC__))
   unsigned __stdcall
 #else
   void

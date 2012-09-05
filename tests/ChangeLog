@@ -1,3 +1,12 @@
+2012-09-05  Daniel Richard. G <danielg at teragram dot com>
+
+	* exception2.c: Fix result codes to avoid false negative failures.
+	* cancel9.c: cosmetic change.
+	* GNUmakefile (clean): delete manifest files.
+	* Bmakefile: Likewise.
+	* Wmakefile: Likewise.
+	* Makefile: Likewise.
+
 2012-09-04  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* Makefile (VCEFLAGS): Changed from /EHsc to /EHs which was causing

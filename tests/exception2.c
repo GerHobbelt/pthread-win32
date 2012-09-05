@@ -123,18 +123,17 @@ main(int argc, char* argv[])
     {
       int result;
 
-#if !defined(NO_ERROR_DIALOGS)
       printf("You should see an \"abnormal termination\" message\n");
       fflush(stdout);
-#endif
 
       result = system("exception2.exe die");
 
-#if defined(NO_ERROR_DIALOGS)
-      exit(result == 1 ? 0 : 1);
-#else
-      exit(0);
-#endif
+      printf("\"exception2.exe die\" returned status %d\n", result);
+
+      /*
+       * result should be 0, 1 or 3 depending on build settings
+       */
+      exit((result == 0 || result == 1 || result == 3) ? 0 : 1);
     }
 
 #if defined(NO_ERROR_DIALOGS)

@@ -331,6 +331,7 @@ clean:
 	- if exist *.o $(RM) *.o
 	- if exist *.asm $(RM) *.asm
 	- if exist *.exe $(RM) *.exe
+	- if exist *.manifest $(RM) *.manifest
 	- if exist *.pass $(RM) *.pass
 	- if exist *.bench $(RM) *.bench
 	- if exist *.log $(RM) *.log

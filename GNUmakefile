@@ -173,7 +173,7 @@ all-tests:
 	$(MAKE) realclean GC-static
 	cd tests && $(MAKE) clean GC-static $(TEST_ENV)
 	$(MAKE) realclean GC-small-static
-	cd tests && $(MAKE) clean GC-small-static $(TEST_ENV)
+	cd tests && $(MAKE) clean GC-static $(TEST_ENV)
 	@ $(ECHO) "$@ completed successfully."
 
 all-tests-cflags:
