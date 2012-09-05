@@ -197,7 +197,7 @@ of the library that use exceptions as part of the thread
 cancellation and exit implementation. The default version uses
 setjmp/longjmp.
 
-There is some contension amongst POSIX threads experts as
+There is some contention amongst POSIX threads experts as
 to how POSIX threads cancellation and exit should work
 with languages that use exceptions, e.g. C++ and even C
 (Microsoft's Structured Exceptions).
@@ -337,26 +337,6 @@ help information. E.g.
 
 $ nmake
 
-Microsoft (R) Program Maintenance Utility   Version 6.00.8168.0
-Copyright (C) Microsoft Corp 1988-1998. All rights reserved.
-
-Run one of the following command lines:
-nmake clean VCE (to build the MSVC dll with C++ exception handling)
-nmake clean VSE (to build the MSVC dll with structured exception handling)
-nmake clean VC (to build the MSVC dll with C cleanup code)
-nmake clean VCE-inlined (to build the MSVC inlined dll with C++ exception handling)
-nmake clean VSE-inlined (to build the MSVC inlined dll with structured exception handling)
-nmake clean VC-inlined (to build the MSVC inlined dll with C cleanup code)
-nmake clean VC-static (to build the MSVC static lib with C cleanup code)
-nmake clean VCE-debug (to build the debug MSVC dll with C++ exception handling)
-nmake clean VSE-debug (to build the debug MSVC dll with structured exception handling)
-nmake clean VC-debug (to build the debug MSVC dll with C cleanup code)
-nmake clean VCE-inlined-debug (to build the debug MSVC inlined dll with C++ exception handling)
-nmake clean VSE-inlined-debug (to build the debug MSVC inlined dll with structured exception handling)
-nmake clean VC-inlined-debug (to build the debug MSVC inlined dll with C cleanup code)
-nmake clean VC-static-debug (to build the debug MSVC static lib with C cleanup code)
-
-
 The pre-built dlls are normally built using the *-inlined targets.
 
 You can run the testsuite by changing to the "tests" directory and
@@ -365,21 +345,6 @@ running nmake. E.g.:
 $ cd tests
 $ nmake
 
-Microsoft (R) Program Maintenance Utility   Version 6.00.8168.0
-Copyright (C) Microsoft Corp 1988-1998. All rights reserved.
-
-Run one of the following command lines:
-nmake clean VC (to test using VC dll with VC (no EH) applications)
-nmake clean VCX (to test using VC dll with VC++ (EH) applications)
-nmake clean VCE (to test using the VCE dll with VC++ EH applications)
-nmake clean VSE (to test using VSE dll with VC (SEH) applications)
-nmake clean VC-bench (to benchtest using VC dll with C bench app)
-nmake clean VCX-bench (to benchtest using VC dll with C++ bench app)
-nmake clean VCE-bench (to benchtest using VCE dll with C++ bench app)
-nmake clean VSE-bench (to benchtest using VSE dll with SEH bench app)
-nmake clean VC-static (to test using VC static lib with VC (no EH) applications)
-
-
 Building under Mingw32
 ----------------------
 
@@ -387,36 +352,12 @@ The dll can be built easily with recent versions of Mingw32.
 (The distributed versions are built using Mingw32 and MsysDTK
 from www.mingw32.org.)
 
-From the source directory, run make for help information. E.g.:
-
-$ make
-Run one of the following command lines:
-make clean GC            (to build the GNU C dll with C cleanup code)
-make clean GCE           (to build the GNU C dll with C++ exception handling)
-make clean GC-inlined    (to build the GNU C inlined dll with C cleanup code)
-make clean GCE-inlined   (to build the GNU C inlined dll with C++ exception handling)
-make clean GC-static     (to build the GNU C inlined static lib with C cleanup code)
-make clean GC-debug      (to build the GNU C debug dll with C cleanup code)
-make clean GCE-debug     (to build the GNU C debug dll with C++ exception handling)
-make clean GC-inlined-debug    (to build the GNU C inlined debug dll with C cleanup code)
-make clean GCE-inlined-debug   (to build the GNU C inlined debug dll with C++ exception handling)
-make clean GC-static-debug     (to build the GNU C inlined static debug lib with C cleanup code)
-
+From the source directory, run 'make' without arguments for help information.
 
 The pre-built dlls are normally built using the *-inlined targets.
 
 You can run the testsuite by changing to the "tests" directory and
-running make for help information. E.g.:
-
-$ cd tests
-$ make
-Run one of the following command lines:
-make clean GC    (to test using GC dll with C (no EH) applications)
-make clean GCX   (to test using GC dll with C++ (EH) applications)
-make clean GCE   (to test using GCE dll with C++ (EH) applications)
-make clean GC-bench       (to benchtest using GNU C dll with C cleanup code)
-make clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)
-make clean GC-static   (to test using GC static lib with C (no EH) applications)
+running 'make' for help information.
 
 
 Building under Linux using the Mingw32 cross development tools
@@ -450,29 +391,20 @@ MinGW32 (creates libpthreadGCn.a as a static link lib):
 make clean GC-static
 
 
-Define PTW32_STATIC_LIB when building your application. Also, your
-application must call a two non-portable routines to initialise the
-some state on startup and cleanup before exit. One other routine needs
-to be called to cleanup after any Win32 threads have called POSIX API
+Define PTW32_STATIC_LIB when building your application.
+
+The application must call pthread_win32_process_detach_np() at thread
+exit to cleanup after any Win32 threads have called POSIX API
 routines. See README.NONPORTABLE or the html reference manual pages for
-details on these routines:
+details:
 
-BOOL pthread_win32_process_attach_np (void);
-BOOL pthread_win32_process_detach_np (void);
-BOOL pthread_win32_thread_attach_np (void); // Currently a no-op
 BOOL pthread_win32_thread_detach_np (void);
-
-
-The tests makefiles have the same targets but only check that the
-static library is statically linkable. They don't run the full
-testsuite. To run the full testsuite, build the dlls and run the
-dll test targets.
 
 
 Building the library under Cygwin
 ---------------------------------
 
-Cygwin is implementing it's own POSIX threads routines and these
+Cygwin implements it's own POSIX threads routines and these
 will be the ones to use if you develop using Cygwin.
 
 
