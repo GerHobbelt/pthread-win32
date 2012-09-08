@@ -210,7 +210,6 @@ CANCEL_SRCS	= \
 		pthread_cancel.c 
 
 CONDVAR_SRCS	= \
-		ptw32_cond_check_need_init.c \
 		pthread_condattr_destroy.c \
 		pthread_condattr_getpshared.c \
 		pthread_condattr_init.c \
@@ -230,15 +229,9 @@ MISC_SRCS	= \
 		pthread_once.c \
 		pthread_self.c \
 		pthread_setconcurrency.c \
-		ptw32_calloc.c \
-		ptw32_MCS_lock.c \
-		ptw32_new.c \
-		ptw32_reuse.c \
-		ptw32_relmillisecs.c \
 		w32_CancelableWait.c
 
 MUTEX_SRCS	= \
-		ptw32_mutex_check_need_init.c \
 		pthread_mutex_init.c \
 		pthread_mutex_destroy.c \
 		pthread_mutexattr_init.c \
@@ -267,6 +260,7 @@ NONPORTABLE_SRCS = \
 		pthread_timechange_handler_np.c 
 
 PRIVATE_SRCS	= \
+		ptw32_MCS_lock.c \
 		ptw32_is_attr.c \
 		ptw32_processInitialize.c \
 		ptw32_processTerminate.c \
@@ -278,11 +272,18 @@ PRIVATE_SRCS	= \
 		ptw32_semwait.c \
 		ptw32_timespec.c \
 		ptw32_throw.c \
-		ptw32_getprocessors.c
-
-RWLOCK_SRCS	= \
+		ptw32_getprocessors.c \
+		ptw32_calloc.c \
+		ptw32_new.c \
+		ptw32_reuse.c \
+		ptw32_relmillisecs.c \
+		ptw32_cond_check_need_init.c \
+		ptw32_mutex_check_need_init.c \
 		ptw32_rwlock_check_need_init.c \
 		ptw32_rwlock_cancelwrwait.c \
+		ptw32_spinlock_check_need_init.c
+
+RWLOCK_SRCS	= \
 		pthread_rwlock_init.c \
 		pthread_rwlock_destroy.c \
 		pthread_rwlockattr_init.c \
@@ -326,7 +327,6 @@ SEMAPHORE_SRCS = \
 		sem_unlink.c
 
 SPIN_SRCS	= \
-		ptw32_spinlock_check_need_init.c \
 		pthread_spin_init.c \
 		pthread_spin_destroy.c \
 		pthread_spin_lock.c \

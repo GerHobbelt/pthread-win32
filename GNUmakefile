@@ -293,3 +293,40 @@ realclean: clean
 	-$(RM) $(GCD_STATIC_STAMP)
 	-$(RM) $(GCD_SMALL_STATIC_STAMP)
 	-cd tests && $(MAKE) clean
+
+var_check_list =
+
+define var_check_target
+var-check-$(1):
+	@for src in $($(1)); do \
+		fgrep -q "\"$$$$src\"" $(2) && continue; \
+		echo "$$$$src is in \$$$$($(1)), but not in $(2)"; \
+		exit 1; \
+	done
+	@grep '^# *include *".*\.c"' $(2) | cut -d'"' -f2 | while read src; do \
+		echo " $($(1)) " | fgrep -q " $$$$src " && continue; \
+		echo "$$$$src is in $(2), but not in \$$$$($(1))"; \
+		exit 1; \
+	done
+	@echo "$(1) <-> $(2): OK"
+
+var_check_list += var-check-$(1)
+endef
+
+$(eval $(call var_check_target,ATTR_SRCS,attr.c))
+$(eval $(call var_check_target,BARRIER_SRCS,barrier.c))
+$(eval $(call var_check_target,CANCEL_SRCS,cancel.c))
+$(eval $(call var_check_target,CONDVAR_SRCS,condvar.c))
+$(eval $(call var_check_target,EXIT_SRCS,exit.c))
+$(eval $(call var_check_target,MISC_SRCS,misc.c))
+$(eval $(call var_check_target,MUTEX_SRCS,mutex.c))
+$(eval $(call var_check_target,NONPORTABLE_SRCS,nonportable.c))
+$(eval $(call var_check_target,PRIVATE_SRCS,private.c))
+$(eval $(call var_check_target,RWLOCK_SRCS,rwlock.c))
+$(eval $(call var_check_target,SCHED_SRCS,sched.c))
+$(eval $(call var_check_target,SEMAPHORE_SRCS,semaphore.c))
+$(eval $(call var_check_target,SPIN_SRCS,spin.c))
+$(eval $(call var_check_target,SYNC_SRCS,sync.c))
+$(eval $(call var_check_target,TSD_SRCS,tsd.c))
+
+srcs-vars-check: $(var_check_list)

@@ -114,7 +114,7 @@ ptw32_mcs_flag_set (HANDLE * flag)
 }
 
 /*
- * ptw32_mcs_flag_set -- wait for notification from another.
+ * ptw32_mcs_flag_wait -- wait for notification from another.
  * 
  * Store an event handle in the flag and wait on it if the flag has not been
  * set, and proceed without creating an event otherwise.
