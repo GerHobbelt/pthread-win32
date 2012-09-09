@@ -147,7 +147,7 @@ main(int argc, char* argv[])
       assert(pthread_create(&et[i], NULL, exceptionedThread, NULL) == 0);
     }
 
-  Sleep(1000);
+  Sleep(100);
 
   /*
    * Success.

@@ -68,7 +68,7 @@ VCDLL	= pthreadVC$(DLL_VER).dll
 VCLIBD	= pthreadVC$(DLL_VER)d.lib
 VCDLLD	= pthreadVC$(DLL_VER)d.dll
 # C++ Exceptions in application - using VC version of pthreads dll
-VCXFLAGS	= /EHsc /TP /D__CLEANUP_C
+VCXFLAGS	= /EHs /TP /D__CLEANUP_C
 
 # Defaults
 CPLIB	= $(VCLIB)
@@ -125,7 +125,7 @@ REGULAR_PASSES = loadfree.pass \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
-	  exception1.pass  exception2.pass  exception3.pass  \
+	  exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
 	  cancel9.pass  stress1.pass
 
 BENCHRESULTS = \
@@ -171,7 +171,7 @@ STATICRESULTS = \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
-	  exception1.pass  exception2.pass  exception3.pass  \
+	  exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
 	  cancel9.pass  stress1.pass
 
 help:
@@ -393,7 +393,8 @@ equal1.pass: create1.pass
 errno1.pass: mutex3.pass
 exception1.pass: cancel4.pass
 exception2.pass: exception1.pass
-exception3.pass: exception2.pass
+exception3_0.pass: exception2.pass
+exception3.pass: exception3_0.pass
 exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass

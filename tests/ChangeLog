@@ -1,3 +1,13 @@
+2012-09-09  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* exception3.c: Rewrite to fix strategy.
+	* exception3_0.c: New test.
+	* exception2.c: Reduce sleep time to speed up test.
+	* Makefile (exception3_0.*): Add new test.
+	* GNUmakefile (exception3_0.*): Add new test.
+	* Bmakefile (exception3_0.*): Add new test.
+	* Wmakefile (exception3_0.*): Add new test.
+
 2012-09-05  Daniel Richard. G <danielg at teragram dot com>
 
 	* exception2.c: Fix result codes to avoid false negative failures.

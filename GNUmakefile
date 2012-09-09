@@ -162,10 +162,10 @@ all:
 TEST_ENV = PTW32_FLAGS="$(PTW32_FLAGS) -DNO_ERROR_DIALOGS" DLL_VER=$(DLL_VER)
 
 all-tests:
-#	$(MAKE) realclean GC
-#	cd tests && $(MAKE) clean GC $(TEST_ENV) && $(MAKE) clean GCX $(TEST_ENV)
-#	$(MAKE) realclean GCE
-#	cd tests && $(MAKE) clean GCE $(TEST_ENV)
+	$(MAKE) realclean GC
+	cd tests && $(MAKE) clean GC $(TEST_ENV) && $(MAKE) clean GCX $(TEST_ENV)
+	$(MAKE) realclean GCE
+	cd tests && $(MAKE) clean GCE $(TEST_ENV)
 	$(MAKE) realclean GC-inlined
 	cd tests && $(MAKE) clean GC $(TEST_ENV) && $(MAKE) clean GCX $(TEST_ENV)
 	$(MAKE) realclean GCE-inlined

@@ -123,7 +123,7 @@ TESTS	= \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
-	  exception1 exception2 exception3 \
+	  exception1 exception2 exception3_0 exception3 \
 	  cancel9 stress1
 
 STRESSTESTS = \
@@ -162,7 +162,7 @@ STATICTESTS = \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
-	  exception1 exception2 exception3 \
+	  exception1 exception2 exception3_0 exception3 \
 	  cancel9 stress1
 
 ALLTESTS = $(TESTS) $(BENCHTESTS)
@@ -300,7 +300,8 @@ equal1.pass: create1.pass
 errno1.pass: mutex3.pass
 exception1.pass: cancel4.pass
 exception2.pass: exception1.pass
-exception3.pass: exception2.pass
+exception3_0.pass: exception2.pass
+exception3.pass: exception3_0.pass
 exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass
