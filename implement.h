@@ -769,7 +769,7 @@ extern "C"
 
 #if defined(__GNUC__)
 # if defined(_WIN64)
-# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_64(location, value, comparand)    \
+# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_64(location, value, comparand) \
     ({                                                                     \
       __typeof (value) _result;                                            \
       __asm__ __volatile__                                                 \
@@ -806,7 +806,7 @@ extern "C"
     })
 # define PTW32_INTERLOCKED_INCREMENT_64(location)                          \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = 1;                                   \
+      PTW32_INTERLOCKED_LONG _temp = 1;                                    \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
@@ -818,7 +818,7 @@ extern "C"
     })
 # define PTW32_INTERLOCKED_DECREMENT_64(location)                          \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = -1;                                  \
+      PTW32_INTERLOCKED_LONG _temp = -1;                                   \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
@@ -829,7 +829,7 @@ extern "C"
       --_temp;                                                             \
     })
 #endif
-# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand)    \
+# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand) \
     ({                                                                     \
       __typeof (value) _result;                                            \
       __asm__ __volatile__                                                 \
@@ -866,7 +866,7 @@ extern "C"
     })
 # define PTW32_INTERLOCKED_INCREMENT_LONG(location)                        \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = 1;                                   \
+      PTW32_INTERLOCKED_LONG _temp = 1;                                    \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
@@ -878,7 +878,7 @@ extern "C"
     })
 # define PTW32_INTERLOCKED_DECREMENT_LONG(location)                        \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = -1;                                  \
+      PTW32_INTERLOCKED_LONG _temp = -1;                                   \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
