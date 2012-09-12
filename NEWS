@@ -22,7 +22,9 @@ by completing the included test suite, stress and bench tests.
 New Features
 ------------
 New routine pthread_timedjoin_np added for compatibility with Linux
-and BSD.
+and BSD. This routine can also be used to achieve the same
+functionality as pthread_tryjoin_np (from Linux) by using an abstime
+representing any time in the past.
 
 Bug Fixes
 ---------
@@ -31,14 +33,19 @@ required but nothing explicitly references this code so was getting
 optimised out.
 - Daniel Richard G.
 
-RELEASE 2.9.0
+RELEASE 2.9.1
 -------------
-(2012-05-25)
+(2012-05-27)
 
 General
 -------
 New bug fixes in this release since 2.8.0 have NOT been applied to the
 1.x.x series.
+
+This release replaces an extremely brief 2.9.0 release and adds
+some last minute non-code changes were made to embed better
+descriptive properties in the dlls to indicate target architecture
+and build environments.
 
 Some changes post 2011-02-26 in CVS may not be compatible with pre
 Windows 2000 systems.

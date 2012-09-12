@@ -1,4 +1,4 @@
-PTHREADS-WIN32 RELEASE 2.9.0 (2012-05-25)
+PTHREADS-WIN32 RELEASE 2.9.1 (2012-05-27)
 -----------------------------------------
 Web Site: http://sourceware.org/pthreads-win32/
 FTP Site: ftp://sourceware.org/pub/pthreads-win32
@@ -11,6 +11,11 @@ Threads component of the POSIX 1003.1 2001 Standard for Microsoft's
 Win32 environment. Some functions from other sections of POSIX
 1003.1 2001 are also supported including semaphores and scheduling
 functions.
+
+This release replaces an extremely brief 2.9.0 release and adds
+some last minute non-code changes were made to embed better
+descriptive properties in the dlls to indicate target architecture
+and build environments.
 
 Some common non-portable functions are also implemented for
 additional compatibility, as are a few functions specific
