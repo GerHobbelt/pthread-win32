@@ -39,7 +39,7 @@
 #define _IMPLEMENT_H
 
 #if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x0400
+# define _WIN32_WINNT 0x0400
 #endif
 
 #include <windows.h>
@@ -60,11 +60,11 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
  * In case ETIMEDOUT hasn't been defined above somehow.
  */
 #if !defined(ETIMEDOUT)
-#  define ETIMEDOUT 10060	/* This is the value in winsock.h. */
+# define ETIMEDOUT 10060	/* This is the value in winsock.h. */
 #endif
 
 #if !defined(malloc)
-#include <malloc.h>
+# include <malloc.h>
 #endif
 
 #if defined(__CLEANUP_C)
@@ -72,42 +72,44 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #endif
 
 #if !defined(INT_MAX)
-#include <limits.h>
+# include <limits.h>
 #endif
 
 /* use local include files during development */
 #include "semaphore.h"
 #include "sched.h"
 
-#if defined(HAVE_C_INLINE) || defined(__cplusplus)
-#define INLINE inline
+#if ( defined(HAVE_C_INLINE) || defined(__cplusplus) ) && defined(PTW32_BUILD_INLINED)
+# define INLINE inline
 #else
-#define INLINE
+# define INLINE
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER < 1300
-/*
- * MSVC 6 does not use the "volatile" qualifier
- */
-#define PTW32_INTERLOCKED_VOLATILE
+#if defined(PTW32_CONFIG_MSVC6)
+# define PTW32_INTERLOCKED_VOLATILE
 #else
-#define PTW32_INTERLOCKED_VOLATILE volatile
+# define PTW32_INTERLOCKED_VOLATILE volatile
 #endif
 
 #define PTW32_INTERLOCKED_LONG long
-#define PTW32_INTERLOCKED_SIZE size_t
 #define PTW32_INTERLOCKED_PVOID PVOID
 #define PTW32_INTERLOCKED_LONGPTR PTW32_INTERLOCKED_VOLATILE long*
-#define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE size_t*
 #define PTW32_INTERLOCKED_PVOID_PTR PTW32_INTERLOCKED_VOLATILE PVOID*
+#if defined(_WIN64)
+#  define PTW32_INTERLOCKED_SIZE LONGLONG
+#  define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE LONGLONG*
+#else
+#  define PTW32_INTERLOCKED_SIZE long
+#  define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE long*
+#endif
 
-#if defined(__MINGW64__) || defined(__MINGW32__)
+#if defined(PTW32_CONFIG_MINGW)
 #  include <stdint.h>
 #elif defined(__BORLANDC__)
 #  define int64_t ULONGLONG
 #else
 #  define int64_t _int64
-#  if defined(_MSC_VER) && _MSC_VER < 1300
+#  if defined(PTW32_CONFIG_MSVC6)
      typedef long intptr_t;
 #  endif
 #endif
@@ -117,9 +119,9 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
  */
 #if defined(PTW32_STATIC_LIB)
   void ptw32_autostatic_anchor(void);
-#   if defined(__MINGW64__) || defined(__MINGW32__)
+# if defined(PTW32_CONFIG_MINGW)
     __attribute__((unused, used))
-#   endif
+# endif
   static void (*local_autostatic_anchor)(void) = ptw32_autostatic_anchor;
 #endif
 
@@ -134,7 +136,7 @@ typedef enum
   PThreadStateRunning,		/* Thread alive & kicking               */
   PThreadStateSuspended,	/* Thread alive but suspended           */
   PThreadStateCancelPending,	/* Thread alive but                     */
-                                /* has cancelation pending.             */
+                                /* has cancellation pending.             */
   PThreadStateCanceling,	/* Thread alive but is                  */
                                 /* in the process of terminating        */
                                 /* due to a cancellation request        */
@@ -569,7 +571,7 @@ struct ThreadKeyAssoc
 
 
 /* Declared in pthread_cancel.c */
-extern DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD);
+extern DWORD (*ptw32_register_cancellation) (PAPCFUNC, HANDLE, DWORD);
 
 /* Thread Reuse stack bottom marker. Must not be NULL or any valid pointer to memory. */
 #define PTW32_THREAD_REUSE_EMPTY ((ptw32_thread_t *)(size_t) 1)
@@ -626,7 +628,7 @@ extern "C"
   void ptw32_robust_mutex_remove(pthread_mutex_t* mutex, ptw32_thread_t* otp);
 
   DWORD
-    ptw32_RegisterCancelation (PAPCFUNC callback,
+    ptw32_Registercancellation (PAPCFUNC callback,
 			       HANDLE threadH, DWORD callback_arg);
 
   int ptw32_processInitialize (void);
@@ -649,7 +651,7 @@ extern "C"
 
   void ptw32_rwlock_cancelwrwait (void *arg);
 
-#if ! (defined (__MINGW64__) || defined(__MINGW32__)) || (defined(__MSVCRT__) && ! defined(__DMC__))
+#if ! defined (PTW32_CONFIG_MINGW) || (defined (__MSVCRT__) && ! defined (__DMC__))
   unsigned __stdcall
 #else
   void
@@ -767,7 +769,7 @@ extern "C"
 
 #if defined(__GNUC__)
 # if defined(_WIN64)
-# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_64(location, value, comparand)    \
+# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_64(location, value, comparand) \
     ({                                                                     \
       __typeof (value) _result;                                            \
       __asm__ __volatile__                                                 \
@@ -804,7 +806,7 @@ extern "C"
     })
 # define PTW32_INTERLOCKED_INCREMENT_64(location)                          \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = 1;                                   \
+      PTW32_INTERLOCKED_LONG _temp = 1;                                    \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
@@ -816,7 +818,7 @@ extern "C"
     })
 # define PTW32_INTERLOCKED_DECREMENT_64(location)                          \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = -1;                                  \
+      PTW32_INTERLOCKED_LONG _temp = -1;                                   \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
@@ -827,7 +829,7 @@ extern "C"
       --_temp;                                                             \
     })
 #endif
-# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand)    \
+# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand) \
     ({                                                                     \
       __typeof (value) _result;                                            \
       __asm__ __volatile__                                                 \
@@ -864,7 +866,7 @@ extern "C"
     })
 # define PTW32_INTERLOCKED_INCREMENT_LONG(location)                        \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = 1;                                   \
+      PTW32_INTERLOCKED_LONG _temp = 1;                                    \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
@@ -876,7 +878,7 @@ extern "C"
     })
 # define PTW32_INTERLOCKED_DECREMENT_LONG(location)                        \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = -1;                                  \
+      PTW32_INTERLOCKED_LONG _temp = -1;                                   \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
@@ -901,7 +903,7 @@ extern "C"
 #   define PTW32_INTERLOCKED_INCREMENT_64(p) InterlockedIncrement64(PTW32_TO_VLONG64PTR(p))
 #   define PTW32_INTERLOCKED_DECREMENT_64(p) InterlockedDecrement64(PTW32_TO_VLONG64PTR(p))
 # endif
-# if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(_WIN64) /* MSVC 6 */
+# if defined(PTW32_CONFIG_MSVC6) && !defined(_WIN64)
 #  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand) \
       ((LONG)InterlockedCompareExchange((PVOID *)(location), (PVOID)(value), (PVOID)(comparand)))
 # else
@@ -911,7 +913,7 @@ extern "C"
 # define PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(p,v) InterlockedExchangeAdd((p),(v))
 # define PTW32_INTERLOCKED_INCREMENT_LONG(p) InterlockedIncrement((p))
 # define PTW32_INTERLOCKED_DECREMENT_LONG(p) InterlockedDecrement((p))
-# if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(_WIN64) /* MSVC 6 */
+# if defined(PTW32_CONFIG_MSVC6) && !defined(_WIN64)
 #  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchange
 #  define PTW32_INTERLOCKED_EXCHANGE_PTR(location, value) \
     ((PVOID)InterlockedExchange((LPLONG)(location), (LONG)(value)))

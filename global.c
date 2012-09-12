@@ -62,7 +62,7 @@ unsigned __int64 ptw32_threadSeqNumber = 0;
  * it will be set at runtime to a substitute routine which cannot unblock
  * blocked threads.
  */
-DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD) = NULL;
+DWORD (*ptw32_register_cancellation) (PAPCFUNC, HANDLE, DWORD) = NULL;
 
 /*
  * Global lock for managing pthread_t struct reuse.

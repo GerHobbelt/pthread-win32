@@ -135,7 +135,7 @@ main()
     }
 
   /*
-   * Code to control or munipulate child threads should probably go here.
+   * Code to control or manipulate child threads should probably go here.
    */
   Sleep(2000);
   pthread_mutex_unlock(&stop_here);

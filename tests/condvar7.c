@@ -34,7 +34,7 @@
  * --------------------------------------------------------------------------
  *
  * Test Synopsis:
- * - Test pthread_cond_broadcast with thread cancelation.
+ * - Test pthread_cond_broadcast with thread cancellation.
  *
  * Test Method (Validation or Falsification):
  * - Validation
@@ -186,7 +186,7 @@ main()
     }
 
   /*
-   * Code to control or munipulate child threads should probably go here.
+   * Code to control or manipulate child threads should probably go here.
    */
 
   assert(pthread_mutex_unlock(&start_flag) == 0);

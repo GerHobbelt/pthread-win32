@@ -75,8 +75,5 @@ main()
 
   assert(lockCount == 2);
 
-  exit(0);
-
-  /* Never reached */
   return 0;
 }

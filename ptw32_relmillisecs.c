@@ -57,8 +57,8 @@ ptw32_relmillisecs (const struct timespec * abstime)
   FILETIME ft;
   SYSTEMTIME st;
 #else /* ! NEED_FTIME */
-#if ( defined(_MSC_VER) && _MSC_VER >= 1300 ) || \
-    ( (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601 )
+#if ( defined(_MSC_VER) && _MSC_VER >= 1300 ) /* MSVC7+ */ || \
+    ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0601 )
   struct __timeb64 currSysTime;
 #else
   struct _timeb currSysTime;
@@ -99,10 +99,10 @@ ptw32_relmillisecs (const struct timespec * abstime)
 
 #else /* ! NEED_FTIME */
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#if defined(_MSC_VER) && _MSC_VER >= 1400  /* MSVC8+ */
   _ftime64_s(&currSysTime);
-#elif ( defined(_MSC_VER) && _MSC_VER >= 1300 ) || \
-      ( (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601 )
+#elif ( defined(_MSC_VER) && _MSC_VER >= 1300 ) /* MSVC7+ */ || \
+      ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0601 )
   _ftime64(&currSysTime);
 #else
   _ftime(&currSysTime);

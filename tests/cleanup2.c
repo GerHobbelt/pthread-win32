@@ -97,7 +97,7 @@ typedef struct {
   CRITICAL_SECTION cs;
 } sharedInt_t;
 
-static sharedInt_t pop_count = {0, {0}};
+static sharedInt_t pop_count;
 
 static void
 increment_pop_count(void * arg)
@@ -141,6 +141,8 @@ main()
   int i;
   pthread_t t[NUMTHREADS + 1];
 
+  memset(&pop_count, 0, sizeof(sharedInt_t));
+
   InitializeCriticalSection(&pop_count.cs);
 
   assert((t[0] = pthread_self()).p != NULL);
@@ -153,7 +155,7 @@ main()
     }
 
   /*
-   * Code to control or munipulate child threads should probably go here.
+   * Code to control or manipulate child threads should probably go here.
    */
   Sleep(1000);
 

@@ -34,10 +34,10 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#if !defined(PTW32_STATIC_LIB)
-
 #include "pthread.h"
 #include "implement.h"
+
+#if !defined(PTW32_STATIC_LIB)
 
 #if defined(_MSC_VER)
 /* 
@@ -89,4 +89,12 @@ DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 
 }				/* DllMain */
 
-#endif /* PTW32_STATIC_LIB */
+#endif /* !PTW32_STATIC_LIB */
+
+#if ! defined(PTW32_BUILD_INLINED)
+/*
+ * Avoid "translation unit is empty" warnings
+ */
+typedef int foo;
+#endif
+

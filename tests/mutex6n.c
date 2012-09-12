@@ -91,17 +91,14 @@ main()
 
   assert(lockCount == 1);
 
-  assert(pthread_mutex_unlock(&mutex) == IS_ROBUST?EPERM:0);
+  assert(pthread_mutex_unlock(&mutex) == (IS_ROBUST?EPERM:0));
 
   Sleep (100);
 
-  assert(lockCount == IS_ROBUST?1:2);
+  assert(lockCount == (IS_ROBUST?1:2));
 
   END_MUTEX_STALLED_ROBUST(mxAttr)
 
-  exit(0);
-
-  /* Never reached */
   return 0;
 }
 
