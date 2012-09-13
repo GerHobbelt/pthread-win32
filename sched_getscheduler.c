@@ -57,9 +57,7 @@ sched_getscheduler (pid_t pid)
 
 	  if (NULL == h)
 	    {
-	      errno =
-		(GetLastError () ==
-		 (0xFF & ERROR_ACCESS_DENIED)) ? EPERM : ESRCH;
+		  PTW32_SET_ERRNO(((0xFF & ERROR_ACCESS_DENIED) == GetLastError()) ? EPERM : ESRCH);
 	      return -1;
 	    }
 	  else

@@ -100,7 +100,7 @@ mythread(void * arg)
   assert(bag->started == 0);
   bag->started = 1;
 
-  PTW32_SET_ERRNO(bag->threadnum);
+  errno = bag->threadnum;
 
   Sleep(1000);
 
@@ -123,7 +123,7 @@ main()
   pthread_t t[NUMTHREADS + 1];
 
   pthread_mutex_lock(&stop_here);
-  PTW32_SET_ERRNO(0);
+  errno = 0;
 
   assert((t[0] = pthread_self()).p != NULL);
 
