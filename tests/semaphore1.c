@@ -85,7 +85,7 @@ thr(void * arg)
 
   if ( result == -1 )
   {
-    int err = errno;
+    int err = PTW32_GET_ERRNO();
     if (err != EAGAIN)
     {
       printf("thread: sem_trywait 1: expecting error %s: got %s\n",
@@ -126,7 +126,7 @@ main()
 
   if (result2 == -1)
   {
-    int err = errno;
+    int err = PTW32_GET_ERRNO();
     if (err != EAGAIN)
     {
       printf("main: sem_trywait 1: expecting error %s: got %s\n",
