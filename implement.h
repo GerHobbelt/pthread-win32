@@ -52,6 +52,39 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #endif
 
 /*
+ * Designed to allow error values to be set and retrieved in builds where
+ * MSCRT libraries are statically linked to DLLs.
+ */
+#if ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0800 ) || \
+    ( defined(_MSC_VER) && _MSC_VER >= 1400 )  /* MSVC8+ */
+#  if defined(PTW32_CONFIG_MINGW)
+__attribute__((unused))
+#  endif
+static INLINE int ptw32_get_errno(void) { int err = 0; _get_errno(&err); return err; }
+#  define PTW32_GET_ERRNO() ptw32_get_errno()
+#  if defined(PTW32_BROKEN_ERRNO)
+#    if defined(PTW32_CONFIG_MINGW)
+__attribute__((unused))
+#    endif
+static INLINE void ptw32_set_errno(int err) { _set_errno(err); SetLastError(err); }
+#    define PTW32_SET_ERRNO(err) ptw32_set_errno(err)
+#  else
+#    define PTW32_SET_ERRNO(err) _set_errno(err)
+#  endif
+#else
+#  define PTW32_GET_ERRNO() (errno)
+#  if defined(PTW32_BROKEN_ERRNO)
+#    if defined(PTW32_CONFIG_MINGW)
+__attribute__((unused))
+#    endif
+static INLINE void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
+#    define PTW32_SET_ERRNO(err) ptw32_set_errno(err)
+#  else
+#    define PTW32_SET_ERRNO(err) (errno = (err))
+#  endif
+#endif
+
+/*
  * note: ETIMEDOUT is correctly defined in winsock.h
  */
 #include <winsock.h>

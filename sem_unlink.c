@@ -53,6 +53,6 @@
 int
 sem_unlink (const char *name)
 {
-  errno = ENOSYS;
+  PTW32_SET_ERRNO(ENOSYS);
   return -1;
 }				/* sem_unlink */

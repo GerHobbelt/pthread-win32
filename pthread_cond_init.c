@@ -101,13 +101,13 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
 
   if (sem_init (&(cv->semBlockLock), 0, 1) != 0)
     {
-      result = errno;
+      result = PTW32_GET_ERRNO();
       goto FAIL0;
     }
 
   if (sem_init (&(cv->semBlockQueue), 0, 0) != 0)
     {
-      result = errno;
+      result = PTW32_GET_ERRNO();
       goto FAIL1;
     }
 

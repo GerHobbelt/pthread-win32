@@ -53,6 +53,6 @@
 int
 sem_open (const char *name, int oflag, mode_t mode, unsigned int value)
 {
-  errno = ENOSYS;
+  PTW32_SET_ERRNO(ENOSYS);
   return -1;
 }				/* sem_open */

@@ -138,7 +138,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
        */
       if (ptw32_semwait (&(cv->semBlockLock)) != 0) /* Non-cancelable */
 	{
-	  result = errno;
+	  result = PTW32_GET_ERRNO();
 	}
       else
         {
@@ -166,7 +166,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
 	{
 	  if (sem_post (&(cv->semBlockLock)) != 0)
 	    {
-	      result = errno;
+	      result = PTW32_GET_ERRNO();
 	    }
 	  result1 = pthread_mutex_unlock (&(cv->mtxUnblockLock));
 	  result2 = EBUSY;
@@ -180,11 +180,11 @@ pthread_cond_destroy (pthread_cond_t * cond)
 
 	  if (sem_destroy (&(cv->semBlockLock)) != 0)
 	    {
-	      result = errno;
+	      result = PTW32_GET_ERRNO();
 	    }
 	  if (sem_destroy (&(cv->semBlockQueue)) != 0)
 	    {
-	      result1 = errno;
+	      result1 = PTW32_GET_ERRNO();
 	    }
 	  if ((result2 = pthread_mutex_unlock (&(cv->mtxUnblockLock))) == 0)
 	    {

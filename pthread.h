@@ -1273,6 +1273,30 @@ PTW32_DLLPORT int PTW32_CDECL pthreadCancelableTimedWait (HANDLE waitHandle,
 #endif
 
 /*
+ * If pthreads-win32 is compiled as a DLL, and both it and
+ * the application are linked against the static C runtime
+ * (i.e. with the /MT compiler flag), then the application
+ * will not be able to see errno values produced by the
+ * library. Refer to the following links for details:
+ *
+ * http://support.microsoft.com/kb/94248
+ * (Section 4: Problems Encountered When Using Multiple CRT Libraries)
+ *
+ * http://social.msdn.microsoft.com/forums/en-US/vclanguage/thread/b4500c0d-1b69-40c7-9ef5-08da1025b5bf
+ *
+ * When pthreads-win32 is built with PTW32_BROKEN_ERRNO
+ * defined, in addition to setting errno when errors occur,
+ * it will also call SetLastError() with the same value.
+ * The application can then use GetLastError() to obtain the
+ * value of errno.
+ *
+ * Note: "_DLL" implies the /MD compiler flag.
+ */
+#if !defined(_DLL) && !defined(PTW32_STATIC_LIB)
+#  define PTW32_BROKEN_ERRNO
+#endif
+
+/*
  * Some compiler environments don't define some things.
  */
 #if defined(__BORLANDC__)

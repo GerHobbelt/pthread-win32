@@ -71,7 +71,7 @@ sched_setscheduler (pid_t pid, int policy)
 
   if (SCHED_OTHER != policy)
     {
-      errno = ENOSYS;
+      PTW32_SET_ERRNO(ENOSYS);
       return -1;
     }
 

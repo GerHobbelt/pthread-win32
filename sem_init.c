@@ -158,7 +158,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 
   if (result != 0)
     {
-      errno = result;
+      PTW32_SET_ERRNO(result);
       return -1;
     }
 
