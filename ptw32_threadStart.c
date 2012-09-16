@@ -194,19 +194,19 @@ ptw32_threadStart (void *vthreadParms)
   {
     switch (ei[0])
       {
-      case PTW32_EPS_CANCEL:
-	status = sp->exitStatus = PTHREAD_CANCELED;
+        case PTW32_EPS_CANCEL:
+          status = sp->exitStatus = PTHREAD_CANCELED;
 #if defined(_UWIN)
-	if (--pthread_count <= 0)
-	  exit (0);
+          if (--pthread_count <= 0)
+        	exit (0);
 #endif
-	break;
-      case PTW32_EPS_EXIT:
-	status = sp->exitStatus;
-	break;
-      default:
-	status = sp->exitStatus = PTHREAD_CANCELED;
-	break;
+          break;
+        case PTW32_EPS_EXIT:
+          status = sp->exitStatus;
+          break;
+        default:
+          status = sp->exitStatus = PTHREAD_CANCELED;
+          break;
       }
   }
 
@@ -218,7 +218,6 @@ ptw32_threadStart (void *vthreadParms)
 
   if (0 == setjmp_rc)
     {
-
       /*
        * Run the caller's routine;
        */
@@ -228,17 +227,17 @@ ptw32_threadStart (void *vthreadParms)
   else
     {
       switch (setjmp_rc)
-	{
-	case PTW32_EPS_CANCEL:
-	  status = sp->exitStatus = PTHREAD_CANCELED;
-	  break;
-	case PTW32_EPS_EXIT:
-	  status = sp->exitStatus;
-	  break;
-	default:
-	  status = sp->exitStatus = PTHREAD_CANCELED;
-	  break;
-	}
+        {
+      	  case PTW32_EPS_CANCEL:
+      		status = sp->exitStatus = PTHREAD_CANCELED;
+      		break;
+      	  case PTW32_EPS_EXIT:
+      		status = sp->exitStatus;
+      		break;
+      	  default:
+      		status = sp->exitStatus = PTHREAD_CANCELED;
+      		break;
+        }
     }
 
 #else /* __CLEANUP_C */
@@ -276,14 +275,13 @@ ptw32_threadStart (void *vthreadParms)
        * ptw32_terminate() will be called if there is no user
        * supplied function.
        */
-      terminate_function
-	term_func = set_terminate (0);
+      terminate_function term_func = set_terminate (0);
       set_terminate (term_func);
 
       if (term_func != 0)
-	{
-	  term_func ();
-	}
+      	{
+    	  term_func ();
+      	}
       throw;
     }
   }
@@ -334,7 +332,7 @@ ptw32_threadStart (void *vthreadParms)
    * implicitly created pthreads (those created
    * for Win32 threads which have called pthreads routines)
    * must be cleaned up explicitly by the application
-   * (by calling pthread_win32_thread_detach_np()).
+   * by calling pthread_exit().
    * For the dll, dllMain will do the cleanup automatically.
    */
   (void) pthread_win32_thread_detach_np ();
