@@ -51,3 +51,4 @@
 #include "sched_setscheduler.c"
 #include "sched_getscheduler.c"
 #include "sched_yield.c"
+#include "sched_setaffinity.c"

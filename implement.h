@@ -217,7 +217,8 @@ struct ptw32_thread_t_
   int cancelState;
   int cancelType;
   int implicit:1;
-  DWORD thread;			/* Win32 thread ID */
+  DWORD thread;			/* Windows thread ID */
+  cpu_set_t cpuset;		/* Thread CPU affinity set */
 #if defined(_UWIN)
   DWORD dummy[5];
 #endif

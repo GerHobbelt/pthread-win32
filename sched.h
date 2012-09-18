@@ -143,6 +143,11 @@ struct sched_param {
   int sched_priority;
 };
 
+/* CPU affinity */
+
+typedef DWORD_PTR cpu_set_t;
+
+
 #if defined(__cplusplus)
 extern "C"
 {
@@ -157,6 +162,31 @@ PTW32_DLLPORT int __cdecl sched_get_priority_max (int policy);
 PTW32_DLLPORT int __cdecl sched_setscheduler (pid_t pid, int policy);
 
 PTW32_DLLPORT int __cdecl sched_getscheduler (pid_t pid);
+
+/* Compatibility with Linux - not standard */
+
+PTW32_DLLPORT int __cdecl sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
+
+PTW32_DLLPORT int __cdecl sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
+
+PTW32_DLLPORT void __cdecl CPU_ZERO (cpu_set_t *set);
+
+PTW32_DLLPORT void __cdecl CPU_SET (int cpu, cpu_set_t *set);
+
+PTW32_DLLPORT void __cdecl CPU_CLR (int cpu, cpu_set_t *set);
+
+PTW32_DLLPORT int __cdecl CPU_ISSET (int cpu, cpu_set_t *set);
+
+PTW32_DLLPORT int __cdecl CPU_COUNT (cpu_set_t *set);
+
+PTW32_DLLPORT void __cdecl CPU_AND (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2);
+
+PTW32_DLLPORT void __cdecl CPU_OR (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2);
+
+PTW32_DLLPORT void __cdecl CPU_XOR (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2);
+
+PTW32_DLLPORT int __cdecl CPU_EQUAL (cpu_set_t *set1, cpu_set_t *set2);
+
 
 /*
  * Note that this macro returns ENOTSUP rather than
