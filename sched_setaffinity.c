@@ -102,9 +102,9 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
     }
   else
     {
-	  if (0 == pid)
+	  if (0 == targetPid)
 	    {
-		  int targetPid = (int) GetCurrentProcessId ();
+		  targetPid = (int) GetCurrentProcessId ();
 	    }
 
 	  h = OpenProcess (PROCESS_SET_INFORMATION, PTW32_FALSE, (DWORD) targetPid);
@@ -212,9 +212,9 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 
 #if ! defined(NEED_PROCESS_AFFINITY_MASK)
 
-	  if (0 == pid)
+	  if (0 == targetPid)
 	    {
-		  int targetPid = (int) GetCurrentProcessId ();
+		  targetPid = (int) GetCurrentProcessId ();
 	    }
 
 	  h = OpenProcess (PROCESS_QUERY_INFORMATION, PTW32_FALSE, (DWORD) targetPid);
@@ -281,7 +281,7 @@ int CPU_COUNT (cpu_set_t *set)
   int bit, count = 0;
   cpu_set_t s = *set;
 
-  for (bit = 1; bit < ((cpu_set_t)1<<(sizeof(cpu_set_t)*8)); bit <<= 1)
+  for (bit = 1; bit <= ((cpu_set_t)1<<((sizeof(cpu_set_t)*8)-1)); bit <<= 1)
     {
 	  if (s & bit)
 	    {
