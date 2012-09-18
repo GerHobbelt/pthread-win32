@@ -119,7 +119,7 @@ pthread_setaffinity_np(pthread_t thread, size_t cpusetsize,
 					   * pthread_getaffinity_np() returns the actual thread
 					   * CPU set.
 					   */
-					  *(tp->cpuset) = newMask;
+					  tp->cpuset = newMask;
 				    }
 				  else
 				  {
@@ -148,8 +148,7 @@ pthread_setaffinity_np(pthread_t thread, size_t cpusetsize,
 }
 
 int
-pthread_getaffinity_np(pthread_t thread, size_t cpusetsize,
-                                  const cpu_set_t *cpuset)
+pthread_getaffinity_np(pthread_t thread, size_t cpusetsize, cpu_set_t *cpuset)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -200,7 +199,7 @@ pthread_getaffinity_np(pthread_t thread, size_t cpusetsize,
     {
 	  if (cpuset)
 	    {
-		  *cpuset = *(tp->cpuset);
+		  *cpuset = tp->cpuset;
 		}
 	  else
 	    {

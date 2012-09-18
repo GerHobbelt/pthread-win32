@@ -1190,7 +1190,7 @@ PTW32_DLLPORT int PTW32_CDECL pthread_setaffinity_np(pthread_t thread,
 										 const cpu_set_t *cpuset);
 PTW32_DLLPORT int PTW32_CDECL pthread_getaffinity_np(pthread_t thread,
 										 size_t cpusetsize,
-										 const cpu_set_t *cpuset);
+										 cpu_set_t *cpuset);
 
 /*
  * Possibly supported by other POSIX threads implementations

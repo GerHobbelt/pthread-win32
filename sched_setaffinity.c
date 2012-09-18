@@ -227,7 +227,7 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 	    {
 		  if (GetProcessAffinityMask (h, &vProcessMask, &vSystemMask))
 		    {
-			  *mask = (cpu_set_t)(size_t) *vProcessMask;
+			  *mask = (cpu_set_t)(size_t) vProcessMask;
 		    }
 		  else
 		    {
@@ -263,17 +263,17 @@ void CPU_ZERO (cpu_set_t *set)
 
 void CPU_SET (int cpu, cpu_set_t *set)
 {
-  *set |= (cpu_set_t)(size_t) (1 << (cpu - 1));
+  *set |= ((cpu_set_t)1 << (cpu - 1));
 }
 
 void CPU_CLR (int cpu, cpu_set_t *set)
 {
-  *set &= (cpu_set_t)(size_t) (~(1 << (cpu - 1)));
+  *set &= (~((cpu_set_t)1 << (cpu - 1)));
 }
 
 int CPU_ISSET (int cpu, cpu_set_t *set)
 {
-  return ((*set & (1 << (cpu - 1))) != (cpu_set_t)(size_t) 0);
+  return ((*set & ((cpu_set_t)1 << (cpu - 1))) != (cpu_set_t)(size_t) 0);
 }
 
 int CPU_COUNT (cpu_set_t *set)
@@ -281,7 +281,7 @@ int CPU_COUNT (cpu_set_t *set)
   int bit, count = 0;
   cpu_set_t s = *set;
 
-  for (bit = 1; bit < (1<<(sizeof(cpu_set_t)*8)); bit <<= 1)
+  for (bit = 1; bit < ((cpu_set_t)1<<(sizeof(cpu_set_t)*8)); bit <<= 1)
     {
 	  if (s & bit)
 	    {

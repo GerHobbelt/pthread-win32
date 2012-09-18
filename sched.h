@@ -39,6 +39,8 @@
 #if !defined(_SCHED_H)
 #define _SCHED_H
 
+#include <windows.h>
+
 #undef PTW32_SCHED_LEVEL
 
 #if defined(_POSIX_SOURCE)
