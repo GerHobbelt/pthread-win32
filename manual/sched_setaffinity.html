@@ -1,0 +1,49 @@
+POSIX Threads for Windows – REFERENCE - Pthreads-w32
+Reference Index
+Table of Contents
+Name
+sched_setaffinity - set process CPU affinity
+sched_getaffinity - get process CPU affinity
+Synopsis
+#include <sched.h> 
+int sched_setaffinity(pid_t pid, int cpusetsize, const cpu_set_t *mask);
+int sched_getaffinity(pid_t pid, int cpusetsize, cpu_set_t *mask);
+Description
+sched_setaffinity() sets the CPU affinity mask of the process whose ID is pid to the value specified by mask. If pid is zero, then the calling process is used. The argument cpusetsize is the length (in bytes) of the data pointed to by mask. Normally this argument would be specified as sizeof(cpu_set_t).
+If the process specified by pid is not currently running on one of the CPUs specified in mask, then that process is migrated to one of the CPUs specified in mask.
+After a call to sched_setaffinity(), the set of CPUs on which the process will actually run is the intersection of the set specified in the mask argument and the set of CPUs actually present on the system.
+sched_getaffinity() writes the affinity mask of the process whose ID is pid into the cpu_set_t structure pointed to by mask. The cpusetsize argument specifies the size (in bytes) of mask. If pid is zero, then the mask of the calling process is returned.
+Pthreads-w32 currently ignores the cpusetsize parameter for either function because cpu_set_t is a direct typeset to the Windows affinity vector type DWORD_PTR.
+Windows may require that the requesting process have permission to set its own CPU affinity or that of another process.
+Return Value
+On success, sched_setaffinity() and sched_getaffinity() return 0. On error, -1 is returned, and errno is set appropriately.
+Errors
+EFAULT
+A supplied memory address was invalid.
+EINVAL
+The affinity bit mask mask contains no processors that are currently physically on the system.
+EAGAIN
+The function did not succeed in changing or abtaining the CPU affinity for some undetermined reason. Try again.
+EPERM
+The calling process does not have appropriate privileges.
+ESRCH 
+The process whose ID is pid could not be found.
+The following sections are informative. 
+Application Usage
+A process's CPU affinity mask determines the set of CPUs on which it is eligible to run. On a multiprocessor system, setting the CPU affinity mask can be used to obtain performance benefits. For example, by dedicating one CPU to a particular process (i.e., setting the affinity mask of that process to specify a single CPU, and setting the affinity mask of all other processes to exclude that CPU), it is possible to ensure maximum execution speed for that process. Restricting a process to run on a single CPU also avoids the performance cost caused by the cache invalidation that occurs when a process ceases to execute on one CPU and then recommences execution on a different CPU.
+A CPU affinity mask is represented by the cpu_set_t structure, a "CPU set", pointed to by mask. A set of macros for manipulating CPU sets is described in cpu_set.
+See Also
+cpu_set(), pthread_setaffininty_np(), pthread_getaffinity_np()
+Copyright
+Most of this is taken from the Linux manual page.
+Modified by Ross Johnson for use with Pthreads-w32.
+
+Table of Contents
+Name 
+Synopsis 
+Description 
+Return Value 
+Errors 
+Application Usage 
+See Also 
+Copyright 
