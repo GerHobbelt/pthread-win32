@@ -69,15 +69,15 @@ main()
 	    {
 		  if (CPU_COUNT(&mask) > 1)
 		    {
-			  printf("CPU mask Default = 0x%x\n", mask);
+			  printf("CPU mask Default = 0x%lx\n", (long unsigned int) mask);
 			  CPU_AND(&newmask, &mask, &switchmask); /* Remove every other CPU */
 			  assert(sched_setaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
 			  assert(sched_getaffinity(0, sizeof(cpu_set_t), &mask) == 0);
-			  printf("CPU mask New     = 0x%x\n", mask);
+			  printf("CPU mask New     = 0x%lx\n", (long unsigned int) mask);
 			  CPU_XOR(&newmask, &mask, &flipmask);  /* Switch to all alternative CPUs */
 			  assert(sched_setaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
 			  assert(sched_getaffinity(0, sizeof(cpu_set_t), &mask) == 0);
-			  printf("CPU mask Flipped = 0x%x\n", mask);
+			  printf("CPU mask Flipped = 0x%lx\n", (long unsigned int) mask);
 			  assert(newmask != mask);
 			}
 	    }
