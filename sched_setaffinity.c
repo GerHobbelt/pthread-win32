@@ -84,6 +84,7 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
       *                              not modifiable by us.
       *              ESRCH           The process referred to by 'pid' was
       *                              not found.
+      *              ENOSYS			 Function not supported.
       *
       * ------------------------------------------------------
       */
@@ -97,50 +98,64 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
   int result = 0;
 
   if (NULL == mask)
-    {
+	{
 	  result = EFAULT;
-    }
+	}
   else
-    {
+	{
 	  if (0 == targetPid)
-	    {
+		{
 		  targetPid = (int) GetCurrentProcessId ();
-	    }
+		}
 
-	  h = OpenProcess (PROCESS_SET_INFORMATION, PTW32_FALSE, (DWORD) targetPid);
+	  h = OpenProcess (PROCESS_QUERY_INFORMATION|PROCESS_SET_INFORMATION, PTW32_FALSE, (DWORD) targetPid);
 
 	  if (NULL == h)
-	    {
+		{
 		  result = (((0xFF & ERROR_ACCESS_DENIED) == GetLastError()) ? EPERM : ESRCH);
-	    }
+		}
 	  else
-	    {
+		{
 		  if (GetProcessAffinityMask (h, &vProcessMask, &vSystemMask))
-		    {
+			{
 			  /*
 			   * Result is the intersection of available CPUs and the mask.
 			   */
-			  DWORD_PTR newMask = vSystemMask & *((PDWORD_PTR) mask);
+			  DWORD_PTR newMask = vSystemMask & ((DWORD_PTR)(size_t) *mask);
 
 			  if (newMask)
-			    {
-				  SetProcessAffinityMask(h, newMask);
-			    }
+				{
+				  if (SetProcessAffinityMask(h, newMask) == 0)
+				    {
+					  switch (GetLastError())
+					    {
+					  	  case (0xFF & ERROR_ACCESS_DENIED):
+					  		  result = EPERM;
+					  		  break;
+					  	  case (0xFF & ERROR_INVALID_PARAMETER):
+					  		  result = EINVAL;
+					  		  break;
+					  	  default:
+					  		  result = EAGAIN;
+					  		  break;
+					    }
+				    }
+				}
 			  else
-			    {
+				{
 				  /*
 				   * Mask does not contain any CPUs currently available on the system.
 				   */
 				  result = EINVAL;
-			    }
-		    }
+				}
+			}
 		  else
-		    {
+			{
 			  result = EAGAIN;
-		    }
-	    }
+			}
+		}
 	  CloseHandle(h);
-    }
+	}
 
   if (result != 0)
     {
@@ -148,10 +163,16 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 	  return -1;
     }
   else
-#endif
     {
 	  return 0;
     }
+
+#else
+
+  PTW32_SET_ERRNO(ENOSYS);
+  return -1;
+
+#endif
 }
 
 
@@ -237,7 +258,7 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 	  CloseHandle(h);
 
 #else
-	  *mask = 1;
+	  *mask = 0x1;
 #endif
 
     }
@@ -256,57 +277,63 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 /*
  * Support routines for cpu_set_t
  */
-void CPU_ZERO (cpu_set_t *set)
+INLINE void CPU_ZERO (cpu_set_t *set)
 {
   *set = (cpu_set_t)(size_t) 0;
 }
 
-void CPU_SET (int cpu, cpu_set_t *set)
+INLINE void CPU_SET (int cpu, cpu_set_t *set)
 {
-  *set |= ((cpu_set_t)1 << (cpu - 1));
+  *set |= ((cpu_set_t)1 << cpu);
 }
 
-void CPU_CLR (int cpu, cpu_set_t *set)
+INLINE void CPU_CLR (int cpu, cpu_set_t *set)
 {
-  *set &= (~((cpu_set_t)1 << (cpu - 1)));
+  *set &= (~((cpu_set_t)1 << cpu));
 }
 
-int CPU_ISSET (int cpu, cpu_set_t *set)
+INLINE int CPU_ISSET (int cpu, cpu_set_t *set)
 {
-  return ((*set & ((cpu_set_t)1 << (cpu - 1))) != (cpu_set_t)(size_t) 0);
+  return ((*set & ((cpu_set_t)1 << cpu)) != (cpu_set_t)(size_t) 0);
 }
 
-int CPU_COUNT (cpu_set_t *set)
+INLINE int CPU_COUNT (cpu_set_t *set)
 {
-  int bit, count = 0;
+  cpu_set_t mask;
+  int count = 0;
   cpu_set_t s = *set;
 
-  for (bit = 1; bit <= ((cpu_set_t)1<<((sizeof(cpu_set_t)*8)-1)); bit <<= 1)
+  for (mask = 1;; mask <<= 1)
     {
-	  if (s & bit)
+	  if (s & mask)
 	    {
 		  count++;
 	    }
+	  if (((cpu_set_t)1<<((sizeof(cpu_set_t)*8)-1)) == mask)
+	    {
+		  break;
+	    }
     }
+
   return count;
 }
 
-void CPU_AND (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2)
+INLINE void CPU_AND (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2)
 {
   *destset = (cpu_set_t)((size_t)*srcset1 & (size_t)*srcset2);
 }
 
-void CPU_OR (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2)
+INLINE void CPU_OR (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2)
 {
   *destset = (cpu_set_t)((size_t)*srcset1 | (size_t)*srcset2);
 }
 
-void CPU_XOR (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2)
+INLINE void CPU_XOR (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2)
 {
   *destset = (cpu_set_t)((size_t)*srcset1 ^ (size_t)*srcset2);
 }
 
-int CPU_EQUAL (cpu_set_t *set1, cpu_set_t *set2)
+INLINE int CPU_EQUAL (cpu_set_t *set1, cpu_set_t *set2)
 {
 	return ((size_t)*set1 == (size_t)*set2);
 }

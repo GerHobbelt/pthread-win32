@@ -36,7 +36,7 @@
 #include "implement.h"
 
 int
-pthread_setaffinity_np(pthread_t thread, size_t cpusetsize,
+pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
                                   const cpu_set_t *cpuset)
      /*
       * ------------------------------------------------------
@@ -73,6 +73,7 @@ pthread_setaffinity_np(pthread_t thread, size_t cpusetsize,
       * 				ESRCH	Thread does not exist
       * 				EFAULT	pcuset is NULL
       * 				EAGAIN	The thread affinity could not be set
+      *                 ENOSYS	Function not supported.
       *
       * ------------------------------------------------------
       */
@@ -87,32 +88,29 @@ pthread_setaffinity_np(pthread_t thread, size_t cpusetsize,
 
   tp = (ptw32_thread_t *) thread.p;
 
-  if (NULL == tp
-	  || thread.x != tp->ptHandle.x
-	  || NULL == tp->threadH)
+  if (NULL == tp || thread.x != tp->ptHandle.x || NULL == tp->threadH)
     {
 	  result = ESRCH;
     }
-
-  if (0 == result)
-    {
+  else
+	{
 	  if (cpuset)
-	    {
+		{
 		  if (GetProcessAffinityMask (OpenProcess (PROCESS_QUERY_INFORMATION,
-				  	  	  	  	  	  	  	  	   PTW32_FALSE,
-				  	  	  	  	  	  	  	  	   GetCurrentProcessId ()),
-				  	  	  	  	  	  &vProcessMask,
-				  	  	  	  	  	  &vSystemMask))
-		  	{
+												   PTW32_FALSE,
+												   GetCurrentProcessId ()),
+									  &vProcessMask,
+									  &vSystemMask))
+			{
 			  /*
 			   * Result is the intersection of available CPUs and the mask.
 			   */
 			  DWORD_PTR newMask = vProcessMask & *((PDWORD_PTR) cpuset);
 
 			  if (newMask)
-			    {
+				{
 				  if (SetThreadAffinityMask (tp->threadH, newMask))
-				    {
+					{
 					  /*
 					   * We record the intersection of the process affinity
 					   * and the thread affinity cpusets so that
@@ -120,27 +118,27 @@ pthread_setaffinity_np(pthread_t thread, size_t cpusetsize,
 					   * CPU set.
 					   */
 					  tp->cpuset = newMask;
-				    }
+					}
 				  else
-				  {
-					result = EAGAIN;
-				  }
-			    }
+					{
+					  result = EAGAIN;
+					}
+				}
 			  else
-			    {
+				{
 				  result = EINVAL;
-			    }
-		  	}
+				}
+			}
 		  else
-		    {
+			{
 			  result = EAGAIN;
-		    }
-	    }
+			}
+		}
 	  else
-	    {
+		{
 		  result = EFAULT;
-	    }
-    }
+		}
+	}
 
   ptw32_mcs_lock_release (&node);
 
@@ -148,7 +146,7 @@ pthread_setaffinity_np(pthread_t thread, size_t cpusetsize,
 }
 
 int
-pthread_getaffinity_np(pthread_t thread, size_t cpusetsize, cpu_set_t *cpuset)
+pthread_getaffinity_np (pthread_t thread, size_t cpusetsize, cpu_set_t *cpuset)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -188,14 +186,11 @@ pthread_getaffinity_np(pthread_t thread, size_t cpusetsize, cpu_set_t *cpuset)
 
   tp = (ptw32_thread_t *) thread.p;
 
-  if (NULL == tp
-	  || thread.x != tp->ptHandle.x
-	  || NULL == tp->threadH)
+  if (NULL == tp || thread.x != tp->ptHandle.x || NULL == tp->threadH)
     {
 	  result = ESRCH;
     }
-
-  if (0 == result)
+  else
     {
 	  if (cpuset)
 	    {

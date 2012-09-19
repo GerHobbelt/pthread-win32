@@ -1213,8 +1213,8 @@ PTW32_DLLPORT int PTW32_CDECL pthread_win32_thread_detach_np(void);
  */
 PTW32_DLLPORT int PTW32_CDECL pthread_win32_test_features_np(int);
 enum ptw32_features {
-  PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE = 0x0001, /* System provides it. */
-  PTW32_ALERTABLE_ASYNC_CANCEL              = 0x0002  /* Can cancel blocked threads. */
+  PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE = 0x0001,	/* System provides it. */
+  PTW32_ALERTABLE_ASYNC_CANCEL              = 0x0002	/* Can cancel blocked threads. */
 };
 
 /*

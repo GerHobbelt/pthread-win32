@@ -126,7 +126,7 @@ REGULAR_PASSES = loadfree.pass \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
-	  cancel9.pass  stress1.pass
+	  cancel9.pass  affinity1.pass  affinity2.pass  stress1.pass
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
@@ -172,7 +172,7 @@ STATICRESULTS = \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
-	  cancel9.pass  stress1.pass
+	  cancel9.pass  affinity1.pass  affinity2.pass  stress1.pass
 
 help:
 	@ $(ECHO) Run one of the following command lines:
@@ -346,6 +346,8 @@ benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
 
+affinity1.pass: test
+affinity2.pass: affinity1.pass
 barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass
 barrier3.pass: barrier2.pass
@@ -407,7 +409,7 @@ join1.pass: create1.pass
 join2.pass: create1.pass
 join3.pass: join2.pass
 join4.pass: join3.pass
-kill1.pass: 
+kill1.pass:
 loadfree.pass: pthread.dll
 mutex1.pass: self1.pass
 mutex1n.pass: mutex1.pass
