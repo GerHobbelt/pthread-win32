@@ -277,63 +277,10 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 /*
  * Support routines for cpu_set_t
  */
-INLINE void CPU_ZERO (cpu_set_t *set)
+INLINE int CpuCount (cpu_set_t *set)
 {
-  *set = (cpu_set_t)(size_t) 0;
-}
-
-INLINE void CPU_SET (int cpu, cpu_set_t *set)
-{
-  *set |= ((cpu_set_t)1 << cpu);
-}
-
-INLINE void CPU_CLR (int cpu, cpu_set_t *set)
-{
-  *set &= (~((cpu_set_t)1 << cpu));
-}
-
-INLINE int CPU_ISSET (int cpu, cpu_set_t *set)
-{
-  return ((*set & ((cpu_set_t)1 << cpu)) != (cpu_set_t)(size_t) 0);
-}
-
-INLINE int CPU_COUNT (cpu_set_t *set)
-{
-  cpu_set_t mask;
-  int count = 0;
-  cpu_set_t s = *set;
-
-  for (mask = 1;; mask <<= 1)
-    {
-	  if (s & mask)
-	    {
-		  count++;
-	    }
-	  if (((cpu_set_t)1<<((sizeof(cpu_set_t)*8)-1)) == mask)
-	    {
-		  break;
-	    }
-    }
-
+  cpu_set_t tset;
+  int count;
+  for (count = 0, tset = *set; tset; count += tset & (cpu_set_t)1, tset>>=1);
   return count;
-}
-
-INLINE void CPU_AND (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2)
-{
-  *destset = (cpu_set_t)((size_t)*srcset1 & (size_t)*srcset2);
-}
-
-INLINE void CPU_OR (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2)
-{
-  *destset = (cpu_set_t)((size_t)*srcset1 | (size_t)*srcset2);
-}
-
-INLINE void CPU_XOR (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2)
-{
-  *destset = (cpu_set_t)((size_t)*srcset1 ^ (size_t)*srcset2);
-}
-
-INLINE int CPU_EQUAL (cpu_set_t *set1, cpu_set_t *set2)
-{
-	return ((size_t)*set1 == (size_t)*set2);
 }

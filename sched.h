@@ -39,6 +39,10 @@
 #if !defined(_SCHED_H)
 #define _SCHED_H
 
+#if !defined(_WIN32_WINNT)
+# define _WIN32_WINNT 0x0400
+#endif
+
 #include <windows.h>
 
 #undef PTW32_SCHED_LEVEL
@@ -147,8 +151,12 @@ struct sched_param {
 
 /* CPU affinity */
 
-typedef DWORD_PTR cpu_set_t;
+#if ! defined(MAXULONG_PTR)
+/* DWORD_PTR is not defined */
+typedef size_t DWORD_PTR, *PDWORD_PTR;
+#endif
 
+typedef DWORD_PTR cpu_set_t;
 
 #if defined(__cplusplus)
 extern "C"
@@ -171,24 +179,28 @@ PTW32_DLLPORT int __cdecl sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_s
 
 PTW32_DLLPORT int __cdecl sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
 
-PTW32_DLLPORT void __cdecl CPU_ZERO (cpu_set_t *set);
+PTW32_DLLPORT int __cdecl CpuCount (cpu_set_t *set);
 
-PTW32_DLLPORT void __cdecl CPU_SET (int cpu, cpu_set_t *set);
+/*
+ * Support macros for cpu_set_t
+ */
+#define CPU_ZERO(setptr) ((void)(*(setptr) = (cpu_set_t)0))
 
-PTW32_DLLPORT void __cdecl CPU_CLR (int cpu, cpu_set_t *set);
+#define CPU_SET(cpu, setptr) ((void)(*(setptr) |= ((cpu_set_t)1 << (cpu))))
 
-PTW32_DLLPORT int __cdecl CPU_ISSET (int cpu, cpu_set_t *set);
+#define CPU_CLR(cpu, setptr) ((void)(*(setptr) &= (~((cpu_set_t)1 << (cpu)))))
 
-PTW32_DLLPORT int __cdecl CPU_COUNT (cpu_set_t *set);
+#define CPU_ISSET(cpu, setptr) (((*(setptr) & ((cpu_set_t)1 << (cpu))) != (cpu_set_t)0))
 
-PTW32_DLLPORT void __cdecl CPU_AND (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2);
+#define CPU_AND(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) & (size_t)*(srcset2ptr))))
 
-PTW32_DLLPORT void __cdecl CPU_OR (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2);
+#define CPU_OR(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) | (size_t)*(srcset2ptr))))
 
-PTW32_DLLPORT void __cdecl CPU_XOR (cpu_set_t *destset, cpu_set_t *srcset1, cpu_set_t *srcset2);
+#define CPU_XOR(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) ^ (size_t)*(srcset2ptr))))
 
-PTW32_DLLPORT int __cdecl CPU_EQUAL (cpu_set_t *set1, cpu_set_t *set2);
+#define CPU_EQUAL(set1ptr, set2ptr) (((size_t)*(set1ptr) == (size_t)*(set2ptr)))
 
+#define CPU_COUNT(setptr) (CpuCount(setptr))
 
 /*
  * Note that this macro returns ENOTSUP rather than

@@ -73,7 +73,6 @@ pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
       * 				ESRCH	Thread does not exist
       * 				EFAULT	pcuset is NULL
       * 				EAGAIN	The thread affinity could not be set
-      *                 ENOSYS	Function not supported.
       *
       * ------------------------------------------------------
       */
@@ -81,8 +80,7 @@ pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
   int result = 0;
   ptw32_thread_t * tp;
   ptw32_mcs_local_node_t node;
-  DWORD_PTR vProcessMask;
-  DWORD_PTR vSystemMask;
+  cpu_set_t processCpuset;
 
   ptw32_mcs_lock_acquire (&ptw32_thread_reuse_lock, &node);
 
@@ -96,20 +94,20 @@ pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
 	{
 	  if (cpuset)
 		{
-		  if (GetProcessAffinityMask (OpenProcess (PROCESS_QUERY_INFORMATION,
-												   PTW32_FALSE,
-												   GetCurrentProcessId ()),
-									  &vProcessMask,
-									  &vSystemMask))
+		  if (sched_getaffinity(0, sizeof(cpu_set_t), &processCpuset))
+		    {
+			  result = PTW32_GET_ERRNO();
+		    }
+		  else
 			{
 			  /*
 			   * Result is the intersection of available CPUs and the mask.
 			   */
-			  DWORD_PTR newMask = vProcessMask & *((PDWORD_PTR) cpuset);
+			  cpu_set_t newMask = processCpuset & *cpuset;
 
 			  if (newMask)
 				{
-				  if (SetThreadAffinityMask (tp->threadH, newMask))
+				  if (SetThreadAffinityMask (tp->threadH, (DWORD_PTR)(size_t) newMask))
 					{
 					  /*
 					   * We record the intersection of the process affinity
@@ -128,10 +126,6 @@ pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
 				{
 				  result = EINVAL;
 				}
-			}
-		  else
-			{
-			  result = EAGAIN;
 			}
 		}
 	  else

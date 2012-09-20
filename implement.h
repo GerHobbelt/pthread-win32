@@ -112,10 +112,13 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 #include "semaphore.h"
 #include "sched.h"
 
-#if ( defined(HAVE_C_INLINE) || defined(__cplusplus) ) && defined(PTW32_BUILD_INLINED)
-# define INLINE inline
-#else
-# define INLINE
+/* MSVC 7.1 doesn't like complex #if expressions */
+#define INLINE
+#if defined(PTW32_BUILD_INLINED)
+#  if defined(HAVE_C_INLINE) || defined(__cplusplus)
+#    undef INLINE
+#    define INLINE inline
+#  endif
 #endif
 
 #if defined(PTW32_CONFIG_MSVC6)
