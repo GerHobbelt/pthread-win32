@@ -281,6 +281,11 @@ INLINE int CpuCount (cpu_set_t *set)
 {
   cpu_set_t tset;
   int count;
+
+  /*
+   * Relies on cpu_set_t being unsigned, otherwise the right-shift will
+   * be arithmetic rather than logical and the 'for' will loop forever.
+   */
   for (count = 0, tset = *set; tset; count += tset & (cpu_set_t)1, tset>>=1);
   return count;
 }
