@@ -80,8 +80,8 @@ sem_t s;
 void *
 thr (void * arg)
 {
-  assert(sem_wait(&s) == 0);
   assert(pthread_detach(pthread_self()) == 0);
+  assert(sem_wait(&s) == 0);
   return NULL;
 }
 
@@ -106,7 +106,7 @@ main()
           assert(sem_getvalue(&s, &value) == 0);
         }
       while (value != -i);
-      //printf("Value = %d\n", value); fflush(stdout);
+      //printf("1:Value = %d\n", value); fflush(stdout);
       assert(-value == i);
     }
 
@@ -114,7 +114,7 @@ main()
     {
       assert(sem_post(&s) == 0);
       assert(sem_getvalue(&s, &value) == 0);
-      //printf("Value = %d\n", value);	fflush(stdout);
+      //printf("2:Value = %d\n", value);	fflush(stdout);
       assert(-value == i);
     }
 

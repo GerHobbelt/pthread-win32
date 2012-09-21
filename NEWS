@@ -33,6 +33,10 @@ required but nothing explicitly references this code so was getting
 optimised out.
 - Daniel Richard G.
 
+sem_getvalue() could return the errno value instead of setting errno
+and returning -1.
+- Ross Johnson
+
 RELEASE 2.9.1
 -------------
 (2012-05-27)
