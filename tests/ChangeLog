@@ -1,3 +1,15 @@
+2012-09-21  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* affinity1.c: New test for new process CPU affinity routines.
+	* affinity2.c: New test for new process CPU affinity routines.
+	* affinity3.c: New test for new process and thread CPU affinity routines.
+	* affinity4.c: New test for new process and thread CPU affinity routines.
+	* affinity5.c: New test for new process and thread CPU affinity routines.
+	* Makefile: Add new tests.
+	* GNUmakfile: Likewise.
+	* Bmakfile: Likewise.
+	* Wmakfile: Likewise.
+
 2012-09-09  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* exception3.c: Rewrite to fix strategy.

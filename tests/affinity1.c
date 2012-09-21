@@ -56,7 +56,7 @@ main()
 	  cpu_set_t newmask = 0;
 	  cpu_set_t src1mask = 0;
 	  cpu_set_t src2mask = 0;
-	  int cpu;
+	  cpu_set_t src3mask = 0;
 
 	  result = sched_setaffinity(0, sizeof(cpu_set_t), &mask);
 
@@ -81,6 +81,8 @@ main()
 		src2mask |= ((cpu_set_t)0xff << (8*i));		/* 0b00000000000000001111111111111111 */
 	  for (i = sizeof(cpu_set_t)/2; i < sizeof(cpu_set_t); i++)
 		src2mask |= ((cpu_set_t)0x55 << (8*i));		/* 0b01010101010101011111111111111111 */
+	  for (i = 0; i < sizeof(cpu_set_t); i++)
+		  src3mask |= ((cpu_set_t)0x55 << (8*i));	/* 0b01010101010101010101010101010101 */
 
 	  assert(CPU_COUNT(&src1mask) == (sizeof(cpu_set_t)*4));
 	  assert(CPU_COUNT(&src2mask) == ((sizeof(cpu_set_t)*4 + (sizeof(cpu_set_t)*2))));
@@ -94,7 +96,7 @@ main()
 	  assert((CPU_OR(&newmask, &src1mask, &src2mask), newmask == src2mask));
 	  assert((CPU_AND(&newmask, &src1mask, &src2mask), newmask == src1mask));
 	  assert((CPU_XOR(&newmask, &src1mask, &src2mask), newmask == (src1mask ^ src2mask)));
-	  assert(CPU_EQUAL(&src1mask, &src1mask));
+	  assert(CPU_EQUAL(&src1mask, &src3mask));
 	  assert(!CPU_EQUAL(&src1mask, &src2mask));
 
 	  /*
