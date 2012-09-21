@@ -47,41 +47,35 @@ main()
   cpu_set_t flipmask   = 0xFFFFFFFF;
 
   assert(sched_getaffinity(0, sizeof(cpu_set_t), &mask) == 0);
+  assert(mask != 0);
 
-  if (!mask)
-    {
-	  result = -1;
-    }
+  result = sched_setaffinity(0, sizeof(cpu_set_t), &mask);
+  if (result != 0)
+	{
+	  assert(errno != ESRCH);
+	  assert(errno != EFAULT);
+	  assert(errno != EPERM);
+	  assert(errno != EINVAL);
+	  assert(errno != EAGAIN);
+	  assert(errno == ENOSYS);
+	  assert(CPU_COUNT(&mask) == 1);
+	}
   else
-    {
-	  result = sched_setaffinity(0, sizeof(cpu_set_t), &mask);
-	  if (result != 0)
+	{
+	  if (CPU_COUNT(&mask) > 1)
 		{
-		  assert(errno != ESRCH);
-		  assert(errno != EFAULT);
-		  assert(errno != EPERM);
-		  assert(errno != EINVAL);
-		  assert(errno != EAGAIN);
-		  assert(errno == ENOSYS);
-		  assert(CPU_COUNT(&mask) == 1);
+		  printf("CPU mask Default = 0x%lx\n", (long unsigned int) mask);
+		  CPU_AND(&newmask, &mask, &switchmask); /* Remove every other CPU */
+		  assert(sched_setaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
+		  assert(sched_getaffinity(0, sizeof(cpu_set_t), &mask) == 0);
+		  printf("CPU mask New     = 0x%lx\n", (long unsigned int) mask);
+		  CPU_XOR(&newmask, &mask, &flipmask);  /* Switch to all alternative CPUs */
+		  assert(sched_setaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
+		  assert(sched_getaffinity(0, sizeof(cpu_set_t), &mask) == 0);
+		  printf("CPU mask Flipped = 0x%lx\n", (long unsigned int) mask);
+		  assert(newmask != mask);
 		}
-	  else
-	    {
-		  if (CPU_COUNT(&mask) > 1)
-		    {
-			  printf("CPU mask Default = 0x%lx\n", (long unsigned int) mask);
-			  CPU_AND(&newmask, &mask, &switchmask); /* Remove every other CPU */
-			  assert(sched_setaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
-			  assert(sched_getaffinity(0, sizeof(cpu_set_t), &mask) == 0);
-			  printf("CPU mask New     = 0x%lx\n", (long unsigned int) mask);
-			  CPU_XOR(&newmask, &mask, &flipmask);  /* Switch to all alternative CPUs */
-			  assert(sched_setaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
-			  assert(sched_getaffinity(0, sizeof(cpu_set_t), &mask) == 0);
-			  printf("CPU mask Flipped = 0x%lx\n", (long unsigned int) mask);
-			  assert(newmask != mask);
-			}
-	    }
-    }
+	}
 
   return 0;
 }

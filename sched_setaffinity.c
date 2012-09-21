@@ -277,7 +277,7 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 /*
  * Support routines for cpu_set_t
  */
-INLINE int CpuCount (cpu_set_t *set)
+int CpuCount (cpu_set_t *set)
 {
   cpu_set_t tset;
   int count;
@@ -286,6 +286,12 @@ INLINE int CpuCount (cpu_set_t *set)
    * Relies on cpu_set_t being unsigned, otherwise the right-shift will
    * be arithmetic rather than logical and the 'for' will loop forever.
    */
-  for (count = 0, tset = *set; tset; count += tset & (cpu_set_t)1, tset>>=1);
+  for (count = 0, tset = *set; tset; tset >>= 1)
+    {
+	  if (tset & (cpu_set_t)1)
+	  	{
+		  count++;
+	  	}
+    }
   return count;
 }

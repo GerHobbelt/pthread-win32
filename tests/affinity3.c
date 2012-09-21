@@ -51,45 +51,39 @@ main()
 
   assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &processCpus) == 0);
   printf("This thread has a starting affinity with %d CPUs\n", CPU_COUNT(&processCpus));
+  assert(processCpus != 0);
 
-  if (!processCpus)
-    {
-	  result = -1;
-    }
+  for (i = 0; i < sizeof(cpu_set_t); i++)
+	switchmask |= ((cpu_set_t)0x55 << (8*i));	/* 0b01010101010101010101010101010101 */
+  for (i = 0; i < sizeof(cpu_set_t); i++)
+	flipmask |= ((cpu_set_t)0xff << (8*i));		/* 0b11111111111111111111111111111111 */
+
+  result = pthread_setaffinity_np(self, sizeof(cpu_set_t), &processCpus);
+  if (result != 0)
+	{
+	  assert(result != ESRCH);
+	  assert(result != EFAULT);
+	  assert(result != EPERM);
+	  assert(result != EINVAL);
+	  assert(result != EAGAIN);
+	  assert(result == ENOSYS);
+	  assert(CPU_COUNT(&mask) == 1);
+	}
   else
-    {
-	  for (i = 0; i < sizeof(cpu_set_t); i++)
-		switchmask |= ((cpu_set_t)0x55 << (8*i));	/* 0b01010101010101010101010101010101 */
-	  for (i = 0; i < sizeof(cpu_set_t); i++)
-		flipmask |= ((cpu_set_t)0xff << (8*i));		/* 0b11111111111111111111111111111111 */
-
-	  result = pthread_setaffinity_np(self, sizeof(cpu_set_t), &processCpus);
-	  if (result != 0)
+	{
+	  if (CPU_COUNT(&mask) > 1)
 		{
-		  assert(result != ESRCH);
-		  assert(result != EFAULT);
-		  assert(result != EPERM);
-		  assert(result != EINVAL);
-		  assert(result != EAGAIN);
-		  assert(result == ENOSYS);
-		  assert(CPU_COUNT(&mask) == 1);
+		  CPU_AND(&newmask, &processCpus, &switchmask); /* Remove every other CPU */
+		  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &newmask) == 0);
+		  assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &mask) == 0);
+		  assert(CPU_EQUAL(&mask, &newmask));
+		  CPU_XOR(&newmask, &mask, &flipmask);  /* Switch to all alternative CPUs */
+		  assert(!CPU_EQUAL(&mask, &newmask));
+		  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &newmask) == 0);
+		  assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &mask) == 0);
+		  assert(CPU_EQUAL(&mask, &newmask));
 		}
-	  else
-	    {
-		  if (CPU_COUNT(&mask) > 1)
-		    {
-			  CPU_AND(&newmask, &processCpus, &switchmask); /* Remove every other CPU */
-			  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &newmask) == 0);
-			  assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &mask) == 0);
-			  assert(CPU_EQUAL(&mask, &newmask));
-			  CPU_XOR(&newmask, &mask, &flipmask);  /* Switch to all alternative CPUs */
-			  assert(!CPU_EQUAL(&mask, &newmask));
-			  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &newmask) == 0);
-			  assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &mask) == 0);
-			  assert(CPU_EQUAL(&mask, &newmask));
-			}
-	    }
-    }
+	}
 
   return 0;
 }
