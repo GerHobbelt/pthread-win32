@@ -85,7 +85,6 @@ sem_getvalue (sem_t * sem, int *sval)
     }
   else
     {
-      long value;
       register sem_t s = *sem;
 
       if ((result = pthread_mutex_lock(&s->lock)) == 0)
