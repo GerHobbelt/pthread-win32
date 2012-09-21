@@ -39,11 +39,14 @@
 #if !defined(_SCHED_H)
 #define _SCHED_H
 
-#if !defined(_WIN32_WINNT)
-# define _WIN32_WINNT 0x0400
+#if defined(_MSC_VER)
+#  if _MSC_VER < 1300
+#    define PTW32_CONFIG_MSVC6
+#  endif
+#  if _MSC_VER < 1400
+#    define PTW32_CONFIG_MSVC7
+#  endif
 #endif
-
-#include <windows.h>
 
 #undef PTW32_SCHED_LEVEL
 
@@ -151,12 +154,15 @@ struct sched_param {
 
 /* CPU affinity */
 
-#if ! defined(MAXULONG_PTR)
-/* DWORD_PTR is not defined */
+#if defined(PTW32_CONFIG_MSVC6) && ! defined(PTW32_DWORD_PTR)
+/*
+ * VC++6.0 or early compiler's header has no DWORD_PTR type.
+ */
 typedef size_t DWORD_PTR, *PDWORD_PTR;
+#define PTW32_DWORD_PTR
 #endif
 
-typedef DWORD_PTR cpu_set_t;
+typedef size_t cpu_set_t;
 
 #if defined(__cplusplus)
 extern "C"

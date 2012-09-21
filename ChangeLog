@@ -1,8 +1,10 @@
-2012-09-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
+2012-09-21  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* create.c: Major changes to incorporate CPU affinity inheritance.
 	* pthread_self.c: Likewise.
 	* ptw32_new.c (cpuset): Initialise new pthread_thread_t element.
+	* pthread.h (DWORD_PTR): Conditional definition moved to sched.h.
+	* sched.h (DWORD_PTR): As above; other changes.
 	
 2012-09-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
 

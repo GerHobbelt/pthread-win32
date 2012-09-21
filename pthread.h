@@ -210,19 +210,11 @@
 #include <windows.h>
 #endif
 
-#if defined(PTW32_CONFIG_MSVC6) || defined(__DMC__)
-/*
- * VC++6.0 or early compiler's header has no DWORD_PTR type.
- */
-typedef unsigned long DWORD_PTR;
-typedef unsigned long ULONG_PTR;
-#endif
 /*
  * -----------------
  * autoconf switches
  * -----------------
  */
-
 #if defined(HAVE_PTW32_CONFIG_H)
 #include "config.h"
 #endif /* HAVE_PTW32_CONFIG_H */
@@ -265,10 +257,6 @@ enum {
 #  endif
 #endif
 
-/*
- *
- */
-
 #if PTW32_LEVEL >= PTW32_LEVEL_MAX
 #if defined(NEED_ERRNO)
 #include "need_errno.h"
@@ -276,6 +264,8 @@ enum {
 #include <errno.h>
 #endif
 #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
+
+#include <sched.h>
 
 /*
  * Several systems don't define some error numbers.
@@ -307,8 +297,6 @@ enum {
 #if !defined(ENOTRECOVERABLE)
 #  define ENOTRECOVERABLE 44
 #endif
-
-#include <sched.h>
 
 /*
  * To avoid including windows.h we define only those things that we
