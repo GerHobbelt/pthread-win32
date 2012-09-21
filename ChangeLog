@@ -1,3 +1,9 @@
+2012-09-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* create.c: Major changes to incorporate CPU affinity inheritance.
+	* pthread_self.c: Likewise.
+	* ptw32_new.c (cpuset): Initialise new pthread_thread_t element.
+	
 2012-09-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* sched_setaffinity.c: New API to set process CPU affinity in POSIX

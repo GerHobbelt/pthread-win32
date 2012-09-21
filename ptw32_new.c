@@ -79,6 +79,7 @@ ptw32_new (void)
   tp->threadLock = 0;
   tp->robustMxListLock = 0;
   tp->robustMxList = NULL;
+  CPU_ZERO(&tp->cpuset);
   tp->cancelEvent = CreateEvent (0, (int) PTW32_TRUE,	/* manualReset  */
 				 (int) PTW32_FALSE,	/* setSignaled  */
 				 NULL);

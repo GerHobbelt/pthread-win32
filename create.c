@@ -85,6 +85,7 @@ pthread_create (pthread_t * tid,
 {
   pthread_t thread;
   ptw32_thread_t * tp;
+  ptw32_thread_t * sp;
   register pthread_attr_t a;
   HANDLE threadH = 0;
   int result = EAGAIN;
@@ -92,7 +93,6 @@ pthread_create (pthread_t * tid,
   ThreadParms *parms = NULL;
   unsigned int stackSize;
   int priority;
-  pthread_t self;
 
   /*
    * Before doing anything, check that tid can be stored through
@@ -101,6 +101,11 @@ pthread_create (pthread_t * tid,
    * This is assured by conditionally assigning *tid again at the end.
    */
   tid->x = 0;
+
+  if (NULL == (sp = (ptw32_thread_t *)pthread_self().p))
+    {
+	  goto FAIL0;
+    }
 
   if (attr != NULL)
     {
@@ -129,16 +134,13 @@ pthread_create (pthread_t * tid,
   parms->start = start;
   parms->arg = arg;
 
-#if defined(HAVE_SIGSET_T)
-
   /*
-   * Threads inherit their initial sigmask from their creator thread.
+   * Threads inherit their initial sigmask and CPU affinity from their creator thread.
    */
-  self = pthread_self();
-  tp->sigmask = ((ptw32_thread_t *)self.p)->sigmask;
-
-#endif /* HAVE_SIGSET_T */
-
+#if defined(HAVE_SIGSET_T)
+  tp->sigmask = sp->sigmask;
+#endif
+  tp->cpuset = sp->cpuset;
 
   if (a != NULL)
     {
@@ -164,17 +166,14 @@ pthread_create (pthread_t * tid,
        * PTHREAD_EXPLICIT_SCHED and priority THREAD_PRIORITY_NORMAL.
        */
       if (PTHREAD_INHERIT_SCHED == a->inheritsched)
-	{
-	  /*
-	   * If the thread that called pthread_create() is a Win32 thread
-	   * then the inherited priority could be the result of a temporary
-	   * system adjustment. This is not the case for POSIX threads.
-	   */
-#if ! defined(HAVE_SIGSET_T)
-	  self = pthread_self ();
-#endif
-	  priority = ((ptw32_thread_t *) self.p)->sched_priority;
-	}
+        {
+    	  /*
+    	   * If the thread that called pthread_create() is a Win32 thread
+    	   * then the inherited priority could be the result of a temporary
+    	   * system adjustment. This is not the case for POSIX threads.
+    	   */
+    	  priority = sp->sched_priority;
+        }
 
 #endif
 
@@ -215,14 +214,16 @@ pthread_create (pthread_t * tid,
   if (threadH != 0)
     {
       if (a != NULL)
-	{
-	  (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
-	}
+        {
+    	  (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
+        }
+
+      SetThreadAffinityMask(tp->threadH, (DWORD_PTR)(size_t)tp->cpuset);
 
       if (run)
-	{
-	  ResumeThread (threadH);
-	}
+        {
+    	  ResumeThread (threadH);
+        }
     }
 
 #else
@@ -251,19 +252,21 @@ pthread_create (pthread_t * tid,
     else
       {
         if (!run)
-	  {
-	    /* 
-	     * beginthread does not allow for create flags, so we do it now.
-	     * Note that beginthread itself creates the thread in SUSPENDED
-	     * mode, and then calls ResumeThread to start it.
-	     */
-	    SuspendThread (threadH);
-	  }
+          {
+        	/*
+        	 * beginthread does not allow for create flags, so we do it now.
+        	 * Note that beginthread itself creates the thread in SUSPENDED
+        	 * mode, and then calls ResumeThread to start it.
+        	 */
+        	SuspendThread (threadH);
+          }
   
         if (a != NULL)
-	  {
-	    (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
-	  }
+          {
+        	(void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
+          }
+
+        SetThreadAffinityMask(tp->threadH, (DWORD_PTR)(size_t)tp->cpuset);
       }
 
     ptw32_mcs_lock_release (&stateLock);
