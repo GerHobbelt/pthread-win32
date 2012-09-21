@@ -456,5 +456,5 @@ clean:
 	- $(RM) *.bench
 	- $(RM) *.static
 	- $(RM) *.log
-	- $(RM) SIZES.GC
-	- $(RM) SIZES.GCE
+	- $(RM) SIZES.G*
+	
