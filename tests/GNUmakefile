@@ -78,7 +78,7 @@ INCLUDES	= -I.
 TEST	= GC
 
 # Default lib version
-GCX	= $(TEST)$(DLL_VER)
+GCX	= GC$(DLL_VER)
 
 # Files we need to run the tests
 # - paths are relative to pthreads build dir.
@@ -193,46 +193,46 @@ all:
 	@ $(MAKE) clean GCE
 
 GC:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-pass
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-pass
 
 GC-asm:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-asm
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-asm
 
 GCE:
-	$(MAKE) TEST=GCE CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-pass
+	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-pass
 
 GCX:
-	$(MAKE) TEST=GC CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
 
 GC-bench:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
 
 GCE-bench:
-	$(MAKE) TEST=GCE  CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
+	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
 
 GC-debug:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" DLL_VER="$(DLL_VER)d" all-pass
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" all-pass
 
 GCE-debug:
-	$(MAKE) TEST=GCE CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX" OPT="${DOPT}" DLL_VER="$(DLL_VER)d" all-pass
+	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX" OPT="${DOPT}" all-pass
 
 GC-bench-debug:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${OPT}" DLL_VER="$(DLL_VER)d" all-bench
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${OPT}" all-bench
 
 GC-static:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
 
 GC-static-debug:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL_VER="$(DLL_VER)d" DLL="" all-static
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" all-static
 
 GC-stress:
 	@ $(ECHO) "Stress tests can take a long time since they are trying to"
 	@ $(ECHO) "expose weaknesses that may be intermittant or statistically rare."
 	@ $(ECHO) "A pass does not prove correctness, but may give greater confidence."
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="" all-stress
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="" all-stress
 
 GCE-stress:
-	$(MAKE) TEST=GCE  CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="" all-stress
+	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="" all-stress
 
 all-asm: $(ASM)
 	@ $(ECHO) "ALL TESTS PASSED! Congratulations!"
