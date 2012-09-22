@@ -41,7 +41,7 @@ int
 main()
 {
   int result;
-  int i;
+  unsigned int i;
   cpu_set_t newmask;
   cpu_set_t processCpus;
   cpu_set_t mask = 0;

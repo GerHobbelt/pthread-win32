@@ -40,8 +40,7 @@
 int
 main()
 {
-  int result;
-  int i;
+  unsigned int i;
   cpu_set_t newmask = 0;
   cpu_set_t src1mask = 0;
   cpu_set_t src2mask = 0;
