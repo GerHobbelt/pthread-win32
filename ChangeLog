@@ -1,3 +1,13 @@
+2012-09-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread_win32_attach_detach_np.c (pthread_win32_detach_thread_np):
+	Check for NULL ptw32_selfThreadKey before call to TlsSetKey(). Need
+	to find where this is being set to NULL before this point. Was
+	consistently failing tests/seamphore3.c in all GC static builds and
+	never seen in GC DLL builds. May also be responsible for
+	inconsistent VCE fails on that test, although the fail mode was
+	different - the latter hangs the test while the former segfaults.
+
 2012-09-21  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* create.c: Major changes to incorporate CPU affinity inheritance.

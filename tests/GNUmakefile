@@ -175,16 +175,17 @@ STATICRESULTS	= $(STATICTESTS:%=%.pass)
 
 help:
 	@ $(ECHO) "Run one of the following command lines:"
-	@ $(ECHO) "$(MAKE) clean GC         (to test using GC dll with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCX        (to test using GC dll with C++ (EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCE        (to test using GCE dll with C++ (EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GC-bench   (to benchtest using GNU C dll with C cleanup code)"
-	@ $(ECHO) "$(MAKE) clean GCE-bench  (to benchtest using GNU C dll with C++ exception handling)"
-	@ $(ECHO) "$(MAKE) clean GC-stress  (to stresstest using GNU C dll with C cleanup code)"
-	@ $(ECHO) "$(MAKE) clean GCE-stress (to stresstest using GNU C dll with C++ exception handling)"
-	@ $(ECHO) "$(MAKE) clean GC-static  (to test using GC static lib with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GC-debug   (to test using GC dll with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCE-debug  (to test using GCE dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC               (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCX              (to test using GC dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCE              (to test using GCE dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-bench         (to benchtest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "$(MAKE) clean GCE-bench        (to benchtest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "$(MAKE) clean GC-stress        (to stresstest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "$(MAKE) clean GCE-stress       (to stresstest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "$(MAKE) clean GC-static        (to test using GC static lib with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-static-debug  (to test using GC static lib with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-debug         (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCE-debug        (to test using GCE dll with C++ (EH) applications)"
 
 all:
 	@ $(MAKE) clean GC
@@ -220,6 +221,9 @@ GC-bench-debug:
 
 GC-static:
 	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
+
+GC-static-debug:
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL_VER="$(DLL_VER)d" DLL="" all-static
 
 GC-stress:
 	@ $(ECHO) "Stress tests can take a long time since they are trying to"

@@ -1,3 +1,7 @@
+2012-09-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile (GC-static-debug): New make target.
+
 2012-09-21  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* affinity1.c: New test for new process CPU affinity routines.
