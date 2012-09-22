@@ -96,6 +96,20 @@
 #endif
 
 /*
+ * The Open Watcom C/C++ compiler uses a non-standard calling convention
+ * that passes function args in registers unless __cdecl is explicitly specified
+ * in exposed function prototypes.
+ *
+ * We force all calls to cdecl even though this could slow Watcom code down
+ * slightly. If you know that the Watcom compiler will be used to build both
+ * the DLL and application, then you can probably define this as a null string.
+ * Remember that pthread.h (this file) is used for both the DLL and application builds.
+ */
+#if !defined(PTW32_CDECL)
+# define PTW32_CDECL __cdecl
+#endif
+
+/*
  * This is a duplicate of what is in the autoconf config.h,
  * which is only used when building the pthread-win32 libraries.
  */
@@ -116,6 +130,8 @@
 /*
  *
  */
+
+#include <stdlib.h>
 
 #if PTW32_SCHED_LEVEL >= PTW32_SCHED_LEVEL_MAX
 #if defined(NEED_ERRNO)
@@ -138,6 +154,14 @@
  typedef int pid_t;
 #endif
 
+/*
+ * Microsoft VC++6.0 lacks these *_PTR types
+ */
+#if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(PTW32_HAVE_DWORD_PTR)
+typedef unsigned long ULONG_PTR;
+typedef ULONG_PTR DWORD_PTR;
+#endif
+
 /* Thread scheduling policies */
 
 enum {
@@ -154,14 +178,6 @@ struct sched_param {
 
 /* CPU affinity */
 
-#if defined(PTW32_CONFIG_MSVC6) && ! defined(PTW32_DWORD_PTR)
-/*
- * VC++6.0 or early compiler's header has no DWORD_PTR type.
- */
-typedef size_t DWORD_PTR, *PDWORD_PTR;
-#define PTW32_DWORD_PTR
-#endif
-
 typedef size_t cpu_set_t;
 
 #if defined(__cplusplus)
@@ -169,23 +185,23 @@ extern "C"
 {
 #endif                          /* __cplusplus */
 
-PTW32_DLLPORT int __cdecl sched_yield (void);
+PTW32_DLLPORT int PTW32_CDECL sched_yield (void);
 
-PTW32_DLLPORT int __cdecl sched_get_priority_min (int policy);
+PTW32_DLLPORT int PTW32_CDECL sched_get_priority_min (int policy);
 
-PTW32_DLLPORT int __cdecl sched_get_priority_max (int policy);
+PTW32_DLLPORT int PTW32_CDECL sched_get_priority_max (int policy);
 
-PTW32_DLLPORT int __cdecl sched_setscheduler (pid_t pid, int policy);
+PTW32_DLLPORT int PTW32_CDECL sched_setscheduler (pid_t pid, int policy);
 
-PTW32_DLLPORT int __cdecl sched_getscheduler (pid_t pid);
+PTW32_DLLPORT int PTW32_CDECL sched_getscheduler (pid_t pid);
 
 /* Compatibility with Linux - not standard */
 
-PTW32_DLLPORT int __cdecl sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
+PTW32_DLLPORT int PTW32_CDECL sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
 
-PTW32_DLLPORT int __cdecl sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
+PTW32_DLLPORT int PTW32_CDECL sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
 
-PTW32_DLLPORT int __cdecl CpuCount (cpu_set_t *set);
+PTW32_DLLPORT int PTW32_CDECL CpuCount (cpu_set_t *set);
 
 /*
  * Support macros for cpu_set_t

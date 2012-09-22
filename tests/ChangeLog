@@ -1,3 +1,36 @@
+2012-09-22  Daniel Richard. G <danielg at teragram dot com>
+
+	* Makefile: This reverts an earlier change of mine. In some
+	versions of nmake, $(MAKE) is a full path, which utterly futzes
+	up the "make help" output; regularized the test targets, so we
+	have e.g. VSE-static now; regularized the parentheticals;
+	removed a spurious use of $(DLL_VER); new test targets: VCX-debug
+	{VSE,VCX}-static{,-debug}; fixed the {VC,VCE}-static-debug targets.
+	* exception3.c: Narrowly exclude this test from the known-bad VS2005
+	configuration (By the way: I downloaded and tested with what is
+	presumably the most up-to-date MSVCR80.DLL. Same deal.); use
+	pthread_win32_set_terminate_np() when appropriate, and verify that
+	it has an effect different from calling set_terminate(); no need for
+	that assert(); it's overly pedantic.
+	* exception3_0.c: Same VS2005 exclusion.
+	* once3.c: Put in a note so that users know what to do if the test
+	hangs or exits abnormally (I figured this is better than narrowly
+	disabling pthread_cancel() on MSVC6, since cancellation does seem to
+	work correctly with /EHa, and we don't have any way of telling at
+	compile time whether /EHs or /EHa is in use).
+	* once4.c: Likewise.
+	* semaphore1.c: s/PTW32_BROKEN_ERRNO/PTW32_USES_SEPARATE_CRT/
+
+2012-09-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread_win32_attach_detach_np.c (pthread_win32_detach_thread_np):
+	Check for NULL ptw32_selfThreadKey before call to TlsSetKey(). Need
+	to find where this is being set to NULL before this point. Was
+	consistently failing tests/seamphore3.c in all GC static builds and
+	never seen in GC DLL builds. May also be responsible for
+	inconsistent VCE fails on that test, although the fail mode was
+	different - the latter hangs the test while the former segfaults.
+
 2012-09-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* GNUmakefile (GC-static-debug): New make target.

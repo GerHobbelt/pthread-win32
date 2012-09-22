@@ -139,7 +139,13 @@ main()
 {
   pthread_t t[NUM_THREADS][NUM_ONCE];
   int i, j;
-  
+
+#if defined(PTW32_CONFIG_MSVC6) && defined(__CLEANUP_CXX)
+  puts("If this test fails or hangs, rebuild the library with /EHa instead of /EHs.");
+  puts("(This is a known issue with Microsoft VC++6.0.)");
+  fflush(stdout);
+#endif
+
   memset(&numOnce, 0, sizeof(sharedInt_t));
   memset(&numThreads, 0, sizeof(sharedInt_t));
 

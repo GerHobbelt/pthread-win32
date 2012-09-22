@@ -89,35 +89,29 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
 #elif defined(__WATCOMC__)
 # include <eh.h>
 # include <exceptio.h>
-typedef terminate_handler
-  terminate_function;
 #else
 # if defined(__GNUC__) && __GNUC__ < 3
 #   include <new.h>
 # else
 #   include <new>
 using
-  std::terminate_handler;
-using
   std::terminate;
 using
   std::set_terminate;
 # endif
-typedef terminate_handler
-  terminate_function;
 #endif
 
-static terminate_function
-  ptw32_oldTerminate;
+#endif /* __CLEANUP_CXX */
 
-void
-ptw32_terminate ()
-{
-  set_terminate (ptw32_oldTerminate);
-  (void) pthread_win32_thread_detach_np ();
-  terminate ();
-}
-
+/*
+ * MSVC6 does not optimize ptw32_threadStart() safely
+ * (i.e. tests/context1.c fails with "abnormal program
+ * termination" in some configurations), and there's no
+ * point to optimizing this routine anyway
+ */
+#ifdef _MSC_VER
+# pragma optimize("g", off)
+# pragma warning( disable : 4748 )
 #endif
 
 #if ! defined (PTW32_CONFIG_MINGW) || (defined (__MSVCRT__) && ! defined (__DMC__))
@@ -244,46 +238,10 @@ ptw32_threadStart (void *vthreadParms)
 
 #if defined(__CLEANUP_CXX)
 
-  ptw32_oldTerminate = set_terminate (&ptw32_terminate);
-
   try
   {
-    /*
-     * Run the caller's routine in a nested try block so that we
-     * can run the user's terminate function, which may call
-     * pthread_exit() or be canceled.
-     */
-    try
-    {
-      status = sp->exitStatus = (*start) (arg);
-      sp->state = PThreadStateExiting;
-    }
-    catch (ptw32_exception &)
-    {
-      /*
-       * Pass these through to the outer block.
-       */
-      throw;
-    }
-    catch (...)
-    {
-      /*
-       * We want to run the user's terminate function if supplied.
-       * That function may call pthread_exit() or be canceled, which will
-       * be handled by the outer try block.
-       *
-       * ptw32_terminate() will be called if there is no user
-       * supplied function.
-       */
-      terminate_function term_func = set_terminate (0);
-      set_terminate (term_func);
-
-      if (term_func != 0)
-      	{
-    	  term_func ();
-      	}
-      throw;
-    }
+    status = sp->exitStatus = (*start) (arg);
+    sp->state = PThreadStateExiting;
   }
   catch (ptw32_exception_cancel &)
   {
@@ -302,15 +260,12 @@ ptw32_threadStart (void *vthreadParms)
   catch (...)
   {
     /*
-     * A system unexpected exception has occurred running the user's
-     * terminate routine. We get control back within this block
-     * and exit with a substitute status. If the thread was not
-     * cancelled then this indicates the unhandled exception.
+     * Some other exception occurred. Clean up while we have
+     * the opportunity, and call the terminate handler.
      */
-    status = sp->exitStatus = PTHREAD_CANCELED;
+    (void) pthread_win32_thread_detach_np ();
+    terminate ();
   }
-
-  (void) set_terminate (ptw32_oldTerminate);
 
 #else
 
@@ -324,7 +279,7 @@ ptw32_threadStart (void *vthreadParms)
   /*
    * We need to cleanup the pthread now if we have
    * been statically linked, in which case the cleanup
-   * in dllMain won't get done. Joinable threads will
+   * in DllMain won't get done. Joinable threads will
    * only be partially cleaned up and must be fully cleaned
    * up by pthread_join() or pthread_detach().
    *
@@ -333,7 +288,7 @@ ptw32_threadStart (void *vthreadParms)
    * for Win32 threads which have called pthreads routines)
    * must be cleaned up explicitly by the application
    * by calling pthread_exit().
-   * For the dll, dllMain will do the cleanup automatically.
+   * For the dll, DllMain will do the cleanup automatically.
    */
   (void) pthread_win32_thread_detach_np ();
 #endif
@@ -353,3 +308,18 @@ ptw32_threadStart (void *vthreadParms)
 #endif
 
 }				/* ptw32_threadStart */
+
+/*
+ * Reset optimization
+ */
+#ifdef _MSC_VER
+# pragma optimize("", on)
+#endif
+
+#if defined (PTW32_USES_SEPARATE_CRT) && defined (__cplusplus)
+ptw32_terminate_handler
+pthread_win32_set_terminate_np(ptw32_terminate_handler termFunction)
+{
+  return set_terminate(termFunction);
+}
+#endif

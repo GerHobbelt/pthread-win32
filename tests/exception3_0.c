@@ -73,7 +73,13 @@
 
 #include "test.h"
 
-#if defined(__cplusplus)
+/*
+ * Note: Due to a buggy C++ runtime in Visual Studio 2005, when we are
+ * built with /MD and an unhandled exception occurs, the runtime does not
+ * properly call the terminate handler specified by set_terminate().
+ */
+#if defined(__cplusplus) \
+	&& !(defined(_MSC_VER) && _MSC_VER == 1400 && defined(_DLL) && !defined(_DEBUG))
 
 #if defined(_MSC_VER)
 # include <eh.h>

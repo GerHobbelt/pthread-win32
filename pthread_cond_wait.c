@@ -384,14 +384,14 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
   /* Thread can be cancelled in sem_wait() but this is OK */
   if (sem_wait (&(cv->semBlockLock)) != 0)
     {
-      return errno;
+      return PTW32_GET_ERRNO();
     }
 
   ++(cv->nWaitersBlocked);
 
   if (sem_post (&(cv->semBlockLock)) != 0)
     {
-      return errno;
+      return PTW32_GET_ERRNO();
     }
 
   /*

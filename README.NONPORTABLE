@@ -169,7 +169,7 @@ pthread_win32_thread_attach_np (void);
 BOOL
 pthread_win32_thread_detach_np (void);
 
-	These functions contain the code normally run via dllMain
+	These functions contain the code normally run via DllMain
 	when the library is used as a dll. As of version 2.9.0 of the
 	library, static builds using either MSC or GCC will call
 	pthread_win32_process_* automatically at application startup and
