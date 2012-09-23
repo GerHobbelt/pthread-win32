@@ -167,13 +167,13 @@ all-tests:
 	$(MAKE) realclean GCE
 	cd tests && $(MAKE) clean GCE $(TEST_ENV)
 	$(MAKE) realclean GC-inlined
-	cd tests && $(MAKE) clean GC $(TEST_ENV) && $(MAKE) clean GCX $(TEST_ENV)
+	cd tests && $(MAKE) clean GC-inlined $(TEST_ENV) && $(MAKE) clean GCX-inlined $(TEST_ENV)
 	$(MAKE) realclean GCE-inlined
-	cd tests && $(MAKE) clean GCE $(TEST_ENV)
+	cd tests && $(MAKE) clean GCE-inlined $(TEST_ENV)
 	$(MAKE) realclean GC-static
 	cd tests && $(MAKE) clean GC-static $(TEST_ENV)
 	$(MAKE) realclean GC-small-static
-	cd tests && $(MAKE) clean GC-static $(TEST_ENV)
+	cd tests && $(MAKE) clean GC-small-static $(TEST_ENV)
 	@ $(ECHO) "$@ completed successfully."
 
 all-tests-cflags:

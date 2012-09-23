@@ -5,9 +5,7 @@
 #
 #      Pthreads-win32 - POSIX Threads Library for Win32
 #      Copyright(C) 1998 John E. Bossom
-#      Copyright(C) 1999,2005 Pthreads-win32 contributors
-# 
-#      Contact Email: rpj@callisto.canberra.edu.au
+#      Copyright(C) 1999,2012 Pthreads-win32 contributors
 # 
 #      The current list of contributors is contained
 #      in the file CONTRIBUTORS included with the source
@@ -35,6 +33,7 @@ DLL_VER	= 2
 
 CP	= copy
 RM	= erase
+RMDIR	= rmdir /s /q
 CAT	= type
 MKDIR	= mkdir
 ECHO	= echo
@@ -254,16 +253,16 @@ $(STRESSRESULTS): $*.exe
 	@ $(ECHO) ...... Done
 	@ $(TOUCH) $*.pass
 
-VC:
+VC VC-inlined:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
 
-VCE:
+VCE VCE-inlined:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
 
-VSE:	
+VSE VCE-inlined:	
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" tests
 
-VCX:
+VCX VCX-inlined:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
 
 VC-bench:
@@ -290,40 +289,40 @@ VSE-stress:
 VCX-stress:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" stresstests
 
-VC-static:
+VC-static VC-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VCE-static:
+VCE-static VCE-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VSE-static:
+VSE-static VSE-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VCX-static:
+VCX-static VCX-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VC-debug:
+VC-debug VC-inlined-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" tests
 
-VC-static-debug:
+VC-static-debug VC-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VCE-debug:
+VCE-debug VCE-inlined-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" tests
 
-VCE-static-debug:
+VCE-static-debug VCE-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VSE-debug:
+VSE-debug VSE-inlined-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" tests
 
-VSE-static-debug:
+VSE-static-debug VSE-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VCX-debug:
+VCX-debug VCX-inlined-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" tests
 
-VCX-static-debug:
+VCX-static-debug VCX-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" statictests
 
 .c.exe:

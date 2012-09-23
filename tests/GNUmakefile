@@ -192,16 +192,16 @@ all:
 	@ $(MAKE) clean GCX
 	@ $(MAKE) clean GCE
 
-GC:
+GC GC-inlined:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-pass
 
 GC-asm:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-asm
 
-GCE:
+GCE GCE-inlined:
 	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-pass
 
-GCX:
+GCX GCX-inlined:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
 
 GC-bench:
@@ -219,7 +219,7 @@ GCE-debug:
 GC-bench-debug:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${OPT}" all-bench
 
-GC-static:
+GC-static GC-small-static:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
 
 GC-static-debug:
