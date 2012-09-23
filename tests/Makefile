@@ -259,7 +259,7 @@ VC VC-inlined:
 VCE VCE-inlined:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
 
-VSE VCE-inlined:	
+VSE VSE-inlined:	
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" tests
 
 VCX VCX-inlined:
