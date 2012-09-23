@@ -44,14 +44,16 @@ mythread(void * arg)
   cpu_set_t *parentCpus = (cpu_set_t*) arg;
   cpu_set_t threadCpus;
   DWORD_PTR vThreadMask;
+  unsigned long int a, b; /* To stop GCC complaining about %lx args to printf */
 
   assert(pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &threadCpus) == 0);
   assert(CPU_EQUAL(parentCpus, &threadCpus));
-  vThreadMask = SetThreadAffinityMask(threadH, threadCpus);
+  vThreadMask = SetThreadAffinityMask(threadH, (DWORD_PTR)threadCpus.cpuset /* Violating Opacity */);
   assert(vThreadMask != 0);
-  assert((size_t)vThreadMask == (size_t)threadCpus);
-  assert((cpu_set_t)(size_t)vThreadMask == threadCpus);
-  printf("Parent/Thread CPU affinity = 0x%lx/0x%lx\n", (unsigned long)*parentCpus, (unsigned long)threadCpus);
+  assert(memcmp(&vThreadMask, &threadCpus, min(sizeof(DWORD_PTR),sizeof(cpu_set_t))) == 0);
+  printf("Parent/Thread CPU affinity = 0x%lx/0x%lx\n",
+		  a = (unsigned long int)parentCpus->cpuset /* Violating Opacity */,
+		  b = (unsigned long int)threadCpus.cpuset) /* Violating Opacity */;
 
   return (void*) 0;
 }
@@ -59,11 +61,18 @@ mythread(void * arg)
 int
 main()
 {
+  unsigned int cpu;
   pthread_t tid;
   cpu_set_t threadCpus;
   DWORD_PTR vThreadMask;
-  cpu_set_t keepCpus = 0xaaaaaaaa;
+  cpu_set_t keepCpus;
   pthread_t self = pthread_self();
+
+  CPU_ZERO(&keepCpus);
+  for (cpu = 1; cpu < sizeof(cpu_set_t)*8; cpu += 2)
+    {
+	  CPU_SET(cpu, &keepCpus);					/* 0b10101010101010101010101010101010 */
+    }
 
   assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &threadCpus) == 0);
   if (CPU_COUNT(&threadCpus) > 1)
@@ -72,9 +81,9 @@ main()
 	  assert(pthread_join(tid, NULL) == 0);
 	  CPU_AND(&threadCpus, &threadCpus, &keepCpus);
 	  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &threadCpus) == 0);
-	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), threadCpus);
+	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), (DWORD_PTR)threadCpus.cpuset /* Violating Opacity */);
 	  assert(vThreadMask != 0);
-	  assert((size_t)vThreadMask == (size_t)threadCpus);
+	  assert(memcmp(&vThreadMask, &threadCpus, min(sizeof(DWORD_PTR),sizeof(cpu_set_t))) == 0);
 	  assert(pthread_create(&tid, NULL, mythread, (void*)&threadCpus) == 0);
 	  assert(pthread_join(tid, NULL) == 0);
     }

@@ -132,7 +132,7 @@ pthread_self (void)
     			    {
     				  if (SetThreadAffinityMask(sp->threadH, vThreadMask))
     				    {
-    					  sp->cpuset = (cpu_set_t)(size_t)vThreadMask;
+    					  sp->cpuset.cpuset = (_sched_cpu_set_vector_)vThreadMask;
     				    }
     				  else fail = PTW32_TRUE;
     			    }

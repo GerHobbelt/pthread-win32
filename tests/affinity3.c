@@ -41,22 +41,30 @@ int
 main()
 {
   int result;
-  unsigned int i;
+  unsigned int cpu;
   cpu_set_t newmask;
   cpu_set_t processCpus;
-  cpu_set_t mask = 0;
-  cpu_set_t switchmask = 0;
-  cpu_set_t flipmask = 0;
+  cpu_set_t mask;
+  cpu_set_t switchmask;
+  cpu_set_t flipmask;
   pthread_t self = pthread_self();
+
+  CPU_ZERO(&mask);
+  CPU_ZERO(&switchmask);
+  CPU_ZERO(&flipmask);
 
   assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &processCpus) == 0);
   printf("This thread has a starting affinity with %d CPUs\n", CPU_COUNT(&processCpus));
-  assert(processCpus != 0);
+  assert(!CPU_EQUAL(&mask, &processCpus));
 
-  for (i = 0; i < sizeof(cpu_set_t); i++)
-	switchmask |= ((cpu_set_t)0x55 << (8*i));	/* 0b01010101010101010101010101010101 */
-  for (i = 0; i < sizeof(cpu_set_t); i++)
-	flipmask |= ((cpu_set_t)0xff << (8*i));		/* 0b11111111111111111111111111111111 */
+  for (cpu = 0; cpu < sizeof(cpu_set_t)*8; cpu += 2)
+    {
+	  CPU_SET(cpu, &switchmask);				/* 0b01010101010101010101010101010101 */
+    }
+  for (cpu = 0; cpu < sizeof(cpu_set_t)*8; cpu++)
+    {
+	  CPU_SET(cpu, &flipmask);					/* 0b11111111111111111111111111111111 */
+    }
 
   result = pthread_setaffinity_np(self, sizeof(cpu_set_t), &processCpus);
   if (result != 0)

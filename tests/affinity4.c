@@ -40,19 +40,27 @@
 int
 main()
 {
+  unsigned int cpu;
   cpu_set_t threadCpus;
   DWORD_PTR vThreadMask;
-  cpu_set_t keepCpus = 0xaaaaaaaa;
+  cpu_set_t keepCpus;
   pthread_t self = pthread_self();
+
+  CPU_ZERO(&keepCpus);
+  for (cpu = 1; cpu < sizeof(cpu_set_t)*8; cpu += 2)
+    {
+	  CPU_SET(cpu, &keepCpus);					/* 0b10101010101010101010101010101010 */
+    }
 
   assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &threadCpus) == 0);
   if (CPU_COUNT(&threadCpus) > 1)
     {
 	  CPU_AND(&threadCpus, &threadCpus, &keepCpus);
+	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), (DWORD_PTR)threadCpus.cpuset /* Violating Opacity */);
 	  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &threadCpus) == 0);
-	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), threadCpus);
+	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), vThreadMask);
 	  assert(vThreadMask != 0);
-	  assert((size_t)vThreadMask == (size_t)threadCpus);
+	  assert(memcmp(&vThreadMask, &threadCpus, min(sizeof(DWORD_PTR),sizeof(cpu_set_t))) == 0);
     }
 
   return 0;

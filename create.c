@@ -218,7 +218,7 @@ pthread_create (pthread_t * tid,
     	  (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
         }
 
-      SetThreadAffinityMask(tp->threadH, (DWORD_PTR)(size_t)tp->cpuset);
+      SetThreadAffinityMask(tp->threadH, (DWORD_PTR)tp->cpuset.cpuset);
 
       if (run)
         {
@@ -266,7 +266,7 @@ pthread_create (pthread_t * tid,
         	(void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
           }
 
-        SetThreadAffinityMask(tp->threadH, (DWORD_PTR)(size_t)tp->cpuset);
+        SetThreadAffinityMask(tp->threadH, (DWORD_PTR)tp->cpuset.cpuset);
       }
 
     ptw32_mcs_lock_release (&stateLock);

@@ -37,7 +37,7 @@
 #include "sched.h"
 
 int
-sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
+sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -97,7 +97,7 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
   int targetPid = (int)(size_t) pid;
   int result = 0;
 
-  if (NULL == mask)
+  if (NULL == set)
 	{
 	  result = EFAULT;
 	}
@@ -121,7 +121,7 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 			  /*
 			   * Result is the intersection of available CPUs and the mask.
 			   */
-			  DWORD_PTR newMask = vSystemMask & ((DWORD_PTR)(size_t) *mask);
+			  DWORD_PTR newMask = vSystemMask & (DWORD_PTR)set->cpuset;
 
 			  if (newMask)
 				{
@@ -177,7 +177,7 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 
 
 int
-sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
+sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -224,7 +224,7 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
   int targetPid = (int)(size_t) pid;
   int result = 0;
 
-  if (NULL == mask)
+  if (NULL == set)
     {
 	  result = EFAULT;
     }
@@ -248,7 +248,7 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 	    {
 		  if (GetProcessAffinityMask (h, &vProcessMask, &vSystemMask))
 		    {
-			  *mask = (cpu_set_t)(size_t) vProcessMask;
+			  set->cpuset = (_sched_cpu_set_vector_)vProcessMask;
 		    }
 		  else
 		    {
@@ -258,7 +258,7 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 	  CloseHandle(h);
 
 #else
-	  *mask = 0x1;
+	  *set = 0x1;
 #endif
 
     }
@@ -277,21 +277,61 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask)
 /*
  * Support routines for cpu_set_t
  */
-int CpuCount (cpu_set_t *set)
+int _sched_affinitycpucount (const cpu_set_t *set)
 {
-  cpu_set_t tset;
+  _sched_cpu_set_vector_ tset;
   int count;
 
   /*
    * Relies on cpu_set_t being unsigned, otherwise the right-shift will
    * be arithmetic rather than logical and the 'for' will loop forever.
    */
-  for (count = 0, tset = *set; tset; tset >>= 1)
+  for (count = 0, tset = set->cpuset; tset; tset >>= 1)
     {
-	  if (tset & (cpu_set_t)1)
+	  if (tset & (_sched_cpu_set_vector_)1)
 	  	{
 		  count++;
 	  	}
     }
   return count;
+}
+
+void _sched_affinitycpuzero (cpu_set_t *pset)
+{
+  pset->cpuset = (_sched_cpu_set_vector_)0;
+}
+
+void _sched_affinitycpuset (int cpu, cpu_set_t *pset)
+{
+  pset->cpuset |= ((_sched_cpu_set_vector_)1 << cpu);
+}
+
+void _sched_affinitycpuclr (int cpu, cpu_set_t *pset)
+{
+  pset->cpuset &= ~((_sched_cpu_set_vector_)1 << cpu);
+}
+
+int _sched_affinitycpuisset (int cpu, const cpu_set_t *pset)
+{
+	return ((pset->cpuset & ((_sched_cpu_set_vector_)1 << cpu)) != (_sched_cpu_set_vector_)0);
+}
+
+void _sched_affinitycpuand(cpu_set_t *pdestset, const cpu_set_t *psrcset1, const cpu_set_t *psrcset2)
+{
+  pdestset->cpuset = (psrcset1->cpuset & psrcset2->cpuset);
+}
+
+void _sched_affinitycpuor(cpu_set_t *pdestset, const cpu_set_t *psrcset1, const cpu_set_t *psrcset2)
+{
+  pdestset->cpuset = (psrcset1->cpuset | psrcset2->cpuset);
+}
+
+void _sched_affinitycpuxor(cpu_set_t *pdestset, const cpu_set_t *psrcset1, const cpu_set_t *psrcset2)
+{
+  pdestset->cpuset = (psrcset1->cpuset ^ psrcset2->cpuset);
+}
+
+int _sched_affinitycpuequal (const cpu_set_t *pset1, const cpu_set_t *pset2)
+{
+  return (pset1->cpuset == pset2->cpuset);
 }

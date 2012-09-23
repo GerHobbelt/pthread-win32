@@ -176,9 +176,24 @@ struct sched_param {
   int sched_priority;
 };
 
-/* CPU affinity */
+/*
+ * CPU affinity
+ *
+ * cpu_set_t:
+ * Considered opaque but cannot be an opaque pointer
+ * due to the need for compatibility with GNU systems
+ * and sched_setaffinity() et.al. which include the
+ * cpusetsize parameter "normally set to sizeof(cpu_set_t)".
+ */
 
-typedef size_t cpu_set_t;
+typedef size_t _sched_cpu_set_vector_;
+
+struct _sched_cpu_set_t_
+{
+  _sched_cpu_set_vector_	cpuset;
+};
+
+typedef struct _sched_cpu_set_t_ cpu_set_t;
 
 #if defined(__cplusplus)
 extern "C"
@@ -201,28 +216,44 @@ PTW32_DLLPORT int PTW32_CDECL sched_setaffinity (pid_t pid, size_t cpusetsize, c
 
 PTW32_DLLPORT int PTW32_CDECL sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
 
-PTW32_DLLPORT int PTW32_CDECL CpuCount (cpu_set_t *set);
-
 /*
- * Support macros for cpu_set_t
+ * Support routines and macros for cpu_set_t
  */
-#define CPU_ZERO(setptr) ((void)(*(setptr) = (cpu_set_t)0))
+PTW32_DLLPORT int PTW32_CDECL _sched_affinitycpucount (const cpu_set_t *set);
 
-#define CPU_SET(cpu, setptr) ((void)(*(setptr) |= ((cpu_set_t)1 << (cpu))))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuzero (cpu_set_t *pset);
 
-#define CPU_CLR(cpu, setptr) ((void)(*(setptr) &= (~((cpu_set_t)1 << (cpu)))))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuset (int cpu, cpu_set_t *pset);
 
-#define CPU_ISSET(cpu, setptr) (((*(setptr) & ((cpu_set_t)1 << (cpu))) != (cpu_set_t)0))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuclr (int cpu, cpu_set_t *pset);
 
-#define CPU_AND(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) & (size_t)*(srcset2ptr))))
+PTW32_DLLPORT int PTW32_CDECL _sched_affinitycpuisset (int cpu, const cpu_set_t *pset);
 
-#define CPU_OR(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) | (size_t)*(srcset2ptr))))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuand(cpu_set_t *pdestset, const cpu_set_t *psrcset1, const cpu_set_t *psrcset2);
 
-#define CPU_XOR(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) ^ (size_t)*(srcset2ptr))))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuor(cpu_set_t *pdestset, const cpu_set_t *psrcset1, const cpu_set_t *psrcset2);
 
-#define CPU_EQUAL(set1ptr, set2ptr) (((size_t)*(set1ptr) == (size_t)*(set2ptr)))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuxor(cpu_set_t *pdestset, const cpu_set_t *psrcset1, const cpu_set_t *psrcset2);
 
-#define CPU_COUNT(setptr) (CpuCount(setptr))
+PTW32_DLLPORT int PTW32_CDECL _sched_affinitycpuequal (const cpu_set_t *pset1, const cpu_set_t *pset2);
+
+#define CPU_COUNT(setptr) (_sched_affinitycpucount(setptr))
+
+#define CPU_ZERO(setptr) (_sched_affinitycpuzero(setptr))
+
+#define CPU_SET(cpu, setptr) (_sched_affinitycpuset((cpu),(setptr)))
+
+#define CPU_CLR(cpu, setptr) (_sched_affinitycpuclr((cpu),(setptr)))
+
+#define CPU_ISSET(cpu, setptr) (_sched_affinitycpuisset((cpu),(setptr)))
+
+#define CPU_AND(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuand((destsetptr),(srcset1ptr),(srcset2ptr)))
+
+#define CPU_OR(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuor((destsetptr),(srcset1ptr),(srcset2ptr)))
+
+#define CPU_XOR(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuxor((destsetptr),(srcset1ptr),(srcset2ptr)))
+
+#define CPU_EQUAL(set1ptr, set2ptr) (_sched_affinitycpuequal((set1ptr),(set2ptr)))
 
 /*
  * Note that this macro returns ENOTSUP rather than
