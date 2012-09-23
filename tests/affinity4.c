@@ -60,7 +60,7 @@ main()
 	  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &threadCpus) == 0);
 	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), vThreadMask);
 	  assert(vThreadMask != 0);
-	  assert(memcmp(&vThreadMask, &threadCpus, min(sizeof(DWORD_PTR),sizeof(cpu_set_t))) == 0);
+	  assert(memcmp(&vThreadMask, &threadCpus, sizeof(DWORD_PTR)) == 0);
     }
 
   return 0;
