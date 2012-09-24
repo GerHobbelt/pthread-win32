@@ -66,8 +66,6 @@ VOID
 __stdcall
 CancelFiberFunc(LPVOID lpParameter);
 
-void DisplayFiberInfo(void);
-
 typedef struct
 {
    DWORD dwParameter;          // DWORD parameter to fiber (unused)

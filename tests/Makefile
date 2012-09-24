@@ -360,10 +360,7 @@ clean:
 	- if exist *.pass $(RM) *.pass
 	- if exist *.bench $(RM) *.bench
 	- if exist *.log $(RM) *.log
-	- if exist SIZES.VC $(RM) SIZES.VC
-	- if exist SIZES.VC-static $(RM) SIZES.VC-static
-	- if exist SIZES.VCE $(RM) SIZES.VCE
-	- if exist SIZES.VSE $(RM) SIZES.VSE
+	- if exist SIZES.V* $(RM) SIZES.V*
 
 benchtest1.bench:
 benchtest2.bench:
