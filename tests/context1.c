@@ -85,7 +85,7 @@ static void * func(void * arg)
 
   Sleep(1000);
 
-  return 0; 
+  return 0;
 }
 
 static void
