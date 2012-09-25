@@ -95,6 +95,7 @@ anotherEnding ()
    * Switched context
    */
   washere++;
+  pthread_exit(0);
 }
 
 int
