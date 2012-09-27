@@ -93,7 +93,7 @@ ptw32_threadReusePop (void)
           ptw32_threadReuseBottom = PTW32_THREAD_REUSE_EMPTY;
         }
 
-      tp->prevReuse = NULL;
+      tp->prevReuse = PTW32_THREAD_REUSE_EMPTY;
 
       t = tp->ptHandle;
     }

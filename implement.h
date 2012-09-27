@@ -172,7 +172,7 @@ struct ptw32_thread_t_
   unsigned __int64 seqNumber;	/* Process-unique thread sequence number */
   HANDLE threadH;		/* Win32 thread handle - POSIX thread is invalid if threadH == 0 */
   pthread_t ptHandle;		/* This thread's permanent pthread_t handle */
-  ptw32_thread_t * prevReuse;	/* Links threads on reuse stack */
+  ptw32_thread_t * prevReuse;	/* Links threads on reuse stack; sentinel is PTW32_THREAD_REUSE_EMPTY */
   volatile PThreadState state;
   ptw32_mcs_lock_t threadLock;	/* Used for serialised access to public thread state */
   ptw32_mcs_lock_t stateLock;	/* Used for async-cancel safety */
