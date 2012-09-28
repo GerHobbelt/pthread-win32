@@ -1,3 +1,15 @@
+2012-09-28  Daniel Richard. G <danielg at teragram dot com>
+
+	* all: #include<config.h>; renamed HAVE_PTW32_CONFIG_H define in
+	build files to HAVE_CONFIG_H since we no longer need a
+	uniquely-named symbol for this.
+	* Bmakefile: Removed _WIN32_WINNT assignment from build files since
+	this is now handled in source.
+	* Wmakefile: Likewise.
+	* Makefile: Added mkdir invocations to "install" target.
+	* common.mk: Elaborated the pthread.$(OBJEXT) dependency list.
+	* pthread.h: Removed the #include"config.h" bit.
+
 2012-09-23  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* GNUmakefile: Modify "all-tests" to use new targets in tests

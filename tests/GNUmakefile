@@ -94,7 +94,7 @@ COPYFILES	= $(HDR) $(LIB) $(DLL) $(QAPC)
 # stop.
 
 TESTS	= \
-	  fiber1 sizes loadfree \
+	  sizes loadfree \
 	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
@@ -133,7 +133,7 @@ BENCHTESTS = \
 	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
 
 STATICTESTS = \
-	  fiber1 sizes \
+	  sizes \
 	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
@@ -317,7 +317,6 @@ exit3.pass: create1.pass
 exit4.pass:
 exit5.pass: exit4.pass kill1.pass
 eyal1.pass: tsd1.pass
-fiber1.pass:
 inherit1.pass: join1.pass priority1.pass
 join0.pass: create1.pass
 join1.pass: create1.pass

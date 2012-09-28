@@ -64,7 +64,7 @@ BCXFLAGS	= -D__CLEANUP_C
 CPLIB	= $(BCLIB)
 CPDLL	= $(BCDLL)
 
-CFLAGS= -q $(OPTIM) /D_WIN32_WINNT=0x400 -w -tWC -tWM -4 -w-aus -w-asc -w-par
+CFLAGS= -q $(OPTIM) -w -tWC -tWM -4 -w-aus -w-asc -w-par
 LFLAGS= 
 INCLUDES=-I.
 BUILD_DIR=..

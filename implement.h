@@ -38,6 +38,10 @@
 #if !defined(_IMPLEMENT_H)
 #define _IMPLEMENT_H
 
+#if !defined(PTW32_CONFIG_H) && !defined(_PTHREAD_TEST_H_)
+# error "config.h was not #included"
+#endif
+
 #if !defined(_WIN32_WINNT)
 # define _WIN32_WINNT 0x0400
 #endif

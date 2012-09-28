@@ -367,23 +367,30 @@ sync.$(OBJEXT):		sync.c $(SYNC_SRCS) $(INCL)
 tsd.$(OBJEXT):		tsd.c $(TSD_SRCS) $(INCL)
 version.$(RESEXT):	version.rc $(INCL)
 
-pthread.$(OBJEXT): \
-		pthread.c \
-		$(ATTR_SRCS) \
-		$(BARRIER_SRCS) \
-		$(CANCEL_SRCS) \
-		$(CONDVAR_SRCS) \
-		$(EXIT_SRCS) \
-		$(MISC_SRCS) \
-		$(MUTEX_SRCS) \
-		$(NONPORTABLE_SRCS) \
-		$(PRIVATE_SRCS) \
-		$(RWLOCK_SRCS) \
-		$(SCHED_SRCS) \
-		$(SEMAPHORE_SRCS) \
-		$(SPIN_SRCS) \
-		$(SYNC_SRCS) \
-		$(TSD_SRCS) \
+pthread.$(OBJEXT): pthread.c \
+		attr.c $(ATTR_SRCS) \
+		autostatic.c \
+		barrier.c $(BARRIER_SRCS) \
+		cancel.c $(CANCEL_SRCS) \
+		cleanup.c \
+		condvar.c $(CONDVAR_SRCS) \
+		create.c \
+		dll.c \
+		errno.c \
+		exit.c $(EXIT_SRCS) \
+		fork.c \
+		global.c \
+		misc.c $(MISC_SRCS) \
+		mutex.c $(MUTEX_SRCS) \
+		nonportable.c $(NONPORTABLE_SRCS) \
+		private.c $(PRIVATE_SRCS) \
+		rwlock.c $(RWLOCK_SRCS) \
+		sched.c $(SCHED_SRCS) \
+		semaphore.c $(SEMAPHORE_SRCS) \
+		signal.c \
+		spin.c $(SPIN_SRCS) \
+		sync.c $(SYNC_SRCS) \
+		tsd.c $(TSD_SRCS) \
 		$(INCL)
 
 # end common.mk

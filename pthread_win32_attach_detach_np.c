@@ -34,6 +34,10 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include "pthread.h"
 #include "implement.h"
 
@@ -155,7 +159,10 @@ pthread_win32_process_detach_np ()
 	  if (sp->detachState == PTHREAD_CREATE_DETACHED)
 	    {
 	      ptw32_threadDestroy (sp->ptHandle);
-	      TlsSetValue (ptw32_selfThreadKey->key, NULL);
+	      if (ptw32_selfThreadKey)
+	        {
+	    	  TlsSetValue (ptw32_selfThreadKey->key, NULL);
+	        }
 	    }
 	}
 
@@ -230,7 +237,7 @@ pthread_win32_thread_detach_np ()
                        (PTW32_INTERLOCKED_LONG)-1);
               /*
                * If there are no waiters then the next thread to block will
-               * sleep, wakeup immediately and then go back to sleep.
+               * sleep, wake up immediately and then go back to sleep.
                * See pthread_mutex_lock.c.
                */
               SetEvent(mx->event);
