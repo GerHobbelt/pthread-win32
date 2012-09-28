@@ -1,3 +1,10 @@
+2012-09-28  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile: expand on rudimentary install target; add DEST_LIB_NAME
+	variable defaulting to "pthread.lib".
+	* GNUmakefile: Add install target similar to Makefile with DEST_LIB_NAME
+	defaulting to "libpthread.a".
+
 2012-09-28  Daniel Richard. G <danielg at teragram dot com>
 
 	* all: #include<config.h>; renamed HAVE_PTW32_CONFIG_H define in
