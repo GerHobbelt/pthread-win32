@@ -1,12 +1,14 @@
 /*
- * File: create3.c
+ * context.h
  *
+ * Description:
+ * POSIX thread macros related to thread cancellation.
  *
  * --------------------------------------------------------------------------
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2003 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2005 Pthreads-win32 contributors
  * 
  *      Contact Email: rpj@callisto.canberra.edu.au
  * 
@@ -30,93 +32,43 @@
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
- *
- * --------------------------------------------------------------------------
- *
- * Test Synopsis: Test passing NULL as thread id arg to pthread_create.
- *
- * Test Method (Validation or Falsification):
- * - 
- *
- * Requirements Tested:
- * -
- *
- * Features Tested:
- * - 
- *
- * Cases Tested:
- * - 
- *
- * Description:
- * - 
- *
- * Environment:
- * - 
- *
- * Input:
- * - None.
- *
- * Output:
- * - File name, Line number, and failed expression on failure.
- * - No output on success.
- *
- * Assumptions:
- * - 
- *
- * Pass Criteria:
- * - Process returns zero exit status.
- *
- * Fail Criteria:
- * - Process returns non-zero exit status.
  */
 
+#ifndef PTW32_CONTEXT_H
+#define PTW32_CONTEXT_H
 
-#ifdef __GNUC__
-#include <stdlib.h>
+#undef PTW32_PROGCTR
+
+#if defined(_M_IX86) || (defined(_X86_) && !defined(__amd64__))
+#define PTW32_PROGCTR(Context)  ((Context).Eip)
 #endif
 
-#include "test.h"
+#if defined (_M_IA64) || defined(_IA64)
+#define PTW32_PROGCTR(Context)  ((Context).StIIP)
+#endif
 
-/*
- * Create NUMTHREADS threads in addition to the Main thread.
- */
-enum {
-  NUMTHREADS = 1
-};
+#if defined(_MIPS_) || defined(MIPS)
+#define PTW32_PROGCTR(Context)  ((Context).Fir)
+#endif
 
+#if defined(_ALPHA_)
+#define PTW32_PROGCTR(Context)  ((Context).Fir)
+#endif
 
-void *
-threadFunc(void * arg)
-{
-  return (void *) 0;
-}
+#if defined(_PPC_)
+#define PTW32_PROGCTR(Context)  ((Context).Iar)
+#endif
 
-int
-main(int argc, char * argv[])
-{
-  int i;
-  pthread_t mt;
+#if defined(_AMD64_) || defined(__amd64__)
+#define PTW32_PROGCTR(Context)  ((Context).Rip)
+#endif
 
-  if (argc <= 1)
-    {
-      int result;
+#if defined(_ARM_) || defined(ARM)
+#define PTW32_PROGCTR(Context)  ((Context).Pc)
+#endif
 
-      printf("You should see an application memory write error message\n");
-      fflush(stdout);
-      result = system("create3.exe die");
-      exit(0);
-    }
+#if !defined(PTW32_PROGCTR)
+#error Module contains CPU-specific code; modify and recompile.
+#endif
 
-  assert((mt = pthread_self()).p != NULL);
-
-  for (i = 0; i < NUMTHREADS; i++)
-    {
-      assert(pthread_create(NULL, NULL, threadFunc, NULL) == 0);
-    }
-
-  /*
-   * Success.
-   */
-  return 0;
-}
-
+#endif
