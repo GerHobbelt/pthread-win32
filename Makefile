@@ -488,8 +488,10 @@ $(STATIC_STAMPS): $(DLL_INLINED_OBJS)
 .c.obj:
 	$(CC) $(EHFLAGS) /D$(CLEANUP) -c $<
 
+# TARGET_CPU is an environment variable set by Visual Studio Command Prompt
+# as provided by the SDK
 .rc.res:
-	rc /dPTW32_RC_MSC /d$(CLEANUP) $<
+	rc /dPTW32_ARCH$(TARGET_CPU) /dPTW32_RC_MSC /d$(CLEANUP) $<
 
 .c.i:
 	$(CC) /P /O2 /Ob1 $(VCFLAGS) $<

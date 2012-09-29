@@ -131,7 +131,7 @@ ptw32_threadStart (void *vthreadParms)
   ThreadParms * threadParms = (ThreadParms *) vthreadParms;
   pthread_t self;
   ptw32_thread_t * sp;
-  void *(*start) (void *);
+  void * (PTW32_CDECL *start) (void *);
   void * arg;
 
 #if defined(__CLEANUP_SEH)
