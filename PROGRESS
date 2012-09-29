@@ -1,0 +1,69 @@
+Last updated: $Date$
+
+Completion:	60 out of 61 functions	[ 98%]
+
+U = unimplemented
+* = practically completed
+
+no.	name					status
+1	pthread_atfork				*
+2	pthread_attr_destroy			*
+3	pthread_attr_getdetachstate		*
+4	pthread_attr_getinheritsched		U
+5	pthread_attr_getschedparam		*
+6	pthread_attr_getschedpolicy		U
+7	pthread_attr_getscope			U
+8	pthread_attr_getstackaddr		*
+9	pthread_attr_getstacksize		*
+10	pthread_attr_init			*
+11	pthread_attr_setdetachstate		*
+12	pthread_attr_setinheritsched		U
+13	pthread_attr_setschedparam		*
+14	pthread_attr_setschedpolicy		U
+15	pthread_attr_setscope			U
+16	pthread_attr_setstackaddr		*
+17	pthread_attr_setstacksize		*
+18	pthread_cancel				*
+19	pthread_cleanup_pop			*
+20	pthread_cleanup_push			*
+21	pthread_condattr_destroy		*
+22	pthread_condattr_getpshared		*
+23	pthread_condattr_init			*
+24	pthread_condattr_setpshared		*
+25	pthread_cond_broadcast			*
+26	pthread_cond_destroy			*
+27	pthread_cond_init			*
+28	pthread_cond_signal			*
+29	pthread_cond_timedwait			*
+30	pthread_cond_wait			*
+31	pthread_create				*
+32	pthread_detach				*
+33	pthread_equal				*
+34	pthread_exit				*
+35	pthread_getschedparam			*
+36	pthread_getspecific			*
+37	pthread_join				*
+38	pthread_key_create			*
+39	pthread_key_delete			*
+40	pthread_kill
+41	pthread_mutexattr_destroy		*
+42	pthread_mutexattr_getprioceiling	U
+43	pthread_mutexattr_getprotocol		U
+44	phtread_mutexattr_getpshared		*
+45	pthread_mutexattr_init			*
+46	pthread_mutexattr_setprioceiling	U
+47	pthread_mutexattr_setprotocol		U
+48	pthread_mutexattr_setpshared		*
+49	pthread_mutexattr_destroy		*
+50	pthread_mutex_init			*
+51	pthread_mutex_lock			*
+52	pthread_mutex_trylock			*
+53	pthread_mutex_unlock			*
+54	pthread_once				*
+55	pthread_self				*
+56	pthread_setcancelstate			*	
+57	pthread_setcanceltype			*	
+58	pthread_setschedparam			*
+59	pthread_setspecific			*
+60	pthread_sigmask				*	
+61	pthread_testcancel			*

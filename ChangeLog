@@ -1,0 +1,1375 @@
+Mon Dec  7 09:44:40 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* dll.c (PthreadsEntryPoint): Cast return value of GetProcAddress
+	to resolve compile warning from MSVC.
+
+Sun Dec  6 21:54:35 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* buildlib.bat: Fix args to CL when building the .DLL
+
+	* cleanup.c (_pthread_destructor_run_all): Fix TSD key management.
+	This is a tidy-up before TSD and Thread management is completely
+	replaced by John Bossom's much more elegant code.
+
+	* tsd.c (pthread_key_create): Fix TSD key management.
+
+	* global.c (_pthread_key_virgin_next): Initialise.
+
+	* build.bat: New DOS script to compile and link a pthreads app
+	using Microsoft's CL compiler linker.
+	* buildlib.bat: New DOS script to compile all the object files
+	and create pthread.lib and pthread.dll using Microsoft's CL
+	compiler linker.
+
+1998-12-05  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* implement.h (_pthread_try_enter_critical_section): New extern
+	* dll.c (_pthread_try_enter_critical_section): New pointer to
+	TryEnterCriticalSection if it exists; otherwise NULL.
+	* dll.c (PthreadsEntryPoint):
+	Initialize _pthread_try_enter_critical_section at startup
+	and release kernel32 handle when DLL is being unloaded.
+	* mutex.c (pthread_mutex_trylock): Replaced check for NT with
+	a check if _pthread_try_enter_critical_section is valid
+	pointer to a function. Call _pthread_try_enter_critical_section
+	instead of TryEnterCriticalSection to avoid errors on Win95.
+
+Thu Dec 3 13:32:00 1998  Ross Johnson  <rpj@ise.canberra.edu.au>
+
+	* README: Correct cygwin32 compatibility statement.
+
+Sun Nov 15 21:24:06 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* cleanup.c (_pthread_destructor_run_all): Declare missing void * arg.
+	Fixup CVS merge conflicts.
+
+1998-10-30  Ben Elliston  <bje@cygnus.com>
+
+	* condvar.c (cond_wait): Fix semantic error. Test for equality
+	instead of making an assignment.
+
+Fri Oct 30 15:15:50 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* cleanup.c (_pthread_handler_push): Fixed bug appending new
+	handler to list reported by Peter Slacik
+	<Peter.Slacik@leibinger.freinet.de>.
+	(new_thread): Rename poorly named local variable to
+	"new_handler".
+
+Sat Oct 24 18:34:59 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* global.c: Add TSD key management array and index declarations.
+
+	* implement.h: Ditto for externs.
+
+Fri Oct 23 00:08:09 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h (_PTHREAD_TSD_KEY_REUSE): Add enum.
+
+	* private.c (_pthread_delete_thread): Add call to
+	_pthread_destructor_run_all() to clean up the threads keys.
+
+	* cleanup.c (_pthread_destructor_run_all): Check for no more dirty
+	keys to run destructors on. Assume that the destructor call always
+	succeeds and set the key value to NULL.
+
+Thu Oct 22 21:44:44 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* tsd.c (pthread_setspecific): Add key management code.
+	(pthread_key_create): Ditto.
+	(pthread_key_delete): Ditto.
+
+	* implement.h (struct _pthread_tsd_key): Add status member.
+
+	* tsd.c: Add description of pthread_key_delete() from the
+	standard as a comment.
+
+Fri Oct 16 17:38:47 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* cleanup.c (_pthread_destructor_run_all): Fix and improve
+	stepping through the key table.
+
+Thu Oct 15 14:05:01 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* private.c (_pthread_new_thread): Remove init of destructorstack.
+	No longer an element of pthread_t.
+
+	* tsd.c (pthread_setspecific): Fix type declaration and cast.
+	(pthread_getspecific): Ditto.
+	(pthread_getspecific): Change error return value to NULL if key
+	is not in use.
+
+Thu Oct 15 11:53:21 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* global.c (_pthread_tsd_key_table): Fix declaration.
+
+	* implement.h(_pthread_TSD_keys_TlsIndex): Add missing extern.
+	(_pthread_tsd_mutex): Ditto.
+
+	* create.c (_pthread_start_call): Fix "keys" array declaration.
+	Add comment.
+
+	* tsd.c (pthread_setspecific): Fix type declaration and cast.
+	(pthread_getspecific): Ditto.
+
+	* cleanup.c (_pthread_destructor_run_all): Declare missing loop
+	counter.
+
+Wed Oct 14 21:09:24 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* private.c (_pthread_new_thread): Increment _pthread_threads_count.
+	(_pthread_delete_thread): Decrement _pthread_threads_count.
+	Remove some comments.
+
+	* exit.c (_pthread_exit): : Fix two pthread_mutex_lock() calls that
+ 	should have been pthread_mutex_unlock() calls.
+	(_pthread_vacuum): Remove call to _pthread_destructor_pop_all().
+
+	* create.c (pthread_create): Fix two pthread_mutex_lock() calls that
+ 	should have been pthread_mutex_unlock() calls.
+
+	* global.c (_pthread_tsd_mutex): Add mutex for TSD operations.
+
+	* tsd.c (pthread_key_create): Add critical section.
+	(pthread_setspecific): Ditto.
+	(pthread_getspecific): Ditto.
+	(pthread_key_delete): Ditto.
+
+	* sync.c (pthread_join): Fix two pthread_mutex_lock() calls that
+ 	should have been pthread_mutex_unlock() calls.
+
+Mon Oct 12 00:00:44 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h (_pthread_tsd_key_table): New.
+
+	* create.c (_pthread_start_call): Initialise per-thread TSD keys
+	to NULL.
+
+	* misc.c (pthread_once): Correct typo in comment.
+
+	* implement.h (_pthread_destructor_push): Remove.
+	(_pthread_destructor_pop): Remove.
+	(_pthread_destructor_run_all): Rename from _pthread_destructor_pop_all.
+	(_PTHREAD_TSD_KEY_DELETED): Add enum.
+	(_PTHREAD_TSD_KEY_INUSE): Add enum.
+
+	* cleanup.c (_pthread_destructor_push): Remove.
+	(_pthread_destructor_pop): Remove.
+	(_pthread_destructor_run_all): Totally revamped TSD.
+
+	* dll.c (_pthread_TSD_keys_TlsIndex): Initialise.
+
+	* tsd.c (pthread_setspecific): Totally revamped TSD.
+	(pthread_getspecific): Ditto.
+	(pthread_create): Ditto.
+	(pthread_delete): Ditto.
+
+Sun Oct 11 22:44:55 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* global.c (_pthread_tsd_key_table): Add new global.
+
+	* implement.h (_pthread_tsd_key_t and struct _pthread_tsd_key):
+	Add.
+	(struct _pthread): Remove destructorstack.
+
+	* cleanup.c (_pthread_destructor_run_all): Rename from
+ 	_pthread_destructor_pop_all. The key destructor stack was made
+ 	global rather than per-thread. No longer removes destructor nodes
+	from the stack. Comments updated.
+
+1998-10-06  Ben Elliston  <bje@cygnus.com>
+
+	* condvar.c (cond_wait): Use POSIX, not Win32 mutex calls.
+	(pthread_cond_broadcast): Likewise.
+	(pthread_cond_signal): Likewise.
+
+1998-10-05  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.def: Update. Some functions aren't available yet, others
+	are macros in <pthread.h>.
+
+	* tests/join.c: Remove; useless.
+
+Mon Oct  5 14:25:08 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* pthread.def: New file for building the DLL.
+
+1998-10-05  Ben Elliston  <bje@cygnus.com>
+
+	* misc.c (pthread_equal): Correct inverted logic bug.
+	(pthread_once): Use the POSIX mutex primitives, not Win32. Remove
+	irrelevant FIXME comment.
+
+	* global.c (PTHREAD_MUTEX_INITIALIZER): Move to pthread.h.
+
+	* pthread.h (PTHREAD_MUTEX_INITIALIZER): Define.
+	(pthread_mutex_t): Reimplement as a struct containing a valid
+	flag. If the flag is ever down upon entry to a mutex operation,
+	we call pthread_mutex_create() to initialise the object. This
+	fixes the problem of how to handle statically initialised objects
+	that can't call InitializeCriticalSection() due to their context.
+	(PTHREAD_ONCE_INIT): Define.
+
+	* mutex.c (pthread_mutex_init): Set valid flag.
+	(pthread_mutex_destroy): Clear valid flag.
+	(pthread_mutex_lock): Check and handle the valid flag.
+	(pthread_mutex_unlock): Likewise.
+	(pthread_mutex_trylock): Likewise.
+
+	* tests/mutex3.c: New file; test for the static initialisation
+	macro. Passes.
+
+	* tests/create1.c: New file; test pthread_create(). Passes.
+	
+	* tests/equal.c: Poor test; remove.
+	
+	* tests/equal1.c New file; test pthread_equal(). Passes.
+
+	* tests/once1.c: New file; test for pthread_once(). Passes.
+
+	* tests/self.c: Remove; rename to self1.c.
+
+	* tests/self1.c: This is the old self.c.
+
+	* tests/self2.c: New file. Test pthread_self() with a single
+	thread. Passes.
+
+	* tests/self3.c: New file. Test pthread_self() with a couple of
+	threads to ensure their thread IDs differ. Passes.
+	
+1998-10-04  Ben Elliston  <bje@cygnus.com>
+
+	* tests/mutex2.c: Test pthread_mutex_trylock(). Passes.
+
+	* tests/mutex1.c: New basic test for mutex functions (it passes).
+	(main): Eliminate warning.
+
+	* configure.in: Test for __stdcall, not _stdcall. Typo.
+
+	* configure: Regenerate.
+
+	* attr.c (pthread_attr_setstackaddr): Remove FIXME comment. Win32
+	does know about ENOSYS after all.
+	(pthread_attr_setstackaddr): Likewise.
+
+1998-10-03  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in: Test for the `_stdcall' keyword.  Define `STDCALL'
+	to `_stdcall' if we have it, null otherwise.
+
+	* configure: Regenerate.
+
+	* acconfig.h (STDCALL): New define.
+
+	* config.h.in: Regenerate.
+
+	* create.c (_pthread_start_call): Add STDCALL prefix.
+	
+	* mutex.c (pthread_mutex_init): Correct function signature.
+
+	* attr.c (pthread_attr_init): Only zero out the `sigmask' member
+	if we have the sigset_t type.
+
+	* pthread.h: No need to include <unistd.h>.  It doesn't even exist
+	on Win32! Again, an artifact of cross-compilation.	
+	(pthread_sigmask): Only provide if we have the sigset_t type.
+
+	* process.h: Remove. This was a stand-in before we started doing
+	native compilation under Win32.
+
+	* pthread.h (pthread_mutex_init): Make `attr' argument const.
+
+1998-10-02  Ben Elliston  <bje@cygnus.com>
+
+	* COPYING: Remove.
+
+	* COPYING.LIB: Add. This library is under the LGPL.
+
+1998-09-13  Ben Elliston  <bje@cygnus.com>
+
+	* configure.in: Test for required system features.
+
+	* configure: Generate. 
+
+	* acconfig.h: New file.
+
+	* config.h.in: Generate.
+
+	* Makefile.in: Renamed from Makefile.
+
+	* COPYING: Import from a recent GNU package.
+
+	* config.guess: Likewise.
+
+	* config.sub: Likewise.
+
+	* install-sh: Likewise.
+
+	* config.h: Remove.  
+
+	* Makefile: Likewise.
+
+1998-09-12  Ben Elliston  <bje@cygnus.com>
+
+	* windows.h: No longer needed; remove.
+
+	* windows.c: Likewise.
+
+Sat Sep 12 20:09:24 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* windows.h: Remove error number definitions. These are in <errno.h>
+	
+	* tsd.c: Add comment explaining rationale for not building
+	POSIX TSD on top of Win32 TLS.
+
+1998-09-12  Ben Elliston  <bje@cygnus.com>
+
+	* {most}.c: Include <errno.h> to get POSIX error values.
+
+	* signal.c (pthread_sigmask): Only provide if HAVE_SIGSET_T is
+	defined.
+ 
+	* config.h: #undef features, don't #define them.  This will be
+	generated by autoconf very soon.
+	
+1998-08-11  Ben Elliston  <bje@cygnus.com>
+
+	* Makefile (LIB): Define.
+	(clean): Define target.
+	(all): Build a library not just the object files.
+
+	* pthread.h: Provide a definition for struct timespec if we don't
+	already have one.
+
+	* windows.c (TlsGetValue): Bug fix.
+	
+Thu Aug  6 15:19:22 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* misc.c (pthread_once): Fix arg 1 of EnterCriticalSection()
+ 	and LeaveCriticalSection() calls to pass address-of lock.
+
+	* fork.c (pthread_atfork): Typecast (void (*)(void *)) funcptr
+	in each _pthread_handler_push() call.
+
+	* exit.c (_pthread_exit): Fix attr arg in 
+	pthread_attr_getdetachstate() call.
+
+	* private.c (_pthread_new_thread): Typecast (HANDLE) NULL.
+	(_pthread_delete_thread): Ditto.
+
+	* implement.h: (_PTHREAD_MAX_THREADS): Add define. This keeps
+	changing in an attempt to make thread administration data types
+	opaque and cleanup DLL startup.
+
+	* dll.c (PthreadsEntryPoint): 
+	(_pthread_virgins): Remove malloc() and free() calls.
+	(_pthread_reuse): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
+	* global.c (_POSIX_THREAD_THREADS_MAX): Initialise with 
+	_PTHREAD_MAX_THREADS.
+	(_pthread_virgins): Ditto.
+	(_pthread_reuse): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
+	* create.c (pthread_create): Typecast (HANDLE) NULL.
+	Typecast (unsigned (*)(void *)) start_routine.
+
+	* condvar.c (pthread_cond_init): Add address-of operator & to
+	arg 1 of pthread_mutex_init() call.
+	(pthread_cond_destroy): Add address-of operator & to
+	arg 1 of pthread_mutex_destroy() call. 
+
+	* cleanup.c (_pthread_destructor_pop_all): Add (int) cast to 
+	pthread_getspecific() arg.
+	(_pthread_destructor_pop): Add (void *) cast to "if" conditional.
+	(_pthread_destructor_push): Add (void *) cast to
+	_pthread_handler_push() "key" arg.
+	(malloc.h): Add include.
+
+	* implement.h (_pthread_destructor_pop): Add prototype.
+
+	* tsd.c (implement.h): Add include.
+
+	* sync.c (pthread_join): Remove target_thread_mutex and it's
+	initialisation. Rename getdetachedstate to getdetachstate.
+	Remove unused variable "exitcode".
+	(pthread_detach): Remove target_thread_mutex and it's
+	initialisation. Rename getdetachedstate to getdetachstate.
+	Rename setdetachedstate to setdetachstate.
+
+	* signal.c (pthread_sigmask): Rename SIG_SET to SIG_SETMASK.
+	Cast "set" to (long *) in assignment to passify compiler warning.
+	Add address-of operator & to thread->attr.sigmask in memcpy() call
+	and assignment.
+	(pthread_sigmask): Add address-of operator & to thread->attr.sigmask
+	in memcpy() call and assignment.
+
+	* windows.h (THREAD_PRIORITY_ERROR_RETURN): Add.
+	(THREAD_PRIORITY_LOWEST): Add.
+	(THREAD_PRIORITY_HIGHEST): Add.
+
+	* sched.c (is_attr): Add function.
+	(implement.h): Add include.
+	(pthread_setschedparam): Rename all instances of "sched_policy"
+	to "sched_priority".
+	(pthread_getschedparam): Ditto.
+
+Tue Aug  4 16:57:58 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* private.c (_pthread_delete_thread): Fix typo. Add missing ';'.
+
+	* global.c (_pthread_virgins): Change types from pointer to 
+	array pointer.
+	(_pthread_reuse): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
+	* implement.h(_pthread_virgins): Change types from pointer to 
+	array pointer.
+	(_pthread_reuse): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
+	* private.c (_pthread_delete_thread): Fix "entry" should be "thread".
+
+	* misc.c (pthread_self): Add extern for _pthread_threadID_TlsIndex.
+
+	* global.c: Add comment.
+
+	* misc.c (pthread_once): Fix member -> dereferences.
+	Change _pthread_once_flag to once_control->flag in "if" test.
+
+Tue Aug  4 00:09:30 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h(_pthread_virgins): Add extern.
+	(_pthread_virgin_next): Ditto.
+	(_pthread_reuse): Ditto.
+	(_pthread_reuse_top): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
+	* global.c (_pthread_virgins): Changed from array to pointer.
+	Storage allocation for the array moved into dll.c.
+	(_pthread_reuse): Ditto.
+	(_pthread_win32handle_map): Ditto.
+	(_pthread_threads_mutex_table): Ditto.
+
+	* dll.c (PthreadsEntryPoint): Set up thread admin storage when
+	DLL is loaded.
+
+	* fork.c (pthread_atfork): Fix function pointer arg to all
+	_pthread_handler_push() calls. Change "arg" arg to NULL in child push.
+
+	* exit.c: Add windows.h and process.h includes.
+	(_pthread_exit): Add local detachstate declaration.
+	(_pthread_exit): Fix incorrect name for pthread_attr_getdetachstate().
+
+	* pthread.h (_POSIX_THREAD_ATTR_STACKSIZE): Move from global.c
+	(_POSIX_THREAD_ATTR_STACKADDR): Ditto.
+
+	* create.c (pthread_create): Fix #if should be #ifdef.
+	(_pthread_start_call): Remove usused variables.
+
+	* process.h: Create.
+
+	* windows.h: Move _beginthreadex and _endthreadex into
+	process.h
+
+Mon Aug  3 21:19:57 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* condvar.c (pthread_cond_init): Add NULL attr to
+	pthread_mutex_init() call - default attributes will be used.
+	(cond_wait): Fix typo.
+	(cond_wait): Fix typo - cv was ev.
+	(pthread_cond_broadcast): Fix two identical typos.
+
+	* cleanup.c (_pthread_destructor_pop_all): Remove _ prefix from
+	PTHREAD_DESTRUCTOR_ITERATIONS.
+
+	* pthread.h: Move _POSIX_* values into posix.h
+
+	* pthread.h: Fix typo in pthread_mutex_init() prototype.
+
+	* attr.c (pthread_attr_init): Fix error in priority member init.
+
+	* windows.h (THREAD_PRIORITY_NORMAL): Add.
+
+	* pthread.h (sched_param): Add missing ';' to struct definition. 
+
+	* attr.c (pthread_attr_init): Remove obsolete pthread_attr_t
+	member initialisation - cancelstate, canceltype, cancel_pending.
+	(is_attr): Make arg "attr" a const.
+
+	* implement.h (_PTHREAD_HANDLER_POP_LIFO): Remove definition.
+	(_PTHREAD_HANDLER_POP_FIFO): Ditto.
+	(_PTHREAD_VALID): Add missing newline escape (\).
+	(_pthread_handler_node): Make element "next" a pointer.
+
+1998-08-02  Ben Elliston  <bje@cygnus.com>
+
+	* windows.h: Remove duplicate TlsSetValue() prototype.  Add 
+	TlsGetValue() prototype.
+	(FALSE): Define.
+	(TRUE): Likewise.
+	Add forgotten errno values.  Guard against multiple #includes.
+
+	* windows.c: New file.  Implement stubs for Win32 functions.
+
+	* Makefile (SRCS): Remove.  Not explicitly needed.
+	(CFLAGS): Add -Wall for all warnings with GCC.
+
+Sun Aug  2 19:03:42 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* config.h: Create. This is a temporary stand-in for autoconf yet
+	to be done.
+ 	(HAVE_SIGNAL_H): Add.
+
+	* pthread.h: Minor rearrangement for temporary config.h.
+
+Fri Jul 31 14:00:29 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* cleanup.c (_pthread_destructor_pop): Implement. Removes
+	destructors associated with a key without executing them.
+	(_pthread_destructor_pop_all): Add FIXME comment.
+
+	* tsd.c (pthread_key_delete): Add call to _pthread_destructor_pop().
+
+Fri Jul 31 00:05:45 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* tsd.c (pthread_key_create): Update to properly associate
+	the destructor routine with the key.
+	(pthread_key_delete): Add FIXME comment.
+
+	* exit.c (_pthread_vacuum): Add call to
+	_pthread_destructor_pop_all().
+
+	* implement.h (_pthread_handler_pop_all): Add prototype.
+	(_pthread_destructor_pop_all): Ditto.
+
+	* cleanup.c (_pthread_destructor_push): Implement. This is just a
+	call to _pthread_handler_push().
+	(_pthread_destructor_pop_all): Implement. This is significantly
+	different to _pthread_handler_pop_all().
+
+	* Makefile (SRCS): Create. Preliminary.
+
+	* windows.h: Create. Contains Win32 definitions for compile
+	testing. This is just a standin for the real one.
+
+	* pthread.h (SIG_UNBLOCK): Fix typo. Was SIG_BLOCK.
+	(windows.h): Add include. Required for CRITICAL_SECTION.
+	(pthread_cond_t): Move enum declaration outside of struct
+	definition.
+	(unistd.h): Add include - may be temporary.
+
+	* condvar.c (windows.h): Add include.
+
+	* implement.h (_PTHREAD_THIS): Remove - no longer required.
+	(_PTHREAD_STACK): Use pthread_self() instead of _PTHREAD_THIS.
+
+Thu Jul 30 23:12:45 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Remove _pthread_find_entry() prototype.
+
+	* private.c: Extend comments.
+	Remove _pthread_find_entry() - no longer needed.
+
+	* create.c (_pthread_start_call): Add call to TlsSetValue() to
+	store the thread ID.
+
+	* dll.c (PthreadsEntryPoint): Implement. This is called
+	whenever a process loads the DLL. Used to initialise thread
+	local storage.
+
+	* implement.h: Add _pthread_threadID_TlsIndex.
+	Add ()s around _PTHREAD_VALID expression.
+
+	* misc.c (pthread_self): Re-implement using Win32 TLS to store
+	the threads own ID.
+
+Wed Jul 29 11:39:03 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* private.c: Corrections in comments.
+	(_pthread_new_thread): Alter "if" flow to be more natural.
+
+	* cleanup.c (_pthread_handler_push): Same as below.
+
+	* create.c (pthread_create): Same as below.
+
+	* private.c (_pthread_new_thread): Rename "new" to "new_thread".
+	Since when has a C programmer been required to know C++?
+
+Tue Jul 28 14:04:29 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* implement.h: Add _PTHREAD_VALID macro.
+
+	* sync.c (pthread_join): Modify to use the new thread
+	type and _pthread_delete_thread(). Rename "target" to "thread".
+	Remove extra local variable "target".
+	(pthread_detach): Ditto.
+
+	* signal.c (pthread_sigmask): Move init of "us" out of inner block.
+	Fix instance of "this" should have been "us". Rename "us" to "thread".
+
+	* sched.c (pthread_setschedparam): Modify to use the new thread
+	type.
+	(pthread_getschedparam): Ditto.
+
+	* private.c (_pthread_find_thread): Fix return type and arg.
+
+	* implement.h: Remove _PTHREAD_YES and _PTHREAD_NO.
+	(_pthread_new_thread): Add prototype.
+	(_pthread_find_thread): Ditto.
+	(_pthread_delete_thread): Ditto.
+	(_pthread_new_thread_entry): Remove prototype.
+	(_pthread_find_thread_entry): Ditto.
+	(_pthread_delete_thread_entry): Ditto.
+	(  _PTHREAD_NEW, _PTHREAD_INUSE, _PTHREAD_EXITED, _PTHREAD_REUSE):
+	Add.
+
+
+	* create.c (pthread_create): Minor rename "us" to "new" (I need
+	these cues but it doesn't stop me coming out with some major bugs
+	at times).
+	Load start_routine and arg into the thread so the wrapper can
+	call it.
+
+	* exit.c (pthread_exit): Fix pthread_this should be pthread_self.
+
+	* cancel.c (pthread_setcancelstate): Change
+ 	_pthread_threads_thread_t * to pthread_t and init with
+ 	pthread_this().
+	(pthread_setcanceltype): Ditto.
+
+	* exit.c (_pthread_exit): Add new pthread_t arg.
+	Rename _pthread_delete_thread_entry to _pthread_delete_thread.
+	Rename "us" to "thread".
+	(pthread_exit): Call _pthread_exit with added thread arg.
+
+	* create.c (_pthread_start_call): Insert missing ")".
+	Add "us" arg to _pthread_exit() call.
+	(pthread_create): Modify to use new thread allocation scheme.
+
+	* private.c: Added detailed explanation of the new thread
+	allocation scheme.
+	(_pthread_new_thread): Totally rewritten to use
+	new thread allocation scheme.
+	(_pthread_delete_thread): Ditto.
+	(_pthread_find_thread): Obsolete.
+
+Mon Jul 27 17:46:37 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* create.c (pthread_create): Start of rewrite. Not completed yet.
+
+	* private.c (_pthread_new_thread_entry): Start of rewrite. Not
+	complete.
+
+	* implement.h (_pthread_threads_thread): Rename, remove thread
+	member, add win32handle and ptstatus members.
+	(_pthread_t): Add.
+
+	* pthread.h: pthread_t is no longer mapped directly to a Win32
+	HANDLE type. This is so we can let the Win32 thread terminate and
+	reuse the HANDLE while pthreads holds it's own thread ID until
+	the last waiting join exits.
+
+Mon Jul 27 00:20:37 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* private.c (_pthread_delete_thread_entry): Destroy the thread
+ 	entry attribute object before deleting the thread entry itself.
+
+	* attr.c (pthread_attr_init): Initialise cancel_pending = FALSE.
+	(pthread_attr_setdetachstate): Rename "detached" to "detachedstate".
+	(pthread_attr_getdetachstate): Ditto.
+
+	* exit.c (_pthread_exit): Fix incorrect check for detachedstate.
+
+	* implement.h (_pthread_call_t): Remove env member. 
+
+Sun Jul 26 13:06:12 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h (_pthread_new_thread_entry): Fix prototype.
+	(_pthread_find_thread_entry): Ditto.
+	(_pthread_delete_thread_entry): Ditto.
+	(_pthread_exit): Add prototype.
+
+	* exit.c (_pthread_exit): New function. Called from pthread_exit()
+	and _pthread_start_call() to exit the thread. It allows an extra
+	argument which is the return code passed to _endthreadex().
+	(_pthread_exit): Move thread entry delete call from _pthread_vacuum()
+	into here. Add more explanation of thread entry deletion.
+	(_pthread_exit): Clarify comment.
+
+	* create.c (_pthread_start_call): Change pthread_exit() call to
+	_pthread_exit() call.
+
+	* exit.c (_pthread_vacuum): Add thread entry deletion code
+	moved from _pthread_start_call(). See next item.
+	(pthread_exit): Remove longjmp(). Add mutex lock around thread table
+	manipulation code. This routine now calls _enthreadex().
+
+	* create.c (_pthread_start_call): Remove setjmp() call and move
+	cleanup code out. Call pthread_exit(NULL) to terminate the thread.
+
+1998-07-26  Ben Elliston  <bje@cygnus.com>
+
+	* tsd.c (pthread_getspecific): Update comments.
+
+	* mutex.c (pthread_mutexattr_setpshared): Not supported; remove.
+	(pthread_mutexattr_getpshared): Likewise.
+
+	* pthread.h (pthread_mutexattr_setpshared): Remove prototype.
+	(pthread_mutexattr_getpshared): Likewise.
+
+Sun Jul 26 00:09:59 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* sync.c: Rename all instances of _pthread_count_mutex to
+	_pthread_table_mutex.
+
+	* implement.h: Rename _pthread_count_mutex to
+	_pthread_table_mutex.
+
+	* global.c: Rename _pthread_count_mutex to
+	_pthread_table_mutex.
+
+	* create.c (pthread_create): Add critical sections.
+	(_pthread_start_call): Rename _pthread_count_mutex to
+	_pthread_table_mutex.
+
+	* cancel.c (pthread_setcancelstate): Fix indirection bug and rename
+	"this" to "us".
+
+	* signal.c (pthread_sigmask): Rename "this" to "us" and fix some
+	minor syntax errors. Declare "us" and initialise it.
+
+	* sync.c (pthread_detach): Rename "this" to "target".
+
+	* pthread.h: Converting PTHREAD_* defines to alias the (const int)
+	values in global.c.
+
+	* global.c: Started converting PTHREAD_* defines to (const int) as
+ 	a part of making the eventual pthreads DLL binary compatible
+ 	through version changes.
+
+	* condvar.c (cond_wait): Add cancelation point. This applies the
+	point to both pthread_cond_wait() and pthread_cond_timedwait().
+
+	* exit.c (pthread_exit): Rename "this" to "us".
+
+	* implement.h: Add comment.
+
+	* sync.c (pthread_join): I've satisfied myself that pthread_detach()
+	does set the detached attribute in the thread entry attributes
+	to PTHREAD_CREATE_DETACHED. "if" conditions were changed to test
+	that attribute instead of a separate flag.
+
+	* create.c (pthread_create): Rename "this" to "us".
+	(pthread_create): cancelstate and canceltype are not attributes
+	so the copy to thread entry attribute storage was removed.
+	Only the thread itself can change it's cancelstate or canceltype,
+	ie. the thread must exist already.
+
+	* private.c (_pthread_delete_thread_entry): Mutex locks removed.
+	Mutexes must be applied at the caller level.
+	(_pthread_new_thread_entry): Ditto.
+	(_pthread_new_thread_entry): Init cancelstate, canceltype, and
+	cancel_pending to default values.
+	(_pthread_new_thread_entry): Rename "this" to "new".
+	(_pthread_find_thread_entry): Rename "this" to "entry".
+	(_pthread_delete_thread_entry): Rename "thread_entry" to "entry".
+
+	* create.c (_pthread_start_call): Mutexes changed to
+	_pthread_count_mutex. All access to the threads table entries is
+	under the one mutex. Otherwise chaos reigns.
+
+Sat Jul 25 23:16:51 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h (_pthread_threads_thread): Move cancelstate and
+ 	canceltype members out of pthread_attr_t into here.
+
+	* fork.c (fork): Add comment.
+
+1998-07-25  Ben Elliston  <bje@cygnus.com>
+
+	* fork.c (fork): Autoconfiscate.
+
+Sat Jul 25 00:00:13 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* create.c (_pthread_start_call): Set thread priority.  Ensure our
+ 	thread entry is removed from the thread table but only if
+ 	pthread_detach() was called and there are no waiting joins.
+	(pthread_create): Set detach flag in thread entry if the 
+	thread is created PTHREAD_CREATE_DETACHED.
+
+	* pthread.h (pthread_attr_t): Rename member "detachedstate".
+
+	* attr.c (pthread_attr_init): Rename attr members.
+
+	* exit.c (pthread_exit): Fix indirection mistake.
+
+	* implement.h (_PTHREAD_THREADS_TABLE_INDEX): Add.
+
+	* exit.c (_pthread_vacuum): Fix incorrect args to
+	_pthread_handler_pop_all() calls.
+	Make thread entry removal conditional.
+
+	* sync.c (pthread_join): Add multiple join and async detach handling.
+
+	* implement.h (_PTHREAD_THREADS_TABLE_INDEX): Add.
+
+	* global.c (_pthread_threads_mutex_table): Add.
+
+	* implement.h (_pthread_once_flag): Remove.
+	(_pthread_once_lock): Ditto.
+	(_pthread_threads_mutex_table): Add.
+
+	* global.c (_pthread_once_flag): Remove.
+	(_pthread_once_lock): Ditto.
+
+	* sync.c (pthread_join): Fix tests involving new return value
+	from _pthread_find_thread_entry().
+	(pthread_detach): Ditto.
+
+	* private.c (_pthread_find_thread_entry): Failure return code
+	changed from -1 to NULL.
+
+Fri Jul 24 23:09:33 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* create.c (pthread_create): Change . to -> in sigmask memcpy() args.
+
+	* pthread.h: (pthread_cancel): Add function prototype.
+	(pthread_testcancel): Ditto.
+
+1998-07-24  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.h (pthread_condattr_t): Rename dummy structure member.
+	(pthread_mutexattr_t): Likewise.
+
+Fri Jul 24 21:13:55 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* cancel.c (pthread_cancel): Implement.
+	(pthread_testcancel): Implement.
+
+	* exit.c (pthread_exit): Add comment explaining the longjmp().
+
+	* implement.h (_pthread_threads_thread_t): New member cancelthread.
+	(_PTHREAD_YES): Define.
+	(_PTHREAD_NO): Define.
+	(RND_SIZEOF): Remove.
+
+	* create.c (pthread_create): Rename cancelability to cancelstate.
+
+	* pthread.h (pthread_attr_t): Rename cancelability to cancelstate.
+	(PTHREAD_CANCELED): Define.
+
+1998-07-24  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.h (SIG_BLOCK): Define if not already defined.
+	(SIG_UNBLOCK): Likewise.
+	(SIG_SETMASK): Likewise.
+	(pthread_attr_t): Add signal mask member.
+	(pthread_sigmask): Add function prototype.
+
+	* signal.c (pthread_sigmask): Implement.
+
+	* create.c: #include <string.h> to get a prototype for memcpy().
+	(pthread_create): New threads inherit their creator's signal
+	mask.  Copy the signal mask to the new thread structure if we know
+	about signals.
+	
+Fri Jul 24 16:33:17 1998  Ross Johnson  <rpj@swan.canberra.edu.au>
+
+	* fork.c (pthread_atfork): Add all the necessary push calls.
+	Local implementation semantics:
+	If we get an ENOMEM at any time then ALL handlers
+	(including those from previous pthread_atfork() calls) will be
+	popped off each of the three atfork stacks before we return.
+	(fork): Add all the necessary pop calls. Add the thread cancellation
+	and join calls to the child fork.
+	Add #includes.
+
+	* implement.h: (_pthread_handler_push): Fix return type and stack arg
+	type in prototype.
+	(_pthread_handler_pop): Fix stack arg type in prototype.
+	(_pthread_handler_pop_all): Fix stack arg type in prototype.
+
+	* cleanup.c (_pthread_handler_push): Change return type to int and
+	return ENOMEM if malloc() fails.
+
+	* sync.c (pthread_detach): Use equality test, not assignment.
+
+	* create.c (_pthread_start_call): Add call to Win32 CloseHandle()
+	if thread is detached.
+
+1998-07-24  Ben Elliston  <bje@cygnus.com>
+
+	* sync.c (pthread_detach): Close the Win32 thread handle to
+	emulate detached (or daemon) threads.
+
+Fri Jul 24 03:00:25 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* sync.c (pthread_join): Save valueptr arg in joinvalueptr for
+	pthread_exit() to use.
+
+	* private.c (_pthread_new_thread_entry): Initialise joinvalueptr to
+	NULL.
+
+	* create.c (_pthread_start_call): Rewrite to facilitate joins.
+	pthread_exit() will do a longjmp() back to here. Does appropriate
+	cleanup and exit/return from the thread.
+	(pthread_create): _beginthreadex() now passes a pointer to our
+	thread table entry instead of just the call member of that entry.
+
+	* implement.h (_pthread_threads_thread): New member 
+	void ** joinvalueptr.
+	(_pthread_call_t): New member jmpbuf env.
+
+	* exit.c (pthread_exit): Major rewrite to handle joins and handing
+	value pointer to joining thread. Uses longjmp() back to 
+	_pthread_start_call().
+
+	* create.c (pthread_create): Ensure values of new attribute members
+	are copied to the thread attribute object.
+
+	* attr.c (pthread_attr_destroy):  Fix merge conflicts.
+	(pthread_attr_getdetachstate):  Fix merge conflicts.
+	(pthread_attr_setdetachstate):  Fix merge conflicts.
+
+	* pthread.h:  Fix merge conflicts.
+
+	* sync.c (pthread_join): Fix merge conflicts.
+
+Fri Jul 24 00:21:21 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* sync.c (pthread_join): Add check for valid and joinable
+	thread.
+	(pthread_detach): Implement. After checking for a valid and joinable
+	thread, it's still a no-op.
+
+	* private.c (_pthread_find_thread_entry): Bug prevented returning
+	an error value in some cases.
+
+	* attr.c (pthread_attr_setdetachedstate): Implement.
+	(pthread_attr_getdetachedstate): Implement.
+
+	* implement.h: Move more hidden definitions into here from
+	pthread.h.
+
+1998-07-24  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.h (PTHREAD_CREATE_JOINABLE): Define.
+	(PTHREAD_CREATE_DETACHED): Likewise.
+	(pthread_attr_t): Add new structure member `detached'.
+	(pthread_attr_getdetachstate): Add function prototype.
+	(pthread_attr_setdetachstate): Likewise.
+
+	* sync.c (pthread_join): Return if the target thread is detached.
+
+	* attr.c (pthread_attr_init): Initialise cancelability and
+	canceltype structure members.
+	(pthread_attr_getdetachstate): Implement.
+	(pthread_attr_setdetachstate): Likewise.
+
+	* implement.h (_PTHREAD_CANCEL_DEFAULTS): Remove.  Bit fields
+	proved to be too cumbersome.  Set the defaults in attr.c using the
+	public PTHREAD_CANCEL_* constants.
+
+	* cancel.c: New file.
+
+	* pthread.h (sched_param): Define this type.
+	(pthread_attr_getschedparam): Add function prototype.
+	(pthread_attr_setschedparam): Likewise.
+	(pthread_setcancelstate): Likewise.
+	(pthread_setcanceltype): Likewise.
+	(sched_get_priority_min): Likewise.
+	(sched_get_priority_max): Likewise.
+	(pthread_mutexattr_setprotocol): Remove; not supported.
+	(pthread_mutexattr_getprotocol): Likewise.
+	(pthread_mutexattr_setprioceiling): Likewise.
+	(pthread_mutexattr_getprioceiling): Likewise.
+	(pthread_attr_t): Add canceltype member.  Update comments.
+	(SCHED_OTHER): Define this scheduling policy constant.
+	(SCHED_FIFO): Likewise.
+	(SCHED_RR): Likewise.
+	(SCHED_MIN): Define the lowest possible value for this constant.
+	(SCHED_MAX): Likewise, the maximum possible value.
+	(PTHREAD_CANCEL_ASYNCHRONOUS): Redefine.
+	(PTHREAD_CANCEL_DEFERRED): Likewise.
+	
+	* sched.c: New file.
+	(pthread_setschedparam): Implement.
+	(pthread_getschedparam): Implement.
+	(sched_get_priority_max): Validate policy argument.
+	(sched_get_priority_min): Likewise.
+
+	* mutex.c (pthread_mutexattr_setprotocol): Remove; not supported.
+	(pthread_mutexattr_getprotocol): Likewise.
+	(pthread_mutexattr_setprioceiling): Likewise.
+	(pthread_mutexattr_getprioceiling): Likewise.
+
+Fri Jul 24 00:21:21 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* create.c (pthread_create): Arg to _pthread_new_thread_entry()
+	changed. See next entry. Move mutex locks out. Changes made yesterday
+	and today allow us to start the new thread running rather than
+	temporarily suspended.
+
+	* private.c (_pthread_new_thread_entry): _pthread_thread_table
+	was changed back to a table of thread structures rather than pointers.
+	As such we're trading storage for increaded speed. This routine
+	was modified to work with the new table. Mutex lock put in around
+	global data accesses.
+	(_pthread_find_thread_entry): Ditto
+	(_pthread_delete_thread_entry): Ditto
+
+Thu Jul 23 23:25:30 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* global.c: New. Global data objects declared here. These moved from
+	pthread.h.
+
+	* pthread.h: Move implementation hidden definitions into
+	implement.h.
+
+	* implement.h: Move implementation hidden definitions from
+	pthread.h. Add constants to index into the different handler stacks.
+
+	* cleanup.c (_pthread_handler_push): Simplify args. Restructure.
+	(_pthread_handler_pop): Simplify args. Restructure.
+	(_pthread_handler_pop_all): Simplify args. Restructure.
+
+Wed Jul 22 00:16:22 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* attr.c, implement.h, pthread.h, ChangeLog: Resolve CVS merge
+	conflicts.
+
+	* private.c (_pthread_find_thread_entry): Changes to return type
+	to support leaner _pthread_threads_table[] which now only stores
+	_pthread_thread_thread_t *.
+	(_pthread_new_thread_entry): Internal changes.
+	(_pthread_delete_thread_entry): Internal changes to avoid contention.
+ 	Calling routines changed accordingly.
+
+	* pthread.h: Modified cleanup macros to use new generic push and pop.
+	Added destructor and atfork stacks to _pthread_threads_thread_t.
+
+	* cleanup.c (_pthread_handler_push, _pthread_handler_pop,
+	_pthread_handler_pop_all): Renamed cleanup push and pop routines
+	and made generic to handle destructors and atfork handlers as
+	well.
+
+	* create.c (_pthread_start_call): New function is a wrapper for
+	all new threads. It allows us to do some cleanup when the thread
+	returns, ie. that is otherwise only done if the thread is cancelled.
+
+	* exit.c (_pthread_vacuum): New function contains code from 
+	pthread_exit() that we need in the new _pthread_start_call()
+	as well.
+
+	* implement.h: Various additions and minor changes.
+
+	* pthread.h: Various additions and minor changes.
+	Change cleanup handler macros to use generic handler push and pop
+	functions.
+
+	* attr.c: Minor mods to all functions.
+	(is_attr): Implemented missing function.
+
+	* create.c (pthread_create): More clean up.
+
+	* private.c (_pthread_find_thread_entry): Implement.
+	(_pthread_delete_thread_entry): Implement.
+	(_pthread_new_thread_entry): Implement.
+	These functions manipulate the implementations internal thread
+	table and are part of general code cleanup and modularisation.
+	They replace _pthread_getthreadindex() which was removed.
+
+	* exit.c (pthread_exit): Changed to use the new code above.
+
+	* pthread.h: Add cancelability constants. Update comments.
+
+1998-07-22  Ben Elliston  <bje@cygnus.com>
+
+	* attr.c (pthread_setstacksize): Update test of attr argument.
+	(pthread_getstacksize): Likewise.
+	(pthread_setstackaddr): Likewise.
+	(pthread_getstackaddr): Likewise.
+	(pthread_attr_init): No need to allocate any storage.
+	(pthread_attr_destroy): No need to free any storage.
+
+	* mutex.c (is_attr): Not likely to be needed; remove.
+	(remove_attr): Likewise.
+	(insert_attr): Likewise.
+
+	* implement.h (_pthread_mutexattr_t): Moved to a public definition
+	in pthread.h.  There was little gain in hiding these details.
+	(_pthread_condattr_t): Likewise.
+	(_pthread_attr_t): Likewise.
+
+	* pthread.h (pthread_atfork): Add function prototype.
+	(pthread_attr_t): Moved here from implement.h.
+
+	* fork.c (pthread_atfork): Preliminary implementation.
+	(_pthread_fork): Likewise.
+
+Wed Jul 22 00:16:22 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* cleanup.c (_pthread_cleanup_push): Implement.
+	(_pthread_cleanup_pop): Implement.
+	(_pthread_do_cancellation): Implement.
+	These are private to the implementation. The real cleanup functions
+	are macros. See below.
+
+	* pthread.h (pthread_cleanup_push): Implement as a macro.
+	(pthread_cleanup_pop): Implement as a macro.
+	Because these are macros which start and end a block, the POSIX scoping
+	requirement is observed. See the comment in the file.
+
+	* exit.c (pthread_exit): Refine the code.
+
+	* create.c (pthread_create): Code cleanup.
+
+	* implement.h (RND_SIZEOF): Add RND_SIZEOF(T) to round sizeof(T)
+	up to multiple of DWORD.
+	Add function prototypes.
+
+	* private.c (_pthread_getthreadindex): "*thread" should have been 
+	"thread". Detect empty slot fail condition.
+
+1998-07-20  Ben Elliston  <bje@cygnus.com>
+
+	* misc.c (pthread_once): Implement.  Don't use a per-application
+	flag and mutex--make `pthread_once_t' contain these elements in
+	their structure.  The earlier version had incorrect semantics.
+	
+	* pthread.h (_pthread_once_flag): Add new variable.  Remove.
+	(_pthread_once_lock): Add new mutex lock to ensure integrity of
+	access to _pthread_once_flag.  Remove.
+	(pthread_once): Add function prototype.
+	(pthread_once_t): Define this type.
+	
+Mon Jul 20 02:31:05 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* private.c (_pthread_getthreadindex): Implement.
+
+	* pthread.h: Add application static data dependent on
+	_PTHREADS_BUILD_DLL define. This is needed to avoid allocating
+	non-sharable static data within the pthread DLL.
+
+	* implement.h: Add _pthread_cleanup_stack_t, _pthread_cleanup_node_t
+	and _PTHREAD_HASH_INDEX.
+
+	* exit.c (pthread_exit): Begin work on cleanup and de-allocate
+	thread-private storage.
+
+	* create.c (pthread_create): Add thread to thread table.
+	Keep a thread-private copy of the attributes with default values
+	filled in when necessary. Same for the cleanup stack. Make 
+	pthread_create C run-time library friendly by using _beginthreadex()
+	instead of CreateThread(). Fix error returns.
+
+Sun Jul 19 16:26:23 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Rename pthreads_thread_count to _pthread_threads_count.
+	Create _pthread_threads_thread_t struct to keep thread specific data.
+
+	* create.c: Rename pthreads_thread_count to _pthread_threads_count.
+	(pthread_create): Handle errors from CreateThread().
+
+1998-07-19  Ben Elliston  <bje@cygnus.com>
+
+	* condvar.c (pthread_cond_wait): Generalise.  Moved from here ..
+	(cond_wait): To here.
+	(pthread_cond_timedwait): Implement; use generalised cond_wait().
+
+	* pthread.h (pthread_key_t): Define this type.
+	(pthread_key_create): Add function prototype.
+	(pthread_setspecific): Likewise.
+	(pthread_getspecific): Likwise.
+	(pthread_key_delete): Likewise.
+
+	* tsd.c (pthread_key_create): Implement.
+	(pthread_setspecific): Likewise.
+	(pthread_getspecific): Likewise.
+	(pthread_key_delete): Likewise.
+
+	* mutex.c (pthread_mutex_trylock): Return ENOSYS if this function
+	is called on a Win32 platform which is not Windows NT.
+
+1998-07-18  Ben Elliston  <bje@cygnus.com>
+
+	* condvar.c (pthread_condattr_init): Do not attempt to malloc any
+	storage; none is needed now that condattr_t is an empty struct.
+	(pthread_condattr_destory): Likewise; do not free storage.
+	(pthread_condattr_setpshared): No longer supported; return ENOSYS.
+	(pthread_condattr_getpshared): Likewise.
+	(pthread_cond_init): Implement with help from Douglas Schmidt.
+	Remember to initialise the cv's internal mutex.
+	(pthread_cond_wait): Likewise.
+	(pthread_cond_signal): Likewise.
+	(pthread_cond_broadcast): Likewise.
+	(pthread_cond_timedwait): Preliminary implementation, but I need
+	to see some API documentation for `WaitForMultipleObject'.
+	(pthread_destory): Implement.
+
+	* pthread.h (pthread_cond_init): Add function protoype.
+	(pthread_cond_broadcast): Likewise.
+	(pthread_cond_signal): Likewise.
+	(pthread_cond_timedwait): Likewise.
+	(pthread_cond_wait): Likewise.
+	(pthread_cond_destroy): Likewise.
+	(pthread_cond_t): Define this type.  Fix for u_int.  Do not assume
+	that the mutex contained withing the pthread_cond_t structure will
+	be a critical section.  Use our new POSIX type!
+
+	* implement.h (_pthread_condattr_t): Remove shared attribute.
+
+1998-07-17  Ben Elliston  <bje@cygnus.com>
+
+	* pthread.h (PTHREADS_PROCESS_PRIVATE): Remove.
+	(PTHREAD_PROCESS_SHARED): Likewise.  No support for mutexes shared
+	across processes for now.
+	(pthread_mutex_t): Use a Win32 CRITICAL_SECTION type for better
+	performance.
+	
+	* implement.h (_pthread_mutexattr_t): Remove shared attribute.
+	
+	* mutex.c (pthread_mutexattr_setpshared): This optional function
+	is no longer supported, since we want to implement POSIX mutex
+	variables using the much more efficient Win32 critical section
+	primitives.  Critical section objects in Win32 cannot be shared
+	between processes.
+	(pthread_mutexattr_getpshared): Likewise.
+	(pthread_mutexattr_init): No need to malloc any storage; the
+	attributes structure is now empty.
+	(pthread_mutexattr_destroy): This is now a nop.
+	(pthread_mutex_init): Use InitializeCriticalSection().
+	(pthread_mutex_destroy): Use DeleteCriticalSection().
+	(pthread_mutex_lock): Use EnterCriticalSection().
+	(pthread_mutex_trylock): Use TryEnterCriticalSection().  This is
+	not supported by Windows 9x, but trylock is a hack anyway, IMHO.
+	(pthread_mutex_unlock): Use LeaveCriticalSection().
+
+1998-07-14  Ben Elliston  <bje@cygnus.com>
+
+	* attr.c (pthread_attr_setstacksize): Implement.
+	(pthread_attr_getstacksize): Likewise.
+	(pthread_attr_setstackaddr): Likewise.
+	(pthread_attr_getstackaddr): Likewise.
+	(pthread_attr_init): Likewise.
+	(pthread_attr_destroy): Likewise.
+	
+	* condvar.c (pthread_condattr_init): Add `_cond' to function name.
+
+	* mutex.c (pthread_mutex_lock): Add `_mutex' to function name.
+	(pthread_mutex_trylock): Likewise.
+	(pthread_mutex_unlock): Likewise.
+
+	* pthread.h (pthread_condattr_setpshared): Fix typo.
+	(pthread_attr_init): Add function prototype.
+	(pthread_attr_destroy): Likewise.
+	(pthread_attr_setstacksize): Likewise.
+	(pthread_attr_getstacksize): Likewise.
+	(pthread_attr_setstackaddr): Likewise.
+	(pthread_attr_getstackaddr): Likewise.
+	
+Mon Jul 13 01:09:55 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Wrap in #ifndef _IMPLEMENT_H
+
+	* create.c (pthread_create): Map stacksize attr to Win32.
+
+	* mutex.c: Include implement.h
+
+1998-07-13  Ben Elliston  <bje@cygnus.com>
+
+	* condvar.c (pthread_condattr_init): Implement.
+	(pthread_condattr_destroy): Likewise.
+	(pthread_condattr_setpshared): Likewise.
+	(pthread_condattr_getpshared): Likewise.
+	
+	* implement.h (PTHREAD_THREADS_MAX): Remove trailing semicolon.
+	(PTHREAD_STACK_MIN): Specify; needs confirming.
+	(_pthread_attr_t): Define this type.
+	(_pthread_condattr_t): Likewise.
+
+	* pthread.h (pthread_mutex_t): Define this type.
+	(pthread_condattr_t): Likewise.
+	(pthread_mutex_destroy): Add function prototype.
+	(pthread_lock): Likewise.
+	(pthread_trylock): Likewise.
+	(pthread_unlock): Likewise.
+	(pthread_condattr_init): Likewise.
+	(pthread_condattr_destroy): Likewise.
+	(pthread_condattr_setpshared): Likewise.
+	(pthread_condattr_getpshared): Likewise.
+
+	* mutex.c (pthread_mutex_init): Implement.
+	(pthread_mutex_destroy): Likewise.
+	(pthread_lock): Likewise.
+	(pthread_trylock): Likewise.
+	(pthread_unlock): Likewise.
+
+1998-07-12  Ben Elliston  <bje@cygnus.com>
+
+	* implement.h (_pthread_mutexattr_t): Define this implementation
+	internal type.  Application programmers only see a mutex attribute
+	object as a void pointer.
+
+	* pthread.h (pthread_mutexattr_t): Define this type.
+	(pthread_mutexattr_init): Add function prototype.
+	(pthread_mutexattr_destroy): Likewise.
+	(pthread_mutexattr_setpshared): Likewise.
+	(pthread_mutexattr_getpshared): Likewise.
+	(pthread_mutexattr_setprotocol): Likewise.
+	(pthread_mutexattr_getprotocol): Likewise.
+	(pthread_mutexattr_setprioceiling): Likewise.
+	(pthread_mutexattr_getprioceiling): Likewise.
+	(PTHREAD_PROCESS_PRIVATE): Define.
+	(PTHREAD_PROCESS_SHARED): Define.
+
+	* mutex.c (pthread_mutexattr_init): Implement.
+	(pthread_mutexattr_destroy): Implement.
+	(pthread_mutexattr_setprotocol): Implement.
+	(pthread_mutexattr_getprotocol): Likewise.
+	(pthread_mutexattr_setprioceiling): Likewise.
+	(pthread_mutexattr_getprioceiling): Likewise.
+	(pthread_mutexattr_setpshared): Likewise.
+	(pthread_mutexattr_getpshared): Likewise.
+	(insert_attr): New function; very preliminary implementation!
+	(is_attr): Likewise.
+	(remove_attr): Likewise.
+	
+Sat Jul 11 14:48:54 1998  Ross Johnson  <rpj@ixobrychus.canberra.edu.au>
+
+	* implement.h: Preliminary implementation specific defines.
+
+	* create.c (pthread_create): Preliminary implementation.
+
+1998-07-11  Ben Elliston  <bje@cygnus.com>
+
+	* sync.c (pthread_join): Implement.
+
+	* misc.c (pthread_equal): Likewise.
+	
+	* pthread.h (pthread_join): Add function prototype.
+	(pthread_equal): Likewise.
+	
+1998-07-10  Ben Elliston  <bje@cygnus.com>
+
+	* misc.c (pthread_self): Implement.
+
+	* exit.c (pthread_exit): Implement.
+
+	* pthread.h (pthread_exit): Add function prototype.
+	(pthread_self): Likewise.
+	(pthread_t): Define this type.
+
+1998-07-09  Ben Elliston  <bje@cygnus.com>
+
+	* create.c (pthread_create): A dummy stub right now.
+
+	* pthread.h (pthread_create): Add function prototype.
+
