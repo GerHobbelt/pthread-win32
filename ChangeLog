@@ -1,3 +1,34 @@
+2012-08-11  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* common.mk (default_target): restore previous behaviour of outputing
+	useful help when "make" is run without a target argument.
+
+2012-08-11  Daniel Richard. G <danielg at teragram dot com>
+
+	* autostatic.c (ptw32_autostatic_anchor): new function; other
+	changes aimed at de-abstracting functionality.
+	* impliment.h (ptw32_autostatic_anchor): dummy reference to
+	ensure that autostatic.o is always linked into static applications.
+	* GNUmakefile: Various improvements.
+	* Makefile: Likewise.
+
+2012-03-19  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* implement.h: Fix interlocked pointer casting under VC++ x64.
+
+2012-03-19  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* implement.h (ptw32_spinlock_check_need_init): added missing
+	forward declaration.
+	
+2012-07-19  Daniel Richard. G <danielg at teragram dot com>
+
+	* common.mk: New; macros common to all build environment makefiles.
+	* Bmakefile: Include new common.mk
+	* Makefile: Likewise; various fixes; added normal and small objects
+	static build.
+	* GNUmakefile: Likewise.
+
 2012-03-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* create.c (pthread_create): add __cdecl attribute to thread routine
