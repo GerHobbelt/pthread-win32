@@ -87,7 +87,6 @@ EHFLAGS	=
 # stop.
 
 PASSES = \
-	sizes.pass \
 	self1.pass  mutex5.pass  \
 	mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
 	semaphore1.pass  semaphore2.pass  semaphore3.pass  \
@@ -187,7 +186,7 @@ all:
 # e.g. nmake clean test cancel3.exe
 test: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC)
 
-tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) loadfree.pass $(PASSES)
+tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) sizes.pass loadfree.pass $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
 benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(XXLIBS) $(BENCHRESULTS)
@@ -196,7 +195,7 @@ benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(XXLIBS) $(BENCHRESULTS)
 stresstests: $(CPLIB) $(CPDLL) $(CPHDR) $(STRESSRESULTS)
 	@ $(ECHO) ALL STRESS TESTS DONE.
 
-statictests: $(CPLIB) $(CPDLL) $(CPHDR) $(PASSES)
+statictests: $(CPLIB) $(CPDLL) $(CPHDR) sizes.pass $(PASSES)
 	@ $(ECHO) ALL STATIC TESTS DONE.
 
 sizes.pass: sizes.exe
@@ -206,7 +205,7 @@ sizes.pass: sizes.exe
 	@ $(ECHO) ...... Passed
 	@ $(TOUCH) $*.pass
 
-loadfree.pass: loadfree.exe
+loadfree.pass: pthread.dll loadfree.exe
 	@ $(ECHO) ... Running $(TEST) test: $*.exe
 	@ .\$*.exe
 	@ $(ECHO) ...... Passed
@@ -411,7 +410,6 @@ join2.pass: create1.pass
 join3.pass: join2.pass
 join4.pass: join3.pass
 kill1.pass:
-loadfree.pass: pthread.dll
 mutex1.pass: self1.pass
 mutex1n.pass: mutex1.pass
 mutex1e.pass: mutex1.pass
@@ -475,12 +473,10 @@ semaphore4.pass: semaphore3.pass cancel1.pass
 semaphore4t.pass: semaphore4.pass
 semaphore5.pass: semaphore4.pass
 sequence1.pass: reuse2.pass
-sizes.pass:
 spin1.pass:
 spin2.pass: spin1.pass
 spin3.pass: spin2.pass
 spin4.pass: spin3.pass
-stress1.pass: condvar9.pass barrier5.pass
 tsd1.pass: barrier5.pass join1.pass
 tsd2.pass: tsd1.pass
 valid1.pass: join1.pass
