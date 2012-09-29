@@ -9,20 +9,26 @@
 # DLL_VER:
 # See pthread.h and README - This number is computed as 'current - age'
 DLL_VER	= 2
+DLL_VERD= $(DLL_VER)d
 
-DEVROOT	= c:\pthreads
+DEVROOT	= C:\pthreads
 
 DLLDEST	= $(DEVROOT)\DLL
-LIBDEST	= $(DEVROOT)\DLL
+LIBDEST	= $(DEVROOT)\LIB
+HDRDEST	= $(DEVROOT)\INCLUDE
 
-DLLS	= pthreadVCE$(DLL_VER).dll pthreadVSE$(DLL_VER).dll pthreadVC$(DLL_VER).dll
-INLINED_STAMPS	= pthreadVCE$(DLL_VER).stamp pthreadVSE$(DLL_VER).stamp pthreadVC$(DLL_VER).stamp
+DLLS	= pthreadVCE$(DLL_VER).dll pthreadVSE$(DLL_VER).dll pthreadVC$(DLL_VER).dll \
+		  pthreadVCE$(DLL_VERD).dll pthreadVSE$(DLL_VERD).dll pthreadVC$(DLL_VERD).dll
+INLINED_STAMPS	= pthreadVCE$(DLL_VER).stamp pthreadVSE$(DLL_VER).stamp pthreadVC$(DLL_VER).stamp \
+				  pthreadVCE$(DLL_VERD).stamp pthreadVSE$(DLL_VERD).stamp pthreadVC$(DLL_VERD).stamp
+STATIC_STAMPS	= pthreadVCE$(DLL_VER).static pthreadVSE$(DLL_VER).static pthreadVC$(DLL_VER).static \
+				  pthreadVCE$(DLL_VERD).static pthreadVSE$(DLL_VERD).static pthreadVC$(DLL_VERD).static
 
 OPTIM	= /O2 /Ob2
-#OPTIM	=
+OPTIMD	=
 
 CFLAGS	= /W3 /MD /nologo /Yd /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
-#CFLAGS	= /W3 /MD /nologo /Yd /Zi /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H
+CFLAGSD	= /Zi $(CFLAGS)
 
 
 # Default cleanup style
@@ -30,10 +36,13 @@ CLEANUP	= __CLEANUP_C
 
 # C++ Exceptions
 VCEFLAGS	= /GX /TP $(CFLAGS)
+VCEFLAGSD	= /GX /TP $(CFLAGSD)
 #Structured Exceptions
 VSEFLAGS	= $(CFLAGS)
+VSEFLAGSD	= $(CFLAGSD)
 #C cleanup code
 VCFLAGS	= $(CFLAGS)
+VCFLAGSD= $(CFLAGSD)
 
 DLL_INLINED_OBJS = \
 		pthread.obj \
@@ -165,6 +174,8 @@ SMALL_STATIC_OBJS	= \
 		ptw32_cond_check_need_init.obj \
 		ptw32_mutex_check_need_init.obj \
 		ptw32_semwait.obj \
+		ptw32_relmillisecs.obj \
+		ptw32_MCS_lock.obj \
 		sched_get_priority_max.obj \
 		sched_get_priority_min.obj \
 		sched_setscheduler.obj \
@@ -181,8 +192,6 @@ SMALL_STATIC_OBJS	= \
 		sem_open.obj \
 		sem_close.obj \
 		sem_unlink.obj \
-		ptw32_increase_semaphore.obj \
-		ptw32_decrease_semaphore.obj \
 		signal.obj \
 		pthread_kill.obj \
 		ptw32_spinlock_check_need_init.obj \
@@ -251,8 +260,10 @@ MISC_SRCS	= \
 		pthread_self.c \
 		pthread_setconcurrency.c \
 		ptw32_calloc.c \
+		ptw32_MCS_lock.c \
 		ptw32_new.c \
 		ptw32_reuse.c \
+		ptw32_relmillisecs.c \
 		w32_CancelableWait.c
 
 MUTEX_SRCS	= \
@@ -337,9 +348,7 @@ SEMAPHORE_SRCS = \
 		sem_getvalue.c \
 		sem_open.c \
 		sem_close.c \
-		sem_unlink.c \
-		ptw32_increase_semaphore.c \
-		ptw32_decrease_semaphore.c
+		sem_unlink.c
 
 SPIN_SRCS	= \
 		ptw32_spinlock_check_need_init.c \
@@ -368,20 +377,40 @@ help:
 	@ echo nmake clean VCE-inlined   (to build the MSVC inlined dll with C++ exception handling)
 	@ echo nmake clean VSE-inlined   (to build the MSVC inlined dll with structured exception handling)
 	@ echo nmake clean VC-inlined    (to build the MSVC inlined dll with C cleanup code)
+	@ echo nmake clean VC-static     (to build the MSVC static lib with C cleanup code)
+	@ echo nmake clean VCE-debug   (to build the debug MSVC dll with C++ exception handling)
+	@ echo nmake clean VSE-debug   (to build the debug MSVC dll with structured exception handling)
+	@ echo nmake clean VC-debug    (to build the debug MSVC dll with C cleanup code)
+	@ echo nmake clean VCE-inlined-debug   (to build the debug MSVC inlined dll with C++ exception handling)
+	@ echo nmake clean VSE-inlined-debug   (to build the debug MSVC inlined dll with structured exception handling)
+	@ echo nmake clean VC-inlined-debug    (to build the debug MSVC inlined dll with C cleanup code)
+	@ echo nmake clean VC-static-debug     (to build the debug MSVC static lib with C cleanup code)
 
 all:
 	@ nmake clean VCE-inlined
 	@ nmake clean VSE-inlined
 	@ nmake clean VC-inlined
+	@ nmake clean VCE-inlined-debug
+	@ nmake clean VSE-inlined-debug
+	@ nmake clean VC-inlined-debug
 
 VCE:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCEFLAGS)" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).dll
 
+VCE-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCEFLAGSD)" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).dll
+
 VSE:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VSEFLAGS)" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).dll
 
+VSE-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VSEFLAGSD)" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).dll
+
 VC:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS)" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).dll
+
+VC-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCFLAGSD)" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).dll
 
 #
 # The so-called inlined DLL is just a single translation unit with
@@ -390,15 +419,30 @@ VC:
 VCE-inlined:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).stamp
 
+VCE-inlined-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCEFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).stamp
+
 VSE-inlined:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VSEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).stamp
+
+VSE-inlined-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VSEFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).stamp
 
 VC-inlined:
 	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).stamp
 
+VC-inlined-debug:
+	nmake /nologo EHFLAGS="$(OPTIMD) $(VCFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).stamp
+
+VC-static:
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS) /DPTW32_BUILD_INLINED /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).static
+
+VC-static-debug:
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCFLAGSD) /DPTW32_BUILD_INLINED /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).static
+
 realclean: clean
-	if exist *.dll del *.dll
-	if exist *.lib del *.lib
+	if exist pthread*.dll del pthread*.dll
+	if exist pthread*.lib del pthread*.lib
 	if exist *.stamp del *.stamp
 
 clean:
@@ -415,6 +459,9 @@ clean:
 install: $(DLLS)
 	copy pthread*.dll $(DLLDEST)
 	copy pthread*.lib $(LIBDEST)
+	copy pthread.h $(HDRDEST)
+	copy sched.h $(HDRDEST)
+	copy semaphore.h $(HDRDEST)
 
 $(DLLS): $(DLL_OBJS)
 	cl /LDd /Zi /nologo $(DLL_OBJS) \
@@ -425,6 +472,10 @@ $(INLINED_STAMPS): $(DLL_INLINED_OBJS)
 	cl /LDd /Zi /nologo $(DLL_INLINED_OBJS) \
 		/link /nodefaultlib:libcmt /implib:$*.lib \
 		msvcrt.lib wsock32.lib /out:$*.dll
+
+$(STATIC_STAMPS): $(DLL_INLINED_OBJS)
+	if exist $*.lib del $*.lib
+	lib $(DLL_INLINED_OBJS) /out:$*.lib
 
 .c.obj:
 	cl $(EHFLAGS) /D$(CLEANUP) -c $<

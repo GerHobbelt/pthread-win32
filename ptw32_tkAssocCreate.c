@@ -40,8 +40,7 @@
 
 
 int
-ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
-		     pthread_t thread, pthread_key_t key)
+ptw32_tkAssocCreate (ptw32_thread_t * sp, pthread_key_t key)
      /*
       * -------------------------------------------------------------------
       * This routine creates an association that
@@ -57,16 +56,12 @@ ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
       *      1)      New associations are pushed to the beginning of the
       *              chain so that the internal ptw32_selfThreadKey association
       *              is always last, thus allowing selfThreadExit to
-      *              be implicitly called by pthread_exit last.
+      *              be implicitly called last by pthread_exit.
+      *      2)      
       *
       * Parameters:
-      *              assocP
-      *                      address into which the association is returned.
       *              thread
-      *                      current running thread. If NULL, then association
-      *                      is only added to the key. A NULL thread indicates
-      *                      that the user called pthread_setspecific prior
-      *                      to starting a thread. That's ok.
+      *                      current running thread.
       *              key
       *                      key on which to create an association.
       * Returns:
@@ -77,65 +72,47 @@ ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
       * -------------------------------------------------------------------
       */
 {
-  int result;
   ThreadKeyAssoc *assoc;
 
   /*
    * Have to create an association and add it
    * to both the key and the thread.
+   *
+   * Both key->keyLock and thread->threadLock are locked on
+   * entry to this routine.
    */
   assoc = (ThreadKeyAssoc *) calloc (1, sizeof (*assoc));
 
   if (assoc == NULL)
     {
-      result = ENOMEM;
-      goto FAIL0;
+      return ENOMEM;
     }
 
-  /*
-   * Initialise only when used for the first time.
-   */
-  assoc->lock = PTHREAD_MUTEX_INITIALIZER;
-  assoc->thread = thread;
+  assoc->thread = sp;
   assoc->key = key;
 
   /*
    * Register assoc with key
    */
-  if ((result = pthread_mutex_lock (&(key->threadsLock))) != 0)
-    {
-      goto FAIL2;
-    }
-
+  assoc->prevThread = NULL;
   assoc->nextThread = (ThreadKeyAssoc *) key->threads;
+  if (assoc->nextThread != NULL)
+    {
+      assoc->nextThread->prevThread = assoc;
+    }
   key->threads = (void *) assoc;
 
-  pthread_mutex_unlock (&(key->threadsLock));
-
-  if (thread.p != NULL)
-    {
-      /*
-       * Register assoc with thread
-       */
-      assoc->nextKey = (ThreadKeyAssoc *) ((ptw32_thread_t *)thread.p)->keys;
-      ((ptw32_thread_t *)thread.p)->keys = (void *) assoc;
-    }
-
-  *assocP = assoc;
-
-  return (result);
-
   /*
-   * -------------
-   * Failure Code
-   * -------------
+   * Register assoc with thread
    */
-FAIL2:
-  pthread_mutex_destroy (&(assoc->lock));
-  free (assoc);
+  assoc->prevKey = NULL;
+  assoc->nextKey = (ThreadKeyAssoc *) sp->keys;
+  if (assoc->nextKey != NULL)
+    {
+      assoc->nextKey->prevKey = assoc;
+    }
+  sp->keys = (void *) assoc;
 
-FAIL0:
-
-  return (result);
+  return (0);
 
 }				/* ptw32_tkAssocCreate */

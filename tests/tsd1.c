@@ -34,6 +34,8 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  *
  *
+ * --------------------------------------------------------------------------
+ *
  * Description:
  * - 
  *
@@ -77,10 +79,15 @@
 #include <sched.h>
 #include "test.h"
 
+enum {
+  NUM_THREADS = 100
+};
+
 static pthread_key_t key = NULL;
-static int accesscount[10];
-static int thread_set[10];
-static int thread_destroyed[10];
+static int accesscount[NUM_THREADS];
+static int thread_set[NUM_THREADS];
+static int thread_destroyed[NUM_THREADS];
+static pthread_barrier_t startBarrier;
 
 static void
 destroy_key(void * arg)
@@ -106,6 +113,8 @@ setkey(void * arg)
   assert(pthread_getspecific(key) == NULL);
 
   assert(pthread_setspecific(key, arg) == 0);
+  assert(pthread_setspecific(key, arg) == 0);
+  assert(pthread_setspecific(key, arg) == 0);
 
   assert(pthread_getspecific(key) == arg);
 
@@ -117,10 +126,7 @@ setkey(void * arg)
 static void *
 mythread(void * arg)
 {
-  while (key == NULL)
-    {
-	sched_yield();
-    }
+  (void) pthread_barrier_wait(&startBarrier);
 
   setkey(arg);
 
@@ -134,21 +140,23 @@ main()
 {
   int i;
   int fail = 0;
-  pthread_t thread[10];
+  pthread_t thread[NUM_THREADS];
 
-  for (i = 1; i < 5; i++)
+  assert(pthread_barrier_init(&startBarrier, NULL, NUM_THREADS/2) == 0);
+
+  for (i = 1; i < NUM_THREADS/2; i++)
     {
-	accesscount[i] = thread_set[i] = thread_destroyed[i] = 0;
+      accesscount[i] = thread_set[i] = thread_destroyed[i] = 0;
       assert(pthread_create(&thread[i], NULL, mythread, (void *)&accesscount[i]) == 0);
     }
-
-  Sleep(2000);
 
   /*
    * Here we test that existing threads will get a key created
    * for them.
    */
   assert(pthread_key_create(&key, destroy_key) == 0);
+
+  (void) pthread_barrier_wait(&startBarrier);
 
   /*
    * Test main thread key.
@@ -160,16 +168,16 @@ main()
    * Here we test that new threads will get a key created
    * for them.
    */
-  for (i = 5; i < 10; i++)
+  for (i = NUM_THREADS/2; i < NUM_THREADS; i++)
     {
-	accesscount[i] = thread_set[i] = thread_destroyed[i] = 0;
+      accesscount[i] = thread_set[i] = thread_destroyed[i] = 0;
       assert(pthread_create(&thread[i], NULL, mythread, (void *)&accesscount[i]) == 0);
     }
 
   /*
    * Wait for all threads to complete.
    */
-  for (i = 1; i < 10; i++)
+  for (i = 1; i < NUM_THREADS; i++)
     {
 	int result = 0;
 
@@ -178,7 +186,9 @@ main()
 
   assert(pthread_key_delete(key) == 0);
 
-  for (i = 1; i < 10; i++)
+  assert(pthread_barrier_destroy(&startBarrier) == 0);
+
+  for (i = 1; i < NUM_THREADS; i++)
     {
 	/*
 	 * The counter is incremented once when the key is set to

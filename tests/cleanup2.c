@@ -92,14 +92,21 @@ struct bag_t_ {
 
 static bag_t threadbag[NUMTHREADS + 1];
 
-static int pop_count = 0;
+typedef struct {
+  int i;
+  CRITICAL_SECTION cs;
+} sharedInt_t;
+
+static sharedInt_t pop_count = {0, {0}};
 
 static void
 increment_pop_count(void * arg)
 {
-  int * c = (int *) arg;
+  sharedInt_t * sI = (sharedInt_t *) arg;
 
-  (*c)++;
+  EnterCriticalSection(&sI->cs);
+  sI->i++;
+  LeaveCriticalSection(&sI->cs);
 }
 
 void *
@@ -133,6 +140,8 @@ main()
   int failed = 0;
   int i;
   pthread_t t[NUMTHREADS + 1];
+
+  InitializeCriticalSection(&pop_count.cs);
 
   assert((t[0] = pthread_self()).p != NULL);
 
@@ -187,7 +196,9 @@ main()
 
   assert(!failed);
 
-  assert(pop_count == NUMTHREADS);
+  assert(pop_count.i == NUMTHREADS);
+
+  DeleteCriticalSection(&pop_count.cs);
 
   /*
    * Success.

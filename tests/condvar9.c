@@ -216,12 +216,10 @@ main()
       assert(pthread_join(t[ct], NULL) == 0);
 
       assert(pthread_mutex_lock(&cvthing.lock) == 0);
-
       cvthing.shared++;
+      assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
       assert(pthread_cond_broadcast(&cvthing.notbusy) == 0);
-
-      assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
       /*
        * Standard check that all threads started - and wait for them to finish.

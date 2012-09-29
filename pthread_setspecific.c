@@ -87,9 +87,8 @@ pthread_setspecific (pthread_key_t key, const void *value)
        * Resolve catch-22 of registering thread with selfThread
        * key
        */
-      ptw32_thread_t * sp;
+      ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
-      sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
       if (sp == NULL)
         {
 	  if (value == NULL)
@@ -108,12 +107,8 @@ pthread_setspecific (pthread_key_t key, const void *value)
 
   if (key != NULL)
     {
-      ThreadKeyAssoc *assoc;
-
       if (self.p != NULL && key->destructor != NULL && value != NULL)
 	{
-          ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
-
 	  /*
 	   * Only require associations if we have to
 	   * call user destroy routine.
@@ -123,38 +118,50 @@ pthread_setspecific (pthread_key_t key, const void *value)
 	   * on the association; setting assoc to NULL short
 	   * circuits the search.
 	   */
-	  assoc = (ThreadKeyAssoc *) sp->keys;
-	  /*
-	   * Locate existing association
-	   */
-	  while (assoc != NULL)
+	  ThreadKeyAssoc *assoc;
+
+	  if (pthread_mutex_lock(&(key->keyLock)) == 0)
 	    {
-	      if (assoc->key == key)
+	      ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
+
+	      (void) pthread_mutex_lock(&(sp->threadLock));
+
+	      assoc = (ThreadKeyAssoc *) sp->keys;
+	      /*
+	       * Locate existing association
+	       */
+	      while (assoc != NULL)
 		{
-		  /*
-		   * Association already exists
-		   */
-		  break;
+		  if (assoc->key == key)
+		    {
+		      /*
+		       * Association already exists
+		       */
+		      break;
+		    }
+		  assoc = assoc->nextKey;
 		}
-	      assoc = assoc->nextKey;
-	    }
 
-	  /*
-	   * create an association if not found
-	   */
-	  if (assoc == NULL)
-	    {
-	      result = ptw32_tkAssocCreate (&assoc, self, key);
+	      /*
+	       * create an association if not found
+	       */
+	      if (assoc == NULL)
+		{
+		  result = ptw32_tkAssocCreate (sp, key);
+		}
+
+	      (void) pthread_mutex_unlock(&(sp->threadLock));
 	    }
+	  (void) pthread_mutex_unlock(&(key->keyLock));
 	}
 
-      if (result == 0)
-	{
-	  if (!TlsSetValue (key->key, (LPVOID) value))
-	    {
-	      result = EAGAIN;
-	    }
-	}
+	if (result == 0)
+	  {
+	    if (!TlsSetValue (key->key, (LPVOID) value))
+	      {
+		result = EAGAIN;
+	      }
+	  }
     }
 
   return (result);

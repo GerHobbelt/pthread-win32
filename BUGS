@@ -25,16 +25,18 @@ Known bugs
 2. Cancellation problems in optimised code
    - Milan Gardian
 
+   This is suspected to be a compiler bug in VC6.0, and also seen in
+   VC7.0 and VS .NET 2003. The GNU C++ compiler does not have a problem
+   with this, and it has been reported that the Intel C++ 8.1 compiler
+   and Visual C++ 2005 Express Edition Beta2 pass tests\semaphore4.c
+   (which exposes the bug).
+
    Workaround [rpj - 2 Feb 2002]
    -----------------------------
    [Please note: this workaround did not solve a similar problem in
    snapshot-2004-11-03 or later, even though similar symptoms were seen.
    tests\semaphore4.c fails in that snapshot for the VCE version of the
-   DLL. It is suspected to be a compiler bug in VC6.0, and also seen in
-   VC7.0 and VS .NET 2003. The GNU C++ compiler does not have a problem
-   with this test, and it has been reported (2005-03-05/08) that the Intel
-   C++ 8.1 compiler and Visual C++ 2005 Express Edition Beta2 are also
-   ok with this test.]
+   DLL.]
 
    The problem disappears when /Ob0 is used, i.e. /O2 /Ob0 works OK,
    but if you want to use inlining optimisation you can be much more
@@ -110,3 +112,22 @@ Known bugs
    creation of production code is highly unreliable for the current version of
    the pthreads library.
 
+3. The Borland Builder 5.5 version of the library produces memory read exceptions
+in some tests.
+
+4. pthread_barrier_wait() can deadlock if the number of potential calling
+threads for a particular barrier is greater than the barrier count parameter
+given to pthread_barrier_init() for that barrier.
+
+This is due to the very lightweight implementation of pthread-win32 barriers.
+To cope with more than "count" possible waiters, barriers must effectively
+implement all the same safeguards as condition variables, making them much
+"heavier" than at present.
+
+The workaround is to ensure that no more than "count" threads attempt to wait
+at the barrier.
+
+5. Canceling a thread blocked on pthread_once appears not to work in the MSVC++
+version of the library "pthreadVCE.dll". The test case "once3.c" hangs. I have no
+clues on this at present. All other versions pass this test ok - pthreadsVC.dll,
+pthreadsVSE.dll, pthreadsGC.dll and pthreadsGCE.dll. 

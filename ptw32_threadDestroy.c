@@ -47,12 +47,6 @@ ptw32_threadDestroy (pthread_t thread)
 
   if (tp != NULL)
     {
-      (void) pthread_mutex_lock (&tp->cancelLock);
-      tp->state = PThreadStateLast;
-      (void) pthread_mutex_unlock (&tp->cancelLock);
-
-      ptw32_callUserDestroyRoutines (thread);
-
       /*
        * Copy thread state so that the thread can be atomically NULLed.
        */
@@ -84,5 +78,5 @@ ptw32_threadDestroy (pthread_t thread)
 #endif
 
     }
-
 }				/* ptw32_threadDestroy */
+

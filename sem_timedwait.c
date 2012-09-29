@@ -41,32 +41,58 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#ifndef _UWIN
-//#include <process.h>
-#endif
-#ifndef NEED_FTIME
-#include <sys/timeb.h>
-#endif
-
 #include "pthread.h"
 #include "semaphore.h"
 #include "implement.h"
 
+
+typedef struct {
+  sem_t sem;
+  int * resultPtr;
+} sem_timedwait_cleanup_args_t;
+
+
 static void PTW32_CDECL
-ptw32_sem_timedwait_cleanup (void * sem)
+ptw32_sem_timedwait_cleanup (void * args)
 {
-  sem_t s = (sem_t) sem;
+  sem_timedwait_cleanup_args_t * a = (sem_timedwait_cleanup_args_t *)args;
+  sem_t s = a->sem;
 
   if (pthread_mutex_lock (&s->lock) == 0)
     {
-      ++s->value;
       /*
-       * Don't release the W32 sema, it doesn't need adjustment
-       * because it doesn't record the number of waiters.
+       * We either timed out or were cancelled.
+       * If someone has posted between then and now we try to take the semaphore.
+       * Otherwise the semaphore count may be wrong after we
+       * return. In the case of a cancellation, it is as if we
+       * were cancelled just before we return (after taking the semaphore)
+       * which is ok.
        */
+      if (WaitForSingleObject(s->sem, 0) == WAIT_OBJECT_0)
+	{
+	  /* We got the semaphore on the second attempt */
+	  *(a->resultPtr) = 0;
+	}
+      else
+	{
+	  /* Indicate we're no longer waiting */
+	  s->value++;
+#ifdef NEED_SEM
+	  if (s->value > 0)
+	    {
+	      s->leftToUnblock = 0;
+	    }
+#else
+          /*
+           * Don't release the W32 sema, it doesn't need adjustment
+           * because it doesn't record the number of waiters.
+           */
+#endif
+	}
       (void) pthread_mutex_unlock (&s->lock);
     }
 }
+
 
 int
 sem_timedwait (sem_t * sem, const struct timespec *abstime)
@@ -111,21 +137,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
   int result = 0;
   sem_t s = *sem;
 
-#ifdef NEED_FTIME
-
-  struct timespec currSysTime;
-
-#else /* NEED_FTIME */
-
-  struct _timeb currSysTime;
-
-#endif /* NEED_FTIME */
-
-  const DWORD NANOSEC_PER_MILLISEC = 1000000;
-  const DWORD MILLISEC_PER_SEC = 1000;
-  DWORD milliseconds;
-  DWORD tmpAbsMilliseconds;
-  DWORD tmpCurrMilliseconds;
+  pthread_testcancel();
 
   if (sem == NULL)
     {
@@ -133,6 +145,8 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
     }
   else
     {
+      DWORD milliseconds;
+
       if (abstime == NULL)
 	{
 	  milliseconds = INFINITE;
@@ -142,98 +156,72 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 	  /* 
 	   * Calculate timeout as milliseconds from current system time. 
 	   */
-
-	  /*
-	   * subtract current system time from abstime in a way that checks
-	   * that abstime is never in the past, or is never equivalent to the
-	   * defined INFINITE value (0xFFFFFFFF).
-	   *
-	   * Assume all integers are unsigned, i.e. cannot test if less than 0.
-	   */
-	  tmpAbsMilliseconds =  abstime->tv_sec * MILLISEC_PER_SEC;
-	  tmpAbsMilliseconds += (abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
-
-	  /* get current system time */
-
-#ifdef NEED_FTIME
-
-	  {
-	    FILETIME ft;
-	    SYSTEMTIME st;
-
-	    GetSystemTime(&st);
-	    SystemTimeToFileTime(&st, &ft);
-	    /*
-	     * GetSystemTimeAsFileTime(&ft); would be faster,
-	     * but it does not exist on WinCE
-	     */
-
-	    ptw32_filetime_to_timespec(&ft, &currSysTime);
-	  }
-
-	  tmpCurrMilliseconds = currSysTime.tv_sec * MILLISEC_PER_SEC;
-	  tmpCurrMilliseconds += (currSysTime.tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
-
-#else /* ! NEED_FTIME */
-
-	  _ftime(&currSysTime);
-
-	  tmpCurrMilliseconds = (DWORD) currSysTime.time * MILLISEC_PER_SEC;
-	  tmpCurrMilliseconds += (DWORD) currSysTime.millitm;
-
-#endif /* NEED_FTIME */
-
-	  if (tmpAbsMilliseconds > tmpCurrMilliseconds)
-	    {
-	      milliseconds = tmpAbsMilliseconds - tmpCurrMilliseconds;
-	      if (milliseconds == INFINITE)
-		{
-		  /* Timeouts must be finite */
-		  milliseconds--;
-		}
-	    }
-	  else
-	    {
-	      /* The abstime given is in the past */
-	      milliseconds = 0;
-	    }
+	  milliseconds = ptw32_relmillisecs (abstime);
 	}
-
-#ifdef NEED_SEM
-
-      result = (pthreadCancelableTimedWait (s->event, milliseconds));
-
-#else /* NEED_SEM */
-
-      pthread_testcancel();
 
       if ((result = pthread_mutex_lock (&s->lock)) == 0)
 	{
-	  int v = --s->value;
+	  int v;
+
+	  /* See sem_destroy.c
+	   */
+	  if (*sem == NULL)
+	    {
+	      (void) pthread_mutex_unlock (&s->lock);
+	      errno = EINVAL;
+	      return -1;
+	    }
+
+	  v = --s->value;
 	  (void) pthread_mutex_unlock (&s->lock);
 
 	  if (v < 0)
 	    {
-	      /* Must wait */
+#ifdef NEED_SEM
+	      int timedout;
+#endif
+	      sem_timedwait_cleanup_args_t cleanup_args;
+
+	      cleanup_args.sem = s;
+	      cleanup_args.resultPtr = &result;
+
 #ifdef _MSC_VER
 #pragma inline_depth(0)
 #endif
-              pthread_cleanup_push(ptw32_sem_timedwait_cleanup, (void *) s);
+	      /* Must wait */
+              pthread_cleanup_push(ptw32_sem_timedwait_cleanup, (void *) &cleanup_args);
+#ifdef NEED_SEM
+	      timedout =
+#endif
 	      result = pthreadCancelableTimedWait (s->sem, milliseconds);
-	      /*
-	       * Restore the semaphore counter if no longer waiting
-	       * and not taking the semaphore. This will occur if the
-	       * thread is cancelled while waiting, or the wake was
-	       * not the result of a post event given to us, e.g. a timeout.
-	       */
-              pthread_cleanup_pop(result);
+	      pthread_cleanup_pop(result);
 #ifdef _MSC_VER
 #pragma inline_depth()
 #endif
+
+#ifdef NEED_SEM
+
+	      if (!timedout && pthread_mutex_lock (&s->lock) == 0)
+	        {
+        	  if (*sem == NULL)
+        	    {
+        	      (void) pthread_mutex_unlock (&s->lock);
+        	      errno = EINVAL;
+        	      return -1;
+        	    }
+
+	          if (s->leftToUnblock > 0)
+	            {
+		      --s->leftToUnblock;
+		      SetEvent(s->sem);
+		    }
+	          (void) pthread_mutex_unlock (&s->lock);
+	        }
+
+#endif /* NEED_SEM */
+
 	    }
 	}
-
-#endif
 
     }
 
@@ -244,12 +232,6 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
       return -1;
 
     }
-
-#ifdef NEED_SEM
-
-  ptw32_decrease_semaphore (sem);
-
-#endif /* NEED_SEM */
 
   return 0;
 

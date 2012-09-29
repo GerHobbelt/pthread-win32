@@ -11,6 +11,7 @@ Ross Johnson		rpj at callisto dot canberra dot edu dot au
 					early prototype routines;
 					ongoing project coordination/maintenance;
 					implementation of spin locks and barriers;
+					various enhancements;
 					bug fixes;
 					documentation;
 					testsuite.
@@ -75,6 +76,8 @@ Alexander Terekhov	TEREKHOV at de dot ibm dot com
 					enhancements to semaphores;
 					enhancements to mutexes;
 					new mutex implementation in 'futex' style;
+					suggested a robust implementation of pthread_once
+					similar to that implemented by V.Kliathcko;
 					system clock change handling re CV timeouts;
 					bug fixes.
 Thomas Pfaff		tpfaff at gmx dot net
@@ -117,3 +120,10 @@ Will Bryant		will dot bryant at ecosm dot com
 					Borland compiler patch and makefile.
 Anuj Goyal		anuj dot goyal at gmail dot com
 					Port to Digital Mars compiler.
+Gottlob Frege		gottlobfrege at  gmail dot com
+					re-implemented pthread_once (version 2)
+					(pthread_once cancellation added by rpj).
+Vladimir Kliatchko	vladimir at kliatchko dot com
+					reimplemented pthread_once with the same form
+					as described by A.Terekhov (later version 2);
+					implementation of MCS (Mellor-Crummey/Scott) locks.

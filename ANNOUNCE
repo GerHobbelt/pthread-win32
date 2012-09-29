@@ -1,16 +1,11 @@
-		 PTHREADS-WIN32 SNAPSHOT 2005-03-08
-		 ----------------------------------
+	     PTHREADS-WIN32 RELEASE 2.8.0 (2006-12-22)
+	     -----------------------------------------
 	 Web Site: http://sources.redhat.com/pthreads-win32/
 	FTP Site: ftp://sources.redhat.com/pub/pthreads-win32
 	 Maintainer: Ross Johnson <rpj@callisto.canberra.edu.au>
 
 
-[Please note: snapshots from 2004-11-03 are using a new mutex implementation
-and should be regarded as beta code. You may not want to use it in production
-yet but please try it if you can. No mutex related problems have been reported
-since snapshot 2005-01-25.]
-
-We are pleased to announce the availability of a new snapshot of
+We are pleased to announce the availability of a new release of
 Pthreads-win32, an Open Source Software implementation of the
 Threads component of the POSIX 1003.1 2001 Standard for Microsoft's
 Win32 environment. Some functions from other sections of POSIX
@@ -45,6 +40,13 @@ Aurelio Medina and improved by Alexander Terekhov.
 Many others have contributed significant time and effort to solve crutial
 problems in order to make the library workable, robust and reliable.
 
+Thanks to Xavier Leroy for granting permission to use and modify his
+LinuxThreads manual pages.
+
+Thanks to The Open Group for making the Single Unix Specification
+publicly available - many of the manual pages included in the package
+were extracted from it.
+
 There is also a separate CONTRIBUTORS file. This file and others are
 on the web site:
 
@@ -54,8 +56,8 @@ As much as possible, the ChangeLog file acknowledges contributions to the
 code base in more detail.
 
 
-Changes since the last snapshot
--------------------------------
+Changes since the last release
+------------------------------
 These are now documented in the NEWS file.
 See the ChangeLog file also.
 
@@ -88,16 +90,20 @@ The following POSIX 1003.1 2001 options are defined and set to -1:
       _POSIX_THREAD_PROCESS_SHARED
 
 
-The following POSIX 1003.1 2001 options are defined and set:
+The following POSIX 1003.1 2001 limits are defined and set:
 
       _POSIX_THREAD_THREADS_MAX
       _POSIX_SEM_VALUE_MAX
       _POSIX_SEM_NSEMS_MAX
-      PTHREAD_DESTRUCTOR_ITERATIONS
-      PTHREAD_KEYS_MAX
+      _POSIX_THREAD_KEYS_MAX
+      _POSIX_THREAD_DESTRUCTOR_ITERATIONS
       PTHREAD_STACK_MIN
       PTHREAD_THREADS_MAX
-      
+      SEM_VALUE_MAX
+      SEM_NSEMS_MAX
+      PTHREAD_KEYS_MAX
+      PTHREAD_DESTRUCTOR_ITERATIONS
+
 
 The following functions are implemented:
 
@@ -216,10 +222,10 @@ The following functions are implemented:
       sem_wait
       sem_trywait
       sem_timedwait
+      sem_getvalue	     (# free if +ve, # of waiters if -ve)
       sem_open		     (returns an error ENOSYS)
       sem_close 	     (returns an error ENOSYS)
       sem_unlink	     (returns an error ENOSYS)
-      sem_getvalue	     (returns an error ENOSYS)
 
       ---------------------------
       RealTime Scheduling

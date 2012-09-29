@@ -1,5 +1,5 @@
 /*
- * File: 
+ * File: condvar6.c
  *
  *
  * --------------------------------------------------------------------------
@@ -184,20 +184,21 @@ main()
   /*
    * Give threads time to start.
    */
-  Sleep(2000);
+  Sleep(1000);
 
   assert(pthread_mutex_lock(&cvthing.lock) == 0);
-
   cvthing.shared++;
+  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
   assert(pthread_cond_broadcast(&cvthing.notbusy) == 0);
-
-  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
   /*
    * Give threads time to complete.
    */
-  Sleep(2000);
+  for (i = 1; i <= NUMTHREADS; i++)
+    {
+      assert(pthread_join(t[i], NULL) == 0);
+    }
 
   /* 
    * Cleanup the CV.

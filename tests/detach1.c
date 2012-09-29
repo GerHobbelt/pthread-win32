@@ -1,15 +1,6 @@
 /*
- * -------------------------------------------------------------
+ * Test for pthread_detach().
  *
- * Module: ptw32_increase_semaphore.c
- *
- * Purpose:
- *	Semaphores aren't actually part of the PThreads standard.
- *	They are defined by the POSIX Standard:
- *
- *		POSIX 1003.1b-1993	(POSIX.1b)
- *
- * -------------------------------------------------------------
  *
  * --------------------------------------------------------------------------
  *
@@ -39,35 +30,64 @@
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *
+ * --------------------------------------------------------------------------
+ *
+ * Depends on API functions: pthread_create(), pthread_detach(), pthread_exit().
  */
 
-#include "pthread.h"
-#include "semaphore.h"
-#include "implement.h"
+#include "test.h"
 
-#ifdef NEED_SEM
 
-INLINE BOOL
-ptw32_increase_semaphore (sem_t * sem, unsigned int n)
+enum {
+  NUMTHREADS = 100
+};
+
+void *
+func(void * arg)
 {
-  BOOL result;
-  register sem_t s = *sem;
+    int i = (int) arg;
 
-  EnterCriticalSection (&s->sem_lock_cs);
+    Sleep(i * 10);
 
-  if (s->value + n > s->value)
-    {
-      s->value += n;
-      SetEvent (s->event);
-      result = PTW32_TRUE;
-    }
-  else
-    {
-      result = PTW32_FALSE;
-    }
+    pthread_exit(arg);
 
-  LeaveCriticalSection (&s->sem_lock_cs);
-  return result;
+    /* Never reached. */
+    exit(1);
 }
 
-#endif /* NEED_SEM */
+int
+main(int argc, char * argv[])
+{
+	pthread_t id[NUMTHREADS];
+	int i;
+
+	/* Create a few threads and then exit. */
+	for (i = 0; i < NUMTHREADS; i++)
+	  {
+	    assert(pthread_create(&id[i], NULL, func, (void *) i) == 0);
+	  }
+
+	/* Some threads will finish before they are detached, some after. */
+	Sleep(NUMTHREADS/2 * 10 + 50);
+
+	for (i = 0; i < NUMTHREADS; i++)
+	  {
+	    assert(pthread_detach(id[i]) == 0);
+	  }
+
+	Sleep(NUMTHREADS * 10 + 100);
+
+	/*
+	 * Check that all threads are now invalid.
+	 * This relies on unique thread IDs - e.g. works with
+	 * pthreads-w32 or Solaris, but may not work for Linux, BSD etc.
+	 */
+	for (i = 0; i < NUMTHREADS; i++)
+	  {
+	    assert(pthread_kill(id[i], 0) == ESRCH);
+	  }
+
+	/* Success. */
+	return 0;
+}

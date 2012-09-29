@@ -106,16 +106,16 @@ mythread(void * arg)
     }
 
   result = pthread_cond_timedwait(&cv, &mutex, &abstime2);
+  assert(pthread_mutex_unlock(&mutex) == 0);
   if (result == ETIMEDOUT)
     {
-      timedout++;
+      InterlockedIncrement((LPLONG)&timedout);
     }
   else
     {
-      awoken++;
+      InterlockedIncrement((LPLONG)&awoken);
     }
 
-  assert(pthread_mutex_unlock(&mutex) == 0);
 
   return arg;
 }
@@ -161,14 +161,14 @@ main()
        * Also tests that redundant broadcasts don't return errors.
        */
 
-      assert(pthread_mutex_lock(&mutex) == 0);
+//      assert(pthread_mutex_lock(&mutex) == 0);
 
-      if (awoken > NUMTHREADS/3)
+      if (InterlockedExchangeAdd((LPLONG)&awoken, 0L) > NUMTHREADS/3)
         {
           assert(pthread_cond_broadcast(&cv) == 0);
         }
 
-      assert(pthread_mutex_unlock(&mutex) == 0);
+//      assert(pthread_mutex_unlock(&mutex) == 0);
 
     }
 

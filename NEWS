@@ -1,3 +1,332 @@
+RELEASE 2.8.0
+-------------
+(2006-12-22)
+
+General
+-------
+New bug fixes in this release since 2.7.0 have not been applied to the
+version 1.x.x series. It is probably time to drop version 1.
+
+Testing and verification
+------------------------
+This release has not yet been tested on SMP architechtures. All tests pass
+on a uni-processor system.
+
+Bug fixes
+---------
+Sem_destroy could return EBUSY even though no threads were waiting on the 
+semaphore. Other races around invalidating semaphore structs (internally)
+have been removed as well.
+
+New tests
+---------
+semaphore5.c - tests the bug fix referred to above.
+
+
+RELEASE 2.7.0
+-------------
+(2005-06-04)
+
+General
+-------
+All new features in this release have been back-ported in release 1.11.0,
+including the incorporation of MCS locks in pthread_once, however, versions
+1 and 2 remain incompatible even though they are now identical in
+performance and functionality.
+
+Testing and verification
+------------------------
+This release has been tested (passed the test suite) on both uni-processor
+and multi-processor systems.
+- Tim Theisen
+
+Bug fixes
+---------
+Pthread_once has been re-implemented to remove priority boosting and other
+complexity to improve robustness. Races for Win32 handles that are not
+recycle-unique have been removed. The general form of pthread_once is now
+the same as that suggested earlier by Alexander Terekhov, but instead of the
+'named mutex', a queue-based lock has been implemented which has the required
+properties of dynamic self initialisation and destruction. This lock is also
+efficient. The ABI is unaffected in as much as the size of pthread_once_t has
+not changed and PTHREAD_ONCE_INIT has not changed, however, applications that
+peek inside pthread_once_t, which is supposed to be opaque, will break.
+- Vladimir Kliatchko
+
+New features
+------------
+* Support for Mingw cross development tools added to GNUmakefile.
+Mingw cross tools allow building the libraries on Linux.
+- Mikael Magnusson
+
+
+RELEASE 2.6.0
+-------------
+(2005-05-19)
+
+General
+-------
+All of the bug fixes and new features in this release have been
+back-ported in release 1.10.0.
+
+Testing and verification
+------------------------
+This release has been tested (passed the test suite) on both uni-processor
+and multi-processor systems. Thanks to Tim Theisen at TomoTherapy for
+exhaustively running the MP tests and for providing crutial observations
+and data when faults are detected.
+
+Bugs fixed
+----------
+
+* pthread_detach() now reclaims remaining thread resources if called after
+the target thread has terminated. Previously, this routine did nothing in
+this case.
+
+New tests
+---------
+
+* detach1.c - tests that pthread_detach properly invalidates the target
+thread, which indicates that the thread resources have been reclaimed.
+
+
+RELEASE 2.5.0
+-------------
+(2005-05-09)
+
+General
+-------
+
+The package now includes a reference documentation set consisting of
+HTML formatted Unix-style manual pages that have been edited for
+consistency with Pthreads-w32. The set can also be read online at:
+http://sources.redhat.com/pthreads-win32/manual/index.html
+
+Thanks again to Tim Theisen for running the test suite pre-release
+on an MP system.
+
+All of the bug fixes and new features in this release have been
+back-ported in release 1.9.0.
+
+Bugs fixed
+----------
+
+* Thread Specific Data (TSD) key management has been ammended to
+eliminate a source of (what was effectively) resource leakage (a HANDLE
+plus memory for each key destruct routine/thread association). This was
+not a true leak because these resources were eventually reclaimed when
+pthread_key_delete was run AND each thread referencing the key had exited.
+The problem was that these two conditions are often not met until very
+late, and often not until the process is about to exit.
+
+The ammended implementation avoids the need for the problematic HANDLE
+and reclaims the memory as soon as either the key is deleted OR the
+thread exits, whichever is first.
+
+Thanks to Richard Hughes at Aculab for identifying and locating the leak.
+
+* TSD key destructors are now processed up to PTHREAD_DESTRUCTOR_ITERATIONS
+times instead of just once. PTHREAD_DESTRUCTOR_ITERATIONS has been
+defined in pthread.h for some time but not used.
+
+* Fix a semaphore accounting race between sem_post/sem_post_multiple
+and sem_wait cancellation. This is the same issue as with
+sem_timedwait that was fixed in the last release.
+
+* sem_init, sem_post, and sem_post_multiple now check that the
+semaphore count never exceeds _POSIX_SEM_VALUE_MAX.
+
+* Although sigwait() is nothing more than a no-op, it should at least
+be a cancellation point to be consistent with the standard.
+
+New tests
+---------
+
+* stress1.c - attempts to expose problems in condition variable
+and semaphore timed wait logic. This test was inspired by Stephan
+Mueller's sample test code used to identify the sem_timedwait bug
+from the last release. It's not a part of the regular test suite
+because it can take awhile to run. To run it:
+nmake clean VC-stress
+
+* tsd2.c - tests that key destructors are re-run if the tsd key value is
+not NULL after the destructor routine has run. Also tests that
+pthread_setspecific() and pthread_getspecific() are callable from
+destructors.
+
+
+RELEASE 2.4.0
+-------------
+(2005-04-26)
+
+General
+-------
+
+There is now no plan to release a version 3.0.0 to fix problems in
+pthread_once(). Other possible implementations of pthread_once
+will still be investigated for a possible future release in an attempt
+to reduce the current implementation's complexity.
+
+All of the bug fixes and new features in this release have been
+back-ported for release 1.8.0.
+
+Bugs fixed
+----------
+
+* Fixed pthread_once race (failures on an MP system). Thanks to
+Tim Theisen for running exhaustive pre-release testing on his MP system
+using a range of compilers:
+  VC++ 6
+  VC++ 7.1
+  Intel C++ version 8.0
+All tests passed.
+Some minor speed improvements were also done.
+
+* Fix integer overrun error in pthread_mutex_timedlock() - missed when
+sem_timedwait() was fixed in release 2.2.0. This routine no longer returns
+ENOTSUP when NEED_SEM is defined - it is supported (NEED_SEM is only
+required for WinCE versions prior to 3.0).
+
+* Fix timeout bug in sem_timedwait().
+- Thanks to Stephan Mueller for reporting, providing diagnostic output
+and test code.
+
+* Fix several problems in the NEED_SEM conditionally included code.
+NEED_SEM included code is provided for systems that don't implement W32
+semaphores, such as WinCE prior to version 3.0. An alternate implementation
+of POSIX semaphores is built using W32 events for these systems when
+NEED_SEM is defined. This code has been completely rewritten in this
+release to reuse most of the default POSIX semaphore code, and particularly,
+to implement all of the sem_* routines supported by pthreads-win32. Tim
+Theisen also run the test suite over the NEED_SEM code on his MP system. All
+tests passed.
+
+* The library now builds without errors for the Borland Builder 5.5 compiler.
+
+New features
+------------
+
+* pthread_mutex_timedlock() and all sem_* routines provided by
+pthreads-win32 are now implemented for WinCE versions prior to 3.0. Those
+versions did not implement W32 semaphores. Define NEED_SEM in config.h when
+building the library for these systems.
+
+Known issues in this release
+----------------------------
+
+* pthread_once is too complicated - but it works as far as testing can
+determine..
+
+* The Borland version of the dll fails some of the tests with a memory read
+exception. The cause is not yet known but a compiler bug has not been ruled
+out.
+
+
+RELEASE 2.3.0
+-------------
+(2005-04-12)
+
+General
+-------
+
+Release 1.7.0 is a backport of features and bug fixes new in
+this release. See earlier notes under Release 2.0.0/General.
+
+Bugs fixed
+----------
+
+* Fixed pthread_once potential for post once_routine cancellation
+hanging due to starvation. See comments in pthread_once.c.
+Momentary priority boosting is used to ensure that, after a
+once_routine is cancelled, the thread that will run the
+once_routine is not starved by higher priority waiting threads at
+critical times. Priority boosting occurs only AFTER a once_routine 
+cancellation, and is applied only to that once_control. The
+once_routine is run at the thread's normal base priority.
+
+New tests
+---------
+
+* once4.c: Aggressively tests pthread_once() under realtime
+conditions using threads with varying priorities. Windows'
+random priority boosting does not occur for threads with realtime
+priority levels.
+
+
+RELEASE 2.2.0
+-------------
+(2005-04-04)
+
+General
+-------
+
+* Added makefile targets to build static link versions of the library.
+Both MinGW and MSVC. Please note that this does not imply any change
+to the LGPL licensing, which still imposes psecific conditions on
+distributing software that has been statically linked with this library.
+
+* There is a known bug in pthread_once(). Cancellation of the init_routine
+exposes a potential starvation (i.e. deadlock) problem if a waiting thread
+has a higher priority than the initting thread. This problem will be fixed
+in version 3.0.0 of the library.
+
+Bugs fixed
+----------
+
+* Fix integer overrun error in sem_timedwait().
+Kevin Lussier
+
+* Fix preprocessor directives for static linking.
+Dimitar Panayotov
+
+
+RELEASE 2.1.0
+-------------
+(2005-03-16)
+
+Bugs fixed
+----------
+
+* Reverse change to pthread_setcancelstate() in 2.0.0.
+
+
+RELEASE 2.0.0
+-------------
+(2005-03-16)
+
+General
+-------
+
+This release represents an ABI change and the DLL version naming has
+incremented from 1 to 2, e.g. pthreadVC2.dll.
+
+Version 1.4.0 back-ports the new functionality included in this
+release. Please distribute DLLs built from that version with updates
+to applications built on pthreads-win32 version 1.x.x.
+
+The package naming has changed, replacing the snapshot date with 
+the version number + descriptive information. E.g. this
+release is "pthreads-w32-2-0-0-release".
+
+Bugs fixed
+----------
+
+* pthread_setcancelstate() no longer checks for a pending
+async cancel event if the library is using alertable async
+cancel. See the README file (Prerequisites section) for info
+on adding alertable async cancelation.
+
+New features
+------------
+
+* pthread_once() now supports init_routine cancellability.
+
+New tests
+---------
+
+* Agressively test pthread_once() init_routine cancellability.
+
+
 SNAPSHOT 2005-03-08
 -------------------
 Version 1.3.0

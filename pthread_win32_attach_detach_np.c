@@ -34,7 +34,6 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-//#include "../QueueUserAPCEx/User/QueueUserAPCEx.h"
 #include "pthread.h"
 #include "implement.h"
 
@@ -92,10 +91,21 @@ pthread_win32_process_attach_np ()
 
 #endif
 
+#ifdef WINCE
+
+  /*
+   * Load COREDLL and try to get address of InterlockedCompareExchange
+   */
+  ptw32_h_kernel32 = LoadLibrary (TEXT ("COREDLL.DLL"));
+
+#else
+
   /*
    * Load KERNEL32 and try to get address of InterlockedCompareExchange
    */
   ptw32_h_kernel32 = LoadLibrary (TEXT ("KERNEL32.DLL"));
+
+#endif
 
   ptw32_interlocked_compare_exchange =
     (PTW32_INTERLOCKED_LONG (WINAPI *)
@@ -262,15 +272,22 @@ pthread_win32_thread_detach_np ()
        */
       ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
-      if (sp != NULL)
+      if (sp != NULL) // otherwise Win32 thread with no implicit POSIX handle.
 	{
+	  ptw32_callUserDestroyRoutines (sp->ptHandle);
+
+	  (void) pthread_mutex_lock (&sp->cancelLock);
+	  sp->state = PThreadStateLast;
 	  /*
-	   * Detached threads have their resources automatically
-	   * cleaned up upon exit (others must be 'joined').
+	   * If the thread is joinable at this point then it MUST be joined
+	   * or detached explicitly by the application.
 	   */
+	  (void) pthread_mutex_unlock (&sp->cancelLock);
+
 	  if (sp->detachState == PTHREAD_CREATE_DETACHED)
 	    {
 	      ptw32_threadDestroy (sp->ptHandle);
+
 	      TlsSetValue (ptw32_selfThreadKey->key, NULL);
 	    }
 	}

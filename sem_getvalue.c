@@ -88,23 +88,21 @@ sem_getvalue (sem_t * sem, int *sval)
       register sem_t s = *sem;
       int result = 0;
 
-#ifdef NEED_SEM
-
-      EnterCriticalSection (&s->sem_lock_cs);
-      value = s->value;
-      LeaveCriticalSection (&s->sem_lock_cs);
-      *sval = value;
-
-#else
-
       if ((result = pthread_mutex_lock(&s->lock)) == 0)
         {
+	  /* See sem_destroy.c
+	   */
+	  if (*sem == NULL)
+	    {
+	      (void) pthread_mutex_unlock (&s->lock);
+	      errno = EINVAL;
+	      return -1;
+	    }
+
           value = s->value;
           (void) pthread_mutex_unlock(&s->lock);
           *sval = value;
         }
-
-#endif
 
       return result;
     }

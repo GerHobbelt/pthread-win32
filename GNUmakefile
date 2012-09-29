@@ -30,6 +30,7 @@
 #
 
 DLL_VER	= 2
+DLL_VERD= $(DLL_VER)d
 
 DEVROOT	= C:\PTHREADS
 
@@ -40,18 +41,25 @@ LIBDEST	= $(DEVROOT)\DLL
 RM	= rm -f
 MV	= mv -f
 CP	= cp -f
-RC	= windres
 
 # If not.
 #RM	= erase
 #MV	= rename
 #CP	= copy
 
-AR	= ar
+# For cross compiling use e.g.
+# make CROSS=i386-mingw32msvc- clean GC-inlined
+CROSS	= 
 
-#OPT	= -g -O0
-#OPT	= -O3
+AR	= $(CROSS)ar
+DLLTOOL = $(CROSS)dlltool
+CC      = $(CROSS)gcc
+CXX     = $(CROSS)g++
+RANLIB  = $(CROSS)ranlib
+RC	= $(CROSS)windres
+
 OPT	= $(CLEANUP) -O3 -finline-functions
+DOPT	= $(CLEANUP) -g -O0
 XOPT	=
 
 RCFLAGS		= --include-dir=.
@@ -69,15 +77,17 @@ LFLAGS		= -lwsock32
 # POSIX says that applications should assume that thread IDs can be
 # recycled. However, Solaris and some other systems use a [very large]
 # sequence number as the thread ID, which provides virtual uniqueness.
+# Pthreads-win32 provides pseudo-unique IDs when the default increment
+# (1) is used, but pthread_t is not a scalar type like Solaris's.
 #
 # Usage:
 # Set to any value in the range: 0 <= value <= 2^wordsize
 #
 # Examples:
 # Set to 0 to emulate non recycle-unique behaviour like Linux or *BSD.
-# Set to 1 for recycle-unique thread IDs like Solaris (this is the default).
-# Set to some other +ve value to emulate smaller word size types (i.e. will
-# wrap sooner). This might be useful to emulate some embedded systems.
+# Set to 1 for recycle-unique thread IDs (this is the default).
+# Set to some other +ve value to emulate smaller word size types
+# (i.e. will wrap sooner).
 #
 #PTW32_FLAGS	= "-DPTW32_THREAD_ID_REUSE_INCREMENT=0"
 #
@@ -87,7 +97,7 @@ GC_CFLAGS	= $(PTW32_FLAGS)
 GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
 
 ## Mingw32
-MAKE		= make
+MAKE		?= make
 CFLAGS	= $(OPT) $(XOPT) -I. -DHAVE_CONFIG_H -Wall
 
 DLL_INLINED_OBJS	= \
@@ -203,6 +213,7 @@ SMALL_STATIC_OBJS	= \
 		pthread_timechange_handler_np.o \
 		ptw32_is_attr.o \
 		ptw32_cond_check_need_init.o \
+		ptw32_MCS_lock.o \
 		ptw32_mutex_check_need_init.o \
 		ptw32_processInitialize.o \
 		ptw32_processTerminate.o \
@@ -219,6 +230,7 @@ SMALL_STATIC_OBJS	= \
 		ptw32_new.o \
 		ptw32_reuse.o \
 		ptw32_semwait.o \
+		ptw32_relmillisecs.o \
 		ptw32_rwlock_check_need_init.o \
 		sched_get_priority_max.o \
 		sched_get_priority_min.o \
@@ -236,8 +248,6 @@ SMALL_STATIC_OBJS	= \
 		sem_open.o \
 		sem_close.o \
 		sem_unlink.o \
-		ptw32_increase_semaphore.o \
-		ptw32_decrease_semaphore.o \
 		signal.o \
 		pthread_kill.o \
 		ptw32_spinlock_check_need_init.o \
@@ -311,6 +321,7 @@ MISC_SRCS	= \
 		pthread_self.c \
 		pthread_setconcurrency.c \
 		ptw32_calloc.c \
+		ptw32_MCS_lock.c \
 		ptw32_new.c \
 		ptw32_reuse.c \
 		w32_CancelableWait.c
@@ -349,6 +360,7 @@ PRIVATE_SRCS	= \
 		ptw32_tkAssocDestroy.c \
 		ptw32_callUserDestroyRoutines.c \
 		ptw32_semwait.c \
+		ptw32_relmillisecs.c \
 		ptw32_timespec.c \
 		ptw32_throw.c \
 		ptw32_InterlockedCompareExchange.c \
@@ -397,9 +409,7 @@ SEMAPHORE_SRCS = \
 		sem_getvalue.c \
 		sem_open.c \
 		sem_close.c \
-		sem_unlink.c \
-		ptw32_increase_semaphore.c \
-		ptw32_decrease_semaphore.c
+		sem_unlink.c
 
 SPIN_SRCS	= \
 		ptw32_spinlock_check_need_init.c \
@@ -421,37 +431,69 @@ TSD_SRCS	= \
 
 
 GCE_DLL	= pthreadGCE$(DLL_VER).dll
+GCED_DLL= pthreadGCE$(DLL_VERD).dll
 GCE_LIB	= libpthreadGCE$(DLL_VER).a
+GCED_LIB= libpthreadGCE$(DLL_VERD).a
 GCE_INLINED_STAMP = pthreadGCE$(DLL_VER).stamp
+GCED_INLINED_STAMP = pthreadGCE$(DLL_VERD).stamp
 
 GC_DLL 	= pthreadGC$(DLL_VER).dll
+GCD_DLL	= pthreadGC$(DLL_VERD).dll
 GC_LIB	= libpthreadGC$(DLL_VER).a
+GCD_LIB	= libpthreadGC$(DLL_VERD).a
 GC_INLINED_STAMP = pthreadGC$(DLL_VER).stamp
+GCD_INLINED_STAMP = pthreadGC$(DLL_VERD).stamp
+GC_STATIC_STAMP = libpthreadGC$(DLL_VER).stamp
+GCD_STATIC_STAMP = libpthreadGC$(DLL_VERD).stamp
 
 PTHREAD_DEF	= pthread.def
 
 help:
 	@ echo "Run one of the following command lines:"
-	@ echo "make clean GCE           (to build the GNU C dll with C++ exception handling)"
 	@ echo "make clean GC            (to build the GNU C dll with C cleanup code)"
-	@ echo "make clean GCE-inlined   (to build the GNU C inlined dll with C++ exception handling)"
+	@ echo "make clean GCE           (to build the GNU C dll with C++ exception handling)"
 	@ echo "make clean GC-inlined    (to build the GNU C inlined dll with C cleanup code)"
+	@ echo "make clean GCE-inlined   (to build the GNU C inlined dll with C++ exception handling)"
+	@ echo "make clean GC-static     (to build the GNU C inlined static lib with C cleanup code)"
+	@ echo "make clean GC-debug      (to build the GNU C debug dll with C cleanup code)"
+	@ echo "make clean GCE-debug     (to build the GNU C debug dll with C++ exception handling)"
+	@ echo "make clean GC-inlined-debug    (to build the GNU C inlined debug dll with C cleanup code)"
+	@ echo "make clean GCE-inlined-debug   (to build the GNU C inlined debug dll with C++ exception handling)"
+	@ echo "make clean GC-static-debug     (to build the GNU C inlined static debug lib with C cleanup code)"
 
 all:
 	@ $(MAKE) clean GCE
 	@ $(MAKE) clean GC
 
 GC:
-		$(MAKE) CC=gcc CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_DLL)
+		$(MAKE) CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_DLL)
+
+GC-debug:
+		$(MAKE) CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCD_DLL)
 
 GCE:
-		$(MAKE) CC=g++ CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_DLL)
+		$(MAKE) CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_DLL)
+
+GCE-debug:
+		$(MAKE) CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCED_DLL)
 
 GC-inlined:
-		$(MAKE) CC=gcc XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_INLINED_STAMP)
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_INLINED_STAMP)
+
+GC-inlined-debug:
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCD_INLINED_STAMP)
 
 GCE-inlined:
-		$(MAKE) CC=g++ XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
+		$(MAKE) CC=$(CXX) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
+
+GCE-inlined-debug:
+		$(MAKE) CC=$(CXX) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCED_INLINED_STAMP)
+
+GC-static:
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_STATIC_STAMP)
+
+GC-static-debug:
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCD_STATIC_STAMP)
 
 tests:
 	@ cd tests
@@ -461,7 +503,7 @@ tests:
 	$(CC) -E -o $@ $(CFLAGS) $^
 
 %.s: %.c
-	$(CC) -c $(CFLAGS) -Wa,-ahl $^ > $@
+	$(CC) -c $(CFLAGS) -DPTW32_BUILD_INLINED -Wa,-ahl $^ > $@
 
 %.o: %.rc
 	$(RC) $(RCFLAGS) $(CLEANUP) -o $@ $<
@@ -471,27 +513,33 @@ tests:
 .c.o:;		 $(CC) -c -o $@ $(CFLAGS) $(XC_FLAGS) $<
 
 
-$(GC_DLL): $(DLL_OBJS)
+$(GC_DLL) $(GCD_DLL): $(DLL_OBJS)
 	$(CC) $(OPT) -shared -o $(GC_DLL) $(DLL_OBJS) $(LFLAGS)
-	dlltool -z pthread.def $(DLL_OBJS)
-	dlltool -k --dllname $@ --output-lib $(GC_LIB) --def $(PTHREAD_DEF)
+	$(DLLTOOL) -z pthread.def $(DLL_OBJS)
+	$(DLLTOOL) -k --dllname $@ --output-lib $(GC_LIB) --def $(PTHREAD_DEF)
 
 $(GCE_DLL): $(DLL_OBJS)
 	$(CC) $(OPT) -mthreads -shared -o $(GCE_DLL) $(DLL_OBJS) $(LFLAGS)
-	dlltool -z pthread.def $(DLL_OBJS)
-	dlltool -k --dllname $@ --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
+	$(DLLTOOL) -z pthread.def $(DLL_OBJS)
+	$(DLLTOOL) -k --dllname $@ --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
 
-$(GC_INLINED_STAMP): $(DLL_INLINED_OBJS)
+$(GC_INLINED_STAMP) $(GCD_INLINED_STAMP): $(DLL_INLINED_OBJS)
 	$(CC) $(OPT) $(XOPT) -shared -o $(GC_DLL) $(DLL_INLINED_OBJS) $(LFLAGS)
-	dlltool -z pthread.def $(DLL_INLINED_OBJS)
-	dlltool -k --dllname $(GC_DLL) --output-lib $(GC_LIB) --def $(PTHREAD_DEF)
+	$(DLLTOOL) -z pthread.def $(DLL_INLINED_OBJS)
+	$(DLLTOOL) -k --dllname $(GC_DLL) --output-lib $(GC_LIB) --def $(PTHREAD_DEF)
 	echo touched > $(GC_INLINED_STAMP)
 
-$(GCE_INLINED_STAMP): $(DLL_INLINED_OBJS)
+$(GCE_INLINED_STAMP) $(GCED_INLINED_STAMP): $(DLL_INLINED_OBJS)
 	$(CC) $(OPT) $(XOPT) -mthreads -shared -o $(GCE_DLL) $(DLL_INLINED_OBJS)  $(LFLAGS)
-	dlltool -z pthread.def $(DLL_INLINED_OBJS)
-	dlltool -k --dllname $(GCE_DLL) --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
+	$(DLLTOOL) -z pthread.def $(DLL_INLINED_OBJS)
+	$(DLLTOOL) -k --dllname $(GCE_DLL) --output-lib $(GCE_LIB) --def $(PTHREAD_DEF)
 	echo touched > $(GCE_INLINED_STAMP)
+
+$(GC_STATIC_STAMP) $(GCD_STATIC_STAMP): $(DLL_INLINED_OBJS)
+	$(RM) $(GC_LIB)
+	$(AR) -rv $(GC_LIB) $(DLL_INLINED_OBJS)
+	$(RANLIB) $(GC_LIB)
+	echo touched > $(GC_STATIC_STAMP)
 
 clean:
 	-$(RM) *~
@@ -508,6 +556,14 @@ realclean: clean
 	-$(RM) $(GCE_DLL)
 	-$(RM) $(GC_INLINED_STAMP)
 	-$(RM) $(GCE_INLINED_STAMP)
+	-$(RM) $(GC_STATIC_STAMP)
+	-$(RM) $(GCD_LIB)
+	-$(RM) $(GCED_LIB)
+	-$(RM) $(GCD_DLL)
+	-$(RM) $(GCED_DLL)
+	-$(RM) $(GCD_INLINED_STAMP)
+	-$(RM) $(GCED_INLINED_STAMP)
+	-$(RM) $(GCD_STATIC_STAMP)
 
 attr.o:		attr.c $(ATTR_SRCS) $(INCL)
 barrier.o:	barrier.c $(BARRIER_SRCS) $(INCL)

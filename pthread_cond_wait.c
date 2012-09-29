@@ -270,7 +270,6 @@ typedef struct
   pthread_mutex_t *mutexPtr;
   pthread_cond_t cv;
   int *resultPtr;
-  int signaled;
 } ptw32_cond_wait_cleanup_args_t;
 
 static void PTW32_CDECL
@@ -401,12 +400,6 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
   cleanup_args.mutexPtr = mutex;
   cleanup_args.cv = cv;
   cleanup_args.resultPtr = &result;
-  /*
-   * If we're canceled, or the cancelable wait fails for any reason,
-   * including a timeout, then tell the cleanup routine that we
-   * have not been signaled.
-   */
-  cleanup_args.signaled = 0;
 
 #ifdef _MSC_VER
 #pragma inline_depth(0)
@@ -440,11 +433,6 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
 	  result = errno;
 	}
     }
-
-  /*
-   * Not executed if we're canceled. Signaled is false if we timed out.
-   */
-  cleanup_args.signaled = (result == 0);
 
   /*
    * Always cleanup

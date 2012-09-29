@@ -97,7 +97,7 @@ test_udp (void *arg)
     }
 
   UDPSocket = socket (AF_INET, SOCK_DGRAM, 0);
-  if (UDPSocket == -1)
+  if ((int)UDPSocket == -1)
     {
       printf ("Server: socket ERROR \n");
       exit (-1);

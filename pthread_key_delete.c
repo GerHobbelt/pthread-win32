@@ -44,7 +44,7 @@ pthread_key_delete (pthread_key_t key)
       * ------------------------------------------------------
       * DOCPUBLIC
       *      This function deletes a thread-specific data key. This
-      *      does not change the value of the thread spcific data key
+      *      does not change the value of the thread specific data key
       *      for any thread and does not run the key's destructor
       *      in any thread so it should be used with caution.
       *
@@ -55,7 +55,7 @@ pthread_key_delete (pthread_key_t key)
       *
       * DESCRIPTION
       *      This function deletes a thread-specific data key. This
-      *      does not change the value of the thread spcific data key
+      *      does not change the value of the thread specific data key
       *      for any thread and does not run the key's destructor
       *      in any thread so it should be used with caution.
       *
@@ -72,49 +72,55 @@ pthread_key_delete (pthread_key_t key)
     {
       if (key->threads != NULL &&
 	  key->destructor != NULL &&
-	  pthread_mutex_lock (&(key->threadsLock)) == 0)
+	  pthread_mutex_lock (&(key->keyLock)) == 0)
 	{
+	  ThreadKeyAssoc *assoc;
 	  /*
 	   * Run through all Thread<-->Key associations
 	   * for this key.
-	   * If the pthread_t still exists (ie the assoc->thread
-	   * is not NULL) then leave the assoc for the thread to
-	   * destroy.
-	   * Notes:
-	   *      If assoc->thread is NULL, then the associated thread
-	   *      is no longer referencing this assoc.
-	   *      The association is only referenced
-	   *      by this key and must be released; otherwise
-	   *      the assoc will be destroyed when the thread is destroyed.
+	   *
+	   * While we hold at least one of the locks guarding
+	   * the assoc, we know that the assoc pointed to by
+	   * key->threads is valid.
 	   */
-	  ThreadKeyAssoc *assoc;
-
-	  assoc = (ThreadKeyAssoc *) key->threads;
-
-	  while (assoc != NULL)
+	  while ((assoc = (ThreadKeyAssoc *) key->threads) != NULL)
 	    {
-	      if (pthread_mutex_lock (&(assoc->lock)) == 0)
+	      ptw32_thread_t * thread = assoc->thread;
+
+	      if (assoc == NULL)
 		{
-		  ThreadKeyAssoc *next;
+		  /* Finished */
+		  break;
+		}
 
-		  assoc->key = NULL;
-		  next = assoc->nextThread;
-		  assoc->nextThread = NULL;
-
-		  pthread_mutex_unlock (&(assoc->lock));
-
+	      if (pthread_mutex_lock (&(thread->threadLock)) == 0)
+		{
+		  /*
+		   * Since we are starting at the head of the key's threads
+		   * chain, this will also point key->threads at the next assoc.
+		   * While we hold key->keyLock, no other thread can insert
+		   * a new assoc via pthread_setspecific.
+		   */
 		  ptw32_tkAssocDestroy (assoc);
-
-		  assoc = next;
+		  (void) pthread_mutex_unlock (&(thread->threadLock));
+		}
+	      else
+		{
+		  /* Thread or lock is no longer valid? */
+		  ptw32_tkAssocDestroy (assoc);
 		}
 	    }
-	  pthread_mutex_unlock (&(key->threadsLock));
+	  pthread_mutex_unlock (&(key->keyLock));
 	}
 
       TlsFree (key->key);
       if (key->destructor != NULL)
 	{
-	  pthread_mutex_destroy (&(key->threadsLock));
+	  /* A thread could be holding the keyLock */
+	  while (EBUSY == pthread_mutex_destroy (&(key->keyLock)))
+	    {
+	      Sleep(1); // Ugly.
+	    }
 	}
 
 #if defined( _DEBUG )

@@ -45,7 +45,7 @@ ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
       * -------------------------------------------------------------------
       * This routine releases all resources for the given ThreadKeyAssoc
       * once it is no longer being referenced
-      * ie) both the key and thread have stopped referencing it.
+      * ie) either the key or thread has stopped referencing it.
       *
       * Parameters:
       *              assoc
@@ -56,10 +56,57 @@ ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
       */
 {
 
-  if ((assoc != NULL) && (assoc->key == NULL && assoc->thread.p == NULL))
+  /*
+   * Both key->keyLock and thread->threadLock are locked on
+   * entry to this routine.
+   */
+  if (assoc != NULL)
     {
+      ThreadKeyAssoc * prev, * next;
 
-      pthread_mutex_destroy (&(assoc->lock));
+      /* Remove assoc from thread's keys chain */
+      prev = assoc->prevKey;
+      next = assoc->nextKey;
+      if (prev != NULL)
+	{
+	  prev->nextKey = next;
+	}
+      if (next != NULL)
+	{
+	  next->prevKey = prev;
+	}
+
+      if (assoc->thread->keys == assoc)
+	{
+	  /* We're at the head of the thread's keys chain */
+	  assoc->thread->keys = next;
+	}
+      if (assoc->thread->nextAssoc == assoc)
+	{
+	  /*
+	   * Thread is exiting and we're deleting the assoc to be processed next.
+	   * Hand thread the assoc after this one.
+	   */
+	  assoc->thread->nextAssoc = next;
+	}
+
+      /* Remove assoc from key's threads chain */
+      prev = assoc->prevThread;
+      next = assoc->nextThread;
+      if (prev != NULL)
+	{
+	  prev->nextThread = next;
+	}
+      if (next != NULL)
+	{
+	  next->prevThread = prev;
+	}
+
+      if (assoc->key->threads == assoc)
+	{
+	  /* We're at the head of the key's threads chain */
+	  assoc->key->threads = next;
+	}
 
       free (assoc);
     }

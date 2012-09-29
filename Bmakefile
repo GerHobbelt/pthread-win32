@@ -102,6 +102,7 @@ MISC_SRCS	= \
 		pthread_self.c \
 		pthread_setconcurrency.c \
 		ptw32_calloc.c \
+		ptw32_MCS_lock.c \
 		ptw32_new.c \
 		w32_CancelableWait.c
 
@@ -139,6 +140,7 @@ PRIVATE_SRCS	= \
 		ptw32_tkAssocDestroy.c \
 		ptw32_callUserDestroyRoutines.c \
 		ptw32_timespec.c \
+		ptw32_relmillisecs.c \
 		ptw32_throw.c \
 		ptw32_InterlockedCompareExchange.c \
 		ptw32_getprocessors.c
@@ -186,9 +188,7 @@ SEMAPHORE_SRCS = \
 		sem_getvalue.c \
 		sem_open.c \
 		sem_close.c \
-		sem_unlink.c \
-		ptw32_increase_semaphore.c \
-		ptw32_decrease_semaphore.c
+		sem_unlink.c
 
 SPIN_SRCS	= \
 		ptw32_spinlock_check_need_init.c \
@@ -212,8 +212,8 @@ TSD_SRCS	= \
 all: clean $(DLLS)
 
 realclean: clean
-	if exist *.dll del *.dll
-	if exist *.lib del *.lib
+	if exist pthread*.dll del pthread*.dll
+	if exist pthread*.lib del pthread*.lib
 	if exist *.stamp del *.stamp
 
 clean:
@@ -239,7 +239,7 @@ install: $(DLLS)
 $(DLLS): $(DLL_OBJS) version.res
 	ilink32 /Tpd /Gi c0d32x.obj $(DLL_OBJS), \
 		$@, ,\
-		cw32mt.lib import32.lib, ,\
+		cw32mti.lib import32.lib, ,\
 		version.res
 
 .c.obj:

@@ -1,3 +1,64 @@
+2005-06-12  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* stress1.c (millisecondsFromNow): Remove limit 0 <= millisecs < 1000;
+	now works for -INT_MAX <= millisecs <= INT_MAX; not needed for
+	stress1.c but should be general anyway.
+
+2005-05-18  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* reuse2.c (main): Must use a read with memory barrier semantics
+	when polling 'done' to force the cache into coherence on MP systems.
+
+2005-05-15  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* detach1.c: New test.
+	* join1.c: Reduce sleep times.
+	* join0.c: Remove MSVCRT conditional compile - join should always
+	return the thread exit code.
+	* join1.c: Likewise.
+	* join2.c: Likewise.
+	* join3.c: Likewise.
+
+2005-04-18  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* condvar3.c: Remove locks from around signalling calls - should not
+	be required for normal operation and only serve to mask deficiencies;
+	ensure that CV destruction is not premature after removing guards.
+	* condvar3_1.c: Likewise.
+	* condvar3_2.c: Likewise.
+	* condvar3_3.c: Likewise.
+	* condvar4.c: Likewise.
+	* condvar5.c: Likewise.
+	* condvar6.c: Likewise.
+	* condvar7.c: Likewise.
+	* condvar8.c: Likewise.
+	* condvar9.c: Likewise.
+
+2005-04-11  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+        * once4.c: New test; tries to test priority adjustments
+        in pthread_once(); set priority class to realtime so that
+        any failures can be seen.
+
+2005-04-06  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* cleanup0.c: Fix unguarded global variable accesses.
+	* cleanup1.c: Likewise.
+	* cleanup2.c: Likewise.
+	* cleanup3.c: Likewise.
+	* once2.c: Likewise.
+	* once3.c: Likewise.
+
+2005-04-01  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* GNUmakefile: Add target to test linking static link library.
+	* Makefile: Likewise.
+	* self1.c: Run process attach/detach routines when static linked.
+
+2005-03-16  Ross Johnson  <rpj@callisto.canberra.edu.au>
+
+	* mutex5.c: Prevent optimiser from removing asserts.
+
 2005-03-12  Ross Johnson  <rpj@callisto.canberra.edu.au>
 
 	* once3.c: New test.

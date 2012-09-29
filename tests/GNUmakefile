@@ -74,7 +74,6 @@ COPYFILES	= $(HDR) $(LIB) $(DLL) $(QAPC)
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
-XTESTS	= once3 
 TESTS	= sizes loadfree \
 	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  semaphore1 semaphore2 semaphore3 \
@@ -82,15 +81,17 @@ TESTS	= sizes loadfree \
 	  create1 create2 reuse1 reuse2 equal1 \
 	  kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
-	  join0 join1 join2 join3 \
+	  join0 join1 detach1 join2 join3 \
 	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
-	  count1 once1 once2 once3 tsd1 self2 \
+	  count1 \
+	  once1 once2 once3 once4 self2 \
 	  cancel1 cancel2 \
-	  semaphore4 semaphore4t \
-	  delay1 delay2 eyal1 \
+	  semaphore4 semaphore4t semaphore5 \
+	  barrier1 barrier2 barrier3 barrier4 barrier5 \
+	  tsd1 tsd2 delay1 delay2 eyal1 \
 	  condvar3 condvar3_1 condvar3_2 condvar3_3 \
 	  condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
 	  errno1 \
@@ -101,15 +102,22 @@ TESTS	= sizes loadfree \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
-	  barrier1 barrier2 barrier3 barrier4 barrier5 \
 	  exception1 exception2 exception3 \
-	  cancel9 create3
+	  cancel9 create3 stress1
+
+STRESSTESTS = \
+	stress1
 
 BENCHTESTS = \
 	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
 
+STATICTESTS = \
+	self1
+
 PASSES		= $(TESTS:%=%.pass)
 BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
+STRESSRESULTS	= $(STRESSTESTS:%=%.pass)
+STATICRESULTS	= $(STATICTESTS:%=%.pass)
 
 help:
 	@ $(ECHO) "Run one of the following command lines:"
@@ -118,6 +126,9 @@ help:
 	@ $(ECHO) "make clean GCE   (to test using GCE dll with C++ (EH) applications)"
 	@ $(ECHO) "make clean GC-bench	  (to benchtest using GNU C dll with C cleanup code)"
 	@ $(ECHO) "make clean GCE-bench   (to benchtest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "make clean GC-stress	  (to stresstest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "make clean GCE-stress   (to stresstest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "make clean GC-static   (to test using GC static lib with C (no EH) applications)"
 
 all:
 	@ $(MAKE) clean GC
@@ -139,11 +150,34 @@ GC-bench:
 GCE-bench:
 	$(MAKE) TEST=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
 
+GC-debug:
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" DLL_VER="$(DLL_VER)d" all-pass
+
+GC-static:
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
+
+GC-stress:
+	$(ECHO) Stress tests can take a long time since they are trying to
+	$(ECHO) expose weaknesses that may be intermittant or statistically rare.
+	$(ECHO) A pass does not prove correctness, but may give greater confidence.
+	$(MAKE) TEST=GC CC=gcc XXCFLAGS="-D__CLEANUP_C" all-stress
+
+GCE-stress:
+	$(MAKE) TEST=GCE  CC=g++ XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-stress
+
 all-pass: $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
 all-bench: $(BENCHRESULTS)
 	@ $(ECHO) BENCH TESTS COMPLETED.
+
+all-stress: $(STRESSRESULTS)
+	@ $(ECHO) STRESS TESTS COMPLETED.
+
+all-static: $(STATICRESULTS)
+	@ $(ECHO) ALL STATIC TESTS PASSED! Congratulations!
+	@ $(ECHO) Build and test the DLL to run all tests.
+	@ $(ECHO) This test only confirms that the static lib links correctly.
 
 benchtest1.bench:
 benchtest2.bench:
@@ -151,7 +185,7 @@ benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
 
-barrier1.pass:
+barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass
 barrier3.pass: barrier2.pass
 barrier4.pass: barrier3.pass
@@ -166,6 +200,7 @@ cancel6a.pass: cancel3.pass
 cancel6d.pass: cancel3.pass
 cancel7.pass: kill1.pass
 cancel8.pass: cancel7.pass
+cancel9.pass: cancel8.pass
 cleanup0.pass: cancel5.pass
 cleanup1.pass: cleanup0.pass
 cleanup2.pass: cleanup1.pass
@@ -192,6 +227,7 @@ create2.pass: create1.pass
 create3.pass:
 delay1.pass: cancel2.pass
 delay2.pass: delay1.pass
+detach1.pass: join0.pass
 equal1.pass: create1.pass
 errno1.pass: mutex3.pass
 exception1.pass: cancel4.pass
@@ -240,6 +276,7 @@ mutex8r.pass: mutex7r.pass
 once1.pass: create1.pass
 once2.pass: once1.pass
 once3.pass: once2.pass
+once4.pass: once3.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass barrier3.pass
 reuse1.pass: create2.pass
@@ -265,15 +302,17 @@ semaphore2.pass:
 semaphore3.pass: semaphore2.pass
 semaphore4.pass: semaphore3.pass cancel1.pass
 semaphore4t.pass: semaphore4.pass
+semaphore5.pass: semaphore4.pass
 sizes.pass:
 spin1.pass:
 spin2.pass: spin1.pass
 spin3.pass: spin2.pass
 spin4.pass: spin3.pass
-tsd1.pass: join1.pass
+stress1.pass:
+tsd1.pass: barrier5.pass join1.pass
+tsd2.pass: tsd1.pass
 valid1.pass: join1.pass
 valid2.pass: valid1.pass
-cancel9.pass: cancel8.pass
 
 sizes.pass: sizes.exe
 	@ $(ECHO) Running $*
@@ -332,4 +371,5 @@ clean:
 	- $(RM) *.exe
 	- $(RM) *.pass
 	- $(RM) *.bench
+	- $(RM) *.static
 	- $(RM) *.log

@@ -101,8 +101,8 @@ mythread(void * arg)
 
   assert(pthread_mutex_lock(&mutex1) == 0);
   ++waiting;
-  assert(pthread_cond_signal(&cv1) == 0);
   assert(pthread_mutex_unlock(&mutex1) == 0);
+  assert(pthread_cond_signal(&cv1) == 0);
 
   assert(pthread_mutex_lock(&mutex) == 0);
   result = pthread_cond_timedwait(&cv, &mutex, &abstime);
@@ -159,9 +159,9 @@ main()
 
   for (i = NUMTHREADS/3; i <= 2*NUMTHREADS/3; i++)
     {
-      assert(pthread_mutex_lock(&mutex) == 0);
+//      assert(pthread_mutex_lock(&mutex) == 0);
       assert(pthread_cond_signal(&cv) == 0);
-      assert(pthread_mutex_unlock(&mutex) == 0);
+//      assert(pthread_mutex_unlock(&mutex) == 0);
 
       signaled++;
     }

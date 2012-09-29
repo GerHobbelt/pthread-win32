@@ -186,7 +186,6 @@ main()
 	  threadbag[i].started = 0;
 	  threadbag[i].threadnum = i;
 	  assert(pthread_create(&t[i], NULL, mythread, (void *) &threadbag[i]) == 0);
-	  assert(pthread_detach(t[i]) == 0);
 	}
 
       /*
@@ -199,20 +198,21 @@ main()
       /*
        * Give threads time to start.
        */
-      Sleep(1000);
+      Sleep(100);
 
       assert(pthread_mutex_lock(&cvthing.lock) == 0);
-
       cvthing.shared++;
+      assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
       assert(pthread_cond_broadcast(&cvthing.notbusy) == 0);
-
-      assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
       /*
        * Give threads time to complete.
        */
-      Sleep(1000);
+      for (i = first; i <= last; i++)
+	{
+	  assert(pthread_join(t[i], NULL) == 0);
+	}
 
       assert(awoken == (i - 1));
     }

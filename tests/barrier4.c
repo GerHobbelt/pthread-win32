@@ -56,9 +56,6 @@ func(void * arg)
 
   assert(pthread_mutex_lock(&mx) == 0);
 
-//  printf("Barrier wait returned %d [%d]\n", result, WAIT_FAILED);
-//  fflush(stdout);
-
   if (result == PTHREAD_BARRIER_SERIAL_THREAD)
     {
       serialThreadCount++;

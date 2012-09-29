@@ -90,6 +90,14 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #define PTW32_INTERLOCKED_LPLONG PVOID*
 #endif
 
+#if defined(__MINGW32__)
+#include <stdint.h>
+#elif defined(__BORLANDC__)
+#define int64_t ULONGLONG
+#else
+#define int64_t _int64
+#endif
+
 typedef enum
 {
   /*
@@ -142,6 +150,7 @@ struct ptw32_thread_t_
 #endif				/* HAVE_SIGSET_T */
   int implicit:1;
   void *keys;
+  void *nextAssoc;
 };
 
 
@@ -175,15 +184,12 @@ struct pthread_attr_t_
 
 struct sem_t_
 {
-#ifdef NEED_SEM
-  unsigned int value;
-  CRITICAL_SECTION sem_lock_cs;
-  HANDLE event;
-#else				/* NEED_SEM */
   int value;
   pthread_mutex_t lock;
   HANDLE sem;
-#endif				/* NEED_SEM */
+#ifdef NEED_SEM
+  int leftToUnblock;
+#endif
 };
 
 #define PTW32_OBJECT_AUTO_INIT ((void *) -1)
@@ -261,7 +267,7 @@ struct pthread_key_t_
 {
   DWORD key;
   void (*destructor) (void *);
-  pthread_mutex_t threadsLock;
+  pthread_mutex_t keyLock;
   void *threads;
 };
 
@@ -318,42 +324,90 @@ struct pthread_rwlockattr_t_
   int pshared;
 };
 
-enum ptw32_once_state {
-  PTW32_ONCE_CLEAR     = 0x0,
-  PTW32_ONCE_DONE      = 0x1,
-  PTW32_ONCE_CANCELLED = 0x2
+/*
+ * MCS lock queue node - see ptw32_MCS_lock.c
+ */
+struct ptw32_mcs_node_t_
+{
+  struct ptw32_mcs_node_t_ **lock;        /* ptr to tail of queue */
+  struct ptw32_mcs_node_t_  *next;        /* ptr to successor in queue */
+  LONG                       readyFlag;   /* set after lock is released by
+                                             predecessor */
+  LONG                       nextFlag;    /* set after 'next' ptr is set by
+                                             successor */
 };
 
-typedef struct {
-  pthread_cond_t cond;
-  pthread_mutex_t mtx;
-} ptw32_once_control_t;
+typedef struct ptw32_mcs_node_t_   ptw32_mcs_local_node_t;
+typedef struct ptw32_mcs_node_t_  *ptw32_mcs_lock_t;
 
 
 struct ThreadKeyAssoc
 {
   /*
    * Purpose:
-   *      This structure creates an association between a
-   *      thread and a key.
-   *      It is used to implement the implicit invocation
-   *      of a user defined destroy routine for thread
-   *      specific data registered by a user upon exiting a
-   *      thread.
+   *      This structure creates an association between a thread and a key.
+   *      It is used to implement the implicit invocation of a user defined
+   *      destroy routine for thread specific data registered by a user upon
+   *      exiting a thread.
+   *
+   *      Graphically, the arrangement is as follows, where:
+   *
+   *         K - Key with destructor
+   *            (head of chain is key->threads)
+   *         T - Thread that has called pthread_setspecific(Kn)
+   *            (head of chain is thread->keys)
+   *         A - Association. Each association is a node at the
+   *             intersection of two doubly-linked lists.
+   *
+   *                 T1    T2    T3
+   *                 |     |     |
+   *                 |     |     |
+   *         K1 -----+-----A-----A----->
+   *                 |     |     |
+   *                 |     |     |
+   *         K2 -----A-----A-----+----->
+   *                 |     |     |
+   *                 |     |     |
+   *         K3 -----A-----+-----A----->
+   *                 |     |     |
+   *                 |     |     |
+   *                 V     V     V
+   *
+   *      Access to the association is guarded by two locks: the key's
+   *      general lock (guarding the row) and the thread's general
+   *      lock (guarding the column). This avoids the need for a
+   *      dedicated lock for each association, which not only consumes
+   *      more handles but requires that: before the lock handle can
+   *      be released - both the key must be deleted and the thread
+   *      must have called the destructor. The two-lock arrangement
+   *      allows the resources to be freed as soon as either thread or
+   *      key is concluded.
+   *
+   *      To avoid deadlock: whenever both locks are required, the key
+   *      and thread locks are always acquired in the order: key lock
+   *      then thread lock. An exception to this exists when a thread
+   *      calls the destructors, however this is done carefully to
+   *      avoid deadlock.
+   *
+   *      An association is created when a thread first calls
+   *      pthread_setspecific() on a key that has a specified
+   *      destructor.
+   *
+   *      An association is destroyed either immediately after the
+   *      thread calls the key destructor function on thread exit, or
+   *      when the key is deleted.
    *
    * Attributes:
-   *      lock
-   *              protects access to the rest of the structure
-   *
    *      thread
-   *              reference to the thread that owns the association.
-   *              As long as this is not NULL, the association remains
-   *              referenced by the pthread_t.
+   *              reference to the thread that owns the
+   *              association. This is actually the pointer to the
+   *              thread struct itself. Since the association is
+   *              destroyed before the thread exits, this can never
+   *              point to a different logical thread to the one that
+   *              created the assoc, i.e. after thread struct reuse.
    *
    *      key
    *              reference to the key that owns the association.
-   *              As long as this is not NULL, the association remains
-   *              referenced by the pthread_key_t.
    *
    *      nextKey
    *              The pthread_t->keys attribute is the head of a
@@ -361,6 +415,9 @@ struct ThreadKeyAssoc
    *              link. This chain provides the 1 to many relationship
    *              between a pthread_t and all pthread_key_t on which
    *              it called pthread_setspecific.
+   *
+   *      prevKey
+   *              Similarly.
    *
    *      nextThread
    *              The pthread_key_t->threads attribute is the head of
@@ -370,11 +427,13 @@ struct ThreadKeyAssoc
    *              PThreads that have called pthread_setspecific for
    *              this pthread_key_t.
    *
+   *      prevThread
+   *              Similarly.
    *
    * Notes:
-   *      1)      As long as one of the attributes, thread or key, is
-   *              not NULL, the association is being referenced; once
-   *              both are NULL, the association must be released.
+   *      1)      As soon as either the key or the thread is no longer
+   *              referencing the association, it can be destroyed. The
+   *              association will be removed from both chains.
    *
    *      2)      Under WIN32, an association is only created by
    *              pthread_setspecific if the user provided a
@@ -382,11 +441,12 @@ struct ThreadKeyAssoc
    *
    *
    */
-  pthread_mutex_t lock;
-  pthread_t thread;
+  ptw32_thread_t * thread;
   pthread_key_t key;
   ThreadKeyAssoc *nextKey;
   ThreadKeyAssoc *nextThread;
+  ThreadKeyAssoc *prevKey;
+  ThreadKeyAssoc *prevThread;
 };
 
 
@@ -483,7 +543,6 @@ extern CRITICAL_SECTION ptw32_cond_list_lock;
 extern CRITICAL_SECTION ptw32_cond_test_init_lock;
 extern CRITICAL_SECTION ptw32_rwlock_test_init_lock;
 extern CRITICAL_SECTION ptw32_spinlock_test_init_lock;
-extern CRITICAL_SECTION ptw32_once_event_lock;
 
 #ifdef _UWIN
 extern int pthread_count;
@@ -550,17 +609,17 @@ extern "C"
 
   void ptw32_callUserDestroyRoutines (pthread_t thread);
 
-  int ptw32_tkAssocCreate (ThreadKeyAssoc ** assocP,
-			   pthread_t thread, pthread_key_t key);
+  int ptw32_tkAssocCreate (ptw32_thread_t * thread, pthread_key_t key);
 
   void ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
   int ptw32_semwait (sem_t * sem);
 
-#ifdef NEED_SEM
-  void ptw32_decrease_semaphore (sem_t * sem);
-  BOOL ptw32_increase_semaphore (sem_t * sem, unsigned int n);
-#endif				/* NEED_SEM */
+  DWORD ptw32_relmillisecs (const struct timespec * abstime);
+
+  void ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node);
+
+  void ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node);
 
 #ifdef NEED_FTIME
   void ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft);

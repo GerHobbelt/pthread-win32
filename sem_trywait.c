@@ -45,7 +45,6 @@
 #include "semaphore.h"
 #include "implement.h"
 
-#include <stdio.h>
 
 int
 sem_trywait (sem_t * sem)
@@ -77,16 +76,6 @@ sem_trywait (sem_t * sem)
       * ------------------------------------------------------
       */
 {
-#ifdef NEED_SEM
-
-  /*
-   * not yet implemented!
-   */
-  errno = ENOTSUP;
-  return -1;
-
-#else /* NEED_SEM */
-
   int result = 0;
   sem_t s = *sem;
 
@@ -96,9 +85,21 @@ sem_trywait (sem_t * sem)
     }
   else if ((result = pthread_mutex_lock (&s->lock)) == 0)
     {
-      if (--s->value < 0)
+      /* See sem_destroy.c
+       */
+     if (*sem == NULL)
+        {
+          (void) pthread_mutex_unlock (&s->lock);
+          errno = EINVAL;
+          return -1;
+        }
+
+      if (s->value > 0)
 	{
-	  s->value++;
+	  s->value--;
+	}
+      else
+	{
 	  result = EAGAIN;
 	}
 
@@ -112,7 +113,5 @@ sem_trywait (sem_t * sem)
     }
 
   return 0;
-
-#endif /* NEED_SEM */
 
 }				/* sem_trywait */

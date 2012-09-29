@@ -75,7 +75,6 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 
 #if defined(_MSC_VER) || defined(__WATCOMC__) || (defined(__BORLANDC__) && defined(HAVE_TASM32))
 #define HAVE_INLINABLE_INTERLOCKED_CMPXCHG
-
     {
       _asm {
 	PUSH         ecx
@@ -86,7 +85,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 	LOCK CMPXCHG dword ptr [ecx],edx
 	MOV          dword ptr [result], eax
 	POP          edx
-        POP          ecx
+	POP          ecx
       }
     }
   else
@@ -100,7 +99,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 	CMPXCHG      dword ptr [ecx],edx
 	MOV          dword ptr [result], eax
 	POP          edx
-        POP          ecx
+	POP          ecx
       }
     }
 

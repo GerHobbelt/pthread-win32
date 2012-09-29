@@ -203,15 +203,13 @@ main()
   assert(pthread_join(t[1], NULL) == 0);
 
   assert(pthread_mutex_lock(&cvthing.lock) == 0);
-
   cvthing.shared++;
+  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
   /*
    * Signal all remaining waiting threads.
    */
   assert(pthread_cond_broadcast(&cvthing.notbusy) == 0);
-
-  assert(pthread_mutex_unlock(&cvthing.lock) == 0);
 
   /*
    * Wait for all threads to complete.
