@@ -5,9 +5,7 @@
 #
 #      Pthreads-win32 - POSIX Threads Library for Win32
 #      Copyright(C) 1998 John E. Bossom
-#      Copyright(C) 1999,2005 Pthreads-win32 contributors
-# 
-#      Contact Email: rpj@callisto.canberra.edu.au
+#      Copyright(C) 1999,2012 Pthreads-win32 contributors
 # 
 #      The current list of contributors is contained
 #      in the file CONTRIBUTORS included with the source
@@ -94,7 +92,7 @@ COPYFILES	= $(HDR) $(LIB) $(DLL) $(QAPC)
 # stop.
 
 TESTS	= \
-	  sizes loadfree \
+	  sizes \
 	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
@@ -132,76 +130,45 @@ STRESSTESTS = \
 BENCHTESTS = \
 	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
 
-STATICTESTS = \
-	  sizes \
-	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
-	  semaphore1 semaphore2 semaphore3 \
-	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
-	  create1 create2 create3 reuse1 reuse2 equal1 \
-	  sequence1 kill1 valid1 valid2 \
-	  exit2 exit3 exit4 exit5 \
-	  join0 join1 detach1 join2 join3 join4 \
-	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
-	  mutex4 mutex6 mutex6n mutex6e mutex6r \
-	  mutex6s mutex6es mutex6rs \
-	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
-	  robust1 robust2 robust3 robust4 robust5 \
-	  count1 \
-	  once1 once2 once3 once4 self2 \
-	  cancel1 cancel2 \
-	  semaphore4 semaphore4t semaphore5 \
-	  barrier1 barrier2 barrier3 barrier4 barrier5 barrier6 \
-	  tsd1 tsd2 delay1 delay2 eyal1 \
-	  condvar3 condvar3_1 condvar3_2 condvar3_3 \
-	  condvar4 condvar5 condvar6 condvar7 condvar8 condvar9 \
-	  errno1 \
-	  rwlock1 rwlock2 rwlock3 rwlock4 rwlock5 rwlock6 rwlock7 rwlock8 \
-	  rwlock2_t rwlock3_t rwlock4_t rwlock5_t rwlock6_t rwlock6_t2 \
-	  context1 cancel3 cancel4 cancel5 cancel6a cancel6d \
-	  cancel7 cancel8 \
-	  cleanup0 cleanup1 cleanup2 cleanup3 \
-	  priority1 priority2 inherit1 \
-	  spin1 spin2 spin3 spin4 \
-	  exception1 exception2 exception3_0 exception3 \
-	  cancel9 affinity1 affinity2 affinity3 affinity4 affinity5 stress1
-
 ALLTESTS = $(TESTS) $(BENCHTESTS)
 
 ASM		= $(ALLTESTS:%=%.s)
 PASSES		= $(TESTS:%=%.pass)
 BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
 STRESSRESULTS	= $(STRESSTESTS:%=%.pass)
-STATICRESULTS	= $(STATICTESTS:%=%.pass)
 
 help:
 	@ $(ECHO) "Run one of the following command lines:"
-	@ $(ECHO) "$(MAKE) clean GC               (to test using GC dll with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCX              (to test using GC dll with C++ (EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCE              (to test using GCE dll with C++ (EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GC-bench         (to benchtest using GNU C dll with C cleanup code)"
-	@ $(ECHO) "$(MAKE) clean GCE-bench        (to benchtest using GNU C dll with C++ exception handling)"
-	@ $(ECHO) "$(MAKE) clean GC-stress        (to stresstest using GNU C dll with C cleanup code)"
-	@ $(ECHO) "$(MAKE) clean GCE-stress       (to stresstest using GNU C dll with C++ exception handling)"
-	@ $(ECHO) "$(MAKE) clean GC-static        (to test using GC static lib with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GC-static-debug  (to test using GC static lib with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GC-debug         (to test using GC dll with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCE-debug        (to test using GCE dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC                       (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCX                      (to test using GC dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCE                      (to test using GCE dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-bench                 (to benchtest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "$(MAKE) clean GCE-bench                (to benchtest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "$(MAKE) clean GC-stress                (to stresstest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "$(MAKE) clean GCE-stress               (to stresstest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "$(MAKE) clean GC-inlined-static        (to test using GC static lib with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-inlined-static-debug  (to test using GC static lib with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-debug                 (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCE-debug                (to test using GCE dll with C++ (EH) applications)"
 
 all:
 	@ $(MAKE) clean GC
 	@ $(MAKE) clean GCX
 	@ $(MAKE) clean GCE
+	@ $(MAKE) clean GC-bench
+	@ $(MAKE) clean GCX-bench
+	@ $(MAKE) clean GCE-bench
 
-GC GC-inlined:
+GC:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-pass
 
 GC-asm:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-asm
 
-GCE GCE-inlined:
+GCE:
 	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-pass
 
-GCX GCX-inlined:
+GCX:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
 
 GC-bench:
@@ -219,11 +186,23 @@ GCE-debug:
 GC-bench-debug:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${OPT}" all-bench
 
-GC-static GC-small-static:
+GC-inlined-static GC-small-static:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
 
-GC-static-debug:
+GC-inlined-static-debug GC-small-static-debug:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" all-static
+
+GCE-inlined-static GCE-small-static:
+	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX -DPTW32_STATIC_LIB" DLL="" all-static
+
+GCE-inlined-static-debug GCE-small-static-debug:
+	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" all-static
+
+GCX-inlined-static GCX-small-static:
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CXX) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
+
+GCX-inlined-static-debug GCX-small-static-debug:
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" all-static
 
 GC-stress:
 	@ $(ECHO) "Stress tests can take a long time since they are trying to"
@@ -232,12 +211,15 @@ GC-stress:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="" all-stress
 
 GCE-stress:
+	@ $(ECHO) "Stress tests can take a long time since they are trying to"
+	@ $(ECHO) "expose weaknesses that may be intermittant or statistically rare."
+	@ $(ECHO) "A pass does not prove correctness, but may give greater confidence."
 	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="" all-stress
 
 all-asm: $(ASM)
 	@ $(ECHO) "ALL TESTS PASSED! Congratulations!"
 
-all-pass: $(PASSES)
+all-pass: loadfree.pass $(PASSES)
 	@ $(ECHO) "ALL TESTS PASSED! Congratulations!"
 
 all-bench: $(BENCHRESULTS)
@@ -246,7 +228,7 @@ all-bench: $(BENCHRESULTS)
 all-stress: $(STRESSRESULTS)
 	@ $(ECHO) "STRESS TESTS COMPLETED."
 
-all-static: $(STATICRESULTS)
+all-static: $(PASSES)
 	@ $(ECHO) "ALL STATIC TESTS PASSED! Congratulations!"
 
 cancel9.exe: XLIBS = -lws2_32
@@ -400,20 +382,20 @@ valid1.pass: join1.pass
 valid2.pass: valid1.pass
 
 sizes.pass: sizes.exe
-	@ $(ECHO) Running $(TEST) test $*
-	@ $(RUN) ./$< > SIZES.$(TEST)
+	@ $(ECHO) Running $(TEST) test \"sizes\"
+	@ $(RUN) ./sizes.exe > SIZES.$(TEST)
 	@ $(CAT) SIZES.$(TEST)
-	@ $(ECHO) Passed
+	@ $(ECHO) Done
 	@ $(TOUCH) $@
 
 %.pass: %.exe
-	@ $(ECHO) Running $(TEST) test $*
+	@ $(ECHO) Running $(TEST) test \"$*\"
 	@ $(RUN) ./$*
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
 %.bench: $(LIB) $(DLL) $(HDR) $(QAPC) $(XXLIBS) %.exe
-	@ $(ECHO) Running $(TEST) test $*
+	@ $(ECHO) Running $(TEST) test \"$*\"
 	@ $(RUN) ./$*
 	@ $(ECHO) Done
 	@ $(TOUCH) $@
@@ -458,7 +440,6 @@ clean:
 	- $(RM) *.manifest
 	- $(RM) *.pass
 	- $(RM) *.bench
-	- $(RM) *.static
 	- $(RM) *.log
 	- $(RM) SIZES.G*
 	

@@ -1,3 +1,9 @@
+2012-09-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile: Align target names with build makefile target names
+	following changes there; remove the separate static tests list.
+	* GNUmakefile: Likewise; consolidate rules.
+
 2012-09-25  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* context1.c (anotherEnding): Should exit the thread, not return.

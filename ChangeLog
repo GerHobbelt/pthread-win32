@@ -1,5 +1,32 @@
 2012-09-28  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
+	* pthread.c: pulls all individual source modules into a single
+	translation unit.
+	* common.mk: Remove everything related to the non-inlined dll targets.
+	This removes all the intermediate .c files that #include other .c files
+	except for pthread.c.
+	* Makefile: Remove and rename targets; remove or edit variables. All
+	of this is to remove the intermediate translation unit aggregation
+	source files.
+	* GNUmakefile: Likewise.
+	* attr.c: Removed.
+	* barrier.c: Removed.
+	* cancel.c: Removed.
+	* condvar.c: Removed.
+	* exit.c: Removed.
+	* fork.c: Removed.
+	* misc.c: Removed.
+	* mutex.c: Removed.
+	* nonportable.c: Removed.
+	* private.c: Removed.
+	* rwlock.c: Removed.
+	* sched.c: Removed.
+	* spin.c: Removed.
+	* sync.c: Removed.
+	* tsd.c: Removed.
+
+2012-09-28  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
 	* Makefile: expand on rudimentary install target; add DEST_LIB_NAME
 	variable defaulting to "pthread.lib".
 	* GNUmakefile: Add install target similar to Makefile with DEST_LIB_NAME

@@ -86,124 +86,84 @@ EHFLAGS	=
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
-PASSES = sizes.pass $(REGULAR_PASSES)
-
-REGULAR_PASSES = \
-	  loadfree.pass \
-	  self1.pass  mutex5.pass  \
-	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
-	  semaphore1.pass  semaphore2.pass  semaphore3.pass  \
-	  mutex2.pass  mutex3.pass  \
-	  mutex2r.pass  mutex2e.pass  mutex3r.pass  mutex3e.pass  \
-	  condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
-	  exit1.pass  create1.pass  create2.pass create3.pass reuse1.pass  reuse2.pass  equal1.pass  \
-	  sequence1.pass  kill1.pass  valid1.pass  valid2.pass  \
-	  exit2.pass  exit3.pass  exit4.pass  exit5.pass  \
-	  join0.pass  join1.pass  detach1.pass  join2.pass join3.pass join4.pass  \
-	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
-	  mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
-	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
-	  mutex8.pass  mutex8n.pass  mutex8e.pass  mutex8r.pass  \
-	  robust1.pass  robust2.pass  robust3.pass  robust4.pass  robust5.pass  \
-	  count1.pass  \
-	  once1.pass  once2.pass  once3.pass  once4.pass  \
-	  self2.pass  \
-	  cancel1.pass  cancel2.pass  \
-	  semaphore4.pass  semaphore4t.pass  semaphore5.pass  \
-	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  barrier6.pass  \
-	  tsd1.pass  tsd2.pass  delay1.pass  delay2.pass  eyal1.pass  \
-	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  \
-	  condvar4.pass  condvar5.pass  condvar6.pass  \
-	  condvar7.pass  condvar8.pass  condvar9.pass  \
-	  errno1.pass  \
-	  rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  \
-	  rwlock5.pass  rwlock6.pass  rwlock7.pass  rwlock8.pass  \
-	  rwlock2_t.pass  rwlock3_t.pass  rwlock4_t.pass  rwlock5_t.pass  rwlock6_t.pass  rwlock6_t2.pass  \
-	  context1.pass  \
-	  cancel3.pass  cancel4.pass  cancel5.pass  cancel6a.pass  cancel6d.pass  \
-	  cancel7.pass  cancel8.pass  \
-	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
-	  priority1.pass priority2.pass inherit1.pass  \
-	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
-	  exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
-	  cancel9.pass  \
-	  affinity1.pass  affinity2.pass  affinity3.pass  affinity4.pass  affinity5.pass  \
-	  stress1.pass
+PASSES = \
+	sizes.pass \
+	self1.pass  mutex5.pass  \
+	mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
+	semaphore1.pass  semaphore2.pass  semaphore3.pass  \
+	mutex2.pass  mutex3.pass  \
+	mutex2r.pass  mutex2e.pass  mutex3r.pass  mutex3e.pass  \
+	condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
+	exit1.pass  create1.pass  create2.pass create3.pass reuse1.pass  reuse2.pass  equal1.pass  \
+	sequence1.pass  kill1.pass  valid1.pass  valid2.pass  \
+	exit2.pass  exit3.pass  exit4.pass  exit5.pass  \
+	join0.pass  join1.pass  detach1.pass  join2.pass join3.pass join4.pass  \
+	mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
+	mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
+	mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
+	mutex8.pass  mutex8n.pass  mutex8e.pass  mutex8r.pass  \
+	robust1.pass  robust2.pass  robust3.pass  robust4.pass  robust5.pass  \
+	count1.pass  \
+	once1.pass  once2.pass  once3.pass  once4.pass  \
+	self2.pass  \
+	cancel1.pass  cancel2.pass  \
+	semaphore4.pass  semaphore4t.pass  semaphore5.pass  \
+	barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  barrier6.pass  \
+	tsd1.pass  tsd2.pass  delay1.pass  delay2.pass  eyal1.pass  \
+	condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  \
+	condvar4.pass  condvar5.pass  condvar6.pass  \
+	condvar7.pass  condvar8.pass  condvar9.pass  \
+	errno1.pass  \
+	rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  \
+	rwlock5.pass  rwlock6.pass  rwlock7.pass  rwlock8.pass  \
+	rwlock2_t.pass  rwlock3_t.pass  rwlock4_t.pass  rwlock5_t.pass  rwlock6_t.pass  rwlock6_t2.pass  \
+	context1.pass  \
+	cancel3.pass  cancel4.pass  cancel5.pass  cancel6a.pass  cancel6d.pass  \
+	cancel7.pass  cancel8.pass  \
+	cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
+	priority1.pass priority2.pass inherit1.pass  \
+	spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
+	exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
+	cancel9.pass  \
+	affinity1.pass  affinity2.pass  affinity3.pass  affinity4.pass  affinity5.pass  \
+	stress1.pass
 
 BENCHRESULTS = \
-	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
+	benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
 
-STRESSRESULTS = \
-	  stress1.stress
-
-STATICRESULTS = \
-	  sizes.pass  \
-	  self1.pass  mutex5.pass  \
-	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
-	  semaphore1.pass  semaphore2.pass  semaphore3.pass  \
-	  mutex2.pass  mutex3.pass  \
-	  mutex2r.pass  mutex2e.pass  mutex3r.pass  mutex3e.pass  \
-	  condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
-	  exit1.pass  create1.pass  create2.pass  create3.pass  reuse1.pass  reuse2.pass  equal1.pass  \
-	  sequence1.pass  kill1.pass  valid1.pass  valid2.pass  \
-	  exit2.pass  exit3.pass  exit4.pass  exit5.pass  \
-	  join0.pass  join1.pass  detach1.pass  join2.pass join3.pass join4.pass  \
-	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
-	  mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
-	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
-	  mutex8.pass  mutex8n.pass  mutex8e.pass  mutex8r.pass  \
-	  robust1.pass  robust2.pass  robust3.pass  robust4.pass  robust5.pass  \
-	  count1.pass  \
-	  once1.pass  once2.pass  once3.pass  once4.pass  \
-	  self2.pass  \
-	  cancel1.pass  cancel2.pass  \
-	  semaphore4.pass  semaphore4t.pass  semaphore5.pass  \
-	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  barrier6.pass  \
-	  tsd1.pass  tsd2.pass  delay1.pass  delay2.pass  eyal1.pass  \
-	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  \
-	  condvar4.pass  condvar5.pass  condvar6.pass  \
-	  condvar7.pass  condvar8.pass  condvar9.pass  \
-	  errno1.pass  \
-	  rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  \
-	  rwlock5.pass  rwlock6.pass  rwlock7.pass  rwlock8.pass  \
-	  rwlock2_t.pass  rwlock3_t.pass  rwlock4_t.pass  rwlock5_t.pass  rwlock6_t.pass  rwlock6_t2.pass  \
-	  context1.pass  \
-	  cancel3.pass  cancel4.pass  cancel5.pass  cancel6a.pass  cancel6d.pass  \
-	  cancel7.pass  cancel8.pass  \
-	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
-	  priority1.pass priority2.pass inherit1.pass  \
-	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
-	  exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
-	  cancel9.pass  \
-	  affinity1.pass  affinity2.pass  affinity3.pass  affinity4.pass  affinity5.pass  \
-	  stress1.pass
+STRESSRESULTS	= \
+	stress1.pass
 
 help:
 	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) nmake clean VC                (to test using VC dll with C (no EH) apps)
-	@ $(ECHO) nmake clean VC-bench          (to benchtest using VC dll with C bench apps)
-	@ $(ECHO) nmake clean VC-stress         (to stresstest using VC dll with C stress apps)
-	@ $(ECHO) nmake clean VC-static         (to test using VC static lib with C (no EH) apps)
-	@ $(ECHO) nmake clean VC-debug          (to test using VC dll with C (no EH) apps)
-	@ $(ECHO) nmake clean VC-static-debug   (to test using VC static lib with C (no EH) apps)
-	@ $(ECHO) nmake clean VCX               (to test using VC dll with C++ (EH) apps)
-	@ $(ECHO) nmake clean VCX-bench         (to benchtest using VC dll with C++ bench apps)
-	@ $(ECHO) nmake clean VCX-stress        (to stresstest using VC dll with C++ stress apps)
-	@ $(ECHO) nmake clean VCX-static        (to test using VC static lib with C++ (EH) apps)
-	@ $(ECHO) nmake clean VCX-debug         (to test using VC dll with C++ (EH) apps)
-	@ $(ECHO) nmake clean VCX-static-debug  (to test using VC static lib with C++ (EH) apps)
-	@ $(ECHO) nmake clean VCE               (to test using VCE dll with C++ (EH) apps)
-	@ $(ECHO) nmake clean VCE-bench         (to benchtest using VCE dll with C++ bench apps)
-	@ $(ECHO) nmake clean VCE-stress        (to stresstest using VCE dll with C++ stress apps)
-	@ $(ECHO) nmake clean VCE-static        (to test using VCE static lib with C++ (EH) apps)
-	@ $(ECHO) nmake clean VCE-debug         (to test using VCE dll with C++ (EH) apps)
-	@ $(ECHO) nmake clean VCE-static-debug  (to test using VCE static lib with C++ (EH) apps)
-	@ $(ECHO) nmake clean VSE               (to test using VSE dll with VC (SEH) apps)
-	@ $(ECHO) nmake clean VSE-bench         (to benchtest using VSE dll with SEH bench apps)
-	@ $(ECHO) nmake clean VSE-stress        (to stresstest using VSE dll with SEH stress apps)
-	@ $(ECHO) nmake clean VSE-static        (to test using VSE static lib with VC (SEH) apps)
-	@ $(ECHO) nmake clean VSE-debug         (to test using VSE dll with VC (SEH) apps)
-	@ $(ECHO) nmake clean VSE-static-debug  (to test using VSE static lib with VC (SEH) apps)
+	@ $(ECHO) nmake clean VC
+	@ $(ECHO) nmake clean VC-bench
+	@ $(ECHO) nmake clean VC-stress
+	@ $(ECHO) nmake clean VC-static
+	@ $(ECHO) nmake clean VC-debug
+	@ $(ECHO) nmake clean VC-inlined-static-debug
+	@ $(ECHO) nmake clean VC-small-static-debug
+	@ $(ECHO) nmake clean VCX
+	@ $(ECHO) nmake clean VCX-bench
+	@ $(ECHO) nmake clean VCX-stress
+	@ $(ECHO) nmake clean VCX-static
+	@ $(ECHO) nmake clean VCX-debug
+	@ $(ECHO) nmake clean VCX-inlined-static-debug
+	@ $(ECHO) nmake clean VCX-small-static-debug
+	@ $(ECHO) nmake clean VCE
+	@ $(ECHO) nmake clean VCE-bench
+	@ $(ECHO) nmake clean VCE-stress
+	@ $(ECHO) nmake clean VCE-static
+	@ $(ECHO) nmake clean VCE-debug
+	@ $(ECHO) nmake clean VCE-inlined-static-debug
+	@ $(ECHO) nmake clean VCE-small-static-debug
+	@ $(ECHO) nmake clean VSE
+	@ $(ECHO) nmake clean VSE-bench
+	@ $(ECHO) nmake clean VSE-stress
+	@ $(ECHO) nmake clean VSE-static
+	@ $(ECHO) nmake clean VSE-debug
+	@ $(ECHO) nmake clean VSE-inlined-static-debug
+	@ $(ECHO) nmake clean VSE-small-static-debug
 
 all:
 	@ $(MAKE) /E clean VC
@@ -212,12 +172,22 @@ all:
 	@ $(MAKE) /E clean VSE
 	@ $(MAKE) /E clean VC-bench
 	@ $(MAKE) /E clean VC-stress
+	@ $(MAKE) /E clean VC-inlined-static-debug
+	@ $(MAKE) /E clean VC-small-static-debug
+	@ $(MAKE) /E clean VCE-bench
+	@ $(MAKE) /E clean VCE-stress
+	@ $(MAKE) /E clean VCE-inlined-static-debug
+	@ $(MAKE) /E clean VCE-small-static-debug
+	@ $(MAKE) /E clean VSE-bench
+	@ $(MAKE) /E clean VSE-stress
+	@ $(MAKE) /E clean VSE-inlined-static-debug
+	@ $(MAKE) /E clean VSE-small-static-debug
 
 # This allows an individual test application to be made using the default lib.
 # e.g. nmake clean test cancel3.exe
 test: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC)
 
-tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) $(PASSES)
+tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) loadfree.pass $(PASSES)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
 benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(XXLIBS) $(BENCHRESULTS)
@@ -226,7 +196,7 @@ benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(XXLIBS) $(BENCHRESULTS)
 stresstests: $(CPLIB) $(CPDLL) $(CPHDR) $(STRESSRESULTS)
 	@ $(ECHO) ALL STRESS TESTS DONE.
 
-statictests: $(CPLIB) $(CPDLL) $(CPHDR) $(STATICRESULTS)
+statictests: $(CPLIB) $(CPDLL) $(CPHDR) $(PASSES)
 	@ $(ECHO) ALL STATIC TESTS DONE.
 
 sizes.pass: sizes.exe
@@ -236,7 +206,13 @@ sizes.pass: sizes.exe
 	@ $(ECHO) ...... Passed
 	@ $(TOUCH) $*.pass
 
-$(REGULAR_PASSES): $*.exe
+loadfree.pass: loadfree.exe
+	@ $(ECHO) ... Running $(TEST) test: $*.exe
+	@ .\$*.exe
+	@ $(ECHO) ...... Passed
+	@ $(TOUCH) $*.pass
+
+$(PASSES): $*.exe
 	@ $(ECHO) ... Running $(TEST) test: $*.exe
 	@ .\$*.exe
 	@ $(ECHO) ...... Passed
@@ -254,16 +230,16 @@ $(STRESSRESULTS): $*.exe
 	@ $(ECHO) ...... Done
 	@ $(TOUCH) $*.pass
 
-VC VC-inlined:
+VC:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
 
-VCE VCE-inlined:
+VCE:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
 
-VSE VSE-inlined:	
+VSE:	
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" tests
 
-VCX VCX-inlined:
+VCX:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
 
 VC-bench:
@@ -290,40 +266,40 @@ VSE-stress:
 VCX-stress:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" stresstests
 
-VC-static VC-small-static:
+VC-inlined-static VC-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VCE-static VCE-small-static:
+VCE-inlined-static VCE-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VSE-static VSE-small-static:
+VSE-inlined-static VSE-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VCX-static VCX-small-static:
+VCX-inlined-static VCX-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" statictests
 
 VC-debug VC-inlined-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" tests
 
-VC-static-debug VC-small-static-debug:
+VC-inlined-static-debug VC-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
 VCE-debug VCE-inlined-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" tests
 
-VCE-static-debug VCE-small-static-debug:
+VCE-inlined-static-debug VCE-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" statictests
 
 VSE-debug VSE-inlined-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" tests
 
-VSE-static-debug VSE-small-static-debug:
+VSE-inlined-static-debug VSE-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" statictests
 
 VCX-debug VCX-inlined-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" tests
 
-VCX-static-debug VCX-small-static-debug:
+VCX-inlined-static-debug VCX-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" statictests
 
 .c.exe:
