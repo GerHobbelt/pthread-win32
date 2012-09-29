@@ -471,6 +471,7 @@
     <ClCompile Include="exception1.c" />
     <ClCompile Include="exception2.c" />
     <ClCompile Include="exception3.c" />
+    <ClCompile Include="exception3_0.c" />
     <ClCompile Include="exit1.c" />
     <ClCompile Include="exit2.c" />
     <ClCompile Include="exit3.c" />
@@ -482,6 +483,7 @@
     <ClCompile Include="join1.c" />
     <ClCompile Include="join2.c" />
     <ClCompile Include="join3.c" />
+    <ClCompile Include="join4.c" />
     <ClCompile Include="kill1.c" />
     <ClCompile Include="loadfree.c" />
     <ClCompile Include="mutex1.c" />

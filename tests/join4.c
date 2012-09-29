@@ -38,15 +38,20 @@
 
 #include "test.h"
 
-void *
+static void *
 func(void * arg)
 {
         Sleep(1200);
         return arg;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main(int argc, char * argv[])
+	main()
+#else
+int
+	test_join4(void)
+#endif
 {
         pthread_t id;
         struct timespec abstime;

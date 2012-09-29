@@ -480,6 +480,9 @@
     <ClCompile Include="w32_CancelableWait.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pthread_timedjoin_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">

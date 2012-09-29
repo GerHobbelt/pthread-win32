@@ -93,10 +93,10 @@ enum {
   NUMTHREADS = 10
 };
 
-int caught = 0;
-CRITICAL_SECTION caughtLock;
+static int caught = 0;
+static CRITICAL_SECTION caughtLock;
 
-void
+static void
 terminateFunction ()
 {
   EnterCriticalSection(&caughtLock);
@@ -125,7 +125,7 @@ terminateFunction ()
   exit(0);
 }
 
-void *
+static void *
 exceptionedThread(void * arg)
 {
   int dummy = 0x1;
@@ -175,8 +175,13 @@ test_exception3_0(void)
 
 #include <stdio.h>
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main()
+	main()
+#else
+int
+	test_exception3_0(void)
+#endif
 {
   fprintf(stderr, "Test N/A for this compiler environment.\n");
   return 0;
