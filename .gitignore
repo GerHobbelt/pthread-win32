@@ -1,0 +1,17 @@
+cvs
+
+*~
+*.bak
+*.o
+*.a
+*.lo
+*.la
+*.user
+*.suo
+*.sdf
+*.opensdf
+
+bin/
+obj/
+ipch/
+
