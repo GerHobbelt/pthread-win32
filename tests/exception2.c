@@ -125,9 +125,20 @@ main(int argc, char* argv[])
 
       printf("You should see an \"abnormal termination\" message\n");
       fflush(stdout);
+
       result = system("exception2.exe die");
-      exit(0);
+
+      printf("\"exception2.exe die\" returned status %d\n", result);
+
+      /*
+       * result should be 0, 1 or 3 depending on build settings
+       */
+      exit((result == 0 || result == 1 || result == 3) ? 0 : 1);
     }
+
+#if defined(NO_ERROR_DIALOGS)
+  SetErrorMode(SEM_NOGPFAULTERRORBOX);
+#endif
 
   assert((mt = pthread_self()).p != NULL);
 
@@ -136,7 +147,7 @@ main(int argc, char* argv[])
       assert(pthread_create(&et[i], NULL, exceptionedThread, NULL) == 0);
     }
 
-  Sleep(1000);
+  Sleep(100);
 
   /*
    * Success.

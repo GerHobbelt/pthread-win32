@@ -100,9 +100,9 @@ ptw32_robust_mutex_inherit(pthread_mutex_t * mutex)
 }
 
 /*
- * The next two internal support functions depend on only being
- * called by the thread that owns the robust mutex. This enables
- * us to avoid additional locks.
+ * The next two internal support functions depend on being
+ * called only by the thread that owns the robust mutex. This
+ * enables us to avoid additional locks.
  * Any mutex currently in the thread's robust mutex list is held
  * by the thread, again eliminating the need for locks.
  * The forward/backward links allow the thread to unlock mutexes

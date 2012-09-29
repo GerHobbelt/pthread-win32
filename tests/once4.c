@@ -58,8 +58,8 @@ typedef struct {
   CRITICAL_SECTION cs;
 } sharedInt_t;
 
-static sharedInt_t numOnce = {0, {0}};
-static sharedInt_t numThreads = {0, {0}};
+static sharedInt_t numOnce;
+static sharedInt_t numThreads;
 
 typedef struct {
   int threadnum;
@@ -94,7 +94,7 @@ myinitfunc(void)
   LeaveCriticalSection(&numOnce.cs);
   /* Simulate slow once routine so that following threads pile up behind it */
   Sleep(10);
-  /* test for cancelation late so we're sure to have waiters. */
+  /* test for cancellation late so we're sure to have waiters. */
   pthread_testcancel();
 }
 
@@ -107,7 +107,7 @@ mythread(void * arg)
   /*
    * Cancel every thread. These threads are deferred cancelable only, so
    * only the thread performing the init_routine will see it (there are
-   * no other cancelation points here). The result will be that every thread
+   * no other cancellation points here). The result will be that every thread
    * eventually cancels only when it becomes the new initter.
    */
   pthread_t self = pthread_self();
@@ -140,6 +140,9 @@ main()
   pthread_t t[NUM_THREADS][NUM_ONCE];
   int i, j;
   
+  memset(&numOnce, 0, sizeof(sharedInt_t));
+  memset(&numThreads, 0, sizeof(sharedInt_t));
+
   InitializeCriticalSection(&print_lock);
   InitializeCriticalSection(&numThreads.cs);
   InitializeCriticalSection(&numOnce.cs);

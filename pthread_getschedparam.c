@@ -51,11 +51,7 @@ pthread_getschedparam (pthread_t thread, int *policy,
       return result;
     }
 
-  /*
-   * Validate the policy and param args.
-   * Check that a policy constant wasn't passed rather than &policy.
-   */
-  if (policy <= (int *) SCHED_MAX || param == NULL)
+  if (policy == NULL)
     {
       return EINVAL;
     }

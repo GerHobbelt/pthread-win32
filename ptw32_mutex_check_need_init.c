@@ -38,9 +38,9 @@
 #include "implement.h"
 
 static struct pthread_mutexattr_t_ ptw32_recursive_mutexattr_s =
-  {PTHREAD_PROCESS_PRIVATE, PTHREAD_MUTEX_RECURSIVE};
+  {PTHREAD_PROCESS_PRIVATE, PTHREAD_MUTEX_RECURSIVE, PTHREAD_MUTEX_STALLED};
 static struct pthread_mutexattr_t_ ptw32_errorcheck_mutexattr_s =
-  {PTHREAD_PROCESS_PRIVATE, PTHREAD_MUTEX_ERRORCHECK};
+  {PTHREAD_PROCESS_PRIVATE, PTHREAD_MUTEX_ERRORCHECK, PTHREAD_MUTEX_STALLED};
 static pthread_mutexattr_t ptw32_recursive_mutexattr = &ptw32_recursive_mutexattr_s;
 static pthread_mutexattr_t ptw32_errorcheck_mutexattr = &ptw32_errorcheck_mutexattr_s;
 
