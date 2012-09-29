@@ -86,8 +86,8 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
 		  ? PTHREAD_MUTEX_DEFAULT : (*attr)->kind);
       mx->ownerThread.p = NULL;
 
-      mx->event = CreateEvent (NULL, PTW32_FALSE,    /* manual reset = No */
-                              PTW32_FALSE,           /* initial state = not signaled */
+      mx->event = CreateEvent (NULL, PTE_FALSE,    /* manual reset = No */
+                              PTE_FALSE,           /* initial state = not signaled */
                               NULL);                 /* event name */
 
       if (0 == mx->event)

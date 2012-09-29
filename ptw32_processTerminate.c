@@ -1,5 +1,5 @@
 /*
- * ptw32_processTerminate.c
+ * pte_processTerminate.c
  *
  * Description:
  * This translation unit implements routines which are private to
@@ -40,7 +40,7 @@
 
 
 void
-ptw32_processTerminate (void)
+pte_processTerminate (void)
      /*
       * ------------------------------------------------------
       * DOCPRIVATE
@@ -54,7 +54,7 @@ ptw32_processTerminate (void)
       *      This function performs process wide termination for
       *      the pthread library.
       *      This routine sets the global variable
-      *      ptw32_processInitialized to FALSE
+      *      pte_processInitialized to FALSE
       *
       * RESULTS
       *              N/A
@@ -62,53 +62,53 @@ ptw32_processTerminate (void)
       * ------------------------------------------------------
       */
 {
-  if (ptw32_processInitialized)
+  if (pte_processInitialized)
     {
-      ptw32_thread_t * tp, * tpNext;
+      pte_thread_t * tp, * tpNext;
 
-      if (ptw32_selfThreadKey != NULL)
+      if (pte_selfThreadKey != NULL)
 	{
 	  /*
-	   * Release ptw32_selfThreadKey
+	   * Release pte_selfThreadKey
 	   */
-	  pthread_key_delete (ptw32_selfThreadKey);
+	  pthread_key_delete (pte_selfThreadKey);
 
-	  ptw32_selfThreadKey = NULL;
+	  pte_selfThreadKey = NULL;
 	}
 
-      if (ptw32_cleanupKey != NULL)
+      if (pte_cleanupKey != NULL)
 	{
 	  /*
-	   * Release ptw32_cleanupKey
+	   * Release pte_cleanupKey
 	   */
-	  pthread_key_delete (ptw32_cleanupKey);
+	  pthread_key_delete (pte_cleanupKey);
 
-	  ptw32_cleanupKey = NULL;
+	  pte_cleanupKey = NULL;
 	}
 
-      EnterCriticalSection (&ptw32_thread_reuse_lock);
+      EnterCriticalSection (&pte_thread_reuse_lock);
 
-      tp = ptw32_threadReuseTop;
-      while (tp != PTW32_THREAD_REUSE_EMPTY)
+      tp = pte_threadReuseTop;
+      while (tp != PTE_THREAD_REUSE_EMPTY)
 	{
 	  tpNext = tp->prevReuse;
 	  free (tp);
 	  tp = tpNext;
 	}
 
-      LeaveCriticalSection (&ptw32_thread_reuse_lock);
+      LeaveCriticalSection (&pte_thread_reuse_lock);
 
       /* 
        * Destroy the global locks and other objects.
        */
-      DeleteCriticalSection (&ptw32_spinlock_test_init_lock);
-      DeleteCriticalSection (&ptw32_rwlock_test_init_lock);
-      DeleteCriticalSection (&ptw32_cond_test_init_lock);
-      DeleteCriticalSection (&ptw32_cond_list_lock);
-      DeleteCriticalSection (&ptw32_mutex_test_init_lock);
-      DeleteCriticalSection (&ptw32_thread_reuse_lock);
+      DeleteCriticalSection (&pte_spinlock_test_init_lock);
+      DeleteCriticalSection (&pte_rwlock_test_init_lock);
+      DeleteCriticalSection (&pte_cond_test_init_lock);
+      DeleteCriticalSection (&pte_cond_list_lock);
+      DeleteCriticalSection (&pte_mutex_test_init_lock);
+      DeleteCriticalSection (&pte_thread_reuse_lock);
 
-      ptw32_processInitialized = PTW32_FALSE;
+      pte_processInitialized = PTE_FALSE;
     }
 
 }				/* processTerminate */

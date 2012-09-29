@@ -1,5 +1,5 @@
 /*
- * ptw32_processInitialize.c
+ * pte_processInitialize.c
  *
  * Description:
  * This translation unit implements routines which are private to
@@ -40,7 +40,7 @@
 
 
 int
-ptw32_processInitialize (void)
+pte_processInitialize (void)
      /*
       * ------------------------------------------------------
       * DOCPRIVATE
@@ -54,7 +54,7 @@ ptw32_processInitialize (void)
       *      This function performs process wide initialization for
       *      the pthread library.
       *      If successful, this routine sets the global variable
-      *      ptw32_processInitialized to TRUE.
+      *      pte_processInitialized to TRUE.
       *
       * RESULTS
       *              TRUE    if successful,
@@ -63,40 +63,40 @@ ptw32_processInitialize (void)
       * ------------------------------------------------------
       */
 {
-  if (ptw32_processInitialized)
+  if (pte_processInitialized)
     {
       /* 
        * Ignore if already initialized. this is useful for 
        * programs that uses a non-dll pthread
-       * library. Such programs must call ptw32_processInitialize() explicitly,
+       * library. Such programs must call pte_processInitialize() explicitly,
        * since this initialization routine is automatically called only when
        * the dll is loaded.
        */
-      return PTW32_TRUE;
+      return PTE_TRUE;
     }
 
-  ptw32_processInitialized = PTW32_TRUE;
+  pte_processInitialized = PTE_TRUE;
 
   /*
    * Initialize Keys
    */
-  if ((pthread_key_create (&ptw32_selfThreadKey, NULL) != 0) ||
-      (pthread_key_create (&ptw32_cleanupKey, NULL) != 0))
+  if ((pthread_key_create (&pte_selfThreadKey, NULL) != 0) ||
+      (pthread_key_create (&pte_cleanupKey, NULL) != 0))
     {
 
-      ptw32_processTerminate ();
+      pte_processTerminate ();
     }
 
   /* 
    * Set up the global locks.
    */
-  InitializeCriticalSection (&ptw32_thread_reuse_lock);
-  InitializeCriticalSection (&ptw32_mutex_test_init_lock);
-  InitializeCriticalSection (&ptw32_cond_list_lock);
-  InitializeCriticalSection (&ptw32_cond_test_init_lock);
-  InitializeCriticalSection (&ptw32_rwlock_test_init_lock);
-  InitializeCriticalSection (&ptw32_spinlock_test_init_lock);
+  InitializeCriticalSection (&pte_thread_reuse_lock);
+  InitializeCriticalSection (&pte_mutex_test_init_lock);
+  InitializeCriticalSection (&pte_cond_list_lock);
+  InitializeCriticalSection (&pte_cond_test_init_lock);
+  InitializeCriticalSection (&pte_rwlock_test_init_lock);
+  InitializeCriticalSection (&pte_spinlock_test_init_lock);
 
-  return (ptw32_processInitialized);
+  return (pte_processInitialized);
 
 }				/* processInitialize */

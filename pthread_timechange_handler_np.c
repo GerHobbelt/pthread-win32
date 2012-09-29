@@ -91,9 +91,9 @@ pthread_timechange_handler_np (void *arg)
   int result = 0;
   pthread_cond_t cv;
 
-  EnterCriticalSection (&ptw32_cond_list_lock);
+  EnterCriticalSection (&pte_cond_list_lock);
 
-  cv = ptw32_cond_list_head;
+  cv = pte_cond_list_head;
 
   while (cv != NULL && 0 == result)
     {
@@ -101,7 +101,7 @@ pthread_timechange_handler_np (void *arg)
       cv = cv->next;
     }
 
-  LeaveCriticalSection (&ptw32_cond_list_lock);
+  LeaveCriticalSection (&pte_cond_list_lock);
 
   return (void *) (result != 0 ? EAGAIN : 0);
 }

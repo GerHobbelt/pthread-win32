@@ -1,5 +1,5 @@
 /*
- * ptw32_callUserDestroyRoutines.c
+ * pte_callUserDestroyRoutines.c
  *
  * Description:
  * This translation unit implements routines which are private to
@@ -46,7 +46,7 @@ using
 #endif
 
 void
-ptw32_callUserDestroyRoutines (pthread_t thread)
+pte_callUserDestroyRoutines (pthread_t thread)
      /*
       * -------------------------------------------------------------------
       * DOCPRIVATE
@@ -70,7 +70,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
     {
       int assocsRemaining;
       int iterations = 0;
-      ptw32_thread_t * sp = (ptw32_thread_t *) thread.p;
+      pte_thread_t * sp = (pte_thread_t *) thread.p;
 
       /*
        * Run through all Thread<-->Key associations
@@ -209,7 +209,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 		   * Remove association from both the key and thread chains
 		   * and reclaim it's memory resources.
 		   */
-		  ptw32_tkAssocDestroy (assoc);
+		  pte_tkAssocDestroy (assoc);
 		  (void) pthread_mutex_unlock(&(sp->threadLock));
 		  (void) pthread_mutex_unlock(&(k->keyLock));
 		}
@@ -217,4 +217,4 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 	}
       while (assocsRemaining);
     }
-}				/* ptw32_callUserDestroyRoutines */
+}				/* pte_callUserDestroyRoutines */

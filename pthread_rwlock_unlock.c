@@ -61,7 +61,7 @@ pthread_rwlock_unlock (pthread_rwlock_t * rwlock)
 
   rwl = *rwlock;
 
-  if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
+  if (rwl->nMagic != PTE_RWLOCK_MAGIC)
     {
       return EINVAL;
     }

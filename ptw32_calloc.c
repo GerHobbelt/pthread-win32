@@ -1,5 +1,5 @@
 /*
- * ptw32_calloc.c
+ * pte_calloc.c
  *
  * Description:
  * This translation unit implements miscellaneous thread functions.
@@ -40,7 +40,7 @@
 
 #ifdef NEED_CALLOC
 void *
-ptw32_calloc (size_t n, size_t s)
+pte_calloc (size_t n, size_t s)
 {
   unsigned int m = n * s;
   void *p;

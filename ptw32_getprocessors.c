@@ -1,5 +1,5 @@
 /*
- * ptw32_getprocessors.c
+ * pte_getprocessors.c
  *
  * Description:
  * This translation unit implements routines which are private to
@@ -40,7 +40,7 @@
 
 
 /*
- * ptw32_getprocessors()
+ * pte_getprocessors()
  *
  * Get the number of CPUs available to the process.
  *
@@ -53,7 +53,7 @@
  * newly initialised spinlocks will notice.
  */
 int
-ptw32_getprocessors (int *count)
+pte_getprocessors (int *count)
 {
   DWORD_PTR vProcessCPUs;
   DWORD_PTR vSystemCPUs;

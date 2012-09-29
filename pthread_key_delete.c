@@ -85,7 +85,7 @@ pthread_key_delete (pthread_key_t key)
 	   */
 	  while ((assoc = (ThreadKeyAssoc *) key->threads) != NULL)
 	    {
-	      ptw32_thread_t * thread = assoc->thread;
+	      pte_thread_t * thread = assoc->thread;
 
 	      if (assoc == NULL)
 		{
@@ -101,13 +101,13 @@ pthread_key_delete (pthread_key_t key)
 		   * While we hold key->keyLock, no other thread can insert
 		   * a new assoc via pthread_setspecific.
 		   */
-		  ptw32_tkAssocDestroy (assoc);
+		  pte_tkAssocDestroy (assoc);
 		  (void) pthread_mutex_unlock (&(thread->threadLock));
 		}
 	      else
 		{
 		  /* Thread or lock is no longer valid? */
-		  ptw32_tkAssocDestroy (assoc);
+		  pte_tkAssocDestroy (assoc);
 		}
 	    }
 	  pthread_mutex_unlock (&(key->keyLock));

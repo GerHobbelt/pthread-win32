@@ -88,7 +88,7 @@ pthread_rwlock_init (pthread_rwlock_t * rwlock,
       goto FAIL2;
     }
 
-  rwl->nMagic = PTW32_RWLOCK_MAGIC;
+  rwl->nMagic = PTE_RWLOCK_MAGIC;
 
   result = 0;
   goto DONE;

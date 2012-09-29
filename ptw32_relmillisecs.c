@@ -1,5 +1,5 @@
 /*
- * ptw32_relmillisecs.c
+ * pte_relmillisecs.c
  *
  * Description:
  * This translation unit implements miscellaneous thread functions.
@@ -45,7 +45,7 @@
 
 
 INLINE DWORD
-ptw32_relmillisecs (const struct timespec * abstime)
+pte_relmillisecs (const struct timespec * abstime)
 {
   const int64_t NANOSEC_PER_MILLISEC = 1000000;
   const int64_t MILLISEC_PER_SEC = 1000;
@@ -86,7 +86,7 @@ ptw32_relmillisecs (const struct timespec * abstime)
    * but it does not exist on WinCE
    */
 
-  ptw32_filetime_to_timespec(&ft, &currSysTime);
+  pte_filetime_to_timespec(&ft, &currSysTime);
 
   tmpCurrMilliseconds = (int64_t)currSysTime.tv_sec * MILLISEC_PER_SEC;
   tmpCurrMilliseconds += ((int64_t)currSysTime.tv_nsec + (NANOSEC_PER_MILLISEC/2))

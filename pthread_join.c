@@ -82,9 +82,9 @@ pthread_join (pthread_t thread, void **value_ptr)
 {
   int result;
   pthread_t self;
-  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
+  pte_thread_t * tp = (pte_thread_t *) thread.p;
 
-  EnterCriticalSection (&ptw32_thread_reuse_lock);
+  EnterCriticalSection (&pte_thread_reuse_lock);
 
   if (NULL == tp
       || thread.x != tp->ptHandle.x)
@@ -100,7 +100,7 @@ pthread_join (pthread_t thread, void **value_ptr)
       result = 0;
     }
 
-  LeaveCriticalSection (&ptw32_thread_reuse_lock);
+  LeaveCriticalSection (&pte_thread_reuse_lock);
 
   if (result == 0)
     {

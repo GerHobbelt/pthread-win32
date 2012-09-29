@@ -1,5 +1,5 @@
 /*
- * ptw32_InterlockedCompareExchange.c
+ * pte_InterlockedCompareExchange.c
  *
  * Description:
  * This translation unit implements routines which are private to
@@ -40,16 +40,16 @@
 
 
 /*
- * ptw32_InterlockedCompareExchange --
+ * pte_InterlockedCompareExchange --
  *
  * Originally needed because W9x doesn't support InterlockedCompareExchange.
  * We now use this version wherever possible so we can inline it.
  */
 
-PTW32_INTERLOCKED_LONG WINAPI
-ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
-				  PTW32_INTERLOCKED_LONG value,
-				  PTW32_INTERLOCKED_LONG comparand)
+PTE_INTERLOCKED_LONG WINAPI
+pte_InterlockedCompareExchange (PTE_INTERLOCKED_LPLONG location,
+				  PTE_INTERLOCKED_LONG value,
+				  PTE_INTERLOCKED_LONG comparand)
 {
 
 #if defined(__WATCOMC__)
@@ -57,7 +57,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 #pragma disable_message (200)
 #endif
 
-  PTW32_INTERLOCKED_LONG result;
+  PTE_INTERLOCKED_LONG result;
 
   /*
    * Using the LOCK prefix on uni-processor machines is significantly slower
@@ -67,7 +67,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
    * Interlocked routine, which appears to avoid the LOCK prefix on
    * uniprocessor systems. So one DLL works for all systems.
    */
-  if (ptw32_smp_system)
+  if (pte_smp_system)
 
 /* *INDENT-OFF* */
 
@@ -153,13 +153,13 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 }
 
 /*
- * ptw32_InterlockedExchange --
+ * pte_InterlockedExchange --
  *
  * We now use this version wherever possible so we can inline it.
  */
 
 LONG WINAPI
-ptw32_InterlockedExchange (LPLONG location,
+pte_InterlockedExchange (LPLONG location,
 			   LONG value)
 {
 
@@ -177,7 +177,7 @@ ptw32_InterlockedExchange (LPLONG location,
    * is nearly 3 times faster than the XCHG instruction, so this routine
    * is not yet very useful for speeding up pthreads.
    */
-  if (ptw32_smp_system)
+  if (pte_smp_system)
 
 /* *INDENT-OFF* */
 
@@ -290,14 +290,14 @@ L1:	MOV          eax,dword ptr [ecx]
 
 #if 1
 
-#if defined(PTW32_BUILD_INLINED) && defined(HAVE_INLINABLE_INTERLOCKED_CMPXCHG)
-#undef PTW32_INTERLOCKED_COMPARE_EXCHANGE
-#define PTW32_INTERLOCKED_COMPARE_EXCHANGE ptw32_InterlockedCompareExchange
+#if defined(PTE_BUILD_INLINED) && defined(HAVE_INLINABLE_INTERLOCKED_CMPXCHG)
+#undef PTE_INTERLOCKED_COMPARE_EXCHANGE
+#define PTE_INTERLOCKED_COMPARE_EXCHANGE pte_InterlockedCompareExchange
 #endif
 
-#if defined(PTW32_BUILD_INLINED) && defined(HAVE_INLINABLE_INTERLOCKED_XCHG)
-#undef PTW32_INTERLOCKED_EXCHANGE
-#define PTW32_INTERLOCKED_EXCHANGE ptw32_InterlockedExchange
+#if defined(PTE_BUILD_INLINED) && defined(HAVE_INLINABLE_INTERLOCKED_XCHG)
+#undef PTE_INTERLOCKED_EXCHANGE
+#define PTE_INTERLOCKED_EXCHANGE pte_InterlockedExchange
 #endif
 
 #endif

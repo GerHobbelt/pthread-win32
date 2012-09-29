@@ -41,7 +41,7 @@
 int
 pthread_attr_setschedpolicy (pthread_attr_t * attr, int policy)
 {
-  if (ptw32_is_attr (attr) != 0)
+  if (pte_is_attr (attr) != 0)
     {
       return EINVAL;
     }

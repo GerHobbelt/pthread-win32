@@ -47,7 +47,7 @@ pthread_setconcurrency (int level)
     }
   else
     {
-      ptw32_concurrency = level;
+      pte_concurrency = level;
       return 0;
     }
 }

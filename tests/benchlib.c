@@ -48,8 +48,8 @@
 
 int old_mutex_use = OLD_WIN32CS;
 
-BOOL (WINAPI *ptw32_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
-HINSTANCE ptw32_h_kernel32;
+BOOL (WINAPI *pte_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
+HINSTANCE pte_h_kernel32;
 
 void
 dummy_call(int * a)
@@ -111,21 +111,21 @@ old_mutex_init(old_mutex_t *mutex, const old_mutexattr_t *attr)
         /*
          * Load KERNEL32 and try to get address of TryEnterCriticalSection
          */
-        ptw32_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
-        ptw32_try_enter_critical_section = (BOOL (WINAPI *)(LPCRITICAL_SECTION))
+        pte_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
+        pte_try_enter_critical_section = (BOOL (WINAPI *)(LPCRITICAL_SECTION))
 
 #if defined(NEED_UNICODE_CONSTS)
-        GetProcAddress(ptw32_h_kernel32,
+        GetProcAddress(pte_h_kernel32,
                        (const TCHAR *)TEXT("TryEnterCriticalSection"));
 #else
-        GetProcAddress(ptw32_h_kernel32,
+        GetProcAddress(pte_h_kernel32,
                        (LPCSTR) "TryEnterCriticalSection");
 #endif
 
-        if (ptw32_try_enter_critical_section != NULL)
+        if (pte_try_enter_critical_section != NULL)
           {
             InitializeCriticalSection(&cs);
-            if ((*ptw32_try_enter_critical_section)(&cs))
+            if ((*pte_try_enter_critical_section)(&cs))
               {
                 LeaveCriticalSection(&cs);
               }
@@ -134,15 +134,15 @@ old_mutex_init(old_mutex_t *mutex, const old_mutexattr_t *attr)
                 /*
                  * Not really supported (Win98?).
                  */
-                ptw32_try_enter_critical_section = NULL;
+                pte_try_enter_critical_section = NULL;
               }
             DeleteCriticalSection(&cs);
           }
 
-        if (ptw32_try_enter_critical_section == NULL)
+        if (pte_try_enter_critical_section == NULL)
           {
-            (void) FreeLibrary(ptw32_h_kernel32);
-            ptw32_h_kernel32 = 0;
+            (void) FreeLibrary(pte_h_kernel32);
+            pte_h_kernel32 = 0;
           }
 
       if (old_mutex_use == OLD_WIN32CS)
@@ -190,7 +190,7 @@ old_mutex_lock(old_mutex_t *mutex)
       return EINVAL;
     }
 
-  if (*mutex == (old_mutex_t) PTW32_OBJECT_AUTO_INIT)
+  if (*mutex == (old_mutex_t) PTE_OBJECT_AUTO_INIT)
     {
       /*
        * Don't use initialisers when benchtesting.
@@ -231,7 +231,7 @@ old_mutex_unlock(old_mutex_t *mutex)
 
   mx = *mutex;
 
-  if (mx != (old_mutex_t) PTW32_OBJECT_AUTO_INIT)
+  if (mx != (old_mutex_t) PTE_OBJECT_AUTO_INIT)
     {
       if (mx->mutex == 0)
 	{
@@ -262,7 +262,7 @@ old_mutex_trylock(old_mutex_t *mutex)
       return EINVAL;
     }
 
-  if (*mutex == (old_mutex_t) PTW32_OBJECT_AUTO_INIT)
+  if (*mutex == (old_mutex_t) PTE_OBJECT_AUTO_INIT)
     {
       /*
        * Don't use initialisers when benchtesting.
@@ -276,11 +276,11 @@ old_mutex_trylock(old_mutex_t *mutex)
     {
       if (mx->mutex == 0)
 	{
-	  if (ptw32_try_enter_critical_section == NULL)
+	  if (pte_try_enter_critical_section == NULL)
           {
             result = 0;
           }
-        else if ((*ptw32_try_enter_critical_section)(&mx->cs) != TRUE)
+        else if ((*pte_try_enter_critical_section)(&mx->cs) != TRUE)
 	    {
 	      result = EBUSY;
 	    }
@@ -316,7 +316,7 @@ old_mutex_destroy(old_mutex_t *mutex)
       return EINVAL;
     }
 
-  if (*mutex != (old_mutex_t) PTW32_OBJECT_AUTO_INIT)
+  if (*mutex != (old_mutex_t) PTE_OBJECT_AUTO_INIT)
     {
       mx = *mutex;
 
@@ -351,10 +351,10 @@ old_mutex_destroy(old_mutex_t *mutex)
       result = EINVAL;
     }
 
-  if (ptw32_try_enter_critical_section != NULL)
+  if (pte_try_enter_critical_section != NULL)
     {
-      (void) FreeLibrary(ptw32_h_kernel32);
-      ptw32_h_kernel32 = 0;
+      (void) FreeLibrary(pte_h_kernel32);
+      pte_h_kernel32 = 0;
     }
 
   return(result);

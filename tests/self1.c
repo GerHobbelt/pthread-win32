@@ -54,7 +54,7 @@ main(int argc, char * argv[])
 	 */
 	pthread_t self;
 
-#ifdef PTW32_STATIC_LIB
+#ifdef PTE_STATIC_LIB
 	pthread_win32_process_attach_np();
 #endif
 
@@ -62,7 +62,7 @@ main(int argc, char * argv[])
 
 	assert(self.p != NULL);
 
-#ifdef PTW32_STATIC_LIB
+#ifdef PTE_STATIC_LIB
 	pthread_win32_process_detach_np();
 #endif
 	return 0;

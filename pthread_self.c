@@ -61,14 +61,14 @@ pthread_self (void)
 {
   pthread_t self;
   pthread_t nil = {NULL, 0};
-  ptw32_thread_t * sp;
+  pte_thread_t * sp;
 
 #ifdef _UWIN
-  if (!ptw32_selfThreadKey)
+  if (!pte_selfThreadKey)
     return nil;
 #endif
 
-  sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
+  sp = (pte_thread_t *) pthread_getspecific (pte_selfThreadKey);
 
   if (sp != NULL)
     {
@@ -80,8 +80,8 @@ pthread_self (void)
        * Need to create an implicit 'self' for the currently
        * executing thread.
        */
-      self = ptw32_new ();
-      sp = (ptw32_thread_t *) self.p;
+      self = pte_new ();
+      sp = (pte_thread_t *) self.p;
 
       if (sp != NULL)
 	{
@@ -118,7 +118,7 @@ pthread_self (void)
 	       * we can't get a Win32 thread handle.
 	       * Thread structs are never freed.
 	       */
-	      ptw32_threadReusePush (self);
+	      pte_threadReusePush (self);
 	      return nil;
 	    }
 #endif
@@ -129,7 +129,7 @@ pthread_self (void)
 	   */
 	  sp->sched_priority = GetThreadPriority (sp->threadH);
 
-          pthread_setspecific (ptw32_selfThreadKey, (void *) sp);
+          pthread_setspecific (pte_selfThreadKey, (void *) sp);
 	}
     }
 

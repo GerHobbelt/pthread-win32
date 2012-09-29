@@ -1,5 +1,5 @@
 /*
- * ptw32_MCS_lock.c
+ * pte_MCS_lock.c
  *
  * Description:
  * This translation unit implements queue-based locks.
@@ -57,33 +57,33 @@
  *
  * Usage of MCS locks:
  *
- * - you need a global ptw32_mcs_lock_t instance initialised to 0 or NULL.
- * - you need a local thread-scope ptw32_mcs_local_node_t instance, which
+ * - you need a global pte_mcs_lock_t instance initialised to 0 or NULL.
+ * - you need a local thread-scope pte_mcs_local_node_t instance, which
  *   may serve several different locks but you need at least one node for
  *   every lock held concurrently by a thread.
  *
  * E.g.:
  * 
- * ptw32_mcs_lock_t lock1 = 0;
- * ptw32_mcs_lock_t lock2 = 0;
+ * pte_mcs_lock_t lock1 = 0;
+ * pte_mcs_lock_t lock2 = 0;
  *
  * void *mythread(void *arg)
  * {
- *   ptw32_mcs_local_node_t node;
+ *   pte_mcs_local_node_t node;
  *
- *   ptw32_mcs_acquire (&lock1, &node);
- *   ptw32_mcs_release (&node);
+ *   pte_mcs_acquire (&lock1, &node);
+ *   pte_mcs_release (&node);
  *
- *   ptw32_mcs_acquire (&lock2, &node);
- *   ptw32_mcs_release (&node);
+ *   pte_mcs_acquire (&lock2, &node);
+ *   pte_mcs_release (&node);
  *   {
- *      ptw32_mcs_local_node_t nodex;
+ *      pte_mcs_local_node_t nodex;
  *
- *      ptw32_mcs_acquire (&lock1, &node);
- *      ptw32_mcs_acquire (&lock2, &nodex);
+ *      pte_mcs_acquire (&lock1, &node);
+ *      pte_mcs_acquire (&lock2, &nodex);
  *
- *      ptw32_mcs_release (&nodex);
- *      ptw32_mcs_release (&node);
+ *      pte_mcs_release (&nodex);
+ *      pte_mcs_release (&node);
  *   }
  *   return (void *)0;
  * }
@@ -93,18 +93,18 @@
 #include "pthread.h"
 
 /*
- * ptw32_mcs_flag_set -- notify another thread about an event.
+ * pte_mcs_flag_set -- notify another thread about an event.
  * 
  * Set event if an event handle has been stored in the flag, and
  * set flag to -1 otherwise. Note that -1 cannot be a valid handle value.
  */
 INLINE void 
-ptw32_mcs_flag_set (LONG * flag)
+pte_mcs_flag_set (LONG * flag)
 {
-  HANDLE e = (HANDLE)PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-						(PTW32_INTERLOCKED_LPLONG)flag,
-						(PTW32_INTERLOCKED_LONG)-1,
-						(PTW32_INTERLOCKED_LONG)0);
+  HANDLE e = (HANDLE)PTE_INTERLOCKED_COMPARE_EXCHANGE(
+						(PTE_INTERLOCKED_LPLONG)flag,
+						(PTE_INTERLOCKED_LONG)-1,
+						(PTE_INTERLOCKED_LONG)0);
   if ((HANDLE)0 != e)
     {
       /* another thread has already stored an event handle in the flag */
@@ -113,24 +113,24 @@ ptw32_mcs_flag_set (LONG * flag)
 }
 
 /*
- * ptw32_mcs_flag_set -- wait for notification from another.
+ * pte_mcs_flag_set -- wait for notification from another.
  * 
  * Store an event handle in the flag and wait on it if the flag has not been
  * set, and proceed without creating an event otherwise.
  */
 INLINE void 
-ptw32_mcs_flag_wait (LONG * flag)
+pte_mcs_flag_wait (LONG * flag)
 {
   if (0 == InterlockedExchangeAdd((LPLONG)flag, 0)) /* MBR fence */
     {
       /* the flag is not set. create event. */
 
-      HANDLE e = CreateEvent(NULL, PTW32_FALSE, PTW32_FALSE, NULL);
+      HANDLE e = CreateEvent(NULL, PTE_FALSE, PTE_FALSE, NULL);
 
-      if (0 == PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-			                  (PTW32_INTERLOCKED_LPLONG)flag,
-			                  (PTW32_INTERLOCKED_LONG)e,
-			                  (PTW32_INTERLOCKED_LONG)0))
+      if (0 == PTE_INTERLOCKED_COMPARE_EXCHANGE(
+			                  (PTE_INTERLOCKED_LPLONG)flag,
+			                  (PTE_INTERLOCKED_LONG)e,
+			                  (PTE_INTERLOCKED_LONG)0))
 	{
 	  /* stored handle in the flag. wait on it now. */
 	  WaitForSingleObject(e, INFINITE);
@@ -141,7 +141,7 @@ ptw32_mcs_flag_wait (LONG * flag)
 }
 
 /*
- * ptw32_mcs_lock_acquire -- acquire an MCS lock.
+ * pte_mcs_lock_acquire -- acquire an MCS lock.
  * 
  * See: 
  * J. M. Mellor-Crummey and M. L. Scott.
@@ -149,9 +149,9 @@ ptw32_mcs_flag_wait (LONG * flag)
  * ACM Transactions on Computer Systems, 9(1):21-65, Feb. 1991.
  */
 INLINE void 
-ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node)
+pte_mcs_lock_acquire (pte_mcs_lock_t * lock, pte_mcs_local_node_t * node)
 {
-  ptw32_mcs_local_node_t  *pred;
+  pte_mcs_local_node_t  *pred;
   
   node->lock = lock;
   node->nextFlag = 0;
@@ -159,20 +159,20 @@ ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node)
   node->next = 0; /* initially, no successor */
   
   /* queue for the lock */
-  pred = (ptw32_mcs_local_node_t *)PTW32_INTERLOCKED_EXCHANGE((LPLONG)lock,
+  pred = (pte_mcs_local_node_t *)PTE_INTERLOCKED_EXCHANGE((LPLONG)lock,
 						              (LONG)node);
 
   if (0 != pred)
     {
       /* the lock was not free. link behind predecessor. */
       pred->next = node;
-      ptw32_mcs_flag_set(&pred->nextFlag);
-      ptw32_mcs_flag_wait(&node->readyFlag);
+      pte_mcs_flag_set(&pred->nextFlag);
+      pte_mcs_flag_wait(&node->readyFlag);
     }
 }
 
 /*
- * ptw32_mcs_lock_release -- release an MCS lock.
+ * pte_mcs_lock_release -- release an MCS lock.
  * 
  * See: 
  * J. M. Mellor-Crummey and M. L. Scott.
@@ -180,31 +180,31 @@ ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node)
  * ACM Transactions on Computer Systems, 9(1):21-65, Feb. 1991.
  */
 INLINE void 
-ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
+pte_mcs_lock_release (pte_mcs_local_node_t * node)
 {
-  ptw32_mcs_lock_t *lock = node->lock;
-  ptw32_mcs_local_node_t *next = (ptw32_mcs_local_node_t *)
+  pte_mcs_lock_t *lock = node->lock;
+  pte_mcs_local_node_t *next = (pte_mcs_local_node_t *)
     InterlockedExchangeAdd((LPLONG)&node->next, 0); /* MBR fence */
 
   if (0 == next)
     {
       /* no known successor */
 
-      if (node == (ptw32_mcs_local_node_t *)
-	  PTW32_INTERLOCKED_COMPARE_EXCHANGE((PTW32_INTERLOCKED_LPLONG)lock,
-					     (PTW32_INTERLOCKED_LONG)0,
-					     (PTW32_INTERLOCKED_LONG)node))
+      if (node == (pte_mcs_local_node_t *)
+	  PTE_INTERLOCKED_COMPARE_EXCHANGE((PTE_INTERLOCKED_LPLONG)lock,
+					     (PTE_INTERLOCKED_LONG)0,
+					     (PTE_INTERLOCKED_LONG)node))
 	{
 	  /* no successor, lock is free now */
 	  return;
 	}
   
       /* wait for successor */
-      ptw32_mcs_flag_wait(&node->nextFlag);
-      next = (ptw32_mcs_local_node_t *)
+      pte_mcs_flag_wait(&node->nextFlag);
+      next = (pte_mcs_local_node_t *)
 	InterlockedExchangeAdd((LPLONG)&node->next, 0); /* MBR fence */
     }
 
   /* pass the lock */
-  ptw32_mcs_flag_set(&next->readyFlag);
+  pte_mcs_flag_set(&next->readyFlag);
 }

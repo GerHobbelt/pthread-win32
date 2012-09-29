@@ -51,17 +51,17 @@ pthread_spin_destroy (pthread_spinlock_t * lock)
 
   if ((s = *lock) != PTHREAD_SPINLOCK_INITIALIZER)
     {
-      if (s->interlock == PTW32_SPIN_USE_MUTEX)
+      if (s->interlock == PTE_SPIN_USE_MUTEX)
 	{
 	  result = pthread_mutex_destroy (&(s->u.mutex));
 	}
-      else if ((PTW32_INTERLOCKED_LONG) PTW32_SPIN_UNLOCKED !=
-	       PTW32_INTERLOCKED_COMPARE_EXCHANGE ((PTW32_INTERLOCKED_LPLONG)
+      else if ((PTE_INTERLOCKED_LONG) PTE_SPIN_UNLOCKED !=
+	       PTE_INTERLOCKED_COMPARE_EXCHANGE ((PTE_INTERLOCKED_LPLONG)
 						   & (s->interlock),
-						   (PTW32_INTERLOCKED_LONG)
-						   PTW32_OBJECT_INVALID,
-						   (PTW32_INTERLOCKED_LONG)
-						   PTW32_SPIN_UNLOCKED))
+						   (PTE_INTERLOCKED_LONG)
+						   PTE_OBJECT_INVALID,
+						   (PTE_INTERLOCKED_LONG)
+						   PTE_SPIN_UNLOCKED))
 	{
 	  result = EINVAL;
 	}
@@ -79,9 +79,9 @@ pthread_spin_destroy (pthread_spinlock_t * lock)
   else
     {
       /*
-       * See notes in ptw32_spinlock_check_need_init() above also.
+       * See notes in pte_spinlock_check_need_init() above also.
        */
-      EnterCriticalSection (&ptw32_spinlock_test_init_lock);
+      EnterCriticalSection (&pte_spinlock_test_init_lock);
 
       /*
        * Check again.
@@ -105,7 +105,7 @@ pthread_spin_destroy (pthread_spinlock_t * lock)
 	  result = EBUSY;
 	}
 
-      LeaveCriticalSection (&ptw32_spinlock_test_init_lock);
+      LeaveCriticalSection (&pte_spinlock_test_init_lock);
     }
 
   return (result);

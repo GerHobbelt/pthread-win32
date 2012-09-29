@@ -12,10 +12,10 @@ pthread_win32_test_features_np(int mask)
 
 	The possible features are:
 
-		PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE
+		PTE_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE
 			Return TRUE if the native version of
 			InterlockedCompareExchange() is being used.
-		PTW32_ALERTABLE_ASYNC_CANCEL
+		PTE_ALERTABLE_ASYNC_CANCEL
 			Return TRUE is the QueueUserAPCEx package
 			QUSEREX.DLL is available and the AlertDrv.sys
 			driver is loaded into Windows, providing

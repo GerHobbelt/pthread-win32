@@ -45,7 +45,7 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
   int step;
   pthread_barrier_t b;
 
-  if (barrier == NULL || *barrier == (pthread_barrier_t) PTW32_OBJECT_INVALID)
+  if (barrier == NULL || *barrier == (pthread_barrier_t) PTE_OBJECT_INVALID)
     {
       return EINVAL;
     }
@@ -76,7 +76,7 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
       /*
        * Use the non-cancelable version of sem_wait().
        */
-      result = ptw32_semwait (&(b->semBarrierBreeched[step]));
+      result = pte_semwait (&(b->semBarrierBreeched[step]));
     }
 
   /*
@@ -85,12 +85,12 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
    */
   if (0 == result)
     {
-      result = ((PTW32_INTERLOCKED_LONG) step ==
-		PTW32_INTERLOCKED_COMPARE_EXCHANGE ((PTW32_INTERLOCKED_LPLONG)
+      result = ((PTE_INTERLOCKED_LONG) step ==
+		PTE_INTERLOCKED_COMPARE_EXCHANGE ((PTE_INTERLOCKED_LPLONG)
 						    & (b->iStep),
-						    (PTW32_INTERLOCKED_LONG)
+						    (PTE_INTERLOCKED_LONG)
 						    (1L - step),
-						    (PTW32_INTERLOCKED_LONG)
+						    (PTE_INTERLOCKED_LONG)
 						    step) ?
 		PTHREAD_BARRIER_SERIAL_THREAD : 0);
     }

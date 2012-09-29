@@ -1,5 +1,5 @@
 /*
- * ptw32_threadStart.c
+ * pte_threadStart.c
  *
  * Description:
  * This translation unit implements routines which are private to
@@ -45,7 +45,7 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
 {
   switch (ep->ExceptionRecord->ExceptionCode)
     {
-    case EXCEPTION_PTW32_SERVICES:
+    case EXCEPTION_PTE_SERVICES:
       {
 	DWORD param;
 	DWORD numParams = ep->ExceptionRecord->NumberParameters;
@@ -69,8 +69,8 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
 	 */
 	pthread_t self = pthread_self ();
 
-	(void) pthread_mutex_destroy (&((ptw32_thread_t *)self.p)->cancelLock);
-	ptw32_callUserDestroyRoutines (self);
+	(void) pthread_mutex_destroy (&((pte_thread_t *)self.p)->cancelLock);
+	pte_callUserDestroyRoutines (self);
 
 	return EXCEPTION_CONTINUE_SEARCH;
 	break;
@@ -104,12 +104,12 @@ typedef terminate_handler
 #endif
 
 static terminate_function
-  ptw32_oldTerminate;
+  pte_oldTerminate;
 
 void
-ptw32_terminate ()
+pte_terminate ()
 {
-  set_terminate (ptw32_oldTerminate);
+  set_terminate (pte_oldTerminate);
   (void) pthread_win32_thread_detach_np ();
   terminate ();
 }
@@ -122,11 +122,11 @@ unsigned
 #else
 void
 #endif
-ptw32_threadStart (void *vthreadParms)
+pte_threadStart (void *vthreadParms)
 {
   ThreadParms * threadParms = (ThreadParms *) vthreadParms;
   pthread_t self;
-  ptw32_thread_t * sp;
+  pte_thread_t * sp;
   void *(*start) (void *);
   void * arg;
 
@@ -142,7 +142,7 @@ ptw32_threadStart (void *vthreadParms)
   void * status = (void *) 0;
 
   self = threadParms->tid;
-  sp = (ptw32_thread_t *) self.p;
+  sp = (pte_thread_t *) self.p;
   start = threadParms->start;
   arg = threadParms->arg;
 
@@ -165,7 +165,7 @@ ptw32_threadStart (void *vthreadParms)
     }
 #endif
 
-  pthread_setspecific (ptw32_selfThreadKey, sp);
+  pthread_setspecific (pte_selfThreadKey, sp);
 
   sp->state = PThreadStateRunning;
 
@@ -188,14 +188,14 @@ ptw32_threadStart (void *vthreadParms)
   {
     switch (ei[0])
       {
-      case PTW32_EPS_CANCEL:
+      case PTE_EPS_CANCEL:
 	status = sp->exitStatus = PTHREAD_CANCELED;
 #ifdef _UWIN
 	if (--pthread_count <= 0)
 	  exit (0);
 #endif
 	break;
-      case PTW32_EPS_EXIT:
+      case PTE_EPS_EXIT:
 	status = sp->exitStatus;
 	break;
       default:
@@ -222,10 +222,10 @@ ptw32_threadStart (void *vthreadParms)
     {
       switch (setjmp_rc)
 	{
-	case PTW32_EPS_CANCEL:
+	case PTE_EPS_CANCEL:
 	  status = sp->exitStatus = PTHREAD_CANCELED;
 	  break;
-	case PTW32_EPS_EXIT:
+	case PTE_EPS_EXIT:
 	  status = sp->exitStatus;
 	  break;
 	default:
@@ -238,7 +238,7 @@ ptw32_threadStart (void *vthreadParms)
 
 #ifdef __CLEANUP_CXX
 
-  ptw32_oldTerminate = set_terminate (&ptw32_terminate);
+  pte_oldTerminate = set_terminate (&pte_terminate);
 
   try
   {
@@ -251,7 +251,7 @@ ptw32_threadStart (void *vthreadParms)
     {
       status = sp->exitStatus = (*start) (arg);
     }
-    catch (ptw32_exception &)
+    catch (pte_exception &)
     {
       /*
        * Pass these through to the outer block.
@@ -265,7 +265,7 @@ ptw32_threadStart (void *vthreadParms)
        * That function may call pthread_exit() or be canceled, which will
        * be handled by the outer try block.
        *
-       * ptw32_terminate() will be called if there is no user
+       * pte_terminate() will be called if there is no user
        * supplied function.
        */
 
@@ -281,14 +281,14 @@ ptw32_threadStart (void *vthreadParms)
       throw;
     }
   }
-  catch (ptw32_exception_cancel &)
+  catch (pte_exception_cancel &)
   {
     /*
      * Thread was canceled.
      */
     status = sp->exitStatus = PTHREAD_CANCELED;
   }
-  catch (ptw32_exception_exit &)
+  catch (pte_exception_exit &)
   {
     /*
      * Thread was exited via pthread_exit().
@@ -307,7 +307,7 @@ ptw32_threadStart (void *vthreadParms)
     sp->state = PThreadStateException;
     (void) pthread_mutex_unlock (&sp->cancelLock);
     (void) pthread_win32_thread_detach_np ();
-    (void) set_terminate (ptw32_oldTerminate);
+    (void) set_terminate (pte_oldTerminate);
     throw;
 
     /*
@@ -315,7 +315,7 @@ ptw32_threadStart (void *vthreadParms)
      */
   }
 
-  (void) set_terminate (ptw32_oldTerminate);
+  (void) set_terminate (pte_oldTerminate);
 
 #else
 
@@ -325,7 +325,7 @@ ptw32_threadStart (void *vthreadParms)
 #endif /* __CLEANUP_C */
 #endif /* __CLEANUP_SEH */
 
-#if defined(PTW32_STATIC_LIB)
+#if defined(PTE_STATIC_LIB)
   /*
    * We need to cleanup the pthread now if we have
    * been statically linked, in which case the cleanup
@@ -357,4 +357,4 @@ ptw32_threadStart (void *vthreadParms)
   return (unsigned) status;
 #endif
 
-}				/* ptw32_threadStart */
+}				/* pte_threadStart */

@@ -68,7 +68,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
   pthread_t self;
   int result = 0;
 
-  if (key != ptw32_selfThreadKey)
+  if (key != pte_selfThreadKey)
     {
       /*
        * Using pthread_self will implicitly create
@@ -87,7 +87,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
        * Resolve catch-22 of registering thread with selfThread
        * key
        */
-      ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
+      pte_thread_t * sp = (pte_thread_t *) pthread_getspecific (pte_selfThreadKey);
 
       if (sp == NULL)
         {
@@ -122,7 +122,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
 
 	  if (pthread_mutex_lock(&(key->keyLock)) == 0)
 	    {
-	      ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
+	      pte_thread_t * sp = (pte_thread_t *) self.p;
 
 	      (void) pthread_mutex_lock(&(sp->threadLock));
 
@@ -147,7 +147,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
 	       */
 	      if (assoc == NULL)
 		{
-		  result = ptw32_tkAssocCreate (sp, key);
+		  result = pte_tkAssocCreate (sp, key);
 		}
 
 	      (void) pthread_mutex_unlock(&(sp->threadLock));

@@ -1,5 +1,5 @@
 /*
- * ptw32_new.c
+ * pte_new.c
  *
  * Description:
  * This translation unit implements miscellaneous thread functions.
@@ -39,32 +39,32 @@
 
 
 pthread_t
-ptw32_new (void)
+pte_new (void)
 {
   pthread_t t;
   pthread_t nil = {NULL, 0};
-  ptw32_thread_t * tp;
+  pte_thread_t * tp;
 
   /*
    * If there's a reusable pthread_t then use it.
    */
-  t = ptw32_threadReusePop ();
+  t = pte_threadReusePop ();
 
   if (NULL != t.p)
     {
-      tp = (ptw32_thread_t *) t.p;
+      tp = (pte_thread_t *) t.p;
     }
   else
     {
       /* No reuse threads available */
-      tp = (ptw32_thread_t *) calloc (1, sizeof(ptw32_thread_t));
+      tp = (pte_thread_t *) calloc (1, sizeof(pte_thread_t));
 
       if (tp == NULL)
 	{
 	  return nil;
 	}
 
-      /* ptHandle.p needs to point to it's parent ptw32_thread_t. */
+      /* ptHandle.p needs to point to it's parent pte_thread_t. */
       t.p = tp->ptHandle.p = tp;
       t.x = tp->ptHandle.x = 0;
     }
@@ -76,13 +76,13 @@ ptw32_new (void)
   tp->cancelType = PTHREAD_CANCEL_DEFERRED;
   tp->cancelLock = PTHREAD_MUTEX_INITIALIZER;
   tp->threadLock = PTHREAD_MUTEX_INITIALIZER;
-  tp->cancelEvent = CreateEvent (0, (int) PTW32_TRUE,	/* manualReset  */
-				 (int) PTW32_FALSE,	/* setSignaled  */
+  tp->cancelEvent = CreateEvent (0, (int) PTE_TRUE,	/* manualReset  */
+				 (int) PTE_FALSE,	/* setSignaled  */
 				 NULL);
 
   if (tp->cancelEvent == NULL)
     {
-      ptw32_threadReusePush (tp->ptHandle);
+      pte_threadReusePush (tp->ptHandle);
       return nil;
     }
 

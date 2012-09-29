@@ -1,5 +1,5 @@
 /*
- * ptw32_semwait.c
+ * pte_semwait.c
  *
  * Description:
  * This translation unit implements mutual exclusion (mutex) primitives.
@@ -42,7 +42,7 @@
 
 
 int
-ptw32_semwait (sem_t * sem)
+pte_semwait (sem_t * sem)
      /*
       * ------------------------------------------------------
       * DESCRIPTION
@@ -115,4 +115,4 @@ ptw32_semwait (sem_t * sem)
 
   return 0;
 
-}				/* ptw32_semwait */
+}				/* pte_semwait */

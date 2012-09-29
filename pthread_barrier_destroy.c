@@ -44,7 +44,7 @@ pthread_barrier_destroy (pthread_barrier_t * barrier)
   int result = 0;
   pthread_barrier_t b;
 
-  if (barrier == NULL || *barrier == (pthread_barrier_t) PTW32_OBJECT_INVALID)
+  if (barrier == NULL || *barrier == (pthread_barrier_t) PTE_OBJECT_INVALID)
     {
       return EINVAL;
     }

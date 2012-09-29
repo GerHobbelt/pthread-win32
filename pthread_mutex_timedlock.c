@@ -39,7 +39,7 @@
 
 
 static INLINE int
-ptw32_timed_eventwait (HANDLE event, const struct timespec *abstime)
+pte_timed_eventwait (HANDLE event, const struct timespec *abstime)
      /*
       * ------------------------------------------------------
       * DESCRIPTION
@@ -81,7 +81,7 @@ ptw32_timed_eventwait (HANDLE event, const struct timespec *abstime)
 	  /* 
 	   * Calculate timeout as milliseconds from current system time. 
 	   */
-	  milliseconds = ptw32_relmillisecs (abstime);
+	  milliseconds = pte_relmillisecs (abstime);
 	}
 
       status = WaitForSingleObject (event, milliseconds);
@@ -102,7 +102,7 @@ ptw32_timed_eventwait (HANDLE event, const struct timespec *abstime)
 
   return 0;
 
-}				/* ptw32_timed_semwait */
+}				/* pte_timed_semwait */
 
 
 int
@@ -119,12 +119,12 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static mutex. We check
-   * again inside the guarded section of ptw32_mutex_check_need_init()
+   * again inside the guarded section of pte_mutex_check_need_init()
    * to avoid race conditions.
    */
   if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
-      if ((result = ptw32_mutex_check_need_init (mutex)) != 0)
+      if ((result = pte_mutex_check_need_init (mutex)) != 0)
 	{
 	  return (result);
 	}
@@ -134,15 +134,15 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 
   if (mx->kind == PTHREAD_MUTEX_NORMAL)
     {
-      if ((LONG) PTW32_INTERLOCKED_EXCHANGE(
+      if ((LONG) PTE_INTERLOCKED_EXCHANGE(
 		   (LPLONG) &mx->lock_idx,
 		   (LONG) 1) != 0)
 	{
-          while ((LONG) PTW32_INTERLOCKED_EXCHANGE(
+          while ((LONG) PTE_INTERLOCKED_EXCHANGE(
                           (LPLONG) &mx->lock_idx,
 			  (LONG) -1) != 0)
             {
-	      if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
+	      if (0 != (result = pte_timed_eventwait (mx->event, abstime)))
 		{
 		  return result;
 		}
@@ -153,10 +153,10 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
     {
       pthread_t self = pthread_self();
 
-      if ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE(
-                   (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
-		   (PTW32_INTERLOCKED_LONG) 1,
-		   (PTW32_INTERLOCKED_LONG) 0) == 0)
+      if ((PTE_INTERLOCKED_LONG) PTE_INTERLOCKED_COMPARE_EXCHANGE(
+                   (PTE_INTERLOCKED_LPLONG) &mx->lock_idx,
+		   (PTE_INTERLOCKED_LONG) 1,
+		   (PTE_INTERLOCKED_LONG) 0) == 0)
 	{
 	  mx->recursive_count = 1;
 	  mx->ownerThread = self;
@@ -176,11 +176,11 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 	    }
 	  else
 	    {
-              while ((LONG) PTW32_INTERLOCKED_EXCHANGE(
+              while ((LONG) PTE_INTERLOCKED_EXCHANGE(
                               (LPLONG) &mx->lock_idx,
 			      (LONG) -1) != 0)
                 {
-		  if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
+		  if (0 != (result = pte_timed_eventwait (mx->event, abstime)))
 		    {
 		      return result;
 		    }

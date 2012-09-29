@@ -1,5 +1,5 @@
 /*
- * ptw32_cond_check_need_init.c
+ * pte_cond_check_need_init.c
  *
  * Description:
  * This translation unit implements condition variables and their primitives.
@@ -40,7 +40,7 @@
 
 
 INLINE int
-ptw32_cond_check_need_init (pthread_cond_t * cond)
+pte_cond_check_need_init (pthread_cond_t * cond)
 {
   int result = 0;
 
@@ -65,7 +65,7 @@ ptw32_cond_check_need_init (pthread_cond_t * cond)
    * the number of processors + 1.
    *
    */
-  EnterCriticalSection (&ptw32_cond_test_init_lock);
+  EnterCriticalSection (&pte_cond_test_init_lock);
 
   /*
    * We got here possibly under race
@@ -88,7 +88,7 @@ ptw32_cond_check_need_init (pthread_cond_t * cond)
       result = EINVAL;
     }
 
-  LeaveCriticalSection (&ptw32_cond_test_init_lock);
+  LeaveCriticalSection (&pte_cond_test_init_lock);
 
   return result;
 }

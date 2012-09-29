@@ -1,5 +1,5 @@
 /*
- * ptw32_tkAssocDestroy.c
+ * pte_tkAssocDestroy.c
  *
  * Description:
  * This translation unit implements routines which are private to
@@ -40,7 +40,7 @@
 
 
 void
-ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
+pte_tkAssocDestroy (ThreadKeyAssoc * assoc)
      /*
       * -------------------------------------------------------------------
       * This routine releases all resources for the given ThreadKeyAssoc
@@ -111,4 +111,4 @@ ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
       free (assoc);
     }
 
-}				/* ptw32_tkAssocDestroy */
+}				/* pte_tkAssocDestroy */

@@ -55,7 +55,7 @@ sched_setscheduler (pid_t pid, int policy)
       if (pid != selfPid)
 	{
 	  HANDLE h =
-	    OpenProcess (PROCESS_SET_INFORMATION, PTW32_FALSE, (DWORD) pid);
+	    OpenProcess (PROCESS_SET_INFORMATION, PTE_FALSE, (DWORD) pid);
 
 	  if (NULL == h)
 	    {

@@ -113,9 +113,9 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
   else
     {
       /*
-       * See notes in ptw32_mutex_check_need_init() above also.
+       * See notes in pte_mutex_check_need_init() above also.
        */
-      EnterCriticalSection (&ptw32_mutex_test_init_lock);
+      EnterCriticalSection (&pte_mutex_test_init_lock);
 
       /*
        * Check again.
@@ -139,7 +139,7 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
 	  result = EBUSY;
 	}
 
-      LeaveCriticalSection (&ptw32_mutex_test_init_lock);
+      LeaveCriticalSection (&pte_mutex_test_init_lock);
     }
 
   return (result);

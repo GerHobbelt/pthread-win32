@@ -55,12 +55,12 @@ pthread_rwlock_timedwrlock (pthread_rwlock_t * rwlock,
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static rwlock. We check
-   * again inside the guarded section of ptw32_rwlock_check_need_init()
+   * again inside the guarded section of pte_rwlock_check_need_init()
    * to avoid race conditions.
    */
   if (*rwlock == PTHREAD_RWLOCK_INITIALIZER)
     {
-      result = ptw32_rwlock_check_need_init (rwlock);
+      result = pte_rwlock_check_need_init (rwlock);
 
       if (result != 0 && result != EBUSY)
 	{
@@ -70,7 +70,7 @@ pthread_rwlock_timedwrlock (pthread_rwlock_t * rwlock,
 
   rwl = *rwlock;
 
-  if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
+  if (rwl->nMagic != PTE_RWLOCK_MAGIC)
     {
       return EINVAL;
     }
@@ -108,7 +108,7 @@ pthread_rwlock_timedwrlock (pthread_rwlock_t * rwlock,
 #ifdef _MSC_VER
 #pragma inline_depth(0)
 #endif
-	  pthread_cleanup_push (ptw32_rwlock_cancelwrwait, (void *) rwl);
+	  pthread_cleanup_push (pte_rwlock_cancelwrwait, (void *) rwl);
 
 	  do
 	    {

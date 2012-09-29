@@ -63,16 +63,16 @@ pthread_setschedparam (pthread_t thread, int policy,
       return ENOTSUP;
     }
 
-  return (ptw32_setthreadpriority (thread, policy, param->sched_priority));
+  return (pte_setthreadpriority (thread, policy, param->sched_priority));
 }
 
 
 int
-ptw32_setthreadpriority (pthread_t thread, int policy, int priority)
+pte_setthreadpriority (pthread_t thread, int policy, int priority)
 {
   int prio;
   int result;
-  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
+  pte_thread_t * tp = (pte_thread_t *) thread.p;
 
   prio = priority;
 

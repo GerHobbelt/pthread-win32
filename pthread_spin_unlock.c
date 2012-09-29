@@ -56,18 +56,18 @@ pthread_spin_unlock (pthread_spinlock_t * lock)
     }
 
   switch ((long)
-	  PTW32_INTERLOCKED_COMPARE_EXCHANGE ((PTW32_INTERLOCKED_LPLONG) &
+	  PTE_INTERLOCKED_COMPARE_EXCHANGE ((PTE_INTERLOCKED_LPLONG) &
 					      (s->interlock),
-					      (PTW32_INTERLOCKED_LONG)
-					      PTW32_SPIN_UNLOCKED,
-					      (PTW32_INTERLOCKED_LONG)
-					      PTW32_SPIN_LOCKED))
+					      (PTE_INTERLOCKED_LONG)
+					      PTE_SPIN_UNLOCKED,
+					      (PTE_INTERLOCKED_LONG)
+					      PTE_SPIN_LOCKED))
     {
-    case PTW32_SPIN_LOCKED:
+    case PTE_SPIN_LOCKED:
       return 0;
-    case PTW32_SPIN_UNLOCKED:
+    case PTE_SPIN_UNLOCKED:
       return EPERM;
-    case PTW32_SPIN_USE_MUTEX:
+    case PTE_SPIN_USE_MUTEX:
       return pthread_mutex_unlock (&(s->u.mutex));
     }
 

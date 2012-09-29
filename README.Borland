@@ -1,4 +1,4 @@
-In ptw32_InterlockedCompareExchange.c, I've added a section for
+In pte_InterlockedCompareExchange.c, I've added a section for
 Borland's compiler; it's identical to that for the MS compiler except
 that it uses /* ... */ comments instead of ; comments.
 

@@ -69,7 +69,7 @@ pthread_testcancel (void)
       */
 {
   pthread_t self = pthread_self ();
-  ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
+  pte_thread_t * sp = (pte_thread_t *) self.p;
 
   if (sp == NULL)
     {
@@ -95,7 +95,7 @@ pthread_testcancel (void)
       (void) pthread_mutex_unlock (&sp->cancelLock);
       sp->cancelState = PTHREAD_CANCEL_DISABLE;
       (void) pthread_mutex_unlock (&sp->cancelLock);
-      ptw32_throw (PTW32_EPS_CANCEL);
+      pte_throw (PTE_EPS_CANCEL);
     }
 
   (void) pthread_mutex_unlock (&sp->cancelLock);

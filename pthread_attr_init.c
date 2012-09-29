@@ -109,7 +109,7 @@ pthread_attr_init (pthread_attr_t * attr)
   attr_result->inheritsched = PTHREAD_EXPLICIT_SCHED;
   attr_result->contentionscope = PTHREAD_SCOPE_SYSTEM;
 
-  attr_result->valid = PTW32_ATTR_VALID;
+  attr_result->valid = PTE_ATTR_VALID;
 
   *attr = attr_result;
 

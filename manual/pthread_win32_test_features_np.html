@@ -25,12 +25,12 @@ find out what features were detected at process attach time.</P>
 check which run-time auto-detected features are available within the
 library.</P>
 <P>The possible features are:</P>
-<P><B>PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE</B></P>
+<P><B>PTE_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE</B></P>
 <P STYLE="margin-left: 2cm">Return TRUE if the Win32 version of
 InterlockedCompareExchange() is being used. On IA32 systems the
 library can use optimised and inlinable assembler versions of
 InterlockedExchange() and InterlockedCompareExchange().</P>
-<P><B>PTW32_ALERTABLE_ASYNC_CANCEL</B></P>
+<P><B>PTE_ALERTABLE_ASYNC_CANCEL</B></P>
 <P STYLE="margin-left: 2cm">Return TRUE if the QueueUserAPCEx package
 QUSEREX.DLL and the AlertDrv.sys driver was detected. This package
 provides alertable (pre-emptive) asynchronous threads cancellation.

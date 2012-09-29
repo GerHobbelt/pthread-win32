@@ -73,10 +73,10 @@ pthread_detach (pthread_t thread)
       */
 {
   int result;
-  BOOL destroyIt = PTW32_FALSE;
-  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
+  BOOL destroyIt = PTE_FALSE;
+  pte_thread_t * tp = (pte_thread_t *) thread.p;
 
-  EnterCriticalSection (&ptw32_thread_reuse_lock);
+  EnterCriticalSection (&pte_thread_reuse_lock);
 
   if (NULL == tp
       || thread.x != tp->ptHandle.x)
@@ -90,7 +90,7 @@ pthread_detach (pthread_t thread)
   else
     {
       /*
-       * Joinable ptw32_thread_t structs are not scavenged until
+       * Joinable pte_thread_t structs are not scavenged until
        * a join or detach is done. The thread may have exited already,
        * but all of the state and locks etc are still there.
        */
@@ -107,7 +107,7 @@ pthread_detach (pthread_t thread)
 	      /*
 	       * Thread is joinable and has exited or is exiting.
 	       */
-	      destroyIt = PTW32_TRUE;
+	      destroyIt = PTE_TRUE;
 	    }
 	  (void) pthread_mutex_unlock (&tp->cancelLock);
 	}
@@ -118,7 +118,7 @@ pthread_detach (pthread_t thread)
 	}
     }
 
-  LeaveCriticalSection (&ptw32_thread_reuse_lock);
+  LeaveCriticalSection (&pte_thread_reuse_lock);
 
   if (result == 0)
     {
@@ -130,7 +130,7 @@ pthread_detach (pthread_t thread)
 	   * detached. Need to wait in case it's still exiting.
 	   */
 	  (void) WaitForSingleObject(tp->threadH, INFINITE);
-	  ptw32_threadDestroy (thread);
+	  pte_threadDestroy (thread);
 	}
     }
 

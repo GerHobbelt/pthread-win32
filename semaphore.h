@@ -39,29 +39,29 @@
 #if !defined( SEMAPHORE_H )
 #define SEMAPHORE_H
 
-#undef PTW32_LEVEL
+#undef PTE_LEVEL
 
 #if defined(_POSIX_SOURCE)
-#define PTW32_LEVEL 0
+#define PTE_LEVEL 0
 /* Early POSIX */
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 199309
-#undef PTW32_LEVEL
-#define PTW32_LEVEL 1
+#undef PTE_LEVEL
+#define PTE_LEVEL 1
 /* Include 1b, 1c and 1d */
 #endif
 
 #if defined(INCLUDE_NP)
-#undef PTW32_LEVEL
-#define PTW32_LEVEL 2
+#undef PTE_LEVEL
+#define PTE_LEVEL 2
 /* Include Non-Portable extensions */
 #endif
 
-#define PTW32_LEVEL_MAX 3
+#define PTE_LEVEL_MAX 3
 
-#if !defined(PTW32_LEVEL)
-#define PTW32_LEVEL PTW32_LEVEL_MAX
+#if !defined(PTE_LEVEL)
+#define PTE_LEVEL PTE_LEVEL_MAX
 /* Include everything */
 #endif
 
@@ -70,19 +70,19 @@
 #endif
 
 /*
- * When building the DLL code, you should define PTW32_BUILD so that
+ * When building the DLL code, you should define PTE_BUILD so that
  * the variables/functions are exported correctly. When using the DLL,
- * do NOT define PTW32_BUILD, and then the variables/functions will
+ * do NOT define PTE_BUILD, and then the variables/functions will
  * be imported correctly.
  */
-#ifndef PTW32_STATIC_LIB
-#  ifdef PTW32_BUILD
-#    define PTW32_DLLPORT __declspec (dllexport)
+#ifndef PTE_STATIC_LIB
+#  ifdef PTE_BUILD
+#    define PTE_DLLPORT __declspec (dllexport)
 #  else
-#    define PTW32_DLLPORT __declspec (dllimport)
+#    define PTE_DLLPORT __declspec (dllimport)
 #  endif
 #else
-#  define PTW32_DLLPORT
+#  define PTE_DLLPORT
 #endif
 
 /*
@@ -90,7 +90,7 @@
  * which is only used when building the pthread-win32 libraries.
  */
 
-#ifndef PTW32_CONFIG_H
+#ifndef PTE_CONFIG_H
 #  if defined(WINCE)
 #    define NEED_ERRNO
 #    define NEED_SEM
@@ -104,13 +104,13 @@
  *
  */
 
-#if PTW32_LEVEL >= PTW32_LEVEL_MAX
+#if PTE_LEVEL >= PTE_LEVEL_MAX
 #ifdef NEED_ERRNO
 #include "need_errno.h"
 #else
 #include <errno.h>
 #endif
-#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
+#endif /* PTE_LEVEL >= PTE_LEVEL_MAX */
 
 #define _POSIX_SEMAPHORES
 
@@ -126,41 +126,41 @@ typedef unsigned int mode_t;
 
 typedef struct sem_t_ * sem_t;
 
-PTW32_DLLPORT int __cdecl sem_init (sem_t * sem,
+PTE_DLLPORT int __cdecl sem_init (sem_t * sem,
 			    int pshared,
 			    unsigned int value);
 
-PTW32_DLLPORT int __cdecl sem_destroy (sem_t * sem);
+PTE_DLLPORT int __cdecl sem_destroy (sem_t * sem);
 
-PTW32_DLLPORT int __cdecl sem_trywait (sem_t * sem);
+PTE_DLLPORT int __cdecl sem_trywait (sem_t * sem);
 
-PTW32_DLLPORT int __cdecl sem_wait (sem_t * sem);
+PTE_DLLPORT int __cdecl sem_wait (sem_t * sem);
 
-PTW32_DLLPORT int __cdecl sem_timedwait (sem_t * sem,
+PTE_DLLPORT int __cdecl sem_timedwait (sem_t * sem,
 				 const struct timespec * abstime);
 
-PTW32_DLLPORT int __cdecl sem_post (sem_t * sem);
+PTE_DLLPORT int __cdecl sem_post (sem_t * sem);
 
-PTW32_DLLPORT int __cdecl sem_post_multiple (sem_t * sem,
+PTE_DLLPORT int __cdecl sem_post_multiple (sem_t * sem,
 				     int count);
 
-PTW32_DLLPORT int __cdecl sem_open (const char * name,
+PTE_DLLPORT int __cdecl sem_open (const char * name,
 			    int oflag,
 			    mode_t mode,
 			    unsigned int value);
 
-PTW32_DLLPORT int __cdecl sem_close (sem_t * sem);
+PTE_DLLPORT int __cdecl sem_close (sem_t * sem);
 
-PTW32_DLLPORT int __cdecl sem_unlink (const char * name);
+PTE_DLLPORT int __cdecl sem_unlink (const char * name);
 
-PTW32_DLLPORT int __cdecl sem_getvalue (sem_t * sem,
+PTE_DLLPORT int __cdecl sem_getvalue (sem_t * sem,
 				int * sval);
 
 #ifdef __cplusplus
 }				/* End of extern "C" */
 #endif				/* __cplusplus */
 
-#undef PTW32_LEVEL
-#undef PTW32_LEVEL_MAX
+#undef PTE_LEVEL
+#undef PTE_LEVEL_MAX
 
 #endif				/* !SEMAPHORE_H */

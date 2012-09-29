@@ -38,7 +38,7 @@
 #include "implement.h"
 
 INLINE int
-ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock)
+pte_rwlock_check_need_init (pthread_rwlock_t * rwlock)
 {
   int result = 0;
 
@@ -63,7 +63,7 @@ ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock)
    * the number of processors + 1.
    *
    */
-  EnterCriticalSection (&ptw32_rwlock_test_init_lock);
+  EnterCriticalSection (&pte_rwlock_test_init_lock);
 
   /*
    * We got here possibly under race
@@ -87,7 +87,7 @@ ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock)
       result = EINVAL;
     }
 
-  LeaveCriticalSection (&ptw32_rwlock_test_init_lock);
+  LeaveCriticalSection (&pte_rwlock_test_init_lock);
 
   return result;
 }

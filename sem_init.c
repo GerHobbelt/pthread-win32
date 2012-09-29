@@ -115,8 +115,8 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 #ifdef NEED_SEM
 
 	  s->sem = CreateEvent (NULL,
-				PTW32_FALSE,	/* auto (not manual) reset */
-				PTW32_FALSE,	/* initial state is unset */
+				PTE_FALSE,	/* auto (not manual) reset */
+				PTE_FALSE,	/* initial state is unset */
 				NULL);
 
 	  if (0 == s->sem)

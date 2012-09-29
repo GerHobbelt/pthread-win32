@@ -39,7 +39,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-#include "ptw32_cond_check_need_init.c"
+#include "pte_cond_check_need_init.c"
 #include "pthread_condattr_init.c"
 #include "pthread_condattr_destroy.c"
 #include "pthread_condattr_getpshared.c"

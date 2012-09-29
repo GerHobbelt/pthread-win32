@@ -52,8 +52,8 @@ typedef struct {
 } sem_timedwait_cleanup_args_t;
 
 
-static void PTW32_CDECL
-ptw32_sem_timedwait_cleanup (void * args)
+static void PTE_CDECL
+pte_sem_timedwait_cleanup (void * args)
 {
   sem_timedwait_cleanup_args_t * a = (sem_timedwait_cleanup_args_t *)args;
   sem_t s = a->sem;
@@ -156,7 +156,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 	  /* 
 	   * Calculate timeout as milliseconds from current system time. 
 	   */
-	  milliseconds = ptw32_relmillisecs (abstime);
+	  milliseconds = pte_relmillisecs (abstime);
 	}
 
       if ((result = pthread_mutex_lock (&s->lock)) == 0)
@@ -189,7 +189,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 #pragma inline_depth(0)
 #endif
 	      /* Must wait */
-              pthread_cleanup_push(ptw32_sem_timedwait_cleanup, (void *) &cleanup_args);
+              pthread_cleanup_push(pte_sem_timedwait_cleanup, (void *) &cleanup_args);
 #ifdef NEED_SEM
 	      timedout =
 #endif

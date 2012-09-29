@@ -86,7 +86,7 @@ pthread_delay_np (struct timespec *interval)
   DWORD millisecs;
   DWORD status;
   pthread_t self;
-  ptw32_thread_t * sp;
+  pte_thread_t * sp;
 
   if (interval == NULL)
     {
@@ -130,7 +130,7 @@ pthread_delay_np (struct timespec *interval)
       return ENOMEM;
     }
 
-  sp = (ptw32_thread_t *) self.p;
+  sp = (pte_thread_t *) self.p;
 
   if (sp->cancelState == PTHREAD_CANCEL_ENABLE)
     {
@@ -151,7 +151,7 @@ pthread_delay_np (struct timespec *interval)
 	      sp->cancelState = PTHREAD_CANCEL_DISABLE;
 	      (void) pthread_mutex_unlock (&sp->cancelLock);
 
-	      ptw32_throw (PTW32_EPS_CANCEL);
+	      pte_throw (PTE_EPS_CANCEL);
 	    }
 
 	  (void) pthread_mutex_unlock (&sp->cancelLock);

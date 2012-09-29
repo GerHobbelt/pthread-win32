@@ -9,7 +9,7 @@ main()
   printf("Sizes of pthreads-win32 structs\n");
   printf("-------------------------------\n");
   printf("%30s %4d\n", "pthread_t", sizeof(pthread_t));
-  printf("%30s %4d\n", "ptw32_thread_t", sizeof(ptw32_thread_t));
+  printf("%30s %4d\n", "pte_thread_t", sizeof(pte_thread_t));
   printf("%30s %4d\n", "pthread_attr_t_", sizeof(struct pthread_attr_t_));
   printf("%30s %4d\n", "sem_t_", sizeof(struct sem_t_));
   printf("%30s %4d\n", "pthread_mutex_t_", sizeof(struct pthread_mutex_t_));
@@ -23,8 +23,8 @@ main()
   printf("%30s %4d\n", "pthread_rwlock_t_", sizeof(struct pthread_rwlock_t_));
   printf("%30s %4d\n", "pthread_rwlockattr_t_", sizeof(struct pthread_rwlockattr_t_));
   printf("%30s %4d\n", "pthread_once_t_", sizeof(struct pthread_once_t_));
-  printf("%30s %4d\n", "ptw32_cleanup_t", sizeof(struct ptw32_cleanup_t));
-  printf("%30s %4d\n", "ptw32_mcs_node_t_", sizeof(struct ptw32_mcs_node_t_));
+  printf("%30s %4d\n", "pte_cleanup_t", sizeof(struct pte_cleanup_t));
+  printf("%30s %4d\n", "pte_mcs_node_t_", sizeof(struct pte_mcs_node_t_));
   printf("%30s %4d\n", "sched_param", sizeof(struct sched_param));
   printf("-------------------------------\n");
 

@@ -155,27 +155,27 @@ SMALL_STATIC_OBJS	= \
 		pthread_setschedparam.obj \
 		pthread_getschedparam.obj \
 		pthread_timechange_handler_np.obj \
-		ptw32_is_attr.obj \
-		ptw32_processInitialize.obj \
-		ptw32_processTerminate.obj \
-		ptw32_threadStart.obj \
-		ptw32_threadDestroy.obj \
-		ptw32_tkAssocCreate.obj \
-		ptw32_tkAssocDestroy.obj \
-		ptw32_callUserDestroyRoutines.obj \
-		ptw32_timespec.obj \
-		ptw32_throw.obj \
-		ptw32_InterlockedCompareExchange.obj \
-		ptw32_getprocessors.obj \
-		ptw32_calloc.obj \
-		ptw32_new.obj \
-		ptw32_reuse.obj \
-		ptw32_rwlock_check_need_init.obj \
-		ptw32_cond_check_need_init.obj \
-		ptw32_mutex_check_need_init.obj \
-		ptw32_semwait.obj \
-		ptw32_relmillisecs.obj \
-		ptw32_MCS_lock.obj \
+		pte_is_attr.obj \
+		pte_processInitialize.obj \
+		pte_processTerminate.obj \
+		pte_threadStart.obj \
+		pte_threadDestroy.obj \
+		pte_tkAssocCreate.obj \
+		pte_tkAssocDestroy.obj \
+		pte_callUserDestroyRoutines.obj \
+		pte_timespec.obj \
+		pte_throw.obj \
+		pte_InterlockedCompareExchange.obj \
+		pte_getprocessors.obj \
+		pte_calloc.obj \
+		pte_new.obj \
+		pte_reuse.obj \
+		pte_rwlock_check_need_init.obj \
+		pte_cond_check_need_init.obj \
+		pte_mutex_check_need_init.obj \
+		pte_semwait.obj \
+		pte_relmillisecs.obj \
+		pte_MCS_lock.obj \
 		sched_get_priority_max.obj \
 		sched_get_priority_min.obj \
 		sched_setscheduler.obj \
@@ -194,7 +194,7 @@ SMALL_STATIC_OBJS	= \
 		sem_unlink.obj \
 		signal.obj \
 		pthread_kill.obj \
-		ptw32_spinlock_check_need_init.obj \
+		pte_spinlock_check_need_init.obj \
 		pthread_spin_init.obj \
 		pthread_spin_destroy.obj \
 		pthread_spin_lock.obj \
@@ -239,7 +239,7 @@ CANCEL_SRCS	= \
 		pthread_cancel.c 
 
 CONDVAR_SRCS	= \
-		ptw32_cond_check_need_init.c \
+		pte_cond_check_need_init.c \
 		pthread_condattr_destroy.c \
 		pthread_condattr_getpshared.c \
 		pthread_condattr_init.c \
@@ -259,15 +259,15 @@ MISC_SRCS	= \
 		pthread_once.c \
 		pthread_self.c \
 		pthread_setconcurrency.c \
-		ptw32_calloc.c \
-		ptw32_MCS_lock.c \
-		ptw32_new.c \
-		ptw32_reuse.c \
-		ptw32_relmillisecs.c \
+		pte_calloc.c \
+		pte_MCS_lock.c \
+		pte_new.c \
+		pte_reuse.c \
+		pte_relmillisecs.c \
 		w32_CancelableWait.c
 
 MUTEX_SRCS	= \
-		ptw32_mutex_check_need_init.c \
+		pte_mutex_check_need_init.c \
 		pthread_mutex_init.c \
 		pthread_mutex_destroy.c \
 		pthread_mutexattr_init.c \
@@ -291,23 +291,23 @@ NONPORTABLE_SRCS = \
 		pthread_timechange_handler_np.c 
 
 PRIVATE_SRCS	= \
-		ptw32_is_attr.c \
-		ptw32_processInitialize.c \
-		ptw32_processTerminate.c \
-		ptw32_threadStart.c \
-		ptw32_threadDestroy.c \
-		ptw32_tkAssocCreate.c \
-		ptw32_tkAssocDestroy.c \
-		ptw32_callUserDestroyRoutines.c \
-		ptw32_semwait.c \
-		ptw32_timespec.c \
-		ptw32_throw.c \
-		ptw32_InterlockedCompareExchange.c \
-		ptw32_getprocessors.c
+		pte_is_attr.c \
+		pte_processInitialize.c \
+		pte_processTerminate.c \
+		pte_threadStart.c \
+		pte_threadDestroy.c \
+		pte_tkAssocCreate.c \
+		pte_tkAssocDestroy.c \
+		pte_callUserDestroyRoutines.c \
+		pte_semwait.c \
+		pte_timespec.c \
+		pte_throw.c \
+		pte_InterlockedCompareExchange.c \
+		pte_getprocessors.c
 
 RWLOCK_SRCS	= \
-		ptw32_rwlock_check_need_init.c \
-		ptw32_rwlock_cancelwrwait.c \
+		pte_rwlock_check_need_init.c \
+		pte_rwlock_cancelwrwait.c \
 		pthread_rwlock_init.c \
 		pthread_rwlock_destroy.c \
 		pthread_rwlockattr_init.c \
@@ -351,7 +351,7 @@ SEMAPHORE_SRCS = \
 		sem_unlink.c
 
 SPIN_SRCS	= \
-		ptw32_spinlock_check_need_init.c \
+		pte_spinlock_check_need_init.c \
 		pthread_spin_init.c \
 		pthread_spin_destroy.c \
 		pthread_spin_lock.c \
@@ -417,28 +417,28 @@ VC-debug:
 # inlining optimisation turned on.
 #
 VCE-inlined:
-	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).stamp
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCEFLAGS) /DPTE_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).stamp
 
 VCE-inlined-debug:
-	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCEFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).stamp
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCEFLAGSD) /DPTE_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).stamp
 
 VSE-inlined:
-	@ nmake /nologo EHFLAGS="$(OPTIM) $(VSEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).stamp
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VSEFLAGS) /DPTE_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).stamp
 
 VSE-inlined-debug:
-	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VSEFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).stamp
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VSEFLAGSD) /DPTE_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).stamp
 
 VC-inlined:
-	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).stamp
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS) /DPTE_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).stamp
 
 VC-inlined-debug:
-	nmake /nologo EHFLAGS="$(OPTIMD) $(VCFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).stamp
+	nmake /nologo EHFLAGS="$(OPTIMD) $(VCFLAGSD) /DPTE_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).stamp
 
 VC-static:
-	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS) /DPTW32_BUILD_INLINED /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).static
+	@ nmake /nologo EHFLAGS="$(OPTIM) $(VCFLAGS) /DPTE_BUILD_INLINED /DPTE_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).static
 
 VC-static-debug:
-	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCFLAGSD) /DPTW32_BUILD_INLINED /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).static
+	@ nmake /nologo EHFLAGS="$(OPTIMD) $(VCFLAGSD) /DPTE_BUILD_INLINED /DPTE_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).static
 
 realclean: clean
 	if exist pthread*.dll del pthread*.dll
@@ -481,7 +481,7 @@ $(STATIC_STAMPS): $(DLL_INLINED_OBJS)
 	cl $(EHFLAGS) /D$(CLEANUP) -c $<
 
 .rc.res:
-	rc /dPTW32_RC_MSC /d$(CLEANUP) $<
+	rc /dPTE_RC_MSC /d$(CLEANUP) $<
 
 .c.i:
 	cl /P /O2 /Ob1 $(VCFLAGS) $<

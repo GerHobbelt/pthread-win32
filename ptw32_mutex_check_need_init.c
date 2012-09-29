@@ -1,5 +1,5 @@
 /*
- * ptw32_mutex_check_need_init.c
+ * pte_mutex_check_need_init.c
  *
  * Description:
  * This translation unit implements mutual exclusion (mutex) primitives.
@@ -37,16 +37,16 @@
 #include "pthread.h"
 #include "implement.h"
 
-static struct pthread_mutexattr_t_ ptw32_recursive_mutexattr_s =
+static struct pthread_mutexattr_t_ pte_recursive_mutexattr_s =
   {PTHREAD_PROCESS_PRIVATE, PTHREAD_MUTEX_RECURSIVE};
-static struct pthread_mutexattr_t_ ptw32_errorcheck_mutexattr_s =
+static struct pthread_mutexattr_t_ pte_errorcheck_mutexattr_s =
   {PTHREAD_PROCESS_PRIVATE, PTHREAD_MUTEX_ERRORCHECK};
-static pthread_mutexattr_t ptw32_recursive_mutexattr = &ptw32_recursive_mutexattr_s;
-static pthread_mutexattr_t ptw32_errorcheck_mutexattr = &ptw32_errorcheck_mutexattr_s;
+static pthread_mutexattr_t pte_recursive_mutexattr = &pte_recursive_mutexattr_s;
+static pthread_mutexattr_t pte_errorcheck_mutexattr = &pte_errorcheck_mutexattr_s;
 
 
 INLINE int
-ptw32_mutex_check_need_init (pthread_mutex_t * mutex)
+pte_mutex_check_need_init (pthread_mutex_t * mutex)
 {
   register int result = 0;
   register pthread_mutex_t mtx;
@@ -72,7 +72,7 @@ ptw32_mutex_check_need_init (pthread_mutex_t * mutex)
    * the number of processors + 1.
    *
    */
-  EnterCriticalSection (&ptw32_mutex_test_init_lock);
+  EnterCriticalSection (&pte_mutex_test_init_lock);
 
   /*
    * We got here possibly under race
@@ -90,11 +90,11 @@ ptw32_mutex_check_need_init (pthread_mutex_t * mutex)
     }
   else if (mtx == PTHREAD_RECURSIVE_MUTEX_INITIALIZER)
     {
-      result = pthread_mutex_init (mutex, &ptw32_recursive_mutexattr);
+      result = pthread_mutex_init (mutex, &pte_recursive_mutexattr);
     }
   else if (mtx == PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
-      result = pthread_mutex_init (mutex, &ptw32_errorcheck_mutexattr);
+      result = pthread_mutex_init (mutex, &pte_errorcheck_mutexattr);
     }
   else if (mtx == NULL)
     {
@@ -106,7 +106,7 @@ ptw32_mutex_check_need_init (pthread_mutex_t * mutex)
       result = EINVAL;
     }
 
-  LeaveCriticalSection (&ptw32_mutex_test_init_lock);
+  LeaveCriticalSection (&pte_mutex_test_init_lock);
 
   return (result);
 }

@@ -45,7 +45,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-#define PTW32_THREAD_NULL_ID {NULL,0}
+#define PTE_THREAD_NULL_ID {NULL,0}
 
 #if defined(__MINGW32__)
 #include <stdint.h>

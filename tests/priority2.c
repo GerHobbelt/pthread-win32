@@ -74,13 +74,13 @@
 #include "test.h"
 
 enum {
-  PTW32TEST_THREAD_INIT_PRIO = 0,
-  PTW32TEST_MAXPRIORITIES = 512
+  PTETEST_THREAD_INIT_PRIO = 0,
+  PTETEST_MAXPRIORITIES = 512
 };
 
 int minPrio;
 int maxPrio;
-int validPriorities[PTW32TEST_MAXPRIORITIES];
+int validPriorities[PTETEST_MAXPRIORITIES];
 pthread_barrier_t startBarrier, endBarrier;
 
 void * func(void * arg)
@@ -118,7 +118,7 @@ getValidPriorities(void * arg)
        */
         param.sched_priority = prioSet;
 	assert(pthread_setschedparam(thread, SCHED_OTHER, &param) == 0);
-	validPriorities[prioSet+(PTW32TEST_MAXPRIORITIES/2)] = GetThreadPriority(threadH);
+	validPriorities[prioSet+(PTETEST_MAXPRIORITIES/2)] = GetThreadPriority(threadH);
     }
 
   return (void *) 0;
@@ -147,7 +147,7 @@ main()
    * is unchanged from the previous value.
    */
   SetThreadPriority(pthread_getw32threadhandle_np(pthread_self()),
-                    PTW32TEST_THREAD_INIT_PRIO);
+                    PTETEST_THREAD_INIT_PRIO);
 
   for (param.sched_priority = minPrio;
        param.sched_priority <= maxPrio;
@@ -160,7 +160,7 @@ main()
       result2 = pthread_barrier_wait(&endBarrier);
       assert(result2 == 0 || result2 == PTHREAD_BARRIER_SERIAL_THREAD);
       assert(GetThreadPriority(pthread_getw32threadhandle_np(t)) ==
-	  validPriorities[param.sched_priority+(PTW32TEST_MAXPRIORITIES/2)]);
+	  validPriorities[param.sched_priority+(PTETEST_MAXPRIORITIES/2)]);
       pthread_join(t, &result);
       assert(param.sched_priority == (int)result);
     }

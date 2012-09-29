@@ -1,5 +1,5 @@
 /*
- * ptw32_threadDestroy.c
+ * pte_threadDestroy.c
  *
  * Description:
  * This translation unit implements routines which are private to
@@ -40,10 +40,10 @@
 
 
 void
-ptw32_threadDestroy (pthread_t thread)
+pte_threadDestroy (pthread_t thread)
 {
-  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
-  ptw32_thread_t threadCopy;
+  pte_thread_t * tp = (pte_thread_t *) thread.p;
+  pte_thread_t threadCopy;
 
   if (tp != NULL)
     {
@@ -56,7 +56,7 @@ ptw32_threadDestroy (pthread_t thread)
        * Thread ID structs are never freed. They're NULLed and reused.
        * This also sets the thread to PThreadStateInitial (invalid).
        */
-      ptw32_threadReusePush (thread);
+      pte_threadReusePush (thread);
 
       /* Now work on the copy. */
       if (threadCopy.cancelEvent != NULL)
@@ -78,5 +78,5 @@ ptw32_threadDestroy (pthread_t thread)
 #endif
 
     }
-}				/* ptw32_threadDestroy */
+}				/* pte_threadDestroy */
 

@@ -81,7 +81,7 @@ pthread_setcanceltype (int type, int *oldtype)
 {
   int result = 0;
   pthread_t self = pthread_self ();
-  ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
+  pte_thread_t * sp = (pte_thread_t *) self.p;
 
   if (sp == NULL
       || (type != PTHREAD_CANCEL_DEFERRED
@@ -113,7 +113,7 @@ pthread_setcanceltype (int type, int *oldtype)
       sp->cancelState = PTHREAD_CANCEL_DISABLE;
       ResetEvent (sp->cancelEvent);
       (void) pthread_mutex_unlock (&sp->cancelLock);
-      ptw32_throw (PTW32_EPS_CANCEL);
+      pte_throw (PTE_EPS_CANCEL);
 
       /* Never reached */
     }

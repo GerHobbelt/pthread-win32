@@ -419,7 +419,7 @@ suffix (1) in this snapshot. E.g. pthreadVC1.dll etc.
 has been kept as default, but the behaviour can now be controlled when the DLL
 is built to effectively switch it off. This makes the library much more
 sensitive to applications that assume that POSIX thread IDs are unique, i.e.
-are not strictly compliant with POSIX. See the PTW32_THREAD_ID_REUSE_INCREMENT
+are not strictly compliant with POSIX. See the PTE_THREAD_ID_REUSE_INCREMENT
 macro comments in config.h for details.
 
 Other changes
@@ -539,7 +539,7 @@ Bug fixes
 * Bug and memory leak in sem_init()
 - Alex Blanco  <Alex.Blanco at motorola.com>
 
-* ptw32_getprocessors() now returns CPU count of 1 for WinCE.
+* pte_getprocessors() now returns CPU count of 1 for WinCE.
 - James Ewing  <james.ewing at sveasoft.com>
 
 * pthread_cond_wait() could be canceled at a point where it should not
@@ -600,7 +600,7 @@ SNAPSHOT 2003-09-04
 
 Bug fixes
 ---------
-* ptw32_cancelableWait() now allows cancelation of waiting implicit POSIX
+* pte_cancelableWait() now allows cancelation of waiting implicit POSIX
 threads.
 
 New test
@@ -729,13 +729,13 @@ Bug fixes
 * sem_timedwait() now uses tighter checks for unreasonable
 abstime values - that would result in unexpected timeout values.
 
-* ptw32_cond_wait_cleanup() no longer mysteriously consumes
+* pte_cond_wait_cleanup() no longer mysteriously consumes
 CV signals but may produce more spurious wakeups. It is believed
 that the sem_timedwait() call is consuming a CV signal that it
 shouldn't.
 - Alexander Terekhov  <TEREKHOV@de.ibm.com>
 
-* Fixed a memory leak in ptw32_threadDestroy() for implicit threads.
+* Fixed a memory leak in pte_threadDestroy() for implicit threads.
 
 * Fixed potential for deadlock in pthread_cond_destroy().
 A deadlock could occur for statically declared CVs (PTHREAD_COND_INITIALIZER),
@@ -758,7 +758,7 @@ from the compiler/language, and one of the following was defined accordingly:
 
 These defines determine the style of cleanup (see pthread.h) and,
 most importantly, the way that cancelation and thread exit (via
-pthread_exit) is performed (see the routine ptw32_throw() in private.c).
+pthread_exit) is performed (see the routine pte_throw() in private.c).
 
 In short, the exceptions versions of the library throw an exception
 when a thread is canceled or exits (via pthread_exit()), which is

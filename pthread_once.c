@@ -38,12 +38,12 @@
 #include "implement.h"
 
 
-static void PTW32_CDECL
-ptw32_once_on_init_cancel (void * arg)
+static void PTE_CDECL
+pte_once_on_init_cancel (void * arg)
 {
   /* when the initting thread is cancelled we have to release the lock */
-  ptw32_mcs_local_node_t *node = (ptw32_mcs_local_node_t *)arg;
-  ptw32_mcs_lock_release(node);
+  pte_mcs_local_node_t *node = (pte_mcs_local_node_t *)arg;
+  pte_mcs_lock_release(node);
 }
 
 int
@@ -56,9 +56,9 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
   
   if (!InterlockedExchangeAdd((LPLONG)&once_control->done, 0)) /* MBR fence */
     {
-      ptw32_mcs_local_node_t node;
+      pte_mcs_local_node_t node;
 
-      ptw32_mcs_lock_acquire((ptw32_mcs_lock_t *)&once_control->lock, &node);
+      pte_mcs_lock_acquire((pte_mcs_lock_t *)&once_control->lock, &node);
 
       if (!once_control->done)
 	{
@@ -67,7 +67,7 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 #pragma inline_depth(0)
 #endif
 
-	  pthread_cleanup_push(ptw32_once_on_init_cancel, (void *)&node);
+	  pthread_cleanup_push(pte_once_on_init_cancel, (void *)&node);
 	  (*init_routine)();
 	  pthread_cleanup_pop(0);
 
@@ -75,10 +75,10 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 #pragma inline_depth()
 #endif
 
-	  once_control->done = PTW32_TRUE;
+	  once_control->done = PTE_TRUE;
 	}
 
-	ptw32_mcs_lock_release(&node);
+	pte_mcs_lock_release(&node);
     }
 
   return 0;

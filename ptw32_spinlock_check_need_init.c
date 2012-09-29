@@ -1,5 +1,5 @@
 /*
- * ptw32_spinlock_check_need_init.c
+ * pte_spinlock_check_need_init.c
  *
  * Description:
  * This translation unit implements spin lock primitives.
@@ -39,7 +39,7 @@
 
 
 INLINE int
-ptw32_spinlock_check_need_init (pthread_spinlock_t * lock)
+pte_spinlock_check_need_init (pthread_spinlock_t * lock)
 {
   int result = 0;
 
@@ -51,7 +51,7 @@ ptw32_spinlock_check_need_init (pthread_spinlock_t * lock)
    * introducing race conditions into applications which are
    * correctly written.
    */
-  EnterCriticalSection (&ptw32_spinlock_test_init_lock);
+  EnterCriticalSection (&pte_spinlock_test_init_lock);
 
   /*
    * We got here possibly under race
@@ -75,7 +75,7 @@ ptw32_spinlock_check_need_init (pthread_spinlock_t * lock)
       result = EINVAL;
     }
 
-  LeaveCriticalSection (&ptw32_spinlock_test_init_lock);
+  LeaveCriticalSection (&pte_spinlock_test_init_lock);
 
   return (result);
 }

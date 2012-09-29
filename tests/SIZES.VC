@@ -14,7 +14,7 @@ Sizes of pthreads-win32 structs
              pthread_rwlock_t_   28
          pthread_rwlockattr_t_    4
                pthread_once_t_    8
-               ptw32_cleanup_t   12
+               pte_cleanup_t   12
                    sched_param    4
 -------------------------------
 

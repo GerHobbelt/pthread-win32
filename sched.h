@@ -39,29 +39,29 @@
 #ifndef _SCHED_H
 #define _SCHED_H
 
-#undef PTW32_LEVEL
+#undef PTE_LEVEL
 
 #if defined(_POSIX_SOURCE)
-#define PTW32_LEVEL 0
+#define PTE_LEVEL 0
 /* Early POSIX */
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 199309
-#undef PTW32_LEVEL
-#define PTW32_LEVEL 1
+#undef PTE_LEVEL
+#define PTE_LEVEL 1
 /* Include 1b, 1c and 1d */
 #endif
 
 #if defined(INCLUDE_NP)
-#undef PTW32_LEVEL
-#define PTW32_LEVEL 2
+#undef PTE_LEVEL
+#define PTE_LEVEL 2
 /* Include Non-Portable extensions */
 #endif
 
-#define PTW32_LEVEL_MAX 3
+#define PTE_LEVEL_MAX 3
 
-#if !defined(PTW32_LEVEL)
-#define PTW32_LEVEL PTW32_LEVEL_MAX
+#if !defined(PTE_LEVEL)
+#define PTE_LEVEL PTE_LEVEL_MAX
 /* Include everything */
 #endif
 
@@ -71,19 +71,19 @@
 #endif
 
 /*
- * When building the DLL code, you should define PTW32_BUILD so that
+ * When building the DLL code, you should define PTE_BUILD so that
  * the variables/functions are exported correctly. When using the DLL,
- * do NOT define PTW32_BUILD, and then the variables/functions will
+ * do NOT define PTE_BUILD, and then the variables/functions will
  * be imported correctly.
  */
-#ifndef PTW32_STATIC_LIB
-#  ifdef PTW32_BUILD
-#    define PTW32_DLLPORT __declspec (dllexport)
+#ifndef PTE_STATIC_LIB
+#  ifdef PTE_BUILD
+#    define PTE_DLLPORT __declspec (dllexport)
 #  else
-#    define PTW32_DLLPORT __declspec (dllimport)
+#    define PTE_DLLPORT __declspec (dllimport)
 #  endif
 #else
-#  define PTW32_DLLPORT
+#  define PTE_DLLPORT
 #endif
 
 /*
@@ -91,7 +91,7 @@
  * which is only used when building the pthread-win32 libraries.
  */
 
-#ifndef PTW32_CONFIG_H
+#ifndef PTE_CONFIG_H
 #  if defined(WINCE)
 #    define NEED_ERRNO
 #    define NEED_SEM
@@ -105,21 +105,21 @@
  *
  */
 
-#if PTW32_LEVEL >= PTW32_LEVEL_MAX
+#if PTE_LEVEL >= PTE_LEVEL_MAX
 #ifdef NEED_ERRNO
 #include "need_errno.h"
 #else
 #include <errno.h>
 #endif
-#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
+#endif /* PTE_LEVEL >= PTE_LEVEL_MAX */
 
 #if defined(__MINGW32__) || defined(_UWIN)
-#if PTW32_LEVEL >= PTW32_LEVEL_MAX
+#if PTE_LEVEL >= PTE_LEVEL_MAX
 /* For pid_t */
 #  include <sys/types.h>
 /* Required by Unix 98 */
 #  include <time.h>
-#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
+#endif /* PTE_LEVEL >= PTE_LEVEL_MAX */
 #else
 typedef int pid_t;
 #endif
@@ -143,15 +143,15 @@ extern "C"
 {
 #endif                          /* __cplusplus */
 
-PTW32_DLLPORT int __cdecl sched_yield (void);
+PTE_DLLPORT int __cdecl sched_yield (void);
 
-PTW32_DLLPORT int __cdecl sched_get_priority_min (int policy);
+PTE_DLLPORT int __cdecl sched_get_priority_min (int policy);
 
-PTW32_DLLPORT int __cdecl sched_get_priority_max (int policy);
+PTE_DLLPORT int __cdecl sched_get_priority_max (int policy);
 
-PTW32_DLLPORT int __cdecl sched_setscheduler (pid_t pid, int policy);
+PTE_DLLPORT int __cdecl sched_setscheduler (pid_t pid, int policy);
 
-PTW32_DLLPORT int __cdecl sched_getscheduler (pid_t pid);
+PTE_DLLPORT int __cdecl sched_getscheduler (pid_t pid);
 
 /*
  * Note that this macro returns ENOTSUP rather than
@@ -171,8 +171,8 @@ PTW32_DLLPORT int __cdecl sched_getscheduler (pid_t pid);
 }                               /* End of extern "C" */
 #endif                          /* __cplusplus */
 
-#undef PTW32_LEVEL
-#undef PTW32_LEVEL_MAX
+#undef PTE_LEVEL
+#undef PTE_LEVEL_MAX
 
 #endif                          /* !_SCHED_H */
 

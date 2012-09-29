@@ -51,12 +51,12 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static mutex. We check
-   * again inside the guarded section of ptw32_mutex_check_need_init()
+   * again inside the guarded section of pte_mutex_check_need_init()
    * to avoid race conditions.
    */
   if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
-      if ((result = ptw32_mutex_check_need_init (mutex)) != 0)
+      if ((result = pte_mutex_check_need_init (mutex)) != 0)
 	{
 	  return (result);
 	}
@@ -64,10 +64,10 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
 
   mx = *mutex;
 
-  if (0 == (LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE (
-		     (PTW32_INTERLOCKED_LPLONG) &mx->lock_idx,
-		     (PTW32_INTERLOCKED_LONG) 1,
-		     (PTW32_INTERLOCKED_LONG) 0))
+  if (0 == (LONG) PTE_INTERLOCKED_COMPARE_EXCHANGE (
+		     (PTE_INTERLOCKED_LPLONG) &mx->lock_idx,
+		     (PTE_INTERLOCKED_LONG) 1,
+		     (PTE_INTERLOCKED_LONG) 0))
     {
       if (mx->kind != PTHREAD_MUTEX_NORMAL)
 	{

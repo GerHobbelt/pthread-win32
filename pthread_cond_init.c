@@ -138,24 +138,24 @@ FAIL0:
 DONE:
   if (0 == result)
     {
-      EnterCriticalSection (&ptw32_cond_list_lock);
+      EnterCriticalSection (&pte_cond_list_lock);
 
       cv->next = NULL;
-      cv->prev = ptw32_cond_list_tail;
+      cv->prev = pte_cond_list_tail;
 
-      if (ptw32_cond_list_tail != NULL)
+      if (pte_cond_list_tail != NULL)
 	{
-	  ptw32_cond_list_tail->next = cv;
+	  pte_cond_list_tail->next = cv;
 	}
 
-      ptw32_cond_list_tail = cv;
+      pte_cond_list_tail = cv;
 
-      if (ptw32_cond_list_head == NULL)
+      if (pte_cond_list_head == NULL)
 	{
-	  ptw32_cond_list_head = cv;
+	  pte_cond_list_head = cv;
 	}
 
-      LeaveCriticalSection (&ptw32_cond_list_lock);
+      LeaveCriticalSection (&pte_cond_list_lock);
     }
 
   *cond = cv;

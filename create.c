@@ -84,11 +84,11 @@ pthread_create (pthread_t * tid,
       */
 {
   pthread_t thread;
-  ptw32_thread_t * tp;
+  pte_thread_t * tp;
   register pthread_attr_t a;
   HANDLE threadH = 0;
   int result = EAGAIN;
-  int run = PTW32_TRUE;
+  int run = PTE_TRUE;
   ThreadParms *parms = NULL;
   long stackSize;
   int priority;
@@ -111,12 +111,12 @@ pthread_create (pthread_t * tid,
       a = NULL;
     }
 
-  if ((thread = ptw32_new ()).p == NULL)
+  if ((thread = pte_new ()).p == NULL)
     {
       goto FAIL0;
     }
 
-  tp = (ptw32_thread_t *) thread.p;
+  tp = (pte_thread_t *) thread.p;
 
   priority = tp->sched_priority;
 
@@ -135,7 +135,7 @@ pthread_create (pthread_t * tid,
    * Threads inherit their initial sigmask from their creator thread.
    */
   self = pthread_self();
-  tp->sigmask = ((ptw32_thread_t *)self.p)->sigmask;
+  tp->sigmask = ((pte_thread_t *)self.p)->sigmask;
 
 #endif /* HAVE_SIGSET_T */
 
@@ -173,7 +173,7 @@ pthread_create (pthread_t * tid,
 #if ! defined(HAVE_SIGSET_T)
 	  self = pthread_self ();
 #endif
-	  priority = ((ptw32_thread_t *) self.p)->sched_priority;
+	  priority = ((pte_thread_t *) self.p)->sched_priority;
 	}
 
 #endif
@@ -206,7 +206,7 @@ pthread_create (pthread_t * tid,
     threadH =
     (HANDLE) _beginthreadex ((void *) NULL,	/* No security info             */
 			     (unsigned) stackSize,	/* default stack size   */
-			     ptw32_threadStart,
+			     pte_threadStart,
 			     parms,
 			     (unsigned)
 			     CREATE_SUSPENDED,
@@ -216,7 +216,7 @@ pthread_create (pthread_t * tid,
     {
       if (a != NULL)
 	{
-	  (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
+	  (void) pte_setthreadpriority (thread, SCHED_OTHER, priority);
 	}
 
       if (run)
@@ -235,7 +235,7 @@ pthread_create (pthread_t * tid,
 
   tp->threadH =
     threadH =
-    (HANDLE) _beginthread (ptw32_threadStart, (unsigned) stackSize,	/* default stack size   */
+    (HANDLE) _beginthread (pte_threadStart, (unsigned) stackSize,	/* default stack size   */
 			   parms);
 
   /*
@@ -259,7 +259,7 @@ pthread_create (pthread_t * tid,
 
       if (a != NULL)
 	{
-	  (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
+	  (void) pte_setthreadpriority (thread, SCHED_OTHER, priority);
 	}
     }
 
@@ -283,7 +283,7 @@ FAIL0:
   if (result != 0)
     {
 
-      ptw32_threadDestroy (thread);
+      pte_threadDestroy (thread);
       tp = NULL;
 
       if (parms != NULL)

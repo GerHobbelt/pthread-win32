@@ -41,7 +41,7 @@
 int
 pthread_attr_getinheritsched (pthread_attr_t * attr, int *inheritsched)
 {
-  if (ptw32_is_attr (attr) != 0 || inheritsched == NULL)
+  if (pte_is_attr (attr) != 0 || inheritsched == NULL)
     {
       return EINVAL;
     }

@@ -25,7 +25,7 @@ CFLAGS	= /q /I. /D_WIN32_WINNT=0x400 /DHAVE_CONFIG_H=1 /4 /tWD /tWM \
 	  /w-aus /w-asc /w-par
 
 #C cleanup code
-BCFLAGS	= $(PTW32_FLAGS) $(CFLAGS)
+BCFLAGS	= $(PTE_FLAGS) $(CFLAGS)
 
 # Agregate modules for inlinability
 DLL_OBJS	= \
@@ -82,7 +82,7 @@ CANCEL_SRCS	= \
 		pthread_cancel.c 
 
 CONDVAR_SRCS	= \
-		ptw32_cond_check_need_init.c \
+		pte_cond_check_need_init.c \
 		pthread_condattr_destroy.c \
 		pthread_condattr_getpshared.c \
 		pthread_condattr_init.c \
@@ -101,13 +101,13 @@ MISC_SRCS	= \
 		pthread_once.c \
 		pthread_self.c \
 		pthread_setconcurrency.c \
-		ptw32_calloc.c \
-		ptw32_MCS_lock.c \
-		ptw32_new.c \
+		pte_calloc.c \
+		pte_MCS_lock.c \
+		pte_new.c \
 		w32_CancelableWait.c
 
 MUTEX_SRCS	= \
-		ptw32_mutex_check_need_init.c \
+		pte_mutex_check_need_init.c \
 		pthread_mutex_init.c \
 		pthread_mutex_destroy.c \
 		pthread_mutexattr_init.c \
@@ -131,23 +131,23 @@ NONPORTABLE_SRCS = \
 		pthread_timechange_handler_np.c 
 
 PRIVATE_SRCS	= \
-		ptw32_is_attr.c \
-		ptw32_processInitialize.c \
-		ptw32_processTerminate.c \
-		ptw32_threadStart.c \
-		ptw32_threadDestroy.c \
-		ptw32_tkAssocCreate.c \
-		ptw32_tkAssocDestroy.c \
-		ptw32_callUserDestroyRoutines.c \
-		ptw32_timespec.c \
-		ptw32_relmillisecs.c \
-		ptw32_throw.c \
-		ptw32_InterlockedCompareExchange.c \
-		ptw32_getprocessors.c
+		pte_is_attr.c \
+		pte_processInitialize.c \
+		pte_processTerminate.c \
+		pte_threadStart.c \
+		pte_threadDestroy.c \
+		pte_tkAssocCreate.c \
+		pte_tkAssocDestroy.c \
+		pte_callUserDestroyRoutines.c \
+		pte_timespec.c \
+		pte_relmillisecs.c \
+		pte_throw.c \
+		pte_InterlockedCompareExchange.c \
+		pte_getprocessors.c
 
 RWLOCK_SRCS	= \
-		ptw32_rwlock_check_need_init.c \
-		ptw32_rwlock_cancelwrwait.c \
+		pte_rwlock_check_need_init.c \
+		pte_rwlock_cancelwrwait.c \
 		pthread_rwlock_init.c \
 		pthread_rwlock_destroy.c \
 		pthread_rwlockattr_init.c \
@@ -191,7 +191,7 @@ SEMAPHORE_SRCS = \
 		sem_unlink.c
 
 SPIN_SRCS	= \
-		ptw32_spinlock_check_need_init.c \
+		pte_spinlock_check_need_init.c \
 		pthread_spin_init.c \
 		pthread_spin_destroy.c \
 		pthread_spin_lock.c \

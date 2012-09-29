@@ -126,7 +126,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
 
   if (*cond != PTHREAD_COND_INITIALIZER)
     {
-      EnterCriticalSection (&ptw32_cond_list_lock);
+      EnterCriticalSection (&pte_cond_list_lock);
 
       cv = *cond;
 
@@ -185,18 +185,18 @@ pthread_cond_destroy (pthread_cond_t * cond)
 
 	  /* Unlink the CV from the list */
 
-	  if (ptw32_cond_list_head == cv)
+	  if (pte_cond_list_head == cv)
 	    {
-	      ptw32_cond_list_head = cv->next;
+	      pte_cond_list_head = cv->next;
 	    }
 	  else
 	    {
 	      cv->prev->next = cv->next;
 	    }
 
-	  if (ptw32_cond_list_tail == cv)
+	  if (pte_cond_list_tail == cv)
 	    {
-	      ptw32_cond_list_tail = cv->prev;
+	      pte_cond_list_tail = cv->prev;
 	    }
 	  else
 	    {
@@ -206,14 +206,14 @@ pthread_cond_destroy (pthread_cond_t * cond)
 	  (void) free (cv);
 	}
 
-      LeaveCriticalSection (&ptw32_cond_list_lock);
+      LeaveCriticalSection (&pte_cond_list_lock);
     }
   else
     {
       /*
-       * See notes in ptw32_cond_check_need_init() above also.
+       * See notes in pte_cond_check_need_init() above also.
        */
-      EnterCriticalSection (&ptw32_cond_test_init_lock);
+      EnterCriticalSection (&pte_cond_test_init_lock);
 
       /*
        * Check again.
@@ -237,7 +237,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
 	  result = EBUSY;
 	}
 
-      LeaveCriticalSection (&ptw32_cond_test_init_lock);
+      LeaveCriticalSection (&pte_cond_test_init_lock);
     }
 
   return ((result != 0) ? result : ((result1 != 0) ? result1 : result2));

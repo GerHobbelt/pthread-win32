@@ -106,7 +106,7 @@ main()
 
   assert(pthread_create(&t, NULL, func, NULL) == 0);
 
-  hThread = ((ptw32_thread_t *)t.p)->threadH;
+  hThread = ((pte_thread_t *)t.p)->threadH;
 
   Sleep(500);
 

@@ -164,7 +164,7 @@ main ()
   pthread_t t;
   void *result;
 
-  if (pthread_win32_test_features_np (PTW32_ALERTABLE_ASYNC_CANCEL))
+  if (pthread_win32_test_features_np (PTE_ALERTABLE_ASYNC_CANCEL))
     {
       printf ("Cancel sleeping thread.\n");
       assert (pthread_create (&t, NULL, test_sleep, NULL) == 0);

@@ -74,11 +74,11 @@ pthread_kill (pthread_t thread, int sig)
       */
 {
   int result = 0;
-  ptw32_thread_t * tp;
+  pte_thread_t * tp;
 
-  EnterCriticalSection (&ptw32_thread_reuse_lock);
+  EnterCriticalSection (&pte_thread_reuse_lock);
 
-  tp = (ptw32_thread_t *) thread.p;
+  tp = (pte_thread_t *) thread.p;
 
   if (NULL == tp
       || thread.x != tp->ptHandle.x
@@ -87,7 +87,7 @@ pthread_kill (pthread_t thread, int sig)
       result = ESRCH;
     }
 
-  LeaveCriticalSection (&ptw32_thread_reuse_lock);
+  LeaveCriticalSection (&pte_thread_reuse_lock);
 
   if (0 == result && 0 != sig)
     {

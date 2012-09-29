@@ -38,62 +38,62 @@
 #include "implement.h"
 
 #if defined(_M_IX86) || defined(_X86_)
-#define PTW32_PROGCTR(Context)  ((Context).Eip)
+#define PTE_PROGCTR(Context)  ((Context).Eip)
 #endif
 
 #if defined (_M_IA64)
-#define PTW32_PROGCTR(Context)  ((Context).StIIP)
+#define PTE_PROGCTR(Context)  ((Context).StIIP)
 #endif
 
 #if defined(_MIPS_)
-#define PTW32_PROGCTR(Context)  ((Context).Fir)
+#define PTE_PROGCTR(Context)  ((Context).Fir)
 #endif
 
 #if defined(_ALPHA_)
-#define PTW32_PROGCTR(Context)  ((Context).Fir)
+#define PTE_PROGCTR(Context)  ((Context).Fir)
 #endif
 
 #if defined(_PPC_)
-#define PTW32_PROGCTR(Context)  ((Context).Iar)
+#define PTE_PROGCTR(Context)  ((Context).Iar)
 #endif
 
 #if defined(_AMD64_)
-#define PTW32_PROGCTR(Context)  ((Context).Rip)
+#define PTE_PROGCTR(Context)  ((Context).Rip)
 #endif
 
-#if !defined(PTW32_PROGCTR)
+#if !defined(PTE_PROGCTR)
 #error Module contains CPU-specific code; modify and recompile.
 #endif
 
 static void
-ptw32_cancel_self (void)
+pte_cancel_self (void)
 {
-  ptw32_throw (PTW32_EPS_CANCEL);
+  pte_throw (PTE_EPS_CANCEL);
 
   /* Never reached */
 }
 
 static void CALLBACK
-ptw32_cancel_callback (DWORD unused)
+pte_cancel_callback (DWORD unused)
 {
-  ptw32_throw (PTW32_EPS_CANCEL);
+  pte_throw (PTE_EPS_CANCEL);
 
   /* Never reached */
 }
 
 /*
- * ptw32_RegisterCancelation() -
+ * pte_RegisterCancelation() -
  * Must have args of same type as QueueUserAPCEx because this function
  * is a substitute for QueueUserAPCEx if it's not available.
  */
 DWORD
-ptw32_RegisterCancelation (PAPCFUNC unused1, HANDLE threadH, DWORD unused2)
+pte_RegisterCancelation (PAPCFUNC unused1, HANDLE threadH, DWORD unused2)
 {
   CONTEXT context;
 
   context.ContextFlags = CONTEXT_CONTROL;
   GetThreadContext (threadH, &context);
-  PTW32_PROGCTR (context) = (DWORD_PTR) ptw32_cancel_self;
+  PTE_PROGCTR (context) = (DWORD_PTR) pte_cancel_self;
   SetThreadContext (threadH, &context);
   return 0;
 }
@@ -125,7 +125,7 @@ pthread_cancel (pthread_t thread)
   int result;
   int cancel_self;
   pthread_t self;
-  ptw32_thread_t * tp;
+  pte_thread_t * tp;
 
   result = pthread_kill (thread, 0);
 
@@ -155,7 +155,7 @@ pthread_cancel (pthread_t thread)
    */
   cancel_self = pthread_equal (thread, self);
 
-  tp = (ptw32_thread_t *) thread.p;
+  tp = (pte_thread_t *) thread.p;
 
   /*
    * Lock for async-cancel safety.
@@ -172,7 +172,7 @@ pthread_cancel (pthread_t thread)
 	  tp->cancelState = PTHREAD_CANCEL_DISABLE;
 
 	  (void) pthread_mutex_unlock (&tp->cancelLock);
-	  ptw32_throw (PTW32_EPS_CANCEL);
+	  pte_throw (PTE_EPS_CANCEL);
 
 	  /* Never reached */
 	}
@@ -189,10 +189,10 @@ pthread_cancel (pthread_t thread)
 	      /*
 	       * If alertdrv and QueueUserAPCEx is available then the following
 	       * will result in a call to QueueUserAPCEx with the args given, otherwise
-	       * this will result in a call to ptw32_RegisterCancelation and only
+	       * this will result in a call to pte_RegisterCancelation and only
 	       * the threadH arg will be used.
 	       */
-	      ptw32_register_cancelation (ptw32_cancel_callback, threadH, 0);
+	      pte_register_cancelation (pte_cancel_callback, threadH, 0);
 	      (void) pthread_mutex_unlock (&tp->cancelLock);
 	      ResumeThread (threadH);
 	    }

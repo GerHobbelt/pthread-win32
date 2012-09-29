@@ -39,7 +39,7 @@
 
 
 static INLINE int
-ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
+pte_cancelable_wait (HANDLE waitHandle, DWORD timeout)
      /*
       * -------------------------------------------------------------------
       * This provides an extra hook into the pthread_cancel
@@ -56,7 +56,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 {
   int result;
   pthread_t self;
-  ptw32_thread_t * sp;
+  pte_thread_t * sp;
   HANDLE handles[2];
   DWORD nHandles = 1;
   DWORD status;
@@ -64,7 +64,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
   handles[0] = waitHandle;
 
   self = pthread_self();
-  sp = (ptw32_thread_t *) self.p;
+  sp = (pte_thread_t *) self.p;
 
   if (sp != NULL)
     {
@@ -85,7 +85,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
       handles[1] = NULL;
     }
 
-  status = WaitForMultipleObjects (nHandles, handles, PTW32_FALSE, timeout);
+  status = WaitForMultipleObjects (nHandles, handles, PTE_FALSE, timeout);
 
   switch (status - WAIT_OBJECT_0)
     {
@@ -120,7 +120,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 	      sp->state = PThreadStateCanceling;
 	      sp->cancelState = PTHREAD_CANCEL_DISABLE;
 	      (void) pthread_mutex_unlock (&sp->cancelLock);
-	      ptw32_throw (PTW32_EPS_CANCEL);
+	      pte_throw (PTE_EPS_CANCEL);
 
 	      /* Never reached */
 	    }
@@ -150,11 +150,11 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 int
 pthreadCancelableWait (HANDLE waitHandle)
 {
-  return (ptw32_cancelable_wait (waitHandle, INFINITE));
+  return (pte_cancelable_wait (waitHandle, INFINITE));
 }
 
 int
 pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout)
 {
-  return (ptw32_cancelable_wait (waitHandle, timeout));
+  return (pte_cancelable_wait (waitHandle, timeout));
 }

@@ -34,7 +34,7 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#ifndef PTW32_STATIC_LIB
+#ifndef PTE_STATIC_LIB
 
 #include "pthread.h"
 #include "implement.h"
@@ -56,7 +56,7 @@ extern "C"
   BOOL WINAPI
 DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
-  BOOL result = PTW32_TRUE;
+  BOOL result = PTE_TRUE;
 
   switch (fdwReason)
     {
@@ -89,4 +89,4 @@ DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 
 }				/* DllMain */
 
-#endif /* PTW32_STATIC_LIB */
+#endif /* PTE_STATIC_LIB */

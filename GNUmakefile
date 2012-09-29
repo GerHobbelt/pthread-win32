@@ -72,7 +72,7 @@ LFLAGS		= -lwsock32
 # non-compliant, but applications that make assumptions that POSIX
 # does not garrantee may fail or misbehave under some settings.
 #
-# PTW32_THREAD_ID_REUSE_INCREMENT
+# PTE_THREAD_ID_REUSE_INCREMENT
 # Purpose:
 # POSIX says that applications should assume that thread IDs can be
 # recycled. However, Solaris and some other systems use a [very large]
@@ -89,12 +89,12 @@ LFLAGS		= -lwsock32
 # Set to some other +ve value to emulate smaller word size types
 # (i.e. will wrap sooner).
 #
-#PTW32_FLAGS	= "-DPTW32_THREAD_ID_REUSE_INCREMENT=0"
+#PTE_FLAGS	= "-DPTE_THREAD_ID_REUSE_INCREMENT=0"
 #
 # ----------------------------------------------------------------------
 
-GC_CFLAGS	= $(PTW32_FLAGS) 
-GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
+GC_CFLAGS	= $(PTE_FLAGS) 
+GCE_CFLAGS	= $(PTE_FLAGS) -mthreads
 
 ## Mingw32
 MAKE		?= make
@@ -211,27 +211,27 @@ SMALL_STATIC_OBJS	= \
 		pthread_setschedparam.o \
 		pthread_getschedparam.o \
 		pthread_timechange_handler_np.o \
-		ptw32_is_attr.o \
-		ptw32_cond_check_need_init.o \
-		ptw32_MCS_lock.o \
-		ptw32_mutex_check_need_init.o \
-		ptw32_processInitialize.o \
-		ptw32_processTerminate.o \
-		ptw32_threadStart.o \
-		ptw32_threadDestroy.o \
-		ptw32_tkAssocCreate.o \
-		ptw32_tkAssocDestroy.o \
-		ptw32_callUserDestroyRoutines.o \
-		ptw32_timespec.o \
-		ptw32_throw.o \
-		ptw32_InterlockedCompareExchange.o \
-		ptw32_getprocessors.o \
-		ptw32_calloc.o \
-		ptw32_new.o \
-		ptw32_reuse.o \
-		ptw32_semwait.o \
-		ptw32_relmillisecs.o \
-		ptw32_rwlock_check_need_init.o \
+		pte_is_attr.o \
+		pte_cond_check_need_init.o \
+		pte_MCS_lock.o \
+		pte_mutex_check_need_init.o \
+		pte_processInitialize.o \
+		pte_processTerminate.o \
+		pte_threadStart.o \
+		pte_threadDestroy.o \
+		pte_tkAssocCreate.o \
+		pte_tkAssocDestroy.o \
+		pte_callUserDestroyRoutines.o \
+		pte_timespec.o \
+		pte_throw.o \
+		pte_InterlockedCompareExchange.o \
+		pte_getprocessors.o \
+		pte_calloc.o \
+		pte_new.o \
+		pte_reuse.o \
+		pte_semwait.o \
+		pte_relmillisecs.o \
+		pte_rwlock_check_need_init.o \
 		sched_get_priority_max.o \
 		sched_get_priority_min.o \
 		sched_setscheduler.o \
@@ -250,7 +250,7 @@ SMALL_STATIC_OBJS	= \
 		sem_unlink.o \
 		signal.o \
 		pthread_kill.o \
-		ptw32_spinlock_check_need_init.o \
+		pte_spinlock_check_need_init.o \
 		pthread_spin_init.o \
 		pthread_spin_destroy.o \
 		pthread_spin_lock.o \
@@ -300,7 +300,7 @@ CANCEL_SRCS	= \
 		pthread_cancel.c 
 
 CONDVAR_SRCS	= \
-		ptw32_cond_check_need_init.c \
+		pte_cond_check_need_init.c \
 		pthread_condattr_destroy.c \
 		pthread_condattr_getpshared.c \
 		pthread_condattr_init.c \
@@ -320,14 +320,14 @@ MISC_SRCS	= \
 		pthread_once.c \
 		pthread_self.c \
 		pthread_setconcurrency.c \
-		ptw32_calloc.c \
-		ptw32_MCS_lock.c \
-		ptw32_new.c \
-		ptw32_reuse.c \
+		pte_calloc.c \
+		pte_MCS_lock.c \
+		pte_new.c \
+		pte_reuse.c \
 		w32_CancelableWait.c
 
 MUTEX_SRCS	= \
-		ptw32_mutex_check_need_init.c \
+		pte_mutex_check_need_init.c \
 		pthread_mutex_init.c \
 		pthread_mutex_destroy.c \
 		pthread_mutexattr_init.c \
@@ -351,24 +351,24 @@ NONPORTABLE_SRCS = \
 		pthread_timechange_handler_np.c 
 
 PRIVATE_SRCS	= \
-		ptw32_is_attr.c \
-		ptw32_processInitialize.c \
-		ptw32_processTerminate.c \
-		ptw32_threadStart.c \
-		ptw32_threadDestroy.c \
-		ptw32_tkAssocCreate.c \
-		ptw32_tkAssocDestroy.c \
-		ptw32_callUserDestroyRoutines.c \
-		ptw32_semwait.c \
-		ptw32_relmillisecs.c \
-		ptw32_timespec.c \
-		ptw32_throw.c \
-		ptw32_InterlockedCompareExchange.c \
-		ptw32_getprocessors.c
+		pte_is_attr.c \
+		pte_processInitialize.c \
+		pte_processTerminate.c \
+		pte_threadStart.c \
+		pte_threadDestroy.c \
+		pte_tkAssocCreate.c \
+		pte_tkAssocDestroy.c \
+		pte_callUserDestroyRoutines.c \
+		pte_semwait.c \
+		pte_relmillisecs.c \
+		pte_timespec.c \
+		pte_throw.c \
+		pte_InterlockedCompareExchange.c \
+		pte_getprocessors.c
 
 RWLOCK_SRCS	= \
-		ptw32_rwlock_check_need_init.c \
-		ptw32_rwlock_cancelwrwait.c \
+		pte_rwlock_check_need_init.c \
+		pte_rwlock_cancelwrwait.c \
 		pthread_rwlock_init.c \
 		pthread_rwlock_destroy.c \
 		pthread_rwlockattr_init.c \
@@ -412,7 +412,7 @@ SEMAPHORE_SRCS = \
 		sem_unlink.c
 
 SPIN_SRCS	= \
-		ptw32_spinlock_check_need_init.c \
+		pte_spinlock_check_need_init.c \
 		pthread_spin_init.c \
 		pthread_spin_destroy.c \
 		pthread_spin_lock.c \
@@ -478,22 +478,22 @@ GCE-debug:
 		$(MAKE) CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCED_DLL)
 
 GC-inlined:
-		$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_INLINED_STAMP)
+		$(MAKE) XOPT="-DPTE_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_INLINED_STAMP)
 
 GC-inlined-debug:
-		$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCD_INLINED_STAMP)
+		$(MAKE) XOPT="-DPTE_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCD_INLINED_STAMP)
 
 GCE-inlined:
-		$(MAKE) CC=$(CXX) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
+		$(MAKE) CC=$(CXX) XOPT="-DPTE_BUILD_INLINED" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GCE_INLINED_STAMP)
 
 GCE-inlined-debug:
-		$(MAKE) CC=$(CXX) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCED_INLINED_STAMP)
+		$(MAKE) CC=$(CXX) XOPT="-DPTE_BUILD_INLINED" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCED_INLINED_STAMP)
 
 GC-static:
-		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_STATIC_STAMP)
+		$(MAKE) XOPT="-DPTE_BUILD_INLINED -DPTE_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" $(GC_STATIC_STAMP)
 
 GC-static-debug:
-		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCD_STATIC_STAMP)
+		$(MAKE) XOPT="-DPTE_BUILD_INLINED -DPTE_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_INLINED_OBJS)" DLL_VER=$(DLL_VERD) OPT="$(DOPT)" $(GCD_STATIC_STAMP)
 
 tests:
 	@ cd tests
@@ -503,7 +503,7 @@ tests:
 	$(CC) -E -o $@ $(CFLAGS) $^
 
 %.s: %.c
-	$(CC) -c $(CFLAGS) -DPTW32_BUILD_INLINED -Wa,-ahl $^ > $@
+	$(CC) -c $(CFLAGS) -DPTE_BUILD_INLINED -Wa,-ahl $^ > $@
 
 %.o: %.rc
 	$(RC) $(RCFLAGS) $(CLEANUP) -o $@ $<

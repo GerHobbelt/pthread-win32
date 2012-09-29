@@ -55,7 +55,7 @@ pthread_rwlock_destroy (pthread_rwlock_t * rwlock)
     {
       rwl = *rwlock;
 
-      if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
+      if (rwl->nMagic != PTE_RWLOCK_MAGIC)
 	{
 	  return EINVAL;
 	}
@@ -110,9 +110,9 @@ pthread_rwlock_destroy (pthread_rwlock_t * rwlock)
   else
     {
       /*
-       * See notes in ptw32_rwlock_check_need_init() above also.
+       * See notes in pte_rwlock_check_need_init() above also.
        */
-      EnterCriticalSection (&ptw32_rwlock_test_init_lock);
+      EnterCriticalSection (&pte_rwlock_test_init_lock);
 
       /*
        * Check again.
@@ -136,7 +136,7 @@ pthread_rwlock_destroy (pthread_rwlock_t * rwlock)
 	  result = EBUSY;
 	}
 
-      LeaveCriticalSection (&ptw32_rwlock_test_init_lock);
+      LeaveCriticalSection (&pte_rwlock_test_init_lock);
     }
 
   return ((result != 0) ? result : ((result1 != 0) ? result1 : result2));

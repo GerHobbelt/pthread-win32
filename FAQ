@@ -159,7 +159,7 @@ of the following was defined accordingly:
 
 These defines determine the style of cleanup (see pthread.h) and,
 most importantly, the way that cancelation and thread exit (via
-pthread_exit) is performed (see the routine ptw32_throw() in private.c).
+pthread_exit) is performed (see the routine pte_throw() in private.c).
 
 In short, the exceptions versions of the library throw an exception
 when a thread is canceled or exits (via pthread_exit()), which is

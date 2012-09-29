@@ -42,13 +42,13 @@ RSC=rc.exe
 # PROP Intermediate_Dir "."
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PTW32_BUILD" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "." /D "__CLEANUP_C" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PTW32_BUILD" /YX /FD /c
+# ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PTE_BUILD" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "." /D "__CLEANUP_C" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PTE_BUILD" /YX /FD /c
 # SUBTRACT CPP /u
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
-# ADD RSC /l 0x409 /i "." /d "NDEBUG" /d "PTW32_RC_MSC"
+# ADD RSC /l 0x409 /i "." /d "NDEBUG" /d "PTE_RC_MSC"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -69,12 +69,12 @@ LINK32=link.exe
 # PROP Intermediate_Dir "."
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PTW32_BUILD" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "." /D "__CLEANUP_C" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PTW32_BUILD" /YX /FD /GZ /c
+# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PTE_BUILD" /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "." /D "__CLEANUP_C" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "PTE_BUILD" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "_DEBUG"
-# ADD RSC /l 0x409 /i "." /d "_DEBUG" /d "PTW32_RC_MSC"
+# ADD RSC /l 0x409 /i "." /d "_DEBUG" /d "PTE_RC_MSC"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -127,12 +127,12 @@ SOURCE=.\version.rc
 !IF  "$(CFG)" == "pthread - Win32 Release"
 
 # ADD BASE RSC /l 0xc09
-# ADD RSC /l 0x409 /i "." /d "PTW32_RC_MSC"
+# ADD RSC /l 0x409 /i "." /d "PTE_RC_MSC"
 
 !ELSEIF  "$(CFG)" == "pthread - Win32 Debug"
 
 # ADD BASE RSC /l 0xc09
-# ADD RSC /l 0x409 /i "." /d "PTW32_RC_MSC"
+# ADD RSC /l 0x409 /i "." /d "PTE_RC_MSC"
 
 !ENDIF 
 

@@ -53,7 +53,7 @@ sched_getscheduler (pid_t pid)
       if (pid != selfPid)
 	{
 	  HANDLE h =
-	    OpenProcess (PROCESS_QUERY_INFORMATION, PTW32_FALSE, (DWORD) pid);
+	    OpenProcess (PROCESS_QUERY_INFORMATION, PTE_FALSE, (DWORD) pid);
 
 	  if (NULL == h)
 	    {

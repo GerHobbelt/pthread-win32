@@ -51,7 +51,7 @@
 
 #include "benchtest.h"
 
-#define PTW32_MUTEX_TYPES
+#define PTE_MUTEX_TYPES
 #define ITERATIONS      100000L
 
 pthread_mutex_t gate1, gate2;
@@ -143,7 +143,7 @@ CSThread(void * arg)
 void
 runTest (char * testNameString, int mType)
 {
-#ifdef PTW32_MUTEX_TYPES
+#ifdef PTE_MUTEX_TYPES
   assert(pthread_mutexattr_settype(&ma, mType) == 0);
 #endif
   assert(pthread_mutex_init(&gate1, &ma) == 0);
@@ -288,7 +288,7 @@ main (int argc, char *argv[])
   /*
    * Now we can start the actual tests
    */
-#ifdef PTW32_MUTEX_TYPES
+#ifdef PTE_MUTEX_TYPES
   runTest("PTHREAD_MUTEX_DEFAULT (W9x,WNT)", PTHREAD_MUTEX_DEFAULT);
 
   runTest("PTHREAD_MUTEX_NORMAL (W9x,WNT)", PTHREAD_MUTEX_NORMAL);
