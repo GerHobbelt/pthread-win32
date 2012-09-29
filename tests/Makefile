@@ -124,8 +124,7 @@ PASSES = \
 	spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
 	cancel9.pass  \
-	affinity1.pass  affinity2.pass  affinity3.pass  affinity4.pass  affinity5.pass  \
-	stress1.pass
+	affinity1.pass  affinity2.pass  affinity3.pass  affinity4.pass  affinity5.pass
 
 BENCHRESULTS = \
 	benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
@@ -186,7 +185,7 @@ all:
 # e.g. nmake clean test cancel3.exe
 test: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC)
 
-tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) sizes.pass loadfree.pass $(PASSES)
+tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) sizes.pass loadfree.pass $(PASSES) $(STRESSRESULTS)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
 benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(XXLIBS) $(BENCHRESULTS)
