@@ -45,6 +45,5 @@ main(int argc, char * argv[])
 	pthread_exit((void *) 0);
 
 	/* Not reached */
-	assert(0);
-	return 0;
+	return 1;
 }

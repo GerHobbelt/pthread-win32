@@ -77,9 +77,9 @@ pthread_detach (pthread_t thread)
   int result;
   BOOL destroyIt = PTW32_FALSE;
   ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
-  ptw32_mcs_local_node_t node;
+  ptw32_mcs_local_node_t reuseLock;
 
-  ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
+  ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &reuseLock);
 
   if (NULL == tp
       || thread.x != tp->ptHandle.x)
@@ -115,7 +115,7 @@ pthread_detach (pthread_t thread)
       ptw32_mcs_lock_release (&stateLock);
     }
 
-  ptw32_mcs_lock_release(&node);
+  ptw32_mcs_lock_release(&reuseLock);
 
   if (result == 0)
     {

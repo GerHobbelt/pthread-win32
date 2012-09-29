@@ -78,6 +78,7 @@ pthread_mutexattr_init (pthread_mutexattr_t * attr)
     {
       ma->pshared = PTHREAD_PROCESS_PRIVATE;
       ma->kind = PTHREAD_MUTEX_DEFAULT;
+      ma->robustness = PTHREAD_MUTEX_STALLED;
     }
 
   *attr = ma;

@@ -189,7 +189,7 @@ main()
 	}
 
       /*
-       * Code to control or munipulate child threads should probably go here.
+       * Code to control or manipulate child threads should probably go here.
        */
       cvthing.shared = 0;
 
