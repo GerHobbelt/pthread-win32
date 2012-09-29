@@ -4,71 +4,41 @@
  * Description:
  * This translation unit implements routines associated with exiting from
  * a thread.
+ *
+ * --------------------------------------------------------------------------
+ *
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ * 
+ *      Contact Email: rpj@callisto.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <windows.h>
-#include <process.h>
 #include "pthread.h"
 #include "implement.h"
+#ifndef _UWIN
+#   include <process.h>
+#endif
 
-void
-_pthread_vacuum(void)
-{
-  /* Run all the handlers. */
-  _pthread_handler_pop_all(_PTHREAD_CLEANUP_STACK, 
-			   _PTHREAD_HANDLER_EXECUTE);
-
-  /* Pop any atfork handlers without executing them. */
-  _pthread_handler_pop_all(_PTHREAD_FORKPREPARE_STACK, 
-			   _PTHREAD_HANDLER_NOEXECUTE);
-
-  _pthread_handler_pop_all(_PTHREAD_FORKPARENT_STACK, 
-			   _PTHREAD_HANDLER_NOEXECUTE);
-
-  _pthread_handler_pop_all(_PTHREAD_FORKCHILD_STACK,
-			   _PTHREAD_HANDLER_NOEXECUTE);
-}
-
-void
-_pthread_exit(pthread_t thread, void * value, int return_code)
-{
-  int detachstate;
-
-  /* CRITICAL SECTION */
-  pthread_mutex_lock(&_pthread_table_mutex);
-
-  /* Copy value into the thread entry so it can be given
-     to any joining threads. */
-  thread->joinvalueptr = value;
-
-  pthread_mutex_unlock(&_pthread_table_mutex);
-  /* END CRITICAL SECTION */
-
-  _pthread_vacuum();
-
-  /* CRITICAL SECTION */
-  pthread_mutex_lock(&_pthread_table_mutex);
-
-  /* Remove the thread entry on exit only if the thread is detached
-     AND there are no waiting joins. Otherwise the thread entry will
-     be deleted by the last waiting pthread_join() after this thread
-     has terminated. */
-
-  if (pthread_attr_getdetachstate(&thread->attr, &detachstate) == 0 
-      && detachstate == PTHREAD_CREATE_DETACHED
-      && thread->join_count == 0)
-    {
-      (void) _pthread_delete_thread(thread);
-    }
-
-  pthread_mutex_unlock(&_pthread_table_mutex);
-  /* END CRITICAL SECTION */
-
-  _endthreadex(return_code);
-}
-
-void
-pthread_exit(void * value)
-{
-  _pthread_exit(pthread_self(), value, 0);
-}
+#include "pthread_exit.c"

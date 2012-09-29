@@ -3,78 +3,86 @@
  *
  * Description:
  * This translation unit implements DLL initialisation.
+ *
+ * --------------------------------------------------------------------------
+ *
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ * 
+ *      Contact Email: rpj@callisto.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-/* We use the DLL entry point function to set up per thread storage
-   specifically to hold the threads own thread ID.
-
-   The thread ID is stored by _pthread_start_call().
-
-   The thread ID is retrieved by pthread_self().
-
- */
-
-#include <windows.h>
-#include <malloc.h>
 #include "pthread.h"
 #include "implement.h"
 
-/* Global index for TLS data. */
-DWORD _pthread_threadID_TlsIndex;
+#ifdef _MSC_VER
+/* 
+ * lpvReserved yields an unreferenced formal parameter;
+ * ignore it
+ */
+#pragma warning( disable : 4100 )
+#endif
 
-/* Global index for thread TSD key array. */
-DWORD _pthread_TSD_keys_TlsIndex;
-
-
-/* Function pointer to TryEnterCriticalSection if it exists; otherwise NULL */
-BOOL (WINAPI *_pthread_try_enter_critical_section)(LPCRITICAL_SECTION) = NULL;
-
-/* Handle to kernel32.dll */
-static HINSTANCE _pthread_h_kernel32;
-
-BOOL WINAPI PthreadsEntryPoint(HINSTANCE dllHandle,
-			  DWORD reason,
-			  LPVOID situation)
+#ifdef __cplusplus
+/*
+ * Dear c++: Please don't mangle this name. -thanks
+ */
+extern "C"
+#endif				/* __cplusplus */
+  BOOL WINAPI
+DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
-  
+  BOOL result = PTW32_TRUE;
 
-  switch (reason)
+  switch (fdwReason)
     {
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-      break;
 
     case DLL_PROCESS_ATTACH:
-      /* Set up per thread thread ID storage. */
-      _pthread_threadID_TlsIndex = TlsAlloc();
+      result = pthread_win32_process_attach_np ();
+      break;
 
-      if (_pthread_threadID_TlsIndex == 0xFFFFFFFF)
-	{
-	  return FALSE;
-	}
+    case DLL_THREAD_ATTACH:
+      /*
+       * A thread is being created
+       */
+      result = pthread_win32_thread_attach_np ();
+      break;
 
-      /* Set up per thread TSD key array pointer. */
-      _pthread_TSD_keys_TlsIndex = TlsAlloc();
-
-      if (_pthread_TSD_keys_TlsIndex == 0xFFFFFFFF)
-	{
-	  return FALSE;
-	}
-
-      /* Load KERNEL32 and try to get address of TryEnterCriticalSection */
-      _pthread_h_kernel32 = LoadLibrary(TEXT("KERNEL32.DLL"));
-      _pthread_try_enter_critical_section = (void *) GetProcAddress(_pthread_h_kernel32, "TryEnterCriticalSection");
+    case DLL_THREAD_DETACH:
+      /*
+       * A thread is exiting cleanly
+       */
+      result = pthread_win32_thread_detach_np ();
       break;
 
     case DLL_PROCESS_DETACH:
-      (void) TlsFree(_pthread_TSD_keys_TlsIndex);
-      (void) TlsFree(_pthread_threadID_TlsIndex);
-      (void) FreeLibrary(_pthread_h_kernel32);
+      (void) pthread_win32_thread_detach_np ();
+      result = pthread_win32_process_detach_np ();
       break;
-
-    default:
-      return FALSE;
     }
 
-  return TRUE;
-}
+  return (result);
+
+}				/* DllMain */

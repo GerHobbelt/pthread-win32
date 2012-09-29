@@ -2,156 +2,52 @@
  * attr.c
  *
  * Description:
- * This translation unit implements operations on thread attribute objects.
+ * This translation unit agregates operations on thread attribute objects.
+ * It is used for inline optimisation.
+ *
+ * The included modules are used separately when static executable sizes
+ * must be minimised.
+ *
+ * --------------------------------------------------------------------------
+ *
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ * 
+ *      Contact Email: rpj@callisto.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
-
-#include <errno.h>
-#include <string.h>
 
 #include "pthread.h"
 #include "implement.h"
 
-static int
-is_attr(const pthread_attr_t *attr)
-{
-  /* Return 0 if the attr object is valid, non-zero otherwise. */
-
-  return (attr == NULL || attr->valid != _PTHREAD_ATTR_VALID);
-}
-
-#ifdef _POSIX_THREAD_ATTR_STACKSIZE
-
-int
-pthread_attr_setstacksize(pthread_attr_t *attr,
-			  size_t stacksize)
-{
-  /* Verify that the stack size is within range. */
-  if (stacksize < PTHREAD_STACK_MIN)
-    {
-      return EINVAL;
-    }
-
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-
-  /* Everything is okay. */
-  attr->stacksize = stacksize;
-  return 0;
-}
-
-int
-pthread_attr_getstacksize(const pthread_attr_t *attr,
-			  size_t *stacksize)
-{
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-
-  /* Everything is okay. */
-  *stacksize = attr->stacksize;
-  return 0;
-}
-
-#endif /* _POSIX_THREAD_ATTR_STACKSIZE */
-
-#ifdef _POSIX_THREAD_ATTR_STACKADDR
-
-int
-pthread_attr_setstackaddr(pthread_attr_t *attr,
-			  void *stackaddr)
-{
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-  return ENOSYS;
-}
-
-int
-pthread_attr_getstackaddr(const pthread_attr_t *attr,
-			  void **stackaddr)
-{
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-  return ENOSYS;
-}
-
-#endif /* _POSIX_THREAD_ATTR_STACKADDR */
-
-
-int
-pthread_attr_init(pthread_attr_t *attr)
-{
-  if (attr == NULL)
-    {
-      /* This is disallowed. */
-      return EINVAL;
-    }
-
-#ifdef _POSIX_THREAD_ATTR_STACKSIZE
-  attr->stacksize = PTHREAD_STACK_MIN;
-#endif
-
-  attr->detachedstate = PTHREAD_CREATE_JOINABLE;
-#if HAVE_SIGSET_T
-  memset(&(attr->sigmask), 0, sizeof(sigset_t));
-#endif /* HAVE_SIGSET_T */
-
-  /* Priority uses Win32 priority values. */
-  attr->priority = THREAD_PRIORITY_NORMAL;
-
-  attr->valid = _PTHREAD_ATTR_VALID;
-
-  return 0;
-}
-
-int
-pthread_attr_destroy(pthread_attr_t *attr)
-{
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-
-  /* Set the attribute object to a specific invalid value. */
-  attr->valid = 0;
-
-  return 0;
-}
-
-int
-pthread_attr_getdetachstate(const pthread_attr_t *attr,
-			    int *detachstate)
-{
-  if (is_attr(attr) != 0 || detachstate == NULL)
-    {
-      return EINVAL;
-    }
-
-  *detachstate = attr->detachedstate;
-  return 0;
-}
-
-int
-pthread_attr_setdetachstate(pthread_attr_t *attr,
-			    int detachstate)
-{
-  if (is_attr(attr) != 0)
-    {
-      return EINVAL;
-    }
-
-  if (detachstate != PTHREAD_CREATE_JOINABLE ||
-      detachstate != PTHREAD_CREATE_DETACHED)
-    {
-      return EINVAL;
-    }
-  
-  attr->detachedstate = detachstate;
-  return 0;
-}
+#include "pthread_attr_init.c"
+#include "pthread_attr_destroy.c"
+#include "pthread_attr_getdetachstate.c"
+#include "pthread_attr_setdetachstate.c"
+#include "pthread_attr_getstackaddr.c"
+#include "pthread_attr_setstackaddr.c"
+#include "pthread_attr_getstacksize.c"
+#include "pthread_attr_setstacksize.c"
+#include "pthread_attr_getscope.c"
+#include "pthread_attr_setscope.c"

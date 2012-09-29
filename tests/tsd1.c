@@ -1,69 +1,128 @@
-#include <pthread.h>
-#include <stdio.h>
+/*
+ * tsd1.c
+ *
+ * Test Thread Specific Data (TSD) key creation and destruction.
+ *
+ *
+ * --------------------------------------------------------------------------
+ *
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ * 
+ *      Contact Email: rpj@callisto.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *
+ *
+ * Description:
+ * - 
+ *
+ * Test Method (validation or falsification):
+ * - validation
+ *
+ * Requirements Tested:
+ * - keys are created for each existing thread including the main thread
+ * - keys are created for newly created threads
+ * - keys are thread specific
+ * - destroy routine is called on each thread exit including the main thread
+ *
+ * Features Tested:
+ * - 
+ *
+ * Cases Tested:
+ * - 
+ *
+ * Environment:
+ * - 
+ *
+ * Input:
+ * - none
+ *
+ * Output:
+ * - text to stdout
+ *
+ * Assumptions:
+ * - already validated:     pthread_create()
+ *                          pthread_once()
+ * - main thread also has a POSIX thread identity
+ *
+ * Pass Criteria:
+ * - stdout matches file reference/tsd1.out
+ *
+ * Fail Criteria:
+ * - fails to match file reference/tsd1.out
+ * - output identifies failed component
+ */
 
-pthread_key_t key;
-pthread_once_t key_once = PTHREAD_ONCE_INIT;
+#include <sched.h>
+#include "test.h"
 
-void
+static pthread_key_t key = NULL;
+static int accesscount[10];
+static int thread_set[10];
+static int thread_destroyed[10];
+
+static void
 destroy_key(void * arg)
 {
-  /* arg is not NULL if we get to here. */
-  printf("SUCCESS: %s: destroying key.\n", (char *) arg);
+  int * j = (int *) arg;
 
-  free((char *) arg);
+  (*j)++;
 
-  /* Is it our responsibility to do this? */
-  arg = NULL;
+  assert(*j == 2);
+
+  thread_destroyed[j - accesscount] = 1;
 }
 
-void
-make_key(void)
+static void
+setkey(void * arg)
 {
-  if (pthread_key_create(&key, destroy_key) != 0)
-    {
-      printf("Key create failed\n");
-      exit(1);
-    }
+  int * j = (int *) arg;
+
+  thread_set[j - accesscount] = 1;
+
+  assert(*j == 0);
+
+  assert(pthread_getspecific(key) == NULL);
+
+  assert(pthread_setspecific(key, arg) == 0);
+
+  assert(pthread_getspecific(key) == arg);
+
+  (*j)++;
+
+  assert(*j == 1);
 }
 
-void *
+static void *
 mythread(void * arg)
 {
-  void * ptr;
-
-  (void) pthread_once(&key_once, make_key);
-
-  if ((ptr = pthread_getspecific(key)) != NULL)
+  while (key == NULL)
     {
-      printf("ERROR: Thread %d, Key 0x%x not initialised to NULL\n",
-	     (int) arg,
-	     (int) key);
-      exit(1);
-    }
-  else
-    {
-      ptr = (void *) malloc(80);
-      sprintf((char *) ptr, "Thread %d Key 0x%x",
-	      (int) arg,
-	      (int) key);
-      (void) pthread_setspecific(key, ptr);
+	sched_yield();
     }
 
-  if ((ptr = pthread_getspecific(key)) == NULL)
-    {
-      printf("FAILED: Thread %d Key 0x%x: key value set or get failed.\n",
-	     (int) arg,
-	     (int) key);
-      exit(1);
-    }
-  else
-    {
-      printf("SUCCESS: Thread %d Key 0x%x: key value set and get succeeded.\n",
-	     (int) arg,
-	     (int) key);
-
-      printf("SUCCESS: %s: exiting thread.\n", (char *) ptr);
-    }
+  setkey(arg);
 
   return 0;
 
@@ -73,15 +132,70 @@ mythread(void * arg)
 int
 main()
 {
-  int rc;
-  pthread_t t1, t2;
-  
-  rc = pthread_create(&t1, NULL, mythread, (void *) 1);
-  printf("pthread_create returned %d\n", rc);
+  int i;
+  int fail = 0;
+  pthread_t thread[10];
 
-  rc = pthread_create(&t2, NULL, mythread, (void *) 2);
-  printf("pthread_create returned %d\n", rc);
+  for (i = 1; i < 5; i++)
+    {
+	accesscount[i] = thread_set[i] = thread_destroyed[i] = 0;
+      assert(pthread_create(&thread[i], NULL, mythread, (void *)&accesscount[i]) == 0);
+    }
 
   Sleep(2000);
-  return 0;
+
+  /*
+   * Here we test that existing threads will get a key created
+   * for them.
+   */
+  assert(pthread_key_create(&key, destroy_key) == 0);
+
+  /*
+   * Test main thread key.
+   */
+  accesscount[0] = 0;
+  setkey((void *) &accesscount[0]);
+
+  /*
+   * Here we test that new threads will get a key created
+   * for them.
+   */
+  for (i = 5; i < 10; i++)
+    {
+	accesscount[i] = thread_set[i] = thread_destroyed[i] = 0;
+      assert(pthread_create(&thread[i], NULL, mythread, (void *)&accesscount[i]) == 0);
+    }
+
+  /*
+   * Wait for all threads to complete.
+   */
+  for (i = 1; i < 10; i++)
+    {
+	int result = 0;
+
+	assert(pthread_join(thread[i], (void **) &result) == 0);
+    }
+
+  assert(pthread_key_delete(key) == 0);
+
+  for (i = 1; i < 10; i++)
+    {
+	/*
+	 * The counter is incremented once when the key is set to
+	 * a value, and again when the key is destroyed. If the key
+	 * doesn't get set for some reason then it will still be
+	 * NULL and the destroy function will not be called, and
+	 * hence accesscount will not equal 2.
+	 */
+	if (accesscount[i] != 2)
+	  {
+	    fail++;
+	    fprintf(stderr, "Thread %d key, set = %d, destroyed = %d\n",
+			i, thread_set[i], thread_destroyed[i]);
+	  }
+    }
+
+  fflush(stderr);
+
+  return (fail);
 }

@@ -1,5 +1,37 @@
 /* Simple POSIX threads program.
  *
+ *
+ * --------------------------------------------------------------------------
+ *
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ * 
+ *      Contact Email: rpj@callisto.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *
+ * --------------------------------------------------------------------------
+ *
  * Author: Eyal Lebedinsky eyal@eyal.emu.id.au
  * Written: Sep 1998.
  * Version Date: 12 Sep 1998
@@ -43,28 +75,27 @@
  * the threads knows its 'id' and also filles in the 'work' done).
 */
 
-#include <stdio.h>
+#include "test.h"
+
 #include <stdlib.h>
 #include <math.h>
 
-#include <pthread.h>
-
-
 struct thread_control {
-	int		id;
-	pthread_t	thread;		/* thread id */
-	pthread_mutex_t	mutex_start;
-	pthread_mutex_t	mutex_started;
-	pthread_mutex_t	mutex_end;
-	pthread_mutex_t	mutex_ended;
-	long		work;		/* work done */
-	int		stat;		/* pthread_init status */
+  int		id;
+  pthread_t	thread;		/* thread id */
+  pthread_mutex_t	mutex_start;
+  pthread_mutex_t	mutex_started;
+  pthread_mutex_t	mutex_end;
+  pthread_mutex_t	mutex_ended;
+  long		work;		/* work done */
+  int		stat;		/* pthread_init status */
 };
+
 typedef struct thread_control	TC;
 
 static TC		*tcs = NULL;
-static int		nthreads = 2;
-static int		nwork = 0;
+static int		nthreads = 10;
+static int		nwork = 100;
 static int		quiet = 0;
 
 static int		todo = -1;
@@ -72,274 +103,265 @@ static int		todo = -1;
 static pthread_mutex_t	mutex_todo = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t	mutex_stdout = PTHREAD_MUTEX_INITIALIZER;
 
-/*static pthread_attr_t    pthread_attr_default;*/
-
 
 static void
 die (int ret)
 {
-	if (NULL != tcs) {
-		free (tcs);
-		tcs = NULL;
-	}
+  if (NULL != tcs)
+    {
+      free (tcs);
+      tcs = NULL;
+    }
 
-	if (ret)
-		exit (ret);
+  if (ret)
+    exit (ret);
 }
 
 
-static void
+static double
 waste_time (int n)
 {
-	int		i;
-	double		f;
+  int		i;
+  double	f, g, h, s;
 
-	f = rand ();
+  s = 0.0;
 
-	for (i = n*100; i > 0; --i) {
-		f = sqrt (f) * f + 10000.0;
-	}
+  /*
+   * Useless work.
+   */
+  for (i = n*100; i > 0; --i)
+    {
+      f = rand ();
+      g = rand ();
+      h = rand ();
+      s += 2.0 * f * g / (h != 0.0 ? (h * h) : 1.0);
+    }
+  return s;
 }
 
 static int
 do_work_unit (int who, int n)
 {
-	int		i;
-	static int	nchars = 0;
+  int		i;
+  static int	nchars = 0;
+  double	f = 0.0;
 
-	if (quiet)
-		i = 0;
-	else {
-/* get lock on stdout
-*/
-		if (pthread_mutex_lock (&mutex_stdout))
-			return (-1);
+  if (quiet)
+    i = 0;
+  else {
+    /*
+     * get lock on stdout
+     */
+    assert(pthread_mutex_lock (&mutex_stdout) == 0);
 
-/* do our job
-*/
-		i = printf ("%c",
-			"0123456789abcdefghijklmnopqrstuvwxyz"[who]);
-		if (!(++nchars % 50))
-			printf ("\n");
-		fflush (stdout);
+    /*
+     * do our job
+     */
+    i = printf ("%c", "0123456789abcdefghijklmnopqrstuvwxyz"[who]);
 
-/* release lock on stdout
-*/
-		if (pthread_mutex_unlock (&mutex_stdout))
-			return (-2);
-	}
+    if (!(++nchars % 50))
+      printf ("\n");
 
-	n = rand () % 10000;	/* ignore incoming 'n' */
-	waste_time (n);
+    fflush (stdout);
 
-	return (n);
+    /*
+     * release lock on stdout
+     */
+    assert(pthread_mutex_unlock (&mutex_stdout) == 0);
+  }
+
+  n = rand () % 10000;	/* ignore incoming 'n' */
+  f = waste_time (n);
+
+  /* This prevents the statement above from being optimised out */
+  if (f > 0.0)
+    return(n);
+
+  return (n);
 }
 
 static int
 print_server (void *ptr)
 {
-	int		mywork;
-	int		n;
-	TC		*tc = (TC *)ptr;
+  int		mywork;
+  int		n;
+  TC		*tc = (TC *)ptr;
 
-	if (pthread_mutex_lock (&tc->mutex_started))
-		return (-1);
+  assert(pthread_mutex_lock (&tc->mutex_started) == 0);
 
-	for (;;) {
-		if (pthread_mutex_lock (&tc->mutex_start))
-			return (-2);
-		if (pthread_mutex_unlock (&tc->mutex_start))
-			return (-3);
-		if (pthread_mutex_lock (&tc->mutex_ended))
-			return (-4);
-		if (pthread_mutex_unlock (&tc->mutex_started))
-			return (-5);
+  for (;;)
+    {
+      assert(pthread_mutex_lock (&tc->mutex_start) == 0);
+      assert(pthread_mutex_unlock (&tc->mutex_start) == 0);
+      assert(pthread_mutex_lock (&tc->mutex_ended) == 0);
+      assert(pthread_mutex_unlock (&tc->mutex_started) == 0);
 
-		for (;;) {
+      for (;;)
+	{
 
-/* get lock on todo list
-*/
-			if (pthread_mutex_lock (&mutex_todo))
-				return (-6);
-			mywork = todo;
-			if (todo >= 0) {
-				++todo;
-				if (todo >= nwork)
-					todo = -1;
-			}
-			if (pthread_mutex_unlock (&mutex_todo))
-				return (-7);
+	  /*
+	   * get lock on todo list
+	   */
+	  assert(pthread_mutex_lock (&mutex_todo) == 0);
 
-			if (mywork < 0)
-				break;
+	  mywork = todo;
+	  if (todo >= 0)
+	    {
+	      ++todo;
+	      if (todo >= nwork)
+		todo = -1;
+	    }
+	  assert(pthread_mutex_unlock (&mutex_todo) == 0);
 
-			if ((n = do_work_unit (tc->id, mywork)) < 0)
-				return (-8);
-			tc->work += n;
-		}
+	  if (mywork < 0)
+	    break;
 
-		if (pthread_mutex_lock (&tc->mutex_end))
-			return (-9);
-		if (pthread_mutex_unlock (&tc->mutex_end))
-			return (-10);
-		if (pthread_mutex_lock (&tc->mutex_started))
-			return (-11);
-		if (pthread_mutex_unlock (&tc->mutex_ended))
-			return (-12);
-
-		if (-2 == mywork)
-			break;
+	  assert((n = do_work_unit (tc->id, mywork)) >= 0);
+	  tc->work += n;
 	}
 
-	if (pthread_mutex_unlock (&tc->mutex_started))
-		return (-13);
+      assert(pthread_mutex_lock (&tc->mutex_end) == 0);
+      assert(pthread_mutex_unlock (&tc->mutex_end) == 0);
+      assert(pthread_mutex_lock (&tc->mutex_started) == 0);
+      assert(pthread_mutex_unlock (&tc->mutex_ended) == 0);
 
-	return (0);
+      if (-2 == mywork)
+	break;
+    }
+
+  assert(pthread_mutex_unlock (&tc->mutex_started) == 0);
+
+  return (0);
 }
 
-static int
+static void
 dosync (void)
 {
-	int		i;
+  int		i;
 
-	for (i = 0; i < nthreads; ++i) {
-		if (pthread_mutex_lock (&tcs[i].mutex_end))
-			return (-1);
-		if (pthread_mutex_unlock (&tcs[i].mutex_start))
-			return (-2);
-		if (pthread_mutex_lock (&tcs[i].mutex_started))
-			return (-3);
-		if (pthread_mutex_unlock (&tcs[i].mutex_started))
-			return (-4);
-	}
+  for (i = 0; i < nthreads; ++i)
+    {
+      assert(pthread_mutex_lock (&tcs[i].mutex_end) == 0);
+      assert(pthread_mutex_unlock (&tcs[i].mutex_start) == 0);
+      assert(pthread_mutex_lock (&tcs[i].mutex_started) == 0);
+      assert(pthread_mutex_unlock (&tcs[i].mutex_started) == 0);
+    }
 
-/* Now threads do their work
-*/
-	for (i = 0; i < nthreads; ++i) {
-		if (pthread_mutex_lock (&tcs[i].mutex_start))
-			return (-5);
-		if (pthread_mutex_unlock (&tcs[i].mutex_end))
-			return (-6);
-		if (pthread_mutex_lock (&tcs[i].mutex_ended))
-			return (-7);
-		if (pthread_mutex_unlock (&tcs[i].mutex_ended))
-			return (-8);
-	}
-
-	return (0);
+  /*
+   * Now threads do their work
+   */
+  for (i = 0; i < nthreads; ++i)
+    {
+      assert(pthread_mutex_lock (&tcs[i].mutex_start) == 0);
+      assert(pthread_mutex_unlock (&tcs[i].mutex_end) == 0);
+      assert(pthread_mutex_lock (&tcs[i].mutex_ended) == 0);
+      assert(pthread_mutex_unlock (&tcs[i].mutex_ended) == 0);
+    }
 }
 
-static int
+static void
 dowork (void)
 {
-	todo = 0;
-	if (dosync () < 0)
-		return (-1);
+  todo = 0;
+  dosync();
 
-	todo = 0;
-	if (dosync () < 0)
-		return (-2);
-
-	return (0);
+  todo = 0;
+  dosync();
 }
 
 int
 main (int argc, char *argv[])
 {
-	int		i;
-	int		nargs;
+  int		i;
 
-	nthreads  = 1;
-	nwork = 100;
-	nargs = 0;
-	for (i = 1; i < argc; ++i) {
-		if (!strcmp ("-q", argv[i])) {
-			quiet = 1;
-			continue;
-		}
-		if (!strcmp ("-h", argv[i])) {
-			printf ("usage: pthreads [nthreads] [nwork] [-q]\n");
-			exit (0);
-		}
-		switch (++nargs) {
-		case 1:
-			nthreads  = atoi (argv[i]);
-			if (nthreads > 36) {
-				printf ("max 36 threads allowed\n");
-				die (1);
-			}
-			break;
-		case 2:
-			nwork = atoi (argv[i]);
-			break;
-		default:
-			printf ("bad argument '%s'\n", argv[i]);
-			die (1);
-			break;
-		}
-	}
+  assert(NULL != (tcs = (TC *) calloc (nthreads, sizeof (*tcs))));
 
-	if (NULL == (tcs = calloc (nthreads, sizeof (*tcs))))
-		die (1);
+  /* 
+   * Launch threads
+   */
+  for (i = 0; i < nthreads; ++i)
+    {
+      tcs[i].id = i;
 
-/* Launch threads
-*/
-	for (i = 0; i < nthreads; ++i) {
-		tcs[i].id = i;
-		pthread_mutex_init (&tcs[i].mutex_start, NULL);
-		pthread_mutex_init (&tcs[i].mutex_started, NULL);
-		pthread_mutex_init (&tcs[i].mutex_end, NULL);
-		pthread_mutex_init (&tcs[i].mutex_ended, NULL);
-		tcs[i].work = 0;
-		if (pthread_mutex_lock (&tcs[i].mutex_start))
-			{}
-		tcs[i].stat = pthread_create (&tcs[i].thread,
-			NULL /*&pthread_attr_default*/,
-			(void*)&print_server, (void *)&tcs[i]);
+      assert(pthread_mutex_init (&tcs[i].mutex_start, NULL) == 0);
+      assert(pthread_mutex_init (&tcs[i].mutex_started, NULL) == 0);
+      assert(pthread_mutex_init (&tcs[i].mutex_end, NULL) == 0);
+      assert(pthread_mutex_init (&tcs[i].mutex_ended, NULL) == 0);
 
-/* Wait for thread initialisation
-*/
-		while (!pthread_mutex_trylock (&tcs[i].mutex_started))
-			pthread_mutex_unlock (&tcs[i].mutex_started);
-	}
+      tcs[i].work = 0;  
 
-	dowork ();
+      assert(pthread_mutex_lock (&tcs[i].mutex_start) == 0);
+      assert((tcs[i].stat = 
+	      pthread_create (&tcs[i].thread,
+			      NULL,
+                  (void *(*)(void *))&print_server,
+                (void *) &tcs[i])
+	      ) == 0);
 
-/* Terminate threads
-*/
-	todo = -2;	/* please terminate */
-	if (dosync () < 0)
-		die (2);
+      /* 
+       * Wait for thread initialisation
+       */
+      {
+	int trylock = 0;
 
-	for (i = 0; i < nthreads; ++i) {
-		if (0 == tcs[i].stat)
-			pthread_join (tcs[i].thread, NULL);
-	}
+	while (trylock == 0)
+	  {
+	    trylock = pthread_mutex_trylock(&tcs[i].mutex_started);
+	    assert(trylock == 0 || trylock == EBUSY);
 
-/* destroy locks
-*/
-	pthread_mutex_destroy (&mutex_stdout);
-	pthread_mutex_destroy (&mutex_todo);
+	    if (trylock == 0)
+	      {
+		assert(pthread_mutex_unlock (&tcs[i].mutex_started) == 0);
+	      }
+	  }
+      }
+    }
 
-/* Cleanup
-*/
-	printf ("\n");
+  dowork ();
 
-/* Show results
-*/
-	for (i = 0; i < nthreads; ++i) {
-		printf ("%2d ", i);
-		if (0 == tcs[i].stat)
-			printf ("%10ld\n", tcs[i].work);
-		else
-			printf ("failed %d\n", tcs[i].stat);
-		pthread_mutex_destroy (&tcs[i].mutex_start);
-		pthread_mutex_destroy (&tcs[i].mutex_started);
-		pthread_mutex_destroy (&tcs[i].mutex_end);
-		pthread_mutex_destroy (&tcs[i].mutex_ended);
-	}
+  /*
+   * Terminate threads
+   */
+  todo = -2;	/* please terminate */
+  dosync();
 
-	die (0);
+  for (i = 0; i < nthreads; ++i)
+    {
+      if (0 == tcs[i].stat)
+	assert(pthread_join (tcs[i].thread, NULL) == 0);
+    }
 
-	return (0);
+  /* 
+   * destroy locks
+   */
+  assert(pthread_mutex_destroy (&mutex_stdout) == 0);
+  assert(pthread_mutex_destroy (&mutex_todo) == 0);
+
+  /*
+   * Cleanup
+   */
+  printf ("\n");
+
+  /*
+   * Show results
+   */
+  for (i = 0; i < nthreads; ++i)
+    {
+      printf ("%2d ", i);
+      if (0 == tcs[i].stat)
+	printf ("%10ld\n", tcs[i].work);
+      else
+	printf ("failed %d\n", tcs[i].stat);
+
+      assert(pthread_mutex_unlock(&tcs[i].mutex_start) == 0);
+
+      assert(pthread_mutex_destroy (&tcs[i].mutex_start) == 0);
+      assert(pthread_mutex_destroy (&tcs[i].mutex_started) == 0);
+      assert(pthread_mutex_destroy (&tcs[i].mutex_end) == 0);
+      assert(pthread_mutex_destroy (&tcs[i].mutex_ended) == 0);
+    }
+
+  die (0);
+
+  return (0);
 }

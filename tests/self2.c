@@ -1,31 +1,73 @@
-#include <pthread.h>
-/* Hack. Peer into implementation details. */
-#include <implement.h>
-#include <assert.h>
-#include <stdio.h>
+/*
+ * self2.c
+ *
+ *
+ * --------------------------------------------------------------------------
+ *
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ * 
+ *      Contact Email: rpj@callisto.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *
+ * --------------------------------------------------------------------------
+ *
+ * Test for pthread_self().
+ *
+ * Depends on API functions:
+ *	pthread_create()
+ *	pthread_self()
+ *
+ * Implicitly depends on:
+ *	pthread_getspecific()
+ *	pthread_setspecific()
+ */
+
+#include "test.h"
+#include <string.h>
+
+static pthread_t me;
 
 void *
 entry(void * arg)
 {
-  /* Like systems such as HP-UX, we can't print the value of the thread ID
-     because it's not an integral type. Instead, we'll poke our noses into
-     the pthread_t structure and dump a useful internal value. This is
-     ordinarily bad, m'kay? */
+  me = pthread_self();
 
-  pthread_t t = pthread_self();
-  printf("my thread is %lx\n", t->win32handle); 
   return arg;
 }
 
 int
 main()
 {
-  int rc;
   pthread_t t;
 
-  rc = pthread_create(&t, NULL, entry, NULL);
-  assert(rc == 0);
+  assert(pthread_create(&t, NULL, entry, NULL) == 0);
 
-  Sleep(2000);
+  Sleep(100);
+
+  assert(pthread_equal(t, me) != 0);
+
+  /* Success. */
   return 0;
 }

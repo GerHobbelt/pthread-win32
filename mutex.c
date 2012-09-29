@@ -3,106 +3,57 @@
  *
  * Description:
  * This translation unit implements mutual exclusion (mutex) primitives.
+ *
+ * --------------------------------------------------------------------------
+ *
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ * 
+ *      Contact Email: rpj@callisto.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <errno.h>
-
+#ifndef _UWIN
+#   include <process.h>
+#endif
+#ifndef NEED_FTIME
+#include <sys/timeb.h>
+#endif
 #include "pthread.h"
 #include "implement.h"
 
-int
-pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr)
-{
-  if (mutex == NULL)
-    {
-      return EINVAL;
-    }
 
-  /* Create a critical section. */
-  InitializeCriticalSection(&mutex->cs);
-
-  /* Mark as valid. */
-  mutex->valid = 1;
-
-  return 0;
-}
-
-int
-pthread_mutex_destroy(pthread_mutex_t *mutex)
-{
-  if (mutex == NULL)
-    {
-      return EINVAL;
-    }
-
-  DeleteCriticalSection(&mutex->cs);
-  
-  /* Mark as invalid. */
-  mutex->valid = 0;
-
-  return 0;
-}
-
-int
-pthread_mutexattr_init(pthread_mutexattr_t *attr)
-{
-  if (attr == NULL)
-    {
-      /* This is disallowed. */
-      return EINVAL;
-    }
-
-  /* None of the optional attributes are supported yet. */
-  return 0;
-}
-
-int
-pthread_mutexattr_destroy(pthread_mutexattr_t *attr)
-{
-  /* Nothing to do. */
-  return 0;
-}
-
-int
-pthread_mutex_lock(pthread_mutex_t *mutex)
-{
-  if (!mutex->valid)
-    {
-      pthread_mutex_init(mutex, NULL);
-    }
-  EnterCriticalSection(&mutex->cs);
-  return 0;
-}
-
-int
-pthread_mutex_unlock(pthread_mutex_t *mutex)
-{
-  if (!mutex->valid)
-    {
-      return EINVAL;
-    }
-  LeaveCriticalSection(&mutex->cs);
-  return 0;
-}
-
-int
-pthread_mutex_trylock(pthread_mutex_t *mutex)
-{
-  if (_pthread_try_enter_critical_section == NULL)
-    {
-      /* TryEnterCriticalSection does not exist in the OS; return ENOSYS. */
-      return ENOSYS;
-    }
-      
-  if (mutex == NULL)
-    {
-      return EINVAL;
-    }
-
-  if (!mutex->valid)
-    {
-      pthread_mutex_init(mutex, NULL);
-    }
-
-  return ((*_pthread_try_enter_critical_section)(&mutex->cs) != TRUE) ? EBUSY : 0;
-}
+#include "ptw32_mutex_check_need_init.c"
+#include "pthread_mutex_init.c"
+#include "pthread_mutex_destroy.c"
+#include "pthread_mutexattr_init.c"
+#include "pthread_mutexattr_destroy.c"
+#include "pthread_mutexattr_getpshared.c"
+#include "pthread_mutexattr_setpshared.c"
+#include "pthread_mutexattr_settype.c"
+#include "pthread_mutexattr_gettype.c"
+#include "pthread_mutex_lock.c"
+#include "pthread_mutex_timedlock.c"
+#include "pthread_mutex_unlock.c"
+#include "pthread_mutex_trylock.c"

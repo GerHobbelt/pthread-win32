@@ -1,0 +1,35 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: Debug - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP8EA.tmp" with contents
+[
+/nologo /MDd /Ze /W3 /WX /Gm /vd1 /GR- /GX- /ZI /Od /I ".." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "CLEANUP_C" /FR"Debug/" /Fp"Debug/Debug.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"E:\PTHREADS\pthreads\tests\semaphore4.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP8EA.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP8EB.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib pthreadVC.lib /nologo /subsystem:console /incremental:yes /pdb:"Debug/Debug.pdb" /debug /machine:I386 /out:"Debug/Debug.exe" /pdbtype:sept /libpath:".." 
+.\Debug\semaphore4.obj
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP8EB.tmp"
+<h3>Output Window</h3>
+Compiling...
+semaphore4.c
+Linking...
+Creating command line "bscmake.exe /nologo /o"Debug/Debug.bsc"  .\Debug\semaphore4.sbr"
+Creating browse info file...
+<h3>Output Window</h3>
+
+
+
+<h3>Results</h3>
+Debug.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

@@ -4,80 +4,117 @@
  * Description:
  * This translation unit instantiates data associated with the implementation
  * as a whole.
+ *
+ * --------------------------------------------------------------------------
+ *
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ * 
+ *      Contact Email: rpj@callisto.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <windows.h>
-#include <process.h>
 #include "pthread.h"
 #include "implement.h"
 
-/* POSIX run-time invariant values. (Currently POSIX minimum values)
 
-   Making these constants will mean that applications remain binary
-   compatible between versions of the DLL. 
+int ptw32_processInitialized = PTW32_FALSE;
+ptw32_thread_t * ptw32_threadReuseTop = PTW32_THREAD_REUSE_EMPTY;
+ptw32_thread_t * ptw32_threadReuseBottom = PTW32_THREAD_REUSE_EMPTY;
+pthread_key_t ptw32_selfThreadKey = NULL;
+pthread_key_t ptw32_cleanupKey = NULL;
+pthread_cond_t ptw32_cond_list_head = NULL;
+pthread_cond_t ptw32_cond_list_tail = NULL;
 
-   FIXME: There are still places in the package that break this.
-*/
+int ptw32_concurrency = 0;
 
-const int _POSIX_THREAD_THREADS_MAX = _PTHREAD_MAX_THREADS;
-const int _POSIX_THREAD_DESTRUCTOR_ITERATIONS = 4;
-const int _POSIX_THREAD_KEYS_MAX = _PTHREAD_MAX_KEYS;
+/* What features have been auto-detaected */
+int ptw32_features = 0;
 
+BOOL ptw32_smp_system = PTW32_TRUE;  /* Safer if assumed true initially. */
 
-const int _pthread_create_joinable     = 0;
-const int _pthread_create_detached     = 1;
+/* 
+ * Function pointer to InterlockedCompareExchange if it exists, otherwise
+ * it will be set at runtime to a substitute local version with the same
+ * functionality but may be architecture specific.
+ */
+PTW32_INTERLOCKED_LONG
+  (WINAPI * ptw32_interlocked_compare_exchange) (PTW32_INTERLOCKED_LPLONG,
+						 PTW32_INTERLOCKED_LONG,
+						 PTW32_INTERLOCKED_LONG) =
+  NULL;
 
-/* Cancelability attributes */
-const int _pthread_cancel_enable       = 0;
-const int _pthread_cancel_disable      = 1;
+/* 
+ * Function pointer to QueueUserAPCEx if it exists, otherwise
+ * it will be set at runtime to a substitute routine which cannot unblock
+ * blocked threads.
+ */
+DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD) = NULL;
 
-const int _pthread_cancel_asynchronous = 0;
-const int _pthread_cancel_deferred     = 1;
+/*
+ * Global lock for managing pthread_t struct reuse.
+ */
+CRITICAL_SECTION ptw32_thread_reuse_lock;
 
+/*
+ * Global lock for testing internal state of statically declared mutexes.
+ */
+CRITICAL_SECTION ptw32_mutex_test_init_lock;
 
-/* Declare variables which are global to all threads in the process. */
+/*
+ * Global lock for testing internal state of PTHREAD_COND_INITIALIZER
+ * created condition variables.
+ */
+CRITICAL_SECTION ptw32_cond_test_init_lock;
 
-pthread_mutex_t _pthread_table_mutex = PTHREAD_MUTEX_INITIALIZER;
+/*
+ * Global lock for testing internal state of PTHREAD_RWLOCK_INITIALIZER
+ * created read/write locks.
+ */
+CRITICAL_SECTION ptw32_rwlock_test_init_lock;
 
-DWORD _pthread_threads_count = 0;
+/*
+ * Global lock for testing internal state of PTHREAD_SPINLOCK_INITIALIZER
+ * created spin locks.
+ */
+CRITICAL_SECTION ptw32_spinlock_test_init_lock;
 
-/* Per thread management storage. See comments in private.c */
-/* An array of struct _pthread */
-_pthread_t _pthread_virgins[_PTHREAD_MAX_THREADS];
+/*
+ * Global lock for condition variable linked list. The list exists
+ * to wake up CVs when a WM_TIMECHANGE message arrives. See
+ * w32_TimeChangeHandler.c.
+ */
+CRITICAL_SECTION ptw32_cond_list_lock;
 
-/* Index to the next available previously unused struct _pthread */
-int _pthread_virgin_next = 0;
+/*
+ * Global lock to serialise once_control event management.
+ */
+CRITICAL_SECTION ptw32_once_event_lock;
 
-/* An array of pointers to struct _pthread */
-pthread_t _pthread_reuse[_PTHREAD_MAX_THREADS];
-
-/* Index to the first available reusable pthread_t. */
-int _pthread_reuse_top = -1;
-
-/* An array of pointers to struct _pthread indexed by hashing
-   the Win32 handle. */
-pthread_t _pthread_win32handle_map[_PTHREAD_MAX_THREADS];
-
-/* Per thread mutex locks. */
-pthread_mutex_t _pthread_threads_mutex_table[_PTHREAD_MAX_THREADS];
-
-/* Global TSD key array. */
-_pthread_tsd_key_t _pthread_tsd_key_table[_PTHREAD_MAX_KEYS];
-
-/* Mutex lock for TSD operations */
-pthread_mutex_t _pthread_tsd_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-/* Index to the next available TSD key. */
-int _pthread_tsd_key_next = 0;
-
-/* An array of pthread_key_t */
-pthread_key_t _pthread_key_virgins[_PTHREAD_MAX_KEYS];
-
-/* Index to the next available previously unused pthread_key_t */
-int _pthread_key_virgin_next = 0;
-
-/* An array of pthread_key_t */
-pthread_key_t _pthread_key_reuse[_PTHREAD_MAX_KEYS];
-
-/* Index to the first available reusable pthread_key_t. */
-int _pthread_key_reuse_top;
+#ifdef _UWIN
+/*
+ * Keep a count of the number of threads.
+ */
+int pthread_count = 0;
+#endif

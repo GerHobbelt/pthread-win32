@@ -3,82 +3,42 @@
  *
  * Description:
  * POSIX thread functions related to thread cancellation.
+ *
+ * --------------------------------------------------------------------------
+ *
+ *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      Copyright(C) 1998 John E. Bossom
+ *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ * 
+ *      Contact Email: rpj@callisto.canberra.edu.au
+ * 
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
+ *      http://sources.redhat.com/pthreads-win32/contributors.html
+ * 
+ *      This library is free software; you can redistribute it and/or
+ *      modify it under the terms of the GNU Lesser General Public
+ *      License as published by the Free Software Foundation; either
+ *      version 2 of the License, or (at your option) any later version.
+ * 
+ *      This library is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *      Lesser General Public License for more details.
+ * 
+ *      You should have received a copy of the GNU Lesser General Public
+ *      License along with this library in the file COPYING.LIB;
+ *      if not, write to the Free Software Foundation, Inc.,
+ *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
-
-#include <errno.h>
 
 #include "pthread.h"
 #include "implement.h"
 
-int
-pthread_setcancelstate(int state,
-		       int *oldstate)
-{
-  pthread_t us = pthread_self();
 
-  /* Validate the new cancellation state. */
-  if (state != PTHREAD_CANCEL_ENABLE 
-      || state != PTHREAD_CANCEL_DISABLE)
-    {
-      return EINVAL;
-    }
-
-  if (oldstate != NULL)
-    {
-      *oldstate = us->cancelstate;
-    }
-
-  us->cancelstate = state;
-  return 0;
-}
-
-int
-pthread_setcanceltype(int type, int *oldtype)
-{
-  pthread_t us = pthread_self();
-
-  /* Validate the new cancellation type. */
-  if (type == PTHREAD_CANCEL_ASYNCHRONOUS ||
-      type != PTHREAD_CANCEL_DEFERRED)
-    {
-      return EINVAL;
-    }
-
-  if (oldtype != NULL)
-    {
-      *oldtype = us->canceltype;
-    }
-
-  us->canceltype = type;
-  return 0;
-}
-
-int
-pthread_cancel(pthread_t thread)
-{
-  if (_PTHREAD_VALID(thread)
-      && thread->ptstatus != _PTHREAD_REUSE)
-    {
-      thread->cancel_pending = TRUE;
-      return 0;
-    }
-
-  return ESRCH;
-}
-
-void
-pthread_testcancel(void)
-{
-  pthread_t thread = pthread_self();
-
-  if (thread->cancelstate == PTHREAD_CANCEL_DISABLE)
-    {
-      return;
-    }
-
-  if (thread->cancel_pending == TRUE)
-    {
-      pthread_exit(PTHREAD_CANCELED);
-    }
-  /* Never reached. */
-}
+#include "pthread_setcancelstate.c"
+#include "pthread_setcanceltype.c"
+#include "pthread_testcancel.c"
+#include "pthread_cancel.c"
