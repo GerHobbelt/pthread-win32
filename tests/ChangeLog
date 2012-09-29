@@ -1,3 +1,29 @@
+2011-05-05  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* openmp1.c: Add missing test; used to comfirm that this
+	library works with libgomp; if this test produces a segfault
+	then try upgrading your version of libgomp/gcc; gcc version
+	4.5.2 passes this test.
+
+2011-03-26  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* sequence1.c: New test for new pthread_getsequence_np().
+
+2011-03-24  Ross Johnson <ross.johnson at homemail.com.au>
+
+	* mutex*.c: Include tests for robust mutexes wherever
+	appropriate.
+	* benchtest*.c: Include comparisons for robust mutexes.
+	* robust1.c: New test for robust mutex handling.
+	* robust2.c: Likewise.
+	* robust3.c: Likewise.
+	* robust4.c: Likewise.
+	* robust5.c: Likewise.
+	* GNUmakefile: Include new tests.
+	* Makefile: Likewise.
+	* Bmakefile: Likewise (not tested).
+	* Wmakefile: Likewise (not tested).
+
 2011-03-06  Ross Johnson <ross.johnson at homemail.com.au>
 
 	* several (MINGW64): Cast and call fixups for 64 bit compatibility;

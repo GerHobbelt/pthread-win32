@@ -51,7 +51,7 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
       return EINVAL;
     }
 
-  ptw32_mcs_lock_acquire((ptw32_mcs_lock_t *)&(*barrier)->lock, &node);
+  ptw32_mcs_lock_acquire(&(*barrier)->lock, &node);
 
   b = *barrier;
   if (--b->nCurrentBarrierHeight == 0)

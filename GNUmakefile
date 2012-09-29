@@ -48,7 +48,7 @@ CP	= cp -f
 #CP	= copy
 
 # For cross compiling use e.g.
-# make CROSS=i386-mingw32msvc- clean GC-inlined
+# make CROSS=x86_64-w64-mingw32- clean GC-inlined
 CROSS	= 
 
 AR	= $(CROSS)ar
@@ -58,7 +58,7 @@ CXX     = $(CROSS)g++
 RANLIB  = $(CROSS)ranlib
 RC	= $(CROSS)windres
 
-OPT	= $(CLEANUP) -O3 -finline-functions
+OPT	= $(CLEANUP) -O3 # -finline-functions -findirect-inlining
 DOPT	= $(CLEANUP) -g -O0
 XOPT	=
 
@@ -184,13 +184,17 @@ SMALL_STATIC_OBJS	= \
 		pthread_mutexattr_setpshared.o \
 		pthread_mutexattr_settype.o \
 		pthread_mutexattr_gettype.o \
+		pthread_mutexattr_setrobust.o \
+		pthread_mutexattr_getrobust.o \
 		pthread_mutex_lock.o \
 		pthread_mutex_timedlock.o \
 		pthread_mutex_unlock.o \
 		pthread_mutex_trylock.o \
+		pthread_mutex_consistent.o \
 		pthread_mutexattr_setkind_np.o \
 		pthread_mutexattr_getkind_np.o \
 		pthread_getw32threadhandle_np.o \
+		pthread_getunique_np.o \
 		pthread_delay_np.o \
 		pthread_num_processors_np.o \
 		pthread_win32_attach_detach_np.o \
@@ -338,15 +342,19 @@ MUTEX_SRCS	= \
 		pthread_mutexattr_setpshared.c \
 		pthread_mutexattr_settype.c \
 		pthread_mutexattr_gettype.c \
+		pthread_mutexattr_setrobust.c \
+		pthread_mutexattr_getrobust.c \
 		pthread_mutex_lock.c \
 		pthread_mutex_timedlock.c \
 		pthread_mutex_unlock.c \
-		pthread_mutex_trylock.c
+		pthread_mutex_trylock.c \
+		pthread_mutex_consistent.c
 
 NONPORTABLE_SRCS = \
 		pthread_mutexattr_setkind_np.c \
 		pthread_mutexattr_getkind_np.c \
 		pthread_getw32threadhandle_np.c \
+                pthread_getunique_np.c \
 		pthread_delay_np.c \
 		pthread_num_processors_np.c \
 		pthread_win32_attach_detach_np.c \
@@ -548,6 +556,7 @@ $(GC_STATIC_STAMP) $(GCD_STATIC_STAMP): $(DLL_INLINED_OBJS)
 clean:
 	-$(RM) *~
 	-$(RM) *.i
+	-$(RM) *.s
 	-$(RM) *.o
 	-$(RM) *.obj
 	-$(RM) *.exe

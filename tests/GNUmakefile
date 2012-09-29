@@ -57,8 +57,10 @@ RANLIB  = $(CROSS)ranlib
 #
 XXCFLAGS	= 
 XXLIBS	= -lws2_32 -lgomp
+OPT	= -O3
+DOPT	= -g -O0
 #CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
-CFLAGS	= -O3 -UNDEBUG -Wall $(XXCFLAGS)
+CFLAGS	= ${OPT} -UNDEBUG -Wall $(XXCFLAGS)
 BUILD_DIR	= ..
 INCLUDES	= -I.
 
@@ -90,13 +92,14 @@ TESTS	= \
 	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
 	  create1 create2 reuse1 reuse2 equal1 \
-	  kill1 valid1 valid2 \
+	  sequence1 kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
 	  join0 join1 detach1 join2 join3 \
 	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
+	  robust1 robust2 robust3 robust4 robust5 \
 	  count1 \
 	  once1 once2 once3 once4 self2 \
 	  cancel1 cancel2 \
@@ -128,13 +131,14 @@ STATICTESTS = \
 	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
 	  create1 create2 reuse1 reuse2 equal1 \
-	  kill1 valid1 valid2 \
+	  sequence1 kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
 	  join0 join1 detach1 join2 join3 \
 	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
 	  mutex7 mutex7n mutex7e mutex7r mutex8 mutex8n mutex8e mutex8r \
+	  robust1 robust2 robust3 robust4 robust5 \
 	  count1 \
 	  once1 once2 once3 once4 self2 \
 	  cancel1 cancel2 \
@@ -172,6 +176,7 @@ help:
 	@ $(ECHO) "make clean GC-stress	  (to stresstest using GNU C dll with C cleanup code)"
 	@ $(ECHO) "make clean GCE-stress   (to stresstest using GNU C dll with C++ exception handling)"
 	@ $(ECHO) "make clean GC-static   (to test using GC static lib with C (no EH) applications)"
+	@ $(ECHO) "make clean GC-debug    (to test using GC dll with C (no EH) applications)"
 
 all:
 	@ $(MAKE) clean GC
@@ -197,7 +202,10 @@ GCE-bench:
 	$(MAKE) TEST=GCE  CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
 
 GC-debug:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-fopenmp -D__CLEANUP_C" DLL_VER="$(DLL_VER)d" all-pass
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-fopenmp -D__CLEANUP_C" OPT="${DOPT}" DLL_VER="$(DLL_VER)d" all-pass
+
+GC-bench-debug:
+	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${OPT}" DLL_VER="$(DLL_VER)d" all-bench
 
 GC-static:
 	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" XXLIBS="-lws2_32" DLL="" all-static
@@ -330,6 +338,11 @@ priority1.pass: join1.pass
 priority2.pass: priority1.pass barrier3.pass
 reuse1.pass: create2.pass
 reuse2.pass: reuse1.pass
+robust1.pass: mutex8r.pass
+robust2.pass: mutex8r.pass
+robust3.pass: robust2.pass
+robust4.pass: robust3.pass
+robust5.pass: robust4.pass
 rwlock1.pass: condvar6.pass
 rwlock2.pass: rwlock1.pass
 rwlock3.pass: rwlock2.pass
@@ -352,6 +365,7 @@ semaphore3.pass: semaphore2.pass
 semaphore4.pass: semaphore3.pass cancel1.pass
 semaphore4t.pass: semaphore4.pass
 semaphore5.pass: semaphore4.pass
+sequence1.pass: reuse2.pass
 sizes.pass:
 spin1.pass:
 spin2.pass: spin1.pass

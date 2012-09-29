@@ -64,9 +64,6 @@ ptw32_threadDestroy (pthread_t thread)
 	  CloseHandle (threadCopy.cancelEvent);
 	}
 
-      (void) pthread_mutex_destroy(&threadCopy.cancelLock);
-      (void) pthread_mutex_destroy(&threadCopy.threadLock);
-
 #if ! (defined(__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__) || defined (__DMC__)
       /*
        * See documentation for endthread vs endthreadex.
