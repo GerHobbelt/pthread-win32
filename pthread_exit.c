@@ -38,7 +38,7 @@
 #include "pthread.h"
 #include "implement.h"
 #ifndef _UWIN
-//#   include <process.h>
+/*#   include <process.h> */
 #endif
 
 void
@@ -88,8 +88,8 @@ pthread_exit (void *value_ptr)
        * Implicit POSIX handles are cleaned up in ptw32_throw() now.
        */
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)  || defined (__DMC__)
-      _endthreadex ((unsigned) value_ptr);
+#if ! (defined (__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__)  || defined (__DMC__)
+      _endthreadex ((unsigned) (size_t) value_ptr);
 #else
       _endthread ();
 #endif

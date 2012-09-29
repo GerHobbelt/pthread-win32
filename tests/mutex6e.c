@@ -74,7 +74,7 @@ int
 main()
 {
   pthread_t t;
-  int result = 0;
+  void* result = (void*)0;
   int mxType = -1;
 
   assert(pthread_mutexattr_init(&mxAttr) == 0);
@@ -86,8 +86,8 @@ main()
 
   assert(pthread_create(&t, NULL, locker, NULL) == 0);
 
-  assert(pthread_join(t, (void **) &result) == 0);
-  assert(result == 555);
+  assert(pthread_join(t, &result) == 0);
+  assert((int)(size_t)result == 555);
 
   assert(lockCount == 2);
 

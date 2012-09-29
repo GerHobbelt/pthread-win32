@@ -102,7 +102,7 @@ pthread_delay_np (struct timespec *interval)
     }
 
   /* convert secs to millisecs */
-  secs_in_millisecs = interval->tv_sec * 1000L;
+  secs_in_millisecs = (DWORD)interval->tv_sec * 1000L;
 
   /* convert nanosecs to millisecs (rounding up) */
   millisecs = (interval->tv_nsec + 999999L) / 1000000L;

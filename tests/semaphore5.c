@@ -1,5 +1,5 @@
 /*
- * delay1.c
+ * File: semaphore5.c
  *
  *
  * --------------------------------------------------------------------------
@@ -33,49 +33,70 @@
  *
  * --------------------------------------------------------------------------
  *
- * Depends on API functions:
- *    pthread_delay_np
+ * Test Synopsis: Verify sem_destroy EBUSY race avoidance
+ * - 
+ *
+ * Test Method (Validation or Falsification):
+ * - Validation
+ *
+ * Requirements Tested:
+ * - 
+ *
+ * Features Tested:
+ * - 
+ *
+ * Cases Tested:
+ * - 
+ *
+ * Description:
+ * - 
+ *
+ * Environment:
+ * - 
+ *
+ * Input:
+ * - None.
+ *
+ * Output:
+ * - File name, Line number, and failed expression on failure.
+ * - No output on success.
+ *
+ * Assumptions:
+ * - 
+ *
+ * Pass Criteria:
+ * - Process returns zero exit status.
+ *
+ * Fail Criteria:
+ * - Process returns non-zero exit status.
  */
+
+// #define ASSERT_TRACE
 
 #include "test.h"
 
-pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;
-
 void *
-func(void * arg)
+thr(void * arg)
 {
-  struct timespec interval = {5, 500000000L};
+  assert(sem_post((sem_t *)arg) == 0);
 
-  assert(pthread_mutex_lock(&mx) == 0);
-
-#ifdef _MSC_VER
-#pragma inline_depth(0)
-#endif
-  pthread_cleanup_push(pthread_mutex_unlock, &mx);
-  assert(pthread_delay_np(&interval) == 0);
-  pthread_cleanup_pop(1);
-#ifdef _MSC_VER
-#pragma inline_depth()
-#endif
-
-  return (void *)(size_t)1;
+  return 0;
 }
 
+
 int
-main(int argc, char * argv[])
+main()
 {
   pthread_t t;
-  void* result = (void*)0;
+  sem_t s;
 
-  assert(pthread_mutex_lock(&mx) == 0);
+  assert(sem_init(&s, PTHREAD_PROCESS_PRIVATE, 0) == 0);
+  assert(pthread_create(&t, NULL, thr, (void *)&s) == 0);
 
-  assert(pthread_create(&t, NULL, func, NULL) == 0);
-  assert(pthread_cancel(t) == 0);
+  assert(sem_wait(&s) == 0);
+  assert(sem_destroy(&s) == 0);
 
-  assert(pthread_mutex_unlock(&mx) == 0);
-
-  assert(pthread_join(t, &result) == 0);
-  assert(result == (void*)PTHREAD_CANCELED);
+  assert(pthread_join(t, NULL) == 0);
 
   return 0;
 }

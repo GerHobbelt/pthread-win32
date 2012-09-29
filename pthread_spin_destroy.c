@@ -59,9 +59,9 @@ pthread_spin_destroy (pthread_spinlock_t * lock)
 	       PTW32_INTERLOCKED_COMPARE_EXCHANGE ((PTW32_INTERLOCKED_LPLONG)
 						   & (s->interlock),
 						   (PTW32_INTERLOCKED_LONG)
-						   PTW32_OBJECT_INVALID,
+						   (size_t)PTW32_OBJECT_INVALID,
 						   (PTW32_INTERLOCKED_LONG)
-						   PTW32_SPIN_UNLOCKED))
+						   (size_t)PTW32_SPIN_UNLOCKED))
 	{
 	  result = EINVAL;
 	}
@@ -81,7 +81,9 @@ pthread_spin_destroy (pthread_spinlock_t * lock)
       /*
        * See notes in ptw32_spinlock_check_need_init() above also.
        */
-      EnterCriticalSection (&ptw32_spinlock_test_init_lock);
+      ptw32_mcs_local_node_t node;
+
+      ptw32_mcs_lock_acquire(&ptw32_spinlock_test_init_lock, &node);
 
       /*
        * Check again.
@@ -105,7 +107,7 @@ pthread_spin_destroy (pthread_spinlock_t * lock)
 	  result = EBUSY;
 	}
 
-      LeaveCriticalSection (&ptw32_spinlock_test_init_lock);
+       ptw32_mcs_lock_release(&node);
     }
 
   return (result);

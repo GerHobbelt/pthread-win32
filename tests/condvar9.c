@@ -163,7 +163,11 @@ main()
   int canceledThreads = 0;
   pthread_t t[NUMTHREADS + 1];
 
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTime;
+#else
   struct _timeb currSysTime;
+#endif
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   assert((t[0] = pthread_self()).p != NULL);
@@ -172,9 +176,9 @@ main()
 
   assert(cvthing.lock == PTHREAD_MUTEX_INITIALIZER);
 
-  _ftime(&currSysTime);
+  PTW32_FTIME(&currSysTime);
 
-  abstime.tv_sec = currSysTime.time;
+  abstime.tv_sec = (long)currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
   abstime.tv_sec += 5;

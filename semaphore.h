@@ -70,12 +70,12 @@
 #endif
 
 /*
- * When building the DLL code, you should define PTW32_BUILD so that
- * the variables/functions are exported correctly. When using the DLL,
+ * When building the library, you should define PTW32_BUILD so that
+ * the variables/functions are exported correctly. When using the library,
  * do NOT define PTW32_BUILD, and then the variables/functions will
  * be imported correctly.
  */
-#ifndef PTW32_STATIC_LIB
+#if !defined(PTW32_STATIC_LIB)
 #  ifdef PTW32_BUILD
 #    define PTW32_DLLPORT __declspec (dllexport)
 #  else
@@ -95,7 +95,10 @@
 #    define NEED_ERRNO
 #    define NEED_SEM
 #  endif
-#  if defined(_UWIN) || defined(__MINGW32__)
+#  if defined(__MINGW64__)
+#    define HAVE_STRUCT_TIMESPEC
+#    define HAVE_MODE_T
+#  elif defined(_UWIN) || defined(__MINGW32__)
 #    define HAVE_MODE_T
 #  endif
 #endif

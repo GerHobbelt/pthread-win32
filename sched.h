@@ -60,7 +60,7 @@
 
 #define PTW32_LEVEL_MAX 3
 
-#if !defined(PTW32_LEVEL)
+#if ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112 )  || !defined(PTW32_LEVEL)
 #define PTW32_LEVEL PTW32_LEVEL_MAX
 /* Include everything */
 #endif
@@ -71,12 +71,12 @@
 #endif
 
 /*
- * When building the DLL code, you should define PTW32_BUILD so that
- * the variables/functions are exported correctly. When using the DLL,
+ * When building the library, you should define PTW32_BUILD so that
+ * the variables/functions are exported correctly. When using the library,
  * do NOT define PTW32_BUILD, and then the variables/functions will
  * be imported correctly.
  */
-#ifndef PTW32_STATIC_LIB
+#if !defined(PTW32_STATIC_LIB)
 #  ifdef PTW32_BUILD
 #    define PTW32_DLLPORT __declspec (dllexport)
 #  else
@@ -96,7 +96,10 @@
 #    define NEED_ERRNO
 #    define NEED_SEM
 #  endif
-#  if defined(_UWIN) || defined(__MINGW32__)
+#  if defined(__MINGW64__)
+#    define HAVE_STRUCT_TIMESPEC
+#    define HAVE_MODE_T
+#  elif defined(_UWIN) || defined(__MINGW32__)
 #    define HAVE_MODE_T
 #  endif
 #endif
@@ -113,13 +116,15 @@
 #endif
 #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
-#if defined(__MINGW32__) || defined(_UWIN)
-#if PTW32_LEVEL >= PTW32_LEVEL_MAX
+#if (defined(__MINGW64__) || defined(__MINGW32__)) || defined(_UWIN)
+# if PTW32_LEVEL >= PTW32_LEVEL_MAX
 /* For pid_t */
 #  include <sys/types.h>
 /* Required by Unix 98 */
 #  include <time.h>
-#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
+# else
+  typedef int pid_t;
+# endif
 #else
 typedef int pid_t;
 #endif

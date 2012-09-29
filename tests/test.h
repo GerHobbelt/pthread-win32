@@ -47,6 +47,12 @@
 
 #define PTW32_THREAD_NULL_ID {NULL,0}
 
+/*
+ * Some non-thread POSIX API substitutes
+ */
+#define rand_r( _seed ) \
+        ( _seed == _seed? rand() : rand() )
+
 #if defined(__MINGW32__)
 #include <stdint.h>
 #elif defined(__BORLANDC__)
@@ -55,8 +61,16 @@
 #define int64_t _int64
 #endif
 
+#ifdef _MSC_VER
+  #define PTW32_FTIME(x) _ftime64_s(x);
+#elif defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601
+  #define PTW32_FTIME(x) _ftime64(x);
+#else
+  #define PTW32_FTIME(x) _ftime(x);
+#endif
 
-char * error_string[] = {
+
+const char * error_string[] = {
   "ZERO_or_EOK",
   "EPERM",
   "ENOFILE_or_ENOENT",
@@ -99,7 +113,7 @@ char * error_string[] = {
   "ENOLCK",
   "ENOSYS",
   "ENOTEMPTY",
-  "EILSEQ",
+  "EILSEQ"
 };
 
 /*

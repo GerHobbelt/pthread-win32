@@ -76,8 +76,9 @@ pthread_t
 ptw32_threadReusePop (void)
 {
   pthread_t t = {NULL, 0};
+  ptw32_mcs_local_node_t node;
 
-  EnterCriticalSection (&ptw32_thread_reuse_lock);
+  ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
 
   if (PTW32_THREAD_REUSE_EMPTY != ptw32_threadReuseTop)
     {
@@ -97,7 +98,7 @@ ptw32_threadReusePop (void)
       t = tp->ptHandle;
     }
 
-  LeaveCriticalSection (&ptw32_thread_reuse_lock);
+  ptw32_mcs_lock_release(&node);
 
   return t;
 
@@ -114,8 +115,9 @@ ptw32_threadReusePush (pthread_t thread)
 {
   ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
   pthread_t t;
+  ptw32_mcs_local_node_t node;
 
-  EnterCriticalSection (&ptw32_thread_reuse_lock);
+  ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
 
   t = tp->ptHandle;
   memset(tp, 0, sizeof(ptw32_thread_t));
@@ -143,5 +145,5 @@ ptw32_threadReusePush (pthread_t thread)
 
   ptw32_threadReuseBottom = tp;
 
-  LeaveCriticalSection (&ptw32_thread_reuse_lock);
+  ptw32_mcs_lock_release(&node);
 }

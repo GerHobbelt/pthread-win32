@@ -42,7 +42,9 @@
  * Not needed yet, but defining it should indicate clashes with build target
  * environment that should be fixed.
  */
-#include <signal.h>
+#ifndef WINCE
+#  include <signal.h>
+#endif
 
 
 int
@@ -75,8 +77,9 @@ pthread_detach (pthread_t thread)
   int result;
   BOOL destroyIt = PTW32_FALSE;
   ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
+  ptw32_mcs_local_node_t node;
 
-  EnterCriticalSection (&ptw32_thread_reuse_lock);
+  ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
 
   if (NULL == tp
       || thread.x != tp->ptHandle.x)
@@ -118,7 +121,7 @@ pthread_detach (pthread_t thread)
 	}
     }
 
-  LeaveCriticalSection (&ptw32_thread_reuse_lock);
+  ptw32_mcs_lock_release(&node);
 
   if (result == 0)
     {

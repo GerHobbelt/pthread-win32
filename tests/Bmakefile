@@ -40,7 +40,8 @@ MKDIR	= mkdir
 TOUCH	= echo Passed >
 ECHO	= @echo
 
-QAPC	= ..\QueueUserAPCEx\User\quserex.dll
+# The next path is relative to $BUILD_DIR
+QAPC	= # ..\QueueUserAPCEx\User\quserex.dll
 
 CPHDR	= pthread.h semaphore.h sched.h
 
@@ -96,7 +97,7 @@ PASSES=   loadfree.pass \
 	  self2.pass  \
 	  cancel1.pass  cancel2.pass  \
 	  semaphore4.pass  semaphore4t.pass  semaphore5.pass  \
-	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  \
+	  barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass barrier6.pass \
 	  tsd1.pass  tsd2.pass  delay1.pass  delay2.pass  eyal1.pass  \
 	  condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  \
 	  condvar4.pass  condvar5.pass  condvar6.pass  \
@@ -191,7 +192,7 @@ BCX-bench:
 	@ $(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<
 
 $(COPYFILES):
-	@ $(ECHO) Copying $@
+	@ $(ECHO) Copying $(BUILD_DIR)\$@
 	@ $(CP) $(BUILD_DIR)\$@ .
 
 pthread.dll: $(CPDLL)
@@ -226,6 +227,7 @@ barrier2.pass: barrier1.pass
 barrier3.pass: barrier2.pass
 barrier4.pass: barrier3.pass
 barrier5.pass: barrier4.pass
+barrier6.pass: barrier5.pass
 cancel1.pass: create1.pass
 cancel2.pass: cancel1.pass
 cancel3.pass: context1.pass

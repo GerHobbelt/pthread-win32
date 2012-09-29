@@ -62,7 +62,7 @@
  *
  * Assumptions:
  * - have working pthread_create, pthread_self, pthread_mutex_lock/unlock
- *   pthread_testcancel, pthread_cancel, pthread_join
+ *   pthread_testcancel, pthread_cancel
  *
  * Pass Criteria:
  * - Process returns zero exit status.

@@ -36,34 +36,7 @@
 
 #include "pthread.h"
 #include "implement.h"
-
-#if defined(_M_IX86) || defined(_X86_)
-#define PTW32_PROGCTR(Context)  ((Context).Eip)
-#endif
-
-#if defined (_M_IA64)
-#define PTW32_PROGCTR(Context)  ((Context).StIIP)
-#endif
-
-#if defined(_MIPS_)
-#define PTW32_PROGCTR(Context)  ((Context).Fir)
-#endif
-
-#if defined(_ALPHA_)
-#define PTW32_PROGCTR(Context)  ((Context).Fir)
-#endif
-
-#if defined(_PPC_)
-#define PTW32_PROGCTR(Context)  ((Context).Iar)
-#endif
-
-#if defined(_AMD64_)
-#define PTW32_PROGCTR(Context)  ((Context).Rip)
-#endif
-
-#if !defined(PTW32_PROGCTR)
-#error Module contains CPU-specific code; modify and recompile.
-#endif
+#include "context.h"
 
 static void
 ptw32_cancel_self (void)
@@ -74,7 +47,7 @@ ptw32_cancel_self (void)
 }
 
 static void CALLBACK
-ptw32_cancel_callback (DWORD unused)
+ptw32_cancel_callback (ULONG_PTR unused)
 {
   ptw32_throw (PTW32_EPS_CANCEL);
 
@@ -140,16 +113,8 @@ pthread_cancel (pthread_t thread)
     };
 
   /*
-   * FIXME!!
-   *
-   * Can a thread cancel itself?
-   *
-   * The standard doesn't
-   * specify an error to be returned if the target
-   * thread is itself.
-   *
-   * If it may, then we need to ensure that a thread can't
-   * deadlock itself trying to cancel itself asyncronously
+   * For self cancellation we need to ensure that a thread can't
+   * deadlock itself trying to cancel itself asynchronously
    * (pthread_cancel is required to be an async-cancel
    * safe function).
    */
@@ -192,7 +157,7 @@ pthread_cancel (pthread_t thread)
 	       * this will result in a call to ptw32_RegisterCancelation and only
 	       * the threadH arg will be used.
 	       */
-	      ptw32_register_cancelation (ptw32_cancel_callback, threadH, 0);
+	      ptw32_register_cancelation ((PAPCFUNC)ptw32_cancel_callback, threadH, 0);
 	      (void) pthread_mutex_unlock (&tp->cancelLock);
 	      ResumeThread (threadH);
 	    }

@@ -46,8 +46,19 @@
  * 'implicit' POSIX threads for each of the possible language modes (C,
  * C++, and SEH).
  */
+#ifdef _MSC_VER
+/*
+ * Ignore the warning:
+ * "C++ exception specification ignored except to indicate that
+ * the function is not __declspec(nothrow)."
+ */
+#pragma warning(disable:4290)
+#endif
 void
 ptw32_throw (DWORD exception)
+#ifdef __CLEANUP_CXX
+  throw(ptw32_exception_cancel,ptw32_exception_exit)
+#endif
 {
   /*
    * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
@@ -73,17 +84,22 @@ ptw32_throw (DWORD exception)
        * explicit thread exit here after cleaning up POSIX
        * residue (i.e. cleanup handlers, POSIX thread handle etc).
        */
+#if ! (defined(__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__) || defined (__DMC__)
       unsigned exitCode = 0;
 
       switch (exception)
 	{
 	case PTW32_EPS_CANCEL:
-	  exitCode = (unsigned) PTHREAD_CANCELED;
+	  exitCode = (unsigned)(size_t) PTHREAD_CANCELED;
 	  break;
 	case PTW32_EPS_EXIT:
-	  exitCode = (unsigned) sp->exitStatus;;
+	  if (NULL != sp)
+	    {
+	      exitCode = (unsigned)(size_t) sp->exitStatus;
+	    }
 	  break;
 	}
+#endif
 
 #if defined(PTW32_STATIC_LIB)
 
@@ -91,7 +107,7 @@ ptw32_throw (DWORD exception)
 
 #endif
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! (defined(__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__) || defined (__DMC__)
       _endthreadex (exitCode);
 #else
       _endthread ();
@@ -161,7 +177,7 @@ ptw32_get_exception_services_code (void)
 
 #else
 
-  return (DWORD) NULL;
+  return (DWORD)0;
 
 #endif
 }

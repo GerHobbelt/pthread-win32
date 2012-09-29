@@ -35,6 +35,9 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#if 0
+#ifndef _WIN64
+
 #include "pthread.h"
 #include "implement.h"
 
@@ -138,7 +141,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
    * unsupported processor or compiler.
    */
 
-  result = 0;
+#error Unsupported platform or compiler!
 
 #endif
 
@@ -152,6 +155,7 @@ ptw32_InterlockedCompareExchange (PTW32_INTERLOCKED_LPLONG location,
 
 }
 
+#if 0
 /*
  * ptw32_InterlockedExchange --
  *
@@ -205,8 +209,6 @@ ptw32_InterlockedExchange (LPLONG location,
        * 'location' may have changed, in which case we will loop
        * back to do the MOV again.
        *
-       * FIXME! Need memory barriers for the MOV+CMPXCHG combo?
-       *
        * Tests show that this routine has almost identical timing
        * to Win32's InterlockedExchange(), which is much faster than
        * using the inlined 'xchg' instruction above, so it's probably
@@ -247,11 +249,9 @@ L1:	MOV          eax,dword ptr [ecx]
        * 'location' may have changed, in which case we will loop
        * back to do the movl again.
        *
-       * FIXME! Need memory barriers for the MOV+CMPXCHG combo?
-       *
        * Tests show that this routine has almost identical timing
-       * to Win32's InterlockedExchange(), which is much faster than
-       * using the an inlined 'xchg' instruction, so it's probably
+       * to Win32's InterlockedExchange(), and is much faster than
+       * using an inlined 'xchg' instruction, so Win32 is probably
        * doing something similar to this (on UP systems).
        */
       __asm__ __volatile__
@@ -273,7 +273,7 @@ L1:	MOV          eax,dword ptr [ecx]
    * unsupported processor or compiler.
    */
 
-  result = 0;
+#error Unsupported platform or compiler!
 
 #endif
 
@@ -286,6 +286,7 @@ L1:	MOV          eax,dword ptr [ecx]
 #endif
 
 }
+#endif
 
 
 #if 1
@@ -295,9 +296,16 @@ L1:	MOV          eax,dword ptr [ecx]
 #define PTW32_INTERLOCKED_COMPARE_EXCHANGE ptw32_InterlockedCompareExchange
 #endif
 
+#if 0
 #if defined(PTW32_BUILD_INLINED) && defined(HAVE_INLINABLE_INTERLOCKED_XCHG)
 #undef PTW32_INTERLOCKED_EXCHANGE
 #define PTW32_INTERLOCKED_EXCHANGE ptw32_InterlockedExchange
 #endif
+#endif
 
 #endif
+
+#endif
+
+#endif /* 0 */
+

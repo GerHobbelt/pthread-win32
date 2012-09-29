@@ -1,6 +1,8 @@
 /*
- * delay1.c
+ * context.h
  *
+ * Description:
+ * POSIX thread macros related to thread cancellation.
  *
  * --------------------------------------------------------------------------
  *
@@ -30,53 +32,43 @@
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
- *
- * --------------------------------------------------------------------------
- *
- * Depends on API functions:
- *    pthread_delay_np
  */
 
-#include "test.h"
+#ifndef PTW32_CONTEXT_H
+#define PTW32_CONTEXT_H
 
-pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;
+#undef PTW32_PROGCTR
 
-void *
-func(void * arg)
-{
-  struct timespec interval = {5, 500000000L};
-
-  assert(pthread_mutex_lock(&mx) == 0);
-
-#ifdef _MSC_VER
-#pragma inline_depth(0)
-#endif
-  pthread_cleanup_push(pthread_mutex_unlock, &mx);
-  assert(pthread_delay_np(&interval) == 0);
-  pthread_cleanup_pop(1);
-#ifdef _MSC_VER
-#pragma inline_depth()
+#if defined(_M_IX86) || (defined(_X86_) && !defined(__amd64__))
+#define PTW32_PROGCTR(Context)  ((Context).Eip)
 #endif
 
-  return (void *)(size_t)1;
-}
+#if defined (_M_IA64) || defined(_IA64)
+#define PTW32_PROGCTR(Context)  ((Context).StIIP)
+#endif
 
-int
-main(int argc, char * argv[])
-{
-  pthread_t t;
-  void* result = (void*)0;
+#if defined(_MIPS_) || defined(MIPS)
+#define PTW32_PROGCTR(Context)  ((Context).Fir)
+#endif
 
-  assert(pthread_mutex_lock(&mx) == 0);
+#if defined(_ALPHA_)
+#define PTW32_PROGCTR(Context)  ((Context).Fir)
+#endif
 
-  assert(pthread_create(&t, NULL, func, NULL) == 0);
-  assert(pthread_cancel(t) == 0);
+#if defined(_PPC_)
+#define PTW32_PROGCTR(Context)  ((Context).Iar)
+#endif
 
-  assert(pthread_mutex_unlock(&mx) == 0);
+#if defined(_AMD64_) || defined(__amd64__)
+#define PTW32_PROGCTR(Context)  ((Context).Rip)
+#endif
 
-  assert(pthread_join(t, &result) == 0);
-  assert(result == (void*)PTHREAD_CANCELED);
+#if defined(_ARM_) || defined(ARM)
+#define PTW32_PROGCTR(Context)  ((Context).Pc)
+#endif
 
-  return 0;
-}
+#if !defined(PTW32_PROGCTR)
+#error Module contains CPU-specific code; modify and recompile.
+#endif
 
+#endif

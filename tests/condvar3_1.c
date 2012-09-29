@@ -126,8 +126,12 @@ main()
 {
   int i;
   pthread_t t[NUMTHREADS + 1];
-  int result = 0;
+  void* result = (void*)0;
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTime;
+#else
   struct _timeb currSysTime;
+#endif
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   assert(pthread_cond_init(&cv, NULL) == 0);
@@ -137,9 +141,9 @@ main()
   assert(pthread_mutex_init(&mutex1, NULL) == 0);
 
   /* get current system time */
-  _ftime(&currSysTime);
+  PTW32_FTIME(&currSysTime);
 
-  abstime.tv_sec = currSysTime.time;
+  abstime.tv_sec = (long)currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
   abstime.tv_sec += 5;
@@ -148,7 +152,7 @@ main()
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
-      assert(pthread_create(&t[i], NULL, mythread, (void *) i) == 0);
+      assert(pthread_create(&t[i], NULL, mythread, (void *)(size_t)i) == 0);
     }
 
   do {
@@ -168,8 +172,8 @@ main()
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
-      assert(pthread_join(t[i], (void **) &result) == 0);
-        assert(result == i);
+      assert(pthread_join(t[i], &result) == 0);
+        assert((int)(size_t)result == i);
     }
 
       fprintf(stderr, "awk = %d\n", awoken);

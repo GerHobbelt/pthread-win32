@@ -60,23 +60,28 @@ CRITICAL_SECTION cs1, cs2;
 pthread_mutexattr_t ma;
 long durationMilliSecs;
 long overHeadMilliSecs = 0;
-struct _timeb currSysTimeStart;
-struct _timeb currSysTimeStop;
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTimeStart;
+  struct __timeb64 currSysTimeStop;
+#else
+  struct _timeb currSysTimeStart;
+  struct _timeb currSysTimeStop;
+#endif
 pthread_t worker;
 int running = 0;
 
-#define GetDurationMilliSecs(_TStart, _TStop) ((_TStop.time*1000+_TStop.millitm) \
-                                               - (_TStart.time*1000+_TStart.millitm))
+#define GetDurationMilliSecs(_TStart, _TStop) ((long)((_TStop.time*1000+_TStop.millitm) \
+                                               - (_TStart.time*1000+_TStart.millitm)))
 
 /*
  * Dummy use of j, otherwise the loop may be removed by the optimiser
  * when doing the overhead timing with an empty loop.
  */
 #define TESTSTART \
-  { int i, j = 0, k = 0; _ftime(&currSysTimeStart); for (i = 0; i < ITERATIONS; i++) { j++;
+  { int i, j = 0, k = 0; PTW32_FTIME(&currSysTimeStart); for (i = 0; i < ITERATIONS; i++) { j++;
 
 #define TESTSTOP \
-  }; _ftime(&currSysTimeStop); if (j + k == i) j++; }
+  }; PTW32_FTIME(&currSysTimeStop); if (j + k == i) j++; }
 
 
 void *

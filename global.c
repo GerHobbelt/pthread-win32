@@ -49,21 +49,8 @@ pthread_cond_t ptw32_cond_list_tail = NULL;
 
 int ptw32_concurrency = 0;
 
-/* What features have been auto-detaected */
+/* What features have been auto-detected */
 int ptw32_features = 0;
-
-BOOL ptw32_smp_system = PTW32_TRUE;  /* Safer if assumed true initially. */
-
-/* 
- * Function pointer to InterlockedCompareExchange if it exists, otherwise
- * it will be set at runtime to a substitute local version with the same
- * functionality but may be architecture specific.
- */
-PTW32_INTERLOCKED_LONG
-  (WINAPI * ptw32_interlocked_compare_exchange) (PTW32_INTERLOCKED_LPLONG,
-						 PTW32_INTERLOCKED_LONG,
-						 PTW32_INTERLOCKED_LONG) =
-  NULL;
 
 /* 
  * Function pointer to QueueUserAPCEx if it exists, otherwise
@@ -75,37 +62,37 @@ DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD) = NULL;
 /*
  * Global lock for managing pthread_t struct reuse.
  */
-CRITICAL_SECTION ptw32_thread_reuse_lock;
+ptw32_mcs_lock_t ptw32_thread_reuse_lock;
 
 /*
  * Global lock for testing internal state of statically declared mutexes.
  */
-CRITICAL_SECTION ptw32_mutex_test_init_lock;
+ptw32_mcs_lock_t ptw32_mutex_test_init_lock;
 
 /*
  * Global lock for testing internal state of PTHREAD_COND_INITIALIZER
  * created condition variables.
  */
-CRITICAL_SECTION ptw32_cond_test_init_lock;
+ptw32_mcs_lock_t ptw32_cond_test_init_lock;
 
 /*
  * Global lock for testing internal state of PTHREAD_RWLOCK_INITIALIZER
  * created read/write locks.
  */
-CRITICAL_SECTION ptw32_rwlock_test_init_lock;
+ptw32_mcs_lock_t ptw32_rwlock_test_init_lock;
 
 /*
  * Global lock for testing internal state of PTHREAD_SPINLOCK_INITIALIZER
  * created spin locks.
  */
-CRITICAL_SECTION ptw32_spinlock_test_init_lock;
+ptw32_mcs_lock_t ptw32_spinlock_test_init_lock;
 
 /*
  * Global lock for condition variable linked list. The list exists
  * to wake up CVs when a WM_TIMECHANGE message arrives. See
  * w32_TimeChangeHandler.c.
  */
-CRITICAL_SECTION ptw32_cond_list_lock;
+ptw32_mcs_lock_t ptw32_cond_list_lock;
 
 #ifdef _UWIN
 /*

@@ -45,15 +45,15 @@
  *      pthread_once()
  */
 
-#define ASSERT_TRACE
+/* #define ASSERT_TRACE */
 
 #include "test.h"
 
 #define NUM_THREADS 100 /* Targeting each once control */
 #define NUM_ONCE    10
 
-pthread_once_t o = PTHREAD_ONCE_INIT;
-pthread_once_t once[NUM_ONCE];
+static pthread_once_t o = PTHREAD_ONCE_INIT;
+static pthread_once_t once[NUM_ONCE];
 
 typedef struct {
   int i;
@@ -86,11 +86,11 @@ mythread(void * arg)
    * eventually cancels only when it becomes the new once thread.
    */
   assert(pthread_cancel(pthread_self()) == 0);
-  assert(pthread_once(&once[(int) arg], myfunc) == 0);
+  assert(pthread_once(&once[(int)(size_t)arg], myfunc) == 0);
   EnterCriticalSection(&numThreads.cs);
   numThreads.i++;
   LeaveCriticalSection(&numThreads.cs);
-  return 0;
+  return (void*)(size_t)0;
 }
 
 int
@@ -108,7 +108,7 @@ main()
 
       for (i = 0; i < NUM_THREADS; i++)
         {
-          assert(pthread_create(&t[i][j], NULL, mythread, (void *) j) == 0);
+          assert(pthread_create(&t[i][j], NULL, mythread, (void *)(size_t)j) == 0);
         }
     }
 

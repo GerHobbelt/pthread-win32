@@ -54,7 +54,7 @@
  * - Master and slave do battle continuously until main tells them to stop.
  * - Afterwards, the CV must be successfully destroyed (will return an
  * error if there are waiters (including any internal semaphore waiters,
- * which, if there are, cannot not be real waiters).
+ * which, if there are, cannot be real waiters).
  *
  * Environment:
  * - 
@@ -97,7 +97,7 @@ static int timeoutCount = 0;
 static int signalsTakenCount = 0;
 static int signalsSent = 0;
 static int bias = 0;
-static int timeout = 10; // Must be > 0
+static int timeout = 10; // Must be > 0
 
 enum {
   CTL_STOP     = -1
@@ -111,13 +111,17 @@ enum {
 struct timespec *
 millisecondsFromNow (struct timespec * time, int millisecs)
 {
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTime;
+#else
   struct _timeb currSysTime;
+#endif
   int64_t nanosecs, secs;
   const int64_t NANOSEC_PER_MILLISEC = 1000000;
   const int64_t NANOSEC_PER_SEC = 1000000000;
 
   /* get current system time and add millisecs */
-  _ftime(&currSysTime);
+  PTW32_FTIME(&currSysTime);
 
   secs = (int64_t)(currSysTime.time) + (millisecs / 1000);
   nanosecs = ((int64_t) (millisecs%1000 + currSysTime.millitm)) * NANOSEC_PER_MILLISEC;
@@ -141,9 +145,9 @@ millisecondsFromNow (struct timespec * time, int millisecs)
 void *
 masterThread (void * arg)
 {
-  int dither = (int) arg;
+  int dither = (int)(size_t)arg;
 
-  timeout = (int) arg;
+  timeout = (int)(size_t)arg;
 
   pthread_barrier_wait(&startBarrier);
 
@@ -239,7 +243,7 @@ main ()
   assert(pthread_barrier_init(&readyBarrier, NULL, 3) == 0);
   assert(pthread_barrier_init(&holdBarrier, NULL, 3) == 0);
 
-  assert(pthread_create(&master, NULL, masterThread, (void *) timeout) == 0);
+  assert(pthread_create(&master, NULL, masterThread, (void *)(size_t)timeout) == 0);
   assert(pthread_create(&slave, NULL, slaveThread, NULL) == 0);
 
   allExit = FALSE;

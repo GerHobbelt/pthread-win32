@@ -185,7 +185,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 	      cleanup_args.sem = s;
 	      cleanup_args.resultPtr = &result;
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 800
 #pragma inline_depth(0)
 #endif
 	      /* Must wait */
@@ -195,7 +195,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 #endif
 	      result = pthreadCancelableTimedWait (s->sem, milliseconds);
 	      pthread_cleanup_pop(result);
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 800
 #pragma inline_depth()
 #endif
 

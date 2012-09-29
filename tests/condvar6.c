@@ -144,7 +144,11 @@ main()
   int i;
   pthread_t t[NUMTHREADS + 1];
 
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && __MSVCRT_VERSION__ >= 0x0601
+  struct __timeb64 currSysTime;
+#else
   struct _timeb currSysTime;
+#endif
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   cvthing.shared = 0;
@@ -157,9 +161,9 @@ main()
 
   assert(pthread_mutex_lock(&start_flag) == 0);
 
-  _ftime(&currSysTime);
+  PTW32_FTIME(&currSysTime);
 
-  abstime.tv_sec = currSysTime.time;
+  abstime.tv_sec = (long)currSysTime.time;
   abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
 
   abstime.tv_sec += 5;

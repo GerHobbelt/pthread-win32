@@ -116,7 +116,7 @@ ptw32_terminate ()
 
 #endif
 
-#if ! defined (__MINGW32__) || (defined (__MSVCRT__) && ! defined (__DMC__))
+#if ! (defined(__MINGW64__) || defined(__MINGW32__)) || (defined (__MSVCRT__) && ! defined (__DMC__))
 unsigned
   __stdcall
 #else
@@ -148,7 +148,7 @@ ptw32_threadStart (void *vthreadParms)
 
   free (threadParms);
 
-#if defined (__MINGW32__) && ! defined (__MSVCRT__)
+#if (defined(__MINGW64__) || defined(__MINGW32__)) && ! defined (__MSVCRT__)
   /*
    * beginthread does not return the thread id and is running
    * before it returns us the thread handle, and so we do it here.
@@ -268,7 +268,6 @@ ptw32_threadStart (void *vthreadParms)
        * ptw32_terminate() will be called if there is no user
        * supplied function.
        */
-
       terminate_function
 	term_func = set_terminate (0);
       set_terminate (term_func);
@@ -277,7 +276,6 @@ ptw32_threadStart (void *vthreadParms)
 	{
 	  term_func ();
 	}
-
       throw;
     }
   }
@@ -299,20 +297,11 @@ ptw32_threadStart (void *vthreadParms)
   {
     /*
      * A system unexpected exception has occurred running the user's
-     * terminate routine. We get control back within this block - cleanup
-     * and release the exception out of thread scope.
+     * terminate routine. We get control back within this block
+     * and exit with a substitue status. If the thread was not
+     * cancelled then this indicates the unhandled exception.
      */
     status = sp->exitStatus = PTHREAD_CANCELED;
-    (void) pthread_mutex_lock (&sp->cancelLock);
-    sp->state = PThreadStateException;
-    (void) pthread_mutex_unlock (&sp->cancelLock);
-    (void) pthread_win32_thread_detach_np ();
-    (void) set_terminate (ptw32_oldTerminate);
-    throw;
-
-    /*
-     * Never reached.
-     */
   }
 
   (void) set_terminate (ptw32_oldTerminate);
@@ -343,8 +332,8 @@ ptw32_threadStart (void *vthreadParms)
   (void) pthread_win32_thread_detach_np ();
 #endif
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
-  _endthreadex ((unsigned) status);
+#if ! (defined(__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__) || defined (__DMC__)
+  _endthreadex ((unsigned)(size_t) status);
 #else
   _endthread ();
 #endif
@@ -353,8 +342,8 @@ ptw32_threadStart (void *vthreadParms)
    * Never reached.
    */
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
-  return (unsigned) status;
+#if ! (defined(__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__) || defined (__DMC__)
+  return (unsigned)(size_t) status;
 #endif
 
 }				/* ptw32_threadStart */
