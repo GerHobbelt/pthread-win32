@@ -88,6 +88,9 @@ test_once2(void)
   pthread_t t[NUM_THREADS][NUM_ONCE];
   int i, j;
 
+  memset(&numOnce, 0, sizeof(sharedInt_t));
+  memset(&numThreads, 0, sizeof(sharedInt_t));
+
   InitializeCriticalSection(&numThreads.cs);
   InitializeCriticalSection(&numOnce.cs);
 

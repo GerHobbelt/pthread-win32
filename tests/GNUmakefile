@@ -101,7 +101,7 @@ TESTS	= \
 	  create1 create2 create3 create3a reuse1 reuse2 equal1 \
 	  sequence1 kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
-	  join0 join1 detach1 join2 join3 \
+	  join0 join1 detach1 join2 join3 join4 \
 	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
@@ -123,7 +123,7 @@ TESTS	= \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
-	  exception1 exception2 exception3 \
+	  exception1 exception2 exception3_0 exception3 \
 	  cancel9 stress1
 
 STRESSTESTS = \
@@ -140,7 +140,7 @@ STATICTESTS = \
 	  create1 create2 create3 create3a reuse1 reuse2 equal1 \
 	  sequence1 kill1 valid1 valid2 \
 	  exit2 exit3 exit4 exit5 \
-	  join0 join1 detach1 join2 join3 \
+	  join0 join1 detach1 join2 join3 join4 \
 	  mutex2 mutex2r mutex2e mutex3 mutex3r mutex3e \
 	  mutex4 mutex6 mutex6n mutex6e mutex6r \
 	  mutex6s mutex6es mutex6rs \
@@ -162,7 +162,7 @@ STATICTESTS = \
 	  cleanup0 cleanup1 cleanup2 cleanup3 \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
-	  exception1 exception2 exception3 \
+	  exception1 exception2 exception3_0 exception3 \
 	  cancel9 stress1
 
 ALLTESTS = $(TESTS) $(BENCHTESTS)
@@ -175,15 +175,16 @@ STATICRESULTS	= $(STATICTESTS:%=%.pass)
 
 help:
 	@ $(ECHO) "Run one of the following command lines:"
-	@ $(ECHO) "$(MAKE) clean GC	        (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC         (to test using GC dll with C (no EH) applications)"
 	@ $(ECHO) "$(MAKE) clean GCX        (to test using GC dll with C++ (EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCE   		(to test using GCE dll with C++ (EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GC-bench	(to benchtest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "$(MAKE) clean GCE        (to test using GCE dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-bench   (to benchtest using GNU C dll with C cleanup code)"
 	@ $(ECHO) "$(MAKE) clean GCE-bench  (to benchtest using GNU C dll with C++ exception handling)"
-	@ $(ECHO) "$(MAKE) clean GC-stress	(to stresstest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "$(MAKE) clean GC-stress  (to stresstest using GNU C dll with C cleanup code)"
 	@ $(ECHO) "$(MAKE) clean GCE-stress (to stresstest using GNU C dll with C++ exception handling)"
 	@ $(ECHO) "$(MAKE) clean GC-static  (to test using GC static lib with C (no EH) applications)"
 	@ $(ECHO) "$(MAKE) clean GC-debug   (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCE-debug  (to test using GCE dll with C++ (EH) applications)"
 
 all:
 	@ $(MAKE) clean GC
@@ -259,7 +260,7 @@ barrier4.pass: barrier3.pass
 barrier5.pass: barrier4.pass
 barrier6.pass: barrier5.pass
 cancel1.pass: create1.pass
-cancel2.pass: cancel1.pass
+cancel2.pass: barrier6.pass
 cancel3.pass: context1.pass
 cancel4.pass: cancel3.pass
 cancel5.pass: cancel3.pass
@@ -300,7 +301,8 @@ equal1.pass: create1.pass
 errno1.pass: mutex3.pass
 exception1.pass: cancel4.pass
 exception2.pass: exception1.pass
-exception3.pass: exception2.pass
+exception3_0.pass: exception2.pass
+exception3.pass: exception3_0.pass
 exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass
@@ -312,6 +314,7 @@ join0.pass: create1.pass
 join1.pass: create1.pass
 join2.pass: create1.pass
 join3.pass: join2.pass
+join4.pass: join3.pass
 kill1.pass:
 loadfree.pass: pthread.dll
 mutex1.pass: self1.pass
@@ -444,6 +447,7 @@ clean:
 	- $(RM) *.obj
 	- $(RM) *.pdb
 	- $(RM) *.exe
+	- $(RM) *.manifest
 	- $(RM) *.pass
 	- $(RM) *.bench
 	- $(RM) *.static

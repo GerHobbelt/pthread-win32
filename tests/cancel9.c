@@ -33,7 +33,7 @@
  *
  * --------------------------------------------------------------------------
  *
- * Test Synopsis: Test true asynchronous cancelation with Alert driver.
+ * Test Synopsis: Test true asynchronous cancellation with Alert driver.
  *
  * Test Method (Validation or Falsification):
  * - 
@@ -177,7 +177,7 @@ test_cancel9(void)
       Sleep (100);
       assert (pthread_cancel (t) == 0);
       assert (pthread_join (t, &result) == 0);
-      assert (result == PTHREAD_CANCELED && "test_sleep" != NULL);
+      assert (result == PTHREAD_CANCELED && "test_sleep");
 
       printf ("Cancel waiting thread.\n");
       assert (pthread_create (&t, NULL, test_wait, NULL) == 0);
@@ -193,7 +193,7 @@ test_cancel9(void)
       Sleep (100);
       assert (pthread_cancel (t) == 0);
       assert (pthread_join (t, &result) == 0);
-      assert (result == PTHREAD_CANCELED && "test_udp" != NULL);
+      assert (result == PTHREAD_CANCELED && "test_udp");
     }
   else
     {

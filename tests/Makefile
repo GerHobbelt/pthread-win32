@@ -50,19 +50,25 @@ OPTIM	= /O2 /Ob0
 XXLIBS	= ws2_32.lib
 
 # C++ Exceptions
-VCEFLAGS	= /EHsc /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
+VCEFLAGS	= /EHs /TP /DPtW32NoCatchWarn /D__CLEANUP_CXX
 VCELIB	= pthreadVCE$(DLL_VER).lib
 VCEDLL	= pthreadVCE$(DLL_VER).dll
+VCELIBD	= pthreadVCE$(DLL_VER)d.lib
+VCEDLLD	= pthreadVCE$(DLL_VER)d.dll
 # Structured Exceptions
 VSEFLAGS	= /D__CLEANUP_SEH
 VSELIB	= pthreadVSE$(DLL_VER).lib
 VSEDLL	= pthreadVSE$(DLL_VER).dll
+VSELIBD	= pthreadVSE$(DLL_VER)d.lib
+VSEDLLD	= pthreadVSE$(DLL_VER)d.dll
 # C cleanup code
 VCFLAGS	= /D__CLEANUP_C
 VCLIB	= pthreadVC$(DLL_VER).lib
 VCDLL	= pthreadVC$(DLL_VER).dll
+VCLIBD	= pthreadVC$(DLL_VER)d.lib
+VCDLLD	= pthreadVC$(DLL_VER)d.dll
 # C++ Exceptions in application - using VC version of pthreads dll
-VCXFLAGS	= /EHsc /TP /D__CLEANUP_C
+VCXFLAGS	= /EHs /TP /D__CLEANUP_C
 
 # Defaults
 CPLIB	= $(VCLIB)
@@ -93,7 +99,7 @@ REGULAR_PASSES = loadfree.pass \
 	  exit1.pass  create1.pass  create2.pass create3.pass creat3a.pass reuse1.pass  reuse2.pass  equal1.pass  \
 	  sequence1.pass  kill1.pass  valid1.pass  valid2.pass  \
 	  exit2.pass  exit3.pass  exit4.pass  exit5.pass  \
-	  join0.pass  join1.pass  detach1.pass  join2.pass join3.pass  \
+	  join0.pass  join1.pass  detach1.pass  join2.pass join3.pass join4.pass  \
 	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
 	  mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
 	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
@@ -119,7 +125,7 @@ REGULAR_PASSES = loadfree.pass \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
-	  exception1.pass  exception2.pass  exception3.pass  \
+	  exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
 	  cancel9.pass  stress1.pass
 
 BENCHRESULTS = \
@@ -139,7 +145,7 @@ STATICRESULTS = \
 	  exit1.pass  create1.pass  create2.pass  create3.pass  creat3a.pass  reuse1.pass  reuse2.pass  equal1.pass  \
 	  sequence1.pass  kill1.pass  valid1.pass  valid2.pass  \
 	  exit2.pass  exit3.pass  exit4.pass  exit5.pass  \
-	  join0.pass  join1.pass  detach1.pass  join2.pass join3.pass  \
+	  join0.pass  join1.pass  detach1.pass  join2.pass join3.pass join4.pass  \
 	  mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
 	  mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
 	  mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
@@ -165,24 +171,29 @@ STATICRESULTS = \
 	  cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
-	  exception1.pass  exception2.pass  exception3.pass  \
+	  exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
 	  cancel9.pass  stress1.pass
 
 help:
 	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) $(MAKE) clean VC          (to test using VC dll with VC (no EH) apps)
-	@ $(ECHO) $(MAKE) clean VC-bench    (to benchtest using VC dll with C bench apps)
-	@ $(ECHO) $(MAKE) clean VC-stress   (to stresstest using VC dll with C stress apps)
-	@ $(ECHO) $(MAKE) clean VC-static   (to test using VC static lib with VC (no EH) apps)
-	@ $(ECHO) $(MAKE) clean VCX         (to test using VC dll with VC++ (EH) applications)
-	@ $(ECHO) $(MAKE) clean VCX-bench   (to benchtest using VC dll with C++ bench apps)
-	@ $(ECHO) $(MAKE) clean VCX-stress  (to stresstest using VC dll with C++ stress apps)
-	@ $(ECHO) $(MAKE) clean VCE         (to test using the VCE dll with VC++ EH applications)
-	@ $(ECHO) $(MAKE) clean VCE-bench   (to benchtest using VCE dll with C++ bench apps)
-	@ $(ECHO) $(MAKE) clean VCE-stress  (to stresstest using VCE dll with C++ stress apps)
-	@ $(ECHO) $(MAKE) clean VSE         (to test using VSE dll with VC (SEH) apps)
-	@ $(ECHO) $(MAKE) clean VSE-bench   (to benchtest using VSE dll with SEH bench apps)
-	@ $(ECHO) $(MAKE) clean VSE-stress  (to stresstest using VSE dll with SEH stress apps)
+	@ $(ECHO) $(MAKE) clean VC                (to test using VC dll with VC (no EH) apps)
+	@ $(ECHO) $(MAKE) clean VC-bench          (to benchtest using VC dll with C bench apps)
+	@ $(ECHO) $(MAKE) clean VC-stress         (to stresstest using VC dll with C stress apps)
+	@ $(ECHO) $(MAKE) clean VC-static         (to test using VC static lib with VC (no EH) apps)
+	@ $(ECHO) $(MAKE) clean VC-debug          (to test using VC dll with VC (no EH) apps)
+	@ $(ECHO) $(MAKE) clean VCX               (to test using VC dll with VC++ (EH) applications)
+	@ $(ECHO) $(MAKE) clean VCX-bench         (to benchtest using VC dll with C++ bench apps)
+	@ $(ECHO) $(MAKE) clean VCX-stress        (to stresstest using VC dll with C++ stress apps)
+	@ $(ECHO) $(MAKE) clean VCE               (to test using the VCE dll with VC++ EH applications)
+	@ $(ECHO) $(MAKE) clean VCE-bench         (to benchtest using VCE dll with C++ bench apps)
+	@ $(ECHO) $(MAKE) clean VCE-stress        (to stresstest using VCE dll with C++ stress apps)
+	@ $(ECHO) $(MAKE) clean VCE-static        (to test using VCE static lib with VC++ EH apps)
+	@ $(ECHO) $(MAKE) clean VCE-debug         (to test using the VCE dll with VC++ EH applications)
+	@ $(ECHO) $(MAKE) clean VCE-static-debug  (to test using VCE static lib with VC++ EH apps)
+	@ $(ECHO) $(MAKE) clean VSE               (to test using VSE dll with VC (SEH) apps)
+	@ $(ECHO) $(MAKE) clean VSE-bench         (to benchtest using VSE dll with SEH bench apps)
+	@ $(ECHO) $(MAKE) clean VSE-stress        (to stresstest using VSE dll with SEH stress apps)
+	@ $(ECHO) $(MAKE) clean VSE-debug         (to test using VSE dll with VC (SEH) apps)
 
 all:
 	@ $(MAKE) /E clean VC
@@ -272,6 +283,24 @@ VCX-stress:
 VC-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
+VCE-static:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" statictests
+
+VC-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" tests
+
+VC-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS)" statictests
+
+VCE-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" tests
+
+VCE-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS)" statictests
+
+VSE-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" tests
+
 .c.exe:
 	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
 
@@ -302,6 +331,7 @@ clean:
 	- if exist *.o $(RM) *.o
 	- if exist *.asm $(RM) *.asm
 	- if exist *.exe $(RM) *.exe
+	- if exist *.manifest $(RM) *.manifest
 	- if exist *.pass $(RM) *.pass
 	- if exist *.bench $(RM) *.bench
 	- if exist *.log $(RM) *.log
@@ -323,7 +353,7 @@ barrier4.pass: barrier3.pass
 barrier5.pass: barrier4.pass
 barrier6.pass: barrier5.pass
 cancel1.pass: create1.pass
-cancel2.pass: cancel1.pass
+cancel2.pass: barrier6.pass
 cancel3.pass: context1.pass
 cancel4.pass: cancel3.pass
 cancel5.pass: cancel3.pass
@@ -364,7 +394,8 @@ equal1.pass: create1.pass
 errno1.pass: mutex3.pass
 exception1.pass: cancel4.pass
 exception2.pass: exception1.pass
-exception3.pass: exception2.pass
+exception3_0.pass: exception2.pass
+exception3.pass: exception3_0.pass
 exit1.pass:
 exit2.pass: create1.pass
 exit3.pass: create1.pass
@@ -376,6 +407,7 @@ join0.pass: create1.pass
 join1.pass: create1.pass
 join2.pass: create1.pass
 join3.pass: join2.pass
+join4.pass: join3.pass
 kill1.pass: 
 loadfree.pass: pthread.dll
 mutex1.pass: self1.pass

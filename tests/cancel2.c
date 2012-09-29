@@ -95,7 +95,7 @@ struct bag_t_ {
 
 static bag_t threadbag[NUMTHREADS + 1];
 
-static pthread_mutex_t waitLock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_barrier_t go = NULL;
 
 static void *
 mythread(void * arg)
@@ -110,18 +110,8 @@ mythread(void * arg)
   /* Set to known state and type */
 
   assert(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == 0);
-
-  switch (bag->threadnum % 2)
-    {
-    case 0:
-      assert(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL) == 0);
-      result = 0;
-      break;
-    case 1:
-      assert(pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL) == 0);
-      result = 1;
-      break;
-    }
+  assert(pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL) == 0);
+  result = 1;
 
 #if !defined(__cplusplus)
   __try
@@ -130,14 +120,10 @@ mythread(void * arg)
 #endif
     {
       /* Wait for go from main */
-      assert(pthread_mutex_lock(&waitLock) == 0);
-      assert(pthread_mutex_unlock(&waitLock) == 0);
-      sched_yield();
+      pthread_barrier_wait(&go);
+      pthread_barrier_wait(&go);
 
-      for (;;)
-	{
-	  pthread_testcancel();
-	}
+      pthread_testcancel();
     }
 #if !defined(__cplusplus)
   __except(EXCEPTION_EXECUTE_HANDLER)
@@ -160,7 +146,7 @@ mythread(void * arg)
    */
   result += 1000;
 
-  return (void *) (size_t)result;
+  return (void *)(size_t)result;
 }
 
 #ifndef MONOLITHIC_PTHREAD_TESTS
@@ -176,7 +162,7 @@ test_cancel2(void)
   pthread_t t[NUMTHREADS + 1];
 
   assert((t[0] = pthread_self()).p != NULL);
-  assert(pthread_mutex_lock(&waitLock) == 0);
+  assert(pthread_barrier_init(&go, NULL, NUMTHREADS + 1) == 0);
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
@@ -186,23 +172,17 @@ test_cancel2(void)
     }
 
   /*
-   * Code to control or munipulate child threads should probably go here.
+   * Code to control or manipulate child threads should probably go here.
    */
-  Sleep(500);
 
-  assert(pthread_mutex_unlock(&waitLock) == 0);
-
-  Sleep(500);
+  pthread_barrier_wait(&go);
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
       assert(pthread_cancel(t[i]) == 0);
     }
 
-  /*
-   * Give threads time to run.
-   */
-  Sleep(NUMTHREADS * 100);
+  pthread_barrier_wait(&go);
 
   /*
    * Standard check that all threads started.
@@ -228,19 +208,19 @@ test_cancel2(void)
       void* result = (void*)0;
 
       assert(pthread_join(t[i], &result) == 0);
-      fail = ((int)(size_t)result != (int) PTHREAD_CANCELED);
+      fail = (result != PTHREAD_CANCELED);
       if (fail)
 	{
-	  fprintf(stderr, "Thread %d: started %d: location %d: cancel type %s\n",
+	  fprintf(stderr, "Thread %d: started %d: location %d\n",
 		  i,
 		  threadbag[i].started,
-		  (int)(size_t)result,
-		  (((int)(size_t)result % 2) == 0) ? "ASYNCHRONOUS" : "DEFERRED");
+		  (int)(size_t)result);
 	}
       failed |= fail;
     }
 
   assert(!failed);
+  assert(pthread_barrier_destroy(&go) == 0);
 
   /*
    * Success.

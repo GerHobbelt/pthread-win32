@@ -37,8 +37,8 @@
  * See the README file for an explanation of the pthreads-win32 version
  * numbering scheme and how the DLL is named etc.
  */
-#define PTW32_VERSION 2,9,1,0
-#define PTW32_VERSION_STRING "2, 9, 1, 0\0"
+#define PTW32_VERSION 2,10,0,0
+#define PTW32_VERSION_STRING "2, 10, 0, 0\0"
 
 /* There are three implementations of cancel cleanup.
  * Note that pthread.h is included in both application
@@ -65,7 +65,7 @@
  * Define defaults for cleanup code.
  * Note: Unless the build explicitly defines one of the following, then
  * we default to standard C style cleanup. This style uses setjmp/longjmp
- * in the cancelation and thread exit implementations and therefore won't
+ * in the cancellation and thread exit implementations and therefore won't
  * do stack unwinding if linked to applications that have it (e.g.
  * C++ apps). This is currently consistent with most/all commercial Unix
  * POSIX threads implementations.
@@ -132,6 +132,18 @@
 #   define HAVE_SIGNAL_H        1
 #   undef HAVE_PTW32_CONFIG_H
 #   pragma comment(lib, "pthread")
+#endif
+
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#  define PTW32_CONFIG_MINGW
+#endif
+#if defined(_MSC_VER)
+#  if _MSC_VER < 1300
+#    define PTW32_CONFIG_MSVC6
+#  endif
+#  if _MSC_VER < 1400
+#    define PTW32_CONFIG_MSVC7
+#  endif
 #endif
 
 /*
@@ -208,7 +220,7 @@
  */
 
 /* Try to avoid including windows.h */
-#if (defined(__MINGW64__) || defined(__MINGW32__)) && defined(__cplusplus)
+#if defined(PTW32_CONFIG_MINGW) && defined(__cplusplus)
 #define PTW32_INCLUDE_WINDOWS_H
 #endif
 
@@ -216,7 +228,7 @@
 #include <windows.h>
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER < 1300 || defined(__DMC__)
+#if defined(PTW32_CONFIG_MSVC6) || defined(__DMC__)
 /*
  * VC++6.0 or early compiler's header has no DWORD_PTR type.
  */
@@ -676,7 +688,7 @@ enum {
 /*
  * ====================
  * ====================
- * Cancelation
+ * cancellation
  * ====================
  * ====================
  */
@@ -1188,6 +1200,9 @@ PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_setkind_np(pthread_mutexattr_t *
                                          int kind);
 PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr,
                                          int *kind);
+PTW32_DLLPORT int PTW32_CDECL pthread_timedjoin_np(pthread_t thread,
+                                         void **value_ptr,
+                                         const struct timespec *abstime);
 
 /*
  * Possibly supported by other POSIX threads implementations
@@ -1327,7 +1342,7 @@ PTW32_DLLPORT DWORD PTW32_CDECL ptw32_get_exception_services_code(void);
 #if defined(_MSC_VER)
         /*
          * WARNING: Replace any 'catch( ... )' with 'PtW32CatchAll'
-         * if you want Pthread-Win32 cancelation and pthread_exit to work.
+         * if you want Pthread-Win32 cancellation and pthread_exit to work.
          */
 
 #if !defined(PtW32NoCatchWarn)
@@ -1337,7 +1352,7 @@ PTW32_DLLPORT DWORD PTW32_CDECL ptw32_get_exception_services_code(void);
 #pragma message("When compiling applications with MSVC++ and C++ exception handling:")
 #pragma message("  Replace any 'catch( ... )' in routines called from POSIX threads")
 #pragma message("  with 'PtW32CatchAll' or 'CATCHALL' if you want POSIX thread")
-#pragma message("  cancelation and pthread_exit to work. For example:")
+#pragma message("  cancellation and pthread_exit to work. For example:")
 #pragma message("")
 #pragma message("    #if defined(PtW32CatchAll)")
 #pragma message("      PtW32CatchAll")

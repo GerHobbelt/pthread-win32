@@ -90,7 +90,7 @@
  * Create NUMTHREADS threads in addition to the Main thread.
  */
 enum {
-  NUMTHREADS = 1
+  NUMTHREADS = 10
 };
 
 static int caught = 0;
@@ -130,7 +130,8 @@ exceptionedThread(void * arg)
 {
   int dummy = 0x1;
 
-  (void) set_terminate(&terminateFunction);
+  set_terminate(&terminateFunction);
+  assert(set_terminate(&terminateFunction) == &terminateFunction);
 
   throw dummy;
 
@@ -164,14 +165,14 @@ test_exception3(void)
       assert(pthread_create(&et[i], NULL, exceptionedThread, NULL) == 0);
     }
 
-  Sleep(5000);
+  Sleep(NUMTHREADS * 100);
 
   assert(caught == NUMTHREADS);
 
   /*
-   * Success.
+   * Fail. Should never be reached.
    */
-  return 0;
+  return 1;
 }
 
 #else /* defined(__cplusplus) */

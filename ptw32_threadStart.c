@@ -59,7 +59,7 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, ULONG_PTR * ei)
 
 	for (param = 0; param < numParams; param++)
 	  {
-	    ei[param] = ep->ExceptionRecord->ExceptionInformation[param];
+	    ei[param] = (DWORD) ep->ExceptionRecord->ExceptionInformation[param];
 	  }
 
 	return EXCEPTION_EXECUTE_HANDLER;
@@ -120,7 +120,7 @@ ptw32_terminate ()
 
 #endif
 
-#if ! (defined(__MINGW64__) || defined(__MINGW32__)) || (defined (__MSVCRT__) && ! defined (__DMC__))
+#if ! defined (PTW32_CONFIG_MINGW) || (defined (__MSVCRT__) && ! defined (__DMC__))
 unsigned
   __stdcall
 #else
@@ -153,7 +153,7 @@ ptw32_threadStart (void *vthreadParms)
 
   free (threadParms);
 
-#if (defined(__MINGW64__) || defined(__MINGW32__)) && ! defined (__MSVCRT__)
+#if defined (PTW32_CONFIG_MINGW) && ! defined (__MSVCRT__)
   /*
    * beginthread does not return the thread id and is running
    * before it returns us the thread handle, and so we do it here.
@@ -340,7 +340,7 @@ ptw32_threadStart (void *vthreadParms)
   (void) pthread_win32_thread_detach_np ();
 #endif
 
-#if ! (defined(__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
   _endthreadex ((unsigned)(size_t) status);
 #else
   _endthread ();
@@ -350,7 +350,7 @@ ptw32_threadStart (void *vthreadParms)
    * Never reached.
    */
 
-#if ! (defined(__MINGW64__) || defined(__MINGW32__)) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
   return (unsigned)(size_t) status;
 #endif
 

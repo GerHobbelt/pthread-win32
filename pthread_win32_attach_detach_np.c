@@ -71,7 +71,7 @@ pthread_win32_process_attach_np ()
    *
    * This should take care of any security issues.
    */
-#if defined(__GNUC__) || _MSC_VER < 1400
+#if defined(__GNUC__) || defined(PTW32_CONFIG_MSVC7)
   if(GetSystemDirectory(QuserExDLLPathBuf, QuserExDLLPathBufSize))
   {
     (void) strncat(QuserExDLLPathBuf,
@@ -90,7 +90,7 @@ pthread_win32_process_attach_np ()
 
   if (ptw32_h_quserex != NULL)
     {
-      ptw32_register_cancelation = (DWORD (*)(PAPCFUNC, HANDLE, DWORD))
+      ptw32_register_cancellation = (DWORD (*)(PAPCFUNC, HANDLE, DWORD))
 #if defined(NEED_UNICODE_CONSTS)
 	GetProcAddress (ptw32_h_quserex,
 			(const TCHAR *) TEXT ("QueueUserAPCEx"));
@@ -99,9 +99,9 @@ pthread_win32_process_attach_np ()
 #endif
     }
 
-  if (NULL == ptw32_register_cancelation)
+  if (NULL == ptw32_register_cancellation)
     {
-      ptw32_register_cancelation = ptw32_RegisterCancelation;
+      ptw32_register_cancellation = ptw32_Registercancellation;
 
       if (ptw32_h_quserex != NULL)
 	{
@@ -124,7 +124,7 @@ pthread_win32_process_attach_np ()
 
       if (queue_user_apc_ex_init == NULL || !queue_user_apc_ex_init ())
 	{
-	  ptw32_register_cancelation = ptw32_RegisterCancelation;
+	  ptw32_register_cancellation = ptw32_Registercancellation;
 
 	  (void) FreeLibrary (ptw32_h_quserex);
 	  ptw32_h_quserex = 0;

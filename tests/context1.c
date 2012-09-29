@@ -95,8 +95,6 @@ anotherEnding (void)
    * Switched context
    */
   washere++;
-
-  pthread_exit(0);
 }
 
 #ifndef MONOLITHIC_PTHREAD_TESTS

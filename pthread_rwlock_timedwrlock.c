@@ -101,10 +101,10 @@ pthread_rwlock_timedwrlock (pthread_rwlock_t * rwlock,
 	  rwl->nCompletedSharedAccessCount = -rwl->nSharedAccessCount;
 
 	  /*
-	   * This routine may be a cancelation point
+	   * This routine may be a cancellation point
 	   * according to POSIX 1003.1j section 18.1.2.
 	   */
-#if defined(_MSC_VER) && _MSC_VER < 1400
+#if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth(0)
 #endif
 	  pthread_cleanup_push (ptw32_rwlock_cancelwrwait, (void *) rwl);
@@ -119,7 +119,7 @@ pthread_rwlock_timedwrlock (pthread_rwlock_t * rwlock,
 	  while (result == 0 && rwl->nCompletedSharedAccessCount < 0);
 
 	  pthread_cleanup_pop ((result != 0) ? 1 : 0);
-#if defined(_MSC_VER) && _MSC_VER < 1400
+#if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth()
 #endif
 

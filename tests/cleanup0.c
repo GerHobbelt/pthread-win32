@@ -97,7 +97,7 @@ typedef struct {
   CRITICAL_SECTION cs;
 } sharedInt_t;
 
-static sharedInt_t pop_count = {0, {0}};
+static sharedInt_t pop_count;
 
 static void PTW32_CDECL
 increment_pop_count(void * arg)
@@ -152,6 +152,8 @@ test_cleanup0(void)
   int i;
   pthread_t t[NUMTHREADS + 1];
 
+  memset(&pop_count, 0, sizeof(sharedInt_t));
+
   InitializeCriticalSection(&pop_count.cs);
 
   assert((t[0] = pthread_self()).p != NULL);
@@ -164,7 +166,7 @@ test_cleanup0(void)
     }
 
   /*
-   * Code to control or munipulate child threads should probably go here.
+   * Code to control or manipulate child threads should probably go here.
    */
   Sleep(500);
 
@@ -198,7 +200,7 @@ test_cleanup0(void)
 
       assert(pthread_join(t[i], &result) == 0);
 
-      fail = ((int)(size_t)result == (int) PTHREAD_CANCELED);
+      fail = (result == PTHREAD_CANCELED);
 
       if (fail)
 	{
