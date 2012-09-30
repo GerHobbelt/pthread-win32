@@ -31,14 +31,16 @@
 
 DLL_VER	= 2
 
-CP	= cp -f
-MV	= mv -f
-RM	= rm -f
-CAT	= cat
-MKDIR	= mkdir
-ECHO	= echo
-TOUCH	= $(ECHO) Passed >
-#MAKE	= make -k
+CP			= cp -f
+MV			= mv -f
+RM			= rm -f
+CAT			= cat
+MKDIR		= mkdir
+ECHO		= echo
+TOUCH		= $(ECHO) Passed >
+TESTFILE	= test -f
+TESTDIR		= test -d
+AND			= &&
 
 # For cross compiling use e.g.
 # # make CROSS=i386-mingw32msvc- clean GC
@@ -388,7 +390,7 @@ sizes.exe: sizes.c $(COPYFILES)
 
 cancel9.exe: XLIBS = -lws2_32
 
-%.exe: %.c
+%.exe: %.c $(COPYFILES)
 	$(CC) $(CFLAGS) $(LFLAGS) -o $@ $< $(INCLUDES) -L. -lpthread$(GCX) $(XLIBS) $(XXLIBS)	
 	@ $(ECHO) Running $(TEST) test \"$*\"
 	@ $(RUN) ./$*
@@ -403,7 +405,7 @@ cancel9.exe: XLIBS = -lws2_32
 
 $(COPYFILES):
 	@ $(ECHO) Copying $(BUILD_DIR)/$@
-	@ $(CP) $(BUILD_DIR)/$@ .
+	@ $(TESTFILE) $(BUILD_DIR)/$@ $(AND) $(CP) $(BUILD_DIR)/$@ .
 
 benchlib.o: benchlib.c
 	@ $(ECHO) Compiling $@
