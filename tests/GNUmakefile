@@ -55,14 +55,16 @@ CXX     = $(CROSS)g++
 RANLIB  = $(CROSS)ranlib
 
 #
-# Mingw32
+# Mingw
 #
+ARCH	= 
+
 XLIBS	=
 XXCFLAGS	= 
 XXLIBS	=
 OPT	= -O3
 DOPT	= -g -O0
-CFLAGS	= ${OPT} -UNDEBUG -Wall $(XXCFLAGS)
+CFLAGS	= ${OPT} $(ARCH) -UNDEBUG -Wall $(XXCFLAGS)
 LFLAGS	= $(XXLFLAGS)
 # Uncomment to link the GCC/C++ runtime libraries statically
 #LFLAGS	+= -static-libgcc -static-libstdc++
@@ -150,6 +152,9 @@ help:
 	@ $(ECHO) "$(MAKE) clean GC-inlined-static-debug  (to test using GC static lib with C (no EH) applications)"
 	@ $(ECHO) "$(MAKE) clean GC-debug                 (to test using GC dll with C (no EH) applications)"
 	@ $(ECHO) "$(MAKE) clean GCE-debug                (to test using GCE dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-foo                   (to build individual test \"foo.c\" with C and run using GC dll)"
+	@ $(ECHO) "$(MAKE) clean GCE-foo                  (to build individual tests \"foo.c\" with C++ and run using GCE dll)" 
+	@ $(ECHO) "$(MAKE) clean GCX-foo                  (to build individual tests \"foo.c\" with C++ and run using GC dll)"
 
 all:
 	@ $(MAKE) clean GC
@@ -168,6 +173,9 @@ GC-asm:
 GCE:
 	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-pass
 
+GCE-%.pass:
+	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" $(@:GCE-%=%)
+
 GCX:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
 
@@ -184,7 +192,7 @@ GCE-debug:
 	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX" OPT="${DOPT}" all-pass
 
 GC-bench-debug:
-	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${OPT}" all-bench
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${DOPT}" all-bench
 
 GC-inlined-static GC-small-static:
 	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
@@ -215,6 +223,25 @@ GCE-stress:
 	@ $(ECHO) "expose weaknesses that may be intermittant or statistically rare."
 	@ $(ECHO) "A pass does not prove correctness, but may give greater confidence."
 	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="" all-stress
+
+# Targets to run individual tests
+# E.g. "make GC-cancel3"
+#
+GC-%:
+	$(MAKE) GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" $(@:GC-%=%).exe
+	@ $(ECHO) Running $@
+	@ ./$(@:GC-%=%) && $(ECHO) Passed || $(ECHO) Failed
+
+GCE-%:
+	$(MAKE) GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" $(@:GCE-%=%).exe
+	@ $(ECHO) Running $@
+	@ ./$(@:GCE-%=%) && $(ECHO) Passed || $(ECHO) Failed
+
+GCX-%:
+	$(MAKE) GCX="GC$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_C" $(@:GCX-%=%).exe
+	@ $(ECHO) Running $@
+	@ ./$(@:GCX-%=%) && $(ECHO) Passed || $(ECHO) Failed
+
 
 all-asm: $(ASM)
 	@ $(ECHO) "ALL TESTS PASSED! Congratulations!"

@@ -60,18 +60,23 @@ AND	= &&
 # make CROSS=x86_64-w64-mingw32- clean GC-inlined
 CROSS	= 
 
-AR	= $(CROSS)ar
+AR		= $(CROSS)ar
 DLLTOOL = $(CROSS)dlltool
 CC      = $(CROSS)gcc
 CXX     = $(CROSS)g++
 RANLIB  = $(CROSS)ranlib
-RC	= $(CROSS)windres
+RC		= $(CROSS)windres
 
-OPT	= $(CLEANUP) -O3 # -finline-functions -findirect-inlining
-XOPT	=
+# Build for non-native architecture. E.g. "-m64" "-m32" etc.
+# Not fully tested fully, needs gcc built with "--enable-multilib"
+# Check your "gcc -v" output for the options used to build your gcc.
+ARCH	= 
 
-RCFLAGS		= --include-dir=.
-LFLAGS		=
+OPT		=  $(ARCH) $(CLEANUP) -O3 # -finline-functions -findirect-inlining
+XOPT	= 
+
+RCFLAGS	= --include-dir=.
+LFLAGS	=
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
 #LFLAGS		+= -lws2_32
 # Uncomment this to link the GCC/C++ runtime libraries statically
@@ -80,7 +85,7 @@ LFLAGS		=
 # PLEASE NOTE: If you do this DO NOT distribute your pthreads DLLs with
 # the official filenaming, i.e. pthreadVC2.dll, etc. Instead, change DLL_VER
 # above to "2slgcc" for example, to build "pthreadGC2slgcc.dll", etc.
-#LFLAGS		+= -static-libgcc -static-libstdc++
+LFLAGS		+= -static-libgcc -static-libstdc++
 
 # ----------------------------------------------------------------------
 # The library can be built with some alternative behaviour to
@@ -253,12 +258,23 @@ install:
 %.o: %.rc
 	$(RC) $(RCFLAGS) $(CLEANUP) -o $@ -i $<
 
+%.o-m64: %.rc
+	$(RC) --target pe-x86-64 $(RCFLAGS) $(CLEANUP) -o $@ -i $<
+
+%.o-m32: %.rc
+	$(RC) --target pe-i386 $(RCFLAGS) $(CLEANUP) -o $@ -i $<
+
 .SUFFIXES: .dll .rc .c .o
 
 .c.o:;		 $(CC) -c -o $@ $(CFLAGS) $(XC_FLAGS) $<
 
 
-$(GC_DLL) $(GCD_DLL) $(GCE_DLL) $(GCED_DLL): $(DLL_OBJS)
+$(GC_DLL) $(GCD_DLL): $(DLL_OBJS)
+	$(CC) $(OPT) -shared -o $@ $^ $(LFLAGS)
+	$(DLLTOOL) -z pthread.def $^
+	$(DLLTOOL) -k --dllname $@ --output-lib lib$(basename $@).a --def $(PTHREAD_DEF)
+
+$(GCE_DLL) $(GCED_DLL): $(DLL_OBJS)
 	$(CC) $(OPT) -mthreads -shared -o $@ $^ $(LFLAGS)
 	$(DLLTOOL) -z pthread.def $^
 	$(DLLTOOL) -k --dllname $@ --output-lib lib$(basename $@).a --def $(PTHREAD_DEF)
