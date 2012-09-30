@@ -207,7 +207,7 @@ install:
 	if not exist $(DLLDEST) mkdir $(DLLDEST)
 	if not exist $(LIBDEST) mkdir $(LIBDEST)
 	if not exist $(HDRDEST) mkdir $(HDRDEST)
-	copy pthreadV*.dll $(DLLDEST)
+	if exist pthreadV*.dll copy pthreadV*.dll $(DLLDEST)
 	copy pthreadV*.lib $(LIBDEST)
 	copy pthread.h $(HDRDEST)
 	copy sched.h $(HDRDEST)
