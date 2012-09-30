@@ -61,20 +61,20 @@ help:
 	@ echo Run one of the following command lines:
 	@ echo nmake clean VC
 	@ echo nmake clean VC-debug
-	@ echo nmake clean VC-inlined-static
-	@ echo nmake clean VC-inlined-static-debug
+	@ echo nmake clean VC-static
+	@ echo nmake clean VC-static-debug
 	@ echo nmake clean VC-small-static
 	@ echo nmake clean VC-small-static-debug
 	@ echo nmake clean VCE
 	@ echo nmake clean VCE-debug
-	@ echo nmake clean VCE-inlined-static
-	@ echo nmake clean VCE-inlined-static-debug
+	@ echo nmake clean VCE-static
+	@ echo nmake clean VCE-static-debug
 	@ echo nmake clean VCE-small-static
 	@ echo nmake clean VCE-small-static-debug
 	@ echo nmake clean VSE
 	@ echo nmake clean VSE-debug
-	@ echo nmake clean VSE-inlined-static
-	@ echo nmake clean VSE-inlined-static-debug
+	@ echo nmake clean VSE-static
+	@ echo nmake clean VSE-static-debug
 	@ echo nmake clean VSE-small-static
 	@ echo nmake clean VSE-small-static-debug
 	@ echo.
@@ -91,12 +91,12 @@ all:
 TEST_ENV = CFLAGS="$(CFLAGS) /DNO_ERROR_DIALOGS"
 
 all-tests:
-	$(MAKE) /E realclean VC-inlined-static$(XDBG)
-	cd tests && $(MAKE) /E clean VC-inlined-static$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX-inlined-static$(XDBG) $(TEST_ENV)
-	$(MAKE) /E realclean VCE-inlined-static$(XDBG)
-	cd tests && $(MAKE) /E clean VCE-inlined-static$(XDBG) $(TEST_ENV)
-	$(MAKE) /E realclean VSE-inlined-static$(XDBG)
-	cd tests && $(MAKE) /E clean VSE-inlined-static$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VC-small-static$(XDBG)
+	cd tests && $(MAKE) /E clean VC-small-static$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX-small-static$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VCE-small-static$(XDBG)
+	cd tests && $(MAKE) /E clean VCE-small-static$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VSE-small-static$(XDBG)
+	cd tests && $(MAKE) /E clean VSE-small-static$(XDBG) $(TEST_ENV)
 	$(MAKE) /E realclean VC$(XDBG)
 	cd tests && $(MAKE) /E clean VC$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX$(XDBG) $(TEST_ENV)
 	$(MAKE) /E realclean VCE$(XDBG)
@@ -104,12 +104,12 @@ all-tests:
 	$(MAKE) /E realclean VSE$(XDBG)
 	cd tests && $(MAKE) /E clean VSE$(XDBG) $(TEST_ENV)
 !IF DEFINED(EXHAUSTIVE)
-	$(MAKE) /E realclean VC-small-static$(XDBG)
-	cd tests && $(MAKE) /E clean VC-small-static$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX-small-static$(XDBG) $(TEST_ENV)
-	$(MAKE) /E realclean VCE-small-static$(XDBG)
-	cd tests && $(MAKE) /E clean VCE-small-static$(XDBG) $(TEST_ENV)
-	$(MAKE) /E realclean VSE-small-static$(XDBG)
-	cd tests && $(MAKE) /E clean VSE-small-static$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VC-static$(XDBG)
+	cd tests && $(MAKE) /E clean VC-static$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX-static$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VCE-static$(XDBG)
+	cd tests && $(MAKE) /E clean VCE-static$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VSE-static$(XDBG)
+	cd tests && $(MAKE) /E clean VSE-static$(XDBG) $(TEST_ENV)
 !ENDIF
 	@ echo $@ completed successfully.
 	$(MAKE) /E realclean
@@ -118,7 +118,7 @@ all-tests:
 all-tests-cflags:
 	$(MAKE) all-tests XCFLAGS="/W3 /WX /MD /nologo"
 	$(MAKE) all-tests XCFLAGS="/W3 /WX /MT /nologo"
-!IF DEFINED(EXHAUSTIVE)
+!IF DEFINED(MORE_EXHAUSTIVE)
 	$(MAKE) all-tests XCFLAGS="/W3 /WX /MDd /nologo" XDBG="-debug"
 	$(MAKE) all-tests XCFLAGS="/W3 /WX /MTd /nologo" XDBG="-debug"
 !ENDIF
@@ -163,22 +163,22 @@ VC-small-static:
 VC-small-static-debug:
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).small_static_stamp
 
-VCE-inlined-static:
+VCE-static:
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).inlined_static_stamp
 
-VCE-inlined-static-debug:
+VCE-static-debug:
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).inlined_static_stamp
 
-VSE-inlined-static:
+VSE-static:
 	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).inlined_static_stamp
 
-VSE-inlined-static-debug:
+VSE-static-debug:
 	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGSD) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).inlined_static_stamp
 
-VC-inlined-static:
+VC-static:
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).inlined_static_stamp
 
-VC-inlined-static-debug:
+VC-static-debug:
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).inlined_static_stamp
 
 

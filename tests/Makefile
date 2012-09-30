@@ -80,8 +80,7 @@ BUILD_DIR=..
 
 COPYFILES	= $(CPHDR) $(CPLIB) $(CPDLL) $(QAPC)
 
-TEST		=
-EHFLAGS	=
+EHFLAGS		=
 
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
@@ -124,78 +123,44 @@ PASSES = \
 	spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
 	cancel9.pass  \
-	affinity1.pass  affinity2.pass  affinity3.pass  affinity4.pass  affinity5.pass
+	affinity1.pass  affinity2.pass  affinity3.pass  affinity4.pass  affinity5.pass  \
+	stress1.pass
+
+XTESTS		= loadfree.pass
+TESTS		= $(PASSES) allpassed
 
 BENCHRESULTS = \
 	benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
-
-STRESSRESULTS	= \
-	stress1.pass
 
 help:
 	@ $(ECHO) Run one of the following command lines:
 	@ $(ECHO) nmake clean VC
 	@ $(ECHO) nmake clean VC-bench
-	@ $(ECHO) nmake clean VC-stress
 	@ $(ECHO) nmake clean VC-static
 	@ $(ECHO) nmake clean VC-debug
-	@ $(ECHO) nmake clean VC-inlined-static-debug
+	@ $(ECHO) nmake clean VC-static-debug
 	@ $(ECHO) nmake clean VC-small-static-debug
 	@ $(ECHO) nmake clean VCX
 	@ $(ECHO) nmake clean VCX-bench
-	@ $(ECHO) nmake clean VCX-stress
 	@ $(ECHO) nmake clean VCX-static
 	@ $(ECHO) nmake clean VCX-debug
-	@ $(ECHO) nmake clean VCX-inlined-static-debug
+	@ $(ECHO) nmake clean VCX-static-debug
 	@ $(ECHO) nmake clean VCX-small-static-debug
 	@ $(ECHO) nmake clean VCE
 	@ $(ECHO) nmake clean VCE-bench
-	@ $(ECHO) nmake clean VCE-stress
 	@ $(ECHO) nmake clean VCE-static
 	@ $(ECHO) nmake clean VCE-debug
-	@ $(ECHO) nmake clean VCE-inlined-static-debug
+	@ $(ECHO) nmake clean VCE-static-debug
 	@ $(ECHO) nmake clean VCE-small-static-debug
 	@ $(ECHO) nmake clean VSE
 	@ $(ECHO) nmake clean VSE-bench
-	@ $(ECHO) nmake clean VSE-stress
 	@ $(ECHO) nmake clean VSE-static
 	@ $(ECHO) nmake clean VSE-debug
-	@ $(ECHO) nmake clean VSE-inlined-static-debug
+	@ $(ECHO) nmake clean VSE-static-debug
 	@ $(ECHO) nmake clean VSE-small-static-debug
 
-all:
-	@ $(MAKE) /E clean VC
-	@ $(MAKE) /E clean VCX
-	@ $(MAKE) /E clean VCE
-	@ $(MAKE) /E clean VSE
-	@ $(MAKE) /E clean VC-bench
-	@ $(MAKE) /E clean VC-stress
-	@ $(MAKE) /E clean VC-inlined-static-debug
-	@ $(MAKE) /E clean VC-small-static-debug
-	@ $(MAKE) /E clean VCE-bench
-	@ $(MAKE) /E clean VCE-stress
-	@ $(MAKE) /E clean VCE-inlined-static-debug
-	@ $(MAKE) /E clean VCE-small-static-debug
-	@ $(MAKE) /E clean VSE-bench
-	@ $(MAKE) /E clean VSE-stress
-	@ $(MAKE) /E clean VSE-inlined-static-debug
-	@ $(MAKE) /E clean VSE-small-static-debug
-
-# This allows an individual test application to be made using the default lib.
-# e.g. nmake clean test cancel3.exe
-test: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC)
-
-tests: $(CPLIB) $(CPDLL) $(CPHDR) $(QAPC) sizes.pass loadfree.pass $(PASSES) $(STRESSRESULTS)
+allpassed:
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
-
-benchtests: $(CPLIB) $(CPDLL) $(CPHDR) $(XXLIBS) $(BENCHRESULTS)
-	@ $(ECHO) ALL BENCH TESTS DONE.
-
-stresstests: $(CPLIB) $(CPDLL) $(CPHDR) $(STRESSRESULTS)
-	@ $(ECHO) ALL STRESS TESTS DONE.
-
-statictests: $(CPLIB) $(CPDLL) $(CPHDR) sizes.pass $(PASSES)
-	@ $(ECHO) ALL STATIC TESTS DONE.
 
 sizes.pass: sizes.exe
 	@ $(ECHO) ... Running $(TEST) test: $*.exe
@@ -210,98 +175,81 @@ loadfree.pass: pthread.dll loadfree.exe
 	@ $(ECHO) ...... Passed
 	@ $(TOUCH) $*.pass
 
-$(PASSES): $*.exe
-	@ $(ECHO) ... Running $(TEST) test: $*.exe
-	@ .\$*.exe
-	@ $(ECHO) ...... Passed
+$(PASSES): $(COPYFILES) sizes.pass $(XTESTS) $*.exe
 	@ $(TOUCH) $*.pass
 
 $(BENCHRESULTS): $*.exe
-	@ $(ECHO) ... Running $(TEST) benchtest: $*.exe
-	@ .\$*.exe
 	@ $(ECHO) ...... Done
 	@ $(TOUCH) $*.bench
 
-$(STRESSRESULTS): $*.exe
-	@ $(ECHO) ... Running $(TEST) stresstest: $*.exe
-	@ .\$*.exe
-	@ $(ECHO) ...... Done
-	@ $(TOUCH) $*.pass
-
 VC:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" $(TESTS)
 
 VCE:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" $(TESTS)
 
 VSE:	
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" tests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" $(TESTS)
 
 VCX:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" $(TESTS)
 
 VC-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" $(XXLIBS) $(BENCHRESULTS)
 
 VCE-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" $(XXLIBS) $(BENCHRESULTS)
 
 VSE-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" $(XXLIBS) $(BENCHRESULTS)
 
 VCX-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" benchtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" $(XXLIBS) $(BENCHRESULTS)
 
-VC-stress:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" stresstests
+VC-static VC-small-static:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(TESTS)
 
-VCE-stress:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" stresstests
+VCE-static VCE-small-static:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(TESTS)
 
-VSE-stress:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" stresstests
+VSE-static VSE-small-static:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(TESTS)
 
-VCX-stress:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" stresstests
+VCX-static VCX-small-static:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(TESTS)
 
-VC-inlined-static VC-small-static:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
+VC-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" $(TESTS)
 
-VCE-inlined-static VCE-small-static:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" statictests
+VC-static-debug VC-small-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(TESTS)
 
-VSE-inlined-static VSE-small-static:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" statictests
+VCE-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" $(TESTS)
 
-VCX-inlined-static VCX-small-static:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" statictests
+VCE-static-debug VCE-small-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(TESTS)
 
-VC-debug VC-inlined-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" tests
+VSE-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" $(TESTS)
 
-VC-inlined-static-debug VC-small-static-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
+VSE-static-debug VSE-small-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(TESTS)
 
-VCE-debug VCE-inlined-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" tests
+VCX-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" $(TESTS)
 
-VCE-inlined-static-debug VCE-small-static-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" statictests
+VCX-static-debug VCX-small-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(TESTS)
 
-VSE-debug VSE-inlined-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" tests
-
-VSE-inlined-static-debug VSE-small-static-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" statictests
-
-VCX-debug VCX-inlined-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" tests
-
-VCX-inlined-static-debug VCX-small-static-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" statictests
+loadfree.exe sizes.exe: $*.c
+	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $*.c /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
 
 .c.exe:
 	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
+	@ $(ECHO) ... Running $(TEST) test: $*.exe
+	@ .\$*.exe
+	@ $(ECHO) ...... Passed
 
 .c.o:
 	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) /c $< /Fo$@
@@ -476,6 +424,7 @@ spin1.pass:
 spin2.pass: spin1.pass
 spin3.pass: spin2.pass
 spin4.pass: spin3.pass
+stress1.pass:
 tsd1.pass: barrier5.pass join1.pass
 tsd2.pass: tsd1.pass
 valid1.pass: join1.pass

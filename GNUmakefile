@@ -156,10 +156,10 @@ help:
 	@ echo "$(MAKE) clean GC-debug                 (to build the GNU C debug dll with C cleanup code)"
 	@ echo "$(MAKE) clean GCE                      (to build the GNU C dll with C++ exception handling)"
 	@ echo "$(MAKE) clean GCE-debug                (to build the GNU C debug dll with C++ exception handling)"
-	@ echo "$(MAKE) clean GC-inlined-static        (to build the GNU C static lib with C cleanup code)"
-	@ echo "$(MAKE) clean GC-inlined-static-debug  (to build the GNU C static debug lib with C cleanup code)"
-	@ echo "$(MAKE) clean GCE-inlined-static       (to build the GNU C++ static lib with C++ cleanup code)"
-	@ echo "$(MAKE) clean GCE-inlined-static-debug (to build the GNU C++ static debug lib with C++ cleanup code)"
+	@ echo "$(MAKE) clean GC-static                (to build the GNU C static lib with C cleanup code)"
+	@ echo "$(MAKE) clean GC-static-debug          (to build the GNU C static debug lib with C cleanup code)"
+	@ echo "$(MAKE) clean GCE-static               (to build the GNU C++ static lib with C++ cleanup code)"
+	@ echo "$(MAKE) clean GCE-static-debug         (to build the GNU C++ static debug lib with C++ cleanup code)"
 	@ echo "$(MAKE) clean GC-small-static          (to build the GNU C static lib with C cleanup code)"
 	@ echo "$(MAKE) clean GC-small-static-debug    (to build the GNU C static debug lib with C cleanup code)"
 	@ echo "$(MAKE) clean GCE-small-static         (to build the GNU C++ static lib with C++ cleanup code)"
@@ -168,25 +168,25 @@ help:
 all:
 	@ $(MAKE) clean GC
 	@ $(MAKE) clean GCE
-	@ $(MAKE) clean GC-inlined-static
-	@ $(MAKE) clean GCE-inlined-static
+	@ $(MAKE) clean GC-static
+	@ $(MAKE) clean GCE-static
 
 TEST_ENV = PTW32_FLAGS="$(PTW32_FLAGS) -DNO_ERROR_DIALOGS" DLL_VER=$(DLL_VER)
 
 all-tests:
-	$(MAKE) realclean GC
-	cd tests && $(MAKE) clean GC $(TEST_ENV) && $(MAKE) clean GCX $(TEST_ENV)
-	$(MAKE) realclean GCE
-	cd tests && $(MAKE) clean GCE $(TEST_ENV)
-	$(MAKE) realclean GC-inlined-static
-	cd tests && $(MAKE) clean GC-inlined-static $(TEST_ENV) && $(MAKE) clean GCX-inlined-static $(TEST_ENV)
-	$(MAKE) realclean GCE-inlined-static
-	cd tests && $(MAKE) clean GCE-inlined-static $(TEST_ENV)
 	$(MAKE) realclean GC-small-static
-	cd tests && $(MAKE) clean GC-small-static $(TEST_ENV) && $(MAKE) clean GCX-small-static $(TEST_ENV)
+	cd tests && $(MAKE) ARCH="$(ARCH)" clean GC-small-static $(TEST_ENV) && $(MAKE) ARCH="$(ARCH)" clean GCX-small-static $(TEST_ENV)
 	$(MAKE) realclean GCE-small-static
-	cd tests && $(MAKE) clean GCE-small-static $(TEST_ENV)
+	cd tests && $(MAKE) ARCH="$(ARCH)" clean GCE-small-static $(TEST_ENV)
 	@ $(ECHO) "$@ completed successfully."
+	$(MAKE) realclean GC
+	cd tests && $(MAKE) ARCH="$(ARCH)" clean GC $(TEST_ENV) && $(MAKE) ARCH="$(ARCH)" clean GCX $(TEST_ENV)
+	$(MAKE) realclean GCE
+	cd tests && $(MAKE) ARCH="$(ARCH)" clean GCE $(TEST_ENV)
+	$(MAKE) realclean GC-static
+	cd tests && $(MAKE) ARCH="$(ARCH)" clean GC-static $(TEST_ENV) && $(MAKE) ARCH="$(ARCH)" clean GCX-static $(TEST_ENV)
+	$(MAKE) realclean GCE-static
+	cd tests && $(MAKE) ARCH="$(ARCH)" clean GCE-static $(TEST_ENV)
 	$(MAKE) realclean
 
 all-tests-cflags:
@@ -205,10 +205,10 @@ GCE:
 GCE-debug:
 		$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_CXX -g -O0" $(GCED_DLL)
 
-GC-inlined-static:
+GC-static:
 		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_INLINED_STATIC_STAMP)
 
-GC-inlined-static-debug:
+GC-static-debug:
 		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCD_INLINED_STATIC_STAMP)
 
 GC-small-static:
@@ -217,10 +217,10 @@ GC-small-static:
 GC-small-static-debug:
 		$(MAKE) XOPT="-DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(STATIC_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCD_SMALL_STATIC_STAMP)
 
-GCE-inlined-static:
+GCE-static:
 		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_INLINED_STATIC_STAMP)
 
-GCE-inlined-static-debug:
+GCE-static-debug:
 		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCED_INLINED_STATIC_STAMP)
 
 GCE-small-static:
