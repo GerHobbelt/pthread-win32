@@ -136,8 +136,8 @@ RESEXT = o
  
 include common.mk
 
-DLL_OBJS += $(RESOURCE_OBJS:%.o=%.o$(ARCH))
-STATIC_OBJS += $(RESOURCE_OBJS:%.o=%.o$(ARCH))
+DLL_OBJS += $(RESOURCE_OBJS)
+STATIC_OBJS += $(RESOURCE_OBJS)
 
 GCE_DLL	= pthreadGCE$(DLL_VER).dll
 GCED_DLL= pthreadGCE$(DLL_VERD).dll
@@ -265,13 +265,11 @@ install:
 	$(CC) -c $(CFLAGS) -DPTW32_BUILD_INLINED -Wa,-ahl $^ > $@
 
 %.o: %.rc
-	$(RC) $(RCFLAGS) $(CLEANUP) -o $@ -i $<
-
-%.o-m64: %.rc
-	$(RC) --target pe-x86-64 $(RCFLAGS) $(CLEANUP) -o $@ -i $<
-
-%.o-m32: %.rc
+ifeq ($(ARCH),-m32)
 	$(RC) --target pe-i386 $(RCFLAGS) $(CLEANUP) -o $@ -i $<
+else
+	$(RC) --target pe-x86-64 $(RCFLAGS) $(CLEANUP) -o $@ -i $<
+endif
 
 .SUFFIXES: .dll .rc .c .o
 
