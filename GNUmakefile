@@ -70,7 +70,10 @@ RC		= $(CROSS)windres
 # Build for non-native architecture. E.g. "-m64" "-m32" etc.
 # Not fully tested fully, needs gcc built with "--enable-multilib"
 # Check your "gcc -v" output for the options used to build your gcc.
-ARCH	= 
+# You can set this as a shell variable or on the make comand line.
+# You don't need to uncomment it here unless you want to hardwire
+# a value.
+#ARCH	= 
 
 OPT		=  $(CLEANUP) -O3 # -finline-functions -findirect-inlining
 XOPT	= 

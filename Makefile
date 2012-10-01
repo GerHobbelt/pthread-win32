@@ -32,8 +32,6 @@ SMALL_STATIC_STAMPS		= pthreadVCE$(DLL_VER).small_static_stamp pthreadVSE$(DLL_V
 						  pthreadVC$(DLL_VER).small_static_stamp pthreadVCE$(DLL_VERD).small_static_stamp \
 						  pthreadVSE$(DLL_VERD).small_static_stamp pthreadVC$(DLL_VERD).small_static_stamp
 
-ARCH	= 
-
 CC	= cl
 CPPFLAGS = /I. /DHAVE_CONFIG_H
 XCFLAGS = /W3 /MD /nologo

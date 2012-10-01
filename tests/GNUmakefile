@@ -59,8 +59,6 @@ RANLIB  = $(CROSS)ranlib
 #
 # Mingw
 #
-ARCH	= 
-
 XLIBS	=
 XXCFLAGS	= 
 XXLIBS	=
