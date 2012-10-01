@@ -27,7 +27,7 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
-DLL_VER	= 2
+DLL_VER	= 2$(ARCH)
 DLL_VERD= $(DLL_VER)d
 
 DESTROOT	= ../PTHREADS-BUILT
@@ -79,13 +79,19 @@ RCFLAGS	= --include-dir=.
 LFLAGS	= $(ARCH)
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
 #LFLAGS		+= -lws2_32
-# Uncomment this to link the GCC/C++ runtime libraries statically
-# (Note: Be sure to read about these options and their associated caveats
+#
+# Uncomment this next to link the GCC/C++ runtime libraries statically
+# (Be sure to read about these options and their associated caveats
 # at http://gcc.gnu.org/onlinedocs/gcc/Link-Options.html)
-# PLEASE NOTE: If you do this DO NOT distribute your pthreads DLLs with
+#
+# NOTE 1: Doing this appears to break GCE:pthread_cleanup_*(), which
+# relies on C++ class destructors being called when leaving scope.
+#
+# NOTE 2: If you do this DO NOT distribute your pthreads DLLs with
 # the official filenaming, i.e. pthreadVC2.dll, etc. Instead, change DLL_VER
 # above to "2slgcc" for example, to build "pthreadGC2slgcc.dll", etc.
-LFLAGS		+= -static-libgcc -static-libstdc++
+#
+#LFLAGS		+= -static-libgcc -static-libstdc++
 
 # ----------------------------------------------------------------------
 # The library can be built with some alternative behaviour to
