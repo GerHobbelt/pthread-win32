@@ -29,7 +29,7 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
-DLL_VER	= 2
+DLL_VER	= 2$(TARGET_CPU)
 
 CP	= copy
 RM	= erase
@@ -175,72 +175,74 @@ loadfree.pass: pthread.dll loadfree.exe
 	@ $(ECHO) ...... Passed
 	@ $(TOUCH) $*.pass
 
-$(PASSES): $(COPYFILES) sizes.pass $(XTESTS) $*.exe
+$(PASSES): $(CPHDR) $(CPLIB) $(QAPC) sizes.pass $(XTESTS) $*.exe
 	@ $(TOUCH) $*.pass
 
 $(BENCHRESULTS): $*.exe
 	@ $(ECHO) ...... Done
 	@ $(TOUCH) $*.bench
 
+copyfiles: $(COPYFILES)
+
 VC:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" copyfiles $(TESTS)
 
 VCE:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" copyfiles $(TESTS)
 
 VSE:	
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" copyfiles $(TESTS)
 
 VCX:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" copyfiles $(TESTS)
 
 VC-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" $(COPYFILES) $(XXLIBS) $(BENCHRESULTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
 
 VCE-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" $(COPYFILES) $(XXLIBS) $(BENCHRESULTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
 
 VSE-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" $(COPYFILES) $(XXLIBS) $(BENCHRESULTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
 
 VCX-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" $(COPYFILES) $(XXLIBS) $(BENCHRESULTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
 
 VC-static VC-small-static:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VCE-static VCE-small-static:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VSE-static VSE-small-static:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VCX-static VCX-small-static:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VC-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" copyfiles $(TESTS)
 
 VC-static-debug VC-small-static-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VCE-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" copyfiles $(TESTS)
 
 VCE-static-debug VCE-small-static-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VSE-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" copyfiles $(TESTS)
 
 VSE-static-debug VSE-small-static-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VCX-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" copyfiles $(TESTS)
 
 VCX-static-debug VCX-small-static-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" XTESTS="" $(COPYFILES) $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 loadfree.exe sizes.exe: $*.c
 	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $*.c /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
@@ -256,6 +258,8 @@ loadfree.exe sizes.exe: $*.c
 
 .c.i:
 	$(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<
+
+copyfiles: $(COPYFILES)
 
 $(COPYFILES):
 	@ $(ECHO) Copying $(BUILD_DIR)\$@

@@ -133,8 +133,8 @@ RESEXT = o
  
 include common.mk
 
-DLL_OBJS += $(RESOURCE_OBJS)
-STATIC_OBJS += $(RESOURCE_OBJS)
+DLL_OBJS += $(RESOURCE_OBJS:%.o=%.o$(ARCH))
+STATIC_OBJS += $(RESOURCE_OBJS:%.o=%.o$(ARCH))
 
 GCE_DLL	= pthreadGCE$(DLL_VER).dll
 GCED_DLL= pthreadGCE$(DLL_VERD).dll

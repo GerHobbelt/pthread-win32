@@ -3,10 +3,17 @@
 # The variables $DLLDEST and $LIBDEST hold the destination directories for the
 # dll and the lib, respectively. Probably all that needs to change is $DEVROOT.
 
+# SDK environment variables:
+#   Configuration: "Release" or "Debug" (default to "Release")
+#   TARGET_CPU: "x64" or "x86" (default to SDK setting)
+#
+# See output of "setenv /?" for other variables
+Configuration	= Release
+#TARGET_CPU	=
 
 # DLL_VER:
 # See pthread.h and README - This number is computed as 'current - age'
-DLL_VER	= 2
+DLL_VER	= 2$(TARGET_CPU)
 DLL_VERD= $(DLL_VER)d
 
 DESTROOT	= ..\PTHREADS-BUILT
@@ -24,6 +31,8 @@ INLINED_STATIC_STAMPS	= pthreadVCE$(DLL_VER).inlined_static_stamp pthreadVSE$(DL
 SMALL_STATIC_STAMPS		= pthreadVCE$(DLL_VER).small_static_stamp pthreadVSE$(DLL_VER).small_static_stamp \
 						  pthreadVC$(DLL_VER).small_static_stamp pthreadVCE$(DLL_VERD).small_static_stamp \
 						  pthreadVSE$(DLL_VERD).small_static_stamp pthreadVC$(DLL_VERD).small_static_stamp
+
+ARCH	= 
 
 CC	= cl
 CPPFLAGS = /I. /DHAVE_CONFIG_H
@@ -125,69 +134,87 @@ all-tests-cflags:
 	@ echo $@ completed successfully.
 
 VCE:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).dll
 
 VCE-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).dll
 
 VSE:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).dll
 
 VSE-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).dll
 
 VC:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).dll
 
 VC-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).dll
 
 #
 # Static builds
 #
 VCE-small-static:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).small_static_stamp
 
 VCE-small-static-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).small_static_stamp
 
 VSE-small-static:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).small_static_stamp
 
 VSE-small-static-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).small_static_stamp
 
 VC-small-static:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).small_static_stamp
 
 VC-small-static-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).small_static_stamp
 
 VCE-static:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).inlined_static_stamp
 
 VCE-static-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).inlined_static_stamp
 
 VSE-static:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).inlined_static_stamp
 
 VSE-static-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGSD) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).inlined_static_stamp
 
 VC-static:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).inlined_static_stamp
 
 VC-static-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).inlined_static_stamp
 
 
 realclean: clean
-	if exist pthread*.dll del pthread*.dll
-	if exist pthread*.lib del pthread*.lib
+	if exist *.dll del *.dll
+	if exist *.lib del *.lib
+	if exist *.a del *.a
 	if exist *.manifest del *.manifest
-	if exist *.inlined_static_stamp del *.inlined_static_stamp
-	if exist *.small_static_stamp del *.small_static_stamp
+	if exist *_stamp del *_stamp
 	cd tests && $(MAKE) clean
 
 clean:

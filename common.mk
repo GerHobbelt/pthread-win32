@@ -1,7 +1,7 @@
 # Common makefile definitions
 
 RESOURCE_OBJS	= \
-		version.$(RESEXT)$(ARCH)
+		version.$(RESEXT)
 
 # pthread.c aggregates all source into a single compilation unit for inlinability
 DLL_OBJS	= \
