@@ -306,18 +306,10 @@ clean:
 	-$(RM) $(PTHREAD_DEF)
 
 realclean: clean
-	-$(RM) $(GC_LIB)
-	-$(RM) $(GCE_LIB)
-	-$(RM) $(GC_DLL)
-	-$(RM) $(GCE_DLL)
-	-$(RM) $(GC_INLINED_STATIC_STAMP)
-	-$(RM) $(GC_SMALL_STATIC_STAMP)
-	-$(RM) $(GCD_LIB)
-	-$(RM) $(GCED_LIB)
-	-$(RM) $(GCD_DLL)
-	-$(RM) $(GCED_DLL)
-	-$(RM) $(GCD_INLINED_STATIC_STAMP)
-	-$(RM) $(GCD_SMALL_STATIC_STAMP)
+	-$(RM) lib*.a
+	-$(RM) *.lib
+	-$(RM) pthread*.dll
+	-$(RM) *_stamp
 	-cd tests && $(MAKE) clean
 
 var_check_list =
