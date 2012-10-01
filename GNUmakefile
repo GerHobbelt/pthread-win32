@@ -75,6 +75,12 @@ RC		= $(CROSS)windres
 # a value.
 #ARCH	= 
 
+ifeq ($(ARCH),-m32)
+RES_TARGET	= --target pe-i386
+else
+RES_TARGET	= --target pe-x86-64
+endif
+
 OPT		=  $(CLEANUP) -O3 # -finline-functions -findirect-inlining
 XOPT	= 
 
@@ -265,11 +271,7 @@ install:
 	$(CC) -c $(CFLAGS) -DPTW32_BUILD_INLINED -Wa,-ahl $^ > $@
 
 %.o: %.rc
-ifeq ($(ARCH),-m32)
-	$(RC) --target pe-i386 $(RCFLAGS) $(CLEANUP) -o $@ -i $<
-else
-	$(RC) --target pe-x86-64 $(RCFLAGS) $(CLEANUP) -o $@ -i $<
-endif
+	$(RC) $(RES_TARGET) $(RCFLAGS) $(CLEANUP) -o $@ -i $<
 
 .SUFFIXES: .dll .rc .c .o
 
