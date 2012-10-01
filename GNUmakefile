@@ -72,11 +72,11 @@ RC		= $(CROSS)windres
 # Check your "gcc -v" output for the options used to build your gcc.
 ARCH	= 
 
-OPT		=  $(ARCH) $(CLEANUP) -O3 # -finline-functions -findirect-inlining
+OPT		=  $(CLEANUP) -O3 # -finline-functions -findirect-inlining
 XOPT	= 
 
 RCFLAGS	= --include-dir=.
-LFLAGS	=
+LFLAGS	= $(ARCH)
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
 #LFLAGS		+= -lws2_32
 # Uncomment this to link the GCC/C++ runtime libraries statically
@@ -120,7 +120,7 @@ GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
 
 ## Mingw
 #MAKE		?= make
-CFLAGS	= $(OPT) $(XOPT) -I. -DHAVE_CONFIG_H -Wall
+CFLAGS	= $(OPT) $(XOPT) $(ARCH) -I. -DHAVE_CONFIG_H -Wall
 
 OBJEXT = o
 RESEXT = o

@@ -67,7 +67,7 @@ XXLIBS	=
 OPT	= -O3
 DOPT	= -g -O0
 CFLAGS	= ${OPT} $(ARCH) -UNDEBUG -Wall $(XXCFLAGS)
-LFLAGS	= $(XXLFLAGS)
+LFLAGS	= $(ARCH) $(XXLFLAGS)
 # Uncomment to link the GCC/C++ runtime libraries statically
 LFLAGS	+= -static-libgcc -static-libstdc++
 BUILD_DIR	= ..
