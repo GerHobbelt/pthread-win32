@@ -382,7 +382,11 @@ sizes.pass: sizes.exe
 	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
-%.pass: sizes.pass $(XTESTS) %.exe
+%.pass: sizes.pass $(XTESTS)
+	$(CC) $(CFLAGS) $(LFLAGS) -o $*.exe $*.c $(INCLUDES) -L. -lpthread$(GCX) $(XLIBS) $(XXLIBS)	
+	@ $(ECHO) Running $(TEST) test \"$*\"
+	@ $(RUN) ./$*
+	@ $(ECHO) Passed
 	@ $(TOUCH) $@
 
 %.bench:  $(COPYFILES) $(XXLIBS) %.exe

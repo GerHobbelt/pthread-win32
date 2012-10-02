@@ -159,115 +159,85 @@ help:
 	@ $(ECHO) nmake clean VSE-static-debug
 	@ $(ECHO) nmake clean VSE-small-static-debug
 
-allpassed:
-	@ $(ECHO) ALL TESTS PASSED! Congratulations!
-
-sizes.pass: sizes.exe
-	@ $(ECHO) ... Running $(TEST) test: $*.exe
-	@ .\$*.exe > SIZES.$(TEST)
-	@ $(CAT) SIZES.$(TEST)
-	@ $(ECHO) ...... Passed
-	@ $(TOUCH) $*.pass
-
-loadfree.pass: pthread.dll loadfree.exe
-	@ $(ECHO) ... Running $(TEST) test: $*.exe
-	@ .\$*.exe
-	@ $(ECHO) ...... Passed
-	@ $(TOUCH) $*.pass
-
-$(PASSES): $(CPHDR) $(CPLIB) $(QAPC) sizes.pass $(XTESTS) $*.exe
-	@ $(TOUCH) $*.pass
-
-$(BENCHRESULTS): $*.exe
-	@ $(ECHO) ...... Done
-	@ $(TOUCH) $*.bench
-
-copyfiles: $(COPYFILES)
-
 VC:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" copyfiles $(TESTS)
 
 VCE:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" copyfiles $(TESTS)
 
 VSE:	
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" copyfiles $(TESTS)
 
 VCX:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" copyfiles $(TESTS)
 
 VC-bench:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
 
 VCE-bench:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
 
 VSE-bench:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
 
 VCX-bench:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
 
 VC-static VC-small-static:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VCE-static VCE-small-static:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VSE-static VSE-small-static:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VCX-static VCX-small-static:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VC-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" copyfiles $(TESTS)
 
 VC-static-debug VC-small-static-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VCE-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" copyfiles $(TESTS)
 
 VCE-static-debug VCE-small-static-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VSE-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" copyfiles $(TESTS)
 
 VSE-static-debug VSE-small-static-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
 
 VCX-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" copyfiles $(TESTS)
 
 VCX-static-debug VCX-small-static-debug:
+	@ -setenv
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
-
-loadfree.exe sizes.exe: $*.c
-	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $*.c /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
-
-.c.exe:
-	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
-	@ $(ECHO) ... Running $(TEST) test: $*.exe
-	@ .\$*.exe
-	@ $(ECHO) ...... Passed
-
-.c.o:
-	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) /c $< /Fo$@
-
-.c.i:
-	$(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<
-
-copyfiles: $(COPYFILES)
-
-$(COPYFILES):
-	@ $(ECHO) Copying $(BUILD_DIR)\$@
-	@ if exist $(BUILD_DIR)\$@ $(CP) $(BUILD_DIR)\$@ .
-
-pthread.dll: $(CPDLL)
-	@ $(CP) $(CPDLL) pthread.dll
-	@ $(CP) $(CPLIB) pthread.lib
 
 clean:
 	- if exist *.dll $(RM) *.dll
@@ -433,3 +403,57 @@ tsd1.pass: barrier5.pass join1.pass
 tsd2.pass: tsd1.pass
 valid1.pass: join1.pass
 valid2.pass: valid1.pass
+
+allpassed:
+	@ $(ECHO) ALL TESTS PASSED! Congratulations!
+
+sizes.pass: sizes.exe
+	@ $(ECHO) ... Running $(TEST) test: $*.exe
+	@ .\$*.exe > SIZES.$(TEST)
+	@ $(CAT) SIZES.$(TEST)
+	@ $(ECHO) ...... Passed
+	@ $(TOUCH) $*.pass
+
+loadfree.pass: pthread.dll loadfree.exe
+	@ $(ECHO) ... Running $(TEST) test: $*.exe
+	@ .\$*.exe
+	@ $(ECHO) ...... Passed
+	@ $(TOUCH) $*.pass
+
+$(PASSES): $(CPHDR) $(CPLIB) $(QAPC) sizes.pass $(XTESTS)
+	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $*.c /Fe$*.exe /link $(LFLAGS) $(CPLIB) $(XXLIBS)
+	@ $(ECHO) ... Running $(TEST) test: $*.exe
+	@ .\$*.exe
+	@ $(ECHO) ...... Passed
+	@ $(TOUCH) $*.pass
+
+$(BENCHRESULTS): $*.exe
+	@ $(ECHO) ...... Done
+	@ $(TOUCH) $*.bench
+
+copyfiles: $(COPYFILES)
+
+loadfree.exe sizes.exe: $*.c
+	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $*.c /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
+
+.c.exe:
+	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
+	@ $(ECHO) ... Running $(TEST) test: $*.exe
+	@ .\$*.exe
+	@ $(ECHO) ...... Passed
+
+.c.o:
+	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) /c $< /Fo$@
+
+.c.i:
+	$(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<
+
+copyfiles: $(COPYFILES)
+
+$(COPYFILES):
+	@ $(ECHO) Copying $(BUILD_DIR)\$@
+	@ if exist $(BUILD_DIR)\$@ $(CP) $(BUILD_DIR)\$@ .
+
+pthread.dll: $(CPDLL)
+	@ $(CP) $(CPDLL) pthread.dll
+	@ $(CP) $(CPLIB) pthread.lib
