@@ -37,6 +37,13 @@
 
 #include "test.h"
 
+typedef union
+{
+	/* Violates opacity */
+	cpu_set_t cpuset;
+	unsigned long int bits;  /* To stop GCC complaining about %lx args to printf */
+} cpuset_to_ulint;
+
 void *
 mythread(void * arg)
 {
@@ -44,16 +51,17 @@ mythread(void * arg)
   cpu_set_t *parentCpus = (cpu_set_t*) arg;
   cpu_set_t threadCpus;
   DWORD_PTR vThreadMask;
-  unsigned long int a, b; /* To stop GCC complaining about %lx args to printf */
+  cpuset_to_ulint a, b;
 
   assert(pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &threadCpus) == 0);
   assert(CPU_EQUAL(parentCpus, &threadCpus));
   vThreadMask = SetThreadAffinityMask(threadH, (*(PDWORD_PTR)&threadCpus) /* Violating Opacity */);
   assert(vThreadMask != 0);
   assert(memcmp(&vThreadMask, &threadCpus, sizeof(DWORD_PTR)) == 0);
-  printf("Parent/Thread CPU affinity = 0x%lx/0x%lx\n",
-		  a = (*(unsigned long int*)&parentCpus)  /* Violating Opacity */,
-		  b = (*(unsigned long int*)&threadCpus)) /* Violating Opacity */;
+  a.cpuset = *parentCpus;
+  b.cpuset = threadCpus;
+  /* Violates opacity */
+  printf("CPU affinity: Parent/Thread = 0x%lx/0x%lx\n", a.bits, b.bits);
 
   return (void*) 0;
 }
