@@ -369,6 +369,9 @@ tsd2.pass: tsd1.pass
 valid1.pass: join1.pass
 valid2.pass: valid1.pass
 
+cancel9.pass: XLIBS = -lws2_32
+cancel9.exe: XLIBS = -lws2_32
+
 loadfree.pass: pthread.dll loadfree.exe
 	@ $(ECHO) Running $(TEST) test \"loadfree\"
 	@ $(RUN) ./loadfree.exe
@@ -400,8 +403,6 @@ loadfree.exe: loadfree.c $(COPYFILES)
 
 sizes.exe: sizes.c $(COPYFILES)
 	$(CC) $(CFLAGS) $(LFLAGS) -o $@ $< $(INCLUDES) -L. -lpthread$(GCX) $(XLIBS) $(XXLIBS)	
-
-cancel9.exe: XLIBS = -lws2_32
 
 %.exe: %.c $(COPYFILES)
 	$(CC) $(CFLAGS) $(LFLAGS) -o $@ $< $(INCLUDES) -L. -lpthread$(GCX) $(XLIBS) $(XXLIBS)	

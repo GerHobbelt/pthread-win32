@@ -111,9 +111,9 @@ pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
 
 			  CPU_AND(&newMask, &processCpuset, cpuset);
 
-			  if (newMask.cpuset)
+			  if (((_sched_cpu_set_vector_*)&newMask)->_cpuset)
 				{
-				  if (SetThreadAffinityMask (tp->threadH, (DWORD_PTR)newMask.cpuset))
+				  if (SetThreadAffinityMask (tp->threadH, ((_sched_cpu_set_vector_*)&newMask)->_cpuset))
 					{
 					  /*
 					   * We record the intersection of the process affinity
@@ -121,7 +121,7 @@ pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
 					   * pthread_getaffinity_np() returns the actual thread
 					   * CPU set.
 					   */
-					  tp->cpuset.cpuset = newMask.cpuset;
+					  tp->cpuset = ((_sched_cpu_set_vector_*)&newMask)->_cpuset;
 					}
 				  else
 					{
@@ -194,21 +194,21 @@ pthread_getaffinity_np (pthread_t thread, size_t cpusetsize, cpu_set_t *cpuset)
     {
 	  if (cpuset)
 	    {
-		  if (tp->cpuset.cpuset)
+		  if (tp->cpuset)
 		    {
 			  /*
 			   * The application may have set thread affinity independently
 			   * via SetThreadAffinityMask(). If so, we adjust our record of the threads
 			   * affinity and try to do so in a reasonable way.
 			   */
-			  DWORD_PTR vThreadMask = SetThreadAffinityMask(tp->threadH, (DWORD_PTR)tp->cpuset.cpuset);
-			  if (vThreadMask && vThreadMask != (DWORD_PTR)tp->cpuset.cpuset)
+			  DWORD_PTR vThreadMask = SetThreadAffinityMask(tp->threadH, tp->cpuset);
+			  if (vThreadMask && vThreadMask != tp->cpuset)
 			    {
 				  (void) SetThreadAffinityMask(tp->threadH, vThreadMask);
-				  tp->cpuset.cpuset = (_sched_cpu_set_vector_)vThreadMask;
+				  tp->cpuset = vThreadMask;
 			    }
 		    }
-		  cpuset->cpuset = tp->cpuset.cpuset;
+		  ((_sched_cpu_set_vector_*)cpuset)->_cpuset = tp->cpuset;
 		}
 	  else
 	    {

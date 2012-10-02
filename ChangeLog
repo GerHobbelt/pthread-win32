@@ -1,3 +1,15 @@
+2012-10-02  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* sched.h (cpu_set_t): Redefined.
+	* implement.h (_sched_cpu_set_vector_): Created as the private equivalent
+	of cpu_set.
+	(pthread_thread_t_.cpuset): Type change. 
+	* sched_setaffinity.c: Reflect changes to cpu_set_t and _sched_cpu_set_vector_.
+	* pthread_setaffinity.c: Likewise.
+	* create.c: Likewise.
+	* pthread_self.c: Likewise.
+	* ptw32_new.c: Likewise.
+
 2012-09-28  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread.c: pulls all individual source modules into a single

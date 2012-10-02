@@ -48,12 +48,12 @@ mythread(void * arg)
 
   assert(pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &threadCpus) == 0);
   assert(CPU_EQUAL(parentCpus, &threadCpus));
-  vThreadMask = SetThreadAffinityMask(threadH, (DWORD_PTR)threadCpus.cpuset /* Violating Opacity */);
+  vThreadMask = SetThreadAffinityMask(threadH, (*(PDWORD_PTR)&threadCpus) /* Violating Opacity */);
   assert(vThreadMask != 0);
   assert(memcmp(&vThreadMask, &threadCpus, sizeof(DWORD_PTR)) == 0);
   printf("Parent/Thread CPU affinity = 0x%lx/0x%lx\n",
-		  a = (unsigned long int)parentCpus->cpuset /* Violating Opacity */,
-		  b = (unsigned long int)threadCpus.cpuset) /* Violating Opacity */;
+		  a = (*(unsigned long int*)&parentCpus)  /* Violating Opacity */,
+		  b = (*(unsigned long int*)&threadCpus)) /* Violating Opacity */;
 
   return (void*) 0;
 }
@@ -81,7 +81,7 @@ main()
 	  assert(pthread_join(tid, NULL) == 0);
 	  CPU_AND(&threadCpus, &threadCpus, &keepCpus);
 	  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &threadCpus) == 0);
-	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), (DWORD_PTR)threadCpus.cpuset /* Violating Opacity */);
+	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), (*(PDWORD_PTR)&threadCpus) /* Violating Opacity */);
 	  assert(vThreadMask != 0);
 	  assert(memcmp(&vThreadMask, &threadCpus, sizeof(DWORD_PTR)) == 0);
 	  assert(pthread_create(&tid, NULL, mythread, (void*)&threadCpus) == 0);
