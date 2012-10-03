@@ -84,8 +84,6 @@ help:
 	@ echo nmake clean VSE-static-debug
 	@ echo nmake clean VSE-small-static
 	@ echo nmake clean VSE-small-static-debug
-	@ echo.
-	@ echo Recommended builds for production use are *-inlined and *-small-static.
 
 all:
 	$(MAKE) /E clean VCE
