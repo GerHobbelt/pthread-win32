@@ -46,6 +46,7 @@ main()
   cpu_set_t src2mask;
   cpu_set_t src3mask;
 
+  CPU_ZERO(&newmask);
   CPU_ZERO(&src1mask);
   memset(&src2mask, 0, sizeof(cpu_set_t));
   assert(memcmp(&src1mask, &src2mask, sizeof(cpu_set_t)) == 0);
