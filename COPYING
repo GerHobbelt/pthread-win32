@@ -32,7 +32,7 @@ Pthreads-win32 is covered by the GNU Lesser General Public License
     A copy of the GNU Lesser General Public License is distributed with
     pthreads-win32 under the filename:
 
-	    COPYING.GNU
+	    COPYING.FSF
 
     You should have received a copy of the version 2.1 GNU Lesser General
     Public License with pthreads-win32; if not, write to:
