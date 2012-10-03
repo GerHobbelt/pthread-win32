@@ -287,7 +287,7 @@ int _sched_affinitycpucount (const cpu_set_t *set)
   int count;
 
   /*
-   * Relies on cpu_set_t being unsigned, otherwise the right-shift will
+   * Relies on tset being unsigned, otherwise the right-shift will
    * be arithmetic rather than logical and the 'for' will loop forever.
    */
   for (count = 0, tset = ((_sched_cpu_set_vector_*)set)->_cpuset; tset; tset >>= 1)
