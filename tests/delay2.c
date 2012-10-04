@@ -41,6 +41,13 @@
 
 static pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;
 
+static void PTW32_CDECL
+pthread_mutex_cleanup(void *args)
+{
+	pthread_mutex_t *cvl = (pthread_mutex_t *)args;
+	pthread_mutex_unlock(cvl);
+}
+
 static void *
 func(void * arg)
 {
@@ -51,7 +58,7 @@ func(void * arg)
 #ifdef _MSC_VER
 #pragma inline_depth(0)
 #endif
-  pthread_cleanup_push(pthread_mutex_unlock, &mx);
+  pthread_cleanup_push(pthread_mutex_cleanup, &mx);
   assert(pthread_delay_np(&interval) == 0);
   pthread_cleanup_pop(1);
 #ifdef _MSC_VER

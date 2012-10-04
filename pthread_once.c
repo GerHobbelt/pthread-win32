@@ -37,6 +37,13 @@
 #include "pthread.h"
 #include "implement.h"
 
+static void PTW32_CDECL
+ptw32_mcs_lock_cleanup(void *args)
+{
+	ptw32_mcs_local_node_t *node = (ptw32_mcs_local_node_t *)args;
+	ptw32_mcs_lock_release(node);
+}
+
 int
 pthread_once (pthread_once_t * once_control, void (PTW32_CDECL *init_routine) (void))
 {
@@ -60,7 +67,7 @@ pthread_once (pthread_once_t * once_control, void (PTW32_CDECL *init_routine) (v
 #pragma inline_depth(0)
 #endif
 
-	  pthread_cleanup_push(ptw32_mcs_lock_release, &node);
+	  pthread_cleanup_push(ptw32_mcs_lock_cleanup, &node);
 	  (*init_routine)();
 	  pthread_cleanup_pop(0);
 

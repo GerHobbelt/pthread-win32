@@ -72,7 +72,7 @@ static bag_t threadbag[NUM_THREADS][NUM_ONCE];
 
 static CRITICAL_SECTION print_lock;
 
-static void
+static void PTW32_CDECL
 mycleanupfunc(void * arg)
 {
   bag_t * bag = (bag_t *) arg;
