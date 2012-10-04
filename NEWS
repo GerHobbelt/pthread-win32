@@ -4,27 +4,48 @@ RELEASE 2.10.0
 
 General
 -------
-New bug fixes in this release since 2.8.0 have NOT been applied to the
+New bug fixes in all releases since 2.8.0 have NOT been applied to the
 1.x.x series.
 
-Some changes post 2011-02-26 in CVS may not be compatible with pre
-Windows 2000 systems.
-
-Use of other than the "C" version of the library is now discouraged.
-That is, the "C++" version fails some tests and does not provide any
-additional functionality.
+Some changes in CVS from 2011-02-26 onward may not be compatible with
+pre Windows 2000 systems.
 
 Testing and verification
 ------------------------
 This version has been tested on SMP architecture (Intel x64 Hex Core)
-by completing the included test suite, stress and bench tests.
+by completing the included test suite, as well as the stress and bench
+tests.
+
+Be sure to run your builds against the test suite. As of this release
+we are successfully passing all tests with all build configurations
+so if you see failures then please consider how your toolchains might
+be contributing to the failure. See the README file for more detailed
+descriptions of the toolchains and test machines that we have used
+to get the tests to pass successfully.
 
 New Features
 ------------
-New routine pthread_timedjoin_np added for compatibility with Linux
-and BSD. This routine can also be used to achieve the same
-functionality as pthread_tryjoin_np (from Linux) by using an abstime
-representing any time in the past.
+New routines:
+pthread_timedjoin_np()
+ - added for compatibility with Linux and BSD. This routine can also be
+   used to achieve the same functionality as pthread_tryjoin_np (from
+   Linux) by using an abstime representing any time in the past.
+sched_getaffinity()
+sched_setaffinity()
+pthread_getaffinity_np()
+pthread_getaffinity_np()
+ - added for compatibility with Linux and other libgcc-based systems.
+   The macros to manipulate cpu_set_t objects (the cpu affinity mask
+   vector) are also defined: CPU_ZERO, CPU_CLR, CPU_SET, CPU_EQUAL,
+   CPU_AND, CPU_OR, CPU_XOR, CPU_COUNT, CPU_ISSET.
+
+Builds:
+New makefile targets have been added and existing targets modified or
+removed. For example, targets to build and test all of the possible
+configurations of both dll and static libs.
+
+The makefiles now know how to build both 32 and 64 bit versions if
+the toolchain (MSVS or Mingw) allow it.
 
 Bug Fixes
 ---------
@@ -36,6 +57,22 @@ optimised out.
 sem_getvalue() could return the errno value instead of setting errno
 and returning -1.
 - Ross Johnson
+
+Errno values were being lost if the library is statically linked
+with the runtime library, meaning also that the application used a
+separate runtime instance. This is still the case except a build
+switch has been added that allows more robust error status to be
+incorporated, i.e. allow the return code to be retrieved via
+GetLastError().
+- Daniel Richard G.
+
+Identified the cause of significant failures around cancelation
+and pthread_exit() for the GCE (GNU C++) build configuration as
+coming from Mingw32. Not sure if this is general or just when
+building 32 bit libraries and apps that run on 64 bit systems.
+These failures do not arise with Mingw64 32 bit builds running on
+64 bit systems.
+- Daniel Richard G. and Ross Johnson
 
 RELEASE 2.9.1
 -------------

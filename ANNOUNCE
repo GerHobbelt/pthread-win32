@@ -75,7 +75,7 @@ These are now documented in the BUGS file.
 Level of standards conformance
 ------------------------------
 
-The following POSIX 1003.1 2001 options are defined and set to 200112L:
+The following POSIX options are defined and set to 200809L:
 
       _POSIX_THREADS
       _POSIX_THREAD_SAFE_FUNCTIONS
@@ -86,8 +86,7 @@ The following POSIX 1003.1 2001 options are defined and set to 200112L:
       _POSIX_SPIN_LOCKS
       _POSIX_BARRIERS
 
-
-The following POSIX 1003.1 2001 options are defined and set to -1:
+The following POSIX options are defined and set to -1:
 
       _POSIX_THREAD_ATTR_STACKADDR
       _POSIX_THREAD_PRIO_INHERIT
@@ -95,7 +94,7 @@ The following POSIX 1003.1 2001 options are defined and set to -1:
       _POSIX_THREAD_PROCESS_SHARED
 
 
-The following POSIX 1003.1 2001 limits are defined and set:
+The following POSIX limits are defined and set:
 
       _POSIX_THREAD_THREADS_MAX
       _POSIX_SEM_VALUE_MAX
@@ -254,6 +253,8 @@ The following functions are implemented:
       sched_get_priority_max
       sched_get_priority_min
       sched_rr_get_interval  (returns an error ENOTSUP)
+      sched_getaffinity
+      sched_setaffinity
       sched_setscheduler     (only supports SCHED_OTHER)
       sched_getscheduler     (only supports SCHED_OTHER)
       sched_yield
@@ -273,6 +274,8 @@ The following functions are implemented:
       pthread_timechange_handler_np
       pthread_delay_np
       pthread_getunique_np
+      pthread_getaffinity_np
+      pthread_setaffinity_np
       pthread_mutexattr_getkind_np
       pthread_mutexattr_setkind_np	(types: PTHREAD_MUTEX_FAST_NP,
 						PTHREAD_MUTEX_ERRORCHECK_NP,
@@ -302,6 +305,19 @@ The following functions are implemented:
       PTHREAD_COND_INITIALIZER
       PTHREAD_RWLOCK_INITIALIZER
       PTHREAD_SPINLOCK_INITIALIZER
+
+      ---------------------------
+      CPU Affinity Mask Support
+      ---------------------------
+      CPU_ZERO
+      CPU_EQUAL
+      CPU_COUNT
+      CPU_SET
+      CPU_CLR
+      CPU_ISSET
+      CPU_AND
+      CPU_OR
+      CPU_XOR
 
 
 The library includes two non-API functions for creating cancellation

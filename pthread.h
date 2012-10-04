@@ -14,17 +14,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -354,17 +354,17 @@ extern "C"
  * either indicates that sysconf(), which is not implemented, may be used at
  * runtime to check the status of the option.
  *
- * _POSIX_THREADS (== 200112L)
- *                      If == 200112L, you can use threads
+ * _POSIX_THREADS (== 20080912L)
+ *                      If == 20080912L, you can use threads
  *
- * _POSIX_THREAD_ATTR_STACKSIZE (== 200112L)
- *                      If == 200112L, you can control the size of a thread's
+ * _POSIX_THREAD_ATTR_STACKSIZE (== 200809L)
+ *                      If == 200809L, you can control the size of a thread's
  *                      stack
  *                              pthread_attr_getstacksize
  *                              pthread_attr_setstacksize
  *
  * _POSIX_THREAD_ATTR_STACKADDR (== -1)
- *                      If == 200112L, you can allocate and control a thread's
+ *                      If == 200809L, you can allocate and control a thread's
  *                      stack. If not supported, the following functions
  *                      will return ENOSYS, indicating they are not
  *                      supported:
@@ -379,13 +379,13 @@ extern "C"
  *                      writers over readers when threads have equal priority.
  *
  * _POSIX_THREAD_PRIO_INHERIT (== -1)
- *                      If == 200112L, you can create priority inheritance
+ *                      If == 200809L, you can create priority inheritance
  *                      mutexes.
  *                              pthread_mutexattr_getprotocol +
  *                              pthread_mutexattr_setprotocol +
  *
  * _POSIX_THREAD_PRIO_PROTECT (== -1)
- *                      If == 200112L, you can create priority ceiling mutexes
+ *                      If == 200809L, you can create priority ceiling mutexes
  *                      Indicates the availability of:
  *                              pthread_mutex_getprioceiling
  *                              pthread_mutex_setprioceiling
@@ -404,22 +404,24 @@ extern "C"
  *                              pthread_condattr_getpshared
  *                              pthread_condattr_setpshared
  *
- * _POSIX_THREAD_SAFE_FUNCTIONS (== 200112L)
- *                      If == 200112L you can use the special *_r library
+ * _POSIX_THREAD_SAFE_FUNCTIONS (== 200809L)
+ *                      If == 200809L you can use the special *_r library
  *                      functions that provide thread-safe behaviour
  *
- * _POSIX_READER_WRITER_LOCKS (== 200112L)
- *                      If == 200112L, you can use read/write locks
+ * _POSIX_READER_WRITER_LOCKS (== 200809L)
+ *                      If == 200809L, you can use read/write locks
  *
- * _POSIX_SPIN_LOCKS (== 200112L)
- *                      If == 200112L, you can use spin locks
+ * _POSIX_SPIN_LOCKS (== 200809L)
+ *                      If == 200809L, you can use spin locks
  *
- * _POSIX_BARRIERS (== 200112L)
- *                      If == 200112L, you can use barriers
+ * _POSIX_BARRIERS (== 200809L)
+ *                      If == 200809L, you can use barriers
  *
- *      + These functions provide both 'inherit' and/or
- *        'protect' protocol, based upon these macro
- *        settings.
+ * _POSIX_ROBUST_MUTEXES (== 200809L)
+ *                      If == 200809L, you can use robust mutexes
+ *                      Officially this should also imply
+ *                      _POSIX_THREAD_PROCESS_SHARED != -1 however
+ *                      not here yet.
  *
  * -------------------------------------------------------------
  */
@@ -444,6 +446,9 @@ extern "C"
 
 #undef _POSIX_THREAD_ATTR_STACKSIZE
 #define _POSIX_THREAD_ATTR_STACKSIZE 200809L
+
+#undef _POSIX_ROBUST_MUTEXES
+#define _POSIX_ROBUST_MUTEXES 200809L
 
 /*
  * The following options are not supported
@@ -1098,7 +1103,7 @@ PTW32_DLLPORT int PTW32_CDECL pthread_getschedparam (pthread_t thread,
                                    struct sched_param *param);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_setconcurrency (int);
- 
+
 PTW32_DLLPORT int PTW32_CDECL pthread_getconcurrency (void);
 
 /*

@@ -89,8 +89,8 @@ can differentiate between binary incompatible versions of the
 libs and dlls.
 
 In general the naming format used is:
-    pthread[VG]{SE,CE,C}[c].dll
-    pthread[VG]{SE,CE,C}[c].lib
+    pthread[VG]{SE,CE,C}[c][M].dll
+    pthread[VG]{SE,CE,C}[c][M].lib
 
 where:
     [VG] indicates the compiler
@@ -106,6 +106,14 @@ where:
               compatibility with applications built against
               a snapshot with the same compatibility number.
               See 'Version numbering' below.
+        M   - Machine architecture:
+              pthreadV*: "x86" or "x64"
+              pthreadG*: "-m32" or "-m64"
+              If none of these suffixes appear then the dll or lib
+              have been built using the toolchain default
+              configuration.
+              Don't rely on this to determine the architecture,
+              use the Properties->Detail tab for the file.
 
 The name may also be suffixed by a 'd' to indicate a debugging version
 of the library. E.g. pthreadVC2d.lib. Debugging versions contain
@@ -113,13 +121,15 @@ additional information for debugging (symbols etc) and are often not
 optimised in any way (compiled with optimisation turned off).
 
 Examples:
-	pthreadVSE.dll	(MSVC/SEH)
-	pthreadGCE.dll	(GNUC/C++ EH)
-	pthreadGC.dll	(GNUC/not dependent on exceptions)
-	pthreadVC1.dll	(MSVC/not dependent on exceptions - not binary
-			compatible with pthreadVC.dll)
-	pthreadVC2.dll	(MSVC/not dependent on exceptions - not binary
-			compatible with pthreadVC1.dll or pthreadVC.dll)
+	pthreadVSE.dll      (MSVC/SEH)
+	pthreadGCE.dll      (GNUC/C++ EH)
+	pthreadGC.dll       (GNUC/not dependent on exceptions)
+	pthreadVC1.dll      (MSVC/not dependent on exceptions - not binary
+                         compatible with pthreadVC.dll)
+	pthreadVC2.dll	    (MSVC/not dependent on exceptions - not binary
+                         compatible with pthreadVC1.dll or pthreadVC.dll)
+    pthreadGC2-m32.dll  (As built by "make GC ARCH=-m32")
+    pthreadVC2x64.dll   (As built by "nmake VC TARGET_CPU=x64")
 
 The GNU library archive file names have correspondingly changed to:
 
@@ -189,8 +199,8 @@ or,
 What are all these pthread*.dll and pthread*.lib files?
 -------------------------------------------------------
 
-Simple, use either pthreadGCv.* if you use GCC, or pthreadVCv.* if you
-use MSVC - where 'v' is the DLL versioning (compatibility) number.
+Simple, use either pthreadGCc.* if you use GCC, or pthreadVCc.* if you
+use MSVC - where 'c' is the DLL versioning (compatibility) number.
 
 Otherwise, you need to choose carefully and know WHY.
 
@@ -200,40 +210,7 @@ of the library that use exceptions as part of the thread
 cancellation and exit implementation. The default version uses
 setjmp/longjmp.
 
-There is some contention amongst POSIX threads experts as
-to how POSIX threads cancellation and exit should work
-with languages that use exceptions, e.g. C++ and even C
-(Microsoft's Structured Exceptions).
-
-The issue is: should cancellation of a thread in, say,
-a C++ application cause object destructors and C++ exception
-handlers to be invoked as the stack unwinds during thread
-exit, or not?
-
-There seems to be more opinion in favour of using the
-standard C version of the library (no EH) with C++ applications
-for the reason that this appears to be the assumption commercial
-pthreads implementations make. Therefore, if you use an EH version
-of pthreads-win32 then you may be under the illusion that
-your application will be portable, when in fact it is likely to
-behave differently when linked with other pthreads libraries.
-
-Now you may be asking: then why have you kept the EH versions of
-the library?
-
-There are a couple of reasons:
-- there is division amongst the experts and so the code may
-  be needed in the future. Yes, it's in the repository and we
-  can get it out anytime in the future, but it would be difficult
-  to find.
-- pthreads-win32 is one of the few implementations, and possibly
-  the only freely available one, that has EH versions. It may be
-  useful to people who want to play with or study application
-  behaviour under these conditions.
-
-Notes:
-
-[If you use either pthreadVCE or pthreadGCE]
+If you use either pthreadVCE or pthreadGCE:
 
 1. [See also the discussion in the FAQ file - Q2, Q4, and Q5]
 
@@ -254,10 +231,6 @@ threads then you will need to replace the "catch(...)" with the macro
 Otherwise neither pthreads cancellation nor pthread_exit() will work
 reliably when using versions of the library that use C++ exceptions
 for cancellation and thread exit.
-
-This is due to what is believed to be a C++ compliance error in VC++
-whereby you may not have multiple handlers for the same exception in
-the same try/catch block. GNU G++ doesn't have this restriction.
 
 
 Other name changes
@@ -332,45 +305,178 @@ now run or crash in similar ways irrespective of the pthreads platform
 you use. Or at least this is the hope.
 
 
-Building under VC++ using C++ EH, Structured EH, or just C
-----------------------------------------------------------
+Development Build Toolchains and Configurations
+-----------------------------------------------
+
+As of Release 2.10 all build configurations pass the full test suite
+for the following toolchains and configurations:
+
+DLL and static library (full inlined and small) builds:
+VC, VCE, VSE
+GC, GCE
+
+MSVS:
+Intel Core i7 (6 Core HT)
+Windows 7 64 bit
+MSVS 2010 Express with SDK 7.1 (using the SDK command shell)
+TARGET_CPU = x64 and x86
+
+GNU:
+Intel Core i7 (6 Core HT)
+Windows 7 64 bit
+MinGW64 multilib enabled
+ARCH = -m32 and -m64
+
+
+Building with MS Visual Studio (C, VC++ using C++ EH, or Structured EH)
+-----------------------------------------------------------------------
 
 From the source directory run nmake without any arguments to list
 help information. E.g.
 
 $ nmake
 
-The pre-built dlls are normally built using the *-inlined targets.
+With the MS SDK installed and from the SDK command shell the following
+variables can be defined either on the nmake command line or in the
+shell environment (note that these are already set by the SDK but
+can be changed either directly or through the SDKs "setenv" utility):
+
+TARGET_CPU
+ - possible values are "x64" and "x86"
+
+Configuration
+ - possible values are "Debug" and "Release". "Debug" does not
+   generate debugging versions of the pthreads libraries (use the
+   *-debug targets for this).
+
+NOTE: "Makefile" sets "Configuration" to "Release" unless you override it
+on the nmake command line.
+
+nmake may also accept other SDK environment variables on the command
+line. See the SDK documentation for those, or run "set" and "setenv /?"
+for clues.
+
+If TARGET_CPU is defined (command line or environment or Makefile) the
+DLLs and libraries will have the TARGET_CPU value appended to their
+names, e.g.:
+
+pthreadVC2x64.dll
+pthreadVC2x64.lib
+
+As examples, as of Release 2.10 the pre-built DLLs and static libraries
+are built from:
+
+$ nmake realclean VC TARGET_CPU=x64
+$ nmake realclean VC TARGET_CPU=x32
+$ nmake realclean VCE TARGET_CPU=x64
+$ nmake realclean VCE TARGET_CPU=x32
+$ nmake realclean VSE TARGET_CPU=x64
+$ nmake realclean VSE TARGET_CPU=x32
+$ nmake realclean VC-static TARGET_CPU=x64
+$ nmake realclean VC-static TARGET_CPU=x32
+$ nmake realclean VCE-static TARGET_CPU=x64
+$ nmake realclean VCE-static TARGET_CPU=x32
+$ nmake realclean VSE-static TARGET_CPU=x64
+$ nmake realclean VSE-static TARGET_CPU=x32
 
 You can run the testsuite by changing to the "tests" directory and
 running nmake. E.g.:
 
 $ cd tests
-$ nmake
+$ nmake VC
 
-Building under Mingw32
-----------------------
+To build and test all DLLs and static lib compatibility versions
+(VC, VCE, VSE):
 
-The dll can be built easily with recent versions of Mingw32.
-(The distributed versions are built using Mingw32 and MsysDTK
-from www.mingw32.org.)
+$ nmake all-tests
+or (from the SDK command shell):
+$ nmake all-tests TARGET_CPU=x64
+$ nmake all-tests TARGET_CPU=x86
+
+For failure analysis etc. individual or a given set of tests can be built
+and run, e.g:
+
+$ cd tests
+$ nmake VC TESTS="foo.exe bar.exe"
+
+or, to build and run all prerequisite tests as well leading to any
+individual or set of tests, e.g:
+
+$ cd tests
+$ nmake VC TESTS="foo.pass bar.pass" 
+
+
+Building under MinGW
+--------------------
+
+Use Mingw64 to build either 64 or 32 bit versions of the DLL. Mingw32
+GCE builds fail when run on 64 bit systems however this is not the
+case when using Mingw64 (multilib) for either 64 or 32 bit builds.
 
 From the source directory, run 'make' without arguments for help information.
 
-The pre-built dlls are normally built using the *-inlined targets.
+$ make
+
+With MinGW64 multilib installed the following variables can be defined
+either on the make command line or in the shell environment:
+
+ARCH
+ - possible values are "-m64" and "-m32". You will probably recognise
+   these as gcc flags however the GNUmakefile also converts these into
+   the appropriate windres options when building version.o.
+
+When ARCH is defined anywhere (command line or environment or GNUmakefile)
+the DLLs and libraries have the ARCH value appended to their names, e.g.:
+
+pthreadGC2-m64.dll
+libpthreadGC2-m64.a
+
+As examples, as of Release 2.10 the pre-built DLLs and static libraries
+are built from:
+
+$ nmake realclean GC ARCH=-m64
+$ nmake realclean GC ARCH=-m32
+$ nmake realclean GCE ARCH=-m64
+$ nmake realclean GCE ARCH=-m32
+$ nmake realclean GC-static ARCH=-m64
+$ nmake realclean GC-static ARCH=-m32
+$ nmake realclean GCE-static ARCH=-m64
+$ nmake realclean GCE-static ARCH=-m32
 
 You can run the testsuite by changing to the "tests" directory and
-running 'make' for help information.
+running nmake. E.g.:
+
+$ cd tests
+$ make GC
+
+To build and test all DLLs and static lib compatibility versions (GC, GCE):
+
+$ make all-tests
+or, with MinGW64 (multilib enabled):
+$ make all-tests ARCH=-m64
+$ make all-tests ARCH=-m32
+
+For failure analysis etc. individual or a given set of tests can be built
+and run, e.g:
+
+$ cd tests
+$ make GC TESTS="foo.exe bar.exe"
+
+or, to build and run all prerequisite tests as well leading to any
+individual or set of tests, e.g:
+
+$ cd tests
+$ make GC TESTS="foo.pass bar.pass" 
 
 
-Building under Linux using the Mingw32 cross development tools
---------------------------------------------------------------
+Building under Linux using the MinGW cross development tools
+------------------------------------------------------------
 
-You can build the library without leaving Linux by using the Mingw32 cross
-development toolchain. See http://www.libsdl.org/extras/win32/cross/ for
-tools and info. The GNUmakefile contains some support for this, for example:
+You can build the library on Linux by using the MinGW cross development
+toolchain. See http://www.libsdl.org/extras/win32/cross/ for tools and
+info. The GNUmakefile contains some support for this, for example:
 
-make CROSS=i386-mingw32msvc- clean GC-inlined
+make CROSS=i386-mingw32msvc- clean GC
 
 will build pthreadGCn.dll and libpthreadGCn.a (n=version#), provided your
 cross-tools/bin directory is in your PATH (or use the cross-make.sh script
@@ -393,16 +499,7 @@ MinGW32 (creates libpthreadGCn.a as a static link lib):
 
 make clean GC-static
 
-
-Define PTW32_STATIC_LIB when building your application.
-
-The application must call pthread_win32_process_detach_np() at thread
-exit to cleanup after any Win32 threads have called POSIX API
-routines. See README.NONPORTABLE or the html reference manual pages for
-details:
-
-BOOL pthread_win32_thread_detach_np (void);
-
+Define PTW32_STATIC_LIB also when building your application.
 
 Building the library under Cygwin
 ---------------------------------
@@ -420,39 +517,34 @@ from the FTP site (see under "Availability" below):
 	pthread.h
 	semaphore.h
 	sched.h
-	pthreadVC.dll	- built with MSVC compiler using C setjmp/longjmp
-	pthreadVC.lib
-	pthreadVCE.dll	- built with MSVC++ compiler using C++ EH
-	pthreadVCE.lib
-	pthreadVSE.dll	- built with MSVC compiler using SEH
-	pthreadVSE.lib
-	pthreadGC.dll	- built with Mingw32 GCC
-	libpthreadGC.a	- derived from pthreadGC.dll
-	pthreadGCE.dll	- built with Mingw32 G++
-	libpthreadGCE.a	- derived from pthreadGCE.dll
+	pthreadVC2.dll		- built with MSVC compiler using C setjmp/longjmp
+	pthreadVC2.lib
+	pthreadVCE2.dll		- built with MSVC++ compiler using C++ EH
+	pthreadVCE2.lib
+	pthreadVSE2.dll		- built with MSVC compiler using SEH
+	pthreadVSE2.lib
+	pthreadGC2.dll		- built with Mingw32 GCC
+	libpthreadGC2.a		- derived from pthreadGC.dll
+	pthreadGCE2.dll		- built with Mingw32 G++
+	libpthreadGCE2.a	- derived from pthreadGCE.dll
 
-As of August 2003 pthreads-win32 pthreadG* versions are built and tested
-using the MinGW + MsysDTK environment current as of that date or later.
-The following file MAY be needed for older MinGW environments.
-
-	gcc.dll 	- needed to build and run applications that use
-			  pthreadGCE.dll.
-
+You may also need to include runtime DLLs from your SDK when
+distributing your applications.
 
 Building applications with GNU compilers
 ----------------------------------------
 
-If you're using pthreadGC.dll:
+If you're using pthreadGC2.dll:
 
-With the three header files, pthreadGC.dll and libpthreadGC.a in the
+With the three header files, pthreadGC2.dll and libpthreadGC2.a in the
 same directory as your application myapp.c, you could compile, link
-and run myapp.c under Mingw32 as follows:
+and run myapp.c under MinGW as follows:
 
-	gcc -o myapp.exe myapp.c -I. -L. -lpthreadGC
+	gcc -o myapp.exe myapp.c -I. -L. -lpthreadGC2
 	myapp
 
-Or put pthreadGC.dll in an appropriate directory in your PATH,
-put libpthreadGC.a in your system lib directory, and
+Or put pthreadGC2.dll in an appropriate directory in your PATH,
+put libpthreadGC2.a in your system lib directory, and
 put the three header files in your system include directory,
 then use:
 
@@ -460,13 +552,13 @@ then use:
 	myapp
 
 
-If you're using pthreadGCE.dll:
+If you're using pthreadGCE2.dll:
 
-With the three header files, pthreadGCE.dll, gcc.dll and libpthreadGCE.a
+With the three header files, pthreadGCE2.dll and libpthreadGCE2.a
 in the same directory as your application myapp.c, you could compile,
 link and run myapp.c under Mingw32 as follows:
 
-	gcc -x c++ -o myapp.exe myapp.c -I. -L. -lpthreadGCE
+	gcc -x c++ -o myapp.exe myapp.c -I. -L. -lpthreadGCE2
 	myapp
 
 Or put pthreadGCE.dll and gcc.dll in an appropriate directory in
