@@ -379,12 +379,6 @@ $ nmake realclean VCE-static TARGET_CPU=x32
 $ nmake realclean VSE-static TARGET_CPU=x64
 $ nmake realclean VSE-static TARGET_CPU=x32
 
-You can run the testsuite by changing to the "tests" directory and
-running nmake. E.g.:
-
-$ cd tests
-$ nmake VC
-
 To build and test all DLLs and static lib compatibility versions
 (VC, VCE, VSE):
 
@@ -392,6 +386,12 @@ $ nmake all-tests
 or (from the SDK command shell):
 $ nmake all-tests TARGET_CPU=x64
 $ nmake all-tests TARGET_CPU=x86
+
+You can run the testsuite by changing to the "tests" directory and
+running nmake. E.g.:
+
+$ cd tests
+$ nmake VC
 
 For failure analysis etc. individual or a given set of tests can be built
 and run, e.g:
@@ -443,18 +443,18 @@ $ nmake realclean GC-static ARCH=-m32
 $ nmake realclean GCE-static ARCH=-m64
 $ nmake realclean GCE-static ARCH=-m32
 
-You can run the testsuite by changing to the "tests" directory and
-running nmake. E.g.:
-
-$ cd tests
-$ make GC
-
 To build and test all DLLs and static lib compatibility versions (GC, GCE):
 
 $ make all-tests
 or, with MinGW64 (multilib enabled):
 $ make all-tests ARCH=-m64
 $ make all-tests ARCH=-m32
+
+You can run the testsuite by changing to the "tests" directory and
+running nmake. E.g.:
+
+$ cd tests
+$ make GC
 
 For failure analysis etc. individual or a given set of tests can be built
 and run, e.g:
