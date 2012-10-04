@@ -96,7 +96,7 @@ struct bag_t_ {
 static bag_t threadbag[NUMTHREADS + 1];
 
 static
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__)
 unsigned __stdcall
 #else
 void
@@ -119,7 +119,7 @@ Win32thread(void * arg)
       pthread_testcancel();
     }
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__)
   return 0;
 #endif
 }
@@ -141,7 +141,7 @@ test_cancel7(void)
     {
       threadbag[i].started = 0;
       threadbag[i].threadnum = i;
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__)
       h[i] = (HANDLE) _beginthreadex(NULL, 0, Win32thread, (void *) &threadbag[i], 0, &thrAddr);
 #else
       h[i] = (HANDLE) _beginthread(Win32thread, 0, (void *) &threadbag[i]);
@@ -190,7 +190,7 @@ test_cancel7(void)
       int fail = 0;
       int result = 0;
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__)
       assert(GetExitCodeThread(h[i], (LPDWORD) &result) == TRUE);
 #else
       /*

@@ -45,7 +45,7 @@ static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t threads[NUMTHREADS];
 static unsigned numThreads = 0;
 
-void *
+static void *
 myfunc(void *arg)
 {
   pthread_mutex_lock(&lock);

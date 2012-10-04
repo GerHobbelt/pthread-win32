@@ -79,7 +79,7 @@ enum {
 
 static int washere = 0;
 
-void * func(void * arg)
+static void * func(void * arg)
 {
   washere = (int)(size_t)arg;
   return (void *) 0;

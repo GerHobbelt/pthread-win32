@@ -251,13 +251,13 @@ int main(int argc, char **argv)
     pthread_win32_process_detach_np(); // ptw32_processTerminate();
 	pthread_win32_process_attach_np(); // ptw32_processInitialize();
 	TEST_WRAPPER(test_cancel7);
-//	TEST_WRAPPER(test_cancel8);
+	TEST_WRAPPER(test_cancel8);
 	TEST_WRAPPER(test_cleanup1);
 	TEST_WRAPPER(test_condvar7);
 	TEST_WRAPPER(test_condvar9);
 	TEST_WRAPPER(test_exception1);
-//	TEST_WRAPPER(test_loadfree);
-//	TEST_WRAPPER(test_sequence1);
+	TEST_WRAPPER(test_loadfree);
+	TEST_WRAPPER(test_sequence1);
 
 	TEST_WRAPPER(test_barrier1);
 	TEST_WRAPPER(test_barrier2);

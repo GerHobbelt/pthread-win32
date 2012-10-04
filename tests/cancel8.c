@@ -99,7 +99,7 @@ static pthread_cond_t CV = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t CVLock = PTHREAD_MUTEX_INITIALIZER;
 
 static
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__)
 unsigned __stdcall
 #else
 void
@@ -120,7 +120,7 @@ Win32thread(void * arg)
   pthread_cond_wait(&CV, &CVLock);
   pthread_cleanup_pop(1);
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__)
   return 0;
 #endif
 }
@@ -142,7 +142,7 @@ test_cancel8(void)
     {
       threadbag[i].started = 0;
       threadbag[i].threadnum = i;
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__)
       h[i] = (HANDLE) _beginthreadex(NULL, 0, Win32thread, (void *) &threadbag[i], 0, &thrAddr);
 #else
       h[i] = (HANDLE) _beginthread(Win32thread, 0, (void *) &threadbag[i]);
@@ -191,7 +191,7 @@ test_cancel8(void)
       int fail = 0;
       int result = 0;
 
-#if ! defined (__MINGW32__) || defined (__MSVCRT__)
+#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__)
       assert(GetExitCodeThread(h[i], (LPDWORD) &result) == TRUE);
 #else
       /*
