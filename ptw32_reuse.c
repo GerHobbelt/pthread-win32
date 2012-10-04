@@ -108,7 +108,7 @@ ptw32_threadReusePop (void)
  * Push a clean pthread_t struct onto the reuse stack.
  * Must be re-initialised when reused.
  * All object elements (mutexes, events etc) must have been either
- * detroyed before this, or never initialised.
+ * destroyed before this, or never initialised.
  */
 void
 ptw32_threadReusePush (pthread_t thread)

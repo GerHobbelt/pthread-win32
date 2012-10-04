@@ -118,6 +118,7 @@ pthread_self (void)
 	       * we can't get a Win32 thread handle.
 	       * Thread structs are never freed.
 	       */
+		  sp->threadH = 0;
 	      ptw32_threadReusePush (self);
 	      /*
 	       * As this is a win32 thread calling us and we have failed,
