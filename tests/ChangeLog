@@ -1,3 +1,7 @@
+2012-10-04  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* join4.c: Modified for pthread_tryjoin_np tests.
+
 2012-09-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* Makefile: Align target names with build makefile target names

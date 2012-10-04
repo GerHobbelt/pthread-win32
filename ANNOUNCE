@@ -270,6 +270,7 @@ The following functions are implemented:
       Non-portable routines (see the README.NONPORTABLE file for usage)
       ---------------------------
       pthread_timedjoin_np
+      pthread_tryjoin_np
       pthread_getw32threadhandle_np
       pthread_timechange_handler_np
       pthread_delay_np

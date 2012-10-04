@@ -1,3 +1,13 @@
+2012-10-04  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread_tryjoin_np.c: New API
+	* pthread.c (pthread_try_join_np): Added.
+	* common.mk (pthread_tryjoin_np): Added.
+	* pthread.h (pthread_tryjoin_np): Added.
+	* NEWS: Updated.
+	* README: Updated.
+	* ANNOUNCE: Updated.
+
 2012-10-02  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* sched.h (cpu_set_t): Redefined.

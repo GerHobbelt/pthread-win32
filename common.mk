@@ -58,6 +58,7 @@ STATIC_OBJS	= \
 		pthread_getw32threadhandle_np.$(OBJEXT) \
 		pthread_join.$(OBJEXT) \
 		pthread_timedjoin_np.$(OBJEXT) \
+		pthread_tryjoin_np.$(OBJEXT) \
 		pthread_key_create.$(OBJEXT) \
 		pthread_key_delete.$(OBJEXT) \
 		pthread_kill.$(OBJEXT) \
@@ -235,7 +236,6 @@ PTHREAD_SRCS	= \
 		pthread_mutexattr_getkind_np.c \
 		pthread_getw32threadhandle_np.c \
 		pthread_getunique_np.c \
-		pthread_timedjoin_np.c \
 		pthread_setaffinity.c \
 		pthread_delay_np.c \
 		pthread_num_processors_np.c \
@@ -286,6 +286,8 @@ PTHREAD_SRCS	= \
 		pthread_spin_trylock.c \
 		pthread_detach.c \
 		pthread_join.c \
+		pthread_timedjoin_np.c \
+		pthread_tryjoin_np.c \
 		pthread_key_create.c \
 		pthread_key_delete.c \
 		pthread_setspecific.c \

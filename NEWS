@@ -17,19 +17,18 @@ by completing the included test suite, as well as the stress and bench
 tests.
 
 Be sure to run your builds against the test suite. As of this release
-we are successfully passing all tests with all build configurations
-so if you see failures then please consider how your toolchains might
-be contributing to the failure. See the README file for more detailed
-descriptions of the toolchains and test machines that we have used
-to get the tests to pass successfully.
+we are successfully passing the full test suite with all build
+configurations. If you see failures then please consider how your
+toolchains might be contributing to the failure. See the README file
+for more detailed descriptions of the toolchains and test systems that
+we have used to get the tests to pass successfully.
 
 New Features
 ------------
 New routines:
 pthread_timedjoin_np()
- - added for compatibility with Linux and BSD. This routine can also be
-   used to achieve the same functionality as pthread_tryjoin_np (from
-   Linux) by using an abstime representing any time in the past.
+pthread_tryjoin_np()
+ - added for compatibility with Linux.
 sched_getaffinity()
 sched_setaffinity()
 pthread_getaffinity_np()

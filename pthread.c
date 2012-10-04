@@ -131,6 +131,7 @@
 #include "pthread_getw32threadhandle_np.c"
 #include "pthread_getunique_np.c"
 #include "pthread_timedjoin_np.c"
+#include "pthread_tryjoin_np.c"
 #include "pthread_setaffinity.c"
 #include "pthread_delay_np.c"
 #include "pthread_num_processors_np.c"

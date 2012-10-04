@@ -141,13 +141,12 @@ pthread_delay_np (const struct timespec *interval)
 int
 pthread_timedjoin_np (pthread_t thread, void **value_ptr, const struct timespec *abstime)
 
-		This function is added for compatibility with Linux.
+int
+pthread_tryjoin_np (pthread_t thread, void **value_ptr)
+
+		These function is added for compatibility with Linux.
 		
-		Linux also defines pthread_tryjoin_np(), which in pthreads-win32
-		can be derived from this routine by setting abstime to any time not in the future,
-		e.g. possibly as:
-		
-		#define pthread_tryjoin_np(thread, value_ptr) pthread_timedjoin_np((thread),(value_ptr),({0,0}))
+
 
 int
 pthread_num_processors_np (void)
