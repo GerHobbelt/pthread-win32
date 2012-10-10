@@ -86,17 +86,16 @@ EHFLAGS		=
 include common.mk
 
 #
-# Define "FAST=foo bar" to build and run only the tests "foo.exe" and "bar.exe"
-# without any prerequisite tests. Set FAST to one or more tests.
+# To build and run "foo.exe" and "bar.exe" only use, e.g.:
+# nmake clean VC NO_DEPS=1 TESTS="foo bar"
 #
 # To build and run "foo.exe" and "bar.exe" and run all prerequisite tests
-# use "TESTS=foo bar". Set TESTS to one or more tests.
+# use, e.g.:
+# nmake clean VC TESTS="foo bar"
 #
-# You can't use FAST with TESTS.
+# Set TESTS to one or more tests.
 #
-!IFDEF FAST
-TESTS	= $(FAST)
-!ELSE
+!IFNDEF NO_DEPS
 include runorder.mk
 !ENDIF
 
@@ -271,7 +270,7 @@ include passes.mk
 # for certain tests, while others do. So the compile command is included in
 # the command list below and the dependency is commented out, which works.
 $(ALL_KNOWN_PASSES): #$(@R).exe
-	$(CC) /DPTW32_DLL_PATH="\"$(CPDLL)\"" $(EHFLAGS) $(CFLAGS) $(INCLUDES) $*.c /Fe$*.exe /link $(LFLAGS) $(CPLIB) $(XXLIBS)
+	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $*.c /Fe$*.exe /link $(LFLAGS) $(CPLIB) $(XXLIBS)
 	@ $(ECHO) ... Running $(TEST) test: $*.exe
 	@ .\$*.exe
 	@ $(ECHO) ...... Passed

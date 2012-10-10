@@ -55,7 +55,7 @@ create3.pass: create2.pass
 delay1.pass: self1.pass create3.pass
 delay2.pass: delay1.pass
 detach1.pass: join0.pass
-equal1.pass: create1.pass
+equal1.pass: self1.pass create1.pass
 errno1.pass: mutex3.pass
 exception1.pass: cancel4.pass
 exception2.pass: exception1.pass
@@ -64,7 +64,7 @@ exception3.pass: exception3_0.pass
 exit1.pass: self1.pass create3.pass
 exit2.pass: create1.pass
 exit3.pass: create1.pass
-exit4.pass: loadfree.pass self1.pass create3.pass 
+exit4.pass: self1.pass create3.pass 
 exit5.pass: exit4.pass kill1.pass
 eyal1.pass: self1.pass create3.pass mutex8.pass tsd1.pass
 inherit1.pass: join1.pass priority1.pass
@@ -73,8 +73,7 @@ join1.pass: create1.pass
 join2.pass: create1.pass
 join3.pass: join2.pass
 join4.pass: join3.pass
-kill1.pass: loadfree.pass
-loadfree.pass: sizes.pass
+kill1.pass: self1.pass
 mutex1.pass: mutex5.pass
 mutex1n.pass: mutex1.pass
 mutex1e.pass: mutex1.pass
@@ -86,7 +85,7 @@ mutex3.pass: create1.pass
 mutex3r.pass: mutex3.pass
 mutex3e.pass: mutex3.pass
 mutex4.pass: mutex3.pass
-mutex5.pass: loadfree.pass
+mutex5.pass: sizes.pass
 mutex6.pass: mutex4.pass
 mutex6n.pass: mutex4.pass
 mutex6e.pass: mutex4.pass
@@ -129,8 +128,8 @@ rwlock4_t.pass: rwlock3_t.pass
 rwlock5_t.pass: rwlock4_t.pass
 rwlock6_t.pass: rwlock5_t.pass
 rwlock6_t2.pass: rwlock6_t.pass
-self1.pass: loadfree.pass
-self2.pass: create1.pass
+self1.pass: sizes.pass
+self2.pass: self1.pass equal1.pass create1.pass
 semaphore1.pass: sizes.pass
 semaphore2.pass: semaphore1.pass
 semaphore3.pass: semaphore2.pass

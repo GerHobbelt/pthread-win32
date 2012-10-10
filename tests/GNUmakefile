@@ -106,17 +106,16 @@ TESTS			= $(ALL_KNOWN_TESTS)
 BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
 
 #
-# Define "FAST=foo bar" to build and run only the tests "foo.exe" and "bar.exe"
-# without any prerequisite tests. Set FAST to one or more tests.
+# To build and run "foo.exe" and "bar.exe" only use, e.g.:
+# make clean GC NO_DEPS=1 TESTS="foo bar"
 #
 # To build and run "foo.exe" and "bar.exe" and run all prerequisite tests
-# use "TESTS=foo bar". Set TESTS to one or more tests.
+# use, e.g.:
+# make clean GC TESTS="foo bar"
 #
-# You can't use FAST with TESTS.
+# Set TESTS to one or more tests.
 #
-ifdef FAST
-TESTS	= $(FAST)
-else
+ifndef NO_DEPS
 include runorder.mk
 endif
 

@@ -20,7 +20,6 @@ ALL_KNOWN_TESTS = \
 	eyal1  \
 	join0  join1  join2 join3 join4  \
 	kill1  \
-	loadfree  \
 	mutex1  mutex1n  mutex1e  mutex1r  \
 	mutex2  mutex2r  mutex2e  mutex3  mutex3r  mutex3e  \
 	mutex4  mutex5  mutex6  mutex6n  mutex6e  mutex6r  \

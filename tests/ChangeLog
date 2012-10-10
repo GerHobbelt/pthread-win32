@@ -2,11 +2,15 @@
 
 	* cancel1.c: Fix comment typo.
 	* Makefile: Adding functionality to support rapid turnaround of
-	individual or small sets of tests.
+	individual or small sets of tests; removed loadfree test.
 	* GNUmakefile: Likewise.
+	* Bmakefile: Removed loadfree test.
+	* Wmakefile: Likewise.
 	* common.mk: New makefile include file; split out common macros.
 	* runorder.mk: New makefile include file; split out run order rules
 	to allow selective inclusion.
+	* loadfree.c: Removed from suite; not required; unnecessarily
+	complicates the makefiles.
 
 2012-10-04  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
