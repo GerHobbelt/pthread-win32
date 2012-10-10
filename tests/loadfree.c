@@ -15,17 +15,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -35,37 +35,46 @@
  * From: Todd Owen <towen@lucidcalm.dropbear.id.au>
  * To: pthreads-win32@sourceware.cygnus.com
  * Subject: invalid page fault when using LoadLibrary/FreeLibrary
- * 
+ *
  * hi,
  * for me, pthread.dll consistently causes an "invalid page fault in
  * kernel32.dll" when I load it "explicitly"...to be precise, loading (with
  * LoadLibrary) isn't a problem, it gives the error when I call FreeLibrary.
  * I guess that the dll's cleanup must be causing the error.
- * 
+ *
  * Implicit linkage of the dll has never given me this problem.  Here's a
  * program (console application) that gives me the error.
- * 
+ *
  * I compile with: mingw32 (gcc-2.95 release), with the MSVCRT add-on (not
  * that the compiler should make much difference in this case).
  * PTHREAD.DLL: is the precompiled 1999-11-02 one (I tried an older one as
  * well, with the same result).
- * 
+ *
  * Fascinatingly, if you have your own dll (mycode.dll) which implicitly
  * loads pthread.dll, and then do LoadLibrary/FreeLibrary on _this_ dll, the
  * same thing happens.
- * 
+ *
  */
 
+/* Compile this program with e.g. -DPTW32_DLL_PATH="\"pthreadVC2.dll\""
+ */
 #include "test.h"
 
 int main() {
+#ifndef PTW32_STATIC_LIB
+#  ifndef PTW32_DLL_PATH
+#    error PTW32_DLL_PATH must specify a path to the pthreads-win32 DLL
+#  endif
   HINSTANCE hinst;
 
-  assert((hinst = LoadLibrary("pthread")) != (HINSTANCE) 0);
+  assert((hinst = LoadLibrary(PTW32_DLL_PATH)) != (HINSTANCE) 0);
 
   Sleep(100);
 
   FreeLibrary(hinst);
+#else
+  printf("This test is N/A when statically linking\n");
+#endif
   return 0;
 }
 

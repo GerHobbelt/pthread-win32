@@ -87,33 +87,23 @@
 #undef PTW32_LEVEL
 
 #if defined(_POSIX_SOURCE)
-#define PTW32_LEVEL 0
-/* Early POSIX */
+#define PTW32_LEVEL 0	/* Early POSIX */
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 199309
 #undef PTW32_LEVEL
-#define PTW32_LEVEL 1
-/* Include 1b, 1c and 1d */
+#define PTW32_LEVEL 1	/* Include 1b, 1c and 1d */
 #endif
 
 #if defined(INCLUDE_NP)
 #undef PTW32_LEVEL
-#define PTW32_LEVEL 2
-/* Include Non-Portable extensions */
+#define PTW32_LEVEL 2	/* Include Non-Portable extensions */
 #endif
 
 #define PTW32_LEVEL_MAX 3
 
 #if ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112 )  || !defined(PTW32_LEVEL)
-#define PTW32_LEVEL PTW32_LEVEL_MAX
-/* Include everything */
-#endif
-
-#if defined(_UWIN)
-#   define HAVE_STRUCT_TIMESPEC 1
-#   define HAVE_SIGNAL_H        1
-#   pragma comment(lib, "pthread")
+#define PTW32_LEVEL PTW32_LEVEL_MAX	/* Include everything */
 #endif
 
 #if defined(__MINGW32__) || defined(__MINGW64__)
@@ -211,23 +201,6 @@
 #endif
 
 /*
- * -----------------
- * autoconf switches
- * -----------------
- */
-#if !defined(NEED_FTIME)
-#include <time.h>
-#else /* NEED_FTIME */
-/* use native WIN32 time API */
-#endif /* NEED_FTIME */
-
-#if defined(HAVE_SIGNAL_H)
-#include <signal.h>
-#endif /* HAVE_SIGNAL_H */
-
-#include <limits.h>
-
-/*
  * Boolean values to make us independent of system includes.
  */
 enum {
@@ -244,14 +217,29 @@ enum {
 #  if defined(WINCE)
 #    define NEED_ERRNO
 #    define NEED_SEM
-#  endif
-#  if defined(__MINGW64__)
+#  elif defined(_UWIN)
+#    define HAVE_MODE_T
+#    define HAVE_STRUCT_TIMESPEC
+#    define HAVE_SIGNAL_H
+#  elif defined(__MINGW64__)
 #    define HAVE_STRUCT_TIMESPEC
 #    define HAVE_MODE_T
-#  elif defined(_UWIN) || defined(__MINGW32__)
+#  elif defined(__MINGW32__)
 #    define HAVE_MODE_T
 #  endif
 #endif
+
+#if !defined(NEED_FTIME)
+#include <time.h>
+#else /* NEED_FTIME */
+/* use native WIN32 time API */
+#endif /* NEED_FTIME */
+
+#if defined(HAVE_SIGNAL_H)
+#include <signal.h>
+#endif
+
+#include <limits.h>
 
 #if PTW32_LEVEL >= PTW32_LEVEL_MAX
 #if defined(NEED_ERRNO)
@@ -580,6 +568,7 @@ typedef struct pthread_mutexattr_t_ * pthread_mutexattr_t;
 typedef struct pthread_cond_t_ * pthread_cond_t;
 typedef struct pthread_condattr_t_ * pthread_condattr_t;
 #endif
+
 typedef struct pthread_rwlock_t_ * pthread_rwlock_t;
 typedef struct pthread_rwlockattr_t_ * pthread_rwlockattr_t;
 typedef struct pthread_spinlock_t_ * pthread_spinlock_t;

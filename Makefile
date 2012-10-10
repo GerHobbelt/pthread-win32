@@ -13,7 +13,7 @@ Configuration	= Release
 
 # DLL_VER:
 # See pthread.h and README - This number is computed as 'current - age'
-DLL_VER	= 2$(TARGET_CPU)
+DLL_VER	= 2$(EXTRAVERSION)
 DLL_VERD= $(DLL_VER)d
 
 DESTROOT	= ..\PTHREADS-BUILT
@@ -116,9 +116,8 @@ all-tests:
 	$(MAKE) /E realclean VSE-static$(XDBG)
 	cd tests && $(MAKE) /E clean VSE-static$(XDBG) $(TEST_ENV)
 !ENDIF
+	$(MAKE) realclean
 	@ echo $@ completed successfully.
-	$(MAKE) /E realclean
-	
 
 all-tests-cflags:
 	$(MAKE) all-tests XCFLAGS="/W3 /WX /MD /nologo"

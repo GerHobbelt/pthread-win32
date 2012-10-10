@@ -104,7 +104,7 @@
  * We force all calls to cdecl even though this could slow Watcom code down
  * slightly. If you know that the Watcom compiler will be used to build both
  * the DLL and application, then you can probably define this as a null string.
- * Remember that pthread.h (this file) is used for both the DLL and application builds.
+ * Remember that sched.h (this file) is used for both the DLL and application builds.
  */
 #if !defined(PTW32_CDECL)
 # define PTW32_CDECL __cdecl

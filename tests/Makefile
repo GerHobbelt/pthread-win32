@@ -29,7 +29,7 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
-DLL_VER	= 2$(TARGET_CPU)
+DLL_VER	= 2$(EXTRAVERSION)
 
 CP	= copy
 RM	= erase
@@ -37,7 +37,7 @@ RMDIR	= rmdir /s /q
 CAT	= type
 MKDIR	= mkdir
 ECHO	= echo
-TOUCH	= $(ECHO) Passed >
+TOUCH	= $(ECHO) touched >
 
 # The next path is relative to $BUILD_DIR
 QAPC	= # ..\QueueUserAPCEx\User\quserex.dll
@@ -78,382 +78,211 @@ LFLAGS= /INCREMENTAL:NO
 INCLUDES=-I.
 BUILD_DIR=..
 
-COPYFILES	= $(CPHDR) $(CPLIB) $(CPDLL) $(QAPC)
-
 EHFLAGS		=
 
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
 
-PASSES = \
-	self1.pass  mutex5.pass  \
-	mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
-	semaphore1.pass  semaphore2.pass  semaphore3.pass  \
-	mutex2.pass  mutex3.pass  \
-	mutex2r.pass  mutex2e.pass  mutex3r.pass  mutex3e.pass  \
-	condvar1.pass  condvar1_1.pass  condvar1_2.pass  condvar2.pass  condvar2_1.pass  \
-	exit1.pass  create1.pass  create2.pass create3.pass reuse1.pass  reuse2.pass  equal1.pass  \
-	sequence1.pass  kill1.pass  valid1.pass  valid2.pass  \
-	exit2.pass  exit3.pass  exit4.pass  exit5.pass  \
-	join0.pass  join1.pass  detach1.pass  join2.pass join3.pass join4.pass  \
-	mutex4.pass  mutex6.pass  mutex6n.pass  mutex6e.pass  mutex6r.pass  \
-	mutex6s.pass  mutex6es.pass  mutex6rs.pass  \
-	mutex7.pass  mutex7n.pass  mutex7e.pass  mutex7r.pass  \
-	mutex8.pass  mutex8n.pass  mutex8e.pass  mutex8r.pass  \
-	robust1.pass  robust2.pass  robust3.pass  robust4.pass  robust5.pass  \
-	count1.pass  \
-	once1.pass  once2.pass  once3.pass  once4.pass  \
-	self2.pass  \
-	cancel1.pass  cancel2.pass  \
-	semaphore4.pass  semaphore4t.pass  semaphore5.pass  \
-	barrier1.pass  barrier2.pass  barrier3.pass  barrier4.pass  barrier5.pass  barrier6.pass  \
-	tsd1.pass  tsd2.pass  delay1.pass  delay2.pass  eyal1.pass  \
-	condvar3.pass  condvar3_1.pass  condvar3_2.pass  condvar3_3.pass  \
-	condvar4.pass  condvar5.pass  condvar6.pass  \
-	condvar7.pass  condvar8.pass  condvar9.pass  \
-	errno1.pass  \
-	rwlock1.pass  rwlock2.pass  rwlock3.pass  rwlock4.pass  \
-	rwlock5.pass  rwlock6.pass  rwlock7.pass  rwlock8.pass  \
-	rwlock2_t.pass  rwlock3_t.pass  rwlock4_t.pass  rwlock5_t.pass  rwlock6_t.pass  rwlock6_t2.pass  \
-	context1.pass  \
-	cancel3.pass  cancel4.pass  cancel5.pass  cancel6a.pass  cancel6d.pass  \
-	cancel7.pass  cancel8.pass  \
-	cleanup0.pass  cleanup1.pass  cleanup2.pass  cleanup3.pass  \
-	priority1.pass priority2.pass inherit1.pass  \
-	spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
-	exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
-	cancel9.pass  \
-	affinity1.pass  affinity2.pass  affinity3.pass  affinity4.pass  affinity5.pass  \
-	stress1.pass
-
-XTESTS		= loadfree.pass
-TESTS		= $(PASSES) allpassed
-
-BENCHRESULTS = \
-	benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
+include common.mk
 
 help:
 	@ $(ECHO) Run one of the following command lines:
 	@ $(ECHO) nmake clean VC
 	@ $(ECHO) nmake clean VC-bench
 	@ $(ECHO) nmake clean VC-static
+	@ $(ECHO) nmake clean VC-static-bench
 	@ $(ECHO) nmake clean VC-debug
 	@ $(ECHO) nmake clean VC-static-debug
 	@ $(ECHO) nmake clean VC-small-static-debug
 	@ $(ECHO) nmake clean VCX
 	@ $(ECHO) nmake clean VCX-bench
 	@ $(ECHO) nmake clean VCX-static
+	@ $(ECHO) nmake clean VCX-static-bench
 	@ $(ECHO) nmake clean VCX-debug
 	@ $(ECHO) nmake clean VCX-static-debug
 	@ $(ECHO) nmake clean VCX-small-static-debug
 	@ $(ECHO) nmake clean VCE
 	@ $(ECHO) nmake clean VCE-bench
 	@ $(ECHO) nmake clean VCE-static
+	@ $(ECHO) nmake clean VCE-static-bench
 	@ $(ECHO) nmake clean VCE-debug
 	@ $(ECHO) nmake clean VCE-static-debug
 	@ $(ECHO) nmake clean VCE-small-static-debug
 	@ $(ECHO) nmake clean VSE
 	@ $(ECHO) nmake clean VSE-bench
 	@ $(ECHO) nmake clean VSE-static
+	@ $(ECHO) nmake clean VSE-static-bench
 	@ $(ECHO) nmake clean VSE-debug
 	@ $(ECHO) nmake clean VSE-static-debug
 	@ $(ECHO) nmake clean VSE-small-static-debug
 
 VC:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" runtests
 
 VCE:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" runtests
 
 VSE:	
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" runtests
 
 VCX:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" runtests
 
 VC-bench:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" XXLIBS="benchlib.obj $(XXLIBS)" $(BENCHTESTS)
 
 VCE-bench:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" XXLIBS="benchlib.obj $(XXLIBS)" $(BENCHTESTS)
 
 VSE-bench:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" XXLIBS="benchlib.obj $(XXLIBS)" $(BENCHTESTS)
 
 VCX-bench:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.o" copyfiles $(XXLIBS) $(BENCHRESULTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" XXLIBS="benchlib.obj $(XXLIBS)" $(BENCHTESTS)
 
 VC-static VC-small-static:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" runtests
 
 VCE-static VCE-small-static:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" runtests
 
 VSE-static VSE-small-static:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" runtests
 
 VCX-static VCX-small-static:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" runtests
+
+VC-static-bench:
+	@ -setenv
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" XXLIBS="benchlib.obj $(XXLIBS)" $(BENCHTESTS)
+
+VCE-static-bench:
+	@ -setenv
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" XXLIBS="benchlib.obj $(XXLIBS)" $(BENCHTESTS)
+
+VSE-static-bench:
+	@ -setenv
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" XXLIBS="benchlib.obj $(XXLIBS)" $(BENCHTESTS)
+
+VCX-static-bench:
+	@ -setenv
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" XXLIBS="benchlib.obj $(XXLIBS)" $(BENCHTESTS)
 
 VC-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" runtests
 
 VC-static-debug VC-small-static-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" runtests
 
 VCE-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" runtests
 
 VCE-static-debug VCE-small-static-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" runtests
 
 VSE-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" runtests
 
 VSE-static-debug VSE-small-static-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" runtests
 
 VCX-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" runtests
 
 VCX-static-debug VCX-small-static-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" XTESTS="" copyfiles $(TESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" runtests
 
 clean:
-	- if exist *.dll $(RM) *.dll
-	- if exist *.lib $(RM) *.lib
-	- if exist pthread.h $(RM) pthread.h
-	- if exist semaphore.h $(RM) semaphore.h
-	- if exist sched.h $(RM) sched.h
-	- if exist *.e $(RM) *.e
-	- if exist *.i $(RM) *.i
-	- if exist *.obj $(RM) *.obj
-	- if exist *.pdb $(RM) *.pdb
-	- if exist *.o $(RM) *.o
-	- if exist *.asm $(RM) *.asm
-	- if exist *.exe $(RM) *.exe
-	- if exist *.manifest $(RM) *.manifest
-	- if exist *.pass $(RM) *.pass
-	- if exist *.bench $(RM) *.bench
-	- if exist *.log $(RM) *.log
-	- if exist SIZES.V* $(RM) SIZES.V*
+	if exist passes.mk $(RM) passes.mk
+	if exist allpasses.mk $(RM) allpasses.mk
+	if exist *.dll $(RM) *.dll
+	if exist *.lib $(RM) *.lib
+	if exist pthread.h $(RM) pthread.h
+	if exist semaphore.h $(RM) semaphore.h
+	if exist sched.h $(RM) sched.h
+	if exist *.e $(RM) *.e
+	if exist *.i $(RM) *.i
+	if exist *.obj $(RM) *.obj
+	if exist *.pdb $(RM) *.pdb
+	if exist *.o $(RM) *.o
+	if exist *.asm $(RM) *.asm
+	if exist *.exe $(RM) *.exe
+	if exist *.manifest $(RM) *.manifest
+	if exist *.pass $(RM) *.pass
+	if exist *.bench $(RM) *.bench
+	if exist *.log $(RM) *.log
+	if exist SIZES.V* $(RM) SIZES.V*
 
-benchtest1.bench:
-benchtest2.bench:
-benchtest3.bench:
-benchtest4.bench:
-benchtest5.bench:
+# If someone can tell me how to do the equivalent of GNU make $(TESTS:%=%.pass)
+# then we can get rid of these two rules and the associated includes below.
+# PS. I know about $(TESTS:.ext=.newext) but that requires already having a
+# filename extension.
+allpasses.mk: $(ALL_KNOWN_TESTS)
+	@ $(ECHO) ALL_KNOWN_PASSES = \> allpasses.mk
+	@ !if exist $?.c $(ECHO) $?.pass \>> allpasses.mk
 
-affinity1.pass:
-affinity2.pass: affinity1.pass
-affinity3.pass: affinity2.pass
-affinity4.pass: affinity3.pass
-affinity5.pass: affinity4.pass
-barrier1.pass: semaphore4.pass
-barrier2.pass: barrier1.pass
-barrier3.pass: barrier2.pass
-barrier4.pass: barrier3.pass
-barrier5.pass: barrier4.pass
-barrier6.pass: barrier5.pass
-cancel1.pass: create1.pass
-cancel2.pass: barrier6.pass
-cancel3.pass: context1.pass
-cancel4.pass: cancel3.pass
-cancel5.pass: cancel3.pass
-cancel6a.pass: cancel3.pass
-cancel6d.pass: cancel3.pass
-cancel7.pass: kill1.pass
-cancel8.pass: cancel7.pass
-cancel9.pass: cancel8.pass
-cleanup0.pass: cancel5.pass
-cleanup1.pass: cleanup0.pass
-cleanup2.pass: cleanup1.pass
-cleanup3.pass: cleanup2.pass
-condvar1.pass:
-condvar1_1.pass: condvar1.pass
-condvar1_2.pass: join2.pass
-condvar2.pass: condvar1.pass
-condvar2_1.pass: condvar2.pass join2.pass
-condvar3.pass: create1.pass condvar2.pass
-condvar3_1.pass: condvar3.pass join2.pass
-condvar3_2.pass: condvar3_1.pass
-condvar3_3.pass: condvar3_2.pass
-condvar4.pass: create1.pass
-condvar5.pass: condvar4.pass
-condvar6.pass: condvar5.pass
-condvar7.pass: condvar6.pass cleanup1.pass
-condvar8.pass: condvar7.pass
-condvar9.pass: condvar8.pass
-context1.pass: cancel1.pass
-count1.pass: join1.pass
-create1.pass: mutex2.pass
-create2.pass: create1.pass
-create3.pass: create2.pass
-delay1.pass:
-delay2.pass: delay1.pass
-detach1.pass: join0.pass
-equal1.pass: create1.pass
-errno1.pass: mutex3.pass
-exception1.pass: cancel4.pass
-exception2.pass: exception1.pass
-exception3_0.pass: exception2.pass
-exception3.pass: exception3_0.pass
-exit1.pass:
-exit2.pass: create1.pass
-exit3.pass: create1.pass
-exit4.pass:
-exit5.pass: kill1.pass
-eyal1.pass: tsd1.pass
-inherit1.pass: join1.pass priority1.pass
-join0.pass: create1.pass
-join1.pass: create1.pass
-join2.pass: create1.pass
-join3.pass: join2.pass
-join4.pass: join3.pass
-kill1.pass:
-mutex1.pass: self1.pass
-mutex1n.pass: mutex1.pass
-mutex1e.pass: mutex1.pass
-mutex1r.pass: mutex1.pass
-mutex2.pass: mutex1.pass
-mutex2r.pass: mutex2.pass
-mutex2e.pass: mutex2.pass
-mutex3.pass: create1.pass
-mutex3r.pass: mutex3.pass
-mutex3e.pass: mutex3.pass
-mutex4.pass: mutex3.pass
-mutex5.pass:
-mutex6.pass: mutex4.pass
-mutex6n.pass: mutex4.pass
-mutex6e.pass: mutex4.pass
-mutex6r.pass: mutex4.pass
-mutex6s.pass: mutex6.pass
-mutex6rs.pass: mutex6r.pass
-mutex6es.pass: mutex6e.pass
-mutex7.pass: mutex6.pass
-mutex7n.pass: mutex6n.pass
-mutex7e.pass: mutex6e.pass
-mutex7r.pass: mutex6r.pass
-mutex8.pass: mutex7.pass
-mutex8n.pass: mutex7n.pass
-mutex8e.pass: mutex7e.pass
-mutex8r.pass: mutex7r.pass
-once1.pass: create1.pass
-once2.pass: once1.pass
-once3.pass: once2.pass
-once4.pass: once3.pass
-priority1.pass: join1.pass
-priority2.pass: priority1.pass barrier3.pass
-reuse1.pass: create3.pass
-reuse2.pass: reuse1.pass
-robust1.pass: mutex8r.pass
-robust2.pass: mutex8r.pass
-robust3.pass: robust2.pass
-robust4.pass: robust3.pass
-robust5.pass: robust4.pass
-rwlock1.pass: condvar6.pass
-rwlock2.pass: rwlock1.pass
-rwlock3.pass: rwlock2.pass join2.pass
-rwlock4.pass: rwlock3.pass
-rwlock5.pass: rwlock4.pass
-rwlock6.pass: rwlock5.pass
-rwlock7.pass: rwlock6.pass
-rwlock8.pass: rwlock7.pass
-rwlock2_t.pass: rwlock2.pass
-rwlock3_t.pass: rwlock2_t.pass
-rwlock4_t.pass: rwlock3_t.pass
-rwlock5_t.pass: rwlock4_t.pass
-rwlock6_t.pass: rwlock5_t.pass
-rwlock6_t2.pass: rwlock6_t.pass
-self1.pass:
-self2.pass: create1.pass
-semaphore1.pass:
-semaphore2.pass:
-semaphore3.pass: semaphore2.pass
-semaphore4.pass: semaphore3.pass cancel1.pass
-semaphore4t.pass: semaphore4.pass
-semaphore5.pass: semaphore4.pass
-sequence1.pass: reuse2.pass
-spin1.pass:
-spin2.pass: spin1.pass
-spin3.pass: spin2.pass
-spin4.pass: spin3.pass
-stress1.pass:
-tsd1.pass: barrier5.pass join1.pass
-tsd2.pass: tsd1.pass
-valid1.pass: join1.pass
-valid2.pass: valid1.pass
+passes.mk: $(TESTS)
+	@ $(ECHO) PASSES = \> passes.mk
+	@ !if exist $?.c $(ECHO) $?.pass \>> passes.mk
+
+runtests: allpasses.mk passes.mk
+	@ $(ECHO) Running tests
+	@ $(MAKE) /E /nologo PTW32_INCLUDE_PASSES=YES allpassed
+
+!IFDEF PTW32_INCLUDE_PASSES
+include allpasses.mk
+include passes.mk
+# For some reason the dependency below doesn't trigger the inference rule .c.exe below
+# for certain tests, while others do. So the compile command is included in
+# the command list below and the dependency is commented out, which works.
+$(ALL_KNOWN_PASSES): #$(@R).exe
+	$(CC) /DPTW32_DLL_PATH="\"$(CPDLL)\"" $(EHFLAGS) $(CFLAGS) $(INCLUDES) $*.c /Fe$*.exe /link $(LFLAGS) $(CPLIB) $(XXLIBS)
+	@ $(ECHO) ... Running $(TEST) test: $*.exe
+	@ .\$*.exe
+	@ $(ECHO) ...... Passed
+	@ $(TOUCH) $*.pass
+
+allpassed: $(PASSES)
+!ENDIF
+
+$(ALL_KNOWN_TESTS): $(CPHDR) $(CPLIB) $(CPDLL) $(QAPC)
 
 allpassed:
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
-sizes.pass: sizes.exe
-	@ $(ECHO) ... Running $(TEST) test: $*.exe
-	@ .\$*.exe > SIZES.$(TEST)
-	@ $(CAT) SIZES.$(TEST)
-	@ $(ECHO) ...... Passed
-	@ $(TOUCH) $*.pass
-
-loadfree.pass: pthread.dll loadfree.exe
-	@ $(ECHO) ... Running $(TEST) test: $*.exe
+$(BENCHTESTS): $(CPHDR) $(CPLIB) $(CPDLL) $(QAPC) benchlib.obj $@.exe
+	@ $(ECHO) ... Running $(TEST) benchmark: $*.exe
 	@ .\$*.exe
-	@ $(ECHO) ...... Passed
-	@ $(TOUCH) $*.pass
-
-$(PASSES): $(CPHDR) $(CPLIB) $(QAPC) sizes.pass $(XTESTS)
-	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $*.c /Fe$*.exe /link $(LFLAGS) $(CPLIB) $(XXLIBS)
-	@ $(ECHO) ... Running $(TEST) test: $*.exe
-	@ .\$*.exe
-	@ $(ECHO) ...... Passed
-	@ $(TOUCH) $*.pass
-
-$(BENCHRESULTS): $*.exe
 	@ $(ECHO) ...... Done
-	@ $(TOUCH) $*.bench
 
-copyfiles: $(COPYFILES)
+#.c.exe:
+#	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
 
-loadfree.exe sizes.exe: $*.c
-	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $*.c /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
-
-.c.exe:
-	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
-	@ $(ECHO) ... Running $(TEST) test: $*.exe
-	@ .\$*.exe
-	@ $(ECHO) ...... Passed
-
-.c.o:
+.c.obj:
 	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) /c $< /Fo$@
 
 .c.i:
 	$(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<
 
-copyfiles: $(COPYFILES)
-
-$(COPYFILES):
-	@ $(ECHO) Copying $(BUILD_DIR)\$@
-	@ if exist $(BUILD_DIR)\$@ $(CP) $(BUILD_DIR)\$@ .
-
-pthread.dll: $(CPDLL)
-	@ $(CP) $(CPDLL) pthread.dll
-	@ $(CP) $(CPLIB) pthread.lib
+$(CPHDR) $(CPLIB) $(CPDLL) $(QAPC):
+	@ if exist $(BUILD_DIR)\$@ $(ECHO) Copying $(BUILD_DIR)\$@ && $(CP) $(BUILD_DIR)\$@ .
