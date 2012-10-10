@@ -393,17 +393,21 @@ running nmake. E.g.:
 $ cd tests
 $ nmake VC
 
-For failure analysis etc. individual or a given set of tests can be built
+For failure analysis etc. individual tests can be built
 and run, e.g:
 
 $ cd tests
-$ nmake VC TESTS="foo.exe bar.exe"
+$ nmake VC TESTS="foo bar"
 
-or, to build and run all prerequisite tests as well leading to any
-individual or set of tests, e.g:
+This builds and runs all prerequisite tests as well as the
+individual tests listed. Prerequisite tests are defined in tests\common.mk.
+
+To build and run only those tests listed use, e.g.:
 
 $ cd tests
-$ nmake VC TESTS="foo.pass bar.pass" 
+$ nmake VC FAST="foo bar"
+
+You can't use FAST and TEST together.
 
 
 Building under MinGW
@@ -451,22 +455,26 @@ $ make all-tests ARCH=-m64
 $ make all-tests ARCH=-m32
 
 You can run the testsuite by changing to the "tests" directory and
-running nmake. E.g.:
+running make. E.g.:
 
 $ cd tests
 $ make GC
 
-For failure analysis etc. individual or a given set of tests can be built
+For failure analysis etc. individual tests can be built
 and run, e.g:
 
 $ cd tests
-$ make GC TESTS="foo.exe bar.exe"
+$ make GC TESTS="foo bar"
 
-or, to build and run all prerequisite tests as well leading to any
-individual or set of tests, e.g:
+This builds and runs all prerequisite tests as well as the
+individual tests listed. Prerequisite tests are defined in tests\common.mk.
+
+To build and run only those tests listed use, e.g.:
 
 $ cd tests
-$ make GC TESTS="foo.pass bar.pass" 
+$ make GC FAST="foo bar"
+
+You can't use FAST and TEST together.
 
 
 Building under Linux using the MinGW cross development tools

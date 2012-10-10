@@ -85,6 +85,21 @@ EHFLAGS		=
 
 include common.mk
 
+#
+# Define "FAST=foo bar" to build and run only the tests "foo.exe" and "bar.exe"
+# without any prerequisite tests. Set FAST to one or more tests.
+#
+# To build and run "foo.exe" and "bar.exe" and run all prerequisite tests
+# use "TESTS=foo bar". Set TESTS to one or more tests.
+#
+# You can't use FAST with TESTS.
+#
+!IFDEF FAST
+TESTS	= $(FAST)
+!ELSE
+include runorder.mk
+!ENDIF
+
 help:
 	@ $(ECHO) Run one of the following command lines:
 	@ $(ECHO) nmake clean VC

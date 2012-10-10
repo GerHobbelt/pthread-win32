@@ -82,10 +82,6 @@ LFLAGS	= $(ARCH) $(XXLFLAGS)
 BUILD_DIR	= ..
 INCLUDES	= -I.
 
-.INTERMEDIATE: *.exe *.pass
-.SECONDARY: *.exe *.pass
-.PRECIOUS: *.exe *.pass
-
 TEST	= GC
 
 # Default lib version
@@ -101,9 +97,28 @@ QAPC	=  # ../QueueUserAPCEx/User/quserex.dll
 
 include common.mk
 
+.INTERMEDIATE: $(ALL_KNOWN_TESTS:%=%.exe) $(BENCHTESTS:%=%.exe)
+.SECONDARY: $(ALL_KNOWN_TESTS:%=%.exe) $(ALL_KNOWN_TESTS:%=%.pass) $(BENCHTESTS:%=%.exe) $(BENCHTESTS:%=%.bench)
+.PRECIOUS: $(ALL_KNOWN_TESTS:%=%.exe) $(ALL_KNOWN_TESTS:%=%.pass) $(BENCHTESTS:%=%.exe) $(BENCHTESTS:%=%.bench)
+
 ASM				= $(ALL_KNOWN_TESTS:%=%.s)
 TESTS			= $(ALL_KNOWN_TESTS)
 BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
+
+#
+# Define "FAST=foo bar" to build and run only the tests "foo.exe" and "bar.exe"
+# without any prerequisite tests. Set FAST to one or more tests.
+#
+# To build and run "foo.exe" and "bar.exe" and run all prerequisite tests
+# use "TESTS=foo bar". Set TESTS to one or more tests.
+#
+# You can't use FAST with TESTS.
+#
+ifdef FAST
+TESTS	= $(FAST)
+else
+include runorder.mk
+endif
 
 help:
 	@ $(ECHO) "Run one of the following command lines:"
