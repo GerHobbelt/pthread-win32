@@ -132,19 +132,19 @@ help:
 
 VC:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" allpassed
 
 VCE:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" allpassed
 
 VSE:	
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" allpassed
 
 VCX:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" allpassed
 
 VC-bench:
 	@ -setenv
@@ -164,19 +164,19 @@ VCX-bench:
 
 VC-static VC-small-static:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" allpassed
 
 VCE-static VCE-small-static:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" allpassed
 
 VSE-static VSE-small-static:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" allpassed
 
 VCX-static VCX-small-static:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" allpassed
 
 VC-static-bench:
 	@ -setenv
@@ -196,35 +196,35 @@ VCX-static-bench:
 
 VC-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" allpassed
 
 VC-static-debug VC-small-static-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" allpassed
 
 VCE-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" allpassed
 
 VCE-static-debug VCE-small-static-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" allpassed
 
 VSE-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" allpassed
 
 VSE-static-debug VSE-small-static-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" allpassed
 
 VCX-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" allpassed
 
 VCX-static-debug VCX-small-static-debug:
 	@ -setenv
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" runtests
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" allpassed
 
 clean:
 	if exist passes.mk $(RM) passes.mk
@@ -247,53 +247,22 @@ clean:
 	if exist *.log $(RM) *.log
 	if exist SIZES.V* $(RM) SIZES.V*
 
-# If someone can tell me how to do the equivalent of GNU make $(TESTS:%=%.pass)
-# then we can get rid of these two rules and the associated includes below.
-# PS. I know about $(TESTS:.ext=.newext) but that requires already having a
-# filename extension.
-allpasses.mk: $(ALL_KNOWN_TESTS)
-	@ $(ECHO) ALL_KNOWN_PASSES = \> allpasses.mk
-	@ !if exist $?.c $(ECHO) $?.pass \>> allpasses.mk
-
-passes.mk: $(TESTS)
-	@ $(ECHO) PASSES = \> passes.mk
-	@ !if exist $?.c $(ECHO) $?.pass \>> passes.mk
-
-runtests: allpasses.mk passes.mk
-	@ $(ECHO) Running tests
-	@ $(MAKE) /E /nologo PTW32_INCLUDE_PASSES=YES allpassed
-
-!IFDEF PTW32_INCLUDE_PASSES
-include allpasses.mk
-include passes.mk
-# For some reason the dependency below doesn't trigger the inference rule .c.exe below
-# for certain tests, while others do. So the compile command is included in
-# the command list below and the dependency is commented out, which works.
-$(ALL_KNOWN_PASSES): #$(@R).exe
+.c.pass:
 	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $*.c /Fe$*.exe /link $(LFLAGS) $(CPLIB) $(XXLIBS)
 	@ $(ECHO) ... Running $(TEST) test: $*.exe
 	@ .\$*.exe
 	@ $(ECHO) ...... Passed
 	@ $(TOUCH) $*.pass
 
-allpassed: $(PASSES)
-!ENDIF
+$(ALL_KNOWN_TESTS): $(CPHDR) $(CPLIB) $(CPDLL) $(QAPC) $@.pass
 
-$(ALL_KNOWN_TESTS): $(CPHDR) $(CPLIB) $(CPDLL) $(QAPC)
-
-allpassed:
+allpassed: $(TESTS)
 	@ $(ECHO) ALL TESTS PASSED! Congratulations!
 
 $(BENCHTESTS): $(CPHDR) $(CPLIB) $(CPDLL) $(QAPC) benchlib.obj $@.exe
 	@ $(ECHO) ... Running $(TEST) benchmark: $*.exe
 	@ .\$*.exe
 	@ $(ECHO) ...... Done
-
-#.c.exe:
-#	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
-
-.c.obj:
-	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) /c $< /Fo$@
 
 .c.i:
 	$(CC) /P $(EHFLAGS) $(CFLAGS) $(INCLUDES) $<
