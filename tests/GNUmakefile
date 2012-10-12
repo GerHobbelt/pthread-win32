@@ -192,7 +192,6 @@ allpassed: $(HDR) $(LIB) $(DLL) $(QAPC) $(TESTS:%=%.pass)
 all-bench: $(HDR) $(LIB) $(DLL) $(QAPC) $(XXLIBS) $(BENCHRESULTS)
 	@ $(ECHO) "ALL BENCH TESTS COMPLETED."
 
-cancel9.pass: XLIBS = -lws2_32
 cancel9.exe: XLIBS = -lws2_32
 
 %.pass: %.exe
@@ -208,7 +207,7 @@ cancel9.exe: XLIBS = -lws2_32
 	@ $(TOUCH) $@
 
 %.exe: %.c
-	$(CC) -DPTW32_DLL_PATH="\"$(DLL)\"" $(CFLAGS) $(LFLAGS) -o $@ $< $(INCLUDES) -L. -lpthread$(GCX) $(XLIBS) $(XXLIBS)
+	$(CC) $(CFLAGS) $(LFLAGS) -o $@ $< $(INCLUDES) -L. -lpthread$(GCX) $(XLIBS) $(XXLIBS)
 
 %.pre: %.c $(HDR)
 	$(CC) -E $(CFLAGS) -o $@ $< $(INCLUDES)
@@ -244,5 +243,4 @@ clean:
 	- $(RM) *.pass
 	- $(RM) *.bench
 	- $(RM) *.log
-	- $(RM) SIZES.G*
 	
