@@ -79,7 +79,6 @@ ifeq ($(ARCH),-m32)
 RES_TARGET	= --target pe-i386
 endif
 ifeq ($(ARCH),-m64)
-else
 RES_TARGET	= --target pe-x86-64
 endif
 
