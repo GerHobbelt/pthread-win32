@@ -112,21 +112,12 @@ ptw32_threadReusePop (void)
 void
 ptw32_threadReusePush (pthread_t thread)
 {
-pthread_t thread_clone = thread;
-pthread_t thread_clone2;
-
   ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
   pthread_t t;
   ptw32_mcs_local_node_t node;
 
-  thread_clone2 = tp->ptHandle;
-
   ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
 
-  if (!tp && thread_clone.p == thread_clone2.p)
-  {
-	t.p = 0;
-  }
   t = tp->ptHandle;
   memset(tp, 0, sizeof(ptw32_thread_t));
 
