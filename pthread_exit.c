@@ -102,5 +102,4 @@ pthread_exit (void *value_ptr)
   ptw32_throw (PTW32_EPS_EXIT);
 
   /* Never reached. */
-
 }

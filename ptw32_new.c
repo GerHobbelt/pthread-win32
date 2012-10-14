@@ -85,10 +85,13 @@ ptw32_new (void)
 
   if (tp->cancelEvent == NULL)
     {
+		int err = GetLastError();
+		char buf[80];
+		sprintf(buf, "error = %08x\n", err);
+
       ptw32_threadReusePush (tp->ptHandle);
       return nil;
     }
 
   return t;
-
 }

@@ -183,5 +183,4 @@ sem_wait (sem_t * sem)
     }
 
   return 0;
-
 }				/* sem_wait */

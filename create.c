@@ -285,7 +285,6 @@ pthread_create (pthread_t * tid,
 FAIL0:
   if (result != 0)
     {
-
       ptw32_threadDestroy (thread);
       tp = NULL;
 
@@ -304,5 +303,4 @@ FAIL0:
     pthread_count++;
 #endif
   return (result);
-
 }				/* pthread_create */

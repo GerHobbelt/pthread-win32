@@ -63,6 +63,9 @@ pthread_self (void)
   pthread_t nil = {NULL, 0};
   ptw32_thread_t * sp;
 
+  if (!ptw32_processInitialize())
+	return nil;
+
 #if defined(_UWIN)
   if (!ptw32_selfThreadKey)
     return nil;
@@ -138,5 +141,4 @@ pthread_self (void)
     }
 
   return (self);
-
 }				/* pthread_self */
