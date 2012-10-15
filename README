@@ -63,8 +63,10 @@ handling schemes and compilers - and because the library
 may not work reliably if these are mixed in an application,
 each different version of the library has it's own name.
 
-Please do not distribute your own modified versions of the library using
-names conforming to this description.
+Please do not distribute your own modified versions of the library
+using names conforming to this description. You can use the
+makefile variable "EXTRAVERSION" to append your own suffix to the
+library names when building and testing your library.
 
 Note 1: the incompatibility is really between EH implementations
 of the different compilers. It should be possible to use the
@@ -84,13 +86,13 @@ version (it should be arbitrary) as pthread.dll, including
 pthread.lib and libpthread.a as appropriate. This is no longer
 likely to happen.
 
-Note 4: the compatibility number was added so that applications
-can differentiate between binary incompatible versions of the
-libs and dlls.
+Note 4: the compatibility number (major version number) was
+added so that applications can differentiate between binary
+incompatible versions of the libs and dlls.
 
 In general the naming format used is:
-    pthread[VG]{SE,CE,C}[c][M].dll
-    pthread[VG]{SE,CE,C}[c][M].lib
+    pthread[VG]{SE,CE,C}[c][E].dll
+    pthread[VG]{SE,CE,C}[c][E].lib
 
 where:
     [VG] indicates the compiler
@@ -102,39 +104,30 @@ where:
         CE	- C++ EH, or
         C	- no exceptions - uses setjmp/longjmp
 
-        c	- DLL compatibility number indicating ABI and API
+        c	- DLL major version number indicating ABI
               compatibility with applications built against
-              a snapshot with the same compatibility number.
+              a snapshot with the same major version number.
               See 'Version numbering' below.
-        M   - Machine architecture:
-              pthreadV*: "x86" or "x64"
-              pthreadG*: "-m32" or "-m64"
-              If none of these suffixes appear then the dll or lib
-              have been built using the toolchain default
-              configuration.
-              Don't rely on this to determine the architecture,
-              use the Properties->Detail tab for the file.
+        E	- EXTRAVERSION suffix.
 
 The name may also be suffixed by a 'd' to indicate a debugging version
-of the library. E.g. pthreadVC2d.lib. Debugging versions contain
-additional information for debugging (symbols etc) and are often not
-optimised in any way (compiled with optimisation turned off).
+of the library. E.g. pthreadVC2d.lib. These will be created e.g. when
+the *-debug makefile targets are used.
 
 Examples:
-	pthreadVSE.dll      (MSVC/SEH)
-	pthreadGCE.dll      (GNUC/C++ EH)
-	pthreadGC.dll       (GNUC/not dependent on exceptions)
-	pthreadVC1.dll      (MSVC/not dependent on exceptions - not binary
-                         compatible with pthreadVC.dll)
 	pthreadVC2.dll	    (MSVC/not dependent on exceptions - not binary
                          compatible with pthreadVC1.dll or pthreadVC.dll)
-    pthreadGC2-m32.dll  (As built by "make GC ARCH=-m32")
-    pthreadVC2x64.dll   (As built by "nmake VC TARGET_CPU=x64")
+    pthreadGC2-w32.dll  (As built, e.g., by "make GC ARCH=-m32 EXTRAVERSION=-w32")
+    pthreadVC2-w64.dll  (As built, e.g., by "nmake VC ARCH=-m64 EXTRAVERSION=-w64")
 
-The GNU library archive file names have correspondingly changed to:
+For information on ARCH (MinGW GNUmakefile) or TARGET_CPU (MSVS Makefile)
+see the respective "Building with ..." sections below.
 
-	libpthreadGCEc.a
-	libpthreadGCc.a
+The GNU library archive file names have correspondingly changed, e.g.:
+
+	libpthreadGCE2.a
+	libpthreadGC2.a
+	libpthreadGC2-w64.a
 
 
 Version numbering
@@ -163,7 +156,7 @@ The numbers are changed as follows:
    last update in a way that requires recompilation and relinking of
    applications, then increment Major, and set both minor and micro to 0.
    (`M:m:u' becomes `M+1:0:0')
-2. If the general API has changed at all since the last update, or
+2. If the general API has changed at all since the last update or
    there have been semantic/behaviour changes (bug fixes etc) but does
    not require recompilation of existing applications, then increment
    minor and set micro to 0.
@@ -336,56 +329,48 @@ help information. E.g.
 
 $ nmake
 
-With the MS SDK installed and from the SDK command shell the following
-variables can be defined either on the nmake command line or in the
-shell environment (note that these are already set by the SDK but
-can be changed either directly or through the SDKs "setenv" utility):
+As examples, as at Release 2.10 the pre-built DLLs and static libraries
+are built from the following command-lines:
 
-TARGET_CPU
- - possible values are "x64" and "x86"
+[Note: "setenv" comes with the SDK. "/2003" is used to override my build
+system which is Win7 (at the time of writing) for backwards compatibility.]
 
-Configuration
- - possible values are "Debug" and "Release". "Debug" does not
-   generate debugging versions of the pthreads libraries (use the
-   *-debug targets for this).
+$ setenv /x64 /2003 /Release
+$ nmake realclean VC
+$ nmake realclean VCE
+$ nmake realclean VSE
+$ nmake realclean VC-static
+$ nmake realclean VCE-static
+$ nmake realclean VSE-static
+$ setenv /x86 /2003 /Release
+$ nmake realclean VC
+$ nmake realclean VCE
+$ nmake realclean VSE
+$ nmake realclean VC-static
+$ nmake realclean VCE-static
+$ nmake realclean VSE-static
 
-NOTE: "Makefile" sets "Configuration" to "Release" unless you override it
-on the nmake command line.
+If you want to differentiate between libraries by their names you can use,
+e.g.:
 
-nmake may also accept other SDK environment variables on the command
-line. See the SDK documentation for those, or run "set" and "setenv /?"
-for clues.
+$ nmake realclean VC EXTRAVERSION="-w64"
 
-If TARGET_CPU is defined (command line or environment or Makefile) the
-DLLs and libraries will have the TARGET_CPU value appended to their
-names, e.g.:
+The string provided via the variable EXTRAVERSION is appended to the dll
+and .lib library names, e.g.:
 
-pthreadVC2x64.dll
-pthreadVC2x64.lib
-
-As examples, as of Release 2.10 the pre-built DLLs and static libraries
-are built from:
-
-$ nmake realclean VC TARGET_CPU=x64
-$ nmake realclean VC TARGET_CPU=x32
-$ nmake realclean VCE TARGET_CPU=x64
-$ nmake realclean VCE TARGET_CPU=x32
-$ nmake realclean VSE TARGET_CPU=x64
-$ nmake realclean VSE TARGET_CPU=x32
-$ nmake realclean VC-static TARGET_CPU=x64
-$ nmake realclean VC-static TARGET_CPU=x32
-$ nmake realclean VCE-static TARGET_CPU=x64
-$ nmake realclean VCE-static TARGET_CPU=x32
-$ nmake realclean VSE-static TARGET_CPU=x64
-$ nmake realclean VSE-static TARGET_CPU=x32
+pthreadVC2-w64.dll
+pthreadVC2-w64.lib
 
 To build and test all DLLs and static lib compatibility versions
 (VC, VCE, VSE):
 
+[Note that the EXTRAVERSION="..." option is passed to the tests Makefile
+when you target "all-tests". If you change to the tests directory and
+run the tests you will need to repeat the option explicitly to the test
+"nmake" command-line.]
+
+$ setenv /x64 /2003 /release
 $ nmake all-tests
-or (from the SDK command shell):
-$ nmake all-tests TARGET_CPU=x64
-$ nmake all-tests TARGET_CPU=x86
 
 You can run the testsuite by changing to the "tests" directory and
 running nmake. E.g.:
@@ -399,23 +384,22 @@ and run, e.g:
 $ cd tests
 $ nmake VC TESTS="foo bar"
 
-This builds and runs all prerequisite tests as well as the
-individual tests listed. Prerequisite tests are defined in tests\common.mk.
+This builds and runs all prerequisite tests as well as the individual
+tests listed. Prerequisite tests are defined in tests\runorder.mk.
 
-To build and run only those tests listed use, e.g.:
+To build and run only those tests listed use, i.e. without the
+additional prerequistite dependency tests:
 
 $ cd tests
-$ nmake VC FAST="foo bar"
-
-You can't use FAST and TEST together.
+$ nmake VC NO_DEPS=1 TESTS="foo bar"
 
 
-Building under MinGW
---------------------
+Building with MinGW
+-------------------
 
-Use Mingw64 to build either 64 or 32 bit versions of the DLL. Mingw32
-GCE builds fail when run on 64 bit systems however this is not the
-case when using Mingw64 (multilib) for either 64 or 32 bit builds.
+Please use Mingw64 to build either 64 or 32 bit variants of the DLL that will
+run on 64 bit systems. We have found that Mingw32 builds of the GCE library
+variants fail when run on 64 bit systems.
 
 From the source directory, run 'make' without arguments for help information.
 
@@ -429,14 +413,8 @@ ARCH
    these as gcc flags however the GNUmakefile also converts these into
    the appropriate windres options when building version.o.
 
-When ARCH is defined anywhere (command line or environment or GNUmakefile)
-the DLLs and libraries have the ARCH value appended to their names, e.g.:
-
-pthreadGC2-m64.dll
-libpthreadGC2-m64.a
-
-As examples, as of Release 2.10 the pre-built DLLs and static libraries
-are built from:
+As examples, as at Release 2.10 the pre-built DLLs and static libraries
+are built from the following command-lines:
 
 $ nmake realclean GC ARCH=-m64
 $ nmake realclean GC ARCH=-m32
@@ -447,7 +425,23 @@ $ nmake realclean GC-static ARCH=-m32
 $ nmake realclean GCE-static ARCH=-m64
 $ nmake realclean GCE-static ARCH=-m32
 
-To build and test all DLLs and static lib compatibility versions (GC, GCE):
+If you want to differentiate between libraries by their names you can use,
+e.g.:
+
+$ make realclean GC ARCH="-m64" EXTRAVERSION="-w64"
+
+The string provided via the variable EXTRAVERSION is appended to the dll
+and .a library names, e.g.:
+
+pthreadGC2-w64.dll
+libpthreadGC2-w64.a
+
+To build and test all DLLs and static lib compatibility variants (GC, GCE):
+
+Note that the ARCH="..." and/or EXTRAVERSION="..." options are passed to the
+tests GNUmakefile when you target "all-tests". If you change to the tests
+directory and run the tests you will need to repeat those options explicitly
+to the test "make" command-line.
 
 $ make all-tests
 or, with MinGW64 (multilib enabled):
@@ -460,21 +454,19 @@ running make. E.g.:
 $ cd tests
 $ make GC
 
-For failure analysis etc. individual tests can be built
-and run, e.g:
+For failure analysis etc. individual tests can be built and run, e.g:
 
 $ cd tests
 $ make GC TESTS="foo bar"
 
-This builds and runs all prerequisite tests as well as the
-individual tests listed. Prerequisite tests are defined in tests\common.mk.
+This builds and runs all prerequisite tests as well as the individual
+tests listed. Prerequisite tests are defined in tests\runorder.mk.
 
-To build and run only those tests listed use, e.g.:
+To build and run only those tests listed use, i.e. without the additional
+prerequistite dependency tests:
 
 $ cd tests
-$ make GC FAST="foo bar"
-
-You can't use FAST and TEST together.
+$ make GC NO_DEPS=1 TESTS="foo bar"
 
 
 Building under Linux using the MinGW cross development tools

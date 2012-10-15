@@ -1,3 +1,9 @@
+2012-10-16  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile (EXTRAVERSION): Naming option for libraries to be
+	consistent with MSVS Makefile; no longer automatically based on
+	ARCH setting.
+
 2012-10-10  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* cancel1.c: Fix comment typo.

@@ -27,7 +27,9 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
-DLL_VER	= 2$(ARCH)
+DLL_VER	= 2$(EXTRAVERSION)
+
+# See pthread.h and README for the description of version numbering.
 DLL_VERD= $(DLL_VER)d
 
 DESTROOT	= ../PTHREADS-BUILT
@@ -187,22 +189,22 @@ all:
 	@ $(MAKE) clean GC-static
 	@ $(MAKE) clean GCE-static
 
-TEST_ENV = PTW32_FLAGS="$(PTW32_FLAGS) -DNO_ERROR_DIALOGS" DLL_VER=$(DLL_VER)
+TEST_ENV = PTW32_FLAGS="$(PTW32_FLAGS) -DNO_ERROR_DIALOGS" DLL_VER=$(DLL_VER) ARCH="$(ARCH)"
 
 all-tests:
 	$(MAKE) realclean GC-small-static
-	cd tests && $(MAKE) ARCH="$(ARCH)" clean GC-small-static $(TEST_ENV) && $(MAKE) ARCH="$(ARCH)" clean GCX-small-static $(TEST_ENV)
+	cd tests && $(MAKE) clean GC-small-static $(TEST_ENV) && $(MAKE) clean GCX-small-static $(TEST_ENV)
 	$(MAKE) realclean GCE-small-static
-	cd tests && $(MAKE) ARCH="$(ARCH)" clean GCE-small-static $(TEST_ENV)
+	cd tests && $(MAKE) clean GCE-small-static $(TEST_ENV)
 	@ $(ECHO) "$@ completed successfully."
 	$(MAKE) realclean GC
-	cd tests && $(MAKE) ARCH="$(ARCH)" clean GC $(TEST_ENV) && $(MAKE) ARCH="$(ARCH)" clean GCX $(TEST_ENV)
+	cd tests && $(MAKE) clean GC $(TEST_ENV) && $(MAKE) clean GCX $(TEST_ENV)
 	$(MAKE) realclean GCE
-	cd tests && $(MAKE) ARCH="$(ARCH)" clean GCE $(TEST_ENV)
+	cd tests && $(MAKE) clean GCE $(TEST_ENV)
 	$(MAKE) realclean GC-static
-	cd tests && $(MAKE) ARCH="$(ARCH)" clean GC-static $(TEST_ENV) && $(MAKE) ARCH="$(ARCH)" clean GCX-static $(TEST_ENV)
+	cd tests && $(MAKE) clean GC-static $(TEST_ENV) && $(MAKE) clean GCX-static $(TEST_ENV)
 	$(MAKE) realclean GCE-static
-	cd tests && $(MAKE) ARCH="$(ARCH)" clean GCE-static $(TEST_ENV)
+	cd tests && $(MAKE) clean GCE-static $(TEST_ENV)
 	$(MAKE) realclean
 
 all-tests-cflags:
