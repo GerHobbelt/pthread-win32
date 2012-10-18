@@ -79,7 +79,7 @@ RC		= $(CROSS)windres
 #ARCH	= 
 
 SUPPORTED_TARGETS	= $(filter pe-% pei-% elf32-% elf64-% srec symbolsrec verilog tekhex binary ihex,$(shell $(RC) --help))
-RC_TARGET			= --target $(filter $(SUPPORTED_TARGETS),$(shell $(OBJDUMP) -p $(firstword $(DLL_OBJS))))
+RC_TARGET			= --target $(filter $(SUPPORTED_TARGETS),$(shell $(OBJDUMP) -p $(firstword $(shell ls *.$(OBJEXT)))))
 
 OPT		=  $(CLEANUP) -O3 # -finline-functions -findirect-inlining
 XOPT	= 
