@@ -67,7 +67,7 @@ DLLTOOL = $(CROSS)dlltool
 CC      = $(CROSS)gcc
 CXX     = $(CROSS)g++
 RANLIB  = $(CROSS)ranlib
-OBJDUMP	= $(CROSS)objdump
+O_TARGETS	= $(filter $(SUPPORTED_TARGETS),$(shell $(CROSS)objdump -p *.$(OBJEXT)))
 RC		= $(CROSS)windres
 
 # Build for non-native architecture. E.g. "-m64" "-m32" etc.
@@ -84,7 +84,7 @@ RC		= $(CROSS)windres
 # to match that.
 #
 SUPPORTED_TARGETS	= $(filter pe-% pei-% elf32-% elf64-% srec symbolsrec verilog tekhex binary ihex,$(shell $(RC) --help))
-RC_TARGET			= --target $(filter $(SUPPORTED_TARGETS),$(shell $(OBJDUMP) -p $(firstword *.$(OBJEXT))))
+RC_TARGET			= --target $(firstword $(O_TARGETS))
 
 OPT		=  $(CLEANUP) -O3 # -finline-functions -findirect-inlining
 XOPT	= 
