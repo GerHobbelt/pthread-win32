@@ -78,8 +78,13 @@ RC		= $(CROSS)windres
 # a value.
 #ARCH	= 
 
+#
+# Look for targets that $(RC) (usually windres) supports then look at any object
+# file just built to see which target the compiler used and set the $(RC) target
+# to match that.
+#
 SUPPORTED_TARGETS	= $(filter pe-% pei-% elf32-% elf64-% srec symbolsrec verilog tekhex binary ihex,$(shell $(RC) --help))
-RC_TARGET			= --target $(filter $(SUPPORTED_TARGETS),$(shell $(OBJDUMP) -p $(firstword $(shell ls *.$(OBJEXT)))))
+RC_TARGET			= --target $(filter $(SUPPORTED_TARGETS),$(shell $(OBJDUMP) -p $(firstword *.$(OBJEXT))))
 
 OPT		=  $(CLEANUP) -O3 # -finline-functions -findirect-inlining
 XOPT	= 
