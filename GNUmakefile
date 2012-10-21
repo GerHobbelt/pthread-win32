@@ -67,8 +67,8 @@ DLLTOOL = $(CROSS)dlltool
 CC      = $(CROSS)gcc
 CXX     = $(CROSS)g++
 RANLIB  = $(CROSS)ranlib
-O_TARGETS	= $(filter $(SUPPORTED_TARGETS),$(shell $(CROSS)objdump -p *.$(OBJEXT)))
 RC		= $(CROSS)windres
+OD_PRIVATE	= $(CROSS)objdump -p
 
 # Build for non-native architecture. E.g. "-m64" "-m32" etc.
 # Not fully tested fully, needs gcc built with "--enable-multilib"
@@ -81,10 +81,10 @@ RC		= $(CROSS)windres
 #
 # Look for targets that $(RC) (usually windres) supports then look at any object
 # file just built to see which target the compiler used and set the $(RC) target
-# to match that.
+# to match it.
 #
 SUPPORTED_TARGETS	= $(filter pe-% pei-% elf32-% elf64-% srec symbolsrec verilog tekhex binary ihex,$(shell $(RC) --help))
-RC_TARGET			= --target $(firstword $(O_TARGETS))
+RC_TARGET			= --target $(firstword $(filter $(SUPPORTED_TARGETS),$(shell $(OD_PRIVATE) *.$(OBJEXT))))
 
 OPT		=  $(CLEANUP) -O3 # -finline-functions -findirect-inlining
 XOPT	= 
