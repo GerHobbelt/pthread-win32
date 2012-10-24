@@ -8,9 +8,10 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2012 Pthreads-win32 contributors
  *
- *      Contact Email: rpj@callisto.canberra.edu.au
+ *      Homepage1: http://sourceware.org/pthreads-win32/
+ *      Homepage2: http://sourceforge.net/projects/pthreads4w/
  *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
@@ -69,11 +70,8 @@
  * - main thread also has a POSIX thread identity
  *
  * Pass Criteria:
- * - stdout matches file reference/tsd1.out
  *
  * Fail Criteria:
- * - fails to match file reference/tsd1.out
- * - output identifies failed component
  */
 
 #include <sched.h>
@@ -193,19 +191,19 @@ test_tsd1(void)
 
   for (i = 1; i < NUM_THREADS; i++)
     {
-	/*
-	 * The counter is incremented once when the key is set to
-	 * a value, and again when the key is destroyed. If the key
-	 * doesn't get set for some reason then it will still be
-	 * NULL and the destroy function will not be called, and
-	 * hence accesscount will not equal 2.
-	 */
-	if (accesscount[i] != 2)
-	  {
-	    fail++;
-	    fprintf(stderr, "Thread %d key, set = %d, destroyed = %d\n",
-			i, thread_set[i], thread_destroyed[i]);
-	  }
+      /*
+       * The counter is incremented once when the key is set to
+       * a value, and again when the key is destroyed. If the key
+       * doesn't get set for some reason then it will still be
+       * NULL and the destroy function will not be called, and
+       * hence accesscount will not equal 2.
+       */
+      if (accesscount[i] != 2)
+        {
+          fail++;
+          fprintf(stderr, "Thread %d key, set = %d, destroyed = %d\n",
+              i, thread_set[i], thread_destroyed[i]);
+        }
     }
 
   fflush(stderr);

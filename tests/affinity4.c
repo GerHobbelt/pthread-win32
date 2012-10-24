@@ -8,6 +8,9 @@
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2012 Pthreads-win32 contributors
  *
+ *      Homepage1: http://sourceware.org/pthreads-win32/
+ *      Homepage2: http://sourceforge.net/projects/pthreads4w/
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
@@ -56,7 +59,7 @@ main()
   if (CPU_COUNT(&threadCpus) > 1)
     {
 	  CPU_AND(&threadCpus, &threadCpus, &keepCpus);
-	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), (DWORD_PTR)threadCpus.cpuset /* Violating Opacity */);
+	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), (*(PDWORD_PTR)&threadCpus) /* Violating Opacity */);
 	  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &threadCpus) == 0);
 	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), vThreadMask);
 	  assert(vThreadMask != 0);

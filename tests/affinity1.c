@@ -8,6 +8,9 @@
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2012 Pthreads-win32 contributors
  *
+ *      Homepage1: http://sourceware.org/pthreads-win32/
+ *      Homepage2: http://sourceforge.net/projects/pthreads4w/
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
@@ -46,6 +49,7 @@ main()
   cpu_set_t src2mask;
   cpu_set_t src3mask;
 
+  CPU_ZERO(&newmask);
   CPU_ZERO(&src1mask);
   memset(&src2mask, 0, sizeof(cpu_set_t));
   assert(memcmp(&src1mask, &src2mask, sizeof(cpu_set_t)) == 0);

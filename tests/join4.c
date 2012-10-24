@@ -6,9 +6,10 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2012 Pthreads-win32 contributors
  *
- *      Contact Email: rpj@callisto.canberra.edu.au
+ *      Homepage1: http://sourceware.org/pthreads-win32/
+ *      Homepage2: http://sourceforge.net/projects/pthreads4w/
  *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
@@ -76,15 +77,14 @@ int
         assert(pthread_timedjoin_np(id, &result, &abstime) == ETIMEDOUT);
         assert((int)(size_t)result == -1);
 
-        /* Test for pthread_tryjoin_np behaviour by setting abstime to the past */
-        abstime.tv_sec -= 1;
-        assert(pthread_timedjoin_np(id, &result, &abstime) == ETIMEDOUT); /* i.e. EBUSY */
+        /* Test for pthread_tryjoin_np behaviour before thread has exited */
+        assert(pthread_tryjoin_np(id, &result) == EBUSY);
         assert((int)(size_t)result == -1);
 
         Sleep(500);
 
         /* Test for pthread_tryjoin_np behaviour after thread has exited */
-        assert(pthread_timedjoin_np(id, &result, &abstime) == 0);
+        assert(pthread_tryjoin_np(id, &result) == 0);
         assert((int)(size_t)result == 999);
 
         /* Success. */

@@ -9,7 +9,7 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2012 Pthreads-win32 contributors
  *
  *      Contact Email: Ross.Johnson@homemail.com.au
  *
@@ -210,7 +210,6 @@ typedef struct ptw32_mcs_node_t_*    ptw32_mcs_lock_t;
 typedef struct ptw32_robust_node_t_  ptw32_robust_node_t;
 typedef struct ptw32_thread_t_       ptw32_thread_t;
 
-
 struct ptw32_thread_t_
 {
   unsigned __int64 seqNumber;	/* Process-unique thread sequence number */
@@ -242,7 +241,7 @@ struct ptw32_thread_t_
   int cancelType;
   int implicit:1;
   DWORD thread;			/* Windows thread ID */
-  cpu_set_t cpuset;		/* Thread CPU affinity set */
+  size_t cpuset;		/* Thread CPU affinity set */
 #if defined(_UWIN)
   DWORD dummy[5];
 #endif
@@ -457,6 +456,12 @@ struct pthread_rwlockattr_t_
 {
   int pshared;
 };
+
+typedef union
+{
+  char cpuset[CPU_SETSIZE/8];
+  size_t _cpuset;
+} _sched_cpu_set_vector_;
 
 typedef struct ThreadKeyAssoc ThreadKeyAssoc;
 

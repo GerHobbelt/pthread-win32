@@ -11,9 +11,10 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2012 Pthreads-win32 contributors
  *
- *      Contact Email: rpj@callisto.canberra.edu.au
+ *      Homepage1: http://sourceware.org/pthreads-win32/
+ *      Homepage2: http://sourceforge.net/projects/pthreads4w/
  *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
@@ -103,7 +104,7 @@
  * We force all calls to cdecl even though this could slow Watcom code down
  * slightly. If you know that the Watcom compiler will be used to build both
  * the DLL and application, then you can probably define this as a null string.
- * Remember that pthread.h (this file) is used for both the DLL and application builds.
+ * Remember that sched.h (this file) is used for both the DLL and application builds.
  */
 #if !defined(PTW32_CDECL)
 # define PTW32_CDECL __cdecl
@@ -192,14 +193,31 @@ struct sched_param {
  * cpusetsize parameter "normally set to sizeof(cpu_set_t)".
  */
 
-typedef size_t _sched_cpu_set_vector_;
+#define CPU_SETSIZE (sizeof(size_t)*8)
 
-struct _sched_cpu_set_t_
+#define CPU_COUNT(setptr) (_sched_affinitycpucount(setptr))
+
+#define CPU_ZERO(setptr) (_sched_affinitycpuzero(setptr))
+
+#define CPU_SET(cpu, setptr) (_sched_affinitycpuset((cpu),(setptr)))
+
+#define CPU_CLR(cpu, setptr) (_sched_affinitycpuclr((cpu),(setptr)))
+
+#define CPU_ISSET(cpu, setptr) (_sched_affinitycpuisset((cpu),(setptr)))
+
+#define CPU_AND(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuand((destsetptr),(srcset1ptr),(srcset2ptr)))
+
+#define CPU_OR(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuor((destsetptr),(srcset1ptr),(srcset2ptr)))
+
+#define CPU_XOR(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuxor((destsetptr),(srcset1ptr),(srcset2ptr)))
+
+#define CPU_EQUAL(set1ptr, set2ptr) (_sched_affinitycpuequal((set1ptr),(set2ptr)))
+
+typedef union
 {
-  _sched_cpu_set_vector_	cpuset;
-};
-
-typedef struct _sched_cpu_set_t_ cpu_set_t;
+  char cpuset[CPU_SETSIZE/8];
+  size_t _align;
+} cpu_set_t;
 
 #if defined(__cplusplus)
 extern "C"
@@ -242,24 +260,6 @@ PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuor(cpu_set_t *pdestset, const c
 PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuxor(cpu_set_t *pdestset, const cpu_set_t *psrcset1, const cpu_set_t *psrcset2);
 
 PTW32_DLLPORT int PTW32_CDECL _sched_affinitycpuequal (const cpu_set_t *pset1, const cpu_set_t *pset2);
-
-#define CPU_COUNT(setptr) (_sched_affinitycpucount(setptr))
-
-#define CPU_ZERO(setptr) (_sched_affinitycpuzero(setptr))
-
-#define CPU_SET(cpu, setptr) (_sched_affinitycpuset((cpu),(setptr)))
-
-#define CPU_CLR(cpu, setptr) (_sched_affinitycpuclr((cpu),(setptr)))
-
-#define CPU_ISSET(cpu, setptr) (_sched_affinitycpuisset((cpu),(setptr)))
-
-#define CPU_AND(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuand((destsetptr),(srcset1ptr),(srcset2ptr)))
-
-#define CPU_OR(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuor((destsetptr),(srcset1ptr),(srcset2ptr)))
-
-#define CPU_XOR(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuxor((destsetptr),(srcset1ptr),(srcset2ptr)))
-
-#define CPU_EQUAL(set1ptr, set2ptr) (_sched_affinitycpuequal((set1ptr),(set2ptr)))
 
 /*
  * Note that this macro returns ENOTSUP rather than

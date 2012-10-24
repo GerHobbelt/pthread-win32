@@ -4,10 +4,11 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
- *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *      Copyright(C) 1999,2012 Pthreads-win32 contributors
+ *
+ *      Homepage1: http://sourceware.org/pthreads-win32/
+ *      Homepage2: http://sourceforge.net/projects/pthreads4w/
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
@@ -42,23 +43,12 @@
  * as __CLEANUP_C.
  */
 
-#if defined(__MINGW64__)
-#  define PTW32_ARCH "x64 (mingw64)"
-#elif defined (__MINGW32__)
-#  define PTW32_ARCH "x86 (mingw32)"
-#elif defined(PTW32_ARCHx64)
-#  define PTW32_ARCH "x64"
-#elif defined(PTW32_ARCHx86)
-#  define PTW32_ARCH "x86"
-#elif defined(_WIN64)
-#  define PTW32_ARCH "x64"
-#elif defined(_WIN32)
-#  define PTW32_ARCH "x86"
-#else
-#error undefined PTW32_ARCH
-#endif
-
 #if defined(PTW32_RC_MSC)
+#  if defined(PTW32_ARCHx64)
+#    define PTW32_ARCH "x64"
+#  elif defined(PTW32_ARCHx86)
+#    define PTW32_ARCH "x86"
+#  endif
 #  if defined(__CLEANUP_C)
 #    define PTW32_VERSIONINFO_NAME "pthreadVC2.DLL\0"
 #    define PTW32_VERSIONINFO_DESCRIPTION "MS C " PTW32_ARCH "\0"
@@ -72,6 +62,11 @@
 #    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
 #elif defined(__GNUC__)
+#  if defined(_M_X64)
+#    define PTW32_ARCH "x64 (mingw64)"
+#  else
+#    define PTW32_ARCH "x86 (mingw32)"
+#  endif
 #  if defined(__CLEANUP_C)
 #    define PTW32_VERSIONINFO_NAME "pthreadGC2.DLL\0"
 #    define PTW32_VERSIONINFO_DESCRIPTION "GNU C " PTW32_ARCH "\0"
@@ -82,6 +77,11 @@
 #    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
 #elif defined(__BORLANDC__)
+#  if defined(_M_X64)
+#    define PTW32_ARCH "x64 (Borland)"
+#  else
+#    define PTW32_ARCH "x86 (Borland)"
+#  endif
 #  if defined(__CLEANUP_C)
 #    define PTW32_VERSIONINFO_NAME "pthreadBC2.DLL\0"
 #    define PTW32_VERSIONINFO_DESCRIPTION "BORLAND C " PTW32_ARCH "\0"
@@ -92,6 +92,11 @@
 #    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
 #elif defined(__WATCOMC__)
+#  if defined(_M_X64)
+#    define PTW32_ARCH "x64 (Watcom)"
+#  else
+#    define PTW32_ARCH "x86 (Watcom)"
+#  endif
 #  if defined(__CLEANUP_C)
 #    define PTW32_VERSIONINFO_NAME "pthreadWC2.DLL\0"
 #    define PTW32_VERSIONINFO_DESCRIPTION "WATCOM C " PTW32_ARCH "\0"

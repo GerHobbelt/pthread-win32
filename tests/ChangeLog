@@ -1,3 +1,43 @@
+2012-10-24  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* tsd3.c: New regression test for Stephane Clairet bug fix/report;
+	this test confirms that keys are deleted correctly prior to threads
+	exiting.
+	* tsd2.c: Modified comments and indentation.
+	* tsd1.c: Likewise.
+	* common.mk (tsd3): New test added.
+	* reorder.mk (tsd): Likewise.
+
+2012-10-16  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile (EXTRAVERSION): Naming option for libraries to be
+	consistent with MSVS Makefile; no longer automatically based on
+	ARCH setting.
+
+2012-10-10  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* cancel1.c: Fix comment typo.
+	* Makefile: Adding functionality to support rapid turnaround of
+	individual or small sets of tests; removed loadfree test.
+	* GNUmakefile: Likewise.
+	* Bmakefile: Removed loadfree test.
+	* Wmakefile: Likewise.
+	* common.mk: New makefile include file; split out common macros.
+	* runorder.mk: New makefile include file; split out run order rules
+	to allow selective inclusion.
+	* loadfree.c: Removed from suite; not required; unnecessarily
+	complicates the makefiles.
+
+2012-10-04  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* join4.c: Modified for pthread_tryjoin_np tests.
+
+2012-09-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile: Align target names with build makefile target names
+	following changes there; remove the separate static tests list.
+	* GNUmakefile: Likewise; consolidate rules.
+
 2012-09-25  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* context1.c (anotherEnding): Should exit the thread, not return.

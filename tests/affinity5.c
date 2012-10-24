@@ -8,6 +8,9 @@
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2012 Pthreads-win32 contributors
  *
+ *      Homepage1: http://sourceware.org/pthreads-win32/
+ *      Homepage2: http://sourceforge.net/projects/pthreads4w/
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
@@ -37,6 +40,13 @@
 
 #include "test.h"
 
+typedef union
+{
+	/* Violates opacity */
+	cpu_set_t cpuset;
+	unsigned long int bits;  /* To stop GCC complaining about %lx args to printf */
+} cpuset_to_ulint;
+
 void *
 mythread(void * arg)
 {
@@ -44,16 +54,17 @@ mythread(void * arg)
   cpu_set_t *parentCpus = (cpu_set_t*) arg;
   cpu_set_t threadCpus;
   DWORD_PTR vThreadMask;
-  unsigned long int a, b; /* To stop GCC complaining about %lx args to printf */
+  cpuset_to_ulint a, b;
 
   assert(pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &threadCpus) == 0);
   assert(CPU_EQUAL(parentCpus, &threadCpus));
-  vThreadMask = SetThreadAffinityMask(threadH, (DWORD_PTR)threadCpus.cpuset /* Violating Opacity */);
+  vThreadMask = SetThreadAffinityMask(threadH, (*(PDWORD_PTR)&threadCpus) /* Violating Opacity */);
   assert(vThreadMask != 0);
   assert(memcmp(&vThreadMask, &threadCpus, sizeof(DWORD_PTR)) == 0);
-  printf("Parent/Thread CPU affinity = 0x%lx/0x%lx\n",
-		  a = (unsigned long int)parentCpus->cpuset /* Violating Opacity */,
-		  b = (unsigned long int)threadCpus.cpuset) /* Violating Opacity */;
+  a.cpuset = *parentCpus;
+  b.cpuset = threadCpus;
+  /* Violates opacity */
+  printf("CPU affinity: Parent/Thread = 0x%lx/0x%lx\n", a.bits, b.bits);
 
   return (void*) 0;
 }
@@ -81,7 +92,7 @@ main()
 	  assert(pthread_join(tid, NULL) == 0);
 	  CPU_AND(&threadCpus, &threadCpus, &keepCpus);
 	  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &threadCpus) == 0);
-	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), (DWORD_PTR)threadCpus.cpuset /* Violating Opacity */);
+	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), (*(PDWORD_PTR)&threadCpus) /* Violating Opacity */);
 	  assert(vThreadMask != 0);
 	  assert(memcmp(&vThreadMask, &threadCpus, sizeof(DWORD_PTR)) == 0);
 	  assert(pthread_create(&tid, NULL, mythread, (void*)&threadCpus) == 0);

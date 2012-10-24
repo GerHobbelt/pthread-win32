@@ -4,9 +4,10 @@
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2005 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2012 Pthreads-win32 contributors
  *
- *      Contact Email: rpj@callisto.canberra.edu.au
+ *      Homepage1: http://sourceware.org/pthreads-win32/
+ *      Homepage2: http://sourceforge.net/projects/pthreads4w/
  *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
@@ -104,33 +105,23 @@
 #undef PTW32_LEVEL
 
 #if defined(_POSIX_SOURCE)
-#define PTW32_LEVEL 0
-/* Early POSIX */
+#define PTW32_LEVEL 0	/* Early POSIX */
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 199309
 #undef PTW32_LEVEL
-#define PTW32_LEVEL 1
-/* Include 1b, 1c and 1d */
+#define PTW32_LEVEL 1	/* Include 1b, 1c and 1d */
 #endif
 
 #if defined(INCLUDE_NP)
 #undef PTW32_LEVEL
-#define PTW32_LEVEL 2
-/* Include Non-Portable extensions */
+#define PTW32_LEVEL 2	/* Include Non-Portable extensions */
 #endif
 
 #define PTW32_LEVEL_MAX 3
 
 #if ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112 )  || !defined(PTW32_LEVEL)
-#define PTW32_LEVEL PTW32_LEVEL_MAX
-/* Include everything */
-#endif
-
-#if defined(_UWIN)
-#   define HAVE_STRUCT_TIMESPEC 1
-#   define HAVE_SIGNAL_H        1
-#   pragma comment(lib, "pthread")
+#define PTW32_LEVEL PTW32_LEVEL_MAX	/* Include everything */
 #endif
 
 #if defined(__MINGW32__) || defined(__MINGW64__)
@@ -228,23 +219,6 @@
 #endif
 
 /*
- * -----------------
- * autoconf switches
- * -----------------
- */
-#if !defined(NEED_FTIME)
-#include <time.h>
-#else /* NEED_FTIME */
-/* use native WIN32 time API */
-#endif /* NEED_FTIME */
-
-#if defined(HAVE_SIGNAL_H)
-#include <signal.h>
-#endif /* HAVE_SIGNAL_H */
-
-#include <limits.h>
-
-/*
  * Boolean values to make us independent of system includes.
  */
 enum {
@@ -261,14 +235,29 @@ enum {
 #  if defined(WINCE)
 #    define NEED_ERRNO
 #    define NEED_SEM
-#  endif
-#  if defined(__MINGW64__)
+#  elif defined(_UWIN)
+#    define HAVE_MODE_T
+#    define HAVE_STRUCT_TIMESPEC
+#    define HAVE_SIGNAL_H
+#  elif defined(__MINGW64__)
 #    define HAVE_STRUCT_TIMESPEC
 #    define HAVE_MODE_T
-#  elif defined(_UWIN) || defined(__MINGW32__)
+#  elif defined(__MINGW32__)
 #    define HAVE_MODE_T
 #  endif
 #endif
+
+#if !defined(NEED_FTIME)
+#include <time.h>
+#else /* NEED_FTIME */
+/* use native WIN32 time API */
+#endif /* NEED_FTIME */
+
+#if defined(HAVE_SIGNAL_H)
+#include <signal.h>
+#endif
+
+#include <limits.h>
 
 #if PTW32_LEVEL >= PTW32_LEVEL_MAX
 #if defined(NEED_ERRNO)
@@ -371,17 +360,17 @@ extern "C"
  * either indicates that sysconf(), which is not implemented, may be used at
  * runtime to check the status of the option.
  *
- * _POSIX_THREADS (== 200112L)
- *                      If == 200112L, you can use threads
+ * _POSIX_THREADS (== 20080912L)
+ *                      If == 20080912L, you can use threads
  *
- * _POSIX_THREAD_ATTR_STACKSIZE (== 200112L)
- *                      If == 200112L, you can control the size of a thread's
+ * _POSIX_THREAD_ATTR_STACKSIZE (== 200809L)
+ *                      If == 200809L, you can control the size of a thread's
  *                      stack
  *                              pthread_attr_getstacksize
  *                              pthread_attr_setstacksize
  *
  * _POSIX_THREAD_ATTR_STACKADDR (== -1)
- *                      If == 200112L, you can allocate and control a thread's
+ *                      If == 200809L, you can allocate and control a thread's
  *                      stack. If not supported, the following functions
  *                      will return ENOSYS, indicating they are not
  *                      supported:
@@ -396,13 +385,13 @@ extern "C"
  *                      writers over readers when threads have equal priority.
  *
  * _POSIX_THREAD_PRIO_INHERIT (== -1)
- *                      If == 200112L, you can create priority inheritance
+ *                      If == 200809L, you can create priority inheritance
  *                      mutexes.
  *                              pthread_mutexattr_getprotocol +
  *                              pthread_mutexattr_setprotocol +
  *
  * _POSIX_THREAD_PRIO_PROTECT (== -1)
- *                      If == 200112L, you can create priority ceiling mutexes
+ *                      If == 200809L, you can create priority ceiling mutexes
  *                      Indicates the availability of:
  *                              pthread_mutex_getprioceiling
  *                              pthread_mutex_setprioceiling
@@ -421,22 +410,24 @@ extern "C"
  *                              pthread_condattr_getpshared
  *                              pthread_condattr_setpshared
  *
- * _POSIX_THREAD_SAFE_FUNCTIONS (== 200112L)
- *                      If == 200112L you can use the special *_r library
+ * _POSIX_THREAD_SAFE_FUNCTIONS (== 200809L)
+ *                      If == 200809L you can use the special *_r library
  *                      functions that provide thread-safe behaviour
  *
- * _POSIX_READER_WRITER_LOCKS (== 200112L)
- *                      If == 200112L, you can use read/write locks
+ * _POSIX_READER_WRITER_LOCKS (== 200809L)
+ *                      If == 200809L, you can use read/write locks
  *
- * _POSIX_SPIN_LOCKS (== 200112L)
- *                      If == 200112L, you can use spin locks
+ * _POSIX_SPIN_LOCKS (== 200809L)
+ *                      If == 200809L, you can use spin locks
  *
- * _POSIX_BARRIERS (== 200112L)
- *                      If == 200112L, you can use barriers
+ * _POSIX_BARRIERS (== 200809L)
+ *                      If == 200809L, you can use barriers
  *
- *      + These functions provide both 'inherit' and/or
- *        'protect' protocol, based upon these macro
- *        settings.
+ * _POSIX_ROBUST_MUTEXES (== 200809L)
+ *                      If == 200809L, you can use robust mutexes
+ *                      Officially this should also imply
+ *                      _POSIX_THREAD_PROCESS_SHARED != -1 however
+ *                      not here yet.
  *
  * -------------------------------------------------------------
  */
@@ -461,6 +452,9 @@ extern "C"
 
 #undef _POSIX_THREAD_ATTR_STACKSIZE
 #define _POSIX_THREAD_ATTR_STACKSIZE 200809L
+
+#undef _POSIX_ROBUST_MUTEXES
+#define _POSIX_ROBUST_MUTEXES 200809L
 
 /*
  * The following options are not supported
@@ -592,6 +586,7 @@ typedef struct pthread_mutexattr_t_ * pthread_mutexattr_t;
 typedef struct pthread_cond_t_ * pthread_cond_t;
 typedef struct pthread_condattr_t_ * pthread_condattr_t;
 #endif
+
 typedef struct pthread_rwlock_t_ * pthread_rwlock_t;
 typedef struct pthread_rwlockattr_t_ * pthread_rwlockattr_t;
 typedef struct pthread_spinlock_t_ * pthread_spinlock_t;
@@ -1174,6 +1169,8 @@ PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_getkind_np(pthread_mutexattr_t *
 PTW32_DLLPORT int PTW32_CDECL pthread_timedjoin_np(pthread_t thread,
                                          void **value_ptr,
                                          const struct timespec *abstime);
+PTW32_DLLPORT int PTW32_CDECL pthread_tryjoin_np(pthread_t thread,
+                                         void **value_ptr);
 PTW32_DLLPORT int PTW32_CDECL pthread_setaffinity_np(pthread_t thread,
 										 size_t cpusetsize,
 										 const cpu_set_t *cpuset);

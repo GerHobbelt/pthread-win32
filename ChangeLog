@@ -1,3 +1,63 @@
+2012-10-24  Stephane Clairet <Stephane dot Clairet at 4d dot com>
+
+	* pthread_key_delete.c: Bug fix - move keylock release to after the
+	while loop. (This bug first was introduced at release 2.9.1) 
+
+2012-10-16  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile: Remove SDK environment setting; now needs to be done
+	explicitly before running any nmake.
+	* GNUmakefile: Move per command-line ARCH setting to TESTS_ENV.
+
+2012-10-04  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread_tryjoin_np.c: New API
+	* pthread.c (pthread_try_join_np): Added.
+	* common.mk (pthread_tryjoin_np): Added.
+	* pthread.h (pthread_tryjoin_np): Added.
+	* NEWS: Updated.
+	* README: Updated.
+	* ANNOUNCE: Updated.
+
+2012-10-02  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* sched.h (cpu_set_t): Redefined.
+	* implement.h (_sched_cpu_set_vector_): Created as the private equivalent
+	of cpu_set.
+	(pthread_thread_t_.cpuset): Type change. 
+	* sched_setaffinity.c: Reflect changes to cpu_set_t and _sched_cpu_set_vector_.
+	* pthread_setaffinity.c: Likewise.
+	* create.c: Likewise.
+	* pthread_self.c: Likewise.
+	* ptw32_new.c: Likewise.
+
+2012-09-28  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread.c: pulls all individual source modules into a single
+	translation unit.
+	* common.mk: Remove everything related to the non-inlined dll targets.
+	This removes all the intermediate .c files that #include other .c files
+	except for pthread.c.
+	* Makefile: Remove and rename targets; remove or edit variables. All
+	of this is to remove the intermediate translation unit aggregation
+	source files.
+	* GNUmakefile: Likewise.
+	* attr.c: Removed.
+	* barrier.c: Removed.
+	* cancel.c: Removed.
+	* condvar.c: Removed.
+	* exit.c: Removed.
+	* fork.c: Removed.
+	* misc.c: Removed.
+	* mutex.c: Removed.
+	* nonportable.c: Removed.
+	* private.c: Removed.
+	* rwlock.c: Removed.
+	* sched.c: Removed.
+	* spin.c: Removed.
+	* sync.c: Removed.
+	* tsd.c: Removed.
+
 2012-09-28  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* Makefile: expand on rudimentary install target; add DEST_LIB_NAME
