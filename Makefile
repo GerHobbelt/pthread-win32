@@ -9,11 +9,12 @@
 DLL_VER	= 2
 DLL_VERD= $(DLL_VER)d
 
-DEVROOT	= C:\pthreads
+DESTROOT	= ..\PTHREADS-BUILT
+DEST_LIB_NAME = pthread.lib
 
-DLLDEST	= $(DEVROOT)\dll
-LIBDEST	= $(DEVROOT)\lib
-HDRDEST	= $(DEVROOT)\include
+DLLDEST	= $(DESTROOT)\bin
+LIBDEST	= $(DESTROOT)\lib
+HDRDEST	= $(DESTROOT)\include
 
 DLLS	= pthreadVCE$(DLL_VER).dll pthreadVSE$(DLL_VER).dll pthreadVC$(DLL_VER).dll \
 		  pthreadVCE$(DLL_VERD).dll pthreadVSE$(DLL_VERD).dll pthreadVC$(DLL_VERD).dll
@@ -25,7 +26,7 @@ SMALL_STATIC_STAMPS	= pthreadVCE$(DLL_VER).small_stamp pthreadVSE$(DLL_VER).smal
 				  pthreadVCE$(DLL_VERD).small_stamp pthreadVSE$(DLL_VERD).small_stamp pthreadVC$(DLL_VERD).small_stamp
 
 CC	= cl
-CPPFLAGS = /I. /DHAVE_PTW32_CONFIG_H
+CPPFLAGS = /I. /DHAVE_CONFIG_H
 XCFLAGS = /W3 /MD /nologo
 CFLAGS	= /O2 /Ob2 $(XCFLAGS)
 CFLAGSD	= /Z7 $(XCFLAGS)
@@ -236,13 +237,23 @@ clean:
 	if exist *.i del *.i
 	if exist *.res del *.res
 
-
+# Very basic install. It assumes "realclean" was done just prior to build target if
+# you want the installed $(DEVDEST_LIB_NAME) to match that build.
 install:
-	if exist pthread*.dll copy pthread*.dll $(DLLDEST)
-	copy pthread*.lib $(LIBDEST)
+	if not exist $(DLLDEST) mkdir $(DLLDEST)
+	if not exist $(LIBDEST) mkdir $(LIBDEST)
+	if not exist $(HDRDEST) mkdir $(HDRDEST)
+	copy pthreadV*.dll $(DLLDEST)
+	copy pthreadV*.lib $(LIBDEST)
 	copy pthread.h $(HDRDEST)
 	copy sched.h $(HDRDEST)
 	copy semaphore.h $(HDRDEST)
+	if exist pthreadVC$(DLL_VER).lib copy pthreadVC$(DLL_VER).lib $(LIBDEST)\$(DEST_LIB_NAME)
+	if exist pthreadVC$(DLL_VERD).lib copy pthreadVC$(DLL_VERD).lib $(LIBDEST)\$(DEST_LIB_NAME)
+	if exist pthreadVCE$(DLL_VER).lib copy pthreadVCE$(DLL_VER).lib $(LIBDEST)\$(DEST_LIB_NAME)
+	if exist pthreadVCE$(DLL_VERD).lib copy pthreadVCE$(DLL_VERD).lib $(LIBDEST)\$(DEST_LIB_NAME)
+	if exist pthreadVSE$(DLL_VER).lib copy pthreadVSE$(DLL_VER).lib $(LIBDEST)\$(DEST_LIB_NAME)
+	if exist pthreadVSE$(DLL_VERD).lib copy pthreadVSE$(DLL_VERD).lib $(LIBDEST)\$(DEST_LIB_NAME)
 
 $(DLLS): $(DLL_OBJS)
 	$(CC) /LDd /Zi /nologo $(DLL_OBJS) /link /implib:$*.lib $(XLIBS) /out:$@

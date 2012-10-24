@@ -32,22 +32,31 @@
 DLL_VER	= 2
 DLL_VERD= $(DLL_VER)d
 
-DEVROOT	= C:\PTHREADS
-
-DLLDEST	= $(DEVROOT)\DLL
-LIBDEST	= $(DEVROOT)\DLL
+DESTROOT	= ../PTHREADS-BUILT
+DEST_LIB_NAME = libpthread.a
+DLLDEST	= $(DESTROOT)/bin
+LIBDEST	= $(DESTROOT)/lib
+HDRDEST	= $(DESTROOT)/include
 
 # If Running MsysDTK
 RM	= rm -f
 MV	= mv -f
 CP	= cp -f
+MKDIR	= mkdir -p
 ECHO	= echo
+TESTNDIR = test ! -d
+TESTFILE = test -f
+AND	= &&
 
 # If not.
 #RM	= erase
 #MV	= rename
 #CP	= copy
+#MKDIR	= mkdir
 #ECHO	= echo
+#TESTNDIR = if exist
+#TESTFILE = if exist
+# AND = 
 
 # For cross compiling use e.g.
 # make CROSS=x86_64-w64-mingw32- clean GC-inlined
@@ -108,7 +117,7 @@ GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
 
 ## Mingw
 #MAKE		?= make
-CFLAGS	= $(OPT) $(XOPT) -I. -DHAVE_PTW32_CONFIG_H -Wall
+CFLAGS	= $(OPT) $(XOPT) -I. -DHAVE_CONFIG_H -Wall
 
 OBJEXT = o
 RESEXT = o
@@ -219,6 +228,22 @@ GC-small-static-debug:
 tests:
 	@ cd tests
 	@ $(MAKE) auto
+
+# Very basic install. It assumes "realclean" was done just prior to build target if
+# you want the installed $(DEVDEST_LIB_NAME) to match that build.
+install:
+	-$(TESTNDIR) $(DLLDEST) $(AND) $(MKDIR) $(DLLDEST)
+	-$(TESTNDIR) $(LIBDEST) $(AND) $(MKDIR) $(LIBDEST)
+	-$(TESTNDIR) $(HDRDEST) $(AND) $(MKDIR) $(HDRDEST)
+	$(CP) pthreadGC*.dll $(DLLDEST)
+	$(CP) libpthreadGC*.a $(LIBDEST)
+	$(CP) pthread.h $(HDRDEST)
+	$(CP) sched.h $(HDRDEST)
+	$(CP) semaphore.h $(HDRDEST)
+	-$(TESTFILE) libpthreadGC$(DLL_VER).a $(AND) $(CP) libpthreadGC$(DLL_VER).a $(LIBDEST)/$(DEST_LIB_NAME)
+	-$(TESTFILE) libpthreadGC$(DLL_VERD).a $(AND) $(CP) libpthreadGC$(DLL_VERD).a $(LIBDEST)/$(DEST_LIB_NAME)
+	-$(TESTFILE) libpthreadGCE$(DLL_VER).a $(AND) $(CP) libpthreadGCE$(DLL_VER).a $(LIBDEST)/$(DEST_LIB_NAME)
+	-$(TESTFILE) libpthreadGCE$(DLL_VERD).a $(AND) $(CP) libpthreadGCE$(DLL_VERD).a $(LIBDEST)/$(DEST_LIB_NAME)
 
 %.pre: %.c
 	$(CC) -E -o $@ $(CFLAGS) $^

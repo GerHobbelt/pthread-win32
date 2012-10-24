@@ -34,6 +34,10 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 /* [i_a] sanity build checks */
 #if defined(_MSC_VER) && (defined(_WIN32) || defined(_WIN64))
 #if   !defined(PTW32_STATIC_LIB) && !defined(_WINDLL)

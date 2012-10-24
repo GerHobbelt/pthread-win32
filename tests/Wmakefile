@@ -62,7 +62,7 @@ WCDLL	= pthreadWC$(DLL_VER).dll
 # C++ Exceptions in application - using WC version of pthreads dll
 WCXFLAGS	= -xs -d__CLEANUP_C
 
-CFLAGS= -w4 -e25 -d_WIN32_WINNT=0x400 -d_REENTRANT -zq -bm $(OPTIM) -5r -bt=nt -mf -d2
+CFLAGS= -w4 -e25 -d_REENTRANT -zq -bm $(OPTIM) -5r -bt=nt -mf -d2
 
 LFLAGS= 
 INCLUDES= -i=.

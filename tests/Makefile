@@ -88,7 +88,7 @@ EHFLAGS	=
 
 PASSES = sizes.pass $(REGULAR_PASSES)
 
-REGULAR_PASSES = fiber1.pass  \
+REGULAR_PASSES = \
 	  loadfree.pass \
 	  self1.pass  mutex5.pass  \
 	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
@@ -137,7 +137,7 @@ STRESSRESULTS = \
 	  stress1.stress
 
 STATICRESULTS = \
-	  fiber1.pass  sizes.pass  \
+	  sizes.pass  \
 	  self1.pass  mutex5.pass  \
 	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
 	  semaphore1.pass  semaphore2.pass  semaphore3.pass  \
@@ -429,7 +429,6 @@ exit3.pass: create1.pass
 exit4.pass:
 exit5.pass: exit4.pass kill1.pass
 eyal1.pass: tsd1.pass
-fiber1.pass:
 inherit1.pass: join1.pass priority1.pass
 join0.pass: create1.pass
 join1.pass: create1.pass

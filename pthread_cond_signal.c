@@ -39,6 +39,10 @@
  * See the comments at the top of pthread_cond_wait.c.
  */
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include "pthread.h"
 #include "implement.h"
 
