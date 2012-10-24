@@ -1,3 +1,19 @@
+2012-09-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* sched_setaffinity.c: New API to set process CPU affinity in POSIX
+	context; compatibility with Linux.
+	* pthread_setaffinity.c: Likewise.
+	* implement.h (pthread_t_): Added cpuset element.
+	* sched.h: Added new prototypes. 
+	* sched.h (cpu_set_t): Support for new process and thread affinity API.
+	* pthread.h: Added new prototypes.
+
+2012-09-16  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* README (Version numbering): Changes back to major.minor.micro.
+	* README.NONPORTABLE: Updated description around process/thread
+	attach/detach routines.
+
 2012-09-05  Daniel Richard. G <danielg at teragram dot com>
 
 	* implement.h: whitespace adjustment.

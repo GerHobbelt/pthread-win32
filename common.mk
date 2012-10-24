@@ -120,6 +120,7 @@ SMALL_STATIC_OBJS	= \
 		pthread_rwlockattr_init.$(OBJEXT) \
 		pthread_rwlockattr_setpshared.$(OBJEXT) \
 		pthread_self.$(OBJEXT) \
+		pthread_setaffinity.$(OBJEXT) \
 		pthread_setcancelstate.$(OBJEXT) \
 		pthread_setcanceltype.$(OBJEXT) \
 		pthread_setconcurrency.$(OBJEXT) \
@@ -158,6 +159,7 @@ SMALL_STATIC_OBJS	= \
 		sched_get_priority_max.$(OBJEXT) \
 		sched_get_priority_min.$(OBJEXT) \
 		sched_getscheduler.$(OBJEXT) \
+		sched_setaffinity.$(OBJEXT) \
 		sched_setscheduler.$(OBJEXT) \
 		sched_yield.$(OBJEXT) \
 		sem_close.$(OBJEXT) \
@@ -254,6 +256,7 @@ NONPORTABLE_SRCS = \
 		pthread_getw32threadhandle_np.c \
 		pthread_getunique_np.c \
 		pthread_timedjoin_np.c \
+		pthread_setaffinity.c \
 		pthread_delay_np.c \
 		pthread_num_processors_np.c \
 		pthread_win32_attach_detach_np.c \
@@ -311,7 +314,8 @@ SCHED_SRCS	= \
 		sched_get_priority_min.c \
 		sched_setscheduler.c \
 		sched_getscheduler.c \
-		sched_yield.c
+		sched_yield.c \
+		sched_setaffinity.c
 
 SEMAPHORE_SRCS = \
 		sem_init.c \

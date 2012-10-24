@@ -119,7 +119,7 @@ sem_post (sem_t * sem)
 
   if (result != 0)
     {
-      errno = result;
+      PTW32_SET_ERRNO(result);
       return -1;
     }
 

@@ -303,7 +303,7 @@ ptw32_cond_wait_cleanup (void *args)
       /* Use the non-cancellable version of sem_wait() */
       if (ptw32_semwait (&(cv->semBlockLock)) != 0)
 	{
-	  *resultPtr = errno;
+	  *resultPtr = PTW32_GET_ERRNO();
 	  /*
 	   * This is a fatal error for this CV,
 	   * so we deliberately don't unlock
@@ -314,7 +314,7 @@ ptw32_cond_wait_cleanup (void *args)
       cv->nWaitersBlocked -= cv->nWaitersGone;
       if (sem_post (&(cv->semBlockLock)) != 0)
 	{
-	  *resultPtr = errno;
+	  *resultPtr = PTW32_GET_ERRNO();
 	  /*
 	   * This is a fatal error for this CV,
 	   * so we deliberately don't unlock
@@ -335,7 +335,7 @@ ptw32_cond_wait_cleanup (void *args)
     {
       if (sem_post (&(cv->semBlockLock)) != 0)
 	{
-	  *resultPtr = errno;
+	  *resultPtr = PTW32_GET_ERRNO();
 	  return;
 	}
     }
@@ -430,7 +430,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
        */
       if (sem_timedwait (&(cv->semBlockQueue), abstime) != 0)
 	{
-	  result = errno;
+	  result = PTW32_GET_ERRNO();
 	}
     }
 

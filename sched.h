@@ -39,6 +39,12 @@
 #if !defined(_SCHED_H)
 #define _SCHED_H
 
+#if !defined(_WIN32_WINNT)
+# define _WIN32_WINNT 0x0400
+#endif
+
+#include <windows.h>
+
 #undef PTW32_SCHED_LEVEL
 
 #if defined(_POSIX_SOURCE)
@@ -149,6 +155,15 @@ struct sched_param {
   int sched_priority;
 };
 
+/* CPU affinity */
+
+#if ! defined(MAXULONG_PTR)
+/* DWORD_PTR is not defined */
+typedef size_t DWORD_PTR, *PDWORD_PTR;
+#endif
+
+typedef DWORD_PTR cpu_set_t;
+
 #if defined(__cplusplus)
 extern "C"
 {
@@ -163,6 +178,35 @@ PTW32_DLLPORT int __cdecl sched_get_priority_max (int policy);
 PTW32_DLLPORT int __cdecl sched_setscheduler (pid_t pid, int policy);
 
 PTW32_DLLPORT int __cdecl sched_getscheduler (pid_t pid);
+
+/* Compatibility with Linux - not standard */
+
+PTW32_DLLPORT int __cdecl sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
+
+PTW32_DLLPORT int __cdecl sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
+
+PTW32_DLLPORT int __cdecl CpuCount (cpu_set_t *set);
+
+/*
+ * Support macros for cpu_set_t
+ */
+#define CPU_ZERO(setptr) ((void)(*(setptr) = (cpu_set_t)0))
+
+#define CPU_SET(cpu, setptr) ((void)(*(setptr) |= ((cpu_set_t)1 << (cpu))))
+
+#define CPU_CLR(cpu, setptr) ((void)(*(setptr) &= (~((cpu_set_t)1 << (cpu)))))
+
+#define CPU_ISSET(cpu, setptr) (((*(setptr) & ((cpu_set_t)1 << (cpu))) != (cpu_set_t)0))
+
+#define CPU_AND(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) & (size_t)*(srcset2ptr))))
+
+#define CPU_OR(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) | (size_t)*(srcset2ptr))))
+
+#define CPU_XOR(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) ^ (size_t)*(srcset2ptr))))
+
+#define CPU_EQUAL(set1ptr, set2ptr) (((size_t)*(set1ptr) == (size_t)*(set2ptr)))
+
+#define CPU_COUNT(setptr) (CpuCount(setptr))
 
 /*
  * Note that this macro returns ENOTSUP rather than

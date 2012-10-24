@@ -1203,6 +1203,12 @@ PTW32_DLLPORT int PTW32_CDECL pthread_mutexattr_getkind_np(pthread_mutexattr_t *
 PTW32_DLLPORT int PTW32_CDECL pthread_timedjoin_np(pthread_t thread,
                                          void **value_ptr,
                                          const struct timespec *abstime);
+PTW32_DLLPORT int PTW32_CDECL pthread_setaffinity_np(pthread_t thread,
+										 size_t cpusetsize,
+										 const cpu_set_t *cpuset);
+PTW32_DLLPORT int PTW32_CDECL pthread_getaffinity_np(pthread_t thread,
+										 size_t cpusetsize,
+										 cpu_set_t *cpuset);
 
 /*
  * Possibly supported by other POSIX threads implementations
@@ -1225,8 +1231,8 @@ PTW32_DLLPORT int PTW32_CDECL pthread_win32_thread_detach_np(void);
  */
 PTW32_DLLPORT int PTW32_CDECL pthread_win32_test_features_np(int);
 enum ptw32_features {
-  PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE = 0x0001, /* System provides it. */
-  PTW32_ALERTABLE_ASYNC_CANCEL              = 0x0002  /* Can cancel blocked threads. */
+  PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE = 0x0001,	/* System provides it. */
+  PTW32_ALERTABLE_ASYNC_CANCEL              = 0x0002	/* Can cancel blocked threads. */
 };
 
 /*
@@ -1288,6 +1294,30 @@ PTW32_DLLPORT int PTW32_CDECL pthreadCancelableTimedWait (HANDLE waitHandle,
 #      endif
 #    endif
 #  endif
+#endif
+
+/*
+ * If pthreads-win32 is compiled as a DLL, and both it and
+ * the application are linked against the static C runtime
+ * (i.e. with the /MT compiler flag), then the application
+ * will not be able to see errno values produced by the
+ * library. Refer to the following links for details:
+ *
+ * http://support.microsoft.com/kb/94248
+ * (Section 4: Problems Encountered When Using Multiple CRT Libraries)
+ *
+ * http://social.msdn.microsoft.com/forums/en-US/vclanguage/thread/b4500c0d-1b69-40c7-9ef5-08da1025b5bf
+ *
+ * When pthreads-win32 is built with PTW32_BROKEN_ERRNO
+ * defined, in addition to setting errno when errors occur,
+ * it will also call SetLastError() with the same value.
+ * The application can then use GetLastError() to obtain the
+ * value of errno.
+ *
+ * Note: "_DLL" implies the /MD compiler flag.
+ */
+#if !defined(_DLL) && !defined(PTW32_STATIC_LIB)
+#  define PTW32_BROKEN_ERRNO
 #endif
 
 /*

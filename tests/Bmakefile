@@ -113,7 +113,7 @@ PASSES=   loadfree.pass \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
-	  cancel9.pass  create3.pass  stress1.pass
+	  cancel9.pass  create3.pass  create3a.pass  affinity1.pass  affinity2.pass  stress1.pass
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
@@ -224,6 +224,9 @@ benchtest2.bench:
 benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
+
+affinity1.pass:
+affinity2.pass: affinity1.pass
 barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass
 barrier3.pass: barrier2.pass
@@ -264,6 +267,7 @@ count1.pass: join1.pass
 create1.pass: mutex2.pass
 create2.pass: create1.pass
 create3.pass:
+create3a.pass:
 delay1.pass:
 delay2.pass: delay1.pass
 detach1.pass: join0.pass

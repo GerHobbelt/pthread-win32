@@ -133,7 +133,7 @@ sem_post_multiple (sem_t * sem, int count)
 
   if (result != 0)
     {
-      errno = result;
+      PTW32_SET_ERRNO(result);
       return -1;
     }
 

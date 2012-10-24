@@ -120,7 +120,7 @@ sched_get_priority_max (int policy)
 {
   if (policy < SCHED_MIN || policy > SCHED_MAX)
     {
-      errno = EINVAL;
+      PTW32_SET_ERRNO(EINVAL);
       return -1;
     }
 

@@ -92,3 +92,10 @@ _errno (void)
 }				/* _errno */
 
 #endif /* (NEED_ERRNO) */
+
+#if ! defined(PTW32_BUILD_INLINED)
+/*
+ * Avoid "translation unit is empty" warnings
+ */
+typedef int foo;
+#endif

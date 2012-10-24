@@ -130,7 +130,7 @@ sem_wait (sem_t * sem)
 	  if (*sem == NULL)
 	    {
 	      (void) pthread_mutex_unlock (&s->lock);
-	      errno = EINVAL;
+	      PTW32_SET_ERRNO(EINVAL);
 	      return -1;
 	    }
 
@@ -158,7 +158,7 @@ sem_wait (sem_t * sem)
 	      if (*sem == NULL)
 	        {
 	          (void) pthread_mutex_unlock (&s->lock);
-	          errno = EINVAL;
+	          PTW32_SET_ERRNO(EINVAL);
 	          return -1;
 	        }
 
@@ -178,7 +178,7 @@ sem_wait (sem_t * sem)
 
   if (result != 0)
     {
-      errno = result;
+      PTW32_SET_ERRNO(result);
       return -1;
     }
 

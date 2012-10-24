@@ -124,7 +124,7 @@ TESTS	= \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
 	  exception1 exception2 exception3_0 exception3 \
-	  cancel9 stress1
+	  cancel9 affinity1 affinity2 stress1
 
 STRESSTESTS = \
 	stress1
@@ -163,7 +163,7 @@ STATICTESTS = \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
 	  exception1 exception2 exception3_0 exception3 \
-	  cancel9 stress1
+	  cancel9 affinity1 affinity2 stress1
 
 ALLTESTS = $(TESTS) $(BENCHTESTS)
 
@@ -253,6 +253,8 @@ benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
 
+affinity1.pass:
+affinity2.pass: affinity1.pass
 barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass
 barrier3.pass: barrier2.pass

@@ -79,7 +79,7 @@ sem_getvalue (sem_t * sem, int *sval)
 {
   if (sem == NULL || *sem == NULL || sval == NULL)
     {
-      errno = EINVAL;
+      PTW32_SET_ERRNO(EINVAL);
       return -1;
     }
   else
@@ -95,7 +95,7 @@ sem_getvalue (sem_t * sem, int *sval)
 	  if (*sem == NULL)
 	    {
 	      (void) pthread_mutex_unlock (&s->lock);
-	      errno = EINVAL;
+	      PTW32_SET_ERRNO(EINVAL);
 	      return -1;
 	    }
 

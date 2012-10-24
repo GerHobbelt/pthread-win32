@@ -52,6 +52,39 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #endif
 
 /*
+ * Designed to allow error values to be set and retrieved in builds where
+ * MSCRT libraries are statically linked to DLLs.
+ */
+#if ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0800 ) || \
+    ( defined(_MSC_VER) && _MSC_VER >= 1400 )  /* MSVC8+ */
+#  if defined(PTW32_CONFIG_MINGW)
+__attribute__((unused))
+#  endif
+static int ptw32_get_errno(void) { int err = 0; _get_errno(&err); return err; }
+#  define PTW32_GET_ERRNO() ptw32_get_errno()
+#  if defined(PTW32_BROKEN_ERRNO)
+#    if defined(PTW32_CONFIG_MINGW)
+__attribute__((unused))
+#    endif
+static void ptw32_set_errno(int err) { _set_errno(err); SetLastError(err); }
+#    define PTW32_SET_ERRNO(err) ptw32_set_errno(err)
+#  else
+#    define PTW32_SET_ERRNO(err) _set_errno(err)
+#  endif
+#else
+#  define PTW32_GET_ERRNO() (errno)
+#  if defined(PTW32_BROKEN_ERRNO)
+#    if defined(PTW32_CONFIG_MINGW)
+__attribute__((unused))
+#    endif
+static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
+#    define PTW32_SET_ERRNO(err) ptw32_set_errno(err)
+#  else
+#    define PTW32_SET_ERRNO(err) (errno = (err))
+#  endif
+#endif
+
+/*
  * note: ETIMEDOUT is correctly defined in winsock.h
  */
 #include <winsock.h>
@@ -82,10 +115,13 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #include "semaphore.h"
 #include "sched.h"
 
-#if ( defined(HAVE_C_INLINE) || defined(__cplusplus) ) && defined(PTW32_BUILD_INLINED)
-# define INLINE inline
-#else
-# define INLINE
+/* MSVC 7.1 doesn't like complex #if expressions */
+#define INLINE
+#if defined(PTW32_BUILD_INLINED)
+#  if defined(HAVE_C_INLINE) || defined(__cplusplus)
+#    undef INLINE
+#    define INLINE inline
+#  endif
 #endif
 
 #if defined(PTW32_CONFIG_MSVC6)
@@ -201,7 +237,8 @@ struct ptw32_thread_t_
   int cancelState;
   int cancelType;
   int implicit:1;
-  DWORD thread;			/* Win32 thread ID */
+  DWORD thread;			/* Windows thread ID */
+  cpu_set_t cpuset;		/* Thread CPU affinity set */
 #if defined(_UWIN)
   DWORD dummy[5];
 #endif

@@ -1,3 +1,10 @@
+2012-09-20  Ross Johnson  <ross at homemail dot com dot au>
+
+	* cpu_set.html: New manual page.
+	* pthread_create.html: Updated.
+	* index.html: Updated.
+	* sched_setaffinity.html: Fixed corrupted formatting.
+	
 2012-08-19  Ross Johnson  <ross at homemail dot com dot au>
 
 	* pthread_join.html(pthread_timedjoin_np): Added.

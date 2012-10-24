@@ -112,7 +112,7 @@ ptw32_cond_unblock (pthread_cond_t * cond, int unblockAll)
       /* Use the non-cancellable version of sem_wait() */
       if (ptw32_semwait (&(cv->semBlockLock)) != 0)
 	{
-	  result = errno;
+	  result = PTW32_GET_ERRNO();
 	  (void) pthread_mutex_unlock (&(cv->mtxUnblockLock));
 	  return result;
 	}
@@ -141,7 +141,7 @@ ptw32_cond_unblock (pthread_cond_t * cond, int unblockAll)
     {
       if (sem_post_multiple (&(cv->semBlockQueue), nSignalsToIssue) != 0)
 	{
-	  result = errno;
+	  result = PTW32_GET_ERRNO();
 	}
     }
 

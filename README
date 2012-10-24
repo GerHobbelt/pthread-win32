@@ -10,15 +10,14 @@ specific to pthreads-win32, copyrights and the LGPL.
 What is it?
 -----------
 
-Pthreads-win32 is an Open Source Software implementation of the
-Threads component of the POSIX 1003.1c 1995 Standard (or later)
-for Microsoft's Win32 environment. Some functions from POSIX
-1003.1b are also supported including semaphores. Other related
-functions include the set of read-write lock functions. The
+Pthreads-win32 (a.k.a. pthreads4w) is an Open Source Software
+implementation of the Threads component of the POSIX 1003.1c 1995
+Standard (or later) for Microsoft's Windows environment. Some functions
+from POSIX 1003.1b are also supported, including semaphores. Other
+related functions include the set of read-write lock functions. The
 library also supports some of the functionality of the Open
-Group's Single Unix specification, version 2, namely mutex types,
-plus some common and pthreads-win32 specific non-portable
-routines (see README.NONPORTABLE).
+Group's Single Unix specification, namely mutex types, plus some common
+and pthreads-win32 specific non-portable routines (see README.NONPORTABLE).
 
 See the file "ANNOUNCE" for more information including standards
 conformance details and the list of supported and unsupported
@@ -27,7 +26,7 @@ routines.
 
 Prerequisites
 -------------
-MSVC or GNU C (MinGW32 MSys development kit)
+MSVC or GNU C (MinGW32 or MinGW64 MSys development kit)
 	To build from source.
 
 QueueUserAPCEx by Panagiotis E. Hadjidoukas
@@ -64,6 +63,9 @@ handling schemes and compilers - and because the library
 may not work reliably if these are mixed in an application,
 each different version of the library has it's own name.
 
+Please do not distribute your own modified versions of the library using
+names conforming to this description.
+
 Note 1: the incompatibility is really between EH implementations
 of the different compilers. It should be possible to use the
 standard C version from either compiler with C++ applications
@@ -86,24 +88,24 @@ Note 4: the compatibility number was added so that applications
 can differentiate between binary incompatible versions of the
 libs and dlls.
 
-In general:
-	pthread[VG]{SE,CE,C}[c].dll
-	pthread[VG]{SE,CE,C}[c].lib
+In general the naming format used is:
+    pthread[VG]{SE,CE,C}[c].dll
+    pthread[VG]{SE,CE,C}[c].lib
 
 where:
-	[VG] indicates the compiler
-	V	- MS VC, or
-	G	- GNU C
+    [VG] indicates the compiler
+        V	- MS VC, or
+        G	- GNU C
 
-	{SE,CE,C} indicates the exception handling scheme
-	SE	- Structured EH, or
-	CE	- C++ EH, or
-	C	- no exceptions - uses setjmp/longjmp
+    {SE,CE,C} indicates the exception handling scheme
+        SE	- Structured EH, or
+        CE	- C++ EH, or
+        C	- no exceptions - uses setjmp/longjmp
 
-	c	- DLL compatibility number indicating ABI and API
-		  compatibility with applications built against
-		  a snapshot with the same compatibility number.
-		  See 'Version numbering' below.
+        c	- DLL compatibility number indicating ABI and API
+              compatibility with applications built against
+              a snapshot with the same compatibility number.
+              See 'Version numbering' below.
 
 The name may also be suffixed by a 'd' to indicate a debugging version
 of the library. E.g. pthreadVC2d.lib. Debugging versions contain
@@ -125,37 +127,41 @@ The GNU library archive file names have correspondingly changed to:
 	libpthreadGCc.a
 
 
-Versioning numbering
---------------------
+Version numbering
+-----------------
 
-Version numbering is separate from the snapshot dating system, and
-is the canonical version identification system embedded within the
-DLL using the Microsoft version resource system. The versioning
-system chosen follows the GNU Libtool system. See
-http://www.gnu.org/software/libtool/manual.html section 6.2.
-
-See the resource file 'version.rc'.
+See pthread.h and the resource file 'version.rc'.
 
 Microsoft version numbers use 4 integers:
 
 	0.0.0.0
 
-Pthreads-win32 uses the first 3 following the Libtool convention.
+Pthreads-win32 uses the first 3 following the standard major.minor.micro
+system. We had claimed to follow the Libtool convention but this has
+not been the case with recent releases. Binary compatibility and
+consequently library file naming has not changed over this time either
+so it should not cause any problems.
+
 The fourth is commonly used for the build number, but will be reserved
 for future use.
 
-	current.revision.age.0
+	major.minor.micro.0
 
 The numbers are changed as follows:
 
-1. If the library source code has changed at all since the last update,
-   then increment revision (`c:r:a' becomes `c:r+1:a').
-2. If any interfaces have been added, removed, or changed since the last
-   update, increment current, and set revision to 0.
-3. If any interfaces have been added since the last public release, then
-   increment age.
-4. If any interfaces have been removed or changed since the last public
-   release, then set age to 0.
+1. If the general binary interface (ABI) has changed at all since the
+   last update in a way that requires recompilation and relinking of
+   applications, then increment Major, and set both minor and micro to 0.
+   (`M:m:u' becomes `M+1:0:0')
+2. If the general API has changed at all since the last update, or
+   there have been semantic/behaviour changes (bug fixes etc) but does
+   not require recompilation of existing applications, then increment
+   minor and set micro to 0.
+   (`M:m:u' becomes `M:m+1:0')
+3. If there have been no interface or semantic changes since the last
+   public release but a new release is deemed necessary for some reason,
+   then increment micro.
+   (`M:m:u' becomes `M:m:u+1')
 
 
 DLL compatibility numbering is an attempt to ensure that applications
@@ -167,13 +173,10 @@ this inevitably requires incompatible versions of the same DLLs to have
 different names.
 
 Pthreads-win32 has adopted the Cygwin convention of appending a single
-integer number to the DLL name. The number used is based on the library
-version number and is computed as 'current' - 'age'.
+integer number to the DLL name. The number used is simply the library's
+major version number.
 
-(See http://home.att.net/~perlspinr/libversioning.html for a nicely
-detailed explanation.)
-
-Using this method, DLL name/s will only change when the DLL's
+Consequently, DLL name/s will only change when the DLL's
 backwards compatibility changes. Note that the addition of new
 'interfaces' will not of itself change the DLL's compatibility for older
 applications.
