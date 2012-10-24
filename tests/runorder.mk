@@ -145,5 +145,6 @@ spin4.pass: spin3.pass
 stress1.pass: create3.pass mutex8.pass barrier6.pass
 tsd1.pass: barrier5.pass join1.pass
 tsd2.pass: tsd1.pass
+tsd3.pass: tsd2.pass
 valid1.pass: join1.pass
 valid2.pass: valid1.pass

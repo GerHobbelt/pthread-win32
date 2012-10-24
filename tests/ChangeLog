@@ -1,3 +1,13 @@
+2012-10-24  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* tsd3.c: New regression test for Stephane Clairet bug fix/report;
+	this test confirms that keys are deleted correctly prior to threads
+	exiting.
+	* tsd2.c: Modified comments and indentation.
+	* tsd1.c: Likewise.
+	* common.mk (tsd3): New test added.
+	* reorder.mk (tsd): Likewise.
+
 2012-10-16  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* GNUmakefile (EXTRAVERSION): Naming option for libraries to be

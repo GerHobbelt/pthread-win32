@@ -1,3 +1,8 @@
+2012-10-24  Stephane Clairet <Stephane dot Clairet at 4d dot com>
+
+	* pthread_key_delete.c: Bug fix - move keylock release to after the
+	while loop. (This bug first was introduced at release 2.9.1) 
+
 2012-10-16  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* Makefile: Remove SDK environment setting; now needs to be done
