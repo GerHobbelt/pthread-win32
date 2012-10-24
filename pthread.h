@@ -228,19 +228,11 @@
 #include <windows.h>
 #endif
 
-#if defined(PTW32_CONFIG_MSVC6) || defined(__DMC__)
-/*
- * VC++6.0 or early compiler's header has no DWORD_PTR type.
- */
-typedef unsigned long DWORD_PTR;
-typedef unsigned long ULONG_PTR;
-#endif
 /*
  * -----------------
  * autoconf switches
  * -----------------
  */
-
 #if defined(HAVE_PTW32_CONFIG_H)
 #include "config.h"
 #endif /* HAVE_PTW32_CONFIG_H */
@@ -283,10 +275,6 @@ enum {
 #  endif
 #endif
 
-/*
- *
- */
-
 #if PTW32_LEVEL >= PTW32_LEVEL_MAX
 #if defined(NEED_ERRNO)
 #include "need_errno.h"
@@ -294,6 +282,8 @@ enum {
 #include <errno.h>
 #endif
 #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
+
+#include <sched.h>
 
 /*
  * Several systems don't define some error numbers.
@@ -325,8 +315,6 @@ enum {
 #if !defined(ENOTRECOVERABLE)
 #  define ENOTRECOVERABLE 44
 #endif
-
-#include <sched.h>
 
 /*
  * To avoid including windows.h we define only those things that we
@@ -586,18 +574,6 @@ extern "C"
 #else
 #  define PTW32_DLLPORT
 #endif
-
-/*
- * The Open Watcom C/C++ compiler uses a non-standard calling convention
- * that passes function args in registers unless __cdecl is explicitly specified
- * in exposed function prototypes.
- *
- * We force all calls to cdecl even though this could slow Watcom code down
- * slightly. If you know that the Watcom compiler will be used to build both
- * the DLL and application, then you can probably define this as a null string.
- * Remember that pthread.h (this file) is used for both the DLL and application builds.
- */
-#define PTW32_CDECL __cdecl
 
 #if defined(_UWIN) && PTW32_LEVEL >= PTW32_LEVEL_MAX
 #   include     <sys/types.h>
@@ -1281,43 +1257,55 @@ PTW32_DLLPORT int PTW32_CDECL pthreadCancelableTimedWait (HANDLE waitHandle,
 #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
 /*
- * Thread-Safe C Runtime Library Mappings.
+ * Declare a thread-safe errno for Open Watcom
+ * (note: this has not been tested in a long time)
  */
-#if !defined(_UWIN)
-#  if defined(NEED_ERRNO)
-     PTW32_DLLPORT int * PTW32_CDECL _errno( void );
-#  else
-#    if !defined(errno)
-#      if (defined(_MT) || defined(_DLL))
-         __declspec(dllimport) extern int * __cdecl _errno(void);
-#        define errno   (*_errno())
-#      endif
-#    endif
+#if defined(__WATCOMC__) && !defined(errno)
+#  if defined(_MT) || defined(_DLL)
+     __declspec(dllimport) extern int * __cdecl _errno(void);
+#    define errno (*_errno())
 #  endif
 #endif
 
 /*
- * If pthreads-win32 is compiled as a DLL, and both it and
- * the application are linked against the static C runtime
- * (i.e. with the /MT compiler flag), then the application
- * will not be able to see errno values produced by the
- * library. Refer to the following links for details:
+ * If pthreads-win32 is compiled as a DLL with MSVC, and
+ * both it and the application are linked against the static
+ * C runtime (i.e. with the /MT compiler flag), then the
+ * application will not see the same C runtime globals as
+ * the library. These include the errno variable, and the
+ * termination routine called by terminate(). For details,
+ * refer to the following links:
  *
  * http://support.microsoft.com/kb/94248
  * (Section 4: Problems Encountered When Using Multiple CRT Libraries)
  *
  * http://social.msdn.microsoft.com/forums/en-US/vclanguage/thread/b4500c0d-1b69-40c7-9ef5-08da1025b5bf
  *
- * When pthreads-win32 is built with PTW32_BROKEN_ERRNO
- * defined, in addition to setting errno when errors occur,
- * it will also call SetLastError() with the same value.
- * The application can then use GetLastError() to obtain the
- * value of errno.
+ * When pthreads-win32 is built with PTW32_USES_SEPARATE_CRT
+ * defined, the following features are enabled:
+ *
+ * (1) In addition to setting the errno variable when errors
+ * occur, the library will also call SetLastError() with the
+ * same value. The application can then use GetLastError()
+ * to obtain the value of errno. (This pair of routines are
+ * in kernel32.dll, and so are not affected by the use of
+ * multiple CRT libraries.)
+ *
+ * (2) When C++ or SEH cleanup is used, the library defines
+ * a function pthread_win32_set_terminate_np(), which can be
+ * used to set the termination routine that should be called
+ * when an unhandled exception occurs in a thread function
+ * (or otherwise inside the library).
  *
  * Note: "_DLL" implies the /MD compiler flag.
  */
-#if !defined(_DLL) && !defined(PTW32_STATIC_LIB)
-#  define PTW32_BROKEN_ERRNO
+#if defined(_MSC_VER) && !defined(_DLL) && !defined(PTW32_STATIC_LIB)
+#  define PTW32_USES_SEPARATE_CRT
+#endif
+
+#if defined(PTW32_USES_SEPARATE_CRT) && (defined(__CLEANUP_CXX) || defined(__CLEANUP_SEH))
+typedef void (*ptw32_terminate_handler)();
+PTW32_DLLPORT ptw32_terminate_handler PTW32_CDECL pthread_win32_set_terminate_np(ptw32_terminate_handler termFunction);
 #endif
 
 /*

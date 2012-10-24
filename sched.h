@@ -39,11 +39,14 @@
 #if !defined(_SCHED_H)
 #define _SCHED_H
 
-#if !defined(_WIN32_WINNT)
-# define _WIN32_WINNT 0x0400
+#if defined(_MSC_VER)
+#  if _MSC_VER < 1300
+#    define PTW32_CONFIG_MSVC6
+#  endif
+#  if _MSC_VER < 1400
+#    define PTW32_CONFIG_MSVC7
+#  endif
 #endif
-
-#include <windows.h>
 
 #undef PTW32_SCHED_LEVEL
 
@@ -93,6 +96,20 @@
 #endif
 
 /*
+ * The Open Watcom C/C++ compiler uses a non-standard calling convention
+ * that passes function args in registers unless __cdecl is explicitly specified
+ * in exposed function prototypes.
+ *
+ * We force all calls to cdecl even though this could slow Watcom code down
+ * slightly. If you know that the Watcom compiler will be used to build both
+ * the DLL and application, then you can probably define this as a null string.
+ * Remember that pthread.h (this file) is used for both the DLL and application builds.
+ */
+#if !defined(PTW32_CDECL)
+# define PTW32_CDECL __cdecl
+#endif
+
+/*
  * This is a duplicate of what is in the autoconf config.h,
  * which is only used when building the pthread-win32 libraries.
  */
@@ -113,6 +130,8 @@
 /*
  *
  */
+
+#include <stdlib.h>
 
 #if PTW32_SCHED_LEVEL >= PTW32_SCHED_LEVEL_MAX
 #if defined(NEED_ERRNO)
@@ -141,6 +160,14 @@
 # endif
 #endif
 
+/*
+ * Microsoft VC++6.0 lacks these *_PTR types
+ */
+#if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(PTW32_HAVE_DWORD_PTR)
+typedef unsigned long ULONG_PTR;
+typedef ULONG_PTR DWORD_PTR;
+#endif
+
 /* Thread scheduling policies */
 
 enum {
@@ -155,58 +182,84 @@ struct sched_param {
   int sched_priority;
 };
 
-/* CPU affinity */
+/*
+ * CPU affinity
+ *
+ * cpu_set_t:
+ * Considered opaque but cannot be an opaque pointer
+ * due to the need for compatibility with GNU systems
+ * and sched_setaffinity() et.al. which include the
+ * cpusetsize parameter "normally set to sizeof(cpu_set_t)".
+ */
 
-#if ! defined(MAXULONG_PTR)
-/* DWORD_PTR is not defined */
-typedef size_t DWORD_PTR, *PDWORD_PTR;
-#endif
+typedef size_t _sched_cpu_set_vector_;
 
-typedef DWORD_PTR cpu_set_t;
+struct _sched_cpu_set_t_
+{
+  _sched_cpu_set_vector_	cpuset;
+};
+
+typedef struct _sched_cpu_set_t_ cpu_set_t;
 
 #if defined(__cplusplus)
 extern "C"
 {
 #endif                          /* __cplusplus */
 
-PTW32_DLLPORT int __cdecl sched_yield (void);
+PTW32_DLLPORT int PTW32_CDECL sched_yield (void);
 
-PTW32_DLLPORT int __cdecl sched_get_priority_min (int policy);
+PTW32_DLLPORT int PTW32_CDECL sched_get_priority_min (int policy);
 
-PTW32_DLLPORT int __cdecl sched_get_priority_max (int policy);
+PTW32_DLLPORT int PTW32_CDECL sched_get_priority_max (int policy);
 
-PTW32_DLLPORT int __cdecl sched_setscheduler (pid_t pid, int policy);
+PTW32_DLLPORT int PTW32_CDECL sched_setscheduler (pid_t pid, int policy);
 
-PTW32_DLLPORT int __cdecl sched_getscheduler (pid_t pid);
+PTW32_DLLPORT int PTW32_CDECL sched_getscheduler (pid_t pid);
 
 /* Compatibility with Linux - not standard */
 
-PTW32_DLLPORT int __cdecl sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
+PTW32_DLLPORT int PTW32_CDECL sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
 
-PTW32_DLLPORT int __cdecl sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
-
-PTW32_DLLPORT int __cdecl CpuCount (cpu_set_t *set);
+PTW32_DLLPORT int PTW32_CDECL sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *mask);
 
 /*
- * Support macros for cpu_set_t
+ * Support routines and macros for cpu_set_t
  */
-#define CPU_ZERO(setptr) ((void)(*(setptr) = (cpu_set_t)0))
+PTW32_DLLPORT int PTW32_CDECL _sched_affinitycpucount (const cpu_set_t *set);
 
-#define CPU_SET(cpu, setptr) ((void)(*(setptr) |= ((cpu_set_t)1 << (cpu))))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuzero (cpu_set_t *pset);
 
-#define CPU_CLR(cpu, setptr) ((void)(*(setptr) &= (~((cpu_set_t)1 << (cpu)))))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuset (int cpu, cpu_set_t *pset);
 
-#define CPU_ISSET(cpu, setptr) (((*(setptr) & ((cpu_set_t)1 << (cpu))) != (cpu_set_t)0))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuclr (int cpu, cpu_set_t *pset);
 
-#define CPU_AND(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) & (size_t)*(srcset2ptr))))
+PTW32_DLLPORT int PTW32_CDECL _sched_affinitycpuisset (int cpu, const cpu_set_t *pset);
 
-#define CPU_OR(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) | (size_t)*(srcset2ptr))))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuand(cpu_set_t *pdestset, const cpu_set_t *psrcset1, const cpu_set_t *psrcset2);
 
-#define CPU_XOR(destsetptr, srcset1ptr, srcset2ptr) ((void)(*(destsetptr) = (cpu_set_t)((size_t)*(srcset1ptr) ^ (size_t)*(srcset2ptr))))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuor(cpu_set_t *pdestset, const cpu_set_t *psrcset1, const cpu_set_t *psrcset2);
 
-#define CPU_EQUAL(set1ptr, set2ptr) (((size_t)*(set1ptr) == (size_t)*(set2ptr)))
+PTW32_DLLPORT void PTW32_CDECL _sched_affinitycpuxor(cpu_set_t *pdestset, const cpu_set_t *psrcset1, const cpu_set_t *psrcset2);
 
-#define CPU_COUNT(setptr) (CpuCount(setptr))
+PTW32_DLLPORT int PTW32_CDECL _sched_affinitycpuequal (const cpu_set_t *pset1, const cpu_set_t *pset2);
+
+#define CPU_COUNT(setptr) (_sched_affinitycpucount(setptr))
+
+#define CPU_ZERO(setptr) (_sched_affinitycpuzero(setptr))
+
+#define CPU_SET(cpu, setptr) (_sched_affinitycpuset((cpu),(setptr)))
+
+#define CPU_CLR(cpu, setptr) (_sched_affinitycpuclr((cpu),(setptr)))
+
+#define CPU_ISSET(cpu, setptr) (_sched_affinitycpuisset((cpu),(setptr)))
+
+#define CPU_AND(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuand((destsetptr),(srcset1ptr),(srcset2ptr)))
+
+#define CPU_OR(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuor((destsetptr),(srcset1ptr),(srcset2ptr)))
+
+#define CPU_XOR(destsetptr, srcset1ptr, srcset2ptr) (_sched_affinitycpuxor((destsetptr),(srcset1ptr),(srcset2ptr)))
+
+#define CPU_EQUAL(set1ptr, set2ptr) (_sched_affinitycpuequal((set1ptr),(set2ptr)))
 
 /*
  * Note that this macro returns ENOTSUP rather than

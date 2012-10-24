@@ -85,7 +85,7 @@ static void * func(void * arg)
 
   Sleep(1000);
 
-  return 0; 
+  return 0;
 }
 
 static void
@@ -95,6 +95,7 @@ anotherEnding (void)
    * Switched context
    */
   washere++;
+  pthread_exit(0);
 }
 
 #ifndef MONOLITHIC_PTHREAD_TESTS

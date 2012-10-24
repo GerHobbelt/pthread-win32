@@ -1,5 +1,5 @@
 /*
- * affinity2.c
+ * affinity3.c
  *
  *
  * --------------------------------------------------------------------------
@@ -31,7 +31,7 @@
  *
  * --------------------------------------------------------------------------
  *
- * Have the process switch CPUs.
+ * Have the thread switch CPUs.
  *
  */
 
@@ -40,16 +40,22 @@
 int
 main()
 {
-  unsigned int cpu;
   int result;
+  unsigned int cpu;
   cpu_set_t newmask;
+  cpu_set_t processCpus;
   cpu_set_t mask;
   cpu_set_t switchmask;
   cpu_set_t flipmask;
+  pthread_t self = pthread_self();
 
   CPU_ZERO(&mask);
   CPU_ZERO(&switchmask);
   CPU_ZERO(&flipmask);
+
+  assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &processCpus) == 0);
+  printf("This thread has a starting affinity with %d CPUs\n", CPU_COUNT(&processCpus));
+  assert(!CPU_EQUAL(&mask, &processCpus));
 
   for (cpu = 0; cpu < sizeof(cpu_set_t)*8; cpu += 2)
     {
@@ -60,38 +66,30 @@ main()
 	  CPU_SET(cpu, &flipmask);					/* 0b11111111111111111111111111111111 */
     }
 
-  assert(sched_getaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
-  assert(!CPU_EQUAL(&newmask, &mask));
-
-  result = sched_setaffinity(0, sizeof(cpu_set_t), &newmask);
+  result = pthread_setaffinity_np(self, sizeof(cpu_set_t), &processCpus);
   if (result != 0)
 	{
-	  int err =
-#if defined(PTW32_USES_SEPARATE_CRT)
-	  GetLastError();
-#else
-      errno;
-#endif
-
-	  assert(err != ESRCH);
-	  assert(err != EFAULT);
-	  assert(err != EPERM);
-	  assert(err != EINVAL);
-	  assert(err != EAGAIN);
-	  assert(err == ENOSYS);
+	  assert(result != ESRCH);
+	  assert(result != EFAULT);
+	  assert(result != EPERM);
+	  assert(result != EINVAL);
+	  assert(result != EAGAIN);
+	  assert(result == ENOSYS);
 	  assert(CPU_COUNT(&mask) == 1);
 	}
   else
 	{
 	  if (CPU_COUNT(&mask) > 1)
 		{
-		  CPU_AND(&newmask, &mask, &switchmask); /* Remove every other CPU */
-		  assert(sched_setaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
-		  assert(sched_getaffinity(0, sizeof(cpu_set_t), &mask) == 0);
+		  CPU_AND(&newmask, &processCpus, &switchmask); /* Remove every other CPU */
+		  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &newmask) == 0);
+		  assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &mask) == 0);
+		  assert(CPU_EQUAL(&mask, &newmask));
 		  CPU_XOR(&newmask, &mask, &flipmask);  /* Switch to all alternative CPUs */
-		  assert(sched_setaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
-		  assert(sched_getaffinity(0, sizeof(cpu_set_t), &mask) == 0);
-		  assert(!CPU_EQUAL(&newmask, &mask));
+		  assert(!CPU_EQUAL(&mask, &newmask));
+		  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &newmask) == 0);
+		  assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &mask) == 0);
+		  assert(CPU_EQUAL(&mask, &newmask));
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * affinity2.c
+ * affinity4.c
  *
  *
  * --------------------------------------------------------------------------
@@ -31,7 +31,7 @@
  *
  * --------------------------------------------------------------------------
  *
- * Have the process switch CPUs.
+ * Test thread CPU affinity setting.
  *
  */
 
@@ -41,59 +41,27 @@ int
 main()
 {
   unsigned int cpu;
-  int result;
-  cpu_set_t newmask;
-  cpu_set_t mask;
-  cpu_set_t switchmask;
-  cpu_set_t flipmask;
+  cpu_set_t threadCpus;
+  DWORD_PTR vThreadMask;
+  cpu_set_t keepCpus;
+  pthread_t self = pthread_self();
 
-  CPU_ZERO(&mask);
-  CPU_ZERO(&switchmask);
-  CPU_ZERO(&flipmask);
-
-  for (cpu = 0; cpu < sizeof(cpu_set_t)*8; cpu += 2)
+  CPU_ZERO(&keepCpus);
+  for (cpu = 1; cpu < sizeof(cpu_set_t)*8; cpu += 2)
     {
-	  CPU_SET(cpu, &switchmask);				/* 0b01010101010101010101010101010101 */
-    }
-  for (cpu = 0; cpu < sizeof(cpu_set_t)*8; cpu++)
-    {
-	  CPU_SET(cpu, &flipmask);					/* 0b11111111111111111111111111111111 */
+	  CPU_SET(cpu, &keepCpus);					/* 0b10101010101010101010101010101010 */
     }
 
-  assert(sched_getaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
-  assert(!CPU_EQUAL(&newmask, &mask));
-
-  result = sched_setaffinity(0, sizeof(cpu_set_t), &newmask);
-  if (result != 0)
-	{
-	  int err =
-#if defined(PTW32_USES_SEPARATE_CRT)
-	  GetLastError();
-#else
-      errno;
-#endif
-
-	  assert(err != ESRCH);
-	  assert(err != EFAULT);
-	  assert(err != EPERM);
-	  assert(err != EINVAL);
-	  assert(err != EAGAIN);
-	  assert(err == ENOSYS);
-	  assert(CPU_COUNT(&mask) == 1);
-	}
-  else
-	{
-	  if (CPU_COUNT(&mask) > 1)
-		{
-		  CPU_AND(&newmask, &mask, &switchmask); /* Remove every other CPU */
-		  assert(sched_setaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
-		  assert(sched_getaffinity(0, sizeof(cpu_set_t), &mask) == 0);
-		  CPU_XOR(&newmask, &mask, &flipmask);  /* Switch to all alternative CPUs */
-		  assert(sched_setaffinity(0, sizeof(cpu_set_t), &newmask) == 0);
-		  assert(sched_getaffinity(0, sizeof(cpu_set_t), &mask) == 0);
-		  assert(!CPU_EQUAL(&newmask, &mask));
-		}
-	}
+  assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &threadCpus) == 0);
+  if (CPU_COUNT(&threadCpus) > 1)
+    {
+	  CPU_AND(&threadCpus, &threadCpus, &keepCpus);
+	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), (DWORD_PTR)threadCpus.cpuset /* Violating Opacity */);
+	  assert(pthread_setaffinity_np(self, sizeof(cpu_set_t), &threadCpus) == 0);
+	  vThreadMask = SetThreadAffinityMask(GetCurrentThread(), vThreadMask);
+	  assert(vThreadMask != 0);
+	  assert(memcmp(&vThreadMask, &threadCpus, sizeof(DWORD_PTR)) == 0);
+    }
 
   return 0;
 }

@@ -1,3 +1,73 @@
+2012-09-25  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* context1.c (anotherEnding): Should exit the thread, not return.
+
+2012-09-23  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* fiber1.c: Test basic fibers. Starting to look at ways we might use
+	fibers in our poor-man's thread cancellation implementation.
+
+2012-09-23  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile: Add secondary target names to existing test targets so
+	we can output how the library was built, e.g. "Running VC-inlined test".
+	This is useful when making "all-tests" from the library build Makefile.
+	* GNUmakefile: Similarly.
+
+2012-09-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile: Do what Makefile does and print the make target
+	when running each test.
+
+2012-09-22  Daniel Richard. G <danielg at teragram dot com>
+
+	* Makefile: This reverts an earlier change of mine. In some
+	versions of nmake, $(MAKE) is a full path, which utterly futzes
+	up the "make help" output; regularized the test targets, so we
+	have e.g. VSE-static now; regularized the parentheticals;
+	removed a spurious use of $(DLL_VER); new test targets: VCX-debug
+	{VSE,VCX}-static{,-debug}; fixed the {VC,VCE}-static-debug targets.
+	* exception3.c: Narrowly exclude this test from the known-bad VS2005
+	configuration (By the way: I downloaded and tested with what is
+	presumably the most up-to-date MSVCR80.DLL. Same deal.); use
+	pthread_win32_set_terminate_np() when appropriate, and verify that
+	it has an effect different from calling set_terminate(); no need for
+	that assert(); it's overly pedantic.
+	* exception3_0.c: Same VS2005 exclusion.
+	* once3.c: Put in a note so that users know what to do if the test
+	hangs or exits abnormally (I figured this is better than narrowly
+	disabling pthread_cancel() on MSVC6, since cancellation does seem to
+	work correctly with /EHa, and we don't have any way of telling at
+	compile time whether /EHs or /EHa is in use).
+	* once4.c: Likewise.
+	* semaphore1.c: s/PTW32_BROKEN_ERRNO/PTW32_USES_SEPARATE_CRT/
+
+2012-09-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread_win32_attach_detach_np.c (pthread_win32_detach_thread_np):
+	Check for NULL ptw32_selfThreadKey before call to TlsSetKey(). Need
+	to find where this is being set to NULL before this point. Was
+	consistently failing tests/seamphore3.c in all GC static builds and
+	never seen in GC DLL builds. May also be responsible for
+	inconsistent VCE fails on that test, although the fail mode was
+	different - the latter hangs the test while the former segfaults.
+
+2012-09-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile (GC-static-debug): New make target.
+
+2012-09-21  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* affinity1.c: New test for new process CPU affinity routines.
+	* affinity2.c: New test for new process CPU affinity routines.
+	* affinity3.c: New test for new process and thread CPU affinity routines.
+	* affinity4.c: New test for new process and thread CPU affinity routines.
+	* affinity5.c: New test for new process and thread CPU affinity routines.
+	* Makefile: Add new tests.
+	* GNUmakfile: Likewise.
+	* Bmakfile: Likewise.
+	* Wmakfile: Likewise.
+
 2012-09-09  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* exception3.c: Rewrite to fix strategy.

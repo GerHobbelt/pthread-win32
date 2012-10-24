@@ -142,17 +142,17 @@ PTHREAD_DEF	= pthread.def
 help:
 	@ echo "Run one of the following command lines:"
 	@ echo "$(MAKE) clean GC                    (to build the GNU C dll with C cleanup code)"
-	@ echo "$(MAKE) clean GCE                   (to build the GNU C dll with C++ exception handling)"
-	@ echo "$(MAKE) clean GC-inlined            (to build the GNU C inlined dll with C cleanup code)"
-	@ echo "$(MAKE) clean GCE-inlined           (to build the GNU C inlined dll with C++ exception handling)"
-	@ echo "$(MAKE) clean GC-static             (to build the GNU C inlined static lib with C cleanup code)"
-	@ echo "$(MAKE) clean GC-small-static       (to build the GNU C small static lib with C cleanup code)"
 	@ echo "$(MAKE) clean GC-debug              (to build the GNU C debug dll with C cleanup code)"
+	@ echo "$(MAKE) clean GCE                   (to build the GNU C dll with C++ exception handling)"
 	@ echo "$(MAKE) clean GCE-debug             (to build the GNU C debug dll with C++ exception handling)"
+	@ echo "$(MAKE) clean GC-inlined            (to build the GNU C inlined dll with C cleanup code)"
 	@ echo "$(MAKE) clean GC-inlined-debug      (to build the GNU C inlined debug dll with C cleanup code)"
+	@ echo "$(MAKE) clean GCE-inlined           (to build the GNU C inlined dll with C++ exception handling)"
 	@ echo "$(MAKE) clean GCE-inlined-debug     (to build the GNU C inlined debug dll with C++ exception handling)"
-	@ echo "$(MAKE) clean GC-static-debug       (to build the GNU C inlined static debug lib with C cleanup code)"
-	@ echo "$(MAKE) clean GC-small-static-debug (to build the GNU C small static debug lib with C cleanup code)"
+	@ echo "$(MAKE) clean GC-static             (to build the GNU C static lib with C cleanup code)"
+	@ echo "$(MAKE) clean GC-static-debug       (to build the GNU C static debug lib with C cleanup code)"
+	@ echo "$(MAKE) clean GC-small-static       (to build the GNU C small-object static lib with C cleanup code)"
+	@ echo "$(MAKE) clean GC-small-static-debug (to build the GNU C small-object static debug lib with C cleanup code)"
 
 all:
 	@ $(MAKE) clean GC-inlined
@@ -167,13 +167,13 @@ all-tests:
 	$(MAKE) realclean GCE
 	cd tests && $(MAKE) clean GCE $(TEST_ENV)
 	$(MAKE) realclean GC-inlined
-	cd tests && $(MAKE) clean GC $(TEST_ENV) && $(MAKE) clean GCX $(TEST_ENV)
+	cd tests && $(MAKE) clean GC-inlined $(TEST_ENV) && $(MAKE) clean GCX-inlined $(TEST_ENV)
 	$(MAKE) realclean GCE-inlined
-	cd tests && $(MAKE) clean GCE $(TEST_ENV)
+	cd tests && $(MAKE) clean GCE-inlined $(TEST_ENV)
 	$(MAKE) realclean GC-static
 	cd tests && $(MAKE) clean GC-static $(TEST_ENV)
 	$(MAKE) realclean GC-small-static
-	cd tests && $(MAKE) clean GC-static $(TEST_ENV)
+	cd tests && $(MAKE) clean GC-small-static $(TEST_ENV)
 	@ $(ECHO) "$@ completed successfully."
 
 all-tests-cflags:
@@ -273,6 +273,7 @@ clean:
 	-$(RM) *.o
 	-$(RM) *.obj
 	-$(RM) *.exe
+	-$(RM) *.manifest
 	-$(RM) $(PTHREAD_DEF)
 
 realclean: clean

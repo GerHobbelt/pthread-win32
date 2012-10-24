@@ -5,9 +5,7 @@
 #
 #      Pthreads-win32 - POSIX Threads Library for Win32
 #      Copyright(C) 1998 John E. Bossom
-#      Copyright(C) 1999,2005 Pthreads-win32 contributors
-# 
-#      Contact Email: rpj@callisto.canberra.edu.au
+#      Copyright(C) 1999,2012 Pthreads-win32 contributors
 # 
 #      The current list of contributors is contained
 #      in the file CONTRIBUTORS included with the source
@@ -35,6 +33,7 @@ DLL_VER	= 2
 
 CP	= copy
 RM	= erase
+RMDIR	= rmdir /s /q
 CAT	= type
 MKDIR	= mkdir
 ECHO	= echo
@@ -89,7 +88,8 @@ EHFLAGS	=
 
 PASSES = sizes.pass $(REGULAR_PASSES)
 
-REGULAR_PASSES = loadfree.pass \
+REGULAR_PASSES = fiber1.pass  \
+	  loadfree.pass \
 	  self1.pass  mutex5.pass  \
 	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
 	  semaphore1.pass  semaphore2.pass  semaphore3.pass  \
@@ -126,7 +126,9 @@ REGULAR_PASSES = loadfree.pass \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
-	  cancel9.pass  affinity1.pass  affinity2.pass  stress1.pass
+	  cancel9.pass  \
+	  affinity1.pass  affinity2.pass  affinity3.pass  affinity4.pass  affinity5.pass  \
+	  stress1.pass
 
 BENCHRESULTS = \
 	  benchtest1.bench benchtest2.bench benchtest3.bench benchtest4.bench benchtest5.bench
@@ -135,7 +137,7 @@ STRESSRESULTS = \
 	  stress1.stress
 
 STATICRESULTS = \
-	  sizes.pass  \
+	  fiber1.pass  sizes.pass  \
 	  self1.pass  mutex5.pass  \
 	  mutex1.pass  mutex1n.pass  mutex1e.pass  mutex1r.pass  \
 	  semaphore1.pass  semaphore2.pass  semaphore3.pass  \
@@ -172,28 +174,36 @@ STATICRESULTS = \
 	  priority1.pass priority2.pass inherit1.pass  \
 	  spin1.pass  spin2.pass  spin3.pass  spin4.pass  \
 	  exception1.pass  exception2.pass  exception3_0.pass  exception3.pass  \
-	  cancel9.pass  affinity1.pass  affinity2.pass  stress1.pass
+	  cancel9.pass  \
+	  affinity1.pass  affinity2.pass  affinity3.pass  affinity4.pass  affinity5.pass  \
+	  stress1.pass
 
 help:
 	@ $(ECHO) Run one of the following command lines:
-	@ $(ECHO) $(MAKE) clean VC                (to test using VC dll with VC (no EH) apps)
-	@ $(ECHO) $(MAKE) clean VC-bench          (to benchtest using VC dll with C bench apps)
-	@ $(ECHO) $(MAKE) clean VC-stress         (to stresstest using VC dll with C stress apps)
-	@ $(ECHO) $(MAKE) clean VC-static         (to test using VC static lib with VC (no EH) apps)
-	@ $(ECHO) $(MAKE) clean VC-debug          (to test using VC dll with VC (no EH) apps)
-	@ $(ECHO) $(MAKE) clean VCX               (to test using VC dll with VC++ (EH) applications)
-	@ $(ECHO) $(MAKE) clean VCX-bench         (to benchtest using VC dll with C++ bench apps)
-	@ $(ECHO) $(MAKE) clean VCX-stress        (to stresstest using VC dll with C++ stress apps)
-	@ $(ECHO) $(MAKE) clean VCE               (to test using the VCE dll with VC++ EH applications)
-	@ $(ECHO) $(MAKE) clean VCE-bench         (to benchtest using VCE dll with C++ bench apps)
-	@ $(ECHO) $(MAKE) clean VCE-stress        (to stresstest using VCE dll with C++ stress apps)
-	@ $(ECHO) $(MAKE) clean VCE-static        (to test using VCE static lib with VC++ EH apps)
-	@ $(ECHO) $(MAKE) clean VCE-debug         (to test using the VCE dll with VC++ EH applications)
-	@ $(ECHO) $(MAKE) clean VCE-static-debug  (to test using VCE static lib with VC++ EH apps)
-	@ $(ECHO) $(MAKE) clean VSE               (to test using VSE dll with VC (SEH) apps)
-	@ $(ECHO) $(MAKE) clean VSE-bench         (to benchtest using VSE dll with SEH bench apps)
-	@ $(ECHO) $(MAKE) clean VSE-stress        (to stresstest using VSE dll with SEH stress apps)
-	@ $(ECHO) $(MAKE) clean VSE-debug         (to test using VSE dll with VC (SEH) apps)
+	@ $(ECHO) nmake clean VC                (to test using VC dll with C (no EH) apps)
+	@ $(ECHO) nmake clean VC-bench          (to benchtest using VC dll with C bench apps)
+	@ $(ECHO) nmake clean VC-stress         (to stresstest using VC dll with C stress apps)
+	@ $(ECHO) nmake clean VC-static         (to test using VC static lib with C (no EH) apps)
+	@ $(ECHO) nmake clean VC-debug          (to test using VC dll with C (no EH) apps)
+	@ $(ECHO) nmake clean VC-static-debug   (to test using VC static lib with C (no EH) apps)
+	@ $(ECHO) nmake clean VCX               (to test using VC dll with C++ (EH) apps)
+	@ $(ECHO) nmake clean VCX-bench         (to benchtest using VC dll with C++ bench apps)
+	@ $(ECHO) nmake clean VCX-stress        (to stresstest using VC dll with C++ stress apps)
+	@ $(ECHO) nmake clean VCX-static        (to test using VC static lib with C++ (EH) apps)
+	@ $(ECHO) nmake clean VCX-debug         (to test using VC dll with C++ (EH) apps)
+	@ $(ECHO) nmake clean VCX-static-debug  (to test using VC static lib with C++ (EH) apps)
+	@ $(ECHO) nmake clean VCE               (to test using VCE dll with C++ (EH) apps)
+	@ $(ECHO) nmake clean VCE-bench         (to benchtest using VCE dll with C++ bench apps)
+	@ $(ECHO) nmake clean VCE-stress        (to stresstest using VCE dll with C++ stress apps)
+	@ $(ECHO) nmake clean VCE-static        (to test using VCE static lib with C++ (EH) apps)
+	@ $(ECHO) nmake clean VCE-debug         (to test using VCE dll with C++ (EH) apps)
+	@ $(ECHO) nmake clean VCE-static-debug  (to test using VCE static lib with C++ (EH) apps)
+	@ $(ECHO) nmake clean VSE               (to test using VSE dll with VC (SEH) apps)
+	@ $(ECHO) nmake clean VSE-bench         (to benchtest using VSE dll with SEH bench apps)
+	@ $(ECHO) nmake clean VSE-stress        (to stresstest using VSE dll with SEH stress apps)
+	@ $(ECHO) nmake clean VSE-static        (to test using VSE static lib with VC (SEH) apps)
+	@ $(ECHO) nmake clean VSE-debug         (to test using VSE dll with VC (SEH) apps)
+	@ $(ECHO) nmake clean VSE-static-debug  (to test using VSE static lib with VC (SEH) apps)
 
 all:
 	@ $(MAKE) /E clean VC
@@ -220,7 +230,7 @@ statictests: $(CPLIB) $(CPDLL) $(CPHDR) $(STATICRESULTS)
 	@ $(ECHO) ALL STATIC TESTS DONE.
 
 sizes.pass: sizes.exe
-	@ $(ECHO) ... Running $(TEST)$(DLL_VER) test: $*.exe
+	@ $(ECHO) ... Running $(TEST) test: $*.exe
 	@ .\$*.exe > SIZES.$(TEST)
 	@ $(CAT) SIZES.$(TEST)
 	@ $(ECHO) ...... Passed
@@ -244,16 +254,16 @@ $(STRESSRESULTS): $*.exe
 	@ $(ECHO) ...... Done
 	@ $(TOUCH) $*.pass
 
-VC:
+VC VC-inlined:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" tests
 
-VCE:
+VCE VCE-inlined:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" tests
 
-VSE:	
+VSE VSE-inlined:	
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" tests
 
-VCX:
+VCX VCX-inlined:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" tests
 
 VC-bench:
@@ -280,26 +290,41 @@ VSE-stress:
 VCX-stress:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" stresstests
 
-VC-static:
+VC-static VC-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VCE-static:
+VCE-static VCE-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VC-debug:
+VSE-static VSE-small-static:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" statictests
+
+VCX-static VCX-small-static:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" statictests
+
+VC-debug VC-inlined-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" tests
 
-VC-static-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS)" statictests
+VC-static-debug VC-small-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VCE-debug:
+VCE-debug VCE-inlined-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" tests
 
-VCE-static-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS)" statictests
+VCE-static-debug VCE-small-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" statictests
 
-VSE-debug:
+VSE-debug VSE-inlined-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" tests
+
+VSE-static-debug VSE-small-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="" EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" statictests
+
+VCX-debug VCX-inlined-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" tests
+
+VCX-static-debug VCX-small-static-debug:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCXFLAGS) /DPTW32_STATIC_LIB" statictests
 
 .c.exe:
 	$(CC) $(EHFLAGS) $(CFLAGS) $(INCLUDES) $< /Fe$@ /link $(LFLAGS) $(CPLIB) $(XXLIBS)
@@ -335,10 +360,7 @@ clean:
 	- if exist *.pass $(RM) *.pass
 	- if exist *.bench $(RM) *.bench
 	- if exist *.log $(RM) *.log
-	- if exist SIZES.VC $(RM) SIZES.VC
-	- if exist SIZES.VC-static $(RM) SIZES.VC-static
-	- if exist SIZES.VCE $(RM) SIZES.VCE
-	- if exist SIZES.VSE $(RM) SIZES.VSE
+	- if exist SIZES.V* $(RM) SIZES.V*
 
 benchtest1.bench:
 benchtest2.bench:
@@ -346,8 +368,11 @@ benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
 
-affinity1.pass: test
+affinity1.pass:
 affinity2.pass: affinity1.pass
+affinity3.pass: affinity2.pass
+affinity4.pass: affinity3.pass
+affinity5.pass: affinity4.pass
 barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass
 barrier3.pass: barrier2.pass
@@ -404,6 +429,7 @@ exit3.pass: create1.pass
 exit4.pass:
 exit5.pass: exit4.pass kill1.pass
 eyal1.pass: tsd1.pass
+fiber1.pass:
 inherit1.pass: join1.pass priority1.pass
 join0.pass: create1.pass
 join1.pass: create1.pass

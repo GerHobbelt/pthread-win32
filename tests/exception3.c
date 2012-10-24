@@ -73,7 +73,13 @@
 
 #include "test.h"
 
-#if defined(__cplusplus)
+/*
+ * Note: Due to a buggy C++ runtime in Visual Studio 2005, when we are
+ * built with /MD and an unhandled exception occurs, the runtime does not
+ * properly call the terminate handler specified by set_terminate().
+ */
+#if defined(__cplusplus) \
+	&& !(defined(_MSC_VER) && _MSC_VER == 1400 && defined(_DLL) && !defined(_DEBUG))
 
 #if defined(_MSC_VER)
 # include <eh.h>
@@ -125,13 +131,24 @@ terminateFunction ()
   exit(0);
 }
 
+static void
+wrongTerminateFunction ()
+{
+  fputs("This is not the termination routine that should have been called!\n", stderr);
+  exit(1);
+}
+
 static void *
 exceptionedThread(void * arg)
 {
   int dummy = 0x1;
 
+#if defined(PTW32_USES_SEPARATE_CRT) && (defined(__CLEANUP_CXX) || defined(__CLEANUP_SEH))
+  pthread_win32_set_terminate_np(&terminateFunction);
+  set_terminate(&wrongTerminateFunction);
+#else
   set_terminate(&terminateFunction);
-  assert(set_terminate(&terminateFunction) == &terminateFunction);
+#endif
 
   throw dummy;
 

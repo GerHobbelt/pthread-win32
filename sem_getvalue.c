@@ -77,34 +77,38 @@ sem_getvalue (sem_t * sem, int *sval)
       *      pointed to by sem in the int pointed to by sval.
       */
 {
-  if (sem == NULL || *sem == NULL || sval == NULL)
+  int result = 0;
+
+  if (NULL == sem || NULL == *sem || NULL == sval)
     {
-      PTW32_SET_ERRNO(EINVAL);
-      return -1;
+      result = EINVAL;
     }
   else
     {
-      long value;
       register sem_t s = *sem;
-      int result = 0;
 
       if ((result = pthread_mutex_lock(&s->lock)) == 0)
         {
-	  /* See sem_destroy.c
-	   */
-	  if (*sem == NULL)
-	    {
-	      (void) pthread_mutex_unlock (&s->lock);
-	      PTW32_SET_ERRNO(EINVAL);
-	      return -1;
-	    }
-
-          value = s->value;
-          (void) pthread_mutex_unlock(&s->lock);
-          *sval = value;
+    	  /*
+    	   *  See sem_destroy.c
+    	   */
+    	  if (*sem == NULL /* don't test 's' here */)
+    	    {
+    		  result = EINVAL;
+    	    }
+    	  else
+    	    {
+    		  *sval = s->value;
+    	    }
+		  (void) pthread_mutex_unlock (&s->lock);
         }
-
-      return result;
     }
 
+  if (result != 0)
+    {
+      PTW32_SET_ERRNO(result);
+      return -1;
+    }
+
+  return 0;
 }				/* sem_getvalue */

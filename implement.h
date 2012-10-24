@@ -62,7 +62,7 @@ __attribute__((unused))
 #  endif
 static int ptw32_get_errno(void) { int err = 0; _get_errno(&err); return err; }
 #  define PTW32_GET_ERRNO() ptw32_get_errno()
-#  if defined(PTW32_BROKEN_ERRNO)
+#  if defined(PTW32_USES_SEPARATE_CRT)
 #    if defined(PTW32_CONFIG_MINGW)
 __attribute__((unused))
 #    endif
@@ -73,7 +73,7 @@ static void ptw32_set_errno(int err) { _set_errno(err); SetLastError(err); }
 #  endif
 #else
 #  define PTW32_GET_ERRNO() (errno)
-#  if defined(PTW32_BROKEN_ERRNO)
+#  if defined(PTW32_USES_SEPARATE_CRT)
 #    if defined(PTW32_CONFIG_MINGW)
 __attribute__((unused))
 #    endif
@@ -170,7 +170,7 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 /*
  * Don't allow the linker to optimize away autostatic.obj in static builds.
  */
-#if defined(PTW32_STATIC_LIB)
+#if defined(PTW32_STATIC_LIB) && defined(PTW32_BUILD)
   void ptw32_autostatic_anchor(void);
 # if defined(PTW32_CONFIG_MINGW)
     __attribute__((unused, used))

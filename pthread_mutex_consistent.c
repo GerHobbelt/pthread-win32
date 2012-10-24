@@ -41,29 +41,29 @@
  * mutex, usually because its process terminated abnormally. The value of robustness that is
  * defined in pthread.h is PTHREAD_MUTEX_ROBUST or PTHREAD_MUTEX_STALLED. The
  * default value is PTHREAD_MUTEX_STALLED .
- * ■ PTHREAD_MUTEX_STALLED
+ * [] PTHREAD_MUTEX_STALLED
  * When the owner of the mutex terminates without unlocking the mutex, all subsequent calls
  * to pthread_mutex_lock() are blocked from progress in an unspecified manner.
- * ■ PTHREAD_MUTEX_ROBUST
+ * [] PTHREAD_MUTEX_ROBUST
  * When the owner of the mutex terminates without unlocking the mutex, the mutex is
  * unlocked. The next owner of this mutex acquires the mutex with an error return of
  * EOWNERDEAD.
- * Note – Your application must always check the return code from pthread_mutex_lock() for
+ * Note - Your application must always check the return code from pthread_mutex_lock() for
  * a mutex initialized with the PTHREAD_MUTEX_ROBUST attribute.
- * ■ The new owner of this mutex should make the state protected by the mutex consistent.
+ * [] The new owner of this mutex should make the state protected by the mutex consistent.
  * This state might have been left inconsistent when the previous owner terminated.
- * ■ If the new owner is able to make the state consistent, call
+ * [] If the new owner is able to make the state consistent, call
  * pthread_mutex_consistent() for the mutex before unlocking the mutex. This
  * marks the mutex as consistent and subsequent calls to pthread_mutex_lock() and
  * pthread_mutex_unlock() will behave in the normal manner.
- * ■ If the new owner is not able to make the state consistent, do not call
+ * [] If the new owner is not able to make the state consistent, do not call
  * pthread_mutex_consistent() for the mutex, but unlock the mutex.
  * All waiters are woken up and all subsequent calls to pthread_mutex_lock() fail to
  * acquire the mutex. The return code is ENOTRECOVERABLE. The mutex can be made
  * consistent by calling pthread_mutex_destroy() to uninitialize the mutex, and calling
  * pthread_mutex_int() to reinitialize the mutex.However, the state that was protected
  * by the mutex remains inconsistent and some form of application recovery is required.
- * ■ If the thread that acquires the lock with EOWNERDEAD terminates without unlocking the
+ * [] If the thread that acquires the lock with EOWNERDEAD terminates without unlocking the
  * mutex, the next owner acquires the lock with an EOWNERDEAD return code.
  */
 #if !defined(_UWIN)

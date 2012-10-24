@@ -78,7 +78,7 @@ INCLUDES	= -I.
 TEST	= GC
 
 # Default lib version
-GCX	= $(TEST)$(DLL_VER)
+GCX	= GC$(DLL_VER)
 
 # Files we need to run the tests
 # - paths are relative to pthreads build dir.
@@ -94,7 +94,7 @@ COPYFILES	= $(HDR) $(LIB) $(DLL) $(QAPC)
 # stop.
 
 TESTS	= \
-	  sizes loadfree \
+	  fiber1 sizes loadfree \
 	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
@@ -124,7 +124,7 @@ TESTS	= \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
 	  exception1 exception2 exception3_0 exception3 \
-	  cancel9 affinity1 affinity2 stress1
+	  cancel9 affinity1 affinity2 affinity3 affinity4 affinity5 stress1
 
 STRESSTESTS = \
 	stress1
@@ -133,7 +133,7 @@ BENCHTESTS = \
 	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
 
 STATICTESTS = \
-	  sizes \
+	  fiber1 sizes \
 	  self1 mutex5 mutex1 mutex1e mutex1n mutex1r \
 	  semaphore1 semaphore2 semaphore3 \
 	  condvar1 condvar1_1 condvar1_2 condvar2 condvar2_1 exit1 \
@@ -163,7 +163,7 @@ STATICTESTS = \
 	  priority1 priority2 inherit1 \
 	  spin1 spin2 spin3 spin4 \
 	  exception1 exception2 exception3_0 exception3 \
-	  cancel9 affinity1 affinity2 stress1
+	  cancel9 affinity1 affinity2 affinity3 affinity4 affinity5 stress1
 
 ALLTESTS = $(TESTS) $(BENCHTESTS)
 
@@ -175,60 +175,64 @@ STATICRESULTS	= $(STATICTESTS:%=%.pass)
 
 help:
 	@ $(ECHO) "Run one of the following command lines:"
-	@ $(ECHO) "$(MAKE) clean GC         (to test using GC dll with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCX        (to test using GC dll with C++ (EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCE        (to test using GCE dll with C++ (EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GC-bench   (to benchtest using GNU C dll with C cleanup code)"
-	@ $(ECHO) "$(MAKE) clean GCE-bench  (to benchtest using GNU C dll with C++ exception handling)"
-	@ $(ECHO) "$(MAKE) clean GC-stress  (to stresstest using GNU C dll with C cleanup code)"
-	@ $(ECHO) "$(MAKE) clean GCE-stress (to stresstest using GNU C dll with C++ exception handling)"
-	@ $(ECHO) "$(MAKE) clean GC-static  (to test using GC static lib with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GC-debug   (to test using GC dll with C (no EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GCE-debug  (to test using GCE dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC               (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCX              (to test using GC dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCE              (to test using GCE dll with C++ (EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-bench         (to benchtest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "$(MAKE) clean GCE-bench        (to benchtest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "$(MAKE) clean GC-stress        (to stresstest using GNU C dll with C cleanup code)"
+	@ $(ECHO) "$(MAKE) clean GCE-stress       (to stresstest using GNU C dll with C++ exception handling)"
+	@ $(ECHO) "$(MAKE) clean GC-static        (to test using GC static lib with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-static-debug  (to test using GC static lib with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GC-debug         (to test using GC dll with C (no EH) applications)"
+	@ $(ECHO) "$(MAKE) clean GCE-debug        (to test using GCE dll with C++ (EH) applications)"
 
 all:
 	@ $(MAKE) clean GC
 	@ $(MAKE) clean GCX
 	@ $(MAKE) clean GCE
 
-GC:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-pass
+GC GC-inlined:
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-pass
 
 GC-asm:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-asm
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-asm
 
-GCE:
-	$(MAKE) TEST=GCE CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-pass
+GCE GCE-inlined:
+	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" all-pass
 
-GCX:
-	$(MAKE) TEST=GC CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
+GCX GCX-inlined:
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_C" all-pass
 
 GC-bench:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
 
 GCE-bench:
-	$(MAKE) TEST=GCE  CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
+	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="benchlib." all-bench
 
 GC-debug:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" DLL_VER="$(DLL_VER)d" all-pass
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" all-pass
 
 GCE-debug:
-	$(MAKE) TEST=GCE CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX" OPT="${DOPT}" DLL_VER="$(DLL_VER)d" all-pass
+	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX" OPT="${DOPT}" all-pass
 
 GC-bench-debug:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${OPT}" DLL_VER="$(DLL_VER)d" all-bench
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${OPT}" all-bench
 
-GC-static:
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
+GC-static GC-small-static:
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" all-static
+
+GC-static-debug:
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" all-static
 
 GC-stress:
 	@ $(ECHO) "Stress tests can take a long time since they are trying to"
 	@ $(ECHO) "expose weaknesses that may be intermittant or statistically rare."
 	@ $(ECHO) "A pass does not prove correctness, but may give greater confidence."
-	$(MAKE) TEST=GC CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="" all-stress
+	$(MAKE) TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="" all-stress
 
 GCE-stress:
-	$(MAKE) TEST=GCE  CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="" all-stress
+	$(MAKE) TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" XXLIBS="" all-stress
 
 all-asm: $(ASM)
 	@ $(ECHO) "ALL TESTS PASSED! Congratulations!"
@@ -255,6 +259,9 @@ benchtest5.bench:
 
 affinity1.pass:
 affinity2.pass: affinity1.pass
+affinity3.pass: affinity2.pass
+affinity4.pass: affinity3.pass
+affinity5.pass: affinity4.pass
 barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass
 barrier3.pass: barrier2.pass
@@ -311,6 +318,7 @@ exit3.pass: create1.pass
 exit4.pass:
 exit5.pass: exit4.pass kill1.pass
 eyal1.pass: tsd1.pass
+fiber1.pass:
 inherit1.pass: join1.pass priority1.pass
 join0.pass: create1.pass
 join1.pass: create1.pass
@@ -454,5 +462,5 @@ clean:
 	- $(RM) *.bench
 	- $(RM) *.static
 	- $(RM) *.log
-	- $(RM) SIZES.GC
-	- $(RM) SIZES.GCE
+	- $(RM) SIZES.G*
+	

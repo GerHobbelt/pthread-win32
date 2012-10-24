@@ -367,4 +367,23 @@ sync.$(OBJEXT):		sync.c $(SYNC_SRCS) $(INCL)
 tsd.$(OBJEXT):		tsd.c $(TSD_SRCS) $(INCL)
 version.$(RESEXT):	version.rc $(INCL)
 
+pthread.$(OBJEXT): \
+		pthread.c \
+		$(ATTR_SRCS) \
+		$(BARRIER_SRCS) \
+		$(CANCEL_SRCS) \
+		$(CONDVAR_SRCS) \
+		$(EXIT_SRCS) \
+		$(MISC_SRCS) \
+		$(MUTEX_SRCS) \
+		$(NONPORTABLE_SRCS) \
+		$(PRIVATE_SRCS) \
+		$(RWLOCK_SRCS) \
+		$(SCHED_SRCS) \
+		$(SEMAPHORE_SRCS) \
+		$(SPIN_SRCS) \
+		$(SYNC_SRCS) \
+		$(TSD_SRCS) \
+		$(INCL)
+
 # end common.mk

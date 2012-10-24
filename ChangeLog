@@ -1,3 +1,85 @@
+2012-09-23  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile: Modify "all-tests" to use new targets in tests
+	GNUmakefile.
+	* Makefile: Similarly.
+
+2012-09-22  Daniel Richard. G <danielg at teragram dot com>
+
+	* GNUmakefile: Reordered the command lines in the "help" target
+	to match the ordering of the targets in the makefile, which IMO
+	is nicer to the eye; tweaked some of the parentheticals for better
+	clarity; delete *.manifest files, in case the user just finished
+	doing an MSVC build.
+	* Makefile: Use *.static_stamp for the static targets instead of
+	*.static; added a note re VC++6 and /EHs vs. /EHa; reordered the
+	targets, and added a number of new ones (e.g. VSE-small-static);
+	added a note recommending *-inlined and *-small-static to make
+	things a little easier for users bewildered by the large number of
+	targets; reworked the all-tests[-cflags] targets so that (1) more
+	useful targets are built first (the small-static targets make it
+	easier to track down compilation errors), (2) *-debug build and
+	test targets can be used, (3) less-useful build/test permutations
+	are enabled only if EXHAUSTIVE and/or MORE_EXHAUSTIVE is defined,
+	and (4) /MDd and /MTd are covered too; "nmake all-tests-cflags
+	EXHAUSTIVE=1 MORE_EXHAUSTIVE=1" takes a few hours to run; moved
+	some of the VCE targets up, since the pattern in the file was
+	already to list VCE targets first, then VSE, then VC; actually
+	touch the stamp file in the stamp targets.
+	* README.NONPORTABLE: It's "DllMain", not "dllMain".
+	* common.mk: Start of an attempt to define dependencies for
+	pthread.$(OBJEXT).
+	* implement.h: Generalized PTW32_BROKEN_ERRNO into
+	PTW32_USES_SEPARATE_CRT; don't do the autostatic-anchoring thing
+	if we're not building the library!
+	* pthread.h: Moved the PTW32_CDECL bit into sched.h. pthread.h
+	already #includes sched.h, so the latter is a good place to put
+	definitions that need to be shared in common; severely simplified
+	the errno declaration for Open Watcom, made it applicable only to
+	Open Watcom, and made the comment less ambiguous; updated the long
+	comment describing PTW32_BROK^WPTW32_USES_SEPARATE_CRT; added
+	(conditional) declaration of pthread_win32_set_terminate_np(), as
+	well as ptw32_terminate_handler (so that eh.h doesn't have to get
+	involved).
+	* pthread_cond_wait.c: Missed a couple of errno conversions.
+	* pthread_mutex_consistent.c: Visual Studio (either 2010 or 2008
+	Express, don't recall now) actually errored out due to charset
+	issues in this file, so I've replaced non-ASCII characters with
+	ASCII approximations.
+	* ptw32_threadStart.c: Big rewrite of ptw32_threadStart().
+	Everything passes with this, except for GCE (and I can't figure
+	out why).
+	* sched.h: Moved the PTW32_CDECL section here (and made it
+	idempotent); need to #include <stdlib.h> for size_t (one of the test
+	programs #includes sched.h as the very first thing); moved the
+	DWORD_PTR definition up, since it groups better with the pid_t
+	definition; also need ULONG_PTR, don't need PDWORD_PTR; can't use
+	PTW32_CONFIG_MSVC6, because if you only #include sched.h you
+	don't get that bit in pthread.h; use a cpp symbol
+	(PTW32_HAVE_DWORD_PTR) to inhibit defining *_PTR if needed. Note
+	that this isn't #defined inside the conditional, because there are
+	no other instances of these typedefs that need to be disabled, and
+	sched.h itself is already protected against multiple inclusion;
+	DWORD_PTR can't be size_t, because (on MSVC6) the former is "unsigned
+	long" and the latter is "unsigned int" and C++ doesn't see them as
+	interchangeable; minor edit to the comment... I don't like saying
+	"VC++" without the "Microsoft" qualifier; use PTW32_CDECL instead of
+	a literal __cdecl (this was why I moved the PTW32_CDECL bit into this
+	file).
+	* semaphore.h: Put in another idempotentized PTW32_CDECL bit here;
+	use PTW32_CDECL instead of __cdecl, and fixed indentation of function
+	formal parameters.
+
+2012-09-21  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* create.c: Major changes to incorporate CPU affinity inheritance.
+	* pthread_self.c: Likewise.
+	* ptw32_new.c (cpuset): Initialise new pthread_thread_t element.
+	* pthread.h (DWORD_PTR): Conditional definition moved to sched.h.
+	* sched.h (DWORD_PTR): As above; other changes.
+	* sem_post.c: Fix errno handling and restructure.
+	* sem_getvalue.c: Fix return value and restructure.
+	
 2012-09-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* sched_setaffinity.c: New API to set process CPU affinity in POSIX

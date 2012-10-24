@@ -242,7 +242,10 @@ pthread_win32_thread_detach_np ()
 	    {
 	      ptw32_threadDestroy (sp->ptHandle);
 
-	      TlsSetValue (ptw32_selfThreadKey->key, NULL);
+	      if (ptw32_selfThreadKey)
+	        {
+	    	  TlsSetValue (ptw32_selfThreadKey->key, NULL);
+	        }
 	    }
 	}
     }
