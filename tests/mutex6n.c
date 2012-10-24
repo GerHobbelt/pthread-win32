@@ -92,17 +92,13 @@ test_mutex6n(void)
 
   assert(pthread_create(&t, NULL, locker, NULL) == 0);
 
-  Sleep(1000);
+  Sleep(100);
 
   assert(lockCount == 1);
 
-  /*
-   * Should succeed even though we don't own the lock
-   * because FAST mutexes don't check ownership.
-   */
   assert(pthread_mutex_unlock(&mutex) == (IS_ROBUST?EPERM:0));
 
-  Sleep (1000);
+  Sleep (100);
 
   assert(lockCount == (IS_ROBUST?1:2));
 

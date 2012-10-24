@@ -144,7 +144,7 @@ test_cancel3(void)
   /*
    * Code to control or manipulate child threads should probably go here.
    */
-  Sleep (500);
+  Sleep (NUMTHREADS * 100);
 
   for (i = 1; i <= NUMTHREADS; i++)
     {

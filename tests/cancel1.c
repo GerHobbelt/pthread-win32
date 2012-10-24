@@ -150,7 +150,7 @@ test_cancel1(void)
   /*
    * Give threads time to run.
    */
-  Sleep(NUMTHREADS * 1000);
+  Sleep(NUMTHREADS * 100);
 
   /*
    * Standard check that all threads started.

@@ -90,7 +90,7 @@ test_mutex7n(void)
 
   assert(pthread_create(&t, NULL, locker, NULL) == 0);
 
-  Sleep(1000);
+  Sleep(100);
 
   assert(lockCount == 2);
 

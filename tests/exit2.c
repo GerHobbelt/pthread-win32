@@ -63,7 +63,7 @@ test_exit2(void)
 
   assert(pthread_create(&t, NULL, func, (void *) NULL) == 0);
 
-  Sleep(1000);
+  Sleep(100);
 
   return 0;
 }
