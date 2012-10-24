@@ -44,7 +44,8 @@ removed. For example, targets to build and test all of the possible
 configurations of both dll and static libs.
 
 The makefiles now know how to build both 32 and 64 bit versions if
-the toolchain (MSVS or Mingw) allow it.
+the toolchain allows it (MinGW only). See the README file "Building
+with ..." sections for details.
 
 Bug Fixes
 ---------
@@ -72,6 +73,13 @@ building 32 bit libraries and apps that run on 64 bit systems.
 These failures do not arise with Mingw64 32 bit builds running on
 64 bit systems.
 - Daniel Richard G. and Ross Johnson
+
+pthread_key_delete() bug introduced in release 2.9.x caused this
+routine to fail in a way that the test suite was not detecting. A
+new test has been added to confirm that this routine behaves
+correctly, particularly when keys with destructors are deleted
+before threads exit.
+- Stephane Clairet
 
 RELEASE 2.9.1
 -------------
