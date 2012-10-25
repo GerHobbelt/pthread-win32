@@ -1,3 +1,10 @@
+2012-10-26	sicaf-- at hanmail dot net
+
+	* error.c: For WinCE use a more specific cast.
+	* implement.h: For WinCE don't include process.h.
+	* pthread_win32_attach_detach_np.c: For WinCE don't restrict QUserEx.dll
+	search to system path.
+
 2012-10-24  Stephane Clairet <Stephane dot Clairet at 4d dot com>
 
 	* pthread_key_delete.c: Bug fix - move keylock release to after the

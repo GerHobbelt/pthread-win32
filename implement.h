@@ -771,8 +771,10 @@ extern "C"
 #       endif
 #   endif
 #else
-#       include <process.h>
+#   if ! defined(WINCE)
+#     include <process.h>
 #   endif
+#endif
 
 
 /*
