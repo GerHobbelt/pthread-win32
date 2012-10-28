@@ -1,3 +1,15 @@
+2012-10-28  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* implement.h: sem_t_ replace internal state mutex with MCS lock.
+	* sem_init.c: Rewrite to use MCS lock rather than mutex.
+	* sem_destroy.c: Likewise.
+	* sem_wait.c: Likewise.
+	* sem_post.c: Likewise.
+	* sem_post_multiple.c: Likewise.
+	* sem_timedwait.c: Likewise.
+	* sem_trywait.c: Likewise.
+	* ptw32_semwait.c: Likewise.
+
 2012-10-26	sicaf-- at hanmail dot net
 
 	* error.c: For WinCE use a more specific cast.

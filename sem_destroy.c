@@ -25,17 +25,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -86,13 +86,14 @@ sem_destroy (sem_t * sem)
     }
   else
     {
+      ptw32_mcs_local_node_t node;
       s = *sem;
 
-      if ((result = pthread_mutex_lock (&s->lock)) == 0)
+      if ((result = ptw32_mcs_lock_try_acquire(&s->lock, &node)) == 0)
         {
           if (s->value < 0)
             {
-              (void) pthread_mutex_unlock (&s->lock);
+              ptw32_mcs_lock_release(&node);
               result = EBUSY;
             }
           else
@@ -101,12 +102,13 @@ sem_destroy (sem_t * sem)
 
               if (!CloseHandle (s->sem))
 	        {
-                  (void) pthread_mutex_unlock (&s->lock);
+                  ptw32_mcs_lock_release(&node);
 	          result = EINVAL;
 	        }
 	      else
 	        {
                   /*
+                   * FIXME: Need another way to identify invalid semaphores.
                    * Invalidate the semaphore handle when we have the lock.
                    * Other sema operations should test this after acquiring the lock
                    * to check that the sema is still valid, i.e. before performing any
@@ -116,21 +118,12 @@ sem_destroy (sem_t * sem)
                    */
                   *sem = NULL;
 
-                  /* Prevent anyone else actually waiting on or posting this sema.
+                  /*
+                   * Prevent anyone else waiting on or posting this sema.
                    */
                   s->value = SEM_VALUE_MAX;
 
-                  (void) pthread_mutex_unlock (&s->lock);
-
-                  do
-                    {
-                      /* Give other threads a chance to run and exit any sema op
-                       * routines. Due to the SEM_VALUE_MAX value, if sem_post or
-                       * sem_wait were blocked by us they should fall through.
-                       */
-                      Sleep(0);
-                    }
-                  while (pthread_mutex_destroy (&s->lock) == EBUSY);
+                  ptw32_mcs_lock_release(&node);
                 }
             }
         }
