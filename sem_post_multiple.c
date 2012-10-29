@@ -86,58 +86,42 @@ sem_post_multiple (sem_t * sem, int count)
   long waiters;
   sem_t s = *sem;
 
-  if (s == NULL || count <= 0)
+  ptw32_mcs_lock_acquire(&s->lock, &node);
+
+  if (s->value <= (SEM_VALUE_MAX - count))
     {
+      waiters = -s->value;
+      s->value += count;
+      if (waiters > 0)
+        {
+#if defined(NEED_SEM)
+          if (SetEvent(s->sem))
+            {
+              waiters--;
+              s->leftToUnblock += count - 1;
+              if (s->leftToUnblock > waiters)
+                {
+                  s->leftToUnblock = waiters;
+                }
+            }
+#else
+  if (ReleaseSemaphore (s->sem,  (waiters<=count)?waiters:count, 0))
+    {
+      /* No action */
+    }
+#endif
+  else
+    {
+      s->value -= count;
       result = EINVAL;
+    }
+        }
     }
   else
     {
-      ptw32_mcs_lock_acquire(&s->lock, &node);
-      /*
-       * See sem_destroy.c
-       */
-      if (*sem == NULL)
-        {
-          ptw32_mcs_lock_release(&node);
-          result = EINVAL;
-          return -1;
-        }
-
-      if (s->value <= (SEM_VALUE_MAX - count))
-        {
-          waiters = -s->value;
-          s->value += count;
-          if (waiters > 0)
-            {
-#if defined(NEED_SEM)
-              if (SetEvent(s->sem))
-                {
-                  waiters--;
-                  s->leftToUnblock += count - 1;
-                  if (s->leftToUnblock > waiters)
-                    {
-                      s->leftToUnblock = waiters;
-                    }
-                }
-#else
-              if (ReleaseSemaphore (s->sem,  (waiters<=count)?waiters:count, 0))
-                {
-                  /* No action */
-                }
-#endif
-              else
-                {
-                  s->value -= count;
-                  result = EINVAL;
-                }
-            }
-        }
-      else
-        {
-          result = ERANGE;
-        }
-      ptw32_mcs_lock_release(&node);
+      result = ERANGE;
     }
+  ptw32_mcs_lock_release(&node);
 
   if (result != 0)
     {

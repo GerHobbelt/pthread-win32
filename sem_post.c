@@ -80,50 +80,33 @@ sem_post (sem_t * sem)
 {
   int result = 0;
 
-  if (NULL == sem || NULL == *sem)
+  ptw32_mcs_local_node_t node;
+  sem_t s = *sem;
+
+  ptw32_mcs_lock_acquire(&s->lock, &node);
+  if (s->value < SEM_VALUE_MAX)
     {
+#if defined(NEED_SEM)
+      if (++s->value <= 0
+          && !SetEvent(s->sem))
+        {
+          s->value--;
+          result = EINVAL;
+        }
+#else
+  if (++s->value <= 0
+      && !ReleaseSemaphore (s->sem, 1, NULL))
+    {
+      s->value--;
       result = EINVAL;
+    }
+#endif /* NEED_SEM */
     }
   else
     {
-      ptw32_mcs_local_node_t node;
-      sem_t s = *sem;
-
-      ptw32_mcs_lock_acquire(&s->lock, &node);
-      /*
-       *  See sem_destroy.c
-       */
-      if (NULL == *sem /* don't test 's' here */)
-        {
-          result = EINVAL;
-        }
-      else
-        {
-          if (s->value < SEM_VALUE_MAX)
-            {
-#if defined(NEED_SEM)
-              if (++s->value <= 0
-                  && !SetEvent(s->sem))
-                {
-                  s->value--;
-                  result = EINVAL;
-                }
-#else
-              if (++s->value <= 0
-                  && !ReleaseSemaphore (s->sem, 1, NULL))
-                {
-                  s->value--;
-                  result = EINVAL;
-                }
-#endif /* NEED_SEM */
-            }
-          else
-            {
-              result = ERANGE;
-            }
-        }
-      ptw32_mcs_lock_release(&node);
+      result = ERANGE;
     }
+  ptw32_mcs_lock_release(&node);
 
   if (result != 0)
     {

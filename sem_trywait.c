@@ -85,35 +85,18 @@ sem_trywait (sem_t * sem)
   sem_t s = *sem;
   ptw32_mcs_local_node_t node;
 
+  ptw32_mcs_lock_acquire(&s->lock, &node);
 
-  if (s == NULL)
+  if (s->value > 0)
     {
-      result = EINVAL;
+      s->value--;
     }
   else
     {
-      ptw32_mcs_lock_acquire(&s->lock, &node);
-      /*
-       * See sem_destroy.c
-       */
-      if (*sem == NULL)
-        {
-          ptw32_mcs_lock_release(&node);
-          PTW32_SET_ERRNO(EINVAL);
-          return -1;
-        }
-
-      if (s->value > 0)
-        {
-          s->value--;
-        }
-      else
-        {
-          result = EAGAIN;
-        }
-
-      ptw32_mcs_lock_release(&node);
+      result = EAGAIN;
     }
+
+  ptw32_mcs_lock_release(&node);
 
   if (result != 0)
     {

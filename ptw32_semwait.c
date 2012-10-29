@@ -72,59 +72,34 @@ ptw32_semwait (sem_t * sem)
  */
 {
   ptw32_mcs_local_node_t node;
+  int v;
   int result = 0;
   sem_t s = *sem;
 
-  if (s == NULL)
+  ptw32_mcs_lock_acquire(&s->lock, &node);
+  v = --s->value;
+  ptw32_mcs_lock_release(&node);
+
+  if (v < 0)
     {
-      result = EINVAL;
+      /* Must wait */
+      if (WaitForSingleObject (s->sem, INFINITE) == WAIT_OBJECT_0)
+        {
+#if defined(NEED_SEM)
+          ptw32_mcs_lock_acquire(&s->lock, &node);
+          if (s->leftToUnblock > 0)
+            {
+              --s->leftToUnblock;
+              SetEvent(s->sem);
+            }
+          ptw32_mcs_lock_release(&node);
+#endif
+return 0;
+        }
     }
   else
     {
-      int v;
-
-      ptw32_mcs_lock_acquire(&s->lock, &node);
-      /*
-       * See sem_destroy.c
-       */
-      if (*sem == NULL)
-        {
-          ptw32_mcs_lock_release(&node);
-          PTW32_SET_ERRNO(EINVAL);
-          return -1;
-        }
-
-      v = --s->value;
-      ptw32_mcs_lock_release(&node);
-
-      if (v < 0)
-        {
-          /* Must wait */
-          if (WaitForSingleObject (s->sem, INFINITE) == WAIT_OBJECT_0)
-            {
-#if defined(NEED_SEM)
-              ptw32_mcs_lock_acquire(&s->lock, &node);
-              if (*sem == NULL)
-                {
-                  ptw32_mcs_lock_release(&node);
-                  PTW32_SET_ERRNO(EINVAL);
-                  return -1;
-                }
-
-              if (s->leftToUnblock > 0)
-                {
-                  --s->leftToUnblock;
-                  SetEvent(s->sem);
-                }
-              ptw32_mcs_lock_release(&node);
-#endif
-              return 0;
-            }
-        }
-      else
-        {
-          return 0;
-        }
+      return 0;
     }
 
   if (result != 0)

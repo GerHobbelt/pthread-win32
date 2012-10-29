@@ -114,71 +114,46 @@ sem_wait (sem_t * sem)
  * ------------------------------------------------------
  */
 {
+  ptw32_mcs_local_node_t node;
+  int v;
   int result = 0;
   sem_t s = *sem;
 
   pthread_testcancel();
 
-  if (s == NULL)
+  ptw32_mcs_lock_acquire(&s->lock, &node);
+  v = --s->value;
+  ptw32_mcs_lock_release(&node);
+
+  if (v < 0)
     {
-      result = EINVAL;
-    }
-  else
-    {
-      int v;
-      ptw32_mcs_local_node_t node;
-
-      ptw32_mcs_lock_acquire(&s->lock, &node);
-      /*
-       * See sem_destroy.c
-       */
-      if (*sem == NULL)
-        {
-          ptw32_mcs_lock_release(&node);
-          PTW32_SET_ERRNO(EINVAL);
-          return -1;
-        }
-
-      v = --s->value;
-      ptw32_mcs_lock_release(&node);
-
-      if (v < 0)
-        {
 #if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth(0)
 #endif
-          /* Must wait */
-          pthread_cleanup_push(ptw32_sem_wait_cleanup, (void *) s);
-          result = pthreadCancelableWait (s->sem);
-          /* Cleanup if we're canceled or on any other error */
-          pthread_cleanup_pop(result);
+      /* Must wait */
+      pthread_cleanup_push(ptw32_sem_wait_cleanup, (void *) s);
+      result = pthreadCancelableWait (s->sem);
+      /* Cleanup if we're canceled or on any other error */
+      pthread_cleanup_pop(result);
 #if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth()
 #endif
-        }
+    }
 #if defined(NEED_SEM)
 
-      if (!result)
-        {
-          ptw32_mcs_lock_acquire(&s->lock, &node);
-          if (*sem == NULL)
-            {
-              ptw32_mcs_lock_release(&node);
-              PTW32_SET_ERRNO(EINVAL);
-              return -1;
-            }
+  if (!result)
+    {
+      ptw32_mcs_lock_acquire(&s->lock, &node);
 
-          if (s->leftToUnblock > 0)
-            {
-              --s->leftToUnblock;
-              SetEvent(s->sem);
-            }
-          ptw32_mcs_lock_release(&node);
+      if (s->leftToUnblock > 0)
+        {
+          --s->leftToUnblock;
+          SetEvent(s->sem);
         }
+      ptw32_mcs_lock_release(&node);
+    }
 
 #endif /* NEED_SEM */
-
-    }
 
   if (result != 0)
     {

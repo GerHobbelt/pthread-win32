@@ -53,29 +53,29 @@
 
 int
 sem_destroy (sem_t * sem)
-     /*
-      * ------------------------------------------------------
-      * DOCPUBLIC
-      *      This function destroys an unnamed semaphore.
-      *
-      * PARAMETERS
-      *      sem
-      *              pointer to an instance of sem_t
-      *
-      * DESCRIPTION
-      *      This function destroys an unnamed semaphore.
-      *
-      * RESULTS
-      *              0               successfully destroyed semaphore,
-      *              -1              failed, error in errno
-      * ERRNO
-      *              EINVAL          'sem' is not a valid semaphore,
-      *              ENOSYS          semaphores are not supported,
-      *              EBUSY           threads (or processes) are currently
-      *                                      blocked on 'sem'
-      *
-      * ------------------------------------------------------
-      */
+/*
+ * ------------------------------------------------------
+ * DOCPUBLIC
+ *      This function destroys an unnamed semaphore.
+ *
+ * PARAMETERS
+ *      sem
+ *              pointer to an instance of sem_t
+ *
+ * DESCRIPTION
+ *      This function destroys an unnamed semaphore.
+ *
+ * RESULTS
+ *              0               successfully destroyed semaphore,
+ *              -1              failed, error in errno
+ * ERRNO
+ *              EINVAL          'sem' is not a valid semaphore,
+ *              ENOSYS          semaphores are not supported,
+ *              EBUSY           threads (or processes) are currently
+ *                                      blocked on 'sem'
+ *
+ * ------------------------------------------------------
+ */
 {
   int result = 0;
   sem_t s = NULL;
@@ -93,39 +93,21 @@ sem_destroy (sem_t * sem)
         {
           if (s->value < 0)
             {
-              ptw32_mcs_lock_release(&node);
               result = EBUSY;
             }
           else
             {
-              /* There are no threads currently blocked on this semaphore. */
-
+              /*
+               * There are no threads currently blocked on this semaphore
+               * however there could be threads about to wait behind us.
+               * It is up to the application to ensure this is not the case.
+               */
               if (!CloseHandle (s->sem))
-	        {
-                  ptw32_mcs_lock_release(&node);
-	          result = EINVAL;
-	        }
-	      else
-	        {
-                  /*
-                   * FIXME: Need another way to identify invalid semaphores.
-                   * Invalidate the semaphore handle when we have the lock.
-                   * Other sema operations should test this after acquiring the lock
-                   * to check that the sema is still valid, i.e. before performing any
-                   * operations. This may only be necessary before the sema op routine
-                   * returns so that the routine can return EINVAL - e.g. if setting
-                   * s->value to SEM_VALUE_MAX below does force a fall-through.
-                   */
-                  *sem = NULL;
-
-                  /*
-                   * Prevent anyone else waiting on or posting this sema.
-                   */
-                  s->value = SEM_VALUE_MAX;
-
-                  ptw32_mcs_lock_release(&node);
+                {
+                  result = EINVAL;
                 }
             }
+          ptw32_mcs_lock_release(&node);
         }
     }
 

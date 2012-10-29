@@ -84,29 +84,12 @@ sem_getvalue (sem_t * sem, int *sval)
 {
   int result = 0;
 
-  if (NULL == sem || NULL == *sem || NULL == sval)
-    {
-      result = EINVAL;
-    }
-  else
-    {
-      ptw32_mcs_local_node_t node;
-      register sem_t s = *sem;
+  ptw32_mcs_local_node_t node;
+  register sem_t s = *sem;
 
-      ptw32_mcs_lock_acquire(&s->lock, &node);
-      /*
-       *  See sem_destroy.c
-       */
-      if (*sem == NULL /* don't test 's' here */)
-        {
-          result = EINVAL;
-        }
-      else
-        {
-          *sval = s->value;
-        }
-      ptw32_mcs_lock_release(&node);
-    }
+  ptw32_mcs_lock_acquire(&s->lock, &node);
+  *sval = s->value;
+  ptw32_mcs_lock_release(&node);
 
   if (result != 0)
     {
