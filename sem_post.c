@@ -94,12 +94,12 @@ sem_post (sem_t * sem)
           result = EINVAL;
         }
 #else
-  if (++s->value <= 0
-      && !ReleaseSemaphore (s->sem, 1, NULL))
-    {
-      s->value--;
-      result = EINVAL;
-    }
+      if (++s->value <= 0
+          && !ReleaseSemaphore (s->sem, 1, NULL))
+        {
+          s->value--;
+          result = EINVAL;
+        }
 #endif /* NEED_SEM */
     }
   else
