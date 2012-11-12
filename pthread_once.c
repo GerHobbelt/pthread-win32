@@ -42,7 +42,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-/* [i_a] simple wrapper ensures correct calling convention for all
+/* [i_a] simple wrapper ensures correct calling convention for all */
 static void PTW32_CDECL
 ptw32_mcs_lock_cleanup(void *args)
 {
