@@ -42,7 +42,7 @@ by Ross Johnson.
 The implementation of read/write locks was contributed by
 Aurelio Medina and improved by Alexander Terekhov.
 
-Many others have contributed significant time and effort to solve crutial
+Many others have contributed significant time and effort to solve crucial
 problems in order to make the library workable, robust and reliable.
 
 Thanks to Xavier Leroy for granting permission to use and modify his
