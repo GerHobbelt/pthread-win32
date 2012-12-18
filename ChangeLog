@@ -1,3 +1,8 @@
+2012-12-19  Jason Baker <jason underscore baker at symantec dot com>
+
+	* pthread_win32_attach_detach_np.c (pthread_win32_process_attach_np):
+	Fix function calls involving TCHAR.
+
 2012-10-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* sem_destroy.c: Remove NULL argument checks. These are only useful

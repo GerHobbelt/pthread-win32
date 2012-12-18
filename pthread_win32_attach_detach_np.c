@@ -85,12 +85,11 @@ pthread_win32_process_attach_np ()
   }
 #else
 #  if ! defined(WINCE)
-  /* strncat is secure - this is just to avoid a warning */
-  if(GetSystemDirectory(QuserExDLLPathBuf, sizeof(QuserExDLLPathBuf)) &&
-     0 == strncat_s(QuserExDLLPathBuf, sizeof(QuserExDLLPathBuf), "\\QUSEREX.DLL", 12))
-  {
-    ptw32_h_quserex = LoadLibrary(QuserExDLLPathBuf);
-  }
+  if(GetSystemDirectory(QuserExDLLPathBuf, sizeof(QuserExDLLPathBuf)/sizeof(TCHAR)) &&
+      0 == _tcsncat_s(QuserExDLLPathBuf, _countof(QuserExDLLPathBuf), TEXT("\\QUSEREX.DLL"), 12))
+    {
+      ptw32_h_quserex = LoadLibrary(QuserExDLLPathBuf);
+    }
 #  endif
 #endif
 

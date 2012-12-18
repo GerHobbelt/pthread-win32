@@ -81,6 +81,11 @@ correctly, particularly when keys with destructors are deleted
 before threads exit.
 - Stephane Clairet
 
+pthread_win32_process_attach_np() fix potential failure/security around
+finding and loading of QUSEREX.DLL.
+- Jason Baker
+
+
 RELEASE 2.9.1
 -------------
 (2012-05-27)
