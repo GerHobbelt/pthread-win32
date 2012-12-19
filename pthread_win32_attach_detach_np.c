@@ -41,6 +41,7 @@
 
 #include "pthread.h"
 #include "implement.h"
+#include <tchar.h>
 
 /*
  * Handle to quserex.dll
