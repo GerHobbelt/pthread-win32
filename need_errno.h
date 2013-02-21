@@ -114,7 +114,9 @@ _CRTIMP extern int errno;
 #define ERANGE          34
 #define EDEADLK         36
 
-/* defined differently in winsock.h on WinCE */
+/* defined differently in winsock.h on WinCE
+ * We don't use this value.
+ */
 //#if !defined(ENAMETOOLONG)
 //#define ENAMETOOLONG    38
 //#endif
@@ -122,7 +124,9 @@ _CRTIMP extern int errno;
 #define ENOLCK          39
 #define ENOSYS          40
 
-/* defined differently in winsock.h on WinCE */
+/* defined differently in winsock.h on WinCE
+ * We don't use this value.
+ */
 //#if !defined(ENOTEMPTY)
 //#define ENOTEMPTY       41
 //#endif
@@ -134,7 +138,7 @@ _CRTIMP extern int errno;
 #define ENOTRECOVERABLE	44
 
 /*
- * Support EDEADLOCK for compatibiity with older MS-C versions.
+ * Support EDEADLOCK for compatibility with older MS-C versions.
  */
 #define EDEADLOCK       EDEADLK
 
