@@ -146,7 +146,9 @@ pthread_create (pthread_t * tid,
 #if defined(HAVE_SIGSET_T)
   tp->sigmask = sp->sigmask;
 #endif
+#if ! defined(WINCE)
   tp->cpuset = sp->cpuset;
+#endif
 
   if (a != NULL)
     {

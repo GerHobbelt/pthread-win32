@@ -24,7 +24,7 @@
 #error ERROR: Only Win32 targets supported!
 #endif
 
-#include <winsock.h>
+//#include <winsock.h>
 
 #if defined(__cplusplus)
 extern "C" {
@@ -115,17 +115,17 @@ _CRTIMP extern int errno;
 #define EDEADLK         36
 
 /* defined differently in winsock.h on WinCE */
-#if !defined(ENAMETOOLONG)
-#define ENAMETOOLONG    38
-#endif
+//#if !defined(ENAMETOOLONG)
+//#define ENAMETOOLONG    38
+//#endif
 
 #define ENOLCK          39
 #define ENOSYS          40
 
 /* defined differently in winsock.h on WinCE */
-#if !defined(ENOTEMPTY)
-#define ENOTEMPTY       41
-#endif
+//#if !defined(ENOTEMPTY)
+//#define ENOTEMPTY       41
+//#endif
 
 #define EILSEQ          42
 
