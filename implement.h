@@ -59,8 +59,9 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
  * Designed to allow error values to be set and retrieved in builds where
  * MSCRT libraries are statically linked to DLLs.
  */
-#if ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0800 ) || \
-    ( defined(_MSC_VER) && _MSC_VER >= 1400 )  /* MSVC8+ */
+#if ! defined(WINCE) && \
+    (( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0800 ) || \
+    ( defined(_MSC_VER) && _MSC_VER >= 1400 ))  /* MSVC8+ */
 #  if defined(PTW32_CONFIG_MINGW)
 __attribute__((unused))
 #  endif
@@ -224,7 +225,9 @@ struct ptw32_thread_t_
   int cancelType;
   int implicit:1;
   DWORD thread;			/* Windows thread ID */
+#if ! defined(WINCE)
   size_t cpuset;		/* Thread CPU affinity set */
+#endif
 #if defined(_UWIN)
   DWORD dummy[5];
 #endif
