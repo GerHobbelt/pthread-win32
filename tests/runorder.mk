@@ -66,6 +66,7 @@ exit2.pass: create1.pass
 exit3.pass: create1.pass
 exit4.pass: self1.pass create3.pass 
 exit5.pass: exit4.pass kill1.pass
+exit6.pass: exit5.pass
 eyal1.pass: self1.pass create3.pass mutex8.pass tsd1.pass
 inherit1.pass: join1.pass priority1.pass
 join0.pass: create1.pass

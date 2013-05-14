@@ -530,21 +530,24 @@ extern "C"
 # error Please upgrade your GNU compiler to one that supports __declspec.
 #endif
 
+#if defined(PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400
+#  undef PTW32_STATIC_LIB
+#  define PTW32_STATIC_TLSLIB
+#endif
+
 /*
  * When building the library, you should define PTW32_BUILD so that
  * the variables/functions are exported correctly. When using the library,
  * do NOT define PTW32_BUILD, and then the variables/functions will
  * be imported correctly.
  */
-#if !defined(PTW32_STATIC_LIB)
-#  if defined(PTW32_BUILD)
+#if defined(PTW32_STATIC_LIB) || defined(PTW32_STATIC_TLSLIB)
+#  define PTW32_DLLPORT
+#elif defined(PTW32_BUILD)
 #    define PTW32_DLLPORT __declspec (dllexport)
 #  else
 #    define PTW32_DLLPORT __declspec (dllimport)
 #  endif
-#else
-#  define PTW32_DLLPORT
-#endif
 
 #if defined(_UWIN) && PTW32_LEVEL >= PTW32_LEVEL_MAX
 #   include     <sys/types.h>

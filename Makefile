@@ -88,12 +88,12 @@ all:
 TEST_ENV = CFLAGS="$(CFLAGS) /DNO_ERROR_DIALOGS"
 
 all-tests:
-	$(MAKE) /E realclean VC-small-static$(XDBG)
-	cd tests && $(MAKE) /E clean VC-small-static$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX-small-static$(XDBG) $(TEST_ENV)
-	$(MAKE) /E realclean VCE-small-static$(XDBG)
-	cd tests && $(MAKE) /E clean VCE-small-static$(XDBG) $(TEST_ENV)
-	$(MAKE) /E realclean VSE-small-static$(XDBG)
-	cd tests && $(MAKE) /E clean VSE-small-static$(XDBG) $(TEST_ENV)
+#	$(MAKE) /E realclean VC-small-static$(XDBG)
+#	cd tests && $(MAKE) /E clean VC-small-static$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX-small-static$(XDBG) $(TEST_ENV)
+#	$(MAKE) /E realclean VCE-small-static$(XDBG)
+#	cd tests && $(MAKE) /E clean VCE-small-static$(XDBG) $(TEST_ENV)
+#	$(MAKE) /E realclean VSE-small-static$(XDBG)
+#	cd tests && $(MAKE) /E clean VSE-small-static$(XDBG) $(TEST_ENV)
 	$(MAKE) /E realclean VC$(XDBG)
 	cd tests && $(MAKE) /E clean VC$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX$(XDBG) $(TEST_ENV)
 	$(MAKE) /E realclean VCE$(XDBG)

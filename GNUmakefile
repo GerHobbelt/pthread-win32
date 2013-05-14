@@ -172,6 +172,8 @@ PTHREAD_DEF	= pthread.def
 
 help:
 	@ echo "Run one of the following command lines:"
+	@ echo "$(MAKE) clean all                      (build targets GC, GCE, GC-static, GCE-static)"
+	@ echo "$(MAKE) clean all-tests                (build and test all non-debug targets below)"
 	@ echo "$(MAKE) clean GC                       (to build the GNU C dll with C cleanup code)"
 	@ echo "$(MAKE) clean GC-debug                 (to build the GNU C debug dll with C cleanup code)"
 	@ echo "$(MAKE) clean GCE                      (to build the GNU C dll with C++ exception handling)"

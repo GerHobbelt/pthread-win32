@@ -20,7 +20,7 @@ ALL_KNOWN_TESTS = \
 	equal1 \
 	errno1 \
 	exception1 exception2 exception3_0 exception3 \
-	exit1 exit2 exit3 exit4 exit5 \
+	exit1 exit2 exit3 exit4 exit5 exit6 \
 	eyal1 \
 	join0 join1 join2 join3 join4 \
 	kill1 \
@@ -51,3 +51,7 @@ TESTS = $(ALL_KNOWN_TESTS)
 
 BENCHTESTS = \
 	benchtest1 benchtest2 benchtest3 benchtest4 benchtest5
+
+# Output useful info if no target given. I.e. the first target that "make" sees is used in this case.
+default_target: help
+	
