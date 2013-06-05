@@ -873,6 +873,10 @@ PTW32_DLLPORT int PTW32_CDECL pthread_attr_init (pthread_attr_t * attr);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_destroy (pthread_attr_t * attr);
 
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_getaffinity_np (const pthread_attr_t * attr,
+                                         size_t cpusetsize,
+                                         cpu_set_t * cpuset);
+
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_getdetachstate (const pthread_attr_t * attr,
                                          int *detachstate);
 
@@ -881,6 +885,10 @@ PTW32_DLLPORT int PTW32_CDECL pthread_attr_getstackaddr (const pthread_attr_t * 
 
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_getstacksize (const pthread_attr_t * attr,
                                        size_t * stacksize);
+
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_setaffinity_np (pthread_attr_t * attr,
+                                       size_t cpusetsize,
+                                       cpu_set_t * cpuset);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_setdetachstate (pthread_attr_t * attr,
                                          int detachstate);

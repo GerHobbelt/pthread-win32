@@ -16,6 +16,7 @@ STATIC_OBJS	= \
 		errno.$(OBJEXT) \
 		global.$(OBJEXT) \
 		pthread_attr_destroy.$(OBJEXT) \
+		pthread_attr_getaffinity_np.$(OBJEXT) \
 		pthread_attr_getdetachstate.$(OBJEXT) \
 		pthread_attr_getinheritsched.$(OBJEXT) \
 		pthread_attr_getschedparam.$(OBJEXT) \
@@ -24,6 +25,7 @@ STATIC_OBJS	= \
 		pthread_attr_getstackaddr.$(OBJEXT) \
 		pthread_attr_getstacksize.$(OBJEXT) \
 		pthread_attr_init.$(OBJEXT) \
+		pthread_attr_setaffinity_np.$(OBJEXT) \
 		pthread_attr_setdetachstate.$(OBJEXT) \
 		pthread_attr_setinheritsched.$(OBJEXT) \
 		pthread_attr_setschedparam.$(OBJEXT) \
@@ -176,6 +178,8 @@ PTHREAD_SRCS	= \
 		ptw32_spinlock_check_need_init.c \
 		pthread_attr_init.c \
 		pthread_attr_destroy.c \
+		pthread_attr_getaffinity_np.c \
+		pthread_attr_setaffinity_np.c \
 		pthread_attr_getdetachstate.c \
 		pthread_attr_setdetachstate.c \
 		pthread_attr_getscope.c \
