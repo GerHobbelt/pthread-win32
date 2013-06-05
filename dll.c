@@ -137,33 +137,44 @@ EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
 
 #else
 
-static void
-NTAPI tls_callback (void * h, DWORD r, void *u)
+static void NTAPI
+TlsMain (void * h, DWORD r, void *u)
 {
   (void)DllMain((HINSTANCE)h, r, u);
 }
 
-DWORD __tls_index__ = 0;
+#if defined(__MINGW64__) || (__MINGW64_VERSION_MAJOR) || (__MINGW32_MAJOR_VERSION >3) || \
+((__MINGW32_MAJOR_VERSION==3) && (__MINGW32_MINOR_VERSION>=18))
+extern "C"
+{
+__attribute__ ((section(".CRT$XLB"))) PIMAGE_TLS_CALLBACK __crt_xl_tls_callback__ = TlsMain;
+}
+#else
+extern "C" {
 
-extern const DWORD __tls_start__;
-extern const DWORD __tls_end__;
-extern const PIMAGE_TLS_CALLBACK __crt_xl_start__;
-__attribute__ ((section (".CRT$XLzzz"))) const DWORD __crt_xl_end__ = 0;
+__attribute__((section(".ctors"))) void (* gcc_ctor )() = on_process_enter;
+__attribute__((section(".dtors"))) void (* gcc_dtor)() = on_thread_exit;
+__attribute__((section(".dtors.zzz"))) void (* gcc_dtor )() = on_process_exit;
 
-const IMAGE_TLS_DIRECTORY _tls_used = {
-  (size_t)&__tls_start__,
-  (size_t)&__tls_end__,
-  (size_t)&__tls_index__,
-  (size_t)&__crt_xl_start__,
-  0,
-  0
+ULONG __tls_index__ = 0;
+char __tls_end__ __attribute__((section(".tls$zzz"))) = 0;
+char __tls_start__ __attribute__((section(".tls"))) = 0;
+
+__attribute__ ((section(".CRT$XLA"))) PIMAGE_TLS_CALLBACK __crt_xl_start__ = 0;
+__attribute__ ((section(".CRT$XLZ"))) PIMAGE_TLS_CALLBACK __crt_xl_end__ = 0;
+}
+
+__attribute__ ((section(".rdata$T"))) extern "C" const IMAGE_TLS_DIRECTORY32 _tls_used =
+{
+(DWORD) &__tls_start__,
+(DWORD) &__tls_end__,
+(DWORD) &__tls_index__,
+(DWORD) (&__crt_xl_start__+1),
+(DWORD) 0,
+(DWORD) 0
 };
-
-extern const PIMAGE_TLS_CALLBACK __mingw_tls_callback_ptr;
-const PIMAGE_TLS_CALLBACK __mingw_tls_callback_ptr __attribute__((section(".CRT$XLgcc")))
-  = tls_callback;
+#endif
 
 #endif
 
 #endif /* PTW32_STATIC_TLSLIB */
-

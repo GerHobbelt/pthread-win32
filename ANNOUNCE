@@ -275,6 +275,8 @@ The following functions are implemented:
       pthread_timechange_handler_np
       pthread_delay_np
       pthread_getunique_np
+      pthread_attr_getaffinity_np
+      pthread_attr_setaffinity_np
       pthread_getaffinity_np
       pthread_setaffinity_np
       pthread_mutexattr_getkind_np

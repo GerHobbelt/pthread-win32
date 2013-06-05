@@ -32,7 +32,9 @@ pthread_tryjoin_np()
 sched_getaffinity()
 sched_setaffinity()
 pthread_getaffinity_np()
-pthread_getaffinity_np()
+pthread_setaffinity_np()
+pthread_attr_getaffinity_np()
+pthread_attr_setaffinity_np()
  - added for compatibility with Linux and other libgcc-based systems.
    The macros to manipulate cpu_set_t objects (the cpu affinity mask
    vector) are also defined: CPU_ZERO, CPU_CLR, CPU_SET, CPU_EQUAL,
@@ -46,6 +48,12 @@ configurations of both dll and static libs.
 The makefiles now know how to build both 32 and 64 bit versions if
 the toolchain allows it (MinGW only). See the README file "Building
 with ..." sections for details.
+
+Static linking:
+The autostatic functionality has been extended so that builds using
+MSVC8 and later no longer require apps to call
+pthread_win32_thread_detach_np(). That is, all of the DllMain
+functionality is not automatic for static linking for these builds.   
 
 Bug Fixes
 ---------

@@ -110,6 +110,7 @@ pthread_mutexattr_getkind_np(pthread_mutexattr_t * attr, int *kind)
                 PTHREAD_MUTEX_ERRORCHECK
                 PTHREAD_MUTEX_RECURSIVE
 
+
 int
 pthread_delay_np (const struct timespec *interval)
 
@@ -138,6 +139,7 @@ pthread_delay_np (const struct timespec *interval)
         0          Successful completion. 
         [EINVAL]   The value specified by interval is invalid. 
 
+
 int
 pthread_timedjoin_np (pthread_t thread, void **value_ptr, const struct timespec *abstime)
 
@@ -145,7 +147,6 @@ int
 pthread_tryjoin_np (pthread_t thread, void **value_ptr)
 
 		These function is added for compatibility with Linux.
-		
 
 
 int
@@ -155,6 +156,7 @@ pthread_num_processors_np (void)
         in the system. This implementation actually returns the number of
         processors available to the process, which can be a lower number
         than the system's number, depending on the process's affinity mask.
+
 
 BOOL
 pthread_win32_process_attach_np (void);
@@ -184,6 +186,23 @@ pthread_win32_thread_detach_np (void);
 	These functions invariably return TRUE except for
 	pthread_win32_process_attach_np() which will return FALSE
 	if pthreads-win32 initialisation fails.
+
+
+int
+pthread_attr_getaffinity_np (pthread_attr_t * attr, size_t cpusetsize, cpu_set_t * cpuset);
+
+int
+pthread_attr_setaffinity_np (pthread_attr_t * attr, size_t cpusetsize, const cpu_set_t * cpuset);
+
+int
+pthread_getaffinity_np (pthread_t thread, size_t cpusetsize, cpu_set_t * cpuset);
+
+int
+pthread_setaffinity_np (pthread_t thread, size_t cpusetsize, const cpu_set_t * cpuset);
+
+	Manipulate the CPU affinity of threads. Compatibility with libgcc-based pthreads
+	implementations.
+
 
 int
 pthreadCancelableWait (HANDLE waitHandle);
@@ -354,7 +373,7 @@ rewritten.]
 
 Doesn't the compiler take care of padding?
 
-The C89 and later standards only effectively guarrantee element-by-element
+The C89 and later standards only effectively guarantee element-by-element
 equivalence following an assignment or pass by value of a struct or union,
 therefore undefined areas of any two otherwise equivalent pthread_t instances
 can still compare differently, e.g. attempting to compare two such pthread_t
@@ -574,7 +593,7 @@ bitclear((void*) &non-id, (void*) pthread_normalize(&id), sizeof(pthread_t));
 
 A pthread_t type change proposal to neutralise the effects of padding
 
-Even if pthread_nornalize() is available, padding is still a problem because
+Even if pthread_normalize() is available, padding is still a problem because
 the standard only garrantees element-by-element equivalence through
 copy operations (assignment and pass-by-value). So padding bit values can
 still change randomly after calls to pthread_normalize().
