@@ -336,7 +336,7 @@ extern "C"
  *
  * For conformance with the Single Unix Specification (version 3), all of the
  * options below are defined, and have a value of either -1 (not supported)
- * or 200112L (supported).
+ * or yyyymm[dd]L (supported).
  *
  * These options can neither be left undefined nor have a value of 0, because
  * either indicates that sysconf(), which is not implemented, may be used at
