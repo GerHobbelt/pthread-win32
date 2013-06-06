@@ -70,6 +70,8 @@
 #include "ptw32_spinlock_check_need_init.c"
 #include "pthread_attr_init.c"
 #include "pthread_attr_destroy.c"
+#include "pthread_attr_getaffinity_np.c"
+#include "pthread_attr_setaffinity_np.c"
 #include "pthread_attr_getdetachstate.c"
 #include "pthread_attr_setdetachstate.c"
 #include "pthread_attr_getscope.c"

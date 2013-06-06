@@ -3,7 +3,7 @@
 #
 
 ALL_KNOWN_TESTS = \
-	affinity1 affinity2 affinity3 affinity4 affinity5 \
+	affinity1 affinity2 affinity3 affinity4 affinity5 affinity6 \
 	barrier1 barrier2 barrier3 barrier4 barrier5 barrier6 \
 	cancel1 cancel2 cancel3 cancel4 cancel5 cancel6a cancel6d \
 	cancel7 cancel8 cancel9 \

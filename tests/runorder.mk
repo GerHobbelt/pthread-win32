@@ -10,8 +10,9 @@ benchtest5.bench:
 affinity1.pass: 
 affinity2.pass: affinity1.pass
 affinity3.pass: affinity2.pass self1.pass create3.pass
-affinity4.pass: affinity3.pass self1.pass create3.pass
-affinity5.pass: affinity4.pass self1.pass create3.pass
+affinity4.pass: affinity3.pass
+affinity5.pass: affinity4.pass
+affinity6.pass: affinity5.pass
 barrier1.pass: semaphore4.pass
 barrier2.pass: barrier1.pass semaphore4.pass
 barrier3.pass: barrier2.pass semaphore4.pass self1.pass create3.pass join4.pass

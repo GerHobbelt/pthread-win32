@@ -888,7 +888,7 @@ PTW32_DLLPORT int PTW32_CDECL pthread_attr_getstacksize (const pthread_attr_t * 
 
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_setaffinity_np (pthread_attr_t * attr,
                                        size_t cpusetsize,
-                                       cpu_set_t * cpuset);
+                                       const cpu_set_t * cpuset);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_setdetachstate (pthread_attr_t * attr,
                                          int detachstate);
