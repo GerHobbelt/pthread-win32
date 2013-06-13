@@ -1,3 +1,10 @@
+2013-06-13  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* pthread_setname_np.c: Initial version.
+	* pthread_getname_np.c: Initial version.
+	* pthread_attr_setname_np.c: Initial version.
+	* pthread_attr_getname_np.c: Initial version.
+
 2013-06-06  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_attr_setstackaddr.c: Should return ENOSYS rather than silently
