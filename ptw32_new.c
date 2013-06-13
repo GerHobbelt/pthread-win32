@@ -84,6 +84,7 @@ ptw32_new (void)
   tp->threadLock = 0;
   tp->robustMxListLock = 0;
   tp->robustMxList = NULL;
+  tp->name = NULL;
 #if ! defined(WINCE)
   CPU_ZERO((cpu_set_t*)&tp->cpuset);
 #endif

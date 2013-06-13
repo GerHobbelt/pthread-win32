@@ -228,6 +228,7 @@ struct ptw32_thread_t_
 #if ! defined(WINCE)
   size_t cpuset;		/* Thread CPU affinity set */
 #endif
+  char * name;                  /* Thread name */
 #if defined(_UWIN)
   DWORD dummy[5];
 #endif
@@ -250,6 +251,7 @@ struct pthread_attr_t_
   int inheritsched;
   int contentionscope;
   size_t cpuset;
+  char * thrname;
 #if defined(HAVE_SIGSET_T)
   sigset_t sigmask;
 #endif				/* HAVE_SIGSET_T */

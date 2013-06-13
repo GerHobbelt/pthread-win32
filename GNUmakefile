@@ -140,7 +140,7 @@ GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
 
 ## Mingw
 #MAKE		?= make
-CFLAGS	= $(OPT) $(XOPT) $(ARCH) -I. -DHAVE_CONFIG_H -Wall
+CFLAGS	= $(OPT) $(XOPT) $(ARCH) -I. -DHAVE_CONFIG_H -DMINGW_HAS_SECURE_API -Wall
 
 OBJEXT = o
 RESEXT = o

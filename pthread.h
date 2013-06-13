@@ -1219,6 +1219,22 @@ PTW32_DLLPORT HANDLE PTW32_CDECL pthread_getw32threadhandle_np(pthread_t thread)
  */
 PTW32_DLLPORT DWORD PTW32_CDECL pthread_getw32threadid_np (pthread_t thread);
 
+/*
+ * Sets the POSIX thread name. If _MSC_VER is defined the name should be displayed by
+ * the MSVS debugger.
+ */
+#if defined(PTW32_COMPATIBILITY_BSD) || defined(PTW32_COMPATIBILITY_TRU64)
+#define PTHREAD_MAX_NAMELEN_NP 16
+PTW32_DLLPORT int PTW32_CDECL pthread_setname_np (pthread_t thr, const char * name, void * arg);
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_setname_np (pthread_attr_t * attr, const char * name, void * arg);
+#else
+PTW32_DLLPORT int PTW32_CDECL pthread_setname_np (pthread_t thr, const char * name);
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_setname_np (pthread_attr_t * attr, const char * name);
+#endif
+
+PTW32_DLLPORT int PTW32_CDECL pthread_getname_np (pthread_t thr, char * name, int len);
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_getname_np (pthread_attr_t * attr, char * name, int len);
+
 
 /*
  * Protected Methods
