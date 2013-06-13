@@ -1,0 +1,63 @@
+POSIX Threads for Windows – REFERENCE - Pthreads-w32
+Reference Index
+Table of Contents
+Name
+pthread_getname_np, pthread_setname_np - get and set the thread name
+Synopsis
+#include <pthread.h> 
+int pthread_getname_np(pthread_t thr, char * name, int len);
+#if defined(PTW32_COMPATIBILITY_BSD) || defined(PTW32_COMPATIBILITY_TRU64)
+int pthread_setname_np(pthread_t thr, const char * name, void * arg);
+#else
+int pthread_setname_np(pthread_t thr, const char * name);
+#endif
+Description
+pthread_setname_np() sets the descriptive name of the thread.  It takes the following arguments.
+#if defined(PTW32_COMPATIBILITY_BSD) || defined(PTW32_COMPATIBILITY_TRU64)
+thr	The thread whose name will be set.
+name	The printf(3) format string to be used to construct the name of the thread.  The resulting name should be shorter than PTHREAD_MAX_NAMELEN_NP.
+arg	The printf(3) argument used with name.
+#else
+thr	The thread whose name will be set.
+name	The name.
+#endif
+
+pthread_getname_np() gets the descriptive name of the thread.  It takes the following arguments.
+thread	The thread whose descriptive name will be obtained.
+name	The buffer to be filled with the descriptive name of the thread.
+len	The size of the buffer name in bytes.
+
+Pthreads-w32 provides these routines for source code compatibility only although, for MSVC compiled apps using the VC built pthreads-win32 libraries, the name should be displayed by the MSVS debugger. AFAIK the MinGW gdb debugger will not recognise these thread names.
+Return Value
+These routines return 0 on success or an error code on failure.
+	
+Errors
+The pthread_setname_np function shall fail if: 
+ESRCH 
+The value specified by thr does not refer to a valid thread.
+EINVAL
+The expansion of name with arg has length greater or equal to PTHREAD_MAX_NAMELEN_NP.
+
+The following sections are informative. 
+Examples
+None. 
+Application Usage
+
+Rationale
+None. 
+Future Directions
+None. 
+See Also
+The Base Definitions volume of IEEE Std 1003.1-2001, <pthread.h> 
+
+Table of Contents
+Name 
+Synopsis 
+Description 
+Return Value 
+Errors 
+Examples 
+Application Usage 
+Rationale 
+Future Directions 
+See Also
