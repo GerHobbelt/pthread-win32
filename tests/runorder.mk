@@ -103,6 +103,8 @@ mutex8.pass: mutex7.pass
 mutex8n.pass: mutex7n.pass
 mutex8e.pass: mutex7e.pass
 mutex8r.pass: mutex7r.pass
+name_np1.pass: join4.pass barrier6.pass
+name_np2.pass: name_np1.pass
 once1.pass: create1.pass
 once2.pass: once1.pass
 once3.pass: once2.pass

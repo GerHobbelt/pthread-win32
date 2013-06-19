@@ -30,6 +30,7 @@ ALL_KNOWN_TESTS = \
 	mutex6s mutex6es mutex6rs \
 	mutex7 mutex7n mutex7e mutex7r \
 	mutex8 mutex8n mutex8e mutex8r \
+	name_np1 name_np2 \
 	once1 once2 once3 once4 \
 	priority1 priority2 inherit1 \
 	reuse1 reuse2 \

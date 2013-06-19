@@ -1,3 +1,17 @@
+2013-06-19  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* exit6.c: New test (added some time ago but not committed).
+	* name_np1.c: New test for pthread_[sg]etname_np().
+	* name_np2.c: New test for pthread_attr_[sg]etname_np().
+	* common.mk: Add new tests.
+	* reorder.mk: Likewise.
+
+2013-06-06  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* affinity6.c: New test for pthread_attr_[gs]etaffinity_np()
+	* common.mk: Add new tests.
+	* reorder.mk: Likewise.
+
 2012-10-24  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* tsd3.c: New regression test for Stephane Clairet bug fix/report;
@@ -6,7 +20,7 @@
 	* tsd2.c: Modified comments and indentation.
 	* tsd1.c: Likewise.
 	* common.mk (tsd3): New test added.
-	* reorder.mk (tsd): Likewise.
+	* reorder.mk (tsd3): Likewise.
 
 2012-10-16  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
