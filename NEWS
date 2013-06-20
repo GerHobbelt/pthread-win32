@@ -69,7 +69,7 @@ Static linking:
 The autostatic functionality has been extended so that builds using
 MSVC8 and later no longer require apps to call
 pthread_win32_thread_detach_np(). That is, all of the DllMain
-functionality is not automatic for static linking for these builds.   
+functionality is now automatic for static linking for these builds.   
 
 Bug Fixes
 ---------
