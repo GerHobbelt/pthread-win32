@@ -1,268 +1,184 @@
-/* Chapter 10. ThreeStage.c       Pthreads version              */
-/* Three-stage Producer Consumer system                         */
+/*
+ Session 6, Chapter 10. ThreeStage.c
+ Three-stage Producer Consumer system
+ Other files required in this project, either directly or
+ in the form of libraries (DLLs are preferable)
+              QueueObj.c (inlined here)
+              Messages.c (inlined here)
 
-/*  Usage: ThreeStage npc goal                                  */
-/* start up "npc" paired producer  and consumer threads.        */
-/* Each producer must produce a total of                        */
-/* "goal" messages, where each message is tagged                */
-/* with the consumer that should receive it                     */
-/* Messages are sent to a "transmitter thread" which performs   */
-/* additional processing before sending message groups to the   */
-/* "receiver thread." Finally, the receiver thread sends        */
-/* the messages to the consumer thread.                         */
+ Usage: ThreeStage npc goal [display]
+ start up "npc" paired producer  and consumer threads.
+          Display messages if "display" is non-zero
+ Each producer must produce a total of
+ "goal" messages, where each message is tagged
+ with the consumer that should receive it
+ Messages are sent to a "transmitter thread" which performs
+ additional processing before sending message groups to the
+ "receiver thread." Finally, the receiver thread sends
+ the messages to the consumer threads.
 
-/* Transmitter: Receive messages one at a time from producers,  */
-/* create a transmission message of up to "TRANS_BLOCK" messages*/
-/* to be sent to the Receiver. (this could be a network xfer    */
-/* Receiver: Take message blocks sent by the Transmitter        */
-/* and send the individual messages to the designated consumer  */
+ Transmitter: Receive messages one at a time from producers,
+ create a transmission message of up to "TBLOCK_SIZE" messages
+ to be sent to the Receiver. (this could be a network xfer
+ Receiver: Take message blocks sent by the Transmitter
+ and send the individual messages to the designated consumer
+ */
 
-#include "test.h"
-#include <sys/timeb.h>
+#if defined(WIN32)
+#include <WINDOWS.H>
+#define sleep(i) Sleep(i*1000)
+#endif
 
-#include <pthread.h>
-//#include <pthread_exception.h>
-#include <stdio.h>
+#include "pthread.h"
+
+#define DATA_SIZE 256
+typedef struct msg_block_tag { /* Message block */
+  pthread_mutex_t mguard; /* Mutex for  the message block */
+  pthread_cond_t  mconsumed; /* Event: Message consumed;          */
+  /* Produce a new one or stop    */
+  pthread_cond_t  mready; /* Event: Message ready         */
+  /*
+   * Note: the mutex and events are not used by some programs, such
+   * as Program 10-3, 4, 5 (the multi-stage pipeline) as the messages
+   * are part of a protected queue
+   */
+  volatile unsigned int source; /* Creating producer identity     */
+  volatile unsigned int destination;/* Identity of receiving thread*/
+
+  volatile unsigned int f_consumed;
+  volatile unsigned int f_ready;
+  volatile unsigned int f_stop;
+  /* Consumed & ready state flags, stop flag      */
+  volatile unsigned int sequence; /* Message block sequence number        */
+  time_t timestamp;
+  unsigned int checksum; /* Message contents checksum             */
+  unsigned int data[DATA_SIZE]; /* Message Contents               */
+} msg_block_t;
+
+void message_fill (msg_block_t *, unsigned int, unsigned int, unsigned int);
+void message_display (msg_block_t *);
+
+#define CV_TIMEOUT 5  /* tunable parameter for the CV model */
+
+
+/*
+ Definitions of a synchronized, general bounded queue structure.
+ Queues are implemented as arrays with indices to youngest
+ and oldest messages, with wrap around.
+ Each queue also contains a guard mutex and
+ "not empty" and "not full" condition variables.
+ Finally, there is a pointer to an array of messages of
+ arbitrary type
+ */
+
+typedef struct queue_tag {      /* General purpose queue        */
+  pthread_mutex_t q_guard;/* Guard the message block      */
+  pthread_cond_t  q_ne;   /* Event: Queue is not empty            */
+  pthread_cond_t  q_nf;   /* Event: Queue is not full                     */
+  /* These two events are manual-reset for the broadcast model
+   * and auto-reset for the signal model */
+  volatile unsigned int q_size;   /* Queue max size size          */
+  volatile unsigned int q_first;  /* Index of oldest message      */
+  volatile unsigned int q_last;   /* Index of youngest msg        */
+  volatile unsigned int q_destroyed;/* Q receiver has terminated  */
+  void *  msg_array;      /* array of q_size messages     */
+} queue_t;
+
+/* Queue management functions */
+unsigned int q_initialize (queue_t *, unsigned int, unsigned int);
+unsigned int q_destroy (queue_t *);
+unsigned int q_destroyed (queue_t *);
+unsigned int q_empty (queue_t *);
+unsigned int q_full (queue_t *);
+unsigned int q_get (queue_t *, void *, unsigned int, unsigned int);
+unsigned int q_put (queue_t *, void *, unsigned int, unsigned int);
+unsigned int q_remove (queue_t *, void *, unsigned int);
+unsigned int q_insert (queue_t *, void *, unsigned int);
+
 #include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
 #define DELAY_COUNT 1000
 #define MAX_THREADS 1024
-#define DATA_SIZE 256
-
-#ifndef _WINDOWS
-#include <unistd.h>
-#include <errno.h>
-#endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-/* From PWPT (Programming with POSIX Threads, by David Butenhof,
- * Addison-Wesley, 1997) pp 33-34.
- * Define a macro that can be used for diagnostic output from
- * examples. When compiled -DDEBUG, it results in calling printf
- * with the specified argument list. When DEBUG is not defined, it
- * expands to nothing.
- */
-#ifdef DEBUG
-#define DPRINTF(arg) printf arg
-#else
-#define DPRINTF(arg)
-#endif
-
-/*
- * NOTE: the "do {" ... "} while(o);" bracketing around the macros
- * allows the err_abort and errno_abort macros to be used as if they
- * were function calls, even in contexts where a trailing ";" would
- * generate a null statement. For example,
- *
- *      if (status != 0)
- *              err_abort (status, "message");
- *      else
- *              return status;
- *
- * will not compile if err_abort is a macro ending with "}", because
- * C does not expect a ";" to follow the "}". Because C does expect
- * a ";" following the "}" in the do...while constuct, err_abort and
- * errno_abort can be used as if they were function calls.
- */
-
-#ifdef _WINDOWS
-#define errno_get (FormatMessage ( \
-    FORMAT_MESSAGE_FROM_SYSTEM, NULL, \
-    GetLastError(), MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), \
-    Msg, 256, NULL),Msg)
-
-#define err_abort(code,text) do {\
-    fprintf (stderr, "%s at \"%s\":%d: %s\n", \
-        text, __FILE__, __LINE__, strerror (code)); \
-        abort (); \
-} while (0)
-#define errno_abort(text) do {char Msg[256]; \
-    fprintf (stderr, "%s at \"%s\":%d: %s\n", \
-        text, __FILE__, __LINE__, errno_get); \
-        abort (); \
-} while (0)
-#define err_stop(text) do {char Msg[256]; \
-    fprintf (stderr, "%s at %s: %d. %s\n", \
-        text, __FILE__, __LINE__, errno_get); \
-        return 1; \
-} while (0)
-#define err_stop0(text) do {\
-    fprintf (stderr, "%s at %s: %d.\n", \
-        text, __FILE__, __LINE__); \
-        return ; \
-} while (0)
-#else
-#define errno_get strerror(errno)
-#define err_abort(code,text) do {\
-    fprintf (stderr, "%s at \"%s\":%d: %s\n", \
-        text, __FILE__, __LINE__, strerror (code)); \
-        abort (); \
-} while (0)
-#define errno_abort(text) do { \
-    fprintf (stderr, "%s at \"%s\":%d: %s\n", \
-        text, __FILE__, __LINE__, errno_get); \
-        abort (); \
-} while (0)
-#define err_stop(text) do { \
-    fprintf (stderr, "%s at %s: %d. %s\n", \
-        text, __FILE__, __LINE__, errno_get); \
-        return 1; \
-} while (0)
-#define err_stop0(text) do {\
-    fprintf (stderr, "%s at %s: %d.\n", \
-        text, __FILE__, __LINE__); \
-        return ; \
-} while (0)
-#endif
-
-
-/*
- * Define a macro that delays for an amount of time proportional
- * to the integer parameter. The delay is a CPU delay and does not
- * voluntarily yield the processor. This simulates computation.
- */
-
-#define delay_cpu(n)  {\
-    int i=0, j=0;\
-    /* Do some wasteful computations that will not be optimized to nothing */\
-    while (i < n) {\
-        j = (long)(i*i + (float)(2*j)/(float)(i+1));\
-        i++;\
-    }\
-}
 
 /* Queue lengths and blocking factors. These numbers are arbitrary and  */
 /* can be adjusted for performance tuning. The current values are       */
 /* not well balanced.                                                   */
 
-#define TRANS_BLOCK 5   /* Transmitter combines this many messages at at time */
+#define TBLOCK_SIZE 5   /* Transmitter combines this many messages at at time */
+#define Q_TIMEOUT 2000 /* Transmiter and receiver timeout (ms) waiting for messages */
+//#define Q_TIMEOUT INFINITE
+#define MAX_RETRY 5  /* Number of q_get retries before quitting */
 #define P2T_QLEN 10     /* Producer to Transmitter queue length */
 #define T2R_QLEN 4      /* Transmitter to Receiver queue length */
-#define R2C_QLEN 4      /* Receiver to Consumer queue length - there is one such queue for each consumer */
+#define R2C_QLEN 4      /* Receiver to Consumer queue length - there is one
+ * such queue for each consumer */
 
-void *
-producer(void *);
-void *
-consumer(void *);
-void *
-transmitter(void *);
-void *
-receiver(void *);
+void * producer (void *);
+void * consumer (void *);
+void * transmitter (void *);
+void * receiver (void *);
 
-typedef struct _THARG
-{
-  volatile int thread_number;
-  volatile int work_goal;         /* used by producers */
-  volatile int work_done;         /* Used by producers and consumers */
-  char waste[8];                  /* Assure there is no quadword overlap */
+
+typedef struct _THARG {
+  volatile unsigned int thread_number;
+  volatile unsigned int work_goal;    /* used by producers */
+  volatile unsigned int work_done;    /* Used by producers and consumers */
 } THARG;
 
-/* Basic message as generated by producer and received by consumer */
-typedef struct msg_block_tag
-{ /* Message block */
-  volatile unsigned int checksum; /* Message contents checksum    */
-  volatile int source;            /* Creating producer identity      */
-  volatile int destination;       /* Identity of receiving thread*/
-  volatile int sequence;          /* Message block sequence number */
-  time_t timestamp;
-  int data[DATA_SIZE];            /* Message Contents                */
-} msg_block_t, *pmsg_block_t;
 
 /* Grouped messages sent by the transmitter to receiver         */
-typedef struct t2r_msg_tag
-{
-  volatile int num_msgs;          /* Number of messages contained  */
-  msg_block_t messages[TRANS_BLOCK];
-} t2r_msg_t;
-
-/* Definitions of a general bounded queue structure. Queues are */
-/* implemented as arrays with indices to youngest and oldest    */
-/* messages, with wrap around.                                  */
-/* Each queue also contains a guard mutex and                   */
-/* "not empty" and "not full" condition variables.              */
-/* Finally, there is a pointer to an array of messages of       */
-/* arbitrary type                                               */
-
-typedef struct queue_tag
-{ /* General purpose queue        */
-  pthread_mutex_t q_guard;        /* Guard the message block      */
-  pthread_cond_t q_ne;            /* Queue is not empty           */
-  pthread_cond_t q_nf;            /* Queue is not full            */
-  volatile int q_size;            /* Queue max size size          */
-  volatile int q_first;           /* Index of oldest message      */
-  volatile int q_last;            /* Index of youngest msg        */
-  volatile int q_destroyed;       /* Q receiver has terminated   */
-  void *msg_array;                /* array of q_size messages     */
-} queue_t;
-/* Queue management functions */
-int
-q_initialize(queue_t *, int, int, char *);
-int
-q_destroy(queue_t *);
-int
-q_destroyed(queue_t *);
-int
-q_empty(queue_t *);
-int
-q_full(queue_t *);
-int
-q_remove(queue_t *, void *, int);
-int
-q_insert(queue_t *, void *, int);
-void
-message_fill(msg_block_t *, int, int, int);
-void
-message_display(msg_block_t *);
+typedef struct T2R_MSG_TYPEag {
+  volatile unsigned int num_msgs; /* Number of messages contained */
+  msg_block_t messages [TBLOCK_SIZE];
+} T2R_MSG_TYPE;
 
 queue_t p2tq, t2rq, *r2cq_array;
 
-static volatile int ShutDown = 0;
+/* ShutDown, AllProduced are global flags to shut down the system & transmitter */
+static volatile unsigned int ShutDown = 0;
+static volatile unsigned int AllProduced = 0;
+static unsigned int DisplayMessages = 0;
 
-int
-main(int argc, char * argv[])
+int main (int argc, char * argv[])
 {
-  int tstatus, nthread, ithread, goal;
+  unsigned int tstatus = 0, nthread, ithread, goal, thid;
   pthread_t *producer_th, *consumer_th, transmitter_th, receiver_th;
   THARG *producer_arg, *consumer_arg;
-  char obj_name[32], suffix[10];
 
-  if (argc < 3)
-    {
-      printf("Usage: ThreeStage npc goal \n");
+  if (argc < 3) {
+      printf ("Usage: ThreeStage npc goal \n");
       return 1;
-    }
-  srand((int) time(NULL )); /* Seed the RN generator */
+  }
+  if (argc >= 4) DisplayMessages = atoi(argv[3]);
+
+  srand ((int)time(NULL));        /* Seed the RN generator */
 
   nthread = atoi(argv[1]);
-  if (nthread > MAX_THREADS)
-    {
-      printf("Maximum number of producers or consumers is %d.\n", MAX_THREADS);
+  if (nthread > MAX_THREADS) {
+      printf ("Maximum number of producers or consumers is %d.\n", MAX_THREADS);
       return 2;
-    }
+  }
   goal = atoi(argv[2]);
-  producer_th = malloc(nthread * sizeof(pthread_t));
-  producer_arg = calloc(nthread, sizeof(THARG));
-  consumer_th = malloc(nthread * sizeof(pthread_t));
-  consumer_arg = calloc(nthread, sizeof(THARG));
+  producer_th = malloc (nthread * sizeof(pthread_t));
+  producer_arg = calloc (nthread, sizeof (THARG));
+  consumer_th = malloc (nthread * sizeof(pthread_t));
+  consumer_arg = calloc (nthread, sizeof (THARG));
 
-  if (producer_th == NULL || producer_arg == NULL || consumer_th == NULL || consumer_arg == NULL)
-    errno_abort("Cannot allocate working memory for threads.");
+  if (producer_th == NULL || producer_arg == NULL
+      || consumer_th == NULL || consumer_arg == NULL)
+    perror ("Cannot allocate working memory for threads.");
 
-  q_initialize(&p2tq, sizeof(msg_block_t), P2T_QLEN, "P2TQ_");
-  q_initialize(&t2rq, sizeof(t2r_msg_t), T2R_QLEN, "T2RQ_");
+  q_initialize (&p2tq, sizeof(msg_block_t), P2T_QLEN);
+  q_initialize (&t2rq, sizeof(T2R_MSG_TYPE), T2R_QLEN);
   /* Allocate and initialize Receiver to Consumer queue for each consumer */
-  r2cq_array = calloc(nthread, sizeof(queue_t));
-  if (r2cq_array == NULL) errno_abort ("Cannot allocate memory for r2c queues");
+  r2cq_array = calloc (nthread, sizeof(queue_t));
+  if (r2cq_array == NULL) perror ("Cannot allocate memory for r2c queues");
 
-  for (ithread = 0; ithread < nthread; ithread++)
-    {
+  for (ithread = 0; ithread < nthread; ithread++) {
       /* Initialize r2c queue for this consumer thread */
-      strcpy (obj_name, "R2CQ_");
-      sprintf (suffix, "%d_", ithread);
-      strcat (obj_name, suffix);
-      q_initialize (&r2cq_array[ithread], sizeof(msg_block_t),
-          R2C_QLEN, obj_name);
+      q_initialize (&r2cq_array[ithread], sizeof(msg_block_t), R2C_QLEN);
       /* Fill in the thread arg */
       consumer_arg[ithread].thread_number = ithread;
       consumer_arg[ithread].work_goal = goal;
@@ -271,7 +187,7 @@ main(int argc, char * argv[])
       tstatus = pthread_create (&consumer_th[ithread], NULL,
           consumer, (void *)&consumer_arg[ithread]);
       if (tstatus != 0)
-        err_abort (tstatus, "Cannot create consumer thread");
+        perror ("Cannot create consumer thread");
 
       producer_arg[ithread].thread_number = ithread;
       producer_arg[ithread].work_goal = goal;
@@ -279,460 +195,377 @@ main(int argc, char * argv[])
       tstatus = pthread_create (&producer_th[ithread], NULL,
           producer, (void *)&producer_arg[ithread]);
       if (tstatus != 0)
-        err_abort (tstatus, "Cannot create producer thread");
-    }
+        perror ("Cannot create producer thread");
+  }
 
-  tstatus = pthread_create(&transmitter_th, NULL, transmitter, NULL );
+  tstatus = pthread_create (&transmitter_th, NULL, transmitter, &thid);
   if (tstatus != 0)
-    err_abort(tstatus, "Cannot create tranmitter thread");
-  tstatus = pthread_create(&receiver_th, NULL, receiver, NULL );
+    perror ("Cannot create tranmitter thread");
+  tstatus = pthread_create (&receiver_th, NULL, receiver, &thid);
   if (tstatus != 0)
-    err_abort(tstatus, "Cannot create receiver thread");
+    perror ("Cannot create receiver thread");
 
-  printf("BOSS: All threads are running\n");
+
+  printf ("BOSS: All threads are running\n");
   /* Wait for the producers to complete */
-  for (ithread = 0; ithread < nthread; ithread++)
-    {
-      tstatus = pthread_join(producer_th[ithread], NULL );
+  /* The implementation allows too many threads for WaitForMultipleObjects */
+  /* although you could call WFMO in a loop */
+  for (ithread = 0; ithread < nthread; ithread++) {
+      tstatus = pthread_join (producer_th[ithread], NULL);
       if (tstatus != 0)
-        err_abort(tstatus, "Cannot join producer thread");
-      printf("BOSS: Producer %d produced %d work units\n", ithread,
-          producer_arg[ithread].work_done);
-    }
+        perror ("Cannot wait for producer thread");
+      printf ("BOSS: Producer %d produced %d work units\n",
+          ithread, producer_arg[ithread].work_done);
+  }
   /* Producers have completed their work. */
-  printf("BOSS: All producers have completed their work.\n");
+  printf ("BOSS: All producers have completed their work.\n");
+  AllProduced = 1;
 
   /* Wait for the consumers to complete */
-  for (ithread = 0; ithread < nthread; ithread++)
-    {
-      tstatus = pthread_join(consumer_th[ithread], NULL );
+  for (ithread = 0; ithread < nthread; ithread++) {
+      tstatus = pthread_join (consumer_th[ithread], NULL);
       if (tstatus != 0)
-        err_abort(tstatus, "Cannot join consumer thread");
-      printf("BOSS: consumer %d consumed %d work units\n", ithread,
-          consumer_arg[ithread].work_done);
-    }
-  printf("BOSS: All consumers have completed their work.\n");
+        perror ("Cannot wait for consumer thread");
+      printf ("BOSS: consumer %d consumed %d work units\n",
+          ithread, consumer_arg[ithread].work_done);
+  }
+  printf ("BOSS: All consumers have completed their work.\n");
 
-  ShutDown = 1; /* Also set a shutdown flag */
+  ShutDown = 1; /* Set a shutdown flag - All messages have been consumed */
 
-  /* Cancel, and wait for, the transmitter and receiver */
-  tstatus = pthread_cancel(transmitter_th);
+  /* Wait for the transmitter and receiver */
+
+  tstatus = pthread_join (transmitter_th, NULL);
   if (tstatus != 0)
-    err_abort(tstatus, "Failed canceling transmitter");
-
-  tstatus = pthread_cancel(receiver_th);
+    perror ("Failed waiting for transmitter");
+  tstatus = pthread_join (receiver_th, NULL);
   if (tstatus != 0)
-    err_abort(tstatus, "Failed canceling receiver");
+    perror ("Failed waiting for receiver");
 
-  tstatus = pthread_join(transmitter_th, NULL );
-  if (tstatus != 0)
-    err_abort(tstatus, "Failed joining transmitter");
-
-  tstatus = pthread_join(receiver_th, NULL );
-  if (tstatus != 0)
-    err_abort(tstatus, "Failed joining transmitter");
-
-  free(producer_th);
-  free(consumer_th);
-  free(producer_arg);
+  q_destroy (&p2tq);
+  q_destroy (&t2rq);
+  for (ithread = 0; ithread < nthread; ithread++)
+    q_destroy (&r2cq_array[ithread]);
+  free (r2cq_array);
+  free (producer_th);
+  free (consumer_th);
+  free (producer_arg);
   free(consumer_arg);
-  free(r2cq_array);
+  printf ("System has finished. Shutting down\n");
+  return 0;
+}
 
-  printf("System has finished. Shutting down\n");
+void * producer (void * arg)
+{
+  THARG * parg;
+  unsigned int ithread, tstatus = 0;
+  msg_block_t msg;
+
+  parg = (THARG *)arg;
+  ithread = parg->thread_number;
+
+  while (parg->work_done < parg->work_goal && !ShutDown) {
+      /* Periodically produce work units until the goal is satisfied */
+      /* messages receive a source and destination address which are */
+      /* the same in this case but could, in general, be different. */
+      sleep (rand()/100000000);
+      message_fill (&msg, ithread, ithread, parg->work_done);
+
+      /* put the message in the queue - Use an infinite timeout to assure
+       * that the message is inserted, even if consumers are delayed */
+      tstatus = q_put (&p2tq, &msg, sizeof(msg), INFINITE);
+      if (0 == tstatus) {
+          parg->work_done++;
+      }
+  }
 
   return 0;
 }
 
-void *
-producer(void *arg)
-{
-  THARG * parg;
-  int ithread, tstatus;
-  msg_block_t msg;
-
-  parg = (THARG *) arg;
-  ithread = parg->thread_number;
-
-  while (parg->work_done < parg->work_goal)
-    {
-      /* Periodically produce work units until the goal is satisfied */
-      /* messages receive a source and destination address which are */
-      /* the same in this case but could, in general, be different. */
-      delay_cpu(DELAY_COUNT * rand() / RAND_MAX);
-      message_fill(&msg, ithread, ithread, parg->work_done);
-
-      /* Wait until the p2t queue is not full */
-      tstatus = pthread_mutex_lock(&p2tq.q_guard);
-      if (tstatus != 0)
-        err_abort(tstatus, "Error locking p2tq");
-
-      while (q_full(&p2tq))
-        {
-          tstatus = pthread_cond_wait(&p2tq.q_nf, &p2tq.q_guard);
-          if (tstatus != 0)
-            err_abort(tstatus, "Error waiting on p2tq nf");
-        }
-
-      /* put the message in the queue */
-      q_insert(&p2tq, &msg, sizeof(msg));
-
-      /* Signal that the queue is not empty */
-      tstatus = pthread_cond_signal(&p2tq.q_ne);
-      if (tstatus != 0)
-        err_abort(tstatus, "Error sinaling p2tq ne");
-
-      tstatus = pthread_mutex_unlock(&p2tq.q_guard);
-      if (tstatus != 0)
-        err_abort(tstatus, "Error unlocking p2tq");
-
-      parg->work_done++;
-    }
-
-  return NULL ;
-}
-
-/* Cleanup handler to cancel the transmitter thread */
-void
-cancel_transmitter(void *arg)
-{
-  q_destroy(&p2tq); /* No receiver for the p2t Q */
-  printf("\n** transmitter shutting down\n");
-  return;
-}
-
-void *
-transmitter(void *arg)
-{
-  /* Obtain multiple producer messages, combining into a single   */
-  /* compound message for the receiver */
-  /* The transmitter must be prepared to receive cancellation requests */
-  int tout, oldstate;
-  t2r_msg_t t2r_msg = { 0 };
-  msg_block_t p2t_msg;
-  struct timespec timeout;
-
-  pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
-  pthread_cleanup_push(cancel_transmitter, NULL);
-  pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &oldstate);
-
-  while (!ShutDown)
-    {
-      /* Get a message from the producer to transmitter queue */
-      pthread_mutex_lock(&p2tq.q_guard);
-      tout = 0;
-      while (q_empty(&p2tq) && tout != ETIMEDOUT)
-        {
-          PTW32_STRUCT_TIMEB currSysTime;
-          const DWORD NANOSEC_PER_MILLISEC = 1000000;
-
-          PTW32_FTIME(&currSysTime);
-          timeout.tv_sec = (long)currSysTime.time;
-          timeout.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
-          timeout.tv_sec += 2;
-
-          tout = pthread_cond_timedwait(&p2tq.q_ne, &p2tq.q_guard, &timeout);
-          if (tout != 0 && tout != ETIMEDOUT)
-            err_abort(tout, "Error waiting on p2tq ne");
-        }
-
-      if (tout != ETIMEDOUT)
-        {
-          q_remove(&p2tq, &p2t_msg, sizeof(p2t_msg));
-          pthread_cond_signal(&p2tq.q_nf);
-
-          /* Fill the transmitter to receiver buffer */
-          memcpy(&t2r_msg.messages[t2r_msg.num_msgs], &p2t_msg,
-              sizeof(p2t_msg));
-          t2r_msg.num_msgs++;
-        }
-      pthread_mutex_unlock(&p2tq.q_guard);
-
-      /* Transmit the available messages. */
-      if (t2r_msg.num_msgs >= TRANS_BLOCK
-          || (t2r_msg.num_msgs > 0 && tout == ETIMEDOUT))
-        {
-          /* a t2r message is full */
-          pthread_mutex_lock(&t2rq.q_guard);
-          while (q_full(&t2rq))
-            {
-              pthread_cond_wait(&t2rq.q_nf, &t2rq.q_guard);
-            }
-          q_insert(&t2rq, &t2r_msg, sizeof(t2r_msg));
-
-          t2r_msg.num_msgs = 0;
-          pthread_cond_signal(&t2rq.q_ne);
-          pthread_mutex_unlock(&t2rq.q_guard);
-        }
-
-    }
-  pthread_cleanup_pop(1);
-  return NULL ;
-}
-
-/* Cleanup handler to cancel the receiver thread */
-void
-cancel_receiver(void *arg)
-{
-  q_destroy(&t2rq); /* No receiver for the t2r Q */
-  printf("\n** receiver shutting down\n");
-  return;
-}
-
-void *
-receiver(void *arg)
-{
-  /* Obtain compound messages from the transmitter and unblock them       */
-  /* and transmit to the designated consumer.                             */
-
-  int im, ic, oldstate;
-  t2r_msg_t t2r_msg;
-  msg_block_t r2c_msg;
-
-  pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldstate);
-  pthread_cleanup_push (cancel_receiver, NULL);
-  pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &oldstate);
-
-  while (!ShutDown)
-    {
-      pthread_mutex_lock(&t2rq.q_guard);
-      while (q_empty(&t2rq))
-        {
-          pthread_cond_wait(&t2rq.q_ne, &t2rq.q_guard);
-        }
-
-      q_remove(&t2rq, &t2r_msg, sizeof(t2r_msg));
-      pthread_cond_signal(&t2rq.q_nf);
-      pthread_mutex_unlock(&t2rq.q_guard);
-
-      /* Distribute the messages to the proper consumer */
-      for (im = 0; im < t2r_msg.num_msgs; im++)
-        {
-          memcpy(&r2c_msg, &t2r_msg.messages[im], sizeof(r2c_msg));
-          ic = r2c_msg.destination; /* Destination consumer */
-
-          pthread_mutex_lock(&r2cq_array[ic].q_guard);
-
-          /* Throw the message away if the consumer has stopped */
-          if (!q_destroyed(&r2cq_array[ic]))
-            {
-              while (q_full(&r2cq_array[ic]))
-                {
-                  pthread_cond_wait(&r2cq_array[ic].q_nf, &r2cq_array[ic].q_guard);
-                }
-              q_insert(&r2cq_array[ic], &r2c_msg, sizeof(r2c_msg));
-              pthread_cond_signal(&r2cq_array[ic].q_ne);
-            }
-          pthread_mutex_unlock(&r2cq_array[ic].q_guard);
-        }
-    }
-  pthread_cleanup_pop(1);
-  return NULL ;
-}
-
-void *
-consumer(void *arg)
+void * consumer (void * arg)
 {
   THARG * carg;
-  int ithread, tstatus;
+  unsigned int tstatus = 0, ithread, Retries = 0;
   msg_block_t msg;
   queue_t *pr2cq;
 
   carg = (THARG *) arg;
   ithread = carg->thread_number;
+
+  carg = (THARG *)arg;
   pr2cq = &r2cq_array[ithread];
 
-  while (carg->work_done < carg->work_goal)
-    {
-      /* Receive and display messages */
-      /* Wait until the r2c queue is not empty */
-      tstatus = pthread_mutex_lock(&pr2cq->q_guard);
-      if (tstatus != 0)
-        err_abort(tstatus, "Error locking r2cq");
+  while (carg->work_done < carg->work_goal && Retries < MAX_RETRY && !ShutDown) {
+      /* Receive and display/process messages */
+      /* Try to receive the requested number of messages,
+       * but allow for early system shutdown */
 
-      while (q_empty(pr2cq))
-        {
-          tstatus = pthread_cond_wait(&pr2cq->q_ne, &pr2cq->q_guard);
-          if (tstatus != 0)
-            err_abort(tstatus, "Error waiting on r2cq ne");
-        }
+      tstatus = q_get (pr2cq, &msg, sizeof(msg), Q_TIMEOUT);
+      if (0 == tstatus) {
+          if (DisplayMessages > 0) message_display (&msg);
+          carg->work_done++;
+          Retries = 0;
+      } else {
+          Retries++;
+      }
+  }
 
-      /* remove the message from the queue */
-      q_remove(pr2cq, &msg, sizeof(msg));
-
-      /* Signal that the queue is not full as we've removed a message */
-      tstatus = pthread_cond_signal(&pr2cq->q_nf);
-      if (tstatus != 0)
-        err_abort(tstatus, "Error signaling r2cq nf");
-
-      tstatus = pthread_mutex_unlock(&pr2cq->q_guard);
-      if (tstatus != 0)
-        err_abort(tstatus, "Error unlocking r2cq");
-
-      printf("\nMessage received by consumer #: %d", ithread);
-      message_display(&msg);
-
-      carg->work_done++;
-    }
-
-  /* Destroy the queue once the Q's receiving end terminates */
-  q_destroy(pr2cq);
-  return NULL ;
+  return NULL;
 }
 
-unsigned int
-compute_checksum(void * msg, unsigned int length)
+void * transmitter (void * arg)
 {
-  /*
-   * Compute an xor checksum on the entire message of "length"
-   * integers
-   */
+
+  /* Obtain multiple producer messages, combining into a single   */
+  /* compound message for the receiver */
+
+  unsigned int tstatus = 0, im, Retries = 0;
+  T2R_MSG_TYPE t2r_msg = {0};
+  msg_block_t p2t_msg;
+
+  while (!ShutDown && !AllProduced) {
+      t2r_msg.num_msgs = 0;
+      /* pack the messages for transmission to the receiver */
+      im = 0;
+      while (im < TBLOCK_SIZE && !ShutDown && Retries < MAX_RETRY && !AllProduced) {
+          tstatus = q_get (&p2tq, &p2t_msg, sizeof(p2t_msg), Q_TIMEOUT);
+          if (0 == tstatus) {
+              memcpy (&t2r_msg.messages[im], &p2t_msg, sizeof(p2t_msg));
+              t2r_msg.num_msgs++;
+              im++;
+              Retries = 0;
+          } else { /* Timed out.  */
+              Retries++;
+          }
+      }
+      tstatus = q_put (&t2rq, &t2r_msg, sizeof(t2r_msg), INFINITE);
+      if (tstatus != 0) return NULL;
+  }
+  return NULL;
+}
+
+
+void * receiver (void * arg)
+{
+  /* Obtain compound messages from the transmitter and unblock them       */
+  /* and transmit to the designated consumer.                             */
+
+  unsigned int tstatus = 0, im, ic, Retries = 0;
+  T2R_MSG_TYPE t2r_msg;
+  msg_block_t r2c_msg;
+
+  while (!ShutDown && Retries < MAX_RETRY) {
+      tstatus = q_get (&t2rq, &t2r_msg, sizeof(t2r_msg), Q_TIMEOUT);
+      if (tstatus != 0) { /* Timeout - Have the producers shut down? */
+          Retries++;
+          continue;
+      }
+      Retries = 0;
+      /* Distribute the packaged messages to the proper consumer */
+      im = 0;
+      while (im < t2r_msg.num_msgs) {
+          memcpy (&r2c_msg, &t2r_msg.messages[im], sizeof(r2c_msg));
+          ic = r2c_msg.destination; /* Destination consumer */
+          tstatus = q_put (&r2cq_array[ic], &r2c_msg, sizeof(r2c_msg), INFINITE);
+          if (0 == tstatus) im++;
+      }
+  }
+  return NULL;
+}
+
+#if (!defined INFINITE)
+#define INFINITE 0xFFFFFFFF
+#endif
+
+/*
+ Finite bounded queue management functions
+ q_get, q_put timeouts (max_wait) are in ms - convert to sec, rounding up
+ */
+unsigned int q_get (queue_t *q, void * msg, unsigned int msize, unsigned int MaxWait)
+{
+  int tstatus = 0, got_msg = 0, time_inc = (MaxWait + 999) /1000;
+  struct timespec timeout;
+  timeout.tv_nsec = 0;
+
+  if (q_destroyed(q)) return 1;
+  pthread_mutex_lock (&q->q_guard);
+  while (q_empty (q) && 0 == tstatus) {
+      if (MaxWait != INFINITE) {
+          timeout.tv_sec = time(NULL) + time_inc;
+          tstatus = pthread_cond_timedwait (&q->q_ne, &q->q_guard, &timeout);
+      } else {
+          tstatus = pthread_cond_wait (&q->q_ne, &q->q_guard);
+      }
+  }
+  /* remove the message, if any, from the queue */
+  if (0 == tstatus && !q_empty (q)) {
+      q_remove (q, msg, msize);
+      got_msg = 1;
+      /* Signal that the queue is not full as we've removed a message */
+      pthread_cond_broadcast (&q->q_nf);
+  }
+  pthread_mutex_unlock (&q->q_guard);
+  return (0 == tstatus && got_msg == 1 ? 0 : max(1, tstatus));   /* 0 indictates success */
+}
+
+unsigned int q_put (queue_t *q, void * msg, unsigned int msize, unsigned int MaxWait)
+{
+  int tstatus = 0, put_msg = 0, time_inc = (MaxWait + 999) /1000;
+  struct timespec timeout;
+  timeout.tv_nsec = 0;
+
+  if (q_destroyed(q)) return 1;
+  pthread_mutex_lock (&q->q_guard);
+  while (q_full (q) && 0 == tstatus) {
+      if (MaxWait != INFINITE) {
+          timeout.tv_sec = time(NULL) + time_inc;
+          tstatus = pthread_cond_timedwait (&q->q_nf, &q->q_guard, &timeout);
+      } else {
+          tstatus = pthread_cond_wait (&q->q_nf, &q->q_guard);
+      }
+  }
+  /* Insert the message into the queue if there's room */
+  if (0 == tstatus && !q_full (q)) {
+      q_insert (q, msg, msize);
+      put_msg = 1;
+      /* Signal that the queue is not empty as we've inserted a message */
+      pthread_cond_broadcast (&q->q_ne);
+  }
+  pthread_mutex_unlock (&q->q_guard);
+  return (0 == tstatus && put_msg == 1 ? 0 : max(1, tstatus));   /* 0 indictates success */
+}
+
+unsigned int q_initialize (queue_t *q, unsigned int msize, unsigned int nmsgs)
+{
+  /* Initialize queue, including its mutex and events */
+  /* Allocate storage for all messages. */
+
+  q->q_first = q->q_last = 0;
+  q->q_size = nmsgs;
+  q->q_destroyed = 0;
+
+  pthread_mutex_init (&q->q_guard, NULL);
+  pthread_cond_init (&q->q_ne, NULL);
+  pthread_cond_init (&q->q_nf, NULL);
+
+  if ((q->msg_array = calloc (nmsgs, msize)) == NULL) return 1;
+  return 0; /* No error */
+}
+
+unsigned int q_destroy (queue_t *q)
+{
+  if (q_destroyed(q)) return 1;
+  /* Free all the resources created by q_initialize */
+  pthread_mutex_lock (&q->q_guard);
+  q->q_destroyed = 1;
+  free (q->msg_array);
+  pthread_cond_destroy (&q->q_ne);
+  pthread_cond_destroy (&q->q_nf);
+  pthread_mutex_unlock (&q->q_guard);
+  pthread_mutex_destroy (&q->q_guard);
+
+  return 0;
+}
+
+unsigned int q_destroyed (queue_t *q)
+{
+  return (q->q_destroyed);
+}
+
+unsigned int q_empty (queue_t *q)
+{
+  return (q->q_first == q->q_last);
+}
+
+unsigned int q_full (queue_t *q)
+{
+  return ((q->q_first - q->q_last) == 1 ||
+      (q->q_last == q->q_size-1 && q->q_first == 0));
+}
+
+
+unsigned int q_remove (queue_t *q, void * msg, unsigned int msize)
+{
+  char *pm;
+
+  pm = (char *)q->msg_array;
+  /* Remove oldest ("first") message */
+  memcpy (msg, pm + (q->q_first * msize), msize);
+  // Invalidate the message
+  q->q_first = ((q->q_first + 1) % q->q_size);
+  return 0; /* no error */
+}
+
+unsigned int q_insert (queue_t *q, void * msg, unsigned int msize)
+{
+  char *pm;
+
+  pm = (char *)q->msg_array;
+  /* Add a new youngest ("last") message */
+  if (q_full(q)) return 1; /* Error - Q is full */
+  memcpy (pm + (q->q_last * msize), msg, msize);
+  q->q_last = ((q->q_last + 1) % q->q_size);
+
+  return 0;
+}
+
+unsigned int compute_checksum (void * msg, unsigned int length)
+{
+  /* Computer an xor checksum on the entire message of "length"
+   * integers */
   unsigned int i, cs = 0, *pint;
 
   pint = (unsigned int *) msg;
-  for (i = 0; i < length; i++)
-    {
+  for (i = 0; i < length; i++) {
       cs = (cs ^ *pint);
       pint++;
-    }
+  }
   return cs;
 }
 
-void
-message_fill(msg_block_t *mblock, int src, int dest, int seqno)
+void  message_fill (msg_block_t *mblock, unsigned int src, unsigned int dest, unsigned int seqno)
 {
   /* Fill the message buffer, and include checksum and timestamp  */
   /* This function is called from the producer thread while it    */
   /* owns the message block mutex                                 */
 
-  int i;
+  unsigned int i;
 
   mblock->checksum = 0;
-  for (i = 0; i < DATA_SIZE; i++)
-    {
+  for (i = 0; i < DATA_SIZE; i++) {
       mblock->data[i] = rand();
-    }
+  }
   mblock->source = src;
   mblock->destination = dest;
   mblock->sequence = seqno;
-  mblock->timestamp = time(NULL );
-  mblock->checksum = compute_checksum(mblock,
-      sizeof(msg_block_t) / sizeof(int));
+  mblock->timestamp = time(NULL);
+  mblock->checksum = compute_checksum (mblock, sizeof(msg_block_t)/sizeof(unsigned int));
   /*      printf ("Generated message: %d %d %d %d %x %x\n",
-           src, dest, seqno, mblock->timestamp,
-           mblock->data[0], mblock->data[DATA_SIZE-1]);  */
+                src, dest, seqno, mblock->timestamp,
+                mblock->data[0], mblock->data[DATA_SIZE-1]);  */
   return;
 }
 
-void
-message_display(msg_block_t *mblock)
+
+void  message_display (msg_block_t *mblock)
 {
   /* Display message buffer and timestamp, validate checksum      */
   /* This function is called from the consumer thread while it    */
   /* owns the message block mutex                                 */
   unsigned int tcheck = 0;
 
-  tcheck = compute_checksum(mblock, sizeof(msg_block_t) / sizeof(int));
-  printf("\nMessage number %d generated at: %s", mblock->sequence,
-      ctime(&(mblock->timestamp)));
-  printf("Source and destination: %d %d\n", mblock->source,
-      mblock->destination);
-  printf("First and last entries: %x %x\n", mblock->data[0],
-      mblock->data[DATA_SIZE - 1]);
+  tcheck = compute_checksum (mblock, sizeof(msg_block_t)/sizeof(unsigned int));
+  printf ("\nMessage number %d generated at: %s",
+      mblock->sequence, ctime (&(mblock->timestamp)));
+  printf ("Source and destination: %d %d\n",
+      mblock->source, mblock->destination);
+  printf ("First and last entries: %x %x\n",
+      mblock->data[0], mblock->data[DATA_SIZE-1]);
   if (tcheck == 0 /*mblock->checksum was 0 when CS first computed */)
-    printf("GOOD ->Checksum was validated.\n");
+    printf ("GOOD ->Checksum was validated.\n");
   else
-    printf("BAD  ->Checksum failed. message was corrupted\n");
+    printf ("BAD  ->Checksum failed. message was corrupted\n");
 
   return;
 
-}
-
-/* Finite bounded queue management functions */
-int
-q_initialize(queue_t *q, int msize, int nmsgs, char *name)
-{
-  /* Initialize queue, including its mutex and CVs, which are named */
-  /* Allocate storage for all messages. */
-  char obj_name[32];
-
-  q->q_first = q->q_last = 0;
-  q->q_size = nmsgs;
-  q->q_destroyed = 0;
-
-  strcpy(obj_name, name);
-  strcat(obj_name, "q_guard");
-  pthread_mutex_init(&q->q_guard, NULL );
-//  pthread_mutex_setname_np(&q->q_guard, obj_name, 0);
-
-  strcpy(obj_name, name);
-  strcat(obj_name, "q_ne");
-  pthread_cond_init(&q->q_ne, NULL );
-//  pthread_cond_setname_np(&q->q_ne, obj_name, 0);
-
-  strcpy(obj_name, name);
-  strcat(obj_name, "q_nf");
-  pthread_cond_init(&q->q_nf, NULL );
-//  pthread_cond_setname_np(&q->q_nf, obj_name, 0);
-
-  if ((q->msg_array = calloc(nmsgs, msize)) == NULL )
-    return 1;
-  return 0; /* No error */
-}
-
-int
-q_destroy(queue_t *q)
-{
-  /* Free all the resources created by q_initialize */
-  q->q_destroyed = 1;
-  free(q->msg_array);
-  pthread_mutex_destroy(&q->q_guard);
-  pthread_cond_destroy(&q->q_ne);
-  pthread_cond_destroy(&q->q_nf);
-  return 0;
-}
-
-int
-q_destroyed(queue_t *q)
-{
-  return (q->q_destroyed);
-}
-
-int
-q_empty(queue_t *q)
-{
-  return (q->q_first == q->q_last);
-}
-
-int
-q_full(queue_t *q)
-{
-  return ((q->q_last - q->q_first) == 1
-      || (q->q_first == q->q_size - 1 && q->q_last == 0));
-}
-
-int
-q_remove(queue_t *q, void * msg, int msize)
-{
-  char *pm;
-
-  pm = (char *) q->msg_array;
-  /* Remove oldest ("first") message */
-      memcpy(msg, pm + (q->q_first * msize), msize);
-  q->q_first = ((q->q_first + 1) % q->q_size);
-  return 0; /* no error */
-}
-
-int
-q_insert(queue_t *q, void * msg, int msize)
-{
-  char *pm;
-
-  pm = (char *) q->msg_array;
-  /* Add a new youngest ("last") message */
-  if (q_full(q))
-    return 1; /* Error - Q is full */
-  memcpy(pm + (q->q_last * msize), msg, msize);
-  q->q_last = ((q->q_last + 1) % q->q_size);
-
-  return 0;
 }
