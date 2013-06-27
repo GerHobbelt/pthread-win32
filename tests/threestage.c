@@ -148,19 +148,21 @@ int main (int argc, char * argv[])
   THARG *producer_arg, *consumer_arg;
 
   if (argc < 3) {
-      printf ("Usage: ThreeStage npc goal \n");
-      return 1;
+      nthread = 32;
+      goal = 1000;
+  } else {
+      nthread = atoi(argv[1]);
+      goal = atoi(argv[2]);
+      if (argc >= 4)
+        DisplayMessages = atoi(argv[3]);
   }
-  if (argc >= 4) DisplayMessages = atoi(argv[3]);
 
   srand ((int)time(NULL));        /* Seed the RN generator */
 
-  nthread = atoi(argv[1]);
   if (nthread > MAX_THREADS) {
       printf ("Maximum number of producers or consumers is %d.\n", MAX_THREADS);
       return 2;
   }
-  goal = atoi(argv[2]);
   producer_th = malloc (nthread * sizeof(pthread_t));
   producer_arg = calloc (nthread, sizeof (THARG));
   consumer_th = malloc (nthread * sizeof(pthread_t));
