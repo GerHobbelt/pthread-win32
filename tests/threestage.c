@@ -24,7 +24,7 @@
  and send the individual messages to the designated consumer
  */
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <WINDOWS.H>
 #define sleep(i) Sleep(i*1000)
 #endif
@@ -545,7 +545,6 @@ void  message_fill (msg_block_t *mblock, unsigned int src, unsigned int dest, un
                 mblock->data[0], mblock->data[DATA_SIZE-1]);  */
   return;
 }
-
 
 void  message_display (msg_block_t *mblock)
 {
