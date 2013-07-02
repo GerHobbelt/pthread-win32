@@ -1,5 +1,14 @@
 /*
+ This source code is taken directly from examples in the book
+ Windows System Programming, Edition 4 by Johnson (John) Hart
+
  Session 6, Chapter 10. ThreeStage.c
+
+ Several required additional header and source files from the
+ book examples have been included inline to simplify building.
+ The only modification to the code has been to provide default
+ values when run without arguments.
+
  Three-stage Producer Consumer system
  Other files required in this project, either directly or
  in the form of libraries (DLLs are preferable)

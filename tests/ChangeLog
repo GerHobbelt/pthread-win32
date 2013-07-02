@@ -1,3 +1,9 @@
+2013-07-02  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* threestage.c: New test/example code; not written specifically as
+	a test; independently written and essentially unmodified pthreads
+	example.
+
 2013-06-19  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* exit6.c: New test (added some time ago but not committed).
