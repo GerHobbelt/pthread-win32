@@ -172,10 +172,10 @@ int main (int argc, char * argv[])
       printf ("Maximum number of producers or consumers is %d.\n", MAX_THREADS);
       return 2;
   }
-  producer_th = malloc (nthread * sizeof(pthread_t));
-  producer_arg = calloc (nthread, sizeof (THARG));
-  consumer_th = malloc (nthread * sizeof(pthread_t));
-  consumer_arg = calloc (nthread, sizeof (THARG));
+  producer_th = (pthread_t *) malloc (nthread * sizeof(pthread_t));
+  producer_arg = (THARG *) calloc (nthread, sizeof (THARG));
+  consumer_th = (pthread_t *) malloc (nthread * sizeof(pthread_t));
+  consumer_arg = (THARG *) calloc (nthread, sizeof (THARG));
 
   if (producer_th == NULL || producer_arg == NULL
       || consumer_th == NULL || consumer_arg == NULL)
@@ -184,7 +184,7 @@ int main (int argc, char * argv[])
   q_initialize (&p2tq, sizeof(msg_block_t), P2T_QLEN);
   q_initialize (&t2rq, sizeof(T2R_MSG_TYPE), T2R_QLEN);
   /* Allocate and initialize Receiver to Consumer queue for each consumer */
-  r2cq_array = calloc (nthread, sizeof(queue_t));
+  r2cq_array = (queue_t *) calloc (nthread, sizeof(queue_t));
   if (r2cq_array == NULL) perror ("Cannot allocate memory for r2c queues");
 
   for (ithread = 0; ithread < nthread; ithread++) {
