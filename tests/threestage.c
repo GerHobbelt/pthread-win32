@@ -33,12 +33,12 @@
  and send the individual messages to the designated consumer
  */
 
-#if defined(_WIN32)
-#include <WINDOWS.H>
-#define sleep(i) Sleep(i*1000)
-#endif
 
-#include "pthread.h"
+#include "test.h"
+#define sleep(i) Sleep(i*1000)
+#ifndef max
+#define max(a,b) ((a) > (b) ? (a) : (b))
+#endif
 
 #define DATA_SIZE 256
 typedef struct msg_block_tag { /* Message block */
@@ -416,7 +416,7 @@ unsigned int q_get (queue_t *q, void * msg, unsigned int msize, unsigned int Max
       pthread_cond_broadcast (&q->q_nf);
   }
   pthread_mutex_unlock (&q->q_guard);
-  return (0 == tstatus && got_msg == 1 ? 0 : max(1, tstatus));   /* 0 indictates success */
+  return (0 == tstatus && got_msg == 1 ? 0 : max(1, tstatus));   /* 0 indicates success */
 }
 
 unsigned int q_put (queue_t *q, void * msg, unsigned int msize, unsigned int MaxWait)
