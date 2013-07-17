@@ -43,6 +43,12 @@
 int
 pthread_attr_getname_np(pthread_attr_t * attr, char *name, int len)
 {
-  strncpy_s(name, len - 1, (*attr)->thrname, len - 1);
+  //strncpy_s(name, len - 1, (*attr)->thrname, len - 1);
+#if defined(_MSVCRT_)
+# pragma warning(suppress:4996)
+  strncpy(name, (*attr)->thrname, len - 1);
+  (*attr)->thrname[len - 1] = '\0';
+#endif
+
   return 0;
 }
