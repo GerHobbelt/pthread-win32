@@ -127,7 +127,7 @@ pthread_self (void)
     	  if (!fail)
     	    {
 
-#if ! defined(WINCE)
+#if defined(HAVE_CPU_AFFINITY)
 
     	      /*
     	       * Get this threads CPU affinity by temporarily setting the threads

@@ -38,6 +38,8 @@
  *
  */
 
+#if ! defined(WINCE)
+
 #include "test.h"
 
 int
@@ -103,3 +105,16 @@ main()
 
   return 0;
 }
+
+#else
+
+#include <stdio.h>
+
+int
+main()
+{
+  fprintf(stderr, "Test N/A for this target environment.\n");
+  return 0;
+}
+
+#endif

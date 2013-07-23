@@ -85,7 +85,7 @@ ptw32_new (void)
   tp->robustMxListLock = 0;
   tp->robustMxList = NULL;
   tp->name = NULL;
-#if ! defined(WINCE)
+#if defined(HAVE_CPU_AFFINITY)
   CPU_ZERO((cpu_set_t*)&tp->cpuset);
 #endif
   tp->cancelEvent = CreateEvent (0, (int) PTW32_TRUE,	/* manualReset  */

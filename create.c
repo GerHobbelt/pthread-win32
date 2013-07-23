@@ -146,24 +146,26 @@ pthread_create (pthread_t * tid,
 #if defined(HAVE_SIGSET_T)
   tp->sigmask = sp->sigmask;
 #endif
-#if ! defined(WINCE)
+#if defined(HAVE_CPU_AFFINITY)
   tp->cpuset = sp->cpuset;
 #endif
 
   if (a != NULL)
     {
+#if defined(HAVE_CPU_AFFINITY)
       cpu_set_t none;
       cpu_set_t attr_cpuset;
       ((_sched_cpu_set_vector_*)&attr_cpuset)->_cpuset = a->cpuset;
 
-      stackSize = (unsigned int)a->stacksize;
-      tp->detachState = a->detachstate;
-      priority = a->param.sched_priority;
       CPU_ZERO(&none);
       if (! CPU_EQUAL(&attr_cpuset, &none))
         {
           tp->cpuset = a->cpuset;
         }
+#endif
+      stackSize = (unsigned int)a->stacksize;
+      tp->detachState = a->detachstate;
+      priority = a->param.sched_priority;
       if (a->thrname != NULL)
         tp->name = _strdup(a->thrname);
 
@@ -237,7 +239,7 @@ pthread_create (pthread_t * tid,
           (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
         }
 
-#if ! defined(WINCE)
+#if defined(HAVE_CPU_AFFINITY)
 
       SetThreadAffinityMask(tp->threadH, tp->cpuset);
 
@@ -289,7 +291,7 @@ pthread_create (pthread_t * tid,
             (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
           }
 
-#if ! defined(WINCE)
+#if defined(HAVE_CPU_AFFINITY)
 
         SetThreadAffinityMask(tp->threadH, tp->cpuset);
 
@@ -335,5 +337,4 @@ pthread_create (pthread_t * tid,
     pthread_count++;
 #endif
   return (result);
-
 }				/* pthread_create */

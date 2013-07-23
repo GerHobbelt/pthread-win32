@@ -225,7 +225,7 @@ struct ptw32_thread_t_
   int cancelType;
   int implicit:1;
   DWORD thread;			/* Windows thread ID */
-#if ! defined(WINCE)
+#if defined(HAVE_CPU_AFFINITY)
   size_t cpuset;		/* Thread CPU affinity set */
 #endif
   char * name;                  /* Thread name */

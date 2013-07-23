@@ -1,3 +1,13 @@
+2013-07-23  Keith Clanton <keith dot clanton at cloudcar dot com>
+
+	* create.c: Don't apply cpu affinity from thread attributes for WINCE;
+	bug fix.
+	
+2013-07-23  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* config.h (HAVE_CPU_AFFINITY): Defined.
+	* several (WINCE): Substitute HAVE_CPU_AFFINITY where appropriate.
+
 2013-07-17  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_getname_np.c: Replace strncpy_s with strncpy to support older

@@ -85,7 +85,7 @@ pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
       * ------------------------------------------------------
       */
 {
-#if defined(WINCE)
+#if ! defined(HAVE_CPU_AFFINITY)
 
   return ENOSYS;
 
@@ -191,7 +191,7 @@ pthread_getaffinity_np (pthread_t thread, size_t cpusetsize, cpu_set_t *cpuset)
       * ------------------------------------------------------
       */
 {
-#if defined(WINCE)
+#if ! defined(HAVE_CPU_AFFINITY)
 
   return ENOSYS;
 
