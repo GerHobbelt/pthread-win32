@@ -103,6 +103,7 @@
 #define PTW32_LEVEL_MAX 3
 
 #if ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112 )  || !defined(PTW32_LEVEL)
+#undef PTW32_LEVEL
 #define PTW32_LEVEL PTW32_LEVEL_MAX	/* Include everything */
 #endif
 
