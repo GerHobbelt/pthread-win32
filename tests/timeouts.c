@@ -207,7 +207,7 @@ int Wait(time_t sec, long nsec)
   GetTimestampTS(&abstime);
   abstime.tv_sec  += sec;
   abstime.tv_nsec += nsec;
-  if(sc = (abstime.tv_nsec / 1000000000L)){
+  if((sc = (abstime.tv_nsec / 1000000000L))){
       abstime.tv_sec += sc;
       abstime.tv_nsec %= 1000000000L;
   }
@@ -221,16 +221,9 @@ int Wait(time_t sec, long nsec)
 }
 
 char tbuf[128];
-void printtim(long rt, cyg_tim_t dt, int wres)
+void printtim(cyg_tim_t rt, cyg_tim_t dt, int wres)
 {
-//  memset(tbuf, 0, sizeof(tbuf));
-//#if !(_MSC_VER <= 1200)
-//  sprintf(tbuf,   "US% 10llu", //msvc > 6.0 or unix
-//#else
-//  sprintf(tbuf,   "US% 10I64d", //msvc 6.0
-//#endif
-//  (dt / CYG_ONEKAPPA));
-  printf("wait result [%d]: timeout(ms) [expected/actual]: %ld/%ld\n", wres, rt/CYG_ONEMILLION, (long) dt/CYG_ONEMILLION);
+  printf("wait result [%d]: timeout(ms) [expected/actual]: %ld/%ld\n", wres, (long)(rt/CYG_ONEMILLION), (long)(dt/CYG_ONEMILLION));
 }
 
 
@@ -238,14 +231,14 @@ int main(int argc, char* argv[])
 {
   int i = 0;
   int wres = 0;
-  cyg_tim_t t1, t2, dt;
+  cyg_tim_t t1, t2, dt, rt;
 
   CYG_InitTimers();
 
   Init();
 
   while(i++ < 10){
-      long rt = 90*i*MSEC_F;
+      rt = 90*i*MSEC_F;
       CYG_MARK1(&t1);
       wres = Wait(0, rt);
       CYG_MARK1(&t2);
