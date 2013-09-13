@@ -240,7 +240,7 @@ int main(int argc, char* argv[])
   while(i++ < 10){
       rt = 90*i*MSEC_F;
       CYG_MARK1(&t1);
-      wres = Wait(0, rt);
+      wres = Wait(0, (long)(size_t)rt);
       CYG_MARK1(&t2);
       dt = CYG_DIFFT(t1, t2);
       printtim(rt, dt, wres);
