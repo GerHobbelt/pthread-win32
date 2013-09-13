@@ -12,6 +12,7 @@ ALL_KNOWN_TESTS = \
 	condvar3 condvar3_1 condvar3_2 condvar3_3 \
 	condvar4 condvar5 condvar6 \
 	condvar7 condvar8 condvar9 \
+	timeouts \
 	count1 \
 	context1 \
 	create1 create2 create3 \

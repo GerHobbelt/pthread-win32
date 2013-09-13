@@ -148,6 +148,7 @@ spin3.pass: spin2.pass
 spin4.pass: spin3.pass
 stress1.pass: create3.pass mutex8.pass barrier6.pass
 threestage.pass: stress1.pass
+timeouts.pass: condvar9.pass
 tsd1.pass: barrier5.pass join1.pass
 tsd2.pass: tsd1.pass
 tsd3.pass: tsd2.pass
