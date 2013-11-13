@@ -140,6 +140,24 @@ pthread_delay_np (const struct timespec *interval)
         [EINVAL]   The value specified by interval is invalid. 
 
 
+__int64
+pthread_getunique_np (pthread_t thr)
+
+		Returns the unique number associated with thread thr.
+		The unique numbers are a simple way of positively identifying a thread when
+		pthread_t cannot be relied upon to identify the true thread instance. I.e. a
+		pthread_t value may be assigned to different threads throughout the life of a 
+		process.
+		
+		Because pthreads4w (pthreads-win32) threads can be uniquely identified by their
+		pthread_t values this routine is provided only for source code compatibility.
+		
+		NOTE: if the library is re-initialised, i.e. by calling pthread_win32_process_detach_np()
+		followed by pthread_win32_process_attach_np(), then the unique number is reset along with
+		several other library global values. Library reinitialisation should not be required,
+		however, some older applications may still call these routines as they were once required to
+		do when statically linking the library.
+
 int
 pthread_timedjoin_np (pthread_t thread, void **value_ptr, const struct timespec *abstime)
 
