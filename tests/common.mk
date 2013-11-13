@@ -34,6 +34,7 @@ ALL_KNOWN_TESTS = \
 	name_np1 name_np2 \
 	once1 once2 once3 once4 \
 	priority1 priority2 inherit1 \
+	reinit1 \
 	reuse1 reuse2 \
 	robust1 robust2 robust3 robust4 robust5 \
 	rwlock1 rwlock2 rwlock3 rwlock4 \

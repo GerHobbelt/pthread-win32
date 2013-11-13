@@ -111,6 +111,7 @@ once3.pass: once2.pass
 once4.pass: once3.pass
 priority1.pass: join1.pass
 priority2.pass: priority1.pass barrier3.pass
+reinit1.pass: rwlock7.pass
 reuse1.pass: create3.pass
 reuse2.pass: reuse1.pass
 robust1.pass: mutex8r.pass

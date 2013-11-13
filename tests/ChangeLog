@@ -1,3 +1,9 @@
+2013-11-13  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* reinit1.c: New test - reinitialising the library.
+	* common.mk: Add new test.
+	* reorder.mk: Likewise.
+
 2013-07-23  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* affinity*.c: Skipped under WINCE.
