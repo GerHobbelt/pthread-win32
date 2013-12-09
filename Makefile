@@ -233,9 +233,17 @@ $(SMALL_STATIC_STAMPS): $(STATIC_OBJS)
 	$(CC) $(EHFLAGS) /D$(CLEANUP) -c $<
 
 # TARGET_CPU is an environment variable set by Visual Studio Command Prompt
-# as provided by the SDK
+# as provided by the SDK (VS 2010 Express plus SDK 7.1)
+# PLATFORM is an environment variable that may be set in the VS 2013 Express x64 cross
+# development environment
 .rc.res:
+!IF DEFINED(PLATFORM)
+	rc /dPTW32_ARCH$(PLATFORM) /dPTW32_RC_MSC /d$(CLEANUP) $<
+!ELSE IF DEFINED(TARGET_CPU)
 	rc /dPTW32_ARCH$(TARGET_CPU) /dPTW32_RC_MSC /d$(CLEANUP) $<
+!ELSE
+	rc /dPTW32_ARCHx86 /dPTW32_RC_MSC /d$(CLEANUP) $<
+!ENDIF
 
 .c.i:
 	$(CC) /P /O2 /Ob1 $(VCFLAGS) $<

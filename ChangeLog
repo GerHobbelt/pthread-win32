@@ -1,3 +1,8 @@
+2013-12-09  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile (.rc.res): Add logic to extract target CPU from different
+	environments.
+
 2013-07-23  Keith Clanton <keith dot clanton at cloudcar dot com>
 
 	* create.c: Don't apply cpu affinity from thread attributes for WINCE;
