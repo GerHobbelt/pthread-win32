@@ -57,12 +57,11 @@ pthread_getname_np(pthread_t thr, char *name, int len)
 
   ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
 
-  //strncpy_s(name, len - 1, tp->name, len - 1);
-#if defined(_MSVCRT_)
+#if defined(_MSC_VER)
 # pragma warning(suppress:4996)
-  strncpy(name, tp->name, len - 1);
-  tp->name[len - 1] = '\0';
 #endif
+  strncpy(name, tp->name, len - 1);
+  name[len - 1] = '\0';
 
   ptw32_mcs_lock_release (&threadLock);
 
