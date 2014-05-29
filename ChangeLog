@@ -1,3 +1,11 @@
+2014-05-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* autostatic.c: Move content to dll.c so autostatic no longer required.
+	* dll.c: Include content from autostatic.c.
+	* common.mk (autostatic.*): remove from builds.
+	* Makefile (realclean): delete make.log.txt if present.
+	* GNUMakefile (realclean): Likewise.
+
 2014-05-28  Jaeeun Choi <jaeeun at mdstec dot com>
 
 	* pthread_mutex_init.c: Check and free malloced robustNode element if
