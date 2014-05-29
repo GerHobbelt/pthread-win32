@@ -153,23 +153,21 @@ ptw32_threadStart (void *vthreadParms)
   free (threadParms);
 
 #if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
-  pthread_setspecific (ptw32_selfThreadKey, sp);
-  ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
 #else
   /*
    * _beginthread does not return the thread id and is running
    * before it returns us the thread handle, and so we do it here.
    */
   sp->thread = GetCurrentThreadId ();
+#endif
+
+  pthread_setspecific (ptw32_selfThreadKey, sp);
   /*
    * Here we're using stateLock as a general-purpose lock
    * to make the new thread wait until the creating thread
    * has the new handle.
    */
   ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
-  pthread_setspecific (ptw32_selfThreadKey, sp);
-#endif
-
   sp->state = PThreadStateRunning;
   ptw32_mcs_lock_release (&stateLock);
 

@@ -88,7 +88,7 @@ main()
   seqno++;
   assert(pthread_setname_np(t, "MyThread%d", (void *)&seqno) == 0);
 #elif defined(PTW32_COMPATIBILITY_TRU64)
-  assert(pthread_setname_np(t, "MyThread1", NULL);
+  assert(pthread_setname_np(t, "MyThread1", NULL) == 0);
 #else
   assert(pthread_setname_np(t, "MyThread1") == 0);
 #endif

@@ -49,6 +49,11 @@
 
 #if defined(PTW32_STATIC_LIB)
 
+/*
+ * Note: MSVC 8 and higher use code in dll.c, which enables TLS cleanup
+ * on thread exit. Code here can only do process init and exit functions.
+ */
+
 #if defined(PTW32_CONFIG_MINGW) || defined(_MSC_VER)
 
 /* For an explanation of this code (at least the MSVC parts), refer to

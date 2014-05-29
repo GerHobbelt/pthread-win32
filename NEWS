@@ -1,13 +1,13 @@
 RELEASE 2.10.0
 --------------
-(2099-99-99)
+(2013-12-13)
 
 General
 -------
 New bug fixes in all releases since 2.8.0 have NOT been applied to the
 1.x.x series.
 
-Some changes in CVS from 2011-02-26 onward may not be compatible with
+Some changes from 2011-02-26 onward may not be compatible with
 pre Windows 2000 systems.
 
 Testing and verification
@@ -16,13 +16,13 @@ This version has been tested on SMP architecture (Intel x64 Hex Core)
 by completing the included test suite, as well as the stress and bench
 tests.
 
-Be sure to run your builds against the test suite. As of this release
-we are successfully passing the full test suite with all build
-configurations. If you see failures then please consider how your
-toolchains might be contributing to the failure. See the README file
-for more detailed descriptions of the toolchains and test systems that
-we have used to get the tests to pass successfully. We recommend
-MinGW64 over MinGW32 for both 64 and 32 bit builds.
+Be sure to run your builds against the test suite. If you see failures
+then please consider how your toolchains might be contributing to the
+failure. See the README file for more detailed descriptions of the
+toolchains and test systems that we have used to get the tests to pass
+successfully. We recommend MinGW64 over MinGW32 for both 64 and 32 bit
+builds. MinGW also includes its own independent pthreads implementation,
+which you may prefer to use.
 
 New Features
 ------------
@@ -69,7 +69,16 @@ Static linking:
 The autostatic functionality has been extended so that builds using
 MSVC8 and later no longer require apps to call
 pthread_win32_thread_detach_np(). That is, all of the DllMain
-functionality is now automatic for static linking for these builds.   
+functionality is now automatic for static linking for these builds.
+
+Due to an issue with TLS behaviour, the V*-small-static* nmake targets
+in Makefile have been disabled. The issue is exposed by tests/semaphore3.c
+where the pthread_self() call inside the thread fails to return the
+correct POSIX thread handle but returns a new "implicit" POSIX thread
+handle instead. Implicit pthread handles have detached thread status, which
+causes the pthread_detach() call inside the thread to return EINVAL. The
+V*-static* targets appear to be not affected. The primary difference is
+that the latter are generated from a single compilation unit.
 
 Bug Fixes
 ---------

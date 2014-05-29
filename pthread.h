@@ -1,10 +1,10 @@
-/* This is an implementation of the threads API of POSIX 1003.1-2001.
+/* This is an implementation of the threads API of the Single Unix Specification.
  *
  * --------------------------------------------------------------------------
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2012 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2013 Pthreads-win32 contributors
  *
  *      Homepage1: http://sourceware.org/pthreads-win32/
  *      Homepage2: http://sourceforge.net/projects/pthreads4w/

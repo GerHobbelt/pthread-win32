@@ -58,24 +58,26 @@ STATIC_OBJS	= $(STATIC_OBJS) $(RESOURCE_OBJS)
 
 help:
 	@ echo Run one of the following command lines:
+	@ echo nmake clean all-tests
+	@ echo nmake -DEXHAUSTIVE clean all-tests 
 	@ echo nmake clean VC
 	@ echo nmake clean VC-debug
 	@ echo nmake clean VC-static
 	@ echo nmake clean VC-static-debug
-	@ echo nmake clean VC-small-static
-	@ echo nmake clean VC-small-static-debug
+#	@ echo nmake clean VC-small-static
+#	@ echo nmake clean VC-small-static-debug
 	@ echo nmake clean VCE
 	@ echo nmake clean VCE-debug
 	@ echo nmake clean VCE-static
 	@ echo nmake clean VCE-static-debug
-	@ echo nmake clean VCE-small-static
-	@ echo nmake clean VCE-small-static-debug
+#	@ echo nmake clean VCE-small-static
+#	@ echo nmake clean VCE-small-static-debug
 	@ echo nmake clean VSE
 	@ echo nmake clean VSE-debug
 	@ echo nmake clean VSE-static
 	@ echo nmake clean VSE-static-debug
-	@ echo nmake clean VSE-small-static
-	@ echo nmake clean VSE-small-static-debug
+#	@ echo nmake clean VSE-small-static
+#	@ echo nmake clean VSE-small-static-debug
 
 all:
 	$(MAKE) /E clean VCE
@@ -100,14 +102,14 @@ all-tests:
 	cd tests && $(MAKE) /E clean VCE$(XDBG) $(TEST_ENV)
 	$(MAKE) /E realclean VSE$(XDBG)
 	cd tests && $(MAKE) /E clean VSE$(XDBG) $(TEST_ENV)
-!IF DEFINED(EXHAUSTIVE)
+#!IF DEFINED(EXHAUSTIVE)
 	$(MAKE) /E realclean VC-static$(XDBG)
 	cd tests && $(MAKE) /E clean VC-static$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX-static$(XDBG) $(TEST_ENV)
 	$(MAKE) /E realclean VCE-static$(XDBG)
 	cd tests && $(MAKE) /E clean VCE-static$(XDBG) $(TEST_ENV)
 	$(MAKE) /E realclean VSE-static$(XDBG)
 	cd tests && $(MAKE) /E clean VSE-static$(XDBG) $(TEST_ENV)
-!ENDIF
+#!ENDIF
 	$(MAKE) realclean
 	@ echo $@ completed successfully.
 
@@ -142,23 +144,23 @@ VC-debug:
 #
 # Static builds
 #
-VCE-small-static:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).small_static_stamp
+#VCE-small-static:
+#	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).small_static_stamp
 
-VCE-small-static-debug:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).small_static_stamp
+#VCE-small-static-debug:
+#	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VERD).small_static_stamp
 
-VSE-small-static:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).small_static_stamp
+#VSE-small-static:
+#	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VER).small_static_stamp
 
-VSE-small-static-debug:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).small_static_stamp
+#VSE-small-static-debug:
+#	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_SEH pthreadVSE$(DLL_VERD).small_static_stamp
 
-VC-small-static:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).small_static_stamp
+#VC-small-static:
+#	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VER).small_static_stamp
 
-VC-small-static-debug:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).small_static_stamp
+#VC-small-static-debug:
+#	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(DLL_VERD).small_static_stamp
 
 VCE-static:
 	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(DLL_VER).inlined_static_stamp

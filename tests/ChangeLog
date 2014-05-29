@@ -1,3 +1,8 @@
+2013-12-10  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* cancel9.c (bytes, dwEvent): Removed to eliminate warning "set but
+	not used".
+
 2013-11-13  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* reinit1.c: New test - reinitialising the library.
