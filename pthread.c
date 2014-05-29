@@ -104,7 +104,6 @@
 #include "create.c"
 #include "cleanup.c"
 #include "dll.c"
-#include "autostatic.c"
 #include "errno.c"
 #include "pthread_exit.c"
 #include "global.c"

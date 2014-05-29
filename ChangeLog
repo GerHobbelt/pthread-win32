@@ -2,6 +2,7 @@
 
 	* autostatic.c: Move content to dll.c so autostatic no longer required.
 	* dll.c: Include content from autostatic.c.
+	* pthread.c (autostatic.c): Remove #include.
 	* common.mk (autostatic.*): remove from builds.
 	* Makefile (realclean): delete make.log.txt if present.
 	* GNUMakefile (realclean): Likewise.
