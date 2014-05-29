@@ -1,6 +1,6 @@
 RELEASE 2.10.0
 --------------
-(2013-12-13)
+(2014-05-29)
 
 General
 -------
@@ -61,16 +61,13 @@ New makefile targets have been added and existing targets modified or
 removed. For example, targets to build and test all of the possible
 configurations of both dll and static libs.
 
-The makefiles now know how to build both 32 and 64 bit versions if
-the toolchain allows it (MinGW only). See the README file "Building
-with ..." sections for details.
-
 Static linking:
-The autostatic functionality has been extended so that builds using
-MSVC8 and later no longer require apps to call
+The autostatic functionality has been moved to dll.c, and extended so
+that builds using MSVC8 and later no longer require apps to call
 pthread_win32_thread_detach_np(). That is, all of the DllMain
 functionality is now automatic for static linking for these builds.
 
+Some nmake static linking targets have been disabled:
 Due to an issue with TLS behaviour, the V*-small-static* nmake targets
 in Makefile have been disabled. The issue is exposed by tests/semaphore3.c
 where the pthread_self() call inside the thread fails to return the
@@ -82,8 +79,8 @@ that the latter are generated from a single compilation unit.
 
 Bug Fixes
 ---------
-Small object file static linking now works. The autostatic.c code is
-required but nothing explicitly references this code so was getting
+Small object file static linking now works (MinGW). The autostatic code
+is required but nothing explicitly referenced this code so was getting
 optimised out.
 - Daniel Richard G.
 
@@ -103,8 +100,8 @@ Identified the cause of significant failures around cancelation
 and pthread_exit() for the GCE (GNU C++) build configuration as
 coming from Mingw32. Not sure if this is general or just when
 building 32 bit libraries and apps that run on 64 bit systems.
-These failures do not arise with Mingw64 32 bit builds running on
-64 bit systems.
+These failures do not arise with Mingw64 32 bit builds (GCC built
+with multilib enabled) running on 64 bit systems.
 - Daniel Richard G. and Ross Johnson
 
 pthread_key_delete() bug introduced in release 2.9.x caused this
@@ -123,6 +120,10 @@ consequence pthread_attr_setstackaddr() now returns ENOSYS. Previously
 the value was stored and could be retrieved but was otherwise unused.
 pthread_attr_getstackaddr() returns ENOSYS correspondingly.
 - Ross Johnson
+
+Fixed a potential memory leak in pthread_mutex_init(). The leak would
+only occur if the mutex initialisation failed (extremely rare if ever).
+- Jaeeun Choi
 
 RELEASE 2.9.1
 -------------
