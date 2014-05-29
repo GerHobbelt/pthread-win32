@@ -187,6 +187,7 @@ realclean: clean
 	if exist *.a del *.a
 	if exist *.manifest del *.manifest
 	if exist *_stamp del *_stamp
+	if exist make.log.txt del make.log.txt
 	cd tests && $(MAKE) clean
 
 clean:

@@ -320,6 +320,7 @@ realclean: clean
 	-$(RM) *.lib
 	-$(RM) pthread*.dll
 	-$(RM) *_stamp
+	-$(RM) make.log.txt
 	-cd tests && $(MAKE) clean
 
 var_check_list =

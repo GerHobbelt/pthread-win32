@@ -9,7 +9,6 @@ DLL_OBJS	= \
 
 # Separate modules for minimising the size of statically linked images
 STATIC_OBJS	= \
-		autostatic.$(OBJEXT) \
 		cleanup.$(OBJEXT) \
 		create.$(OBJEXT) \
 		dll.$(OBJEXT) \
@@ -216,7 +215,6 @@ PTHREAD_SRCS	= \
 		create.c \
 		cleanup.c \
 		dll.c \
-		autostatic.c \
 		errno.c \
 		pthread_exit.c \
 		global.c \
