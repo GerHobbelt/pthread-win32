@@ -1,3 +1,9 @@
+2014-07-22  Scott Libert  <scott underscore libert at dell dot com>
+
+	* semaphore3.c: Wait for threads to complete before exiting main().
+	This test would sometimes fail because, behaviourally, it was not
+	standard-compliant.
+
 2013-12-10  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* cancel9.c (bytes, dwEvent): Removed to eliminate warning "set but

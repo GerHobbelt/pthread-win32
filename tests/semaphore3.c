@@ -81,7 +81,6 @@ sem_t s;
 void *
 thr (void * arg)
 {
-  assert(pthread_detach(pthread_self()) == 0);
   assert(sem_wait(&s) == 0);
   return NULL;
 }
@@ -106,7 +105,7 @@ main()
           sched_yield();
           assert(sem_getvalue(&s, &value) == 0);
         }
-      while (value != -i);
+      while (-value != i);
       //printf("1:Value = %d\n", value); fflush(stdout);
       assert(-value == i);
     }
@@ -119,6 +118,9 @@ main()
       assert(-value == i);
     }
 
+  for (i = MAX_COUNT - 1; i >= 0; i--)
+    {
+      pthread_join(t[i], NULL);
+    }
   return 0;
 }
-
