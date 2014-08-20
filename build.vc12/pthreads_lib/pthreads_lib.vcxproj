@@ -109,6 +109,9 @@
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
+    <PostBuildEvent>
+      <Command>postbuild $(IntDir) LIB</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -128,6 +131,9 @@
     <ResourceCompile>
       <PreprocessorDefinitions>PTW32_RC_MSC;PTW32_STATIC_LIB;PTW32_BUILD;PTW32_ARCHx64</PreprocessorDefinitions>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>postbuild $(IntDir) LIB</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -154,6 +160,9 @@
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
+    <PostBuildEvent>
+      <Command>postbuild $(IntDir) LIB</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -177,6 +186,9 @@
     <ResourceCompile>
       <PreprocessorDefinitions>PTW32_RC_MSC;PTW32_STATIC_LIB;PTW32_BUILD;PTW32_ARCHx64</PreprocessorDefinitions>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>postbuild $(IntDir) LIB</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\config.h" />
