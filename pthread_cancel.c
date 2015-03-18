@@ -60,12 +60,12 @@ ptw32_cancel_callback (ULONG_PTR unused)
 }
 
 /*
- * ptw32_Registercancellation() -
+ * ptw32_RegisterCancellation() -
  * Must have args of same type as QueueUserAPCEx because this function
  * is a substitute for QueueUserAPCEx if it's not available.
  */
 DWORD
-ptw32_Registercancellation (PAPCFUNC unused1, HANDLE threadH, DWORD unused2)
+ptw32_RegisterCancellation (PAPCFUNC unused1, HANDLE threadH, DWORD unused2)
 {
   CONTEXT context;
 
@@ -160,7 +160,7 @@ pthread_cancel (pthread_t thread)
 	      /*
 	       * If alertdrv and QueueUserAPCEx is available then the following
 	       * will result in a call to QueueUserAPCEx with the args given, otherwise
-	       * this will result in a call to ptw32_Registercancellation and only
+	       * this will result in a call to ptw32_RegisterCancellation and only
 	       * the threadH arg will be used.
 	       */
 	      ptw32_register_cancellation ((PAPCFUNC)ptw32_cancel_callback, threadH, 0);

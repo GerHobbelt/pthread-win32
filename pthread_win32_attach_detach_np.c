@@ -106,7 +106,7 @@ pthread_win32_process_attach_np ()
 
   if (NULL == ptw32_register_cancellation)
     {
-      ptw32_register_cancellation = ptw32_Registercancellation;
+      ptw32_register_cancellation = ptw32_RegisterCancellation;
 
       if (ptw32_h_quserex != NULL)
 	{
@@ -129,7 +129,7 @@ pthread_win32_process_attach_np ()
 
       if (queue_user_apc_ex_init == NULL || !queue_user_apc_ex_init ())
 	{
-	  ptw32_register_cancellation = ptw32_Registercancellation;
+	  ptw32_register_cancellation = ptw32_RegisterCancellation;
 
 	  (void) FreeLibrary (ptw32_h_quserex);
 	  ptw32_h_quserex = 0;

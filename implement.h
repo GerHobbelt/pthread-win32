@@ -192,6 +192,7 @@ typedef enum
   PThreadStateInitial = 0,	/* Thread not running                   */
   PThreadStateRunning,		/* Thread alive & kicking               */
   PThreadStateSuspended,	/* Thread alive but suspended           */
+  PThreadStateCancelPending,	/* Thread alive but                     */
                                 /* has cancellation pending.             */
   PThreadStateCanceling,	/* Thread alive but is                  */
                                 /* in the process of terminating        */
@@ -684,12 +685,13 @@ extern "C"
   int ptw32_mutex_check_need_init (pthread_mutex_t * mutex);
   int ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock);
   int ptw32_spinlock_check_need_init (pthread_spinlock_t * lock);
+
   int ptw32_robust_mutex_inherit(pthread_mutex_t * mutex);
   void ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self);
   void ptw32_robust_mutex_remove(pthread_mutex_t* mutex, ptw32_thread_t* otp);
 
   DWORD
-    ptw32_Registercancellation (PAPCFUNC callback,
+    ptw32_RegisterCancellation (PAPCFUNC callback,
 			       HANDLE threadH, DWORD callback_arg);
 
   int ptw32_processInitialize (void);
