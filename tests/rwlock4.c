@@ -76,6 +76,8 @@ test_rwlock4(void)
 
   assert(pthread_join(t, NULL) == 0);
 
+  // Sleep(20);
+
   assert(pthread_rwlock_unlock(&rwlock1) == 0);
 
   assert(washere == 1);

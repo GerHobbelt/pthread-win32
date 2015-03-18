@@ -109,11 +109,17 @@ by completing the included test suite, stress and bench tests.
 
 New Features
 ------------
+
 DLL properties now properly includes the target architecture, i.e.
 right-click on the file pthreadVC2.dll in explorer and choose the Detail
 tab will show the compiler and architecture in the description field, e.g.
 "MS C x64" or "MS C x86".
 - Ross Johnson
+
+Dependence on the winsock library is now discretionary via
+#define RETAIN_WSALASTERROR in config.h. It is undefined by default unless
+WINCE is defined (because I (RJ) am unsure of the dependency there).
+- Ramiro Polla
 
 (MSC and GNU builds) The statically linked library now automatically
 initialises and cleans up on program start/exit, i.e. statically linked
