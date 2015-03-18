@@ -19,6 +19,11 @@ int main(int argc, char **argv)
 
 #else
 
+int test_affinity1(void);
+int test_affinity2(void);
+int test_affinity3(void);
+int test_affinity4(void);
+int test_affinity5(void);
 int test_barrier1(void);
 int test_barrier2(void);
 int test_barrier3(void);
@@ -60,6 +65,7 @@ int test_condvar7(void);
 int test_condvar8(void);
 int test_condvar9(void);
 int test_context1(void);
+int test_context2(void);
 int test_count1(void);
 int test_create1(void);
 int test_create2(void);
@@ -259,6 +265,11 @@ int main(int argc, char **argv)
 	TEST_WRAPPER(test_loadfree);
 	TEST_WRAPPER(test_sequence1);
 
+	TEST_WRAPPER(test_affinity1);
+	TEST_WRAPPER(test_affinity2);
+	TEST_WRAPPER(test_affinity3);
+	TEST_WRAPPER(test_affinity4);
+	TEST_WRAPPER(test_affinity5);
 	TEST_WRAPPER(test_barrier1);
 	TEST_WRAPPER(test_barrier2);
 	TEST_WRAPPER(test_barrier3);
@@ -300,6 +311,7 @@ int main(int argc, char **argv)
 	TEST_WRAPPER(test_condvar8);
 //	TEST_WRAPPER(test_condvar9);
 	TEST_WRAPPER(test_context1);
+	TEST_WRAPPER(test_context2);
 	TEST_WRAPPER(test_count1);
 	TEST_WRAPPER(test_create1);
 	TEST_WRAPPER(test_create2);

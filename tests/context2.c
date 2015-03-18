@@ -115,8 +115,13 @@ anotherEnding ()
 # pragma optimize("", on)
 #endif
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_context2(void)
+#endif
 {
   pthread_t t;
   HANDLE hThread;

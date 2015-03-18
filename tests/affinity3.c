@@ -40,8 +40,13 @@
 
 #include "test.h"
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_affinity3(void)
+#endif
 {
   int result;
   unsigned int cpu;

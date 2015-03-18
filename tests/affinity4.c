@@ -40,8 +40,13 @@
 
 #include "test.h"
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_affinity4(void)
+#endif
 {
   unsigned int cpu;
   cpu_set_t threadCpus;

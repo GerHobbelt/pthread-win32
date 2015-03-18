@@ -47,7 +47,7 @@ typedef union
 	unsigned long int bits;  /* To stop GCC complaining about %lx args to printf */
 } cpuset_to_ulint;
 
-void *
+static void *
 mythread(void * arg)
 {
   HANDLE threadH = GetCurrentThread();
@@ -69,8 +69,13 @@ mythread(void * arg)
   return (void*) 0;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_affinity5(void)
+#endif
 {
   unsigned int cpu;
   pthread_t tid;
