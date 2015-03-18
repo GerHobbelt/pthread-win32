@@ -48,6 +48,8 @@
 #    define PTW32_ARCH "x64"
 #  elif defined(PTW32_ARCHx86)
 #    define PTW32_ARCH "x86"
+#  else
+#    error "PTW32_ARCHx64 / PTW32_ARCHx86 has not been defined"
 #  endif
 #  if defined(__CLEANUP_C)
 #    define PTW32_VERSIONINFO_NAME "pthreadVC2.DLL\0"
