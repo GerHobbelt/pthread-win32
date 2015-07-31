@@ -1,3 +1,8 @@
+2015-06-31  Dimitry <wipedout at yandex dot ru>
+
+	* sem_init.c: Remove double free() when NEED_SEM defined (for
+	early versions of WinCE).
+
 2014-05-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* autostatic.c: Move content to dll.c so autostatic no longer required.

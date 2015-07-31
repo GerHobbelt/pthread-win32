@@ -125,7 +125,6 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 
           if (0 == s->sem)
             {
-              free (s);
               result = ENOSPC;
             }
           else
