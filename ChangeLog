@@ -1,4 +1,4 @@
-2015-06-31  Dimitry <wipedout at yandex dot ru>
+2015-06-31  Dimitry <>
 
 	* sem_init.c: Remove double free() when NEED_SEM defined (for
 	early versions of WinCE).
