@@ -245,7 +245,7 @@ enum {
 #    define NEED_ERRNO
 #    define NEED_SEM
 #  endif
-#  if defined(__MINGW64__)
+#  if defined(_MSC_VER) || defined(__MINGW64__)
 #    define HAVE_STRUCT_TIMESPEC
 #    define HAVE_MODE_T
 #  elif defined(_UWIN) || defined(__MINGW32__)
