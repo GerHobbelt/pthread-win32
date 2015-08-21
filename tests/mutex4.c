@@ -79,7 +79,7 @@ test_mutex4(void)
   assert(pthread_mutex_lock(&mutex1) == 0);
   assert(pthread_create(&t, NULL, unlocker, (void *)(size_t)(IS_ROBUST?EPERM:0)) == 0);
   assert(pthread_join(t, NULL) == 0);
-  assert(pthread_mutex_unlock(&mutex1) == 0);
+  assert(pthread_mutex_unlock(&mutex1) == IS_ROBUST?0:EPERM);
   assert(wasHere == 2);
 
   wasHere = 0;
@@ -88,7 +88,7 @@ test_mutex4(void)
   assert(pthread_mutex_lock(&mutex1) == 0);
   assert(pthread_create(&t, NULL, unlocker, (void *)(size_t)(IS_ROBUST?EPERM:0)) == 0);
   assert(pthread_join(t, NULL) == 0);
-  assert(pthread_mutex_unlock(&mutex1) == 0);
+  assert(pthread_mutex_unlock(&mutex1) == IS_ROBUST?0:EPERM);
   assert(wasHere == 2);
 
   wasHere = 0;

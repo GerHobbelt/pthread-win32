@@ -44,7 +44,7 @@ ALL_KNOWN_TESTS = \
 	sizes \
 	spin1 spin2 spin3 spin4 \
 	stress1 \
-	tsd1 tsd2 tsd3 \
+	tsd1 tsd2 \
 	valid1 valid2
 
 TESTS = $(ALL_KNOWN_TESTS)
