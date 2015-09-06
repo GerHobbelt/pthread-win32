@@ -38,6 +38,8 @@
  *
  */
 
+#if ! defined(WINCE)
+
 #include "test.h"
 
 #ifndef MONOLITHIC_PTHREAD_TESTS
@@ -114,3 +116,16 @@ test_affinity1(void)
 
   return 0;
 }
+
+#else
+
+#include <stdio.h>
+
+int
+main()
+{
+  fprintf(stderr, "Test N/A for this target environment.\n");
+  return 0;
+}
+
+#endif

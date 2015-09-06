@@ -188,7 +188,8 @@ test_exit5(void)
       result = 1;
 #endif
 
-      assert(threadbag[i].self.p != NULL && pthread_kill(threadbag[i].self, 0) == ESRCH);
+      assert(threadbag[i].self.p != NULL);
+      assert(pthread_kill(threadbag[i].self, 0) == ESRCH);
 
       fail = (result != 1);
 

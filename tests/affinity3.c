@@ -38,6 +38,8 @@
  *
  */
 
+#if ! defined(WINCE)
+
 #include "test.h"
 
 #ifndef MONOLITHIC_PTHREAD_TESTS
@@ -61,6 +63,11 @@ test_affinity3(void)
   CPU_ZERO(&switchmask);
   CPU_ZERO(&flipmask);
 
+  if (pthread_getaffinity_np(self, sizeof(cpu_set_t), &processCpus) == ENOSYS)
+    {
+      printf("pthread_get/set_affinity_np API not supported for this platform: skipping test.");
+      return 0;
+    }
   assert(pthread_getaffinity_np(self, sizeof(cpu_set_t), &processCpus) == 0);
   printf("This thread has a starting affinity with %d CPUs\n", CPU_COUNT(&processCpus));
   assert(!CPU_EQUAL(&mask, &processCpus));
@@ -103,3 +110,16 @@ test_affinity3(void)
 
   return 0;
 }
+
+#else
+
+#include <stdio.h>
+
+int
+main()
+{
+  fprintf(stderr, "Test N/A for this target environment.\n");
+  return 0;
+}
+
+#endif

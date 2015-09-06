@@ -1,28 +1,30 @@
-PTHREADS-WIN32 RELEASE 2.9.1 (2012-05-27)
------------------------------------------
-Web Site: http://sourceware.org/pthreads-win32/
-FTP Site: ftp://sourceware.org/pub/pthreads-win32
-Maintainer: Ross Johnson <ross.johnson@loungebythelake.net>
+PTHREADS4W RELEASE 2.10.0 (2014-05-29)
+--------------------------------------
+Web Site:	http://sourceforge.net/projects/pthreads4w/
+			http://sourceware.org/pthreads-win32/
+Repository:	http://sourceforge.net/p/pthreads4w/code
+			https://sourceware.org/cgi-bin/cvsweb.cgi/pthreads/?cvsroot=pthreads-win32
+Releases:	http://sourceforge.net/projects/pthreads4w/files
+			ftp://sourceware.org/pub/pthreads-win32
+Maintainer: Ross Johnson <firstname dot lastname at loungebythelake dot net>
 
 
 We are pleased to announce the availability of a new release of
-Pthreads-win32, an Open Source Software implementation of the
-Threads component of the POSIX 1003.1 2001 Standard for Microsoft's
-Win32 environment. Some functions from other sections of POSIX
-1003.1 2001 are also supported including semaphores and scheduling
-functions.
-
-This release replaces an extremely brief 2.9.0 release and adds
-some last minute non-code changes were made to embed better
-descriptive properties in the dlls to indicate target architecture
-and build environments.
+Pthreads4w (a.k.a. Pthreads-win32), an Open Source Software implementation of the
+Threads component of the SUSV3 Standard for Microsoft's
+Windows (x86 and x64). Some relevant functions from other sections
+of SUSV3 are also supported including semaphores and scheduling
+functions. See the Conformance section below for details.
 
 Some common non-portable functions are also implemented for
 additional compatibility, as are a few functions specific
-to pthreads-win32 for easier integration with Win32 applications.
+to pthreads4w for easier integration with Windows applications.
 
-Pthreads-win32 is free software, distributed under the GNU Lesser
+Pthreads4w is free software, distributed under the GNU Lesser
 General Public License (LGPL).
+
+For those who want to try the most recent changes, the SourceForge Git repository
+is the one to use. The Sourceware CVS repository is synchronised less often.
 
 
 Acknowledgements
@@ -33,16 +35,19 @@ implementation contributed by John Bossom.
 The implementation of Condition Variables uses algorithms developed
 by Alexander Terekhov and Louis Thomas.
 
-The implementation of POSIX mutexes has been improved by Thomas Pfaff
+The implementation of POSIX mutexes was improved by Thomas Pfaff
 and later by Alexander Terekhov.
 
 The implementation of Spinlocks and Barriers was contributed
 by Ross Johnson.
 
 The implementation of read/write locks was contributed by
-Aurelio Medina and improved by Alexander Terekhov.
+Aurelio Medina and improved (replaced) by Alexander Terekhov.
 
-Many others have contributed significant time and effort to solve crutial
+An implementation of MCS queue-based locks (used internally) was contributed
+by Vladimir Kliatchko.
+
+Many others have contributed significant time and effort to solve crucial
 problems in order to make the library workable, robust and reliable.
 
 Thanks to Xavier Leroy for granting permission to use and modify his
@@ -267,14 +272,21 @@ The following functions are implemented:
                               for thread validity checking)
 
       ---------------------------
-      Non-portable routines (see the README.NONPORTABLE file for usage)
+      Non-portable routines
       ---------------------------
+      (See the README.NONPORTABLE file or HTML manual pages for usage.)
+      pthread_attr_getname_np
+      pthread_attr_setname_np
+      pthread_getname_np
+      pthread_setname_np
       pthread_timedjoin_np
       pthread_tryjoin_np
       pthread_getw32threadhandle_np
       pthread_timechange_handler_np
       pthread_delay_np
       pthread_getunique_np
+      pthread_attr_getaffinity_np
+      pthread_attr_setaffinity_np
       pthread_getaffinity_np
       pthread_setaffinity_np
       pthread_mutexattr_getkind_np
