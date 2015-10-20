@@ -59,8 +59,9 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
  * Designed to allow error values to be set and retrieved in builds where
  * MSCRT libraries are statically linked to DLLs.
  */
-#if ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0800 ) || \
-    ( defined(_MSC_VER) && _MSC_VER >= 1400 )  /* MSVC8+ */
+#if ! defined(WINCE) && \
+    (( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0800 ) || \
+    ( defined(_MSC_VER) && _MSC_VER >= 1400 ))  /* MSVC8+ */
 #  if defined(PTW32_CONFIG_MINGW)
 __attribute__((unused))
 #  endif
@@ -241,7 +242,10 @@ struct ptw32_thread_t_
   int cancelType;
   int implicit:1;
   DWORD thread;			/* Windows thread ID */
+#if defined(HAVE_CPU_AFFINITY)
   size_t cpuset;		/* Thread CPU affinity set */
+#endif
+  char * name;                  /* Thread name */
 #if defined(_UWIN)
   DWORD dummy[5];
 #endif
@@ -263,6 +267,8 @@ struct pthread_attr_t_
   struct sched_param param;
   int inheritsched;
   int contentionscope;
+  size_t cpuset;
+  char * thrname;
 #if defined(HAVE_SIGSET_T)
   sigset_t sigmask;
 #endif				/* HAVE_SIGSET_T */
@@ -280,7 +286,7 @@ struct pthread_attr_t_
 struct sem_t_
 {
   int value;
-  pthread_mutex_t lock;
+  ptw32_mcs_lock_t lock;
   HANDLE sem;
 #if defined(NEED_SEM)
   int leftToUnblock;
@@ -788,8 +794,10 @@ extern "C"
 #       endif
 #   endif
 #else
-#       include <process.h>
+#   if ! defined(WINCE)
+#     include <process.h>
 #   endif
+#endif
 
 
 /*

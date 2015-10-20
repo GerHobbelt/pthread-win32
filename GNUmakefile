@@ -71,7 +71,7 @@ RC		= $(CROSS)windres
 OD_PRIVATE	= $(CROSS)objdump -p
 
 # Build for non-native architecture. E.g. "-m64" "-m32" etc.
-# Not fully tested fully, needs gcc built with "--enable-multilib"
+# Not tested fully, needs gcc built with "--enable-multilib"
 # Check your "gcc -v" output for the options used to build your gcc.
 # You can set this as a shell variable or on the make comand line.
 # You don't need to uncomment it here unless you want to hardwire
@@ -140,7 +140,7 @@ GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
 
 ## Mingw
 #MAKE		?= make
-CFLAGS	= $(OPT) $(XOPT) $(ARCH) -I. -DHAVE_CONFIG_H -Wall
+CFLAGS	= $(OPT) $(XOPT) $(ARCH) -I. -DHAVE_CONFIG_H -DMINGW_HAS_SECURE_API -Wall
 
 OBJEXT = o
 RESEXT = o
@@ -172,6 +172,8 @@ PTHREAD_DEF	= pthread.def
 
 help:
 	@ echo "Run one of the following command lines:"
+	@ echo "$(MAKE) clean all                      (build targets GC, GCE, GC-static, GCE-static)"
+	@ echo "$(MAKE) clean all-tests                (build and test all non-debug targets below)"
 	@ echo "$(MAKE) clean GC                       (to build the GNU C dll with C cleanup code)"
 	@ echo "$(MAKE) clean GC-debug                 (to build the GNU C debug dll with C cleanup code)"
 	@ echo "$(MAKE) clean GCE                      (to build the GNU C dll with C++ exception handling)"
@@ -318,6 +320,7 @@ realclean: clean
 	-$(RM) *.lib
 	-$(RM) pthread*.dll
 	-$(RM) *_stamp
+	-$(RM) make.log.txt
 	-cd tests && $(MAKE) clean
 
 var_check_list =

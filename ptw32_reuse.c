@@ -45,7 +45,9 @@
 
 /*
  * How it works:
- * A pthread_t is a struct (2x32 bit scalar types on IA-32, 2x64 bit on IA-64)
+ * A pthread_t is a struct (2x32 bit scalar types on x86, 2x64 bit on x86_64)
+ * [FIXME: This is not true, x86_64 is 64 bit pointer and 32 bit counter. This
+ * should be fixed in version 3.0.0]
  * which is normally passed/returned by value to/from pthreads routines.
  * Applications are therefore storing a copy of the struct as it is at that
  * time.
@@ -62,7 +64,7 @@
  * reuse stack after it's ptHandle's reuse counter has been incremented.
  *
  * The following can now be said from this:
- * - two pthread_t's are identical if their ptw32_thread_t reference pointers
+ * - two pthread_t's are identical iff their ptw32_thread_t reference pointers
  * are equal and their reuse counters are equal. That is,
  *
  *   equal = (a.p == b.p && a.x == b.x)
