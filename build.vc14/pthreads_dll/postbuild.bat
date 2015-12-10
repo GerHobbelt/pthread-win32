@@ -4,7 +4,7 @@ if /i %2 EQU LIB (set two=lib)
 if /i %2 EQU DLL (set two=dll)
 
 if not exist ..\..\%two% (md ..\..\%two%)
-call :copy_hdr_files %1 ..\..\%two% %two%
+call :copy_hdr_files %1 ..\..\%two%\%1 %two%
 call :copy_bin_files %1 ..\..\%two%\%1 %two%
 exit /b 0
 
