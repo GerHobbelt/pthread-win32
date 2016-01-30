@@ -176,8 +176,8 @@ ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node)
   if (0 != pred)
     {
       /* the lock was not free. link behind predecessor. */
-      pred->next = node;
       ptw32_mcs_flag_set(&pred->nextFlag);
+      pred->next = node;
       ptw32_mcs_flag_wait(&node->readyFlag);
     }
 }
@@ -213,12 +213,20 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
 	  /* no successor, lock is free now */
 	  return;
 	}
-  
+
       /* wait for successor */
       ptw32_mcs_flag_wait(&node->nextFlag);
+      /* now wait for successor to link to us */
       next = (ptw32_mcs_local_node_t *)
-	PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE((PTW32_INTERLOCKED_SIZEPTR)&node->next, (PTW32_INTERLOCKED_SIZE)0); /* MBR fence */
+	    PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE((PTW32_INTERLOCKED_SIZEPTR)&node->next, (PTW32_INTERLOCKED_SIZE)0); /* MBR fence */
+      while (next == 0)
+	{
+	  sched_yield();
+	  next = (ptw32_mcs_local_node_t *)
+        	PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE((PTW32_INTERLOCKED_SIZEPTR)&node->next, (PTW32_INTERLOCKED_SIZE)0); /* MBR fence */
+	}
     }
+
 
   /* pass the lock */
   ptw32_mcs_flag_set(&next->readyFlag);
