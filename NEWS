@@ -21,8 +21,8 @@ then please consider how your toolchains might be contributing to the
 failure. See the README file for more detailed descriptions of the
 toolchains and test systems that we have used to get the tests to pass
 successfully. We recommend MinGW64 over MinGW32 for both 64 and 32 bit
-builds. MinGW also includes its own independent pthreads implementation,
-which you may prefer to use.
+GNU CC builds. MinGW also includes its own independent pthreads
+implementation, which you may prefer to use.
 
 New Features
 ------------
@@ -127,6 +127,12 @@ only occur if the mutex initialisation failed (extremely rare if ever).
 
 Fixed sub-millisecond timeouts, which caused the library to busy wait.
 - Mark Smith
+
+Fix a race condition and crash in MCS locks. The waiter queue management
+code in ptw32_mcs_lock_acquire was racing with the queue management code
+in ptw32_mcs_lock_release and causing a segmentation fault.
+- Anurag Sharma
+- Jonathan Brown (also reported this bug and provided a fix)
 
 RELEASE 2.9.1
 -------------

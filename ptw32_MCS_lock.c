@@ -36,6 +36,7 @@
  */
 
 /*
+
  * About MCS locks:
  *
  * MCS locks are queue-based locks, where the queue nodes are local to the
@@ -88,6 +89,7 @@
  *   }
  *   return (void *)0;
  * }
+ *
  */
 
 #ifdef HAVE_CONFIG_H
@@ -111,7 +113,17 @@ ptw32_mcs_flag_set (HANDLE * flag)
 						(PTW32_INTERLOCKED_SIZEPTR)flag,
 						(PTW32_INTERLOCKED_SIZE)-1,
 						(PTW32_INTERLOCKED_SIZE)0);
-  if ((HANDLE)0 != e)
+  /*
+   * NOTE: when e == -1 and the MSVC debugger is attached to
+   *       the process, we get an exception that halts the
+   *       program noting that the handle value is invalid;
+   *       although innocuous this behavior is cumbersome when
+   *       debugging.  Therefore we avoid calling SetEvent()
+   *       for 'known' invalid HANDLE values that can arise
+   *       when the above interlocked-compare-and-exchange
+   *       is executed.
+   */
+  if (((HANDLE)0 != e) && ((HANDLE)-1 != e))
     {
       /* another thread has already stored an event handle in the flag */
       SetEvent(e);
@@ -176,7 +188,7 @@ ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node)
   if (0 != pred)
     {
       /* the lock was not free. link behind predecessor. */
-      pred->next = node;
+      PTW32_INTERLOCKED_EXCHANGE_PTR((PTW32_INTERLOCKED_PVOID_PTR)&pred->next, (PTW32_INTERLOCKED_PVOID)node);
       ptw32_mcs_flag_set(&pred->nextFlag);
       ptw32_mcs_flag_wait(&node->readyFlag);
     }
@@ -218,6 +230,11 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
       ptw32_mcs_flag_wait(&node->nextFlag);
       next = (ptw32_mcs_local_node_t *)
 	PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE((PTW32_INTERLOCKED_SIZEPTR)&node->next, (PTW32_INTERLOCKED_SIZE)0); /* MBR fence */
+    }
+  else
+    {
+      /* Even if the next is non-0, the successor may still be trying to set the next flag on us, therefore we must wait. */
+      ptw32_mcs_flag_wait(&node->nextFlag);
     }
 
   /* pass the lock */
@@ -278,6 +295,14 @@ ptw32_mcs_node_transfer (ptw32_mcs_local_node_t * new_node, ptw32_mcs_local_node
         {
           sched_yield();
         }
+
+      /* we must wait for the next Node to finish inserting itself. */
+      ptw32_mcs_flag_wait(&old_node->nextFlag);
+      /*
+       * Copy the nextFlag state also so we don't block on it when releasing
+       * this lock.
+       */
       new_node->next = old_node->next;
+      new_node->nextFlag = old_node->nextFlag;
     }
 }

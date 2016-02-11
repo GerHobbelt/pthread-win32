@@ -1,3 +1,9 @@
+2015-11-01	Anurag Sharma <anurags at fb dot com>
+
+	* ptw32_MCS_lock.c: Fix a race condition causing crashes.
+	This race condition was also analysed and reported with a slightly
+	different fix independently by Jonathan Brown at VMware.
+
 2015-11-01	Mark Smith <masmith at fb dot com>
 
 	* ptw32_relnillisecs.c: Fix erroneous 0-time waits, symptomizing as
