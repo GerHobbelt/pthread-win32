@@ -78,7 +78,7 @@
 
 #define MAX_COUNT 100
 
-const int64_t NANOSEC_PER_SEC = 1000000000;
+const long NANOSEC_PER_SEC = 1000000000L;
 
 sem_t s;
 
