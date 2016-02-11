@@ -1,6 +1,6 @@
 RELEASE 2.10.0
 --------------
-(2014-05-29)
+(2016-02-11)
 
 General
 -------
@@ -124,6 +124,9 @@ pthread_attr_getstackaddr() returns ENOSYS correspondingly.
 Fixed a potential memory leak in pthread_mutex_init(). The leak would
 only occur if the mutex initialisation failed (extremely rare if ever).
 - Jaeeun Choi
+
+Fixed sub-millisecond timeouts, which caused the library to busy wait.
+- Mark Smith
 
 RELEASE 2.9.1
 -------------
