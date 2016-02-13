@@ -18,17 +18,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -47,20 +47,23 @@
 
 
 #if defined(PTW32_BUILD_INLINED)
-INLINE 
+INLINE
 #endif /* PTW32_BUILD_INLINED */
 DWORD
 ptw32_relmillisecs (const struct timespec * abstime)
 {
+  const int64_t NANOSEC_PER_SEC = 1000000000;
   const int64_t NANOSEC_PER_MILLISEC = 1000000;
   const int64_t MILLISEC_PER_SEC = 1000;
   DWORD milliseconds;
   int64_t tmpAbsMilliseconds;
+  int64_t tmpAbsNanoseconds;
   int64_t tmpCurrMilliseconds;
+  int64_t tmpCurrNanoseconds;
+
 #if defined(NEED_FTIME)
   struct timespec currSysTime;
   FILETIME ft;
-  SYSTEMTIME st;
 #else /* ! NEED_FTIME */
 #if ( defined(_MSC_VER) && _MSC_VER >= 1300 ) /* MSVC7+ */ || \
     ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0601 )
@@ -71,8 +74,8 @@ ptw32_relmillisecs (const struct timespec * abstime)
 #endif /* NEED_FTIME */
 
 
-  /* 
-   * Calculate timeout as milliseconds from current system time. 
+  /*
+   * Calculate timeout as milliseconds from current system time.
    */
 
   /*
@@ -84,23 +87,27 @@ ptw32_relmillisecs (const struct timespec * abstime)
    */
   tmpAbsMilliseconds =  (int64_t)abstime->tv_sec * MILLISEC_PER_SEC;
   tmpAbsMilliseconds += ((int64_t)abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
+  tmpAbsNanoseconds = (int64_t)abstime->tv_nsec + ((int64_t)abstime->tv_sec * NANOSEC_PER_SEC);
 
   /* get current system time */
 
 #if defined(NEED_FTIME)
 
+# if defined(WINCE)
+
+  SYSTEMTIME st;
   GetSystemTime(&st);
   SystemTimeToFileTime(&st, &ft);
-  /*
-   * GetSystemTimeAsFileTime(&ft); would be faster,
-   * but it does not exist on WinCE
-   */
+# else
+  GetSystemTimeAsFileTime(&ft);
+# endif
 
   ptw32_filetime_to_timespec(&ft, &currSysTime);
 
   tmpCurrMilliseconds = (int64_t)currSysTime.tv_sec * MILLISEC_PER_SEC;
   tmpCurrMilliseconds += ((int64_t)currSysTime.tv_nsec + (NANOSEC_PER_MILLISEC/2))
 			   / NANOSEC_PER_MILLISEC;
+  tmpCurrNanoseconds = (int64_t)currSysTime->tv_nsec + ((int64_t)currSysTime->tv_sec * NANOSEC_PER_SEC);
 
 #else /* ! NEED_FTIME */
 
@@ -115,6 +122,7 @@ ptw32_relmillisecs (const struct timespec * abstime)
 
   tmpCurrMilliseconds = (int64_t) currSysTime.time * MILLISEC_PER_SEC;
   tmpCurrMilliseconds += (int64_t) currSysTime.millitm;
+  tmpCurrNanoseconds = tmpCurrMilliseconds * NANOSEC_PER_MILLISEC;
 
 #endif /* NEED_FTIME */
 
@@ -132,6 +140,14 @@ ptw32_relmillisecs (const struct timespec * abstime)
       /* The abstime given is in the past */
       milliseconds = 0;
     }
+
+  if (milliseconds == 0 && tmpAbsNanoseconds > tmpCurrNanoseconds) {
+     /*
+      * millisecond granularity was too small to represent the wait time.
+      * return the minimum time in milliseconds.
+      */
+     milliseconds = 1;
+ }
 
   return milliseconds;
 }

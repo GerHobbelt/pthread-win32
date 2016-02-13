@@ -1,3 +1,17 @@
+2015-11-01	Anurag Sharma <anurags at fb dot com>
+
+	* ptw32_MCS_lock.c: Fix a race condition causing crashes.
+	This race condition was also analysed and reported with a slightly
+	different fix independently by Jonathan Brown at VMware.
+
+2015-11-01	Mark Smith <masmith at fb dot com>
+
+	* ptw32_relnillisecs.c: Fix erroneous 0-time waits, symptomizing as
+	busy-spinning eating CPU. When the time to wait is specified to be less
+	than 1 millisecond were erroneously rounded down to 0; Modify WinCE
+	dependency.
+	* ptw32_timespec.c: Remove NEED_FTIME conditionality.
+
 2015-06-31  Dimitry <>
 
 	* sem_init.c: Remove double free() when NEED_SEM defined (for

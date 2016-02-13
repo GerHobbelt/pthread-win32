@@ -1,3 +1,8 @@
+2015-11-01	Mark Smith <masmith at fb dot com>
+
+	* semaphore4t.c: Enhanced and additional testing of sub-millisecond
+	timeouts.
+
 2014-07-22  Scott Libert  <scott underscore libert at dell dot com>
 
 	* semaphore3.c: Wait for threads to complete before exiting main().
