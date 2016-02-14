@@ -57,9 +57,9 @@ pthread_getname_np(pthread_t thr, char *name, int len)
 
   ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
 
-  strncpy_s(name, len, tp->name, len - 1);
+  result = strncpy_s(name, len, tp->name, len - 1);
 
   ptw32_mcs_lock_release (&threadLock);
 
-  return 0;
+  return result;
 }
