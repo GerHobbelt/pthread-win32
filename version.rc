@@ -58,8 +58,6 @@
 #  elif defined(__CLEANUP_SEH)
 #    define PTW32_VERSIONINFO_NAME "pthreadVSE2.DLL\0"
 #    define PTW32_VERSIONINFO_DESCRIPTION "MS C SEH " PTW32_ARCH "\0"
-#  else
-#    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
 #elif defined(__GNUC__)
 #  if defined(_M_X64)
