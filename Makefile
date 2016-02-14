@@ -239,9 +239,15 @@ $(SMALL_STATIC_STAMPS): $(STATIC_OBJS)
 # as provided by the SDK (VS 2010 Express plus SDK 7.1)
 # PLATFORM is an environment variable that may be set in the VS 2013 Express x64 cross
 # development environment
+# On my HP Compaq PC running VS 10, PLATFORM was defined as "HPD" but PROCESSOR_ARCHITECTURE
+# was defined as "x86"
 .rc.res:
 !IF DEFINED(PLATFORM)
-	rc /dPTW32_ARCH$(PLATFORM) /dPTW32_RC_MSC /d$(CLEANUP) $<
+!  IF DEFINED(PROCESSOR_ARCHITECTURE)
+	  rc /dPTW32_ARCH$(PROCESSOR_ARCHITECTURE) /dPTW32_RC_MSC /d$(CLEANUP) $<
+!  ELSE
+	  rc /dPTW32_ARCH$(PLATFORM) /dPTW32_RC_MSC /d$(CLEANUP) $<
+!  ENDIF
 !ELSE IF DEFINED(TARGET_CPU)
 	rc /dPTW32_ARCH$(TARGET_CPU) /dPTW32_RC_MSC /d$(CLEANUP) $<
 !ELSE
