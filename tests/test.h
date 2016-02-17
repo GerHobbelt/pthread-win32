@@ -39,10 +39,6 @@
 #ifndef _PTHREAD_TEST_H_
 #define _PTHREAD_TEST_H_
 
-#if defined(_MSC_VER) && _MSC_VER >= 1900
-#define HAVE_STRUCT_TIMESPEC
-#endif
-
 #include "pthread.h"
 #include "sched.h"
 #include "semaphore.h"

@@ -227,6 +227,8 @@ enum {
 #    define HAVE_MODE_T
 #  elif defined(__MINGW32__)
 #    define HAVE_MODE_T
+#  elif defined(_MSC_VER) && _MSC_VER >= 1900
+#    define HAVE_STRUCT_TIMESPEC
 #  endif
 #endif
 
