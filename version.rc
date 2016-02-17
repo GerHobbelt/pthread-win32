@@ -44,9 +44,9 @@
  */
 
 #if defined(PTW32_RC_MSC)
-#  if defined(PTW32_ARCHx64)
+#  if defined(PTW32_ARCHx64) || defined(PTW32_ARCHX64)
 #    define PTW32_ARCH "x64"
-#  elif defined(PTW32_ARCHx86)
+#  elif defined(PTW32_ARCHx86) || defined(PTW32_ARCHX86)
 #    define PTW32_ARCH "x86"
 #  endif
 #  if defined(__CLEANUP_C)
@@ -58,8 +58,6 @@
 #  elif defined(__CLEANUP_SEH)
 #    define PTW32_VERSIONINFO_NAME "pthreadVSE2.DLL\0"
 #    define PTW32_VERSIONINFO_DESCRIPTION "MS C SEH " PTW32_ARCH "\0"
-#  else
-#    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
 #elif defined(__GNUC__)
 #  if defined(_M_X64)
