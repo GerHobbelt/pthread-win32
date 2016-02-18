@@ -74,7 +74,9 @@
  */
 
 #include "test.h"
+#if !defined(PTW32_STATIC_LIB) && !defined(PTW32_STATIC_TLSLIB)
 #include "../ptw32_timespec.c"
+#endif
 
 #define MAX_COUNT 100
 
