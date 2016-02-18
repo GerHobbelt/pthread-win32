@@ -74,8 +74,20 @@
  */
 
 #include "test.h"
-#if !defined(PTW32_STATIC_LIB) && !defined(PTW32_STATIC_TLSLIB)
+/*
+ * These before and after #defines are to avoid multiply defining
+ * the functions in the included .c file, by declaring them as static
+ * (local to this compilation unit).
+ */
+#if defined(INLINE)
+#  define XINLINE INLINE
+#  undef INLINE
+#  define INLINE static XINLINE
+#endif
 #include "../ptw32_timespec.c"
+#if defined(XINLINE)
+#  define INLINE XINLINE
+#  undef XINLINE
 #endif
 
 #define MAX_COUNT 100
