@@ -21,7 +21,7 @@ then please consider how your toolchains might be contributing to the
 failure. See the README file for more detailed descriptions of the
 toolchains and test systems that we have used to get the tests to pass
 successfully. We recommend MinGW64 over MinGW32 for both 64 and 32 bit
-GNU CC builds. MinGW also includes its own independent pthreads
+GNU CC builds. MinGW64 also includes its own independent pthreads
 implementation, which you may prefer to use.
 
 New Features
@@ -60,6 +60,10 @@ Builds:
 New makefile targets have been added and existing targets modified or
 removed. For example, targets to build and test all of the possible
 configurations of both dll and static libs.
+
+GNU compiler builds are now explicitly using ISO C and C++ 2011 standards
+compatibility. If your GNU compiler doesn't support this please consider
+updating.
 
 Static linking:
 The autostatic functionality has been moved to dll.c, and extended so
