@@ -52,8 +52,8 @@ RUN     =
 
 AR      = $(CROSS)ar
 DLLTOOL = $(CROSS)dlltool
-CC      = $(CROSS)gcc
-CXX     = $(CROSS)g++
+CC      = $(CROSS)gcc -std=c11
+CXX     = $(CROSS)g++ -std=c++11
 RANLIB  = $(CROSS)ranlib
 
 #
@@ -137,49 +137,49 @@ help:
 	@ $(ECHO) "$(MAKE) clean GC TESTS="foo bar" (to build individual tests \"foo.c and bar.c\" with C and run using GC dll)"
 
 GC:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C" allpassed
 
 GC-asm:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-asm
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C" all-asm
 
 GC-bench:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
 
 GC-bench-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${DOPT}" all-bench
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${DOPT}" all-bench
 
 GC-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" allpassed
 
 GC-static GC-small-static:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" allpassed
 
 GC-static-debug GC-small-static-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" allpassed
 
 GCE:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)" CC="$(CXX)" XXCFLAGS="-mthreads -D__CLEANUP_CXX" allpassed
 
 GCE-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX" OPT="${DOPT}" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)d" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_CXX" OPT="${DOPT}" allpassed
 
 GCE-static GCE-small-static:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX -DPTW32_STATIC_LIB" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_CXX -DPTW32_STATIC_LIB" DLL="" allpassed
 
 GCE-static-debug GCE-small-static-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)d" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_CXX -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" allpassed
 
 GCX:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_C" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CXX)" XXCFLAGS="-mthreads -D__CLEANUP_C" allpassed
 
 GCX-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" allpassed
 
 GCX-static GCX-small-static:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CXX) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" allpassed
 
 GCX-static-debug GCX-small-static-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" allpassed
 
 all-asm: $(ASM)
 	@ $(ECHO) "ALL TESTS PASSED! Congratulations!"
