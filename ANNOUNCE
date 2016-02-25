@@ -1,4 +1,4 @@
-PTHREADS4W RELEASE 2.10.0 (2014-05-29)
+PTHREADS4W RELEASE 2.10.0 (????-??-??)
 --------------------------------------
 Web Site:	http://sourceforge.net/projects/pthreads4w/
 			http://sourceware.org/pthreads-win32/
@@ -24,7 +24,11 @@ Pthreads4w is free software, distributed under the GNU Lesser
 General Public License (LGPL).
 
 For those who want to try the most recent changes, the SourceForge Git repository
-is the one to use. The Sourceware CVS repository is synchronised less often.
+is the one to use. The Sourceware CVS repository is synchronised much less often
+and may be abandoned altogether.
+
+Release 2.9.1 was probably the last to provide pre-built libraries. The supported
+compilers are now all available free for personal use.  
 
 
 Acknowledgements
