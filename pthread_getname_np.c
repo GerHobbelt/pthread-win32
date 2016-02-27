@@ -57,7 +57,7 @@ pthread_getname_np(pthread_t thr, char *name, int len)
 
   ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || ( defined(PTW32_CONFIG_MINGW) && defined(MINGW_HAS_SECURE_API) )
   result = strncpy_s(name, len, tp->name, len - 1);
 #else
   strncpy(name, tp->name, len - 1);

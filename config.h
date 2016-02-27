@@ -152,4 +152,8 @@
 #define HAVE_C_INLINE
 #endif
 
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+#define HAVE_STRUCT_TIMESPEC
+#endif
+
 #endif /* PTW32_CONFIG_H */

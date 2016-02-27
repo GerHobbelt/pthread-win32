@@ -64,7 +64,11 @@
 extern "C"
 #endif				/* __cplusplus */
   BOOL WINAPI
+#if defined(PTW32_STATIC_TLSLIB)
+PTW32_StaticLibMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
+#else
 DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
+#endif
 {
   BOOL result = PTW32_TRUE;
 
@@ -116,7 +120,7 @@ typedef int foo;
 static void WINAPI
 TlsMain(PVOID h, DWORD r, PVOID u)
 {
-  (void)DllMain((HINSTANCE)h, r, u);
+  (void)PTW32_StaticLibMain((HINSTANCE)h, r, u);
 }
 
 #ifdef _M_X64
