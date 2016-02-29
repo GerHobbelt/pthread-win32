@@ -110,23 +110,21 @@ code on error.
 <P><B>pthread_cancel</B> returns the following error code on error: 
 </P>
 <DL>
-	<DL>
 		<DT STYLE="margin-right: 1cm; margin-bottom: 0.5cm"><B>ESRCH</B> 
 		</DT><DD STYLE="margin-right: 1cm; margin-bottom: 0.5cm">
 		no thread could be found corresponding to that specified by the
 		<I>thread</I> ID. 
-		</DD></DL>
+		</DD>
 </DL>
 <P>
 <B>pthread_setcancelstate</B> returns the following error code on
 error: 
 </P>
 <DL>
-	<DL>
 		<DT STYLE="margin-right: 1cm; margin-bottom: 0.5cm"><B>EINVAL</B> 
 		</DT><DD STYLE="margin-right: 1cm; margin-bottom: 0.5cm">
 		the <I>state</I> argument is not 
-		</DD></DL>
+		</DD>
 </DL>
 <BLOCKQUOTE>
 <B>PTHREAD_CANCEL_ENABLE</B> nor <B>PTHREAD_CANCEL_DISABLE</B> 
@@ -135,11 +133,10 @@ error:
 error: 
 </P>
 <DL>
-	<DL>
 		<DT STYLE="margin-right: 1cm; margin-bottom: 0.5cm"><B>EINVAL</B> 
 		</DT><DD STYLE="margin-right: 1cm; margin-bottom: 0.5cm">
 		the <I>type</I> argument is not 
-		</DD></DL>
+		</DD>
 </DL>
 <BLOCKQUOTE>
 <B>PTHREAD_CANCEL_DEFERRED</B> nor <B>PTHREAD_CANCEL_ASYNCHRONOUS</B>
