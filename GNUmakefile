@@ -63,13 +63,13 @@ AND	= &&
 CROSS	= 
 
 # Override the builtin default C and C++ standards
-CSTD	= c11
-CXXSTD	= c++11
+#CSTD	= -std=c90
+#CXXSTD	= -std=c++90
 
 AR		= $(CROSS)ar
 DLLTOOL = $(CROSS)dlltool
-CC      = $(CROSS)gcc -std=$(CSTD)
-CXX     = $(CROSS)g++ -std=$(CXXSTD)
+CC      = $(CROSS)gcc $(CSTD)
+CXX     = $(CROSS)g++ $(CXXSTD)
 RANLIB  = $(CROSS)ranlib
 RC		= $(CROSS)windres
 OD_PRIVATE	= $(CROSS)objdump -p
@@ -144,7 +144,7 @@ GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
 
 ## Mingw
 #MAKE		?= make
-CFLAGS	= $(OPT) $(XOPT) $(ARCH) -I. -DHAVE_CONFIG_H -DMINGW_HAS_SECURE_API -Wall
+CFLAGS	= $(OPT) $(XOPT) $(ARCH) -I. -DHAVE_CONFIG_H -Wall
 
 OBJEXT = o
 RESEXT = o

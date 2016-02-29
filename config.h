@@ -10,6 +10,9 @@
 /* We're building the pthreads-win32 library */
 #define PTW32_BUILD
 
+/* MinGW: Have strcpy_s etc */
+#define MINGW_HAS_SECURE_API
+
 /* CPU affinity */
 #define HAVE_CPU_AFFINITY
 
@@ -139,6 +142,7 @@
 #define HAVE_STRUCT_TIMESPEC
 #elif defined(__MINGW32__)
 #define HAVE_MODE_T
+#undef MINGW_HAS_SECURE_API
 #endif
 
 #if defined(__BORLANDC__)

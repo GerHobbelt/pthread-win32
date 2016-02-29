@@ -46,14 +46,18 @@ AND			= &&
 # # make CROSS=i386-mingw32msvc- clean GC
 CROSS   =
 
+# Override the builtin default C and C++ standards
+#CSTD	= -std=c90
+#CXXSTD	= -std=c++90
+
 # For cross testing use e.g.
 # # make RUN=wine CROSS=i386-mingw32msvc- clean GC
 RUN     =
 
 AR      = $(CROSS)ar
 DLLTOOL = $(CROSS)dlltool
-CC      = $(CROSS)gcc -std=c11
-CXX     = $(CROSS)g++ -std=c++11
+CC      = $(CROSS)gcc $(CSTD)
+CXX     = $(CROSS)g++ $(CXXSTD)
 RANLIB  = $(CROSS)ranlib
 
 #

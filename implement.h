@@ -147,9 +147,11 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 #if defined(PTW32_CONFIG_MINGW)
 #  include <stdint.h>
 #elif defined(__BORLANDC__)
-#  define int64_t ULONGLONG
+#  define int64_t LONGLONG
+#  define uint64_t ULONGLONG
 #else
 #  define int64_t _int64
+#  define uint64_t unsigned _int64
 #  if defined(PTW32_CONFIG_MSVC6)
      typedef long intptr_t;
 #  endif

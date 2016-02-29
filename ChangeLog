@@ -1,3 +1,13 @@
+2016-02-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile (MINGW_HAVE_SECURE_API): Moved to config.h. Undefined
+	for __MINGW32__; remove (make optional) forcing a specific C std.
+	* implement.h (uint64_t): Define for Visual Studio.
+
+2016-02-29	Keith Marshall <keithmarshall at users dot sourceforge dot net>
+
+	* ptw32_timespec.c: Fix C90 warnings from GCC; int64_t -> uint64_t
+
 2016-02-18	Carey Gister <>
 
 	* dll.c (DllMain): Should not be defined for static library builds.
