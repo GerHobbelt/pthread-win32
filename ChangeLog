@@ -1,3 +1,8 @@
+2016-03-25  Bill Parker <wp02855 at gmail dot com>
+
+	* pthread_mutex_init.c: Memory allocation of robust mutex element
+	was not being checked.
+	
 2016-02-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* GNUmakefile (MINGW_HAVE_SECURE_API): Moved to config.h. Undefined

@@ -108,29 +108,43 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
               mx->kind = -mx->kind - 1;
 
               mx->robustNode = (ptw32_robust_node_t*) malloc(sizeof(ptw32_robust_node_t));
-              mx->robustNode->stateInconsistent = PTW32_ROBUST_CONSISTENT;
-              mx->robustNode->mx = mx;
-              mx->robustNode->next = NULL;
-              mx->robustNode->prev = NULL;
+              if (NULL == mx->robustNode)
+        	{
+        	  result = ENOMEM;
+        	}
+              else
+        	{
+        	  mx->robustNode->stateInconsistent = PTW32_ROBUST_CONSISTENT;
+        	  mx->robustNode->mx = mx;
+        	  mx->robustNode->next = NULL;
+        	  mx->robustNode->prev = NULL;
+        	}
             }
         }
 
-      mx->ownerThread.p = NULL;
+      if (0 == result)
+	{
+	  mx->ownerThread.p = NULL;
 
-      mx->event = CreateEvent (NULL, PTW32_FALSE,    /* manual reset = No */
-                              PTW32_FALSE,           /* initial state = not signaled */
-                              NULL);                 /* event name */
+	  mx->event = CreateEvent (NULL, PTW32_FALSE,    /* manual reset = No */
+				   PTW32_FALSE,           /* initial state = not signalled */
+				   NULL);                 /* event name */
 
-      if (0 == mx->event)
-        {
-          result = ENOSPC;
-          if (mx->robustNode != NULL)
-            {
-              free (mx->robustNode);
-            }
-          free (mx);
-          mx = NULL;
-        }
+	  if (0 == mx->event)
+	    {
+	      result = ENOSPC;
+	    }
+	}
+    }
+
+  if (0 != result)
+    {
+      if (NULL != mx->robustNode)
+	{
+	  free (mx->robustNode);
+	}
+      free (mx);
+      mx = NULL;
     }
 
   *mutex = mx;
