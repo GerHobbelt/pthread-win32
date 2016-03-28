@@ -45,6 +45,9 @@
 #include <sys/timeb.h>
 #endif
 
+static const int64_t NANOSEC_PER_SEC = 1000000000;
+static const int64_t NANOSEC_PER_MILLISEC = 1000000;
+static const int64_t MILLISEC_PER_SEC = 1000;
 
 #if defined(PTW32_BUILD_INLINED)
 INLINE
@@ -52,9 +55,6 @@ INLINE
 DWORD
 ptw32_relmillisecs (const struct timespec * abstime)
 {
-  const int64_t NANOSEC_PER_SEC = 1000000000;
-  const int64_t NANOSEC_PER_MILLISEC = 1000000;
-  const int64_t MILLISEC_PER_SEC = 1000;
   DWORD milliseconds;
   int64_t tmpAbsMilliseconds;
   int64_t tmpAbsNanoseconds;
@@ -150,4 +150,79 @@ ptw32_relmillisecs (const struct timespec * abstime)
  }
 
   return milliseconds;
+}
+
+
+/*
+ * Return the first parameter "abstime" modified to represent the current system time.
+ * If "relative" is not NULL it represents an interval to add to "abstime".
+ */
+
+struct timespec *
+pthread_win32_getabstime_np (struct timespec * abstime, const struct timespec * relative)
+{
+  int64_t sec;
+  int64_t nsec;
+
+#if defined(NEED_FTIME)
+  struct timespec currSysTime;
+  FILETIME ft;
+#else /* ! NEED_FTIME */
+#if ( defined(_MSC_VER) && _MSC_VER >= 1300 ) /* MSVC7+ */ || \
+    ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0601 )
+  struct __timeb64 currSysTime;
+#else
+  struct _timeb currSysTime;
+#endif
+#endif /* NEED_FTIME */
+
+  /* get current system time */
+
+#if defined(NEED_FTIME)
+
+# if defined(WINCE)
+
+  SYSTEMTIME st;
+  GetSystemTime(&st);
+  SystemTimeToFileTime(&st, &ft);
+# else
+  GetSystemTimeAsFileTime(&ft);
+# endif
+
+  ptw32_filetime_to_timespec(&ft, &currSysTime);
+
+  sec = currSysTime.tv_sec;
+  nsec = currSysTime.tv_nsec;
+
+#else /* ! NEED_FTIME */
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400  /* MSVC8+ */
+  _ftime64_s(&currSysTime);
+#elif ( defined(_MSC_VER) && _MSC_VER >= 1300 ) /* MSVC7+ */ || \
+      ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0601 )
+  _ftime64(&currSysTime);
+#else
+  _ftime(&currSysTime);
+#endif
+
+  sec = currSysTime.time;
+  nsec = currSysTime.millitm * NANOSEC_PER_MILLISEC;
+
+#endif /* NEED_FTIME */
+
+  if (NULL != relative)
+    {
+      nsec += relative->tv_nsec;
+      if (nsec >= NANOSEC_PER_SEC)
+	{
+	  sec++;
+	  nsec -= NANOSEC_PER_SEC;
+	}
+      sec += relative->tv_sec;
+    }
+
+  abstime->tv_sec = (time_t) sec;
+  abstime->tv_nsec = (long) nsec;
+
+  return abstime;
 }

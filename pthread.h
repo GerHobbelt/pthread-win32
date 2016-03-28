@@ -107,15 +107,51 @@
 #define PTW32_LEVEL PTW32_LEVEL_MAX	/* Include everything */
 #endif
 
-#if defined(__MINGW32__) || defined(__MINGW64__)
-#  define PTW32_CONFIG_MINGW
-#endif
-#if defined(_MSC_VER)
-#  if _MSC_VER < 1300
-#    define PTW32_CONFIG_MSVC6
-#  endif
-#  if _MSC_VER < 1400
-#    define PTW32_CONFIG_MSVC7
+/*
+ * This is more or less a duplicate of what is in the autoconf config.h,
+ * which is only used when building the pthread-win32 libraries.
+ */
+
+#if !defined(PTW32_CONFIG_H)
+#  if defined(WINCE)
+#    undef  HAVE_CPU_AFFINITY
+#    define NEED_DUPLICATEHANDLE
+#    define NEED_CREATETHREAD
+#    define NEED_ERRNO
+#    define NEED_CALLOC
+#    define NEED_FTIME
+/* #    define NEED_SEM */
+#    define NEED_UNICODE_CONSTS
+#    define NEED_PROCESS_AFFINITY_MASK
+/* This may not be needed */
+#    define RETAIN_WSALASTERROR
+#  elif defined(_MSC_VER)
+#    if _MSC_VER >= 1900
+#      define HAVE_STRUCT_TIMESPEC
+#    elif _MSC_VER < 1300
+#      define PTW32_CONFIG_MSVC6
+#    elif _MSC_VER < 1400
+#      define PTW32_CONFIG_MSVC7
+#    endif
+#  elif !defined(PTW32_CONFIG_MINGW) && (defined(__MINGW32__) || defined(__MINGW64__))
+#    include <_mingw.h>
+#    if defined(__MINGW64_VERSION_MAJOR)
+#      define PTW32_CONFIG_MINGW 64
+#    elif defined(__MINGW_MAJOR_VERSION) || defined(__MINGW32_MAJOR_VERSION)
+#      define PTW32_CONFIG_MINGW 32
+#    else
+#      define PTW32_CONFIG_MINGW 1
+#    endif
+#    define HAVE_MODE_T
+#    if PTW32_CONFIG_MINGW == 64
+#      define HAVE_STRUCT_TIMESPEC
+#    else
+#      undef MINGW_HAS_SECURE_API
+#    endif
+#  elif defined(_UWIN)
+#    define HAVE_MODE_T
+#    define HAVE_STRUCT_TIMESPEC
+#    define HAVE_SIGNAL_H
 #  endif
 #endif
 
@@ -208,29 +244,6 @@ enum {
   PTW32_FALSE = 0,
   PTW32_TRUE = (! PTW32_FALSE)
 };
-
-/*
- * This is a duplicate of what is in the autoconf config.h,
- * which is only used when building the pthread-win32 libraries.
- */
-
-#if !defined(PTW32_CONFIG_H)
-#  if defined(WINCE)
-#    define NEED_ERRNO
-#    define NEED_SEM
-#  elif defined(_UWIN)
-#    define HAVE_MODE_T
-#    define HAVE_STRUCT_TIMESPEC
-#    define HAVE_SIGNAL_H
-#  elif defined(__MINGW64__)
-#    define HAVE_STRUCT_TIMESPEC
-#    define HAVE_MODE_T
-#  elif defined(__MINGW32__)
-#    define HAVE_MODE_T
-#  elif defined(_MSC_VER) && _MSC_VER >= 1900
-#    define HAVE_STRUCT_TIMESPEC
-#  endif
-#endif
 
 #if !defined(NEED_FTIME)
 #include <time.h>
@@ -1168,11 +1181,11 @@ PTW32_DLLPORT int PTW32_CDECL pthread_timedjoin_np(pthread_t thread,
 PTW32_DLLPORT int PTW32_CDECL pthread_tryjoin_np(pthread_t thread,
                                          void **value_ptr);
 PTW32_DLLPORT int PTW32_CDECL pthread_setaffinity_np(pthread_t thread,
-										 size_t cpusetsize,
-										 const cpu_set_t *cpuset);
+					 size_t cpusetsize,
+					 const cpu_set_t *cpuset);
 PTW32_DLLPORT int PTW32_CDECL pthread_getaffinity_np(pthread_t thread,
-										 size_t cpusetsize,
-										 cpu_set_t *cpuset);
+					 size_t cpusetsize,
+					 cpu_set_t *cpuset);
 
 /*
  * Possibly supported by other POSIX threads implementations
@@ -1182,13 +1195,23 @@ PTW32_DLLPORT int PTW32_CDECL pthread_num_processors_np(void);
 PTW32_DLLPORT unsigned __int64 PTW32_CDECL pthread_getunique_np(pthread_t thread);
 
 /*
- * Useful if an application wants to statically link
- * the lib rather than load the DLL at run-time.
+ * May be useful if an application wants to statically link
+ * the lib rather than load the DLL at run-time. These are
+ * now called automagically for MSVC and GCC builds.
  */
 PTW32_DLLPORT int PTW32_CDECL pthread_win32_process_attach_np(void);
 PTW32_DLLPORT int PTW32_CDECL pthread_win32_process_detach_np(void);
 PTW32_DLLPORT int PTW32_CDECL pthread_win32_thread_attach_np(void);
 PTW32_DLLPORT int PTW32_CDECL pthread_win32_thread_detach_np(void);
+
+/*
+ * Returns the first parameter "abstime" modified to represent the current system time.
+ * If "relative" is not NULL it represents an interval to add to "abstime".
+ */
+
+PTW32_DLLPORT struct timespec * PTW32_CDECL pthread_win32_getabstime_np(
+						      struct timespec * abstime,
+						      const struct timespec * relative);
 
 /*
  * Features that are auto-detected at load/run time.
@@ -1243,7 +1266,7 @@ PTW32_DLLPORT int PTW32_CDECL pthread_attr_getname_np (pthread_attr_t * attr, ch
  * Protected Methods
  *
  * This function blocks until the given WIN32 handle
- * is signaled or pthread_cancel had been called.
+ * is signalled or pthread_cancel had been called.
  * This function allows the caller to hook into the
  * PThreads cancel mechanism. It is implemented using
  *
