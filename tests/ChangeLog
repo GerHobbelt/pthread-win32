@@ -1,3 +1,33 @@
+2016-03-28  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* condvar2.c: Use platform-aware pthread_win32_getabstime_np.
+	* condvar2_1.c: Likewise.
+	* condvar3.c: Likewise.
+	* condvar3_1.c: Likewise.
+	* condvar3_2.c: Likewise.
+	* condvar3_3.c: Likewise.
+	* condvar4.c: Likewise.
+	* condvar5.c: Likewise.
+	* condvar6.c: Likewise.
+	* condvar7.c: Likewise.
+	* condvar8.c: Likewise.
+	* condvar9.c: Likewise.
+	* join4.c: Likewise.
+	* mutex8.c: Likewise.
+	* mutex8e.c: Likewise.
+	* mutex8n.c: Likewise.
+	* mutex8r.c: Likewise.
+	* reinit1.c: Likewise.
+	* rwlock2_t.c: Likewise.
+	* rwlock3_t.c: Likewise.
+	* rwlock4_t.c: Likewise.
+	* rwlock5_t.c: Likewise.
+	* rwlock6_t.c: Likewise.
+	* rwlock6_t2.c: Likewise.
+	* semaphore4t.c: Likewise.
+	* stress1.c: Likewise.
+	* reinit1.c: Remove unused variable declarations.
+
 2015-11-01	Mark Smith <masmith at fb dot com>
 
 	* semaphore4t.c: Enhanced and additional testing of sub-millisecond
