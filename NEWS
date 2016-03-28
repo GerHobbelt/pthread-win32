@@ -1,6 +1,6 @@
 RELEASE 2.10.0
 --------------
-(2016-02-11)
+(2016-03-28)
 
 General
 -------
@@ -55,6 +55,11 @@ pthread_attr_setname_np()
    For MSVC builds, the thread name if set is made available for use by the
    MSVS debugger, i.e. it should be displayed within the debugger to
    identify the thread in place of/as well as a threadID.
+pthread_win32_getabstime_np()
+ - Return the current time plus an optional offset in a platform-aware way
+   that is compatible with POSIX timed calls (returns the struct timespec
+   address which is the first argument). Intended primarily to make it
+   easier to write tests but may be useful for applications generally. 
 
 Builds:
 New makefile targets have been added and existing targets modified or
