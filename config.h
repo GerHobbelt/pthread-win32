@@ -115,34 +115,43 @@
  * to the pthreads-win32 maintainer. Thanks.
  *********************************************************************/
 #if defined(WINCE)
-#undef  HAVE_CPU_AFFINITY
-#define NEED_DUPLICATEHANDLE
-#define NEED_CREATETHREAD
-#define NEED_ERRNO
-#define NEED_CALLOC
-#define NEED_FTIME
-/* #define NEED_SEM */
-#define NEED_UNICODE_CONSTS
-#define NEED_PROCESS_AFFINITY_MASK
+#  undef  HAVE_CPU_AFFINITY
+#  define NEED_DUPLICATEHANDLE
+#  define NEED_CREATETHREAD
+#  define NEED_ERRNO
+#  define NEED_CALLOC
+#  define NEED_FTIME
+/* #  define NEED_SEM */
+#  define NEED_UNICODE_CONSTS
+#  define NEED_PROCESS_AFFINITY_MASK
 /* This may not be needed */
-#define RETAIN_WSALASTERROR
+#  define RETAIN_WSALASTERROR
 #endif
 
 #if defined(_UWIN)
-#define HAVE_MODE_T
-#define HAVE_STRUCT_TIMESPEC
+#  define HAVE_MODE_T
+#  define HAVE_STRUCT_TIMESPEC
+#  define HAVE_SIGNAL_H
 #endif
 
 #if defined(__GNUC__)
-#define HAVE_C_INLINE
+#  define HAVE_C_INLINE
 #endif
 
-#if defined(__MINGW64__)
-#define HAVE_MODE_T
-#define HAVE_STRUCT_TIMESPEC
-#elif defined(__MINGW32__)
-#define HAVE_MODE_T
-#undef MINGW_HAS_SECURE_API
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#  include <_mingw.h>
+#  if defined(__MINGW64_VERSION_MAJOR)
+#    define PTW32_CONFIG_MINGW 64
+#  elif defined(__MINGW_MAJOR_VERSION) || defined(__MINGW32_MAJOR_VERSION)
+#    define PTW32_CONFIG_MINGW 32
+#  endif
+#  if PTW32_CONFIG_MINGW == 64
+#    define HAVE_STRUCT_TIMESPEC
+#    define HAVE_MODE_T
+#  else
+#    define HAVE_MODE_T
+#    undef MINGW_HAS_SECURE_API
+#  endif
 #endif
 
 #if defined(__BORLANDC__)

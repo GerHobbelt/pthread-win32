@@ -94,20 +94,50 @@
 #endif
 
 /*
- * This is a duplicate of what is in the autoconf config.h,
+ * This is more or less a duplicate of what is in the autoconf config.h,
  * which is only used when building the pthread-win32 libraries.
  */
 
 #if !defined(PTW32_CONFIG_H)
 #  if defined(WINCE)
+#    undef  HAVE_CPU_AFFINITY
+#    define NEED_DUPLICATEHANDLE
+#    define NEED_CREATETHREAD
 #    define NEED_ERRNO
-#    define NEED_SEM
-#  endif
-#  if defined(__MINGW64__)
+#    define NEED_CALLOC
+#    define NEED_FTIME
+/* #    define NEED_SEM */
+#    define NEED_UNICODE_CONSTS
+#    define NEED_PROCESS_AFFINITY_MASK
+/* This may not be needed */
+#    define RETAIN_WSALASTERROR
+#  elif defined(_MSC_VER)
+#    if _MSC_VER >= 1900
+#      define HAVE_STRUCT_TIMESPEC
+#    elif _MSC_VER < 1300
+#      define PTW32_CONFIG_MSVC6
+#    elif _MSC_VER < 1400
+#      define PTW32_CONFIG_MSVC7
+#    endif
+#  elif !defined(PTW32_CONFIG_MINGW) && (defined(__MINGW32__) || defined(__MINGW64__))
+#    include <_mingw.h>
+#    if defined(__MINGW64_VERSION_MAJOR)
+#      define PTW32_CONFIG_MINGW 64
+#    elif defined(__MINGW_MAJOR_VERSION) || defined(__MINGW32_MAJOR_VERSION)
+#      define PTW32_CONFIG_MINGW 32
+#    else
+#      define PTW32_CONFIG_MINGW 1
+#    endif
+#    define HAVE_MODE_T
+#    if PTW32_CONFIG_MINGW == 64
+#      define HAVE_STRUCT_TIMESPEC
+#    else
+#      undef MINGW_HAS_SECURE_API
+#    endif
+#  elif defined(_UWIN)
+#    define HAVE_MODE_T
 #    define HAVE_STRUCT_TIMESPEC
-#    define HAVE_MODE_T
-#  elif defined(_UWIN) || defined(__MINGW32__)
-#    define HAVE_MODE_T
+#    define HAVE_SIGNAL_H
 #  endif
 #endif
 
