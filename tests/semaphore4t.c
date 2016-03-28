@@ -106,20 +106,15 @@ thr (void * arg)
 int
 timeoutwithnanos(sem_t sem, int nanoseconds)
 {
-  struct timespec ts;
+  struct timespec ts, rel;
   FILETIME ft_before, ft_after;
   int rc;
 
-  GetSystemTimeAsFileTime(&ft_before);
-  ptw32_filetime_to_timespec(&ft_before, &ts);
-  ts.tv_nsec += nanoseconds;
-  if (ts.tv_nsec >= NANOSEC_PER_SEC)
-    {
-      ts.tv_sec += 1;
-      ts.tv_nsec -= NANOSEC_PER_SEC;
-    }
+  rel.tv_sec = 0;
+  rel.tv_nsec = nanoseconds;
 
-  rc = sem_timedwait(&sem, &ts);
+  GetSystemTimeAsFileTime(&ft_before);
+  rc = sem_timedwait(&sem, pthread_win32_getabstime_np(&ts, &rel));
 
   /* This should have timed out */
   assert(rc != 0);

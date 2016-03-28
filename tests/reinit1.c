@@ -108,12 +108,7 @@ main (int argc, char *argv[])
   int count;
   int data_count;
   int reinit_count;
-  int thread_updates = 0;
-  int data_updates = 0;
   int seed = 1;
-
-  PTW32_STRUCT_TIMEB currSysTime1;
-  PTW32_STRUCT_TIMEB currSysTime2;
 
   for (reinit_count = 0; reinit_count < LOOPS; reinit_count++)
     {
@@ -127,8 +122,6 @@ main (int argc, char *argv[])
 
           assert(pthread_rwlock_init (&data[data_count].lock, NULL) == 0);
         }
-
-      PTW32_FTIME(&currSysTime1);
 
       /*
        * Create THREADS threads to access shared data.
