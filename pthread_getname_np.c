@@ -44,9 +44,14 @@ pthread_getname_np(pthread_t thr, char *name, int len)
 {
   ptw32_mcs_local_node_t threadLock;
   ptw32_thread_t * tp;
+  char * s, * d;
   int result;
 
-  /* Validate the thread id. */
+  /*
+   * Validate the thread id. This method works for pthreads-win32 because
+   * pthread_kill and pthread_t are designed to accommodate it, but the
+   * method is not portable.
+   */
   result = pthread_kill (thr, 0);
   if (0 != result)
     {
@@ -57,12 +62,11 @@ pthread_getname_np(pthread_t thr, char *name, int len)
 
   ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
 
-#if defined(_MSC_VER) || ( defined(PTW32_CONFIG_MINGW) && defined(MINGW_HAS_SECURE_API) )
-  result = strncpy_s(name, len, tp->name, len - 1);
-#else
-  strncpy(name, tp->name, len - 1);
-  name[len - 1] = '\0';
-#endif
+  for (s = tp->name, d = name; s && d <= &name[len - 1]; *d++ = *s++)
+    {}
+
+  *d = '\0';
+
   ptw32_mcs_lock_release (&threadLock);
 
   return result;
