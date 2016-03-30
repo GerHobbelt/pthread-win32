@@ -65,7 +65,6 @@ pthread_self (void)
       */
 {
   pthread_t self;
-  DWORD_PTR vThreadMask, vProcessMask, vSystemMask;
   pthread_t nil = {NULL, 0};
   ptw32_thread_t * sp;
 
@@ -134,6 +133,7 @@ pthread_self (void)
     	       * affinity to that of the process to get the old thread affinity,
     	       * then reset to the old affinity.
     	       */
+	      DWORD_PTR vThreadMask, vProcessMask, vSystemMask;
     	      if (GetProcessAffinityMask(GetCurrentProcess(), &vProcessMask, &vSystemMask))
     	        {
     	          vThreadMask = SetThreadAffinityMask(sp->threadH, vProcessMask);

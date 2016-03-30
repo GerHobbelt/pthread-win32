@@ -46,8 +46,10 @@
 # define _WIN32_WINNT 0x0400
 #endif
 
-#include <windows.h>
+#define WIN32_LEAN_AND_MEAN
 
+#include <windows.h>
+#include <sys/types.h>
 /*
  * In case windows.h doesn't define it (e.g. WinCE perhaps)
  */
@@ -55,6 +57,22 @@
 typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #endif
 
+#ifdef __PTW32_H
+/* FIXME: Previously specified in <pthread.h>, this doesn't belong in
+ * a system header; relocated from there, to here.
+ */
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#  define PTW32_CONFIG_MINGW
+#endif
+#if defined(_MSC_VER)
+#  if _MSC_VER < 1300
+#    define PTW32_CONFIG_MSVC6
+#  endif
+#  if _MSC_VER < 1400
+#    define PTW32_CONFIG_MSVC7
+#  endif
+#endif
+#endif
 /*
  * Designed to allow error values to be set and retrieved in builds where
  * MSCRT libraries are statically linked to DLLs.
@@ -89,16 +107,54 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 #  endif
 #endif
 
+#ifdef HAVE_ERRNO_H
+#include <errno.h>
+#else
+#include "need_errno.h"
+#endif
 /*
  * note: ETIMEDOUT is correctly defined in winsock.h
  */
 #include <winsock.h>
-
 /*
  * In case ETIMEDOUT hasn't been defined above somehow.
  */
 #if !defined(ETIMEDOUT)
 # define ETIMEDOUT 10060	/* This is the value in winsock.h. */
+#endif
+#if 1
+/* FIXME: Several systems may not define some error numbers;
+ * defining those which are likely to be missing here will let
+ * us complete the library builds, but we really need some way
+ * to deliver these to client applications.
+ */
+#if !defined(ENOTSUP)
+#  define ENOTSUP 48   /* This is the value in Solaris. */
+#endif
+
+#if !defined(ETIMEDOUT)
+#  define ETIMEDOUT 10060 /* Same as WSAETIMEDOUT */
+#endif
+
+#if !defined(ENOSYS)
+#  define ENOSYS 140     /* Semi-arbitrary value */
+#endif
+
+#if !defined(EDEADLK)
+#  if defined(EDEADLOCK)
+#    define EDEADLK EDEADLOCK
+#  else
+#    define EDEADLK 36     /* This is the value in MSVC. */
+#  endif
+#endif
+
+/* POSIX 2008 - related to robust mutexes */
+#if !defined(EOWNERDEAD)
+#  define EOWNERDEAD 43
+#endif
+#if !defined(ENOTRECOVERABLE)
+#  define ENOTRECOVERABLE 44
+#endif
 #endif
 
 #if !defined(malloc)
