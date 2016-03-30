@@ -62,7 +62,7 @@ pthread_getname_np(pthread_t thr, char *name, int len)
 
   ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
 
-  for (s = tp->name, d = name; s && d < &name[len - 1]; *d++ = *s++)
+  for (s = tp->name, d = name; *s && d < &name[len - 1]; *d++ = *s++)
     {}
 
   *d = '\0';
