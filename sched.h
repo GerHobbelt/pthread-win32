@@ -89,12 +89,15 @@ typedef int pid_t;
  * satisfied...
  */
 #elif ! defined __struct_timespec_defined
+#ifndef _TIMESPEC_DEFINED
+#define _TIMESPEC_DEFINED
 struct timespec
 { /* ...we fall back on this explicit definition.
    */
   time_t	tv_sec;
   int		tv_nsec;
 };
+#endif
 #endif
 
 /* Thread scheduling policies */
@@ -118,7 +121,7 @@ struct sched_param
  * compatibility with GNU systems and sched_setaffinity() et.al., which
  * include the cpusetsize parameter "normally set to sizeof(cpu_set_t)".
  *
- * FIXME: These are GNU, and NOT specified by POSIX; maybe consider 
+ * FIXME: These are GNU, and NOT specified by POSIX; maybe consider
  * occluding them within a _GNU_SOURCE (or similar) feature test.
  */
 #define CPU_SETSIZE (sizeof(size_t)*8)
