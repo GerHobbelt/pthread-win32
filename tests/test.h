@@ -46,6 +46,10 @@
 #include <windows.h>
 #include <stdio.h>
 #include <sys/timeb.h>
+/*
+ * FIXME: May not be available on all platforms.
+ */
+#include <errno.h>
 
 #define PTW32_THREAD_NULL_ID {NULL,0}
 
