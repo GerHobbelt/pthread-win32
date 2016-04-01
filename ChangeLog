@@ -21,6 +21,23 @@
 	* semaphore.h: Patched.
 	* pthread_self.c: Patched.
 
+2016-03-28  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* ptw32_relmillisecs.c (pthread_win32_getabstime_np): New
+	platform-aware function to return the current time plus optional
+	offset.
+	* pthread.h (pthread_win32_getabstime_np): New exported function.
+	* ptw32_timespec.c: COnditionally compile only if NEED_FTIME config
+	flagged.
+	* sched.h: Update platform config flags for applications.
+	* semaphore.h: Likewise.
+	* pthread.h: Likewise.
+
+2016-03-25  Bill Parker <wp02855 at gmail dot com>
+
+	* pthread_mutex_init.c: Memory allocation of robust mutex element
+	was not being checked.
+	
 2016-02-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* GNUmakefile (MINGW_HAVE_SECURE_API): Moved to config.h. Undefined
