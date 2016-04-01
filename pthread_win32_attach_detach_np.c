@@ -42,6 +42,9 @@
 #include "pthread.h"
 #include "implement.h"
 #include <tchar.h>
+#if ! (defined(__GNUC__) || defined(PTW32_CONFIG_MSVC7) || defined(WINCE))
+# include <stdlib.h>
+#endif
 
 /*
  * Handle to quserex.dll

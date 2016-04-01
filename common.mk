@@ -153,7 +153,6 @@ STATIC_OBJS	= \
 		sem_trywait.$(OBJEXT) \
 		sem_unlink.$(OBJEXT) \
 		sem_wait.$(OBJEXT) \
-		signal.$(OBJEXT) \
 		w32_CancelableWait.$(OBJEXT)
 
 PTHREAD_SRCS	= \

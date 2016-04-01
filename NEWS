@@ -1,6 +1,6 @@
 RELEASE 2.10.0
 --------------
-(2016-03-28)
+(2016-04-01)
 
 General
 -------
@@ -60,6 +60,8 @@ pthread_win32_getabstime_np()
    that is compatible with POSIX timed calls (returns the struct timespec
    address which is the first argument). Intended primarily to make it
    easier to write tests but may be useful for applications generally. 
+GNU compiler environments (MinGW32 and MinGW64) now have the option of using
+autoconf to automatically configure the build.
 
 Builds:
 New makefile targets have been added and existing targets modified or
@@ -68,7 +70,8 @@ configurations of both dll and static libs.
 
 GNU compiler builds are now explicitly using ISO C and C++ 2011 standards
 compatibility. If your GNU compiler doesn't support this please consider
-updating.
+updating. Auto configuration is now possible via a 'configure' script. The
+script must be generated using autoconf.
 
 Static linking:
 The autostatic functionality has been moved to dll.c, and extended so

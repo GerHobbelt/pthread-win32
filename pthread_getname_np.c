@@ -44,6 +44,7 @@ pthread_getname_np(pthread_t thr, char *name, int len)
 {
   ptw32_mcs_local_node_t threadLock;
   ptw32_thread_t * tp;
+<<<<<<< HEAD
   char * s, * d;
   int result;
 
@@ -67,6 +68,27 @@ pthread_getname_np(pthread_t thr, char *name, int len)
 
   *d = '\0';
 
+=======
+  int result;
+
+  /* Validate the thread id. */
+  result = pthread_kill (thr, 0);
+  if (0 != result)
+    {
+      return result;
+    }
+
+  tp = (ptw32_thread_t *) thr.p;
+
+  ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
+
+#if defined(_MSC_VER) || ( defined(PTW32_CONFIG_MINGW) && defined(MINGW_HAS_SECURE_API) )
+  result = strncpy_s(name, len, tp->name, len - 1);
+#else
+  strncpy(name, tp->name, len - 1);
+  name[len - 1] = '\0';
+#endif
+>>>>>>> refs/heads/mingw-patch-base
   ptw32_mcs_lock_release (&threadLock);
 
   return result;

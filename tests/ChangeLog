@@ -1,3 +1,17 @@
+2016-03-31  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile (_ptw32.h): Copy header to tests directory required to
+	build tests, and apps.
+
+2016-03-31  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* test.h: source errno.h
+
+2016-03-31  Keith Marshall <MinGW32 project>
+
+	* test.h: Patch for MinGW32 autoconf.
+	* GNUmakefile.in: New for autoconf.
+
 2016-03-28  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* condvar2.c: Use platform-aware pthread_win32_getabstime_np.

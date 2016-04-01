@@ -236,6 +236,7 @@ pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
 	WaitForMultipleObjects on 'waitHandle' and a manually
 	reset w32 event used to implement pthread_cancel.
 
+<<<<<<< HEAD
 int
 pthread_getname_np(pthread_t thr, char *name, int len);
 
@@ -262,6 +263,8 @@ pthread_win32_getabstime_np (struct timespec * abstime, const struct timespec * 
 	struct timespec abstime, reltime = { 0, 5000000 } /* 5 ms */; 
 	pthread_mutex_timedwait(&mtx, pthread_win32_getabstime_np(&abstime, &reltime));
 
+=======
+>>>>>>> refs/heads/mingw-patch-base
 
 Non-portable issues
 -------------------

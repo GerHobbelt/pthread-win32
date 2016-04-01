@@ -42,12 +42,16 @@
 # error "config.h was not #included"
 #endif
 
+#include <_ptw32.h>
+
 #if !defined(_WIN32_WINNT)
 # define _WIN32_WINNT 0x0400
 #endif
 
-#include <windows.h>
+#define WIN32_LEAN_AND_MEAN
 
+#include <windows.h>
+#include <sys/types.h>
 /*
  * In case windows.h doesn't define it (e.g. WinCE perhaps)
  */
@@ -55,6 +59,22 @@
 typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #endif
 
+#ifdef __PTW32_H
+/* FIXME: Previously specified in <pthread.h>, this doesn't belong in
+ * a system header; relocated from there, to here.
+ */
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#  define PTW32_CONFIG_MINGW
+#endif
+#if defined(_MSC_VER)
+#  if _MSC_VER < 1300
+#    define PTW32_CONFIG_MSVC6
+#  endif
+#  if _MSC_VER < 1400
+#    define PTW32_CONFIG_MSVC7
+#  endif
+#endif
+#endif
 /*
  * Designed to allow error values to be set and retrieved in builds where
  * MSCRT libraries are statically linked to DLLs.
@@ -87,18 +107,6 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 #  else
 #    define PTW32_SET_ERRNO(err) (errno = (err))
 #  endif
-#endif
-
-/*
- * note: ETIMEDOUT is correctly defined in winsock.h
- */
-#include <winsock.h>
-
-/*
- * In case ETIMEDOUT hasn't been defined above somehow.
- */
-#if !defined(ETIMEDOUT)
-# define ETIMEDOUT 10060	/* This is the value in winsock.h. */
 #endif
 
 #if !defined(malloc)
