@@ -1,5 +1,10 @@
 2016-03-31  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
+	* Makefile (_ptw32.h): Copy header to tests directory required to
+	build tests, and apps.
+
+2016-03-31  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
 	* test.h: source errno.h
 
 2016-03-31  Keith Marshall <MinGW32 project>

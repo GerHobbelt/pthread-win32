@@ -1,9 +1,11 @@
-2016-02-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
+2016-04-01  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* _ptw32.h: Move more header stuff into here.
 	* pthread.h: Move stuff from here into _ptw32.h.
 	* implement.h: Likewise.
 	* sched.h (struct timespec): Wrap with extra condition check.
+	* pthread_win32_attach_detach.c: Source stdlib.h to define
+	_countof et. al.
 
 2016-03-31  Keith Marshall <MinGW32 project>
 

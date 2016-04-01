@@ -117,6 +117,9 @@
 # endif
 #endif
 
+#if ! defined(__MINGW32__) && ! defined(NEED_ERRNO)
+#  define HAVE_ERRNO_H
+#endif
 #ifdef HAVE_ERRNO_H
 #  include <errno.h>
 #else

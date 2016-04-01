@@ -42,7 +42,7 @@ TOUCH	= $(ECHO) touched >
 # The next path is relative to $BUILD_DIR
 QAPC	= # ..\QueueUserAPCEx\User\quserex.dll
 
-CPHDR	= pthread.h semaphore.h sched.h
+CPHDR	= _ptw32.h pthread.h semaphore.h sched.h
 
 OPTIM	= /O2 /Ob0
 

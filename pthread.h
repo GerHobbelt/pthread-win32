@@ -180,7 +180,6 @@ enum
 #include <time.h>
 #include <sched.h>
 
-__PTW32_BEGIN_C_DECLS
 /*
  * -------------------------------------------------------------
  *
@@ -691,6 +690,7 @@ struct ptw32_cleanup_t
 
 #endif /* __CLEANUP_SEH */
 
+
 /*
  * ===============
  * ===============
@@ -698,6 +698,8 @@ struct ptw32_cleanup_t
  * ===============
  * ===============
  */
+
+__PTW32_BEGIN_C_DECLS
 
 /*
  * PThread Attribute Functions
@@ -1046,7 +1048,7 @@ PTW32_DLLPORT void * PTW32_CDECL pthread_timechange_handler_np(void *);
 /*
  * Returns the Win32 HANDLE for the POSIX thread.
  */
-PTW32_DLLPORT void PTW32_CDECL *pthread_getw32threadhandle_np(pthread_t thread);
+PTW32_DLLPORT void * PTW32_CDECL pthread_getw32threadhandle_np(pthread_t thread);
 /*
  * Returns the win32 thread ID for POSIX thread.
  */

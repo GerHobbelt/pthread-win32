@@ -108,7 +108,7 @@ PTW32_DLLPORT int PTW32_CDECL sem_post (sem_t * sem);
 PTW32_DLLPORT int PTW32_CDECL sem_post_multiple (sem_t * sem,
 						 int count);
 
-PTW32_DLLPORT sem_t PTW32_CDECL *sem_open (const char *, int, ...);
+PTW32_DLLPORT sem_t * PTW32_CDECL sem_open (const char *, int, ...);
 
 PTW32_DLLPORT int PTW32_CDECL sem_close (sem_t * sem);
 
