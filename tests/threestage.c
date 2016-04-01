@@ -33,6 +33,8 @@
  and send the individual messages to the designated consumer
  */
 
+/* Suppress warning re use of ctime() */
+#define _CRT_SECURE_NO_WARNINGS 1
 
 #include "test.h"
 #define sleep(i) Sleep(i*1000)

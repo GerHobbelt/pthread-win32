@@ -83,7 +83,7 @@
 pthread_cond_t cnd;
 pthread_mutex_t mtx;
 
-static const int64_t NANOSEC_PER_SEC = 1000000000;
+static const long NANOSEC_PER_SEC = 1000000000;
 
 int main()
 {
