@@ -1,3 +1,12 @@
+2016-03-31  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* test.h: source errno.h
+
+2016-03-31  Keith Marshall <MinGW32 project>
+
+	* test.h: Patch for MinGW32 autoconf.
+	* GNUmakefile.in: New for autoconf.
+
 2015-11-01	Mark Smith <masmith at fb dot com>
 
 	* semaphore4t.c: Enhanced and additional testing of sub-millisecond

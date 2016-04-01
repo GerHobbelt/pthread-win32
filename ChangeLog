@@ -1,5 +1,26 @@
 2016-02-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
+	* _ptw32.h: Move more header stuff into here.
+	* pthread.h: Move stuff from here into _ptw32.h.
+	* implement.h: Likewise.
+	* sched.h (struct timespec): Wrap with extra condition check.
+
+2016-03-31  Keith Marshall <MinGW32 project>
+
+	* aclocal.m4: New from MinGW32 patches for autoconf.
+	* configure.ac: Likewise.
+	* GNUmakefile.in: Likewise.
+	* install-sh: Likewise.
+	* _ptw32.h: Likewise.
+	* implement.h: Patched.
+	* pthread.h: Patched.
+	* sched.h: Patched.
+	* sem_open.c: Patched.
+	* semaphore.h: Patched.
+	* pthread_self.c: Patched.
+
+2016-02-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
 	* GNUmakefile (MINGW_HAVE_SECURE_API): Moved to config.h. Undefined
 	for __MINGW32__; remove (make optional) forcing a specific C std.
 	* implement.h (uint64_t): Define for Visual Studio.

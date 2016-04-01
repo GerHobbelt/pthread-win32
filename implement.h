@@ -42,6 +42,8 @@
 # error "config.h was not #included"
 #endif
 
+#include <_ptw32.h>
+
 #if !defined(_WIN32_WINNT)
 # define _WIN32_WINNT 0x0400
 #endif
@@ -105,56 +107,6 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 #  else
 #    define PTW32_SET_ERRNO(err) (errno = (err))
 #  endif
-#endif
-
-#ifdef HAVE_ERRNO_H
-#include <errno.h>
-#else
-#include "need_errno.h"
-#endif
-/*
- * note: ETIMEDOUT is correctly defined in winsock.h
- */
-#include <winsock.h>
-/*
- * In case ETIMEDOUT hasn't been defined above somehow.
- */
-#if !defined(ETIMEDOUT)
-# define ETIMEDOUT 10060	/* This is the value in winsock.h. */
-#endif
-#if 1
-/* FIXME: Several systems may not define some error numbers;
- * defining those which are likely to be missing here will let
- * us complete the library builds, but we really need some way
- * to deliver these to client applications.
- */
-#if !defined(ENOTSUP)
-#  define ENOTSUP 48   /* This is the value in Solaris. */
-#endif
-
-#if !defined(ETIMEDOUT)
-#  define ETIMEDOUT 10060 /* Same as WSAETIMEDOUT */
-#endif
-
-#if !defined(ENOSYS)
-#  define ENOSYS 140     /* Semi-arbitrary value */
-#endif
-
-#if !defined(EDEADLK)
-#  if defined(EDEADLOCK)
-#    define EDEADLK EDEADLOCK
-#  else
-#    define EDEADLK 36     /* This is the value in MSVC. */
-#  endif
-#endif
-
-/* POSIX 2008 - related to robust mutexes */
-#if !defined(EOWNERDEAD)
-#  define EOWNERDEAD 43
-#endif
-#if !defined(ENOTRECOVERABLE)
-#  define ENOTRECOVERABLE 44
-#endif
 #endif
 
 #if !defined(malloc)

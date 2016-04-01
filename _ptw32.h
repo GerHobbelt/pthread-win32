@@ -39,6 +39,19 @@
 #ifndef __PTW32_H
 #define __PTW32_H
 
+/* See the README file for an explanation of the pthreads-win32
+ * version numbering scheme and how the DLL is named etc.
+ *
+ * FIXME: consider moving this to <_ptw32.h>; maybe also add a
+ * leading underscore to the macro names.
+ */
+#define PTW32_VERSION_MAJOR 2
+#define PTW32_VERSION_MINOR 10
+#define PTW32_VERSION_MICRO 0
+#define PTW32_VERION_BUILD 0
+#define PTW32_VERSION 2,10,0,0
+#define PTW32_VERSION_STRING "2, 10, 0, 0\0"
+
 #if defined __GNUC__
 # pragma GCC system_header
 # if ! defined __declspec
@@ -102,6 +115,70 @@
 # else
 #  define PTW32_CDECL __cdecl
 # endif
+#endif
+
+#ifdef HAVE_ERRNO_H
+#  include <errno.h>
+#else
+#  include "need_errno.h"
+#endif
+
+/*
+ * In case ETIMEDOUT hasn't been defined above somehow.
+ */
+#if !defined(ETIMEDOUT)
+  /*
+   * note: ETIMEDOUT is no longer defined in winsock.h
+   * WSAETIMEDOUT is so use its value.
+   */
+#  include <winsock.h>
+#  if defined(WSAETIMEDOUT)
+#    define ETIMEDOUT WSAETIMEDOUT
+#  else
+#   define ETIMEDOUT 10060	/* This is the value of WSAETIMEDOUT in winsock.h. */
+#  endif
+#endif
+
+/*
+ * Several systems may not define some error numbers;
+ * defining those which are likely to be missing here will let
+ * us complete the library builds.
+ */
+#if !defined(ENOTSUP)
+#  define ENOTSUP 48   /* This is the value in Solaris. */
+#endif
+
+#if !defined(ENOSYS)
+#  define ENOSYS 140     /* Semi-arbitrary value */
+#endif
+
+#if !defined(EDEADLK)
+#  if defined(EDEADLOCK)
+#    define EDEADLK EDEADLOCK
+#  else
+#    define EDEADLK 36     /* This is the value in MSVC. */
+#  endif
+#endif
+
+/* POSIX 2008 - related to robust mutexes */
+/*
+ * FIXME: These should be changed for version 3.0.0 onward (ABI change).
+ * 42 already conflicts with EILSEQ
+ */
+#if PTW32_VERSION_MAJOR > 2
+#  if !defined(EOWNERDEAD)
+#    define EOWNERDEAD 1000
+#  endif
+#  if !defined(ENOTRECOVERABLE)
+#    define ENOTRECOVERABLE 1001
+#  endif
+#else
+#  if !defined(EOWNERDEAD)
+#    define EOWNERDEAD 42
+#  endif
+#  if !defined(ENOTRECOVERABLE)
+#    define ENOTRECOVERABLE 43
+#  endif
 #endif
 
 #endif	/* !__PTW32_H */

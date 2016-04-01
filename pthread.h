@@ -34,15 +34,6 @@
 #if !defined( PTHREAD_H )
 #define PTHREAD_H
 
-/* See the README file for an explanation of the pthreads-win32
- * version numbering scheme and how the DLL is named etc.
- *
- * FIXME: consider moving this to <_ptw32.h>; maybe also add a
- * leading underscore to the macro names.
- */
-#define PTW32_VERSION 2,10,0,0
-#define PTW32_VERSION_STRING "2, 10, 0, 0\0"
-
 /* There are three implementations of cancel cleanup.
  * Note that pthread.h is included in both application
  * compilation units and also internally for the library.
@@ -81,6 +72,8 @@
 #error ERROR [__FILE__, line __LINE__]: SEH is not supported for this compiler.
 #endif
 
+#include <_ptw32.h>
+
 /*
  * Stop here if we are being included by the resource compiler.
  */
@@ -89,8 +82,6 @@
 #undef  __PTW32_LEVEL
 #undef  __PTW32_LEVEL_MAX
 #define __PTW32_LEVEL_MAX  3
-
-#include <_ptw32.h>
 
 #if _POSIX_C_SOURCE >= 200112L			/* POSIX.1-2001 and later */
 # define __PTW32_LEVEL  __PTW32_LEVEL_MAX	/* include everything     */
@@ -394,13 +385,25 @@ __PTW32_BEGIN_C_DECLS
 #if defined(_UWIN) && __PTW32_LEVEL >= __PTW32_LEVEL_MAX
 #   include     <sys/types.h>
 #else
-/* Generic handle type - intended to extend uniqueness beyond
- * that available with a simple pointer. It should scale for either
- * IA-32 or IA-64.
+/* Generic handle type - intended to provide the lifetime-uniqueness that
+ * a simple pointer can't. It should scale for either
+ * 32 or 64 bit systems.
+ *
+ * The constraint with this approach is that applications must
+ * strictly comply with POSIX, e.g. not assume scalar type, only
+ * compare pthread_t using the API function pthread_equal(), etc.
+ *
+ * Applications can use the element 'p' to compare, e.g. for sorting,
+ * but it will be up to the application to determine if handles are
+ * live or dead, or resurrected for an entirely new/different thread.
  */
 typedef struct
 { void * p;                   /* Pointer to actual object */
+#if PTW32_VERSION_MAJOR > 2
+  size_t x;                   /* Extra information - reuse count etc */
+#else
   unsigned int x;             /* Extra information - reuse count etc */
+#endif
 } ptw32_handle_t;
 
 typedef ptw32_handle_t pthread_t;
