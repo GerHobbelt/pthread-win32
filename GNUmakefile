@@ -267,6 +267,7 @@ install:
 	-$(TESTNDIR) $(HDRDEST) $(AND) $(MKDIR) $(HDRDEST)
 	$(CP) pthreadGC*.dll $(DLLDEST)
 	$(CP) libpthreadGC*.a $(LIBDEST)
+	$(CP) _pthw32.h $(HDRDEST)
 	$(CP) pthread.h $(HDRDEST)
 	$(CP) sched.h $(HDRDEST)
 	$(CP) semaphore.h $(HDRDEST)

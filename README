@@ -398,11 +398,14 @@ $ nmake VC NO_DEPS=1 TESTS="foo bar"
 Building with MinGW
 -------------------
 
-Please use Mingw64 to build either 64 or 32 bit variants of the DLL that will
-run on 64 bit systems. We have found that Mingw32 builds of the GCE library
-variants fail when run on 64 bit systems.
+We have found that Mingw32 builds of the GCE library variants fail when run
+on 64 bit systems. The GC variants are fine.
 
-From the source directory, run 'make' without arguments for help information.
+From the source directory:
+
+run 'autoheader' to rewrite the config.h file
+run 'autoconf' to rewrite the GNUmakefiles (library and tests)
+run 'make' without arguments to list possible targets.
 
 $ make
 
@@ -439,15 +442,15 @@ libpthreadGC2-w64.a
 
 To build and test all DLLs and static lib compatibility variants (GC, GCE):
 
-Note that the ARCH="..." and/or EXTRAVERSION="..." options are passed to the
-tests GNUmakefile when you target "all-tests". If you change to the tests
-directory and run the tests you will need to repeat those options explicitly
-to the test "make" command-line.
-
 $ make all-tests
 or, with MinGW64 (multilib enabled):
 $ make all-tests ARCH=-m64
 $ make all-tests ARCH=-m32
+
+Note that the ARCH="..." and/or EXTRAVERSION="..." options are passed to the
+tests GNUmakefile when you target "all-tests". If you change to the tests
+directory and run the tests you will need to repeat those options explicitly
+to the test "make" command-line.
 
 You can run the testsuite by changing to the "tests" directory and
 running make. E.g.:
@@ -509,36 +512,13 @@ Cygwin implements it's own POSIX threads routines and these
 will be the ones to use if you develop using Cygwin.
 
 
-Ready to run binaries
----------------------
-
-For convenience, the following ready-to-run files can be downloaded
-from the FTP site (see under "Availability" below):
-
-	pthread.h
-	semaphore.h
-	sched.h
-	pthreadVC2.dll		- built with MSVC compiler using C setjmp/longjmp
-	pthreadVC2.lib
-	pthreadVCE2.dll		- built with MSVC++ compiler using C++ EH
-	pthreadVCE2.lib
-	pthreadVSE2.dll		- built with MSVC compiler using SEH
-	pthreadVSE2.lib
-	pthreadGC2.dll		- built with Mingw32 GCC
-	libpthreadGC2.a		- derived from pthreadGC.dll
-	pthreadGCE2.dll		- built with Mingw32 G++
-	libpthreadGCE2.a	- derived from pthreadGCE.dll
-
-You may also need to include runtime DLLs from your SDK when
-distributing your applications.
-
 Building applications with GNU compilers
 ----------------------------------------
 
 If you're using pthreadGC2.dll:
 
-With the three header files, pthreadGC2.dll and libpthreadGC2.a in the
-same directory as your application myapp.c, you could compile, link
+With the four header files, _ptw32.h, pthreadGC2.dll and libpthreadGC2.a
+in the same directory as your application myapp.c, you could compile, link
 and run myapp.c under MinGW as follows:
 
 	gcc -o myapp.exe myapp.c -I. -L. -lpthreadGC2
@@ -546,7 +526,7 @@ and run myapp.c under MinGW as follows:
 
 Or put pthreadGC2.dll in an appropriate directory in your PATH,
 put libpthreadGC2.a in your system lib directory, and
-put the three header files in your system include directory,
+put the four header files in your system include directory,
 then use:
 
 	gcc -o myapp.exe myapp.c -lpthreadGC
@@ -555,7 +535,7 @@ then use:
 
 If you're using pthreadGCE2.dll:
 
-With the three header files, pthreadGCE2.dll and libpthreadGCE2.a
+With the four header files, pthreadGCE2.dll and libpthreadGCE2.a
 in the same directory as your application myapp.c, you could compile,
 link and run myapp.c under Mingw32 as follows:
 
@@ -564,42 +544,11 @@ link and run myapp.c under Mingw32 as follows:
 
 Or put pthreadGCE.dll and gcc.dll in an appropriate directory in
 your PATH, put libpthreadGCE.a in your system lib directory, and
-put the three header files in your system include directory,
+put the four header files in your system include directory,
 then use:
 
 	gcc -x c++ -o myapp.exe myapp.c -lpthreadGCE
 	myapp
-
-
-Availability
-------------
-
-The complete source code in either unbundled, self-extracting
-Zip file, or tar/gzipped format can be found at:
-
-	ftp://sources.redhat.com/pub/pthreads-win32
-
-The pre-built DLL, export libraries and matching pthread.h can
-be found at:
-
-	ftp://sources.redhat.com/pub/pthreads-win32/dll-latest
-
-Home page:
-
-	http://sources.redhat.com/pthreads-win32/
-
-
-Mailing list
-------------
-
-There is a mailing list for discussing pthreads on Win32.
-To join, send email to:
-
-	pthreads-win32-subscribe@sources.redhat.com
-
-Unsubscribe by sending mail to:
-
-	pthreads-win32-unsubscribe@sources.redhat.com
 
 
 Acknowledgements
@@ -618,12 +567,4 @@ industry can be measured by it's open standards.
 
 ----
 Ross Johnson
-<rpj@callisto.canberra.edu.au>
-
-
-
-
-
-
-
-
+<ross.johnson@loungebythelake.net>
