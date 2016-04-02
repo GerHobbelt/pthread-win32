@@ -59,7 +59,7 @@
 #define rand_r( _seed ) \
         ( _seed == _seed? rand() : rand() )
 
-#if defined(PTW32_CONFIG_MINGW)
+#if defined(__MINGW32__)
 # include <stdint.h>
 #elif defined(__BORLANDC__)
 # define int64_t ULONGLONG
@@ -71,7 +71,7 @@
 #  define PTW32_FTIME(x) _ftime64_s(x)
 #  define PTW32_STRUCT_TIMEB struct __timeb64
 #elif ( defined(_MSC_VER) && _MSC_VER >= 1300 ) || \
-      ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0601 )
+      ( defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601 )
 #  define PTW32_FTIME(x) _ftime64(x)
 #  define PTW32_STRUCT_TIMEB struct __timeb64
 #else

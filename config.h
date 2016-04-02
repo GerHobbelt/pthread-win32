@@ -138,22 +138,6 @@
 #  define HAVE_C_INLINE
 #endif
 
-#if defined(__MINGW32__) || defined(__MINGW64__)
-#  include <_mingw.h>
-#  if defined(__MINGW64_VERSION_MAJOR)
-#    define PTW32_CONFIG_MINGW 64
-#  elif defined(__MINGW_MAJOR_VERSION) || defined(__MINGW32_MAJOR_VERSION)
-#    define PTW32_CONFIG_MINGW 32
-#  endif
-#  if PTW32_CONFIG_MINGW == 64
-#    define HAVE_STRUCT_TIMESPEC
-#    define HAVE_MODE_T
-#  else
-#    define HAVE_MODE_T
-#    undef MINGW_HAS_SECURE_API
-#  endif
-#endif
-
 #if defined(__BORLANDC__)
 #endif
 

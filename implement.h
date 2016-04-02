@@ -59,36 +59,20 @@
 typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #endif
 
-#ifdef __PTW32_H
-/* FIXME: Previously specified in <pthread.h>, this doesn't belong in
- * a system header; relocated from there, to here.
- */
-#if defined(__MINGW32__) || defined(__MINGW64__)
-#  define PTW32_CONFIG_MINGW
-#endif
-#if defined(_MSC_VER)
-#  if _MSC_VER < 1300
-#    define PTW32_CONFIG_MSVC6
-#  endif
-#  if _MSC_VER < 1400
-#    define PTW32_CONFIG_MSVC7
-#  endif
-#endif
-#endif
 /*
  * Designed to allow error values to be set and retrieved in builds where
  * MSCRT libraries are statically linked to DLLs.
  */
 #if ! defined(WINCE) && \
-    (( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0800 ) || \
+    (( defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0800 ) || \
     ( defined(_MSC_VER) && _MSC_VER >= 1400 ))  /* MSVC8+ */
-#  if defined(PTW32_CONFIG_MINGW)
+#  if defined(__MINGW32__)
 __attribute__((unused))
 #  endif
 static int ptw32_get_errno(void) { int err = 0; _get_errno(&err); return err; }
 #  define PTW32_GET_ERRNO() ptw32_get_errno()
 #  if defined(PTW32_USES_SEPARATE_CRT)
-#    if defined(PTW32_CONFIG_MINGW)
+#    if defined(__MINGW32__)
 __attribute__((unused))
 #    endif
 static void ptw32_set_errno(int err) { _set_errno(err); SetLastError(err); }
@@ -99,7 +83,7 @@ static void ptw32_set_errno(int err) { _set_errno(err); SetLastError(err); }
 #else
 #  define PTW32_GET_ERRNO() (errno)
 #  if defined(PTW32_USES_SEPARATE_CRT)
-#    if defined(PTW32_CONFIG_MINGW)
+#    if defined(__MINGW32__)
 __attribute__((unused))
 #    endif
 static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
@@ -152,25 +136,12 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 #  define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE long*
 #endif
 
-#if defined(PTW32_CONFIG_MINGW)
-#  include <stdint.h>
-#elif defined(__BORLANDC__)
-#  define int64_t LONGLONG
-#  define uint64_t ULONGLONG
-#else
-#  define int64_t _int64
-#  define uint64_t unsigned _int64
-#  if defined(PTW32_CONFIG_MSVC6)
-     typedef long intptr_t;
-#  endif
-#endif
-
 /*
  * Don't allow the linker to optimize away autostatic.obj in static builds.
  */
 #if defined(PTW32_STATIC_LIB) && defined(PTW32_BUILD)
   void ptw32_autostatic_anchor(void);
-# if defined(PTW32_CONFIG_MINGW)
+# if defined(__GNUC__)
     __attribute__((unused, used))
 # endif
   static void (*local_autostatic_anchor)(void) = ptw32_autostatic_anchor;
@@ -665,10 +636,7 @@ extern ptw32_mcs_lock_t ptw32_spinlock_test_init_lock;
 extern int pthread_count;
 #endif
 
-#if defined(__cplusplus)
-extern "C"
-{
-#endif				/* __cplusplus */
+__PTW32_BEGIN_C_DECLS
 
 /*
  * =====================
@@ -713,7 +681,7 @@ extern "C"
 
   void ptw32_rwlock_cancelwrwait (void *arg);
 
-#if ! defined (PTW32_CONFIG_MINGW) || (defined (__MSVCRT__) && ! defined (__DMC__))
+#if ! defined (__MINGW32__) || (defined (__MSVCRT__) && ! defined (__DMC__))
   unsigned __stdcall
 #else
   void
@@ -764,17 +732,13 @@ extern "C"
 #endif
 ;
 
-#if defined(__cplusplus)
-}
-#endif				/* __cplusplus */
-
+__PTW32_END_C_DECLS
 
 #if defined(_UWIN_)
 #   if defined(_MT)
-#       if defined(__cplusplus)
-extern "C"
-{
-#       endif
+
+__PTW32_BEGIN_C_DECLS
+
   _CRTIMP unsigned long __cdecl _beginthread (void (__cdecl *) (void *),
 					      unsigned, void *);
   _CRTIMP void __cdecl _endthread (void);
@@ -782,9 +746,9 @@ extern "C"
 						unsigned (__stdcall *) (void *),
 						void *, unsigned, unsigned *);
   _CRTIMP void __cdecl _endthreadex (unsigned);
-#       if defined(__cplusplus)
-}
-#       endif
+
+__PTW32_END_C_DECLS
+
 #   endif
 #else
 #   if ! defined(WINCE)

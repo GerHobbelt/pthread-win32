@@ -220,7 +220,7 @@ pthread_create (pthread_t * tid,
    * finished with it here.
    */
 
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
 
   tp->threadH =
       threadH =

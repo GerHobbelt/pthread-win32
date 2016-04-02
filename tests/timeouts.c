@@ -91,7 +91,7 @@
 #define CYG_ONEMILLION          1000000LL
 #define CYG_ONEKAPPA            1000LL
 
-#if !(_MSC_VER <= 1200)
+#if defined(_MSC_VER) && (_MSC_VER > 1200)
 typedef long long cyg_tim_t; //msvc > 6.0
 #else
 typedef int64_t cyg_tim_t; //msvc 6.0

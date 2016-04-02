@@ -52,7 +52,7 @@
 #define PTW32_VERSION 2,10,0,0
 #define PTW32_VERSION_STRING "2, 10, 0, 0\0"
 
-#if defined __GNUC__
+#if defined(__GNUC__)
 # pragma GCC system_header
 # if ! defined __declspec
 #  error "Please upgrade your GNU compiler to one that supports __declspec."
@@ -115,6 +115,50 @@
 # else
 #  define PTW32_CDECL __cdecl
 # endif
+#endif
+
+/*
+ * This is more or less a duplicate of what is in the autoconf config.h,
+ * which is only used when building the pthread-win32 libraries. They
+ */
+
+#if !defined(PTW32_CONFIG_H) && !defined(__PTW32_PSEUDO_CONFIG_H_SOURCED)
+#  define __PTW32_PSEUDO_CONFIG_H_SOURCED
+#  if defined(WINCE)
+#    undef  HAVE_CPU_AFFINITY
+#    define NEED_DUPLICATEHANDLE
+#    define NEED_CREATETHREAD
+#    define NEED_ERRNO
+#    define NEED_CALLOC
+#    define NEED_FTIME
+#    define NEED_UNICODE_CONSTS
+#    define NEED_PROCESS_AFFINITY_MASK
+/* This may not be needed */
+#    define RETAIN_WSALASTERROR
+#  elif defined(_MSC_VER)
+#    if _MSC_VER >= 1900
+#      define HAVE_STRUCT_TIMESPEC
+#    elif _MSC_VER < 1300
+#      define PTW32_CONFIG_MSVC6
+#    elif _MSC_VER < 1400
+#      define PTW32_CONFIG_MSVC7
+#    endif
+#  elif defined(_UWIN)
+#    define HAVE_MODE_T
+#    define HAVE_STRUCT_TIMESPEC
+#    define HAVE_SIGNAL_H
+#  endif
+#endif
+
+#if defined(__BORLANDC__)
+#  define int64_t LONGLONG
+#  define uint64_t ULONGLONG
+#elif !defined(__MINGW32__)
+#  define int64_t _int64
+#  define uint64_t unsigned _int64
+#  if defined(PTW32_CONFIG_MSVC6)
+     typedef long intptr_t;
+#  endif
 #endif
 
 #if ! defined(__MINGW32__) && ! defined(NEED_ERRNO)

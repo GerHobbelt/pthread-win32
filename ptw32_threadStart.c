@@ -119,7 +119,7 @@ using
 # pragma warning( disable : 4748 )
 #endif
 
-#if ! defined (PTW32_CONFIG_MINGW) || (defined (__MSVCRT__) && ! defined (__DMC__))
+#if ! defined (__MINGW32__) || (defined (__MSVCRT__) && ! defined (__DMC__))
 unsigned
   __stdcall
 #else
@@ -152,7 +152,7 @@ ptw32_threadStart (void *vthreadParms)
 
   free (threadParms);
 
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
 #else
   /*
    * _beginthread does not return the thread id and is running
@@ -296,7 +296,7 @@ ptw32_threadStart (void *vthreadParms)
   (void) pthread_win32_thread_detach_np ();
 #endif
 
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
   _endthreadex ((unsigned)(size_t) status);
 #else
   _endthread ();
@@ -306,7 +306,7 @@ ptw32_threadStart (void *vthreadParms)
    * Never reached.
    */
 
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
   return (unsigned)(size_t) status;
 #endif
 

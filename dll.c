@@ -146,7 +146,7 @@ EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
  * on thread exit. Code here can only do process init and exit functions.
  */
 
-#if defined(PTW32_CONFIG_MINGW) || defined(_MSC_VER)
+#if defined(__MINGW32__) || defined(_MSC_VER)
 
 /* For an explanation of this code (at least the MSVC parts), refer to
  *
@@ -177,7 +177,7 @@ static int on_process_exit(void)
     return 0;
 }
 
-#if defined(PTW32_CONFIG_MINGW)
+#if defined(__GNUC__)
 __attribute__((section(".ctors"), used)) static int (*gcc_ctor)(void) = on_process_init;
 __attribute__((section(".dtors"), used)) static int (*gcc_dtor)(void) = on_process_exit;
 #elif defined(_MSC_VER)
@@ -195,7 +195,7 @@ static int (*msc_dtor)(void) = on_process_exit;
 #  endif
 #endif
 
-#endif /* defined(PTW32_CONFIG_MINGW) || defined(_MSC_VER) */
+#endif /* defined(__MINGW32__) || defined(_MSC_VER) */
 
 /* This dummy function exists solely to be referenced by other modules
  * (specifically, in implement.h), so that the linker can't optimize away
