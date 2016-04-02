@@ -164,6 +164,9 @@ main()
   pthread_t et[NUMTHREADS];
   pthread_mutexattr_t ma;
 
+  DWORD dwMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
+  SetErrorMode(dwMode | SEM_NOGPFAULTERRORBOX);
+
   assert((mt = pthread_self()).p != NULL);
 
   printf("See the notes inside of exception3.c re term_funcs.\n");

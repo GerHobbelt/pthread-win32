@@ -197,6 +197,9 @@ main()
   pthread_t et[NUMTHREADS];
   pthread_t ct[NUMTHREADS];
 
+  DWORD dwMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
+  SetErrorMode(dwMode | SEM_NOGPFAULTERRORBOX);
+
   assert((mt = pthread_self()).p != NULL);
 
   for (i = 0; i < NUMTHREADS; i++)

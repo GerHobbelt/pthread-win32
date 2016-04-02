@@ -105,6 +105,9 @@ main()
   pthread_t t;
   HANDLE hThread;
 
+  DWORD dwMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
+  SetErrorMode(dwMode | SEM_NOGPFAULTERRORBOX);
+
   assert(pthread_create(&t, NULL, func, NULL) == 0);
 
   hThread = ((ptw32_thread_t *)t.p)->threadH;
