@@ -93,7 +93,7 @@ GCX	= GC$(DLL_VER)
 
 # Files we need to run the tests
 # - paths are relative to pthreads build dir.
-HDR	= pthread.h semaphore.h sched.h
+HDR	= _ptw32.h pthread.h semaphore.h sched.h
 LIB	= libpthread$(GCX).a
 DLL	= pthread$(GCX).dll
 # The next path is relative to $BUILD_DIR
