@@ -123,9 +123,12 @@ const char * error_string[] = {
   "ENOLCK",
   "ENOSYS",
   "ENOTEMPTY",
+#if PTW32_VERSION_MAJOR > 2
   "EILSEQ",
-  "EOWNERDEAD",
+#else
+  "EILSEQ_or_EOWNERDEAD",
   "ENOTRECOVERABLE"
+#endif
 };
 
 /*
@@ -160,8 +163,12 @@ int assertE;
 			            #e, __FILE__, (int) __LINE__), \
 	                            fflush(stderr) : \
                              0) : \
-          (fprintf(stderr, "Assertion failed: (%s %s %s), file %s, line %d, error %s\n", \
-                   #e,#o,#r, __FILE__, (int) __LINE__, error_string[assertE]), exit(1), 0))
+       (assertE <= sizeof(error_string)/sizeof(error_string[0])) ? \
+	   (fprintf(stderr, "Assertion failed: (%s %s %s), file %s, line %d, error %s\n", \
+			    #e,#o,#r, __FILE__, (int) __LINE__, error_string[assertE]), exit(1), 0) :\
+		   (fprintf(stderr, \
+			    "Assertion failed: (%s %s %s), file %s, line %d, error %d\n", \
+		            #e,#o,#r, __FILE__, (int) __LINE__, assertE), exit(1), 0))
 
 #endif
 

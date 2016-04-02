@@ -150,6 +150,18 @@
 #  endif
 #endif
 
+/*
+ * If HAVE_ERRNO_H is defined then assume that autoconf has been used
+ * to overwrite config.h, otherwise the original config.h is in use
+ * at build-time or the above block of defines is in use otherwise
+ * and NEED_ERRNO is either defined or not defined.
+ */
+#if defined(HAVE_ERRNO_H) || !defined(NEED_ERRNO)
+#  include <errno.h>
+#else
+#  include "need_errno.h"
+#endif
+
 #if defined(__BORLANDC__)
 #  define int64_t LONGLONG
 #  define uint64_t ULONGLONG
@@ -159,15 +171,6 @@
 #  if defined(PTW32_CONFIG_MSVC6)
      typedef long intptr_t;
 #  endif
-#endif
-
-#if ! defined(__MINGW32__) && ! defined(NEED_ERRNO)
-#  define HAVE_ERRNO_H
-#endif
-#ifdef HAVE_ERRNO_H
-#  include <errno.h>
-#else
-#  include "need_errno.h"
 #endif
 
 /*
@@ -209,8 +212,8 @@
 
 /* POSIX 2008 - related to robust mutexes */
 /*
- * FIXME: These should be changed for version 3.0.0 onward (ABI change).
- * 42 already conflicts with EILSEQ
+ * FIXME: These should be changed for version 3.0.0 onward.
+ * 42 clashes with EILSEQ.
  */
 #if PTW32_VERSION_MAJOR > 2
 #  if !defined(EOWNERDEAD)
