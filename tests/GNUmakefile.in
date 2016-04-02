@@ -190,26 +190,28 @@ GCX-static-debug GCX-small-static-debug:
 	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB -Wl,-Bstatic" OPT="$(DOPT)" DLL="" allpassed
 
 all-asm: $(ASM)
-	@ $(ECHO) "ALL TESTS PASSED! Congratulations!"
+	@ $(ECHO) "ALL TESTS COMPILED TO ASSEMBLER CODE"
 
 allpassed: $(HDR) $(LIB) $(DLL) $(QAPC) $(TESTS:%=%.pass)
-	@ $(ECHO) "ALL TESTS PASSED! Congratulations!"
+	@ $(ECHO) "ALL TESTS COMPLETED. Check the logfile: $(LOGFILE)"
+	@ $(ECHO) "FAILURES: $$( grep FAILED $(LOGFILE) | wc -l ) " ; grep FAILED $(LOGFILE)
 
 all-bench: $(HDR) $(LIB) $(DLL) $(QAPC) $(XXLIBS) $(BENCHRESULTS)
-	@ $(ECHO) "ALL BENCH TESTS COMPLETED."
+	@ $(ECHO) "ALL BENCH TESTS COMPLETED. Check the logfile: $(LOGFILE)"
+	@ $(ECHO) "FAILURES: $$( grep FAILED $(LOGFILE) | wc -l ) " ; grep FAILED $(LOGFILE)
 
 cancel9.exe: XLIBS = -lws2_32
 
 %.pass: %.exe
-	@ $(ECHO) Running $(TEST) test \"$*\" | tee -a testsuite.log
+	@ $(ECHO) Running $(TEST) test \"$*\" | tee -a $(LOGFILE)
 	@ (PATH=${top_builddir}:$$PATH $(RUN) ./$* \
-	  && { $(ECHO) Passed; $(TOUCH) $@; } || $(ECHO) FAILED) \
+	  && { $(ECHO) Passed; $(TOUCH) $@; } || { $(ECHO) FAILED: $* ; $(ECHO) ; } ) \
 	  2>&1 | tee -a $(LOGFILE)
 
 %.bench: %.exe
-	@ $(ECHO) Running $(TEST) test \"$*\" | tee -a testsuite.log
+	@ $(ECHO) Running $(TEST) test \"$*\" | tee -a $(LOGFILE)
 	@ (PATH=${top_builddir}:$$PATH $(RUN) ./$* \
-	  && { $(ECHO) Done; $(TOUCH) $@; } || $(ECHO) FAILED) \
+	  && { $(ECHO) Done; $(TOUCH) $@; } || { $(ECHO) FAILED ; $(ECHO) ; } ) \
 	  2>&1 | tee -a $(LOGFILE)
 
 %.exe: %.c
