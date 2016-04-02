@@ -163,7 +163,7 @@ int assertE;
 			            #e, __FILE__, (int) __LINE__), \
 	                            fflush(stderr) : \
                              0) : \
-       (assertE <= sizeof(error_string)/sizeof(error_string[0])) ? \
+       (assertE <= (int) (sizeof(error_string)/sizeof(error_string[0]))) ? \
 	   (fprintf(stderr, "Assertion failed: (%s %s %s), file %s, line %d, error %s\n", \
 			    #e,#o,#r, __FILE__, (int) __LINE__, error_string[assertE]), exit(1), 0) :\
 		   (fprintf(stderr, \
