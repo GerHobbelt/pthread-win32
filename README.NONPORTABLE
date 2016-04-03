@@ -236,7 +236,6 @@ pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
 	WaitForMultipleObjects on 'waitHandle' and a manually
 	reset w32 event used to implement pthread_cancel.
 
-<<<<<<< HEAD
 int
 pthread_getname_np(pthread_t thr, char *name, int len);
 
@@ -263,8 +262,6 @@ pthread_win32_getabstime_np (struct timespec * abstime, const struct timespec * 
 	struct timespec abstime, reltime = { 0, 5000000 } /* 5 ms */; 
 	pthread_mutex_timedwait(&mtx, pthread_win32_getabstime_np(&abstime, &reltime));
 
-=======
->>>>>>> refs/heads/mingw-patch-base
 
 Non-portable issues
 -------------------
@@ -412,10 +409,9 @@ programmers can use memcmp etc., but then face the prospect that the struct may
 include alignment padding bytes or bits as well as extra implementation-specific
 members that are not part of the unique identifying value.
 
-[While this is not currently the case for pthreads-win32, opacity also
-means that an implementation is free to change the definition, which should
-generally only require that applications be recompiled and relinked, not
-rewritten.]
+Opacity also means that an implementation is free to change the definition,
+which should generally only require that applications be recompiled and relinked,
+not rewritten.
 
 
 Doesn't the compiler take care of padding?
@@ -459,9 +455,9 @@ How can we force the behaviour we need?
 Solutions
 
 Adding new functions to the standard API or as non-portable extentions is
-the only reliable and portable way to provide the necessary operations.
-Remember also that POSIX is not tied to the C language. The most common
-functions that have been suggested are:
+the only reliable to provide the necessary operations. Remember also that
+POSIX is not tied to the C language. The most common functions that have
+been suggested are:
 
 pthread_null()
 pthread_compare()
@@ -497,7 +493,7 @@ within the pthread_t that don't uniquely identify the thread, including padding,
 such that client code can return consistent results from operations done on the
 result. If the additional bits are a pointer to an associate structure then
 this function would ensure that the memory used to store that associate
-structure does not leak. After normalization the following compare would be
+structure does not leak. With normalization the following compare would be
 valid and repeatable:
 
 memcmp(pthread_normalize(&t1),pthread_normalize(&t2),sizeof(pthread_t))
