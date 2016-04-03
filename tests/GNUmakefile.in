@@ -68,11 +68,11 @@ RANLIB  = $(CROSS)@RANLIB@
 # Mingw
 #
 XLIBS	=
-XXCFLAGS= 
+XXCFLAGS=
 XXLIBS	=
 OPT	= -O3
 DOPT	= -g -O0
-CFLAGS	= ${OPT} $(ARCH) -UNDEBUG -Wall $(XXCFLAGS)
+CFLAGS	= ${OPT} $(ARCH) -UNDEBUG -Wall -Wno-missing-braces $(XXCFLAGS)
 LFLAGS	= $(ARCH) $(XXLFLAGS)
 #
 # Uncomment this next to link the GCC/C++ runtime libraries statically
@@ -87,6 +87,7 @@ LFLAGS	= $(ARCH) $(XXLFLAGS)
 # above to "2slgcc" for example, to build "pthreadGC2slgcc.dll", etc.
 #
 #LFLAGS	+= -static-libgcc -static-libstdc++
+
 BUILD_DIR	= ..
 INCLUDES	= -I ${top_srcdir}
 

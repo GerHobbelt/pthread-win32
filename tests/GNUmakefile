@@ -68,7 +68,7 @@ XXCFLAGS	=
 XXLIBS	=
 OPT	= -O3
 DOPT	= -g -O0
-CFLAGS	= ${OPT} $(ARCH) -UNDEBUG -Wall $(XXCFLAGS)
+CFLAGS	= ${OPT} $(ARCH) -UNDEBUG -Wall -Wno-missing-braces $(XXCFLAGS)
 LFLAGS	= $(ARCH) $(XXLFLAGS)
 #
 # Uncomment this next to link the GCC/C++ runtime libraries statically

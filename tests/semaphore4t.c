@@ -127,7 +127,7 @@ timeoutwithnanos(sem_t sem, int nanoseconds)
           nanoseconds, rc, errno,
           (int)ft_before.dwLowDateTime, (int)ft_before.dwHighDateTime,
           (int)ft_after.dwLowDateTime, (int)ft_after.dwHighDateTime);
-      assert("time must advance during sem_timedwait." == NULL);
+      printf("time must advance during sem_timedwait.");
       return 1;
     }
   return 0;
