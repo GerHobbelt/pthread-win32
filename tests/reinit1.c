@@ -59,7 +59,7 @@ void *thread_routine (void *arg)
 
   self->changed = 0;
 
-  assert(pthread_getunique_np(self->thread_id) == (self->thread_num + 2));
+  assert(pthread_getunique_np(self->thread_id) == (unsigned __int64)(self->thread_num + 2));
 
   for (iteration = 0; iteration < ITERATIONS; iteration++)
     {
