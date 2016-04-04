@@ -711,26 +711,14 @@ __PTW32_BEGIN_C_DECLS
   void ptw32_filetime_to_timespec (const FILETIME * ft, struct timespec *ts);
 #endif
 
-/* Declared in misc.c */
+/* Declared in pthw32_calloc.c */
 #if defined(NEED_CALLOC)
 #define calloc(n, s) ptw32_calloc(n, s)
   void *ptw32_calloc (size_t n, size_t s);
 #endif
 
-/* Declared in private.c */
-#if defined(_MSC_VER)
-/*
- * Ignore the warning:
- * "C++ exception specification ignored except to indicate that
- * the function is not __declspec(nothrow)."
- */
-#pragma warning(disable:4290)
-#endif
-  void ptw32_throw (DWORD exception)
-#if defined(__CLEANUP_CXX)
-    throw(ptw32_exception_cancel,ptw32_exception_exit)
-#endif
-;
+/* Declared in ptw32_throw.c */
+void ptw32_throw (DWORD exception);
 
 __PTW32_END_C_DECLS
 
