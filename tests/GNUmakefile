@@ -29,6 +29,8 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
+LOGFILE = testsuite.log
+
 DLL_VER	= 2$(EXTRAVERSION)
 
 CP			= cp -f
@@ -36,6 +38,9 @@ MV			= mv -f
 RM			= rm -f
 CAT			= cat
 MKDIR		= mkdir
+GREP		= grep
+WC			= wc
+TEE			= tee
 ECHO		= echo
 TOUCH		= $(ECHO) Passed >
 TESTFILE	= test -f
@@ -189,24 +194,26 @@ all-asm: $(ASM)
 	@ $(ECHO) "ALL TESTS PASSED! Congratulations!"
 
 allpassed: $(HDR) $(LIB) $(DLL) $(QAPC) $(TESTS:%=%.pass)
-	@ $(ECHO) "ALL TESTS PASSED! Congratulations!"
+	@ $(ECHO) "ALL TESTS COMPLETED. Check the logfile: $(LOGFILE)"
+	@ $(ECHO) "FAILURES: $$( $(GREP) FAILED $(LOGFILE) | $(WC) -l )"
+	@ ! $(GREP) FAILED $(LOGFILE)
 
 all-bench: $(HDR) $(LIB) $(DLL) $(QAPC) $(XXLIBS) $(BENCHRESULTS)
-	@ $(ECHO) "ALL BENCH TESTS COMPLETED."
+	@ $(ECHO) "ALL BENCH TESTS COMPLETED. Check the logfile: $(LOGFILE)"
+	@ $(ECHO) "FAILURES: $$( $(GREP) FAILED $(LOGFILE) | $(WC) -l ) "
+	@ ! $(GREP) FAILED $(LOGFILE)
 
 cancel9.exe: XLIBS = -lws2_32
 
 %.pass: %.exe
-	@ $(ECHO) Running $(TEST) test \"$*\"
-	@ $(RUN) ./$*
-	@ $(ECHO) Passed
-	@ $(TOUCH) $@
+	@ $(ECHO) Running $(TEST) test \"$*\" | $(TEE) -a $(LOGFILE)
+	@ $(RUN) ./$* && { $(ECHO) Passed; $(TOUCH) $@; } || { $(ECHO) FAILED: $* ; $(ECHO) ; } \
+	  2>&1 | $(TEE) -a $(LOGFILE)
 
 %.bench: %.exe
-	@ $(ECHO) Running $(TEST) test \"$*\"
-	@ $(RUN) ./$*
-	@ $(ECHO) Done
-	@ $(TOUCH) $@
+	@ $(ECHO) Running $(TEST) test \"$*\" | $(TEE) -a $(LOGFILE)
+	@ $(RUN) ./$* && { $(ECHO) Done; $(TOUCH) $@; } || { $(ECHO) FAILED ; $(ECHO) ; } \
+	  2>&1 | $(TEE) -a $(LOGFILE)
 
 %.exe: %.c
 	$(CC) $(CFLAGS) $(LFLAGS) -o $@ $< $(INCLUDES) -L. -lpthread$(GCX) $(XLIBS) $(XXLIBS)
