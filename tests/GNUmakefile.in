@@ -45,6 +45,7 @@ RM		= rm -f
 CAT		= cat
 GREP	= grep
 WC		= wc
+TEE		= tee
 MKDIR		= mkdir
 ECHO		= echo
 TOUCH		= $(ECHO) Passed >
