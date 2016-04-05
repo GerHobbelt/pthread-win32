@@ -56,7 +56,7 @@
 /*
  * Some non-thread POSIX API substitutes
  */
-#if !defined(__MING64_VERSION_MAJOR)
+#if !defined(__MINGW64_VERSION_MAJOR)
 #  define rand_r( _seed ) \
         ( _seed == _seed? rand() : rand() )
 #endif
