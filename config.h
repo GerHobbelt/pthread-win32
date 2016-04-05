@@ -10,9 +10,6 @@
 /* We're building the pthreads-win32 library */
 #define PTW32_BUILD
 
-/* MinGW: Have strcpy_s etc */
-#define MINGW_HAS_SECURE_API
-
 /* CPU affinity */
 #define HAVE_CPU_AFFINITY
 
