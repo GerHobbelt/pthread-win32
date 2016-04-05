@@ -162,7 +162,7 @@
 #  include "need_errno.h"
 #endif
 
-#if defined(__BORLANDC__)
+#if defined(__MINGW64_VERSION_MAJOR) || defined(__BORLANDC__)
 #  define int64_t LONGLONG
 #  define uint64_t ULONGLONG
 #elif !defined(__MINGW32__)

@@ -56,8 +56,10 @@
 /*
  * Some non-thread POSIX API substitutes
  */
-#define rand_r( _seed ) \
+#if !defined(__MING64_VERSION_MAJOR)
+#  define rand_r( _seed ) \
         ( _seed == _seed? rand() : rand() )
+#endif
 
 #if defined(__MINGW32__)
 # include <stdint.h>
