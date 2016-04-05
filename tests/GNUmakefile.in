@@ -43,6 +43,8 @@ CP		= cp -f
 MV		= mv -f
 RM		= rm -f
 CAT		= cat
+GREP	= grep
+WC		= wc
 MKDIR		= mkdir
 ECHO		= echo
 TOUCH		= $(ECHO) Passed >
@@ -195,11 +197,13 @@ all-asm: $(ASM)
 
 allpassed: $(HDR) $(LIB) $(DLL) $(QAPC) $(TESTS:%=%.pass)
 	@ $(ECHO) "ALL TESTS COMPLETED. Check the logfile: $(LOGFILE)"
-	@ $(ECHO) "FAILURES: $$( grep FAILED $(LOGFILE) | wc -l ) " ; grep FAILED $(LOGFILE)
+	@ $(ECHO) "FAILURES: $$( $(GREP) FAILED $(LOGFILE) | $(WC) -l ) "
+	@ ! $(GREP) FAILED $(LOGFILE)
 
 all-bench: $(HDR) $(LIB) $(DLL) $(QAPC) $(XXLIBS) $(BENCHRESULTS)
 	@ $(ECHO) "ALL BENCH TESTS COMPLETED. Check the logfile: $(LOGFILE)"
-	@ $(ECHO) "FAILURES: $$( grep FAILED $(LOGFILE) | wc -l ) " ; grep FAILED $(LOGFILE)
+	@ $(ECHO) "FAILURES: $$( $(GREP) FAILED $(LOGFILE) | $(WC) -l ) "
+	@ ! $(GREP) FAILED $(LOGFILE)
 
 cancel9.exe: XLIBS = -lws2_32
 
