@@ -236,6 +236,7 @@ benchlib.o: benchlib.c
 clean:
 	- $(RM) *.dll
 	- $(RM) *.lib
+	- $(RM) _ptw32.h
 	- $(RM) pthread.h
 	- $(RM) semaphore.h
 	- $(RM) sched.h
