@@ -488,15 +488,29 @@ enum
  * ====================
  * ====================
  */
-#define PTHREAD_ONCE_INIT       { PTW32_FALSE, 0, 0, 0}
+#if PTW32_VERSION_MAJOR > 2
+
+#define PTHREAD_ONCE_INIT       { PTW32_FALSE, 0 }
 
 struct pthread_once_t_
 {
-  int          done;        /* indicates if user function has been executed */
-  void *       lock;
+  void *       lock;		/* MCS lock */
+  int          done;    	/* indicates if user function has been executed */
+};
+
+#else
+
+#define PTHREAD_ONCE_INIT       { PTW32_FALSE, 0, 0, 0 }
+
+struct pthread_once_t_
+{
+  int          done;       	/* indicates if user function has been executed */
+  void *       lock;		/* MCS lock */
   int          reserved1;
   int          reserved2;
 };
+
+#endif
 
 
 /*
