@@ -50,7 +50,7 @@ QueueUserAPCEx by Panagiotis E. Hadjidoukas
 	are runnable. The simulated async cancellation cannot cancel blocked
 	threads.
 
-        [FOR SECURITY] To be found Quserex.dll MUST be installed in the
+    [FOR SECURITY] To be found Quserex.dll MUST be installed in the
 	Windows System Folder. This is not an unreasonable constraint given a
 	driver must also be installed and loaded at system startup.
 
@@ -203,7 +203,7 @@ of the library that use exceptions as part of the thread
 cancellation and exit implementation. The default version uses
 setjmp/longjmp.
 
-If you use either pthreadVCE or pthreadGCE:
+If you use either pthreadVCE[2] or pthreadGCE[2]:
 
 1. [See also the discussion in the FAQ file - Q2, Q4, and Q5]
 
@@ -224,6 +224,13 @@ threads then you will need to replace the "catch(...)" with the macro
 Otherwise neither pthreads cancellation nor pthread_exit() will work
 reliably when using versions of the library that use C++ exceptions
 for cancellation and thread exit.
+
+NB: [lib]pthreadGCE[2] does not support asynchronous cancellation. Any
+attempt to cancel a thread set for asynchronous cancellation using
+this version of the library will cause the applicaton to terminate.
+We believe this is due to the "unmanaged" context switch that is
+disrupting the stack unwinding mechanism and which is used
+to cancel blocked threads. See pthread_cancel.c
 
 
 Other name changes
