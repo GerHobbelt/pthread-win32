@@ -48,7 +48,7 @@
 
 	* ptw32_timespec.c: Fix C90 warnings from GCC; int64_t -> uint64_t
 
-2016-02-18	Carey Gister <>
+2016-02-18	Carey Gister <careygister at outlook dot com>
 
 	* dll.c (DllMain): Should not be defined for static library builds.
 	Doing so prevents static linking with a dll library.
