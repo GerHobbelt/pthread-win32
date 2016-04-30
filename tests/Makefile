@@ -205,6 +205,7 @@ VCX-static-debug VCX-small-static-debug:
 clean:
 	if exist *.dll $(RM) *.dll
 	if exist *.lib $(RM) *.lib
+	if exist _ptw32.h $(RM) _ptw32.h
 	if exist pthread.h $(RM) pthread.h
 	if exist semaphore.h $(RM) semaphore.h
 	if exist sched.h $(RM) sched.h

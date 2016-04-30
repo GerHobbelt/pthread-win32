@@ -1,3 +1,12 @@
+2016-04-30  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* semaphore4t.c: No longer need to include ptw32_timespec.c and the
+	defines that tried to make it work (but failed). There is now an
+	exported routine that this test uses that can also be used by
+	applications. It's a general routine that keeps all the platform
+	conditional stuff inside the library.
+	* Makefile: Remove _ptw32.h copied from parent directory.
+
 2016-03-31  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* Makefile (_ptw32.h): Copy header to tests directory required to
