@@ -145,6 +145,9 @@ not been the case with recent releases. Binary compatibility and
 consequently library file naming has not changed over this time either
 so it should not cause any problems.
 
+NOTE: Changes to the platform ABI can cause the library ABI to change
+and the current version numbering system does not account for this.
+
 The fourth is commonly used for the build number, but will be reserved
 for future use.
 
@@ -332,16 +335,23 @@ MinGW64 multilib disabled
 Building with MS Visual Studio (C, VC++ using C++ EH, or Structured EH)
 -----------------------------------------------------------------------
 
+NOTE: A VS project/solution/whatever file is included as a contributed
+work and is not used of maintained in development. All building and
+testing is done using makefiles. We use the native make system for each
+toolchain, which is 'nmake' in this case.
+
 From the source directory run nmake without any arguments to list
 help information. E.g.
 
 $ nmake
 
 As examples, as at Release 2.10 the pre-built DLLs and static libraries
-are built from the following command-lines:
+can be built using one of the following command-lines:
 
-[Note: "setenv" comes with the SDK. "/2003" is used to override my build
-system which is Win7 (at the time of writing) for backwards compatibility.]
+[Note: "setenv" comes with the SDK which is not required to build the library.
+I use it to build and test both 64 and 32 bit versions of the library.
+"/2003" is used to override my build system which is Win7 (at the time of
+writing) for backwards compatibility.]
 
 $ setenv /x64 /2003 /Release
 $ nmake realclean VC
@@ -358,7 +368,7 @@ $ nmake realclean VC-static
 $ nmake realclean VCE-static
 $ nmake realclean VSE-static
 
-If you want to differentiate between libraries by their names you can use,
+If you want to differentiate or customise library naming you can use,
 e.g.:
 
 $ nmake realclean VC EXTRAVERSION="-w64"
@@ -372,11 +382,6 @@ pthreadVC2-w64.lib
 To build and test all DLLs and static lib compatibility versions
 (VC, VCE, VSE):
 
-[Note that the EXTRAVERSION="..." option is passed to the tests Makefile
-when you target "all-tests". If you change to the tests directory and
-run the tests you will need to repeat the option explicitly to the test
-"nmake" command-line.]
-
 $ setenv /x64 /2003 /release
 $ nmake all-tests
 
@@ -385,6 +390,11 @@ running nmake. E.g.:
 
 $ cd tests
 $ nmake VC
+
+Note: the EXTRAVERSION="..." option is passed to the tests Makefile
+when you target "all-tests". If you build the library then change to the
+tests directory to run the tests you will need to repeat the option
+explicitly to the test "nmake" command-line.
 
 For failure analysis etc. individual tests can be built
 and run, e.g:
@@ -395,8 +405,7 @@ $ nmake VC TESTS="foo bar"
 This builds and runs all prerequisite tests as well as the individual
 tests listed. Prerequisite tests are defined in tests\runorder.mk.
 
-To build and run only those tests listed use, i.e. without the
-additional prerequistite dependency tests:
+To build and run only the tests listed use:
 
 $ cd tests
 $ nmake VC NO_DEPS=1 TESTS="foo bar"
@@ -404,6 +413,9 @@ $ nmake VC NO_DEPS=1 TESTS="foo bar"
 
 Building with MinGW
 -------------------
+
+NOTE: All building and testing is done using makefiles. We use the native
+make system for each toolchain, which is 'make' in this case.
 
 We have found that Mingw32 builds of the GCE library variants fail when run
 on 64 bit systems. The GC variants are fine.
@@ -454,16 +466,16 @@ or, with MinGW64 (multilib enabled):
 $ make all-tests ARCH=-m64
 $ make all-tests ARCH=-m32
 
-Note that the ARCH="..." and/or EXTRAVERSION="..." options are passed to the
-tests GNUmakefile when you target "all-tests". If you change to the tests
-directory and run the tests you will need to repeat those options explicitly
-to the test "make" command-line.
-
 You can run the testsuite by changing to the "tests" directory and
 running make. E.g.:
 
 $ cd tests
 $ make GC
+
+Note that the ARCH="..." and/or EXTRAVERSION="..." options are passed to the
+tests GNUmakefile when you target "all-tests". If you change to the tests
+directory and run the tests you will need to repeat those options explicitly
+to the test "make" command-line.
 
 For failure analysis etc. individual tests can be built and run, e.g:
 
@@ -473,8 +485,7 @@ $ make GC TESTS="foo bar"
 This builds and runs all prerequisite tests as well as the individual
 tests listed. Prerequisite tests are defined in tests\runorder.mk.
 
-To build and run only those tests listed use, i.e. without the additional
-prerequistite dependency tests:
+To build and run only those tests listed use:
 
 $ cd tests
 $ make GC NO_DEPS=1 TESTS="foo bar"
@@ -518,45 +529,27 @@ Building the library under Cygwin
 Cygwin implements it's own POSIX threads routines and these
 will be the ones to use if you develop using Cygwin.
 
+Building applications
+---------------------
 
-Building applications with GNU compilers
-----------------------------------------
+The files you will need for your application build are:
 
-If you're using pthreadGC2.dll:
+The four header files:
+	_ptw32.h
+	pthread.h
+	semaphore.h
+	sched.h
 
-With the four header files, _ptw32.h, pthreadGC2.dll and libpthreadGC2.a
-in the same directory as your application myapp.c, you could compile, link
-and run myapp.c under MinGW as follows:
+The DLL library files that you built:
+	pthread*.dll
+	plus the matching *.lib (MSVS) or *.a file (GNU)
 
-	gcc -o myapp.exe myapp.c -I. -L. -lpthreadGC2
-	myapp
+or, the static link library that you built:
+	pthread*.lib (MSVS) or libpthread*.a (GNU)
 
-Or put pthreadGC2.dll in an appropriate directory in your PATH,
-put libpthreadGC2.a in your system lib directory, and
-put the four header files in your system include directory,
-then use:
-
-	gcc -o myapp.exe myapp.c -lpthreadGC
-	myapp
-
-
-If you're using pthreadGCE2.dll:
-
-With the four header files, pthreadGCE2.dll and libpthreadGCE2.a
-in the same directory as your application myapp.c, you could compile,
-link and run myapp.c under Mingw32 as follows:
-
-	gcc -x c++ -o myapp.exe myapp.c -I. -L. -lpthreadGCE2
-	myapp
-
-Or put pthreadGCE.dll and gcc.dll in an appropriate directory in
-your PATH, put libpthreadGCE.a in your system lib directory, and
-put the four header files in your system include directory,
-then use:
-
-	gcc -x c++ -o myapp.exe myapp.c -lpthreadGCE
-	myapp
-
+Place them in the appropriate directories for your build, which may be the
+standard compiler locations or, locations specific to your project (you
+might have a separate third-party dependency tree for example).
 
 Acknowledgements
 ----------------
