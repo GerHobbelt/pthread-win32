@@ -1,6 +1,6 @@
 RELEASE 2.10.0
 --------------
-(2016-04-01)
+(2016-09-18)
 
 General
 -------
@@ -70,8 +70,9 @@ configurations of both dll and static libs.
 
 GNU compiler builds are now explicitly using ISO C and C++ 2011 standards
 compatibility. If your GNU compiler doesn't support this please consider
-updating. Auto configuration is now possible via a 'configure' script. The
-script must be generated using autoconf.
+updating. Auto configuration is now possible via 'configure' script. The
+script must be generated using autoconf - see the README file. Thanks to
+Keith Marshall from the MinGW project.
 
 Static linking:
 The autostatic functionality has been moved to dll.c, and extended so

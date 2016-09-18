@@ -1,4 +1,4 @@
-PTHREADS4W RELEASE 2.10.0 (????-??-??)
+PTHREADS4W RELEASE 2.10.0 (2016-09-18)
 --------------------------------------
 Web Site:	http://sourceforge.net/projects/pthreads4w/
 			http://sourceware.org/pthreads-win32/
@@ -28,7 +28,10 @@ is the one to use. The Sourceware CVS repository is synchronised much less often
 and may be abandoned altogether.
 
 Release 2.9.1 was probably the last to provide pre-built libraries. The supported
-compilers are now all available free for personal use.  
+compilers are now all available free for personal use. The MSVS version should
+build out of the box using nmake. The GCC versions now make use of GNU autoconf
+to generate a configure script which in turn creates a custom config.h for the
+environment you use: MinGW or MinGW64, etc.
 
 
 Acknowledgements
