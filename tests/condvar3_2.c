@@ -120,6 +120,8 @@ mythread(void * arg)
   return arg;
 }
 
+/* Cheating here - sneaking a peek at library internals */
+#include "../config.h"
 #include "../implement.h"
 
 int

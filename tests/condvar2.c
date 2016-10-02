@@ -82,6 +82,8 @@
 pthread_cond_t cv;
 pthread_mutex_t mutex;
 
+/* Cheating here - sneaking a peek at library internals */
+#include "../config.h"
 #include "../implement.h"
 
 int
