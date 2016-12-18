@@ -171,7 +171,7 @@
 #  if defined(PTW32_CONFIG_MSVC6)
      typedef long intptr_t;
 #  endif
-#else
+#elif defined(HAVE_STDINT_H) && HAVE_STDINT_H == 1
 #  include <stdint.h>
 #endif
 

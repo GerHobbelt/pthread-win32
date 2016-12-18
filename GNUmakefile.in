@@ -59,6 +59,7 @@ DEST_LIB_NAME = libpthread
 RM	= rm -f
 MV	= mv -f
 CP	= cp -f
+GREP	= grep
 MKDIR	= mkdir -p
 ECHO	= echo
 TESTNDIR = test ! -d
@@ -235,6 +236,7 @@ all-tests:
 	cd tests && $(MAKE) clean GC-static $(TEST_ENV) && $(MAKE) clean GCX-static $(TEST_ENV)
 	$(MAKE) realclean GCE-static
 	cd tests && $(MAKE) clean GCE-static $(TEST_ENV)
+	@ - cd tests && $(GREP) FAILED *.log
 	$(MAKE) realclean
 
 all-tests-cflags:
@@ -374,7 +376,7 @@ realclean: clean
 	-$(RM) pthread*.dll
 	-$(RM) *_stamp
 	-$(RM) make.log.txt
-	-cd tests && $(MAKE) clean
+	-cd tests && $(MAKE) realclean
 
 var_check_list =
 

@@ -262,5 +262,6 @@ clean:
 	- $(RM) *.manifest
 	- $(RM) *.pass
 	- $(RM) *.bench
-#	- $(RM) *.log
-	
+
+realclean: clean
+	- $(RM) *.log

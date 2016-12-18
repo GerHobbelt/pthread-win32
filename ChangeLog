@@ -3,6 +3,7 @@
 	* implement.h (PTW32_TEST_SNEAK_PEEK): Defined in tests/test.h
 	to control what some tests see when sneaking a peek inside this
 	header.
+	* GNUMakefile.in: call tests "make realclean"
 
 2016-12-17  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
