@@ -1,3 +1,9 @@
+2016-124-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* test.c (PTW32_TEST_SNEAK_PEEK): #define this to prevent some
+	tests from failing (specifically "make GCX-small-static") with
+	undefined ptw32_autostatic_anchor. Checked in ../implament.h.
+
 2016-04-30  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* semaphore4t.c: No longer need to include ptw32_timespec.c and the
