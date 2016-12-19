@@ -65,6 +65,7 @@ ECHO	= echo
 TESTNDIR = test ! -d
 TESTFILE = test -f
 AND	= &&
+COUNT_UNIQ = uniq -c
 
 # If not.
 #RM	= erase
@@ -140,7 +141,7 @@ LFLAGS	= $(ARCH)
 # non-compliant, but applications that make assumptions that POSIX
 # does not garrantee may fail or misbehave under some settings.
 #
-# PTW32_THREAD_ID_REUSE_INCREMENT
+# __PTW32_THREAD_ID_REUSE_INCREMENT
 # Purpose:
 # POSIX says that applications should assume that thread IDs can be
 # recycled. However, Solaris and some other systems use a [very large]
@@ -220,7 +221,7 @@ all:
 	@ $(MAKE) clean GC-static
 	@ $(MAKE) clean GCE-static
 
-TEST_ENV = PTW32_FLAGS="$(PTW32_FLAGS) -DNO_ERROR_DIALOGS" DLL_VER=$(DLL_VER) ARCH="$(ARCH)"
+TEST_ENV = __PTW32_FLAGS="$(PTW32_FLAGS) -DNO_ERROR_DIALOGS" DLL_VER=$(DLL_VER) ARCH="$(ARCH)"
 
 all-tests:
 	$(MAKE) realclean GC-small-static
@@ -236,11 +237,11 @@ all-tests:
 	cd tests && $(MAKE) clean GC-static $(TEST_ENV) && $(MAKE) clean GCX-static $(TEST_ENV)
 	$(MAKE) realclean GCE-static
 	cd tests && $(MAKE) clean GCE-static $(TEST_ENV)
-	@ - $(GREP) FAILED *.log
-	$(MAKE) realclean
+	@ $(GREP) FAILED *.log || $(GREP) Passed *.log | $(COUNT_UNIQ)
+	$(MAKE) clean
 
 all-tests-cflags:
-	$(MAKE) all-tests PTW32_FLAGS="-Wall -Wextra"
+	$(MAKE) all-tests __PTW32_FLAGS="-Wall -Wextra"
 	@ $(ECHO) "$@ completed."
 
 GC:
@@ -376,6 +377,7 @@ realclean: clean
 	-$(RM) pthread*.dll
 	-$(RM) *_stamp
 	-$(RM) make.log.txt
+	-$(RM) *.log
 	-cd tests && $(MAKE) realclean
 
 var_check_list =
