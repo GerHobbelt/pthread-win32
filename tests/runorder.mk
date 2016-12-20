@@ -126,7 +126,9 @@ rwlock4.pass: rwlock3.pass
 rwlock5.pass: rwlock4.pass
 rwlock6.pass: rwlock5.pass
 rwlock7.pass: rwlock6.pass
+rwlock7_1.pass: rwlock7.pass
 rwlock8.pass: rwlock7.pass
+rwlock8_1.pass: rwlock8.pass
 rwlock2_t.pass: rwlock2.pass
 rwlock3_t.pass: rwlock2_t.pass
 rwlock4_t.pass: rwlock3_t.pass
