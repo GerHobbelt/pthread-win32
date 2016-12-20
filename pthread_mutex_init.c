@@ -107,14 +107,14 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
                */
               mx->kind = -mx->kind - 1;
 
-              mx->robustNode = (ptw32_robust_node_t*) malloc(sizeof(ptw32_robust_node_t));
+              mx->robustNode = (__ptw32_robust_node_t*) malloc(sizeof(__ptw32_robust_node_t));
               if (NULL == mx->robustNode)
         	{
         	  result = ENOMEM;
         	}
               else
         	{
-        	  mx->robustNode->stateInconsistent = PTW32_ROBUST_CONSISTENT;
+        	  mx->robustNode->stateInconsistent =  __PTW32_ROBUST_CONSISTENT;
         	  mx->robustNode->mx = mx;
         	  mx->robustNode->next = NULL;
         	  mx->robustNode->prev = NULL;
@@ -126,8 +126,8 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
 	{
 	  mx->ownerThread.p = NULL;
 
-	  mx->event = CreateEvent (NULL, PTW32_FALSE,    /* manual reset = No */
-				   PTW32_FALSE,           /* initial state = not signalled */
+	  mx->event = CreateEvent (NULL,  __PTW32_FALSE,    /* manual reset = No */
+				    __PTW32_FALSE,           /* initial state = not signalled */
 				   NULL);                 /* event name */
 
 	  if (0 == mx->event)

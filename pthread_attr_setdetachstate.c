@@ -80,7 +80,7 @@ pthread_attr_setdetachstate (pthread_attr_t * attr, int detachstate)
       * ------------------------------------------------------
       */
 {
-  if (ptw32_is_attr (attr) != 0)
+  if (__ptw32_is_attr (attr) != 0)
     {
       return EINVAL;
     }

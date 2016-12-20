@@ -72,7 +72,7 @@ main()
   if (result != 0)
 	{
 	  int err =
-#if defined(PTW32_USES_SEPARATE_CRT)
+#if defined (__PTW32_USES_SEPARATE_CRT)
 	  GetLastError();
 #else
       errno;

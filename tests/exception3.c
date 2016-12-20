@@ -152,7 +152,7 @@ exceptionedThread(void * arg)
 {
   int dummy = 0x1;
 
-#if defined(PTW32_USES_SEPARATE_CRT) && (defined(__CLEANUP_CXX) || defined(__CLEANUP_SEH))
+#if defined (__PTW32_USES_SEPARATE_CRT) && (defined(__PTW32_CLEANUP_CXX) || defined(__PTW32_CLEANUP_SEH))
   printf("PTW32_USES_SEPARATE_CRT is defined\n");
   pthread_win32_set_terminate_np(&terminateFunction);
   set_terminate(&wrongTerminateFunction);

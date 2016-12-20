@@ -131,8 +131,8 @@ pthread_cond_destroy (pthread_cond_t * cond)
 
   if (*cond != PTHREAD_COND_INITIALIZER)
     {
-      ptw32_mcs_local_node_t node;
-      ptw32_mcs_lock_acquire(&ptw32_cond_list_lock, &node);
+      __ptw32_mcs_local_node_t node;
+      __ptw32_mcs_lock_acquire(&__ptw32_cond_list_lock, &node);
 
       cv = *cond;
 
@@ -141,9 +141,9 @@ pthread_cond_destroy (pthread_cond_t * cond)
        * all already signaled waiters to let them retract their
        * waiter status - SEE NOTE 1 ABOVE!!!
        */
-      if (ptw32_semwait (&(cv->semBlockLock)) != 0) /* Non-cancelable */
+      if (__ptw32_semwait (&(cv->semBlockLock)) != 0) /* Non-cancelable */
 	{
-	  result = PTW32_GET_ERRNO();
+	  result =  __PTW32_GET_ERRNO();
 	}
       else
         {
@@ -160,7 +160,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
 	
       if (result != 0)
         {
-          ptw32_mcs_lock_release(&node);
+          __ptw32_mcs_lock_release(&node);
           return result;
         }
 
@@ -171,7 +171,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
 	{
 	  if (sem_post (&(cv->semBlockLock)) != 0)
 	    {
-	      result = PTW32_GET_ERRNO();
+	      result =  __PTW32_GET_ERRNO();
 	    }
 	  result1 = pthread_mutex_unlock (&(cv->mtxUnblockLock));
 	  result2 = EBUSY;
@@ -185,11 +185,11 @@ pthread_cond_destroy (pthread_cond_t * cond)
 
 	  if (sem_destroy (&(cv->semBlockLock)) != 0)
 	    {
-	      result = PTW32_GET_ERRNO();
+	      result =  __PTW32_GET_ERRNO();
 	    }
 	  if (sem_destroy (&(cv->semBlockQueue)) != 0)
 	    {
-	      result1 = PTW32_GET_ERRNO();
+	      result1 =  __PTW32_GET_ERRNO();
 	    }
 	  if ((result2 = pthread_mutex_unlock (&(cv->mtxUnblockLock))) == 0)
 	    {
@@ -198,18 +198,18 @@ pthread_cond_destroy (pthread_cond_t * cond)
 
 	  /* Unlink the CV from the list */
 
-	  if (ptw32_cond_list_head == cv)
+	  if (__ptw32_cond_list_head == cv)
 	    {
-	      ptw32_cond_list_head = cv->next;
+	      __ptw32_cond_list_head = cv->next;
 	    }
 	  else
 	    {
 	      cv->prev->next = cv->next;
 	    }
 
-	  if (ptw32_cond_list_tail == cv)
+	  if (__ptw32_cond_list_tail == cv)
 	    {
-	      ptw32_cond_list_tail = cv->prev;
+	      __ptw32_cond_list_tail = cv->prev;
 	    }
 	  else
 	    {
@@ -219,15 +219,15 @@ pthread_cond_destroy (pthread_cond_t * cond)
 	  (void) free (cv);
 	}
 
-      ptw32_mcs_lock_release(&node);
+      __ptw32_mcs_lock_release(&node);
     }
   else
     {
-      ptw32_mcs_local_node_t node;
+      __ptw32_mcs_local_node_t node;
       /*
-       * See notes in ptw32_cond_check_need_init() above also.
+       * See notes in __ptw32_cond_check_need_init() above also.
        */
-      ptw32_mcs_lock_acquire(&ptw32_cond_test_init_lock, &node);
+      __ptw32_mcs_lock_acquire(&__ptw32_cond_test_init_lock, &node);
 
       /*
        * Check again.
@@ -251,7 +251,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
 	  result = EBUSY;
 	}
 
-      ptw32_mcs_lock_release(&node);
+      __ptw32_mcs_lock_release(&node);
     }
 
   return ((result != 0) ? result : ((result1 != 0) ? result1 : result2));

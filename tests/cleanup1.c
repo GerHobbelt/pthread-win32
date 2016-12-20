@@ -101,7 +101,7 @@ typedef struct {
 static sharedInt_t pop_count;
 
 static void
-#ifdef __CLEANUP_C
+#ifdef __PTW32_CLEANUP_C
 __cdecl
 #endif
 increment_pop_count(void * arg)

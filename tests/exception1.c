@@ -123,8 +123,8 @@ exceptionedThread(void * arg)
      */
     throw dummy;
   }
-#if defined(PtW32CatchAll)
-  PtW32CatchAll
+#if defined(__PtW32CatchAll)
+  __PtW32CatchAll
 #else
   catch (...)
 #endif
@@ -174,8 +174,8 @@ canceledThread(void * arg)
     for (count = 0; count < 100; count++)
       Sleep(100);
   }
-#if defined(PtW32CatchAll)
-  PtW32CatchAll
+#if defined(__PtW32CatchAll)
+  __PtW32CatchAll
 #else
   catch (...)
 #endif

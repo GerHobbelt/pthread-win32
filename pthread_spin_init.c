@@ -55,7 +55,7 @@ pthread_spin_init (pthread_spinlock_t * lock, int pshared)
       return EINVAL;
     }
 
-  if (0 != ptw32_getprocessors (&cpus))
+  if (0 != __ptw32_getprocessors (&cpus))
     {
       cpus = 1;
     }
@@ -95,7 +95,7 @@ pthread_spin_init (pthread_spinlock_t * lock, int pshared)
   if (cpus > 1)
     {
       s->u.cpus = cpus;
-      s->interlock = PTW32_SPIN_UNLOCKED;
+      s->interlock =  __PTW32_SPIN_UNLOCKED;
     }
   else
     {
@@ -108,7 +108,7 @@ pthread_spin_init (pthread_spinlock_t * lock, int pshared)
 	  result = pthread_mutex_init (&(s->u.mutex), &ma);
 	  if (0 == result)
 	    {
-	      s->interlock = PTW32_SPIN_USE_MUTEX;
+	      s->interlock =  __PTW32_SPIN_USE_MUTEX;
 	    }
 	}
       (void) pthread_mutexattr_destroy (&ma);

@@ -57,14 +57,14 @@ typedef struct {
 } sem_timedwait_cleanup_args_t;
 
 
-static void PTW32_CDECL
-ptw32_sem_timedwait_cleanup (void * args)
+static void  __PTW32_CDECL
+__ptw32_sem_timedwait_cleanup (void * args)
 {
-  ptw32_mcs_local_node_t node;
+  __ptw32_mcs_local_node_t node;
   sem_timedwait_cleanup_args_t * a = (sem_timedwait_cleanup_args_t *)args;
   sem_t s = a->sem;
 
-  ptw32_mcs_lock_acquire(&s->lock, &node);
+  __ptw32_mcs_lock_acquire(&s->lock, &node);
   /*
    * We either timed out or were cancelled.
    * If someone has posted between then and now we try to take the semaphore.
@@ -94,7 +94,7 @@ ptw32_sem_timedwait_cleanup (void * args)
        */
 #endif
     }
-  ptw32_mcs_lock_release(&node);
+  __ptw32_mcs_lock_release(&node);
 }
 
 
@@ -138,7 +138,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
  * ------------------------------------------------------
  */
 {
-  ptw32_mcs_local_node_t node;
+  __ptw32_mcs_local_node_t node;
   DWORD milliseconds;
   int v;
   int result = 0;
@@ -155,12 +155,12 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
       /*
        * Calculate timeout as milliseconds from current system time.
        */
-      milliseconds = ptw32_relmillisecs (abstime);
+      milliseconds = __ptw32_relmillisecs (abstime);
     }
 
-  ptw32_mcs_lock_acquire(&s->lock, &node);
+  __ptw32_mcs_lock_acquire(&s->lock, &node);
   v = --s->value;
-  ptw32_mcs_lock_release(&node);
+  __ptw32_mcs_lock_release(&node);
 
   if (v < 0)
     {
@@ -172,17 +172,17 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
       cleanup_args.sem = s;
       cleanup_args.resultPtr = &result;
 
-#if defined(PTW32_CONFIG_MSVC7)
+#if defined (__PTW32_CONFIG_MSVC7)
 #pragma inline_depth(0)
 #endif
       /* Must wait */
-      pthread_cleanup_push(ptw32_sem_timedwait_cleanup, (void *) &cleanup_args);
+      pthread_cleanup_push(__ptw32_sem_timedwait_cleanup, (void *) &cleanup_args);
 #if defined(NEED_SEM)
       timedout =
 #endif
           result = pthreadCancelableTimedWait (s->sem, milliseconds);
       pthread_cleanup_pop(result);
-#if defined(PTW32_CONFIG_MSVC7)
+#if defined (__PTW32_CONFIG_MSVC7)
 #pragma inline_depth()
 #endif
 
@@ -190,13 +190,13 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 
       if (!timedout)
         {
-          ptw32_mcs_lock_acquire(&s->lock, &node);
+          __ptw32_mcs_lock_acquire(&s->lock, &node);
           if (s->leftToUnblock > 0)
             {
               --s->leftToUnblock;
               SetEvent(s->sem);
             }
-          ptw32_mcs_lock_release(&node);
+          __ptw32_mcs_lock_release(&node);
         }
 
 #endif /* NEED_SEM */
@@ -206,7 +206,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
   if (result != 0)
     {
 
-      PTW32_SET_ERRNO(result);
+       __PTW32_SET_ERRNO(result);
       return -1;
 
     }

@@ -103,8 +103,8 @@ pthread_timedjoin_np (pthread_t thread, void **value_ptr, const struct timespec 
   int result;
   pthread_t self;
   DWORD milliseconds;
-  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
-  ptw32_mcs_local_node_t node;
+  __ptw32_thread_t * tp = (__ptw32_thread_t *) thread.p;
+  __ptw32_mcs_local_node_t node;
 
   if (abstime == NULL)
     {
@@ -115,10 +115,10 @@ pthread_timedjoin_np (pthread_t thread, void **value_ptr, const struct timespec 
       /*
        * Calculate timeout as milliseconds from current system time.
        */
-      milliseconds = ptw32_relmillisecs (abstime);
+      milliseconds = __ptw32_relmillisecs (abstime);
     }
 
-  ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
+  __ptw32_mcs_lock_acquire(&__ptw32_thread_reuse_lock, &node);
 
   if (NULL == tp
       || thread.x != tp->ptHandle.x)
@@ -134,7 +134,7 @@ pthread_timedjoin_np (pthread_t thread, void **value_ptr, const struct timespec 
       result = 0;
     }
 
-  ptw32_mcs_lock_release(&node);
+  __ptw32_mcs_lock_release(&node);
 
   if (result == 0)
     {

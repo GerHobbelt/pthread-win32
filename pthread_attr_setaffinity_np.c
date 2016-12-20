@@ -46,7 +46,7 @@
 int
 pthread_attr_setaffinity_np (pthread_attr_t * attr, size_t cpusetsize, const cpu_set_t * cpuset)
 {
-  if (ptw32_is_attr (attr) != 0 || cpuset == NULL)
+  if (__ptw32_is_attr (attr) != 0 || cpuset == NULL)
     {
       return EINVAL;
     }

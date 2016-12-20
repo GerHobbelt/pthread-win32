@@ -73,17 +73,17 @@ SetThreadName( DWORD dwThreadID, char* threadName)
 }
 #endif
 
-#if defined(PTW32_COMPATIBILITY_BSD) || defined(PTW32_COMPATIBILITY_TRU64)
+#if defined (__PTW32_COMPATIBILITY_BSD) || defined (__PTW32_COMPATIBILITY_TRU64)
 int
 pthread_setname_np(pthread_t thr, const char *name, void *arg)
 {
-  ptw32_mcs_local_node_t threadLock;
+  __ptw32_mcs_local_node_t threadLock;
   int len;
   int result;
   char tmpbuf[PTHREAD_MAX_NAMELEN_NP];
   char * newname;
   char * oldname;
-  ptw32_thread_t * tp;
+  __ptw32_thread_t * tp;
 #if defined(_MSC_VER)
   DWORD Win32ThreadID;
 #endif
@@ -125,9 +125,9 @@ pthread_setname_np(pthread_t thr, const char *name, void *arg)
     }
 #endif
 
-  tp = (ptw32_thread_t *) thr.p;
+  tp = (__ptw32_thread_t *) thr.p;
 
-  ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
+  __ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
 
   oldname = tp->name;
   tp->name = newname;
@@ -136,7 +136,7 @@ pthread_setname_np(pthread_t thr, const char *name, void *arg)
       free(oldname);
     }
 
-  ptw32_mcs_lock_release (&threadLock);
+  __ptw32_mcs_lock_release (&threadLock);
 
   return 0;
 }
@@ -144,11 +144,11 @@ pthread_setname_np(pthread_t thr, const char *name, void *arg)
 int
 pthread_setname_np(pthread_t thr, const char *name)
 {
-  ptw32_mcs_local_node_t threadLock;
+  __ptw32_mcs_local_node_t threadLock;
   int result;
   char * newname;
   char * oldname;
-  ptw32_thread_t * tp;
+  __ptw32_thread_t * tp;
 #if defined(_MSC_VER)
   DWORD Win32ThreadID;
 #endif
@@ -175,9 +175,9 @@ pthread_setname_np(pthread_t thr, const char *name)
     }
 #endif
 
-  tp = (ptw32_thread_t *) thr.p;
+  tp = (__ptw32_thread_t *) thr.p;
 
-  ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
+  __ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
 
   oldname = tp->name;
   tp->name = newname;
@@ -186,7 +186,7 @@ pthread_setname_np(pthread_t thr, const char *name)
       free(oldname);
     }
 
-  ptw32_mcs_lock_release (&threadLock);
+  __ptw32_mcs_lock_release (&threadLock);
 
   return 0;
 }

@@ -45,10 +45,10 @@
 
 
 void
-ptw32_threadDestroy (pthread_t thread)
+__ptw32_threadDestroy (pthread_t thread)
 {
-  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
-  ptw32_thread_t threadCopy;
+  __ptw32_thread_t * tp = (__ptw32_thread_t *) thread.p;
+  __ptw32_thread_t threadCopy;
 
   if (tp != NULL)
     {
@@ -61,7 +61,7 @@ ptw32_threadDestroy (pthread_t thread)
        * Thread ID structs are never freed. They're NULLed and reused.
        * This also sets the thread to PThreadStateInitial (invalid).
        */
-      ptw32_threadReusePush (thread);
+      __ptw32_threadReusePush (thread);
 
       /* Now work on the copy. */
       if (threadCopy.cancelEvent != NULL)
@@ -80,5 +80,5 @@ ptw32_threadDestroy (pthread_t thread)
 #endif
 
     }
-}				/* ptw32_threadDestroy */
+}				/* __ptw32_threadDestroy */
 

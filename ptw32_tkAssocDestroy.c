@@ -45,7 +45,7 @@
 
 
 void
-ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
+__ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
      /*
       * -------------------------------------------------------------------
       * This routine releases all resources for the given ThreadKeyAssoc
@@ -116,4 +116,4 @@ ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc)
       free (assoc);
     }
 
-}				/* ptw32_tkAssocDestroy */
+}				/* __ptw32_tkAssocDestroy */

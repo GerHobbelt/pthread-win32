@@ -89,7 +89,7 @@ _errno (void)
     }
   else
     {
-      result = (int *)(&((ptw32_thread_t *)self.p)->exitStatus);
+      result = (int *)(&((__ptw32_thread_t *)self.p)->exitStatus);
     }
 
   return (result);
@@ -98,7 +98,7 @@ _errno (void)
 
 #endif /* (NEED_ERRNO) */
 
-#if ! defined(PTW32_BUILD_INLINED)
+#if ! defined (__PTW32_BUILD_INLINED)
 /*
  * Avoid "translation unit is empty" warnings
  */

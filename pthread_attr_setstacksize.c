@@ -97,7 +97,7 @@ pthread_attr_setstacksize (pthread_attr_t * attr, size_t stacksize)
 
 #endif
 
-  if (ptw32_is_attr (attr) != 0)
+  if (__ptw32_is_attr (attr) != 0)
     {
       return EINVAL;
     }

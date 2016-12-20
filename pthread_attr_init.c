@@ -118,7 +118,7 @@ pthread_attr_init (pthread_attr_t * attr)
   attr_result->cpuset = ((_sched_cpu_set_vector_*)&cpuset)->_cpuset;
   attr_result->thrname = NULL;
 
-  attr_result->valid = PTW32_ATTR_VALID;
+  attr_result->valid =  __PTW32_ATTR_VALID;
 
   *attr = attr_result;
 

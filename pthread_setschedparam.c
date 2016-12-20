@@ -72,17 +72,17 @@ pthread_setschedparam (pthread_t thread, int policy,
       return ENOTSUP;
     }
 
-  return (ptw32_setthreadpriority (thread, policy, param->sched_priority));
+  return (__ptw32_setthreadpriority (thread, policy, param->sched_priority));
 }
 
 
 int
-ptw32_setthreadpriority (pthread_t thread, int policy, int priority)
+__ptw32_setthreadpriority (pthread_t thread, int policy, int priority)
 {
   int prio;
-  ptw32_mcs_local_node_t threadLock;
+  __ptw32_mcs_local_node_t threadLock;
   int result = 0;
-  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
+  __ptw32_thread_t * tp = (__ptw32_thread_t *) thread.p;
 
   prio = priority;
 
@@ -110,7 +110,7 @@ ptw32_setthreadpriority (pthread_t thread, int policy, int priority)
 
 #endif
 
-  ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
+  __ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
 
   /* If this fails, the current priority is unchanged. */
   if (0 == SetThreadPriority (tp->threadH, prio))
@@ -126,7 +126,7 @@ ptw32_setthreadpriority (pthread_t thread, int policy, int priority)
       tp->sched_priority = priority;
     }
 
-  ptw32_mcs_lock_release (&threadLock);
+  __ptw32_mcs_lock_release (&threadLock);
 
   return result;
 }

@@ -87,31 +87,31 @@ __PTW32_BEGIN_C_DECLS
 /* Function prototypes: some are implemented as stubs, which
  * always fail; (FIXME: identify them).
  */
-PTW32_DLLPORT int PTW32_CDECL sem_init (sem_t * sem,
+__PTW32_DLLPORT int  __PTW32_CDECL sem_init (sem_t * sem,
 					int pshared,
 					unsigned int value);
 
-PTW32_DLLPORT int PTW32_CDECL sem_destroy (sem_t * sem);
+__PTW32_DLLPORT int  __PTW32_CDECL sem_destroy (sem_t * sem);
 
-PTW32_DLLPORT int PTW32_CDECL sem_trywait (sem_t * sem);
+__PTW32_DLLPORT int  __PTW32_CDECL sem_trywait (sem_t * sem);
 
-PTW32_DLLPORT int PTW32_CDECL sem_wait (sem_t * sem);
+__PTW32_DLLPORT int  __PTW32_CDECL sem_wait (sem_t * sem);
 
-PTW32_DLLPORT int PTW32_CDECL sem_timedwait (sem_t * sem,
+__PTW32_DLLPORT int  __PTW32_CDECL sem_timedwait (sem_t * sem,
 					     const struct timespec * abstime);
 
-PTW32_DLLPORT int PTW32_CDECL sem_post (sem_t * sem);
+__PTW32_DLLPORT int  __PTW32_CDECL sem_post (sem_t * sem);
 
-PTW32_DLLPORT int PTW32_CDECL sem_post_multiple (sem_t * sem,
+__PTW32_DLLPORT int  __PTW32_CDECL sem_post_multiple (sem_t * sem,
 						 int count);
 
-PTW32_DLLPORT sem_t * PTW32_CDECL sem_open (const char *, int, ...);
+__PTW32_DLLPORT sem_t *  __PTW32_CDECL sem_open (const char *, int, ...);
 
-PTW32_DLLPORT int PTW32_CDECL sem_close (sem_t * sem);
+__PTW32_DLLPORT int  __PTW32_CDECL sem_close (sem_t * sem);
 
-PTW32_DLLPORT int PTW32_CDECL sem_unlink (const char * name);
+__PTW32_DLLPORT int  __PTW32_CDECL sem_unlink (const char * name);
 
-PTW32_DLLPORT int PTW32_CDECL sem_getvalue (sem_t * sem,
+__PTW32_DLLPORT int  __PTW32_CDECL sem_getvalue (sem_t * sem,
 					    int * sval);
 
 __PTW32_END_C_DECLS

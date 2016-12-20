@@ -58,11 +58,11 @@ sched_getscheduler (pid_t pid)
       if (pid != selfPid)
 	{
 	  HANDLE h =
-	    OpenProcess (PROCESS_QUERY_INFORMATION, PTW32_FALSE, (DWORD) pid);
+	    OpenProcess (PROCESS_QUERY_INFORMATION,  __PTW32_FALSE, (DWORD) pid);
 
 	  if (NULL == h)
 	    {
-		  PTW32_SET_ERRNO(((0xFF & ERROR_ACCESS_DENIED) == GetLastError()) ? EPERM : ESRCH);
+		   __PTW32_SET_ERRNO(((0xFF & ERROR_ACCESS_DENIED) == GetLastError()) ? EPERM : ESRCH);
 	      return -1;
 	    }
 	  else

@@ -70,13 +70,13 @@ pthread_exit (void *value_ptr)
       * ------------------------------------------------------
       */
 {
-  ptw32_thread_t * sp;
+  __ptw32_thread_t * sp;
 
   /*
    * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
    * unnecessarily.
    */
-  sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
+  sp = (__ptw32_thread_t *) pthread_getspecific (__ptw32_selfThreadKey);
 
 #if defined(_UWIN)
   if (--pthread_count <= 0)
@@ -90,7 +90,7 @@ pthread_exit (void *value_ptr)
        * Win32 thread that has never called a pthreads-win32 routine that
        * required a POSIX handle.
        *
-       * Implicit POSIX handles are cleaned up in ptw32_throw() now.
+       * Implicit POSIX handles are cleaned up in __ptw32_throw() now.
        */
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__)  || defined (__DMC__)
@@ -104,7 +104,7 @@ pthread_exit (void *value_ptr)
 
   sp->exitStatus = value_ptr;
 
-  ptw32_throw (PTW32_EPS_EXIT);
+  __ptw32_throw  (__PTW32_EPS_EXIT);
 
   /* Never reached. */
 

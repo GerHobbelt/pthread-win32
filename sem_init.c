@@ -119,8 +119,8 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 #if defined(NEED_SEM)
 
           s->sem = CreateEvent (NULL,
-              PTW32_FALSE,	/* auto (not manual) reset */
-              PTW32_FALSE,	/* initial state is unset */
+               __PTW32_FALSE,	/* auto (not manual) reset */
+               __PTW32_FALSE,	/* initial state is unset */
               NULL);
 
           if (0 == s->sem)
@@ -153,7 +153,7 @@ sem_init (sem_t * sem, int pshared, unsigned int value)
 
   if (result != 0)
     {
-      PTW32_SET_ERRNO(result);
+       __PTW32_SET_ERRNO(result);
       return -1;
     }
 

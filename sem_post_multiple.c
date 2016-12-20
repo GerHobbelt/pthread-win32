@@ -81,12 +81,12 @@ sem_post_multiple (sem_t * sem, int count)
  * ------------------------------------------------------
  */
 {
-  ptw32_mcs_local_node_t node;
+  __ptw32_mcs_local_node_t node;
   int result = 0;
   long waiters;
   sem_t s = *sem;
 
-  ptw32_mcs_lock_acquire(&s->lock, &node);
+  __ptw32_mcs_lock_acquire(&s->lock, &node);
 
   if (s->value <= (SEM_VALUE_MAX - count))
     {
@@ -121,11 +121,11 @@ sem_post_multiple (sem_t * sem, int count)
     {
       result = ERANGE;
     }
-  ptw32_mcs_lock_release(&node);
+  __ptw32_mcs_lock_release(&node);
 
   if (result != 0)
     {
-      PTW32_SET_ERRNO(result);
+       __PTW32_SET_ERRNO(result);
       return -1;
     }
 

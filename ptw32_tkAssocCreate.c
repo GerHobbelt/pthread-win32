@@ -45,7 +45,7 @@
 
 
 int
-ptw32_tkAssocCreate (ptw32_thread_t * sp, pthread_key_t key)
+__ptw32_tkAssocCreate (__ptw32_thread_t * sp, pthread_key_t key)
      /*
       * -------------------------------------------------------------------
       * This routine creates an association that
@@ -59,7 +59,7 @@ ptw32_tkAssocCreate (ptw32_thread_t * sp, pthread_key_t key)
       *
       * Notes:
       *      1)      New associations are pushed to the beginning of the
-      *              chain so that the internal ptw32_selfThreadKey association
+      *              chain so that the internal __ptw32_selfThreadKey association
       *              is always last, thus allowing selfThreadExit to
       *              be implicitly called last by pthread_exit.
       *      2)      
@@ -120,4 +120,4 @@ ptw32_tkAssocCreate (ptw32_thread_t * sp, pthread_key_t key)
 
   return (0);
 
-}				/* ptw32_tkAssocCreate */
+}				/* __ptw32_tkAssocCreate */

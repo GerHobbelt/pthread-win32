@@ -73,7 +73,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
   pthread_t self;
   int result = 0;
 
-  if (key != ptw32_selfThreadKey)
+  if (key != __ptw32_selfThreadKey)
     {
       /*
        * Using pthread_self will implicitly create
@@ -92,7 +92,7 @@ pthread_setspecific (pthread_key_t key, const void *value)
        * Resolve catch-22 of registering thread with selfThread
        * key
        */
-      ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
+      __ptw32_thread_t * sp = (__ptw32_thread_t *) pthread_getspecific (__ptw32_selfThreadKey);
 
       if (sp == NULL)
         {
@@ -114,9 +114,9 @@ pthread_setspecific (pthread_key_t key, const void *value)
     {
       if (self.p != NULL && key->destructor != NULL && value != NULL)
 	{
-          ptw32_mcs_local_node_t keyLock;
-          ptw32_mcs_local_node_t threadLock;
-	  ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
+          __ptw32_mcs_local_node_t keyLock;
+          __ptw32_mcs_local_node_t threadLock;
+	  __ptw32_thread_t * sp = (__ptw32_thread_t *) self.p;
 	  /*
 	   * Only require associations if we have to
 	   * call user destroy routine.
@@ -128,8 +128,8 @@ pthread_setspecific (pthread_key_t key, const void *value)
 	   */
 	  ThreadKeyAssoc *assoc;
 
-	  ptw32_mcs_lock_acquire(&(key->keyLock), &keyLock);
-	  ptw32_mcs_lock_acquire(&(sp->threadLock), &threadLock);
+	  __ptw32_mcs_lock_acquire(&(key->keyLock), &keyLock);
+	  __ptw32_mcs_lock_acquire(&(sp->threadLock), &threadLock);
 
 	  assoc = (ThreadKeyAssoc *) sp->keys;
 	  /*
@@ -152,11 +152,11 @@ pthread_setspecific (pthread_key_t key, const void *value)
 	   */
 	  if (assoc == NULL)
 	    {
-	      result = ptw32_tkAssocCreate (sp, key);
+	      result = __ptw32_tkAssocCreate (sp, key);
 	    }
 
-	  ptw32_mcs_lock_release(&threadLock);
-	  ptw32_mcs_lock_release(&keyLock);
+	  __ptw32_mcs_lock_release(&threadLock);
+	  __ptw32_mcs_lock_release(&keyLock);
 	}
 
       if (result == 0)

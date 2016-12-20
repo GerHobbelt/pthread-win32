@@ -48,7 +48,7 @@
 #include "implement.h"
 
 static INLINE int
-ptw32_cond_unblock (pthread_cond_t * cond, int unblockAll)
+__ptw32_cond_unblock (pthread_cond_t * cond, int unblockAll)
      /*
       * Notes.
       *
@@ -115,9 +115,9 @@ ptw32_cond_unblock (pthread_cond_t * cond, int unblockAll)
   else if (cv->nWaitersBlocked > cv->nWaitersGone)
     {
       /* Use the non-cancellable version of sem_wait() */
-      if (ptw32_semwait (&(cv->semBlockLock)) != 0)
+      if (__ptw32_semwait (&(cv->semBlockLock)) != 0)
 	{
-	  result = PTW32_GET_ERRNO();
+	  result =  __PTW32_GET_ERRNO();
 	  (void) pthread_mutex_unlock (&(cv->mtxUnblockLock));
 	  return result;
 	}
@@ -146,13 +146,13 @@ ptw32_cond_unblock (pthread_cond_t * cond, int unblockAll)
     {
       if (sem_post_multiple (&(cv->semBlockQueue), nSignalsToIssue) != 0)
 	{
-	  result = PTW32_GET_ERRNO();
+	  result =  __PTW32_GET_ERRNO();
 	}
     }
 
   return result;
 
-}				/* ptw32_cond_unblock */
+}				/* __ptw32_cond_unblock */
 
 int
 pthread_cond_signal (pthread_cond_t * cond)
@@ -192,7 +192,7 @@ pthread_cond_signal (pthread_cond_t * cond)
   /*
    * The '0'(FALSE) unblockAll arg means unblock ONE waiter.
    */
-  return (ptw32_cond_unblock (cond, 0));
+  return (__ptw32_cond_unblock (cond, 0));
 
 }				/* pthread_cond_signal */
 
@@ -231,6 +231,6 @@ pthread_cond_broadcast (pthread_cond_t * cond)
   /*
    * The TRUE unblockAll arg means unblock ALL waiters.
    */
-  return (ptw32_cond_unblock (cond, PTW32_TRUE));
+  return (__ptw32_cond_unblock (cond,  __PTW32_TRUE));
 
 }				/* pthread_cond_broadcast */

@@ -43,7 +43,7 @@
 #include "implement.h"
 
 void
-ptw32_rwlock_cancelwrwait (void *arg)
+__ptw32_rwlock_cancelwrwait (void *arg)
 {
   pthread_rwlock_t rwl = (pthread_rwlock_t) arg;
 

@@ -77,7 +77,7 @@
 int
 main()
 {
-  pthread_t NullThread = PTW32_THREAD_NULL_ID;
+  pthread_t NullThread =  __PTW32_THREAD_NULL_ID;
 
   assert(pthread_kill(NullThread, 0) == ESRCH);
 

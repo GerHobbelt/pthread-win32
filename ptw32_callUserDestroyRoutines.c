@@ -43,7 +43,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-#if defined(__CLEANUP_CXX)
+#if defined(__PTW32_CLEANUP_CXX)
 # if defined(_MSC_VER)
 #  include <eh.h>
 # elif defined(__WATCOMC__)
@@ -61,7 +61,7 @@
 #endif
 
 void
-ptw32_callUserDestroyRoutines (pthread_t thread)
+__ptw32_callUserDestroyRoutines (pthread_t thread)
      /*
       * -------------------------------------------------------------------
       * DOCPRIVATE
@@ -83,11 +83,11 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 
   if (thread.p != NULL)
     {
-      ptw32_mcs_local_node_t threadLock;
-      ptw32_mcs_local_node_t keyLock;
+      __ptw32_mcs_local_node_t threadLock;
+      __ptw32_mcs_local_node_t keyLock;
       int assocsRemaining;
       int iterations = 0;
-      ptw32_thread_t * sp = (ptw32_thread_t *) thread.p;
+      __ptw32_thread_t * sp = (__ptw32_thread_t *) thread.p;
 
       /*
        * Run through all Thread<-->Key associations
@@ -100,7 +100,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 	  assocsRemaining = 0;
 	  iterations++;
 
-	  ptw32_mcs_lock_acquire(&(sp->threadLock), &threadLock);
+	  __ptw32_mcs_lock_acquire(&(sp->threadLock), &threadLock);
 	  /*
 	   * The pointer to the next assoc is stored in the thread struct so that
 	   * the assoc destructor in pthread_key_delete can adjust it
@@ -110,7 +110,7 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 	   * before us.
 	   */
 	  sp->nextAssoc = sp->keys;
-	  ptw32_mcs_lock_release(&threadLock);
+	  __ptw32_mcs_lock_release(&threadLock);
 
 	  for (;;)
 	    {
@@ -123,12 +123,12 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 	       * both assoc guards, but in the reverse order to our convention,
 	       * so we must be careful to avoid deadlock.
 	       */
-	      ptw32_mcs_lock_acquire(&(sp->threadLock), &threadLock);
+	      __ptw32_mcs_lock_acquire(&(sp->threadLock), &threadLock);
 
 	      if ((assoc = (ThreadKeyAssoc *)sp->nextAssoc) == NULL)
 		{
 		  /* Finished */
-		  ptw32_mcs_lock_release(&threadLock);
+		  __ptw32_mcs_lock_release(&threadLock);
 		  break;
 		}
 	      else
@@ -143,9 +143,9 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 		   * If we fail, we need to relinquish the first lock and the
 		   * processor and then try to acquire them all again.
 		   */
-		  if (ptw32_mcs_lock_try_acquire(&(assoc->key->keyLock), &keyLock) == EBUSY)
+		  if (__ptw32_mcs_lock_try_acquire(&(assoc->key->keyLock), &keyLock) == EBUSY)
 		    {
-		      ptw32_mcs_lock_release(&threadLock);
+		      __ptw32_mcs_lock_release(&threadLock);
 		      Sleep(0);
 		      /*
 		       * Go around again.
@@ -182,8 +182,8 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 		   * pthread_setspecific can also be run from destructors and
 		   * also needs to be able to access the assocs.
 		   */
-		  ptw32_mcs_lock_release(&threadLock);
-		  ptw32_mcs_lock_release(&keyLock);
+		  __ptw32_mcs_lock_release(&threadLock);
+		  __ptw32_mcs_lock_release(&keyLock);
 
 		  assocsRemaining++;
 
@@ -226,12 +226,12 @@ ptw32_callUserDestroyRoutines (pthread_t thread)
 		   * Remove association from both the key and thread chains
 		   * and reclaim it's memory resources.
 		   */
-		  ptw32_tkAssocDestroy (assoc);
-		  ptw32_mcs_lock_release(&threadLock);
-		  ptw32_mcs_lock_release(&keyLock);
+		  __ptw32_tkAssocDestroy (assoc);
+		  __ptw32_mcs_lock_release(&threadLock);
+		  __ptw32_mcs_lock_release(&keyLock);
 		}
 	    }
 	}
       while (assocsRemaining);
     }
-}				/* ptw32_callUserDestroyRoutines */
+}				/* __ptw32_callUserDestroyRoutines */

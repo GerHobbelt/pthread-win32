@@ -44,7 +44,7 @@
 
 
 static INLINE int
-ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
+__ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
      /*
       * -------------------------------------------------------------------
       * This provides an extra hook into the pthread_cancel
@@ -61,7 +61,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 {
   int result;
   pthread_t self;
-  ptw32_thread_t * sp;
+  __ptw32_thread_t * sp;
   HANDLE handles[2];
   DWORD nHandles = 1;
   DWORD status;
@@ -69,7 +69,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
   handles[0] = waitHandle;
 
   self = pthread_self();
-  sp = (ptw32_thread_t *) self.p;
+  sp = (__ptw32_thread_t *) self.p;
 
   if (sp != NULL)
     {
@@ -90,7 +90,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
       handles[1] = NULL;
     }
 
-  status = WaitForMultipleObjects (nHandles, handles, PTW32_FALSE, timeout);
+  status = WaitForMultipleObjects (nHandles, handles,  __PTW32_FALSE, timeout);
 
   switch (status - WAIT_OBJECT_0)
     {
@@ -115,22 +115,22 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 
       if (sp != NULL)
 	{
-          ptw32_mcs_local_node_t stateLock;
+          __ptw32_mcs_local_node_t stateLock;
 	  /*
 	   * Should handle POSIX and implicit POSIX threads.
 	   * Make sure we haven't been async-cancelled in the meantime.
 	   */
-	  ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
+	  __ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
 	  if (sp->state < PThreadStateCanceling)
 	    {
 	      sp->state = PThreadStateCanceling;
 	      sp->cancelState = PTHREAD_CANCEL_DISABLE;
-	      ptw32_mcs_lock_release (&stateLock);
-	      ptw32_throw (PTW32_EPS_CANCEL);
+	      __ptw32_mcs_lock_release (&stateLock);
+	      __ptw32_throw  (__PTW32_EPS_CANCEL);
 
 	      /* Never reached */
 	    }
-	  ptw32_mcs_lock_release (&stateLock);
+	  __ptw32_mcs_lock_release (&stateLock);
 	}
 
       /* Should never get to here. */
@@ -156,11 +156,11 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 int
 pthreadCancelableWait (HANDLE waitHandle)
 {
-  return (ptw32_cancelable_wait (waitHandle, INFINITE));
+  return (__ptw32_cancelable_wait (waitHandle, INFINITE));
 }
 
 int
 pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout)
 {
-  return (ptw32_cancelable_wait (waitHandle, timeout));
+  return (__ptw32_cancelable_wait (waitHandle, timeout));
 }

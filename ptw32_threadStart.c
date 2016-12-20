@@ -44,11 +44,11 @@
 #include "implement.h"
 #include <stdio.h>
 
-#if defined(__CLEANUP_C)
+#if defined(__PTW32_CLEANUP_C)
 # include <setjmp.h>
 #endif
 
-#if defined(__CLEANUP_SEH)
+#if defined(__PTW32_CLEANUP_SEH)
 
 static DWORD
 ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
@@ -79,7 +79,7 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
 	 */
 	pthread_t self = pthread_self ();
 
-	ptw32_callUserDestroyRoutines (self);
+	__ptw32_callUserDestroyRoutines (self);
 
 	return EXCEPTION_CONTINUE_SEARCH;
 	break;
@@ -87,7 +87,7 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, DWORD * ei)
     }
 }
 
-#elif defined(__CLEANUP_CXX)
+#elif defined(__PTW32_CLEANUP_CXX)
 
 #if defined(_MSC_VER)
 # include <eh.h>
@@ -106,10 +106,10 @@ using
 # endif
 #endif
 
-#endif /* __CLEANUP_CXX */
+#endif /* __PTW32_CLEANUP_CXX */
 
 /*
- * MSVC6 does not optimize ptw32_threadStart() safely
+ * MSVC6 does not optimize __ptw32_threadStart() safely
  * (i.e. tests/context1.c fails with "abnormal program
  * termination" in some configurations), and there's no
  * point to optimizing this routine anyway
@@ -125,28 +125,28 @@ unsigned
 #else
 void
 #endif
-ptw32_threadStart (void *vthreadParms)
+__ptw32_threadStart (void *vthreadParms)
 {
   ThreadParms * threadParms = (ThreadParms *) vthreadParms;
   pthread_t self;
-  ptw32_thread_t * sp;
-  void * (PTW32_CDECL *start) (void *);
+  __ptw32_thread_t * sp;
+  void *  (__PTW32_CDECL *start) (void *);
   void * arg;
 
-#if defined(__CLEANUP_SEH)
+#if defined(__PTW32_CLEANUP_SEH)
   DWORD
   ei[] = { 0, 0, 0 };
 #endif
 
-#if defined(__CLEANUP_C)
+#if defined(__PTW32_CLEANUP_C)
   int setjmp_rc;
 #endif
 
-  ptw32_mcs_local_node_t stateLock;
+  __ptw32_mcs_local_node_t stateLock;
   void * status = (void *) 0;
 
   self = threadParms->tid;
-  sp = (ptw32_thread_t *) self.p;
+  sp = (__ptw32_thread_t *) self.p;
   start = threadParms->start;
   arg = threadParms->arg;
 
@@ -161,17 +161,17 @@ ptw32_threadStart (void *vthreadParms)
   sp->thread = GetCurrentThreadId ();
 #endif
 
-  pthread_setspecific (ptw32_selfThreadKey, sp);
+  pthread_setspecific (__ptw32_selfThreadKey, sp);
   /*
    * Here we're using stateLock as a general-purpose lock
    * to make the new thread wait until the creating thread
    * has the new handle.
    */
-  ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
+  __ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
   sp->state = PThreadStateRunning;
-  ptw32_mcs_lock_release (&stateLock);
+  __ptw32_mcs_lock_release (&stateLock);
 
-#if defined(__CLEANUP_SEH)
+#if defined(__PTW32_CLEANUP_SEH)
 
   __try
   {
@@ -191,14 +191,14 @@ ptw32_threadStart (void *vthreadParms)
   {
     switch (ei[0])
       {
-        case PTW32_EPS_CANCEL:
+        case  __PTW32_EPS_CANCEL:
           status = sp->exitStatus = PTHREAD_CANCELED;
 #if defined(_UWIN)
           if (--pthread_count <= 0)
         	exit (0);
 #endif
           break;
-        case PTW32_EPS_EXIT:
+        case  __PTW32_EPS_EXIT:
           status = sp->exitStatus;
           break;
         default:
@@ -207,9 +207,9 @@ ptw32_threadStart (void *vthreadParms)
       }
   }
 
-#else /* __CLEANUP_SEH */
+#else /* __PTW32_CLEANUP_SEH */
 
-#if defined(__CLEANUP_C)
+#if defined(__PTW32_CLEANUP_C)
 
   setjmp_rc = setjmp (sp->start_mark);
 
@@ -225,10 +225,10 @@ ptw32_threadStart (void *vthreadParms)
     {
       switch (setjmp_rc)
         {
-      	  case PTW32_EPS_CANCEL:
+      	  case  __PTW32_EPS_CANCEL:
       		status = sp->exitStatus = PTHREAD_CANCELED;
       		break;
-      	  case PTW32_EPS_EXIT:
+      	  case  __PTW32_EPS_EXIT:
       		status = sp->exitStatus;
       		break;
       	  default:
@@ -237,23 +237,23 @@ ptw32_threadStart (void *vthreadParms)
         }
     }
 
-#else /* __CLEANUP_C */
+#else /* __PTW32_CLEANUP_C */
 
-#if defined(__CLEANUP_CXX)
+#if defined(__PTW32_CLEANUP_CXX)
 
   try
   {
     status = sp->exitStatus = (*start) (arg);
     sp->state = PThreadStateExiting;
   }
-  catch (ptw32_exception_cancel &)
+  catch (__ptw32_exception_cancel &)
   {
     /*
      * Thread was canceled.
      */
     status = sp->exitStatus = PTHREAD_CANCELED;
   }
-  catch (ptw32_exception_exit &)
+  catch (__ptw32_exception_exit &)
   {
     /*
      * Thread was exited via pthread_exit().
@@ -274,11 +274,11 @@ ptw32_threadStart (void *vthreadParms)
 
 #error ERROR [__FILE__, line __LINE__]: Cleanup type undefined.
 
-#endif /* __CLEANUP_CXX */
-#endif /* __CLEANUP_C */
-#endif /* __CLEANUP_SEH */
+#endif /* __PTW32_CLEANUP_CXX */
+#endif /* __PTW32_CLEANUP_C */
+#endif /* __PTW32_CLEANUP_SEH */
 
-#if defined(PTW32_STATIC_LIB)
+#if defined (__PTW32_STATIC_LIB)
   /*
    * We need to cleanup the pthread now if we have
    * been statically linked, in which case the cleanup
@@ -310,7 +310,7 @@ ptw32_threadStart (void *vthreadParms)
   return (unsigned)(size_t) status;
 #endif
 
-}				/* ptw32_threadStart */
+}				/* __ptw32_threadStart */
 
 /*
  * Reset optimization
@@ -319,9 +319,9 @@ ptw32_threadStart (void *vthreadParms)
 # pragma optimize("", on)
 #endif
 
-#if defined (PTW32_USES_SEPARATE_CRT) && defined (__cplusplus)
-ptw32_terminate_handler
-pthread_win32_set_terminate_np(ptw32_terminate_handler termFunction)
+#if defined  (__PTW32_USES_SEPARATE_CRT) && defined (__cplusplus)
+__ptw32_terminate_handler
+pthread_win32_set_terminate_np(__ptw32_terminate_handler termFunction)
 {
   return set_terminate(termFunction);
 }

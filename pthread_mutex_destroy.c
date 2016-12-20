@@ -117,13 +117,13 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
     }
   else
     {
-      ptw32_mcs_local_node_t node;
+      __ptw32_mcs_local_node_t node;
 
       /*
-       * See notes in ptw32_mutex_check_need_init() above also.
+       * See notes in __ptw32_mutex_check_need_init() above also.
        */
 
-      ptw32_mcs_lock_acquire(&ptw32_mutex_test_init_lock, &node);
+      __ptw32_mcs_lock_acquire(&__ptw32_mutex_test_init_lock, &node);
 
       /*
        * Check again.
@@ -146,7 +146,7 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
 	   */
 	  result = EBUSY;
 	}
-      ptw32_mcs_lock_release(&node);
+      __ptw32_mcs_lock_release(&node);
     }
 
   return (result);

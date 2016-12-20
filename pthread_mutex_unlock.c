@@ -71,8 +71,8 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 	    {
 	      LONG idx;
 
-	      idx = (LONG) PTW32_INTERLOCKED_EXCHANGE_LONG ((PTW32_INTERLOCKED_LONGPTR)&mx->lock_idx,
-							    (PTW32_INTERLOCKED_LONG)0);
+	      idx = (LONG)  __PTW32_INTERLOCKED_EXCHANGE_LONG  ((__PTW32_INTERLOCKED_LONGPTR)&mx->lock_idx,
+							     (__PTW32_INTERLOCKED_LONG)0);
 	      if (idx != 0)
 	        {
 	          if (idx < 0)
@@ -96,8 +96,8 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
 		    {
 		      mx->ownerThread.p = NULL;
 
-		      if ((LONG) PTW32_INTERLOCKED_EXCHANGE_LONG ((PTW32_INTERLOCKED_LONGPTR)&mx->lock_idx,
-							          (PTW32_INTERLOCKED_LONG)0) < 0L)
+		      if ((LONG)  __PTW32_INTERLOCKED_EXCHANGE_LONG  ((__PTW32_INTERLOCKED_LONGPTR)&mx->lock_idx,
+							           (__PTW32_INTERLOCKED_LONG)0) < 0L)
 		        {
 		          /* Someone may be waiting on that mutex */
 		          if (SetEvent (mx->event) == 0)
@@ -125,15 +125,15 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
            */
           if (pthread_equal (mx->ownerThread, self))
             {
-              PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG((PTW32_INTERLOCKED_LONGPTR) &mx->robustNode->stateInconsistent,
-                                                      (PTW32_INTERLOCKED_LONG)PTW32_ROBUST_NOTRECOVERABLE,
-                                                      (PTW32_INTERLOCKED_LONG)PTW32_ROBUST_INCONSISTENT);
+               __PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG ((__PTW32_INTERLOCKED_LONGPTR) &mx->robustNode->stateInconsistent,
+                                                       (__PTW32_INTERLOCKED_LONG)__PTW32_ROBUST_NOTRECOVERABLE,
+                                                       (__PTW32_INTERLOCKED_LONG)__PTW32_ROBUST_INCONSISTENT);
               if (PTHREAD_MUTEX_NORMAL == kind)
                 {
-                  ptw32_robust_mutex_remove(mutex, NULL);
+                  __ptw32_robust_mutex_remove(mutex, NULL);
 
-                  if ((LONG) PTW32_INTERLOCKED_EXCHANGE_LONG((PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-                                                             (PTW32_INTERLOCKED_LONG) 0) < 0)
+                  if ((LONG)  __PTW32_INTERLOCKED_EXCHANGE_LONG ((__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+                                                              (__PTW32_INTERLOCKED_LONG) 0) < 0)
                     {
                       /*
                        * Someone may be waiting on that mutex.
@@ -149,10 +149,10 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
                   if (kind != PTHREAD_MUTEX_RECURSIVE
                       || 0 == --mx->recursive_count)
                     {
-                      ptw32_robust_mutex_remove(mutex, NULL);
+                      __ptw32_robust_mutex_remove(mutex, NULL);
 
-                      if ((LONG) PTW32_INTERLOCKED_EXCHANGE_LONG((PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-                                                                 (PTW32_INTERLOCKED_LONG) 0) < 0)
+                      if ((LONG)  __PTW32_INTERLOCKED_EXCHANGE_LONG ((__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+                                                                  (__PTW32_INTERLOCKED_LONG) 0) < 0)
                         {
                           /*
                            * Someone may be waiting on that mutex.

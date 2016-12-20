@@ -92,13 +92,13 @@ pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
 #else
 
   int result = 0;
-  ptw32_thread_t * tp;
-  ptw32_mcs_local_node_t node;
+  __ptw32_thread_t * tp;
+  __ptw32_mcs_local_node_t node;
   cpu_set_t processCpuset;
 
-  ptw32_mcs_lock_acquire (&ptw32_thread_reuse_lock, &node);
+  __ptw32_mcs_lock_acquire (&__ptw32_thread_reuse_lock, &node);
 
-  tp = (ptw32_thread_t *) thread.p;
+  tp = (__ptw32_thread_t *) thread.p;
 
   if (NULL == tp || thread.x != tp->ptHandle.x || NULL == tp->threadH)
     {
@@ -110,7 +110,7 @@ pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
 		{
 		  if (sched_getaffinity(0, sizeof(cpu_set_t), &processCpuset))
 		    {
-			  result = PTW32_GET_ERRNO();
+			  result =  __PTW32_GET_ERRNO();
 		    }
 		  else
 			{
@@ -150,7 +150,7 @@ pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
 		}
 	}
 
-  ptw32_mcs_lock_release (&node);
+  __ptw32_mcs_lock_release (&node);
 
   return result;
 
@@ -198,12 +198,12 @@ pthread_getaffinity_np (pthread_t thread, size_t cpusetsize, cpu_set_t *cpuset)
 #else
 
   int result = 0;
-  ptw32_thread_t * tp;
-  ptw32_mcs_local_node_t node;
+  __ptw32_thread_t * tp;
+  __ptw32_mcs_local_node_t node;
 
-  ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
+  __ptw32_mcs_lock_acquire(&__ptw32_thread_reuse_lock, &node);
 
-  tp = (ptw32_thread_t *) thread.p;
+  tp = (__ptw32_thread_t *) thread.p;
 
   if (NULL == tp || thread.x != tp->ptHandle.x || NULL == tp->threadH)
     {
@@ -235,7 +235,7 @@ pthread_getaffinity_np (pthread_t thread, size_t cpusetsize, cpu_set_t *cpuset)
 	    }
     }
 
-  ptw32_mcs_lock_release(&node);
+  __ptw32_mcs_lock_release(&node);
 
   return result;
 

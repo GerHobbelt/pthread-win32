@@ -45,7 +45,7 @@
 
 
 /*
- * ptw32_getprocessors()
+ * __ptw32_getprocessors()
  *
  * Get the number of CPUs available to the process.
  *
@@ -58,7 +58,7 @@
  * newly initialised spinlocks will notice.
  */
 int
-ptw32_getprocessors (int *count)
+__ptw32_getprocessors (int *count)
 {
   DWORD_PTR vProcessCPUs;
   DWORD_PTR vSystemCPUs;

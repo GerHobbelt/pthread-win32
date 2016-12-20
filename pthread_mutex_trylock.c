@@ -57,12 +57,12 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static mutex. We check
-   * again inside the guarded section of ptw32_mutex_check_need_init()
+   * again inside the guarded section of __ptw32_mutex_check_need_init()
    * to avoid race conditions.
    */
   if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
-      if ((result = ptw32_mutex_check_need_init (mutex)) != 0)
+      if ((result = __ptw32_mutex_check_need_init (mutex)) != 0)
 	{
 	  return (result);
 	}
@@ -74,10 +74,10 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
   if (kind >= 0)
     {
       /* Non-robust */
-      if (0 == (PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG (
-		         (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-		         (PTW32_INTERLOCKED_LONG) 1,
-		         (PTW32_INTERLOCKED_LONG) 0))
+      if (0 ==  (__PTW32_INTERLOCKED_LONG)  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG (
+		          (__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+		          (__PTW32_INTERLOCKED_LONG) 1,
+		          (__PTW32_INTERLOCKED_LONG) 0))
         {
           if (kind != PTHREAD_MUTEX_NORMAL)
 	    {
@@ -106,12 +106,12 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
        * The mutex is added to a per thread list when ownership is acquired.
        */
       pthread_t self;
-      ptw32_robust_state_t* statePtr = &mx->robustNode->stateInconsistent;
+      __ptw32_robust_state_t* statePtr = &mx->robustNode->stateInconsistent;
 
-      if ((PTW32_INTERLOCKED_LONG)PTW32_ROBUST_NOTRECOVERABLE ==
-                  PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(
-                    (PTW32_INTERLOCKED_LONGPTR)statePtr,
-                    (PTW32_INTERLOCKED_LONG)0))
+      if  ((__PTW32_INTERLOCKED_LONG)__PTW32_ROBUST_NOTRECOVERABLE ==
+                   __PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(
+                     (__PTW32_INTERLOCKED_LONGPTR)statePtr,
+                     (__PTW32_INTERLOCKED_LONG)0))
         {
           return ENOTRECOVERABLE;
         }
@@ -119,16 +119,16 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
       self = pthread_self();
       kind = -kind - 1; /* Convert to non-robust range */
 
-      if (0 == (PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG (
-        	         (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-        	         (PTW32_INTERLOCKED_LONG) 1,
-        	         (PTW32_INTERLOCKED_LONG) 0))
+      if (0 ==  (__PTW32_INTERLOCKED_LONG)  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG (
+        	          (__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+        	          (__PTW32_INTERLOCKED_LONG) 1,
+        	          (__PTW32_INTERLOCKED_LONG) 0))
         {
           if (kind != PTHREAD_MUTEX_NORMAL)
             {
               mx->recursive_count = 1;
             }
-          ptw32_robust_mutex_add(mutex, self);
+          __ptw32_robust_mutex_add(mutex, self);
         }
       else
         {
@@ -139,10 +139,10 @@ pthread_mutex_trylock (pthread_mutex_t * mutex)
             }
           else
             {
-              if (EOWNERDEAD == (result = ptw32_robust_mutex_inherit(mutex)))
+              if (EOWNERDEAD == (result = __ptw32_robust_mutex_inherit(mutex)))
                 {
                   mx->recursive_count = 1;
-                  ptw32_robust_mutex_add(mutex, self);
+                  __ptw32_robust_mutex_add(mutex, self);
                 }
               else
                 {

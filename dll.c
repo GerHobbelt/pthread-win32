@@ -39,15 +39,15 @@
 # include <config.h>
 #endif
 
-#if defined(PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400
-#  undef PTW32_STATIC_LIB
-#  define PTW32_STATIC_TLSLIB
+#if defined (__PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400
+#  undef  __PTW32_STATIC_LIB
+#  define  __PTW32_STATIC_TLSLIB
 #endif
 
 #include "pthread.h"
 #include "implement.h"
 
-#if !defined(PTW32_STATIC_LIB)
+#if !defined (__PTW32_STATIC_LIB)
 
 #if defined(_MSC_VER)
 /*
@@ -64,13 +64,13 @@
 extern "C"
 #endif				/* __cplusplus */
   BOOL WINAPI
-#if defined(PTW32_STATIC_TLSLIB)
-PTW32_StaticLibMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
+#if defined (__PTW32_STATIC_TLSLIB)
+__PTW32_StaticLibMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 #else
 DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 #endif
 {
-  BOOL result = PTW32_TRUE;
+  BOOL result =  __PTW32_TRUE;
 
   switch (fdwReason)
     {
@@ -105,7 +105,7 @@ DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 
 #endif /* !PTW32_STATIC_LIB */
 
-#if ! defined(PTW32_BUILD_INLINED)
+#if ! defined (__PTW32_BUILD_INLINED)
 /*
  * Avoid "translation unit is empty" warnings
  */
@@ -115,12 +115,12 @@ typedef int foo;
 /* Visual Studio 8+ can leverage PIMAGE_TLS_CALLBACK CRT segments, which
  * give a static lib its very own DllMain.
  */
-#ifdef PTW32_STATIC_TLSLIB
+#ifdef  __PTW32_STATIC_TLSLIB
 
 static void WINAPI
 TlsMain(PVOID h, DWORD r, PVOID u)
 {
-  (void)PTW32_StaticLibMain((HINSTANCE)h, r, u);
+  (void)__PTW32_StaticLibMain((HINSTANCE)h, r, u);
 }
 
 #ifdef _M_X64
@@ -137,9 +137,9 @@ EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
 # pragma data_seg()
 #endif /* _M_X64 */
 
-#endif /* PTW32_STATIC_TLSLIB */
+#endif /*  __PTW32_STATIC_TLSLIB */
 
-#if defined(PTW32_STATIC_LIB)
+#if defined (__PTW32_STATIC_LIB)
 
 /*
  * Note: MSVC 8 and higher use code in dll.c, which enables TLS cleanup
@@ -201,7 +201,7 @@ static int (*msc_dtor)(void) = on_process_exit;
  * (specifically, in implement.h), so that the linker can't optimize away
  * this module. Don't call it.
  */
-void ptw32_autostatic_anchor(void) { abort(); }
+void __ptw32_autostatic_anchor(void) { abort(); }
 
-#endif /* PTW32_STATIC_LIB */
+#endif /*  __PTW32_STATIC_LIB */
 

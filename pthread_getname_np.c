@@ -42,8 +42,8 @@
 int
 pthread_getname_np(pthread_t thr, char *name, int len)
 {
-  ptw32_mcs_local_node_t threadLock;
-  ptw32_thread_t * tp;
+  __ptw32_mcs_local_node_t threadLock;
+  __ptw32_thread_t * tp;
   char * s, * d;
   int result;
 
@@ -58,15 +58,15 @@ pthread_getname_np(pthread_t thr, char *name, int len)
       return result;
     }
 
-  tp = (ptw32_thread_t *) thr.p;
+  tp = (__ptw32_thread_t *) thr.p;
 
-  ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
+  __ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
 
   for (s = tp->name, d = name; *s && d < &name[len - 1]; *d++ = *s++)
     {}
 
   *d = '\0';
-  ptw32_mcs_lock_release (&threadLock);
+  __ptw32_mcs_lock_release (&threadLock);
 
   return result;
 }

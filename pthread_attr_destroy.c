@@ -68,7 +68,7 @@ pthread_attr_destroy (pthread_attr_t * attr)
       * ------------------------------------------------------
       */
 {
-  if (ptw32_is_attr (attr) != 0)
+  if (__ptw32_is_attr (attr) != 0)
     {
       return EINVAL;
     }

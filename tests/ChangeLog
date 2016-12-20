@@ -1,3 +1,4 @@
+<<<<<<< Upstream, based on master
 2016-12-21  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* mutex6.c: fix random failures by using a polling loop to replace
@@ -11,10 +12,20 @@
 	* semaphore5.c: don't fail on expected sem_destroy EBUSY.
 
 2016-124-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
+=======
+2016-12-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
+>>>>>>> d1c1032 Initial version 3 commit; see the ChangeLogs
 
-	* test.c (PTW32_TEST_SNEAK_PEEK): #define this to prevent some
+	* all (PTW32_*): rename to __PTW32_*.
+	(ptw32_*): rename to __ptw32_*.
+	(PtW32*): rename to __PtW32*.
+	* GNUmakefile: removed; must now configure from GNUmakefile.in.
+
+2016-12-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* test.c  (__PTW32_TEST_SNEAK_PEEK): #define this to prevent some
 	tests from failing (specifically "make GCX-small-static") with
-	undefined ptw32_autostatic_anchor. Checked in ../implament.h.
+	undefined __ptw32_autostatic_anchor. Checked in ../implement.h.
 	* GNUMakfile.in: Rename testsuite log to test-specific name and
 	do not remove.
 	* GNUMakfile.in: Add realclean target
@@ -200,7 +211,7 @@
 2012-09-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_win32_attach_detach_np.c (pthread_win32_detach_thread_np):
-	Check for NULL ptw32_selfThreadKey before call to TlsSetKey(). Need
+	Check for NULL __ptw32_selfThreadKey before call to TlsSetKey(). Need
 	to find where this is being set to NULL before this point. Was
 	consistently failing tests/seamphore3.c in all GC static builds and
 	never seen in GC DLL builds. May also be responsible for
@@ -936,7 +947,7 @@
 
 	* rwlock6.c: Fix casts.
 
-	* exception1.c (PtW32CatchAll): Had the wrong name;
+	* exception1.c (__PtW32CatchAll): Had the wrong name;
 	fix casts.
 
 	* cancel3.c: Remove unused waitLock variable.
@@ -1008,9 +1019,9 @@
 
 2000-08-05  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 
-	* cancel2.c: Use PtW32CatchAll macro if defined.
+	* cancel2.c: Use __PtW32CatchAll macro if defined.
 
-	* exception1.c: Use PtW32CatchAll macro if defined.
+	* exception1.c: Use __PtW32CatchAll macro if defined.
 
 2000-08-02  Ross Johnson  <rpj@special.ise.canberra.edu.au>
 

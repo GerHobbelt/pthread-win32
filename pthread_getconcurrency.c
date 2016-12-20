@@ -46,5 +46,5 @@
 int
 pthread_getconcurrency (void)
 {
-  return ptw32_concurrency;
+  return __ptw32_concurrency;
 }

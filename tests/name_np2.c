@@ -60,7 +60,7 @@
 static int washere = 0;
 static pthread_attr_t attr;
 static pthread_barrier_t sync;
-#if defined(PTW32_COMPATIBILITY_BSD)
+#if defined (__PTW32_COMPATIBILITY_BSD)
 static int seqno = 0;
 #endif
 
@@ -84,10 +84,10 @@ main()
   pthread_t t;
 
   assert(pthread_attr_init(&attr) == 0);
-#if defined(PTW32_COMPATIBILITY_BSD)
+#if defined (__PTW32_COMPATIBILITY_BSD)
   seqno++;
   assert(pthread_attr_setname_np(&attr, "MyThread%d", (void *)&seqno) == 0);
-#elif defined(PTW32_COMPATIBILITY_TRU64)
+#elif defined (__PTW32_COMPATIBILITY_TRU64)
   assert(pthread_attr_setname_np(&attr, "MyThread1", NULL) == 0);
 #else
   assert(pthread_attr_setname_np(&attr, "MyThread1") == 0);

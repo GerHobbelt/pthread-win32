@@ -80,10 +80,10 @@ sem_post (sem_t * sem)
 {
   int result = 0;
 
-  ptw32_mcs_local_node_t node;
+  __ptw32_mcs_local_node_t node;
   sem_t s = *sem;
 
-  ptw32_mcs_lock_acquire(&s->lock, &node);
+  __ptw32_mcs_lock_acquire(&s->lock, &node);
   if (s->value < SEM_VALUE_MAX)
     {
 #if defined(NEED_SEM)
@@ -106,11 +106,11 @@ sem_post (sem_t * sem)
     {
       result = ERANGE;
     }
-  ptw32_mcs_lock_release(&node);
+  __ptw32_mcs_lock_release(&node);
 
   if (result != 0)
     {
-      PTW32_SET_ERRNO(result);
+       __PTW32_SET_ERRNO(result);
       return -1;
     }
 

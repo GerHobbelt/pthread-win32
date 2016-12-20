@@ -45,12 +45,12 @@
  * FIXME: consider moving this to <_ptw32.h>; maybe also add a
  * leading underscore to the macro names.
  */
-#define PTW32_VERSION_MAJOR 2
-#define PTW32_VERSION_MINOR 10
-#define PTW32_VERSION_MICRO 0
-#define PTW32_VERION_BUILD 0
-#define PTW32_VERSION 2,10,0,0
-#define PTW32_VERSION_STRING "2, 10, 0, 0\0"
+#define  __PTW32_VERSION_MAJOR 3
+#define  __PTW32_VERSION_MINOR 0
+#define  __PTW32_VERSION_MICRO 0
+#define  __PTW32_VERION_BUILD 0
+#define  __PTW32_VERSION 3,0,0,0
+#define  __PTW32_VERSION_STRING "3, 0, 0, 0\0"
 
 #if defined(__GNUC__)
 # pragma GCC system_header
@@ -67,31 +67,31 @@
 # define __PTW32_END_C_DECLS
 #endif
 
-#if defined (PTW32_STATIC_LIB) && _MSC_VER >= 1400
-# undef PTW32_STATIC_LIB
-# define PTW32_STATIC_TLSLIB
+#if defined  (__PTW32_STATIC_LIB) && _MSC_VER >= 1400
+# undef  __PTW32_STATIC_LIB
+# define  __PTW32_STATIC_TLSLIB
 #endif
 
-/* When building the library, you should define PTW32_BUILD so that
+/* When building the library, you should define  __PTW32_BUILD so that
  * the variables/functions are exported correctly. When using the library,
- * do NOT define PTW32_BUILD, and then the variables/functions will
+ * do NOT define  __PTW32_BUILD, and then the variables/functions will
  * be imported correctly.
  *
- * FIXME: Used defined feature test macros, such as PTW32_STATIC_LIB, (and
- * maybe even PTW32_BUILD), should be renamed with one initial underscore;
- * internally defined macros, such as PTW32_DLLPORT, should be renamed with
+ * FIXME: Used defined feature test macros, such as  __PTW32_STATIC_LIB, (and
+ * maybe even  __PTW32_BUILD), should be renamed with one initial underscore;
+ * internally defined macros, such as  __PTW32_DLLPORT, should be renamed with
  * two initial underscores ... perhaps __PTW32_DECLSPEC is nicer anyway?
  */
-#if defined PTW32_STATIC_LIB || defined PTW32_STATIC_TLSLIB
-# define PTW32_DLLPORT
+#if defined  __PTW32_STATIC_LIB || defined  __PTW32_STATIC_TLSLIB
+# define  __PTW32_DLLPORT
 
-#elif defined PTW32_BUILD
-# define PTW32_DLLPORT __declspec (dllexport)
+#elif defined  __PTW32_BUILD
+# define  __PTW32_DLLPORT __declspec (dllexport)
 #else
-# define PTW32_DLLPORT /*__declspec (dllimport)*/
+# define  __PTW32_DLLPORT /*__declspec (dllimport)*/
 #endif
 
-#ifndef PTW32_CDECL
+#ifndef  __PTW32_CDECL
 /* FIXME: another internal macro; should have two initial underscores;
  * Nominally, we prefer to use __cdecl calling convention for all our
  * functions, but we map it through this macro alias to facilitate the
@@ -111,9 +111,9 @@
    * remember that this must be defined consistently, for both the DLL
    * build, and the application build.
    */
-#  define PTW32_CDECL
+#  define  __PTW32_CDECL
 # else
-#  define PTW32_CDECL __cdecl
+#  define  __PTW32_CDECL __cdecl
 # endif
 #endif
 
@@ -122,7 +122,7 @@
  * which is only used when building the pthread-win32 libraries. They
  */
 
-#if !defined(PTW32_CONFIG_H) && !defined(__PTW32_PSEUDO_CONFIG_H_SOURCED)
+#if !defined (__PTW32_CONFIG_H) && !defined(__PTW32_PSEUDO_CONFIG_H_SOURCED)
 #  define __PTW32_PSEUDO_CONFIG_H_SOURCED
 #  if defined(WINCE)
 #    undef  HAVE_CPU_AFFINITY
@@ -139,9 +139,9 @@
 #    if _MSC_VER >= 1900
 #      define HAVE_STRUCT_TIMESPEC
 #    elif _MSC_VER < 1300
-#      define PTW32_CONFIG_MSVC6
+#      define  __PTW32_CONFIG_MSVC6
 #    elif _MSC_VER < 1400
-#      define PTW32_CONFIG_MSVC7
+#      define  __PTW32_CONFIG_MSVC7
 #    endif
 #  elif defined(_UWIN)
 #    define HAVE_MODE_T
@@ -168,7 +168,7 @@
 #elif !defined(__MINGW32__)
 #  define int64_t _int64
 #  define uint64_t unsigned _int64
-#  if defined(PTW32_CONFIG_MSVC6)
+#  if defined (__PTW32_CONFIG_MSVC6)
      typedef long intptr_t;
 #  endif
 #elif defined(HAVE_STDINT_H) && HAVE_STDINT_H == 1
@@ -217,7 +217,7 @@
  * FIXME: These should be changed for version 3.0.0 onward.
  * 42 clashes with EILSEQ.
  */
-#if PTW32_VERSION_MAJOR > 2
+#if  __PTW32_VERSION_MAJOR > 2
 #  if !defined(EOWNERDEAD)
 #    define EOWNERDEAD 1000
 #  endif

@@ -1,3 +1,4 @@
+<<<<<<< Upstream, based on master
 RELEASE 2.11.0
 --------------
 (Upcoming release)
@@ -47,6 +48,64 @@ semaphore5.c recognises that sem_destroy can legitimately return
 EBUSY; mutex6*.c, mutex7*.c and mutex8*.c all replaced a single
 Sleep() with a polling loop.
 - Ross Johnson
+=======
+RELEASE 3.0.0
+--------------
+(2016-12-20)
+
+General
+-------
+Note that this is a new major release and consolidates the already very
+stable version 2.10.0. The major version increment introduces two minor
+ABI changes along with other naming changes that will require
+recompilation of linking applications and possibly some textual changes
+to compile-time macro references in configuration and source files, e.g.
+PTW32_* to __PTW32_*, etc.
+
+New bug fixes in all releases since 2.8.0 have NOT been applied to the
+1.x.x series.
+
+Some changes from 2011-02-26 onward may not be compatible with
+pre Windows 2000 systems.
+
+Testing and verification
+------------------------
+The MSVC, MinGW and MinGW64 builds have been tested on SMP architecture
+(Intel x64 Hex Core) by completing the included test suite, as well as the
+stress and bench tests.
+
+Be sure to run your builds against the test suite. If you see failures
+then please consider how your toolchains might be contributing to the
+failure. See the README file for more detailed descriptions of the
+toolchains and test systems that we have used to get the tests to pass
+successfully.
+
+We recommend MinGW64 over MinGW for both 64 and 32 bit GNU CC builds
+only because the MinGW DWARF2 exception handling with C++ builds causes some
+problems with thread cancelation.
+
+MinGW64 also includes its own native pthreads implementation, which you may
+prefer to use. If you wish to build our library you will need to select the
+Win32 native threads option at install time. We recommend also selecting the
+SJLJ exception handling method for MinGW64-w32 builds. For MinGW64-w64 builds
+either the SJLJ or SEH exception handling method should work.
+
+New Features
+------------
+No major new features are introduced compared to version 2.10.0. This release
+introduces a change to pthread_t and pthread_once_t that will affect
+applications that link with the library.
+
+pthread_t: remains a struct but extends the reuse counter from 32 bits to 64
+bits. On 64 bit machines the overall size of the object will not increase, we
+simply put 4 bytes of padding to good use reducing the risk that the counter
+could wrap around in very long-running applications from small to, effectively,
+zero. The 64 bit reuse counter extends risk-free run time from months
+(assuming an average thread lifetime of 1ms) to centuries (assuming an
+average thread lifetime of 1ns).
+
+pthread_once_t: removes two long-obsoleted elements and reduces it's size.
+>>>>>>> d1c1032 Initial version 3 commit; see the ChangeLogs
 
 
 RELEASE 2.10.0
@@ -98,8 +157,8 @@ pthread_attr_setname_np()
  - added for compatibility with other POSIX implementations. Because
    some implementations use different *_setname_np() prototypes
    you can define one of the following macros when building the library:
-     PTW32_COMPATIBILITY_BSD (compatibility with NetBSD, FreeBSD)
-     PTW32_COMPATIBILITY_TRU64
+      __PTW32_COMPATIBILITY_BSD (compatibility with NetBSD, FreeBSD)
+      __PTW32_COMPATIBILITY_TRU64
    If not defined then compatibility is with Linux and other equivalents.
    We don't impose a strict limit on the length of the thread name for the
    default compatibility case. Unlike Linux, no default thread name is set.
@@ -193,8 +252,8 @@ Fixed sub-millisecond timeouts, which caused the library to busy wait.
 - Mark Smith
 
 Fix a race condition and crash in MCS locks. The waiter queue management
-code in ptw32_mcs_lock_acquire was racing with the queue management code
-in ptw32_mcs_lock_release and causing a segmentation fault.
+code in __ptw32_mcs_lock_acquire was racing with the queue management code
+in __ptw32_mcs_lock_release and causing a segmentation fault.
 - Anurag Sharma
 - Jonathan Brown (also reported this bug and provided a fix)
 
@@ -755,7 +814,7 @@ suffix (1) in this snapshot. E.g. pthreadVC1.dll etc.
 has been kept as default, but the behaviour can now be controlled when the DLL
 is built to effectively switch it off. This makes the library much more
 sensitive to applications that assume that POSIX thread IDs are unique, i.e.
-are not strictly compliant with POSIX. See the PTW32_THREAD_ID_REUSE_INCREMENT
+are not strictly compliant with POSIX. See the  __PTW32_THREAD_ID_REUSE_INCREMENT
 macro comments in config.h for details.
 
 Other changes
@@ -875,7 +934,7 @@ Bug fixes
 * Bug and memory leak in sem_init()
 - Alex Blanco  <Alex.Blanco at motorola.com>
 
-* ptw32_getprocessors() now returns CPU count of 1 for WinCE.
+* __ptw32_getprocessors() now returns CPU count of 1 for WinCE.
 - James Ewing  <james.ewing at sveasoft.com>
 
 * pthread_cond_wait() could be canceled at a point where it should not
@@ -936,7 +995,7 @@ SNAPSHOT 2003-09-04
 
 Bug fixes
 ---------
-* ptw32_cancelableWait() now allows cancellation of waiting implicit POSIX
+* __ptw32_cancelableWait() now allows cancellation of waiting implicit POSIX
 threads.
 
 New test
@@ -1065,13 +1124,13 @@ Bug fixes
 * sem_timedwait() now uses tighter checks for unreasonable
 abstime values - that would result in unexpected timeout values.
 
-* ptw32_cond_wait_cleanup() no longer mysteriously consumes
+* __ptw32_cond_wait_cleanup() no longer mysteriously consumes
 CV signals but may produce more spurious wakeups. It is believed
 that the sem_timedwait() call is consuming a CV signal that it
 shouldn't.
 - Alexander Terekhov  <TEREKHOV@de.ibm.com>
 
-* Fixed a memory leak in ptw32_threadDestroy() for implicit threads.
+* Fixed a memory leak in __ptw32_threadDestroy() for implicit threads.
 
 * Fixed potential for deadlock in pthread_cond_destroy().
 A deadlock could occur for statically declared CVs (PTHREAD_COND_INITIALIZER),
@@ -1088,13 +1147,13 @@ Cleanup code default style. (IMPORTANT)
 Previously, if not defined, the cleanup style was determined automatically
 from the compiler/language, and one of the following was defined accordingly:
 
-        __CLEANUP_SEH   MSVC only
-        __CLEANUP_CXX   C++, including MSVC++, GNU G++
-        __CLEANUP_C             C, including GNU GCC, not MSVC
+        __PTW32_CLEANUP_SEH   MSVC only
+        __PTW32_CLEANUP_CXX   C++, including MSVC++, GNU G++
+        __PTW32_CLEANUP_C             C, including GNU GCC, not MSVC
 
 These defines determine the style of cleanup (see pthread.h) and,
 most importantly, the way that cancellation and thread exit (via
-pthread_exit) is performed (see the routine ptw32_throw() in private.c).
+pthread_exit) is performed (see the routine __ptw32_throw() in private.c).
 
 In short, the exceptions versions of the library throw an exception
 when a thread is canceled or exits (via pthread_exit()), which is
@@ -1103,8 +1162,8 @@ the correct stack unwinding occurs regardless of where the thread
 is when it's canceled or exits via pthread_exit().
 
 In this and future snapshots, unless the build explicitly defines (e.g.
-via a compiler option) __CLEANUP_SEH, __CLEANUP_CXX, or __CLEANUP_C, then
-the build NOW always defaults to __CLEANUP_C style cleanup. This style
+via a compiler option) __PTW32_CLEANUP_SEH, __PTW32_CLEANUP_CXX, or __PTW32_CLEANUP_C, then
+the build NOW always defaults to __PTW32_CLEANUP_C style cleanup. This style
 uses setjmp/longjmp in the cancellation and pthread_exit implementations,
 and therefore won't do stack unwinding even when linked to applications
 that have it (e.g. C++ apps). This is for consistency with most
@@ -1112,17 +1171,17 @@ current commercial Unix POSIX threads implementations. Compaq's TRU64
 may be an exception (no pun intended) and possible future trend.
 
 Although it was not clearly documented before, it is still necessary to
-build your application using the same __CLEANUP_* define as was
+build your application using the same __PTW32_CLEANUP_* define as was
 used for the version of the library that you link with, so that the
 correct parts of pthread.h are included. That is, the possible
 defines require the following library versions:
 
-        __CLEANUP_SEH   pthreadVSE.dll
-        __CLEANUP_CXX   pthreadVCE.dll or pthreadGCE.dll
-        __CLEANUP_C     pthreadVC.dll or pthreadGC.dll
+        __PTW32_CLEANUP_SEH   pthreadVSE.dll
+        __PTW32_CLEANUP_CXX   pthreadVCE.dll or pthreadGCE.dll
+        __PTW32_CLEANUP_C     pthreadVC.dll or pthreadGC.dll
 
 E.g. regardless of whether your app is C or C++, if you link with
-pthreadVC.lib or libpthreadGC.a, then you must define __CLEANUP_C.
+pthreadVC.lib or libpthreadGC.a, then you must define __PTW32_CLEANUP_C.
 
 
 THE POINT OF ALL THIS IS: if you have not been defining one of these
@@ -1133,13 +1192,13 @@ THIS NOW CHANGES, as has been explained above, but to try to make this
 clearer here's an example:
 
 If you were building your application with MSVC++ i.e. using C++
-exceptions and not explicitly defining one of __CLEANUP_*, then
-__CLEANUP_C++ was automatically defined for you in pthread.h.
+exceptions and not explicitly defining one of __PTW32_CLEANUP_*, then
+__PTW32_CLEANUP_C++ was automatically defined for you in pthread.h.
 You should have been linking with pthreadVCE.dll, which does
 stack unwinding.
 
 If you now build your application as you had before, pthread.h will now
-automatically set __CLEANUP_C as the default style, and you will need to
+automatically set __PTW32_CLEANUP_C as the default style, and you will need to
 link with pthreadVC.dll. Stack unwinding will now NOT occur when a thread
 is canceled, or the thread calls pthread_exit().
 
@@ -1149,7 +1208,7 @@ instantiated objects may not be destroyed or cleaned up after a thread
 is canceled.
 
 If you want the same behaviour as before, then you must now define
-__CLEANUP_C++ explicitly using a compiler option and link with
+__PTW32_CLEANUP_C++ explicitly using a compiler option and link with
 pthreadVCE.dll as you did before.
 
 
@@ -1292,7 +1351,7 @@ consistent with Solaris.
 - Thomas Pfaff <tpfaff@gmx.net>
 
 * Found a fix for the library and workaround for applications for
-the known bug #2, i.e. where __CLEANUP_CXX or __CLEANUP_SEH is defined.
+the known bug #2, i.e. where __PTW32_CLEANUP_CXX or __PTW32_CLEANUP_SEH is defined.
 See the "Known Bugs in this snapshot" section below.
 
 This could be made transparent to applications by replacing the macros that

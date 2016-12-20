@@ -44,7 +44,7 @@
  * This is used inside ../implement.h to control
  * what these test apps see and don't see.
  */
-#define PTW32_TEST_SNEAK_PEEK
+#define  __PTW32_TEST_SNEAK_PEEK
 
 #include "pthread.h"
 #include "sched.h"
@@ -58,7 +58,7 @@
  */
 #include <errno.h>
 
-#define PTW32_THREAD_NULL_ID {NULL,0}
+#define  __PTW32_THREAD_NULL_ID {NULL,0}
 
 /*
  * Some non-thread POSIX API substitutes
@@ -77,15 +77,15 @@
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
-#  define PTW32_FTIME(x) _ftime64_s(x)
-#  define PTW32_STRUCT_TIMEB struct __timeb64
+#  define  __PTW32_FTIME(x) _ftime64_s(x)
+#  define  __PTW32_STRUCT_TIMEB struct __timeb64
 #elif ( defined(_MSC_VER) && _MSC_VER >= 1300 ) || \
       ( defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601 )
-#  define PTW32_FTIME(x) _ftime64(x)
-#  define PTW32_STRUCT_TIMEB struct __timeb64
+#  define  __PTW32_FTIME(x) _ftime64(x)
+#  define  __PTW32_STRUCT_TIMEB struct __timeb64
 #else
-#  define PTW32_FTIME(x) _ftime(x)
-#  define PTW32_STRUCT_TIMEB struct _timeb
+#  define  __PTW32_FTIME(x) _ftime(x)
+#  define  __PTW32_STRUCT_TIMEB struct _timeb
 #endif
 
 
@@ -132,7 +132,7 @@ const char * error_string[] = {
   "ENOLCK",
   "ENOSYS",
   "ENOTEMPTY",
-#if PTW32_VERSION_MAJOR > 2
+#if  __PTW32_VERSION_MAJOR > 2
   "EILSEQ",
 #else
   "EILSEQ_or_EOWNERDEAD",

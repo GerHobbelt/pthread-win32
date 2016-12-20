@@ -59,7 +59,7 @@ pthread_rwlock_destroy (pthread_rwlock_t * rwlock)
     {
       rwl = *rwlock;
 
-      if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
+      if (rwl->nMagic !=  __PTW32_RWLOCK_MAGIC)
 	{
 	  return EINVAL;
 	}
@@ -113,11 +113,11 @@ pthread_rwlock_destroy (pthread_rwlock_t * rwlock)
     }
   else
     {
-      ptw32_mcs_local_node_t node;
+      __ptw32_mcs_local_node_t node;
       /*
-       * See notes in ptw32_rwlock_check_need_init() above also.
+       * See notes in __ptw32_rwlock_check_need_init() above also.
        */
-      ptw32_mcs_lock_acquire(&ptw32_rwlock_test_init_lock, &node);
+      __ptw32_mcs_lock_acquire(&__ptw32_rwlock_test_init_lock, &node);
 
       /*
        * Check again.
@@ -141,7 +141,7 @@ pthread_rwlock_destroy (pthread_rwlock_t * rwlock)
 	  result = EBUSY;
 	}
 
-      ptw32_mcs_lock_release(&node);
+      __ptw32_mcs_lock_release(&node);
     }
 
   return ((result != 0) ? result : ((result1 != 0) ? result1 : result2));
