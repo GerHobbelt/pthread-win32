@@ -1,5 +1,14 @@
 2016-12-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
+	* implement.h (PThreadStateReuse): this thread state enum value
+	must be less than PThreadStateRunning to reflect an invalid thread
+	handle.
+	* pthread_kill.c: changed conditions for return of ESRCH.
+	* ptw32_destroy.c: copy HANDLEs rather than whole thread struct;
+	edit comment.
+
+2016-12-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
 	* all (PTW32_*): rename to __PTW32_*.
 	(ptw32_*): rename to __ptw32_*.
 	(PtW32*): rename to __PtW32*.

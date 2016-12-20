@@ -90,7 +90,7 @@ pthread_kill (pthread_t thread, int sig)
 
   if (NULL == tp
       || thread.x != tp->ptHandle.x
-      || NULL == tp->threadH)
+      || tp->state < PThreadStateRunning)
     {
       result = ESRCH;
     }

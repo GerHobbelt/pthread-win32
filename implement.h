@@ -151,10 +151,11 @@ typedef enum
 {
   /*
    * This enumeration represents the state of the thread;
-   * The thread is still "alive" if the numeric value of the
+   * The thread is still valid if the numeric value of the
    * state is greater or equal "PThreadStateRunning".
    */
   PThreadStateInitial = 0,	/* Thread not running                   */
+  PThreadStateReuse,            /* In reuse pool.                       */
   PThreadStateRunning,		/* Thread alive & kicking               */
   PThreadStateSuspended,	/* Thread alive but suspended           */
   PThreadStateCancelPending,	/* Thread alive but                     */
@@ -164,9 +165,8 @@ typedef enum
                                 /* due to a cancellation request        */
   PThreadStateExiting,		/* Thread alive but exiting             */
                                 /* due to an exception                  */
-  PThreadStateLast,             /* All handlers have been run and now   */
+  PThreadStateLast              /* All handlers have been run and now   */
                                 /* final cleanup can be done.           */
-  PThreadStateReuse             /* In reuse pool.                       */
 }
 PThreadState;
 
