@@ -8,6 +8,7 @@
 	* mutex7n.c: Likewise.
 	* mutex8.c: Likewise
 	* mutex8n.c: Likewise.
+	* semaphore5.c: don't fail on expected sem_destroy EBUSY.
 
 2016-124-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
