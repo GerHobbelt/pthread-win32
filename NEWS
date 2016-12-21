@@ -27,16 +27,26 @@ implementation, which you may prefer to use.
 New Features
 ------------
 The autoconf configuration added in 2.10.0 should be used for all GNU
-builds (MinGW, MinGW64, etc). The GNUmakefile has been removed.
+builds (MinGW, MinGW64, etc). The redundant GNUmakefiles have been
+removed.
 
 Bug Fixes
 ---------
-Various errors in GNUmakefile. Although this file has been removed, the
-changes are recorded as commits to the repository for completeness.
+Various corrections to GNUmakefile. Although this file has been removed, 
+for completeness the changes have been recorded as commits to the
+repository.
 - Kyle Schwarz
 
 MinGW64-w64 defines pid_t as __int64. sched.h now reflects that.
 - Kyle Schwarz
+
+Several tests have been fixed that were seen to fail on machines under
+load. Other tests that used similar crude mechanisms to synchronise
+threads (these are unit tests) had the same improvements applied:
+semaphore5.c recognises that sem_destroy can legitimately return
+EBUSY; mutex6*.c, mutex7*.c and mutex8*.c all replaced a single
+Sleep() with a polling loop.
+- Ross Johnson
 
 
 RELEASE 2.10.0
