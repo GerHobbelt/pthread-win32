@@ -1,4 +1,4 @@
-# @configure_input@
+#
 # --------------------------------------------------------------------------
 #
 #      Pthreads-win32 - POSIX Threads Library for Win32
@@ -26,46 +26,27 @@
 #      if not, write to the Free Software Foundation, Inc.,
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
-PACKAGE = @PACKAGE_TARNAME@
-VERSION = @PACKAGE_VERSION@
 
 DLL_VER	= 2$(EXTRAVERSION)
 
 # See pthread.h and README for the description of version numbering.
-DLL_VERD = $(DLL_VER)d
+DLL_VERD= $(DLL_VER)d
 
-srcdir = @srcdir@
-builddir = @builddir@
-VPATH = @srcdir@
-
-# FIXME: Replace these path name references with autoconf standards.
-DESTROOT = ../PTHREADS-BUILT
+DESTROOT	= ../PTHREADS-BUILT
+DEST_LIB_NAME = libpthread.a
 DLLDEST	= $(DESTROOT)/bin
 LIBDEST	= $(DESTROOT)/lib
 HDRDEST	= $(DESTROOT)/include
-# i.e.
-#
-prefix = @prefix@
-exec_prefix = @exec_prefix@
-bindir = ${DESTDIR}@bindir@
-includedir = ${DESTDIR}@includedir@
-libdir = ${DESTDIR}@libdir@
-
-# FIXME: This is correct for a static library; a DLL import library
-# should be called libpthread.dll.a, or some such.
-DEST_LIB_NAME = libpthread
 
 # If Running MsysDTK
 RM	= rm -f
 MV	= mv -f
 CP	= cp -f
-GREP	= grep
 MKDIR	= mkdir -p
 ECHO	= echo
 TESTNDIR = test ! -d
 TESTFILE = test -f
 AND	= &&
-COUNT_UNIQ = uniq -c
 
 # If not.
 #RM	= erase
@@ -79,18 +60,19 @@ COUNT_UNIQ = uniq -c
 
 # For cross compiling use e.g.
 # make CROSS=x86_64-w64-mingw32- clean GC-inlined
-# FIXME: To be removed; autoconf handles this transparently;
-# DO NOT use this non-standard feature.
-#CROSS =
+CROSS	= 
 
-CC = @CC@
-CXX = @CXX@
+# Override the builtin default C and C++ standards
+#CSTD	= -std=c90
+#CXXSTD	= -std=c++90
 
-AR = @AR@
-DLLTOOL = @DLLTOOL@
-RANLIB = @RANLIB@
-RC = @RC@
-OD_PRIVATE = @OBJDUMP@ -p
+AR		= $(CROSS)ar
+DLLTOOL = $(CROSS)dlltool
+CC      = $(CROSS)gcc $(CSTD)
+CXX     = $(CROSS)g++ $(CXXSTD)
+RANLIB  = $(CROSS)ranlib
+RC		= $(CROSS)windres
+OD_PRIVATE	= $(CROSS)objdump -p
 
 # Build for non-native architecture. E.g. "-m64" "-m32" etc.
 # Not tested fully, needs gcc built with "--enable-multilib"
@@ -105,18 +87,15 @@ OD_PRIVATE = @OBJDUMP@ -p
 # file just built to see which target the compiler used and set the $(RC) target
 # to match it.
 #
-KNOWN_TARGETS := pe-% pei-% elf32-% elf64-% srec symbolsrec verilog tekhex binary ihex
-SUPPORTED_TARGETS := $(filter $(KNOWN_TARGETS),$(shell $(RC) --help))
-RC_TARGET = --target $(firstword $(filter $(SUPPORTED_TARGETS),$(shell $(OD_PRIVATE) *.$(OBJEXT))))
+SUPPORTED_TARGETS	= $(filter pe-% pei-% elf32-% elf64-% srec symbolsrec verilog tekhex binary ihex,$(shell $(RC) --help))
+RC_TARGET			= --target $(firstword $(filter $(SUPPORTED_TARGETS),$(shell $(OD_PRIVATE) *.$(OBJEXT))))
 
-OPT = $(CLEANUP) -O3 # -finline-functions -findirect-inlining
-XOPT = 
+OPT		=  $(CLEANUP) -O3 # -finline-functions -findirect-inlining
+XOPT	= 
 
-RCFLAGS	= --include-dir=${srcdir}
+RCFLAGS	= --include-dir=.
 LFLAGS	= $(ARCH)
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
-# FIXME: autoconf (or GNU make) convention dictates that this should be
-# LIBS (or LDLIBS); ideally, it should be set by configure.
 #LFLAGS		+= -lws2_32
 #
 # Uncomment this next to link the GCC/C++ runtime libraries statically
@@ -130,8 +109,6 @@ LFLAGS	= $(ARCH)
 # the official filenaming, i.e. pthreadVC2.dll, etc. Instead, change DLL_VER
 # above to "2slgcc" for example, to build "pthreadGC2slgcc.dll", etc.
 #
-# FIXME: in this case, convention would have us use LDFLAGS; once again, if
-# we really want this, we should support it via a configure script option.
 #LFLAGS		+= -static-libgcc -static-libstdc++
 
 # ----------------------------------------------------------------------
@@ -141,7 +118,7 @@ LFLAGS	= $(ARCH)
 # non-compliant, but applications that make assumptions that POSIX
 # does not garrantee may fail or misbehave under some settings.
 #
-# __PTW32_THREAD_ID_REUSE_INCREMENT
+# PTW32_THREAD_ID_REUSE_INCREMENT
 # Purpose:
 # POSIX says that applications should assume that thread IDs can be
 # recycled. However, Solaris and some other systems use a [very large]
@@ -167,13 +144,12 @@ GCE_CFLAGS	= $(PTW32_FLAGS) -mthreads
 
 ## Mingw
 #MAKE		?= make
-DEFS = @DEFS@ -DPTW32_BUILD
-CFLAGS	= $(OPT) $(XOPT) $(ARCH) -I. -I${srcdir} $(DEFS) -Wall
+CFLAGS	= $(OPT) $(XOPT) $(ARCH) -I. -DHAVE_CONFIG_H -Wall
 
-OBJEXT = @OBJEXT@
-RESEXT = @OBJEXT@
+OBJEXT = o
+RESEXT = o
  
-include ${srcdir}/common.mk
+include common.mk
 
 DLL_OBJS += $(RESOURCE_OBJS)
 STATIC_OBJS += $(RESOURCE_OBJS)
@@ -196,7 +172,7 @@ GCD_SMALL_STATIC_STAMP = libpthreadGC$(DLL_VERD).small_static_stamp
 GCE_SMALL_STATIC_STAMP = libpthreadGCE$(DLL_VER).small_static_stamp
 GCED_SMALL_STATIC_STAMP = libpthreadGCE$(DLL_VERD).small_static_stamp
 
-PTHREAD_DEF = pthread.def
+PTHREAD_DEF	= pthread.def
 
 help:
 	@ echo "Run one of the following command lines:"
@@ -221,7 +197,7 @@ all:
 	@ $(MAKE) clean GC-static
 	@ $(MAKE) clean GCE-static
 
-TEST_ENV = __PTW32_FLAGS="$(PTW32_FLAGS) -DNO_ERROR_DIALOGS" DLL_VER=$(DLL_VER) ARCH="$(ARCH)"
+TEST_ENV = PTW32_FLAGS="$(PTW32_FLAGS) -DNO_ERROR_DIALOGS" DLL_VER=$(DLL_VER) ARCH="$(ARCH)"
 
 all-tests:
 	$(MAKE) realclean GC-small-static
@@ -237,48 +213,47 @@ all-tests:
 	cd tests && $(MAKE) clean GC-static $(TEST_ENV) && $(MAKE) clean GCX-static $(TEST_ENV)
 	$(MAKE) realclean GCE-static
 	cd tests && $(MAKE) clean GCE-static $(TEST_ENV)
-	@ $(GREP) FAILED *.log || $(GREP) Passed *.log | $(COUNT_UNIQ)
-	$(MAKE) clean
+	$(MAKE) realclean
 
 all-tests-cflags:
-	$(MAKE) all-tests __PTW32_FLAGS="-Wall -Wextra"
-	@ $(ECHO) "$@ completed."
+	$(MAKE) all-tests PTW32_FLAGS="-Wall -Wextra"
+	@ $(ECHO) "$@ completed successfully."
 
 GC:
-	$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_DLL)
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_DLL)
 
 GC-debug:
-	$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCD_DLL)
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCD_DLL)
 
 GCE:
-	$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_DLL)
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CC="$(CXX)" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_DLL)
 
 GCE-debug:
-	$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_CXX -g -O0" $(GCED_DLL)
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED" CC="$(CXX)" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_CXX -g -O0" $(GCED_DLL)
 
 GC-static:
-	$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_INLINED_STATIC_STAMP)
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" $(GC_INLINED_STATIC_STAMP)
 
 GC-static-debug:
-	$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCD_INLINED_STATIC_STAMP)
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCD_INLINED_STATIC_STAMP)
 
 GC-small-static:
-	$(MAKE) XOPT="-DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(STATIC_OBJS)" $(GC_SMALL_STATIC_STAMP)
+		$(MAKE) XOPT="-DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(STATIC_OBJS)" $(GC_SMALL_STATIC_STAMP)
 
 GC-small-static-debug:
-	$(MAKE) XOPT="-DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(STATIC_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCD_SMALL_STATIC_STAMP)
+		$(MAKE) XOPT="-DPTW32_STATIC_LIB" CLEANUP=-D__CLEANUP_C XC_FLAGS="$(GC_CFLAGS)" OBJ="$(STATIC_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCD_SMALL_STATIC_STAMP)
 
 GCE-static:
-	$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_INLINED_STATIC_STAMP)
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CC="$(CXX)" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" $(GCE_INLINED_STATIC_STAMP)
 
 GCE-static-debug:
-	$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCED_INLINED_STATIC_STAMP)
+		$(MAKE) XOPT="-DPTW32_BUILD_INLINED -DPTW32_STATIC_LIB" CC="$(CXX)" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(DLL_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCED_INLINED_STATIC_STAMP)
 
 GCE-small-static:
-	$(MAKE) XOPT="-DPTW32_STATIC_LIB" CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(STATIC_OBJS)" $(GCE_SMALL_STATIC_STAMP)
+		$(MAKE) XOPT="-DPTW32_STATIC_LIB" CC="$(CXX)" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(STATIC_OBJS)" $(GCE_SMALL_STATIC_STAMP)
 
 GCE-small-static-debug:
-	$(MAKE) XOPT="-DPTW32_STATIC_LIB" CC=$(CXX) CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(STATIC_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCED_SMALL_STATIC_STAMP)
+		$(MAKE) XOPT="-DPTW32_STATIC_LIB" CC="$(CXX)" CLEANUP=-D__CLEANUP_CXX XC_FLAGS="$(GCE_CFLAGS)" OBJ="$(STATIC_OBJS)" DLL_VER=$(DLL_VERD) OPT="-D__CLEANUP_C -g -O0" $(GCED_SMALL_STATIC_STAMP)
 
 tests:
 	@ cd tests
@@ -286,46 +261,23 @@ tests:
 
 # Very basic install. It assumes "realclean" was done just prior to build target if
 # you want the installed $(DEVDEST_LIB_NAME) to match that build.
-
-INSTALL = @INSTALL@
-INSTALL_DATA = @INSTALL_DATA@
-mkinstalldirs = @MKDIR_P@ $1
-
-.PHONY: install installdirs install-headers
-.PHONY: install-dlls install-lib-default install-libs-specific
-
-install: installdirs install-headers install-libs install-dlls
-
-installdirs: ${bindir} ${includedir} ${libdir}
-${bindir} ${includedir} ${libdir}:; $(call mkinstalldirs,$@)
-
-install-dlls: $(wildcard ${builddir}/pthreadGC*.dll)
-	$(INSTALL_DATA) $^ ${bindir}
-
-install-libs: install-libs-specific 
-install-libs-specific: $(wildcard ${builddir}/libpthreadGC*.a)
-	$(INSTALL_DATA) $^ ${libdir}
-
-default_libs = $(wildcard $(addprefix $1,$(DLL_VER)$2 $(DLL_VERD)$2))
-
-# FIXME: this is a ghastly, utterly non-deterministic hack; who knows
-# what it's going to install as the default libpthread.a?  Better to
-# just explicitly make it a copy of libpthreadGC$(DLL_VER).a
-install-libs: install-lib-default
-install-lib-default: $(call default_libs,libpthreadGC,.a)
-install-lib-default: $(call default_libs,libpthreadGCE,.a)
-	$(INSTALL_DATA) $(lastword $^) ${libdir}/$(DEST_LIB_NAME).a
-
-# FIXME: similarly, who knows what this will install?  Once again, it
-# would be better to explicitly install libpthread.dll.a as a copy of
-# libpthreadGC$(DLL_VER).dll.a
-install-libs: install-implib-default
-install-implib-default: $(call default_libs,libpthreadGC,.dll.a)
-install-implib-default: $(call default_libs,libpthreadGCE,.dll.a)
-	$(INSTALL_DATA) $(lastword $^) ${libdir}/$(DEST_LIB_NAME).dll.a
-
-install-headers: pthread.h sched.h semaphore.h _ptw32.h
-	$(INSTALL_DATA) $^ ${includedir}
+install:
+	-$(TESTNDIR) $(DLLDEST) $(AND) $(MKDIR) $(DLLDEST)
+	-$(TESTNDIR) $(LIBDEST) $(AND) $(MKDIR) $(LIBDEST)
+	-$(TESTNDIR) $(HDRDEST) $(AND) $(MKDIR) $(HDRDEST)
+	$(CP) _pth32.h $(HDRDEST)
+	$(CP) pthread.h $(HDRDEST)
+	$(CP) sched.h $(HDRDEST)
+	$(CP) semaphore.h $(HDRDEST)
+	-$(TESTFILE) pthreadGC$(DLL_VER).dll $(AND) $(CP) pthreadGC$(DLL_VER).dll $(DLLDEST)
+	-$(TESTFILE) pthreadGC$(DLL_VERD).dll $(AND) $(CP) pthreadGC$(DLL_VERD).dll $(DLLDEST)
+	-$(TESTFILE) pthreadGCE$(DLL_VER).dll $(AND) $(CP) pthreadGCE$(DLL_VER).dll $(DLLDEST)
+	-$(TESTFILE) pthreadGCE$(DLL_VERD).dll $(AND) $(CP) pthreadGCE$(DLL_VERD).dll $(DLLDEST)
+	# Only one of these can be installed, so run e.g. "make realclean GC install".
+	-$(TESTFILE) libpthreadGC$(DLL_VER).a $(AND) $(CP) libpthreadGC$(DLL_VER).a $(LIBDEST)/$(DEST_LIB_NAME)
+	-$(TESTFILE) libpthreadGC$(DLL_VERD).a $(AND) $(CP) libpthreadGC$(DLL_VERD).a $(LIBDEST)/$(DEST_LIB_NAME)
+	-$(TESTFILE) libpthreadGCE$(DLL_VER).a $(AND) $(CP) libpthreadGCE$(DLL_VER).a $(LIBDEST)/$(DEST_LIB_NAME)
+	-$(TESTFILE) libpthreadGCE$(DLL_VERD).a $(AND) $(CP) libpthreadGCE$(DLL_VERD).a $(LIBDEST)/$(DEST_LIB_NAME)
 
 %.pre: %.c
 	$(CC) -E -o $@ $(CFLAGS) $^
@@ -338,18 +290,18 @@ install-headers: pthread.h sched.h semaphore.h _ptw32.h
 
 .SUFFIXES: .dll .rc .c .o
 
-.c.o:;	$(CC) -c -o $@ $(CFLAGS) $(XC_FLAGS) $<
+.c.o:;		 $(CC) -c -o $@ $(CFLAGS) $(XC_FLAGS) $<
 
 
 $(GC_DLL) $(GCD_DLL): $(DLL_OBJS)
 	$(CC) $(OPT) -shared -o $@ $^ $(LFLAGS)
 	$(DLLTOOL) -z pthread.def $^
-	$(DLLTOOL) -k --dllname $@ --output-lib lib$@.a --def $(PTHREAD_DEF)
+	$(DLLTOOL) -k --dllname $@ --output-lib lib$(basename $@).a --def $(PTHREAD_DEF)
 
 $(GCE_DLL) $(GCED_DLL): $(DLL_OBJS)
 	$(CC) $(OPT) -mthreads -shared -o $@ $^ $(LFLAGS)
 	$(DLLTOOL) -z pthread.def $^
-	$(DLLTOOL) -k --dllname $@ --output-lib lib$@.a --def $(PTHREAD_DEF)
+	$(DLLTOOL) -k --dllname $@ --output-lib lib$(basename $@).a --def $(PTHREAD_DEF)
 
 $(GC_INLINED_STATIC_STAMP) $(GCE_INLINED_STATIC_STAMP) $(GCD_INLINED_STATIC_STAMP) $(GCED_INLINED_STATIC_STAMP): $(DLL_OBJS)
 	$(RM) $(basename $@).a
@@ -377,22 +329,21 @@ realclean: clean
 	-$(RM) pthread*.dll
 	-$(RM) *_stamp
 	-$(RM) make.log.txt
-	-$(RM) *.log
-	-cd tests && $(MAKE) realclean
+	-cd tests && $(MAKE) clean
 
 var_check_list =
 
 define var_check_target
 var-check-$(1):
 	@for src in $($(1)); do \
-	  fgrep -q "\"$$$$src\"" $(2) && continue; \
-	  echo "$$$$src is in \$$$$($(1)), but not in $(2)"; \
-	  exit 1; \
+		fgrep -q "\"$$$$src\"" $(2) && continue; \
+		echo "$$$$src is in \$$$$($(1)), but not in $(2)"; \
+		exit 1; \
 	done
 	@grep '^# *include *".*\.c"' $(2) | cut -d'"' -f2 | while read src; do \
-	  echo " $($(1)) " | fgrep -q " $$$$src " && continue; \
-	  echo "$$$$src is in $(2), but not in \$$$$($(1))"; \
-	  exit 1; \
+		echo " $($(1)) " | fgrep -q " $$$$src " && continue; \
+		echo "$$$$src is in $(2), but not in \$$$$($(1))"; \
+		exit 1; \
 	done
 	@echo "$(1) <-> $(2): OK"
 

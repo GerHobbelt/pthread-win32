@@ -28,50 +28,48 @@
 #      if not, write to the Free Software Foundation, Inc.,
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
-srcdir = @srcdir@
-top_srcdir = @top_srcdir@
-VPATH = @srcdir@
 
 LOGFILE = testsuite.log
 
-builddir = @builddir@
-top_builddir = @top_builddir@
-
 DLL_VER	= 2$(EXTRAVERSION)
 
-CP		= cp -f
-MV		= mv -f
-RM		= rm -f
-CAT		= cat
-GREP	= grep
-WC		= wc
-TEE		= tee
+CP			= cp -f
+MV			= mv -f
+RM			= rm -f
+CAT			= cat
 MKDIR		= mkdir
+GREP		= grep
+WC			= wc
+TEE			= tee
 ECHO		= echo
 TOUCH		= $(ECHO) Passed >
 TESTFILE	= test -f
 TESTDIR		= test -d
-AND		= &&
+AND			= &&
 
 # For cross compiling use e.g.
 # # make CROSS=i386-mingw32msvc- clean GC
-#CROSS   =
+CROSS   =
+
+# Override the builtin default C and C++ standards
+#CSTD	= -std=c90
+#CXXSTD	= -std=c++90
 
 # For cross testing use e.g.
 # # make RUN=wine CROSS=i386-mingw32msvc- clean GC
 RUN     =
 
-AR      = $(CROSS)@AR@
-DLLTOOL = $(CROSS)@DLLTOOL@
-CC      = $(CROSS)@CC@
-CXX     = $(CROSS)@CXX@
-RANLIB  = $(CROSS)@RANLIB@
+AR      = $(CROSS)ar
+DLLTOOL = $(CROSS)dlltool
+CC      = $(CROSS)gcc $(CSTD)
+CXX     = $(CROSS)g++ $(CXXSTD)
+RANLIB  = $(CROSS)ranlib
 
 #
 # Mingw
 #
 XLIBS	=
-XXCFLAGS=
+XXCFLAGS	= 
 XXLIBS	=
 OPT	= -O3
 DOPT	= -g -O0
@@ -90,9 +88,8 @@ LFLAGS	= $(ARCH) $(XXLFLAGS)
 # above to "2slgcc" for example, to build "pthreadGC2slgcc.dll", etc.
 #
 #LFLAGS	+= -static-libgcc -static-libstdc++
-
 BUILD_DIR	= ..
-INCLUDES	= -I ${top_srcdir}
+INCLUDES	= -I.
 
 TEST	= GC
 
@@ -101,20 +98,20 @@ GCX	= GC$(DLL_VER)
 
 # Files we need to run the tests
 # - paths are relative to pthreads build dir.
-HDR	= pthread.h semaphore.h sched.h
+HDR	= _ptw32.h pthread.h semaphore.h sched.h
 LIB	= libpthread$(GCX).a
 DLL	= pthread$(GCX).dll
 # The next path is relative to $BUILD_DIR
 QAPC	=  # ../QueueUserAPCEx/User/quserex.dll
 
-include ${srcdir}/common.mk
+include common.mk
 
 .INTERMEDIATE: $(ALL_KNOWN_TESTS:%=%.exe) $(BENCHTESTS:%=%.exe)
 .SECONDARY: $(ALL_KNOWN_TESTS:%=%.exe) $(ALL_KNOWN_TESTS:%=%.pass) $(BENCHTESTS:%=%.exe) $(BENCHTESTS:%=%.bench)
 .PRECIOUS: $(ALL_KNOWN_TESTS:%=%.exe) $(ALL_KNOWN_TESTS:%=%.pass) $(BENCHTESTS:%=%.exe) $(BENCHTESTS:%=%.bench)
 
-ASM		= $(ALL_KNOWN_TESTS:%=%.s)
-TESTS		= $(ALL_KNOWN_TESTS)
+ASM				= $(ALL_KNOWN_TESTS:%=%.s)
+TESTS			= $(ALL_KNOWN_TESTS)
 BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
 
 #
@@ -128,7 +125,7 @@ BENCHRESULTS	= $(BENCHTESTS:%=%.bench)
 # Set TESTS to one or more tests.
 #
 ifndef NO_DEPS
-include ${srcdir}/runorder.mk
+include runorder.mk
 endif
 
 help:
@@ -149,58 +146,58 @@ help:
 	@ $(ECHO) "$(MAKE) clean GC TESTS="foo bar" (to build individual tests \"foo.c and bar.c\" with C and run using GC dll)"
 
 GC:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C" allpassed
 
 GC-asm:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" all-asm
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C" all-asm
 
 GC-bench:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" all-bench
 
 GC-bench-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${DOPT}" all-bench
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C" XXLIBS="benchlib.o" OPT="${DOPT}" all-bench
 
 GC-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" allpassed
 
 GC-static GC-small-static:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB -Wl,-Bstatic" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" allpassed
 
 GC-static-debug GC-small-static-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CC) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB -Wl,-Bstatic" OPT="$(DOPT)" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC="$(CC)" XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" allpassed
 
 GCE:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_CXX" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)" CC="$(CXX)" XXCFLAGS="-mthreads -D__CLEANUP_CXX" allpassed
 
 GCE-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX" OPT="${DOPT}" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)d" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_CXX" OPT="${DOPT}" allpassed
 
 GCE-static GCE-small-static:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)" CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX -DPTW32_STATIC_LIB -Wl,-Bstatic" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_CXX -DPTW32_STATIC_LIB" DLL="" allpassed
 
 GCE-static-debug GCE-small-static-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_CXX -DPTW32_STATIC_LIB -Wl,-Bstatic" OPT="$(DOPT)" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GCE$(DLL_VER)d" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_CXX -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" allpassed
 
 GCX:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CXX) XXCFLAGS="-mthreads -D__CLEANUP_C" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CXX)" XXCFLAGS="-mthreads -D__CLEANUP_C" allpassed
 
 GCX-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_C" OPT="${DOPT}" allpassed
 
 GCX-static GCX-small-static:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CXX) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB -Wl,-Bstatic" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" DLL="" allpassed
 
 GCX-static-debug GCX-small-static-debug:
-	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC=$(CXX) XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB -Wl,-Bstatic" OPT="$(DOPT)" DLL="" allpassed
+	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)d" CC="$(CXX)" XXCFLAGS="-D__CLEANUP_C -DPTW32_STATIC_LIB" OPT="$(DOPT)" DLL="" allpassed
 
 all-asm: $(ASM)
-	@ $(ECHO) "ALL TESTS COMPILED TO ASSEMBLER CODE"
+	@ $(ECHO) "ALL TESTS PASSED! Congratulations!"
 
 allpassed: $(HDR) $(LIB) $(DLL) $(QAPC) $(TESTS:%=%.pass)
 	@ $(ECHO) "ALL TESTS COMPLETED. Check the logfile: $(LOGFILE)"
-	@ $(ECHO) "FAILURES: $$( $(GREP) FAILED $(LOGFILE) | $(WC) -l ) "
+	@ $(ECHO) "FAILURES: $$( $(GREP) FAILED $(LOGFILE) | $(WC) -l )"
 	@ - ! $(GREP) FAILED $(LOGFILE)
-	@ $(MV) $(LOGFILE) ../$(TEST)-$(LOGFILE)
+	@ $(MV) $(LOGFILE) $(TEST)-$(LOGFILE)
 
 all-bench: $(HDR) $(LIB) $(DLL) $(QAPC) $(XXLIBS) $(BENCHRESULTS)
 	@ $(ECHO) "ALL BENCH TESTS COMPLETED. Check the logfile: $(LOGFILE)"
@@ -211,19 +208,17 @@ all-bench: $(HDR) $(LIB) $(DLL) $(QAPC) $(XXLIBS) $(BENCHRESULTS)
 cancel9.exe: XLIBS = -lws2_32
 
 %.pass: %.exe
-	@ $(ECHO) Running $(TEST) test \"$*\" | tee -a $(LOGFILE)
-	@ (PATH=${top_builddir}:$$PATH $(RUN) ./$* \
-	  && { $(ECHO) Passed; $(TOUCH) $@; } || { $(ECHO) FAILED: $* ; $(ECHO) ; } ) \
-	  2>&1 | tee -a $(LOGFILE)
+	@ $(ECHO) Running $(TEST) test \"$*\" | $(TEE) -a $(LOGFILE)
+	@ $(RUN) ./$* && { $(ECHO) Passed; $(TOUCH) $@; } || { $(ECHO) FAILED: $* ; $(ECHO) ; } \
+	  2>&1 | $(TEE) -a $(LOGFILE)
 
 %.bench: %.exe
-	@ $(ECHO) Running $(TEST) test \"$*\" | tee -a $(LOGFILE)
-	@ (PATH=${top_builddir}:$$PATH $(RUN) ./$* \
-	  && { $(ECHO) Done; $(TOUCH) $@; } || { $(ECHO) FAILED ; $(ECHO) ; } ) \
-	  2>&1 | tee -a $(LOGFILE)
+	@ $(ECHO) Running $(TEST) test \"$*\" | $(TEE) -a $(LOGFILE)
+	@ $(RUN) ./$* && { $(ECHO) Done; $(TOUCH) $@; } || { $(ECHO) FAILED ; $(ECHO) ; } \
+	  2>&1 | $(TEE) -a $(LOGFILE)
 
 %.exe: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) $(LFLAGS) -o $@ $< -L.. -lpthread$(GCX) $(XLIBS) $(XXLIBS)
+	$(CC) $(CFLAGS) $(LFLAGS) -o $@ $< $(INCLUDES) -L. -lpthread$(GCX) $(XLIBS) $(XXLIBS)
 
 %.pre: %.c $(HDR)
 	$(CC) -E $(CFLAGS) -o $@ $< $(INCLUDES)
@@ -232,12 +227,9 @@ cancel9.exe: XLIBS = -lws2_32
 	@ $(ECHO) Compiling $@
 	$(CC) -S $(CFLAGS) -o $@ $< $(INCLUDES)
 
-$(HDR) $(LIB) $(DLL) $(QAPC): $(LOGFILE)
-#	@ $(ECHO) Copying $(BUILD_DIR)/$@
-#	@ $(TESTFILE) $(BUILD_DIR)/$@ $(AND) $(CP) $(BUILD_DIR)/$@ .
-
-.PHONY: $(LOGFILE)
-$(LOGFILE):; > $@
+$(HDR) $(LIB) $(DLL) $(QAPC):
+	@ $(ECHO) Copying $(BUILD_DIR)/$@
+	@ $(TESTFILE) $(BUILD_DIR)/$@ $(AND) $(CP) $(BUILD_DIR)/$@ .
 
 benchlib.o: benchlib.c
 	@ $(ECHO) Compiling $@
@@ -262,6 +254,5 @@ clean:
 	- $(RM) *.manifest
 	- $(RM) *.pass
 	- $(RM) *.bench
-
-realclean: clean
-	- $(RM) *.log
+#	- $(RM) *.log
+	
