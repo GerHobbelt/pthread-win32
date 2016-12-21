@@ -324,7 +324,7 @@ install-implib-default: $(call default_libs,libpthreadGC,.dll.a)
 install-implib-default: $(call default_libs,libpthreadGCE,.dll.a)
 	$(INSTALL_DATA) $(lastword $^) ${libdir}/$(DEST_LIB_NAME).dll.a
 
-install-headers: pthread.h sched.h semaphore.h
+install-headers: pthread.h sched.h semaphore.h _ptw32.h
 	$(INSTALL_DATA) $^ ${includedir}
 
 %.pre: %.c
