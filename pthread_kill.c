@@ -81,28 +81,31 @@ pthread_kill (pthread_t thread, int sig)
       */
 {
   int result = 0;
-  __ptw32_thread_t * tp;
-  __ptw32_mcs_local_node_t node;
 
-  __ptw32_mcs_lock_acquire(&__ptw32_thread_reuse_lock, &node);
-
-  tp = (__ptw32_thread_t *) thread.p;
-
-  if (NULL == tp
-      || thread.x != tp->ptHandle.x
-      || tp->state < PThreadStateRunning)
-    {
-      result = ESRCH;
-    }
-
-  __ptw32_mcs_lock_release(&node);
-
-  if (0 == result && 0 != sig)
+  if (0 != sig)
     {
       /*
        * Currently does not support any signals.
        */
       result = EINVAL;
+    }
+  else
+    {
+      __ptw32_mcs_local_node_t node;
+      __ptw32_thread_t * tp;
+
+      __ptw32_mcs_lock_acquire(&__ptw32_thread_reuse_lock, &node);
+
+      tp = (__ptw32_thread_t *) thread.p;
+
+      if (NULL == tp
+	  || thread.x != tp->ptHandle.x
+	  || tp->state < PThreadStateRunning)
+	{
+	  result = ESRCH;
+	}
+
+      __ptw32_mcs_lock_release(&node);
     }
 
   return result;

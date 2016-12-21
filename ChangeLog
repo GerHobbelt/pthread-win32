@@ -6,6 +6,9 @@
 	* pthread_kill.c: changed conditions for return of ESRCH.
 	* ptw32_destroy.c: copy HANDLEs rather than whole thread struct;
 	edit comment.
+	* pthread_self.c: set implicit thread handle state to PThreadStateRunning.
+	* pthread_create.c: set thread state to PThreadStateSuspended
+	regardless because it must have state >= PThreadStateRunning on return.
 
 2016-12-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
 

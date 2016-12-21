@@ -81,7 +81,8 @@ pthread_self (void)
     }
   else
     {
-	  int fail =  __PTW32_FALSE;
+      int fail =  __PTW32_FALSE;
+
       /*
        * Need to create an implicit 'self' for the currently
        * executing thread.
@@ -151,10 +152,6 @@ pthread_self (void)
 
 #endif
 
-    	      /*
-    	       * No need to explicitly serialise access to sched_priority
-    	       * because the new handle is not yet public.
-    	       */
     	      sp->sched_priority = GetThreadPriority (sp->threadH);
     	      pthread_setspecific (__ptw32_selfThreadKey, (void *) sp);
     	    }
@@ -173,6 +170,16 @@ pthread_self (void)
     	   */
     	  return nil;
         }
+      else
+	{
+	  /*
+	   * This implicit POSIX thread is running (it called us).
+	   * No other thread can reference us yet because all API calls
+	   * passing a pthread_t should recognise an invalid thread id
+	   * through the reuse counter inequality.
+	   */
+    	  sp->state = PThreadStateRunning;
+	}
     }
 
   return (self);
