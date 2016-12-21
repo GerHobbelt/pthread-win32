@@ -1,4 +1,3 @@
-<<<<<<< Upstream, based on master
 2016-12-21  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* mutex6.c: fix random failures by using a polling loop to replace
@@ -11,10 +10,7 @@
 	* mutex8n.c: Likewise.
 	* semaphore5.c: don't fail on expected sem_destroy EBUSY.
 
-2016-124-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
-=======
 2016-12-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
->>>>>>> d1c1032 Initial version 3 commit; see the ChangeLogs
 
 	* all (PTW32_*): rename to __PTW32_*.
 	(ptw32_*): rename to __ptw32_*.
