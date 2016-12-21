@@ -371,6 +371,7 @@ clean:
 	-$(RM) *.exe
 	-$(RM) *.manifest
 	-$(RM) $(PTHREAD_DEF)
+	-cd tests && $(MAKE) clean
 
 realclean: clean
 	-$(RM) lib*.a

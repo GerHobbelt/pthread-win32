@@ -219,6 +219,8 @@ clean:
 	if exist *.manifest $(RM) *.manifest
 	if exist *.pass $(RM) *.pass
 	if exist *.bench $(RM) *.bench
+
+realclean: clean
 	if exist *.log $(RM) *.log
 
 .c.pass:
