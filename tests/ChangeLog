@@ -1,3 +1,14 @@
+2016-12-21  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* mutex6.c: fix random failures by using a polling loop to replace
+	a single Sleep().
+	* mutex6n.c: Likewise.
+	* mutex6s.c: Likewise.
+	* mutex7.c: Likewise.
+	* mutex7n.c: Likewise.
+	* mutex8.c: Likewise
+	* mutex8n.c: Likewise.
+
 2016-124-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* test.c (PTW32_TEST_SNEAK_PEEK): #define this to prevent some
