@@ -237,8 +237,9 @@ all-tests:
 	cd tests && $(MAKE) clean GC-static $(TEST_ENV) && $(MAKE) clean GCX-static $(TEST_ENV)
 	$(MAKE) realclean GCE-static
 	cd tests && $(MAKE) clean GCE-static $(TEST_ENV)
-	@ $(GREP) FAILED *.log || $(GREP) Passed *.log | $(COUNT_UNIQ)
-	$(MAKE) clean
+	$(MAKE) realclean
+	@ $(GREP) Passed *.log | $(COUNT_UNIQ)
+	@ $(GREP) FAILED *.log
 
 all-tests-cflags:
 	$(MAKE) all-tests __PTW32_FLAGS="-Wall -Wextra"
@@ -377,7 +378,6 @@ realclean: clean
 	-$(RM) pthread*.dll
 	-$(RM) *_stamp
 	-$(RM) make.log.txt
-	-$(RM) *.log
 	-cd tests && $(MAKE) realclean
 
 var_check_list =
