@@ -206,7 +206,7 @@ all-bench: $(HDR) $(LIB) $(DLL) $(QAPC) $(XXLIBS) $(BENCHRESULTS)
 	@ $(ECHO) "ALL BENCH TESTS COMPLETED. Check the logfile: $(LOGFILE)"
 	@ $(ECHO) "FAILURES: $$( $(GREP) FAILED $(LOGFILE) | $(WC) -l ) "
 	@ - ! $(GREP) FAILED $(LOGFILE)
-	@ $(MV) $(LOGFILE) $(TEST)-$(LOGFILE)
+	@ $(MV) $(LOGFILE) ../$(TEST)-$(LOGFILE)
 
 cancel9.exe: XLIBS = -lws2_32
 
