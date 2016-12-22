@@ -238,8 +238,8 @@ all-tests:
 	$(MAKE) realclean GCE-static
 	cd tests && $(MAKE) clean GCE-static $(TEST_ENV)
 	$(MAKE) realclean
-	@ $(GREP) Passed *.log | $(COUNT_UNIQ)
-	@ $(GREP) FAILED *.log
+	@ - $(GREP) Passed *.log | $(COUNT_UNIQ)
+	@ - $(GREP) FAILED *.log
 
 all-tests-cflags:
 	$(MAKE) all-tests __PTW32_FLAGS="-Wall -Wextra"
