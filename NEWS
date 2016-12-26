@@ -10,6 +10,16 @@ New bug fixes in all releases since 2.8.0 have NOT been applied to the
 Some changes from 2011-02-26 onward may not be compatible with
 pre Windows 2000 systems.
 
+License Change
+--------------
+Pthreads-win32 version 2.11.0 is being release under the Lesser GNU
+Public License version 3 (LGPLv3).
+
+The next major version of this software (version 3) will be released
+under the Apache License version 2.0 and this release 2.11 under
+LGPLv3 will mean that modifications to version 3 of this software can
+also be backported to version 2 going forward.
+
 Testing and verification
 ------------------------
 This version has been tested on SMP architecture (Intel x64 Hex Core)
