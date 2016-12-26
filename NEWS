@@ -12,13 +12,13 @@ pre Windows 2000 systems.
 
 License Change
 --------------
-Pthreads-win32 version 2.11.0 is being release under the Lesser GNU
+Pthreads-win32 version 2.11.0 is being released under the Lesser GNU
 Public License version 3 (LGPLv3).
 
 The next major version of this software (version 3) will be released
-under the Apache License version 2.0 and this release 2.11 under
-LGPLv3 will mean that modifications to version 3 of this software can
-also be backported to version 2 going forward.
+under the Apache License version 2.0 and releasing 2.11 under
+LGPLv3 will allow modifications to version 3 of this software to be
+backported to version 2 going forward.
 
 Testing and verification
 ------------------------
