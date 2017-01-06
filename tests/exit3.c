@@ -41,7 +41,7 @@
 void *
 func(void * arg)
 {
-	int failed = (int) arg;
+	int failed = (int)(size_t) arg;
 
 	pthread_exit(arg);
 
@@ -49,7 +49,7 @@ func(void * arg)
         /*
          * assert(0) in a way to prevent warning or optimising away.
          */
-	assert(failed - (int) arg);
+	assert(failed - (int)(size_t) arg);
 
 	return NULL;
 }

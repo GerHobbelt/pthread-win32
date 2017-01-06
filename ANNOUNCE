@@ -1,14 +1,14 @@
 PTHREADS4W RELEASE 2.10.0 (2016-09-18)
 --------------------------------------
-Web Site:	http://sourceforge.net/projects/pthreads4w/
-Repository:	http://sourceforge.net/p/pthreads4w/code
-Releases:	http://sourceforge.net/projects/pthreads4w/files
+Web Site:	https://sourceforge.net/projects/pthreads4w/
+Repository:	https://sourceforge.net/p/pthreads4w/code
+Releases:	https://sourceforge.net/projects/pthreads4w/files
 Maintainer: Ross Johnson <firstname dot lastname at loungebythelake dot net>
 
 
 We are pleased to announce the availability of a new release of
-Pthreads4w (a.k.a. Pthreads-win32), an Open Source Software implementation of the
-Threads component of the SUSV3 Standard for Microsoft's
+Pthreads4w (a.k.a. Pthreads-win32), an Open Source Software implementation
+of the Threads component of the SUSV3 Standard for Microsoft's
 Windows (x86 and x64). Some relevant functions from other sections
 of SUSV3 are also supported including semaphores and scheduling
 functions. See the Conformance section below for details.
@@ -28,7 +28,7 @@ Release 2.9.1 was probably the last to provide pre-built libraries. The supporte
 compilers are now all available free for personal use. The MSVS version should
 build out of the box using nmake. The GCC versions now make use of GNU autoconf
 to generate a configure script which in turn creates a custom config.h for the
-environment you use: MinGW or MinGW64, etc.
+environment you use: MinGW or MinGW64, etc. and the GNUmakefiles.
 
 
 Acknowledgements
