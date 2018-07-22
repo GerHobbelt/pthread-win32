@@ -165,6 +165,13 @@ EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
 
 static int on_process_init(void)
 {
+#if defined(_MSC_VER) && !defined(_DLL)
+    extern int __cdecl _heap_init (void);
+    extern int __cdecl _mtinit (void);
+
+    _heap_init();
+    _mtinit();
+#endif
     pthread_win32_process_attach_np ();
     return 0;
 }
