@@ -114,11 +114,21 @@ all-tests:
 	@ echo $@ completed successfully.
 
 all-tests-cflags:
+	$(MAKE) all-tests-md all-tests-mt
+	@ echo $@ completed successfully.
+
+all-tests-md:
 	@ -$(SETENV)
 	$(MAKE) all-tests XCFLAGS="/W3 /WX /MD /nologo"
-	$(MAKE) all-tests XCFLAGS="/W3 /WX /MT /nologo"
 !IF DEFINED(MORE_EXHAUSTIVE)
 	$(MAKE) all-tests XCFLAGS="/W3 /WX /MDd /nologo" XDBG="-debug"
+!ENDIF
+	@ echo $@ completed successfully.
+
+all-tests-mt:
+	@ -$(SETENV)
+	$(MAKE) all-tests XCFLAGS="/W3 /WX /MT /nologo"
+!IF DEFINED(MORE_EXHAUSTIVE)
 	$(MAKE) all-tests XCFLAGS="/W3 /WX /MTd /nologo" XDBG="-debug"
 !ENDIF
 	@ echo $@ completed successfully.

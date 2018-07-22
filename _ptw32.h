@@ -165,8 +165,8 @@
 #  define int64_t LONGLONG
 #  define uint64_t ULONGLONG
 #elif !defined(__MINGW32__)
-#  define int64_t _int64
-#  define uint64_t unsigned _int64
+typedef _int64 int64_t;
+typedef unsigned _int64 uint64_t;
 #  if defined (__PTW32_CONFIG_MSVC6)
      typedef long intptr_t;
 #  endif
