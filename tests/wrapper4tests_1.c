@@ -2,7 +2,7 @@
    Ger Hobbelt ([i_a]) : wrapper code for multiple pthreads library tests; for use with MSVC2003/5 project.
  */
 
-#include "pthread.h"
+#include "../pthread.h"
 
 
 #include <stdio.h>

@@ -35,9 +35,9 @@
 
 #include "../config.h"
 
-#include "pthread.h"
-#include "sched.h"
-#include "semaphore.h"
+#include "../pthread.h"
+#include "../sched.h"
+#include "../semaphore.h"
 #include <windows.h>
 #include <stdio.h>
 

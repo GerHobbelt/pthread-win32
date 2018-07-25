@@ -36,7 +36,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #include "pthread.h"
@@ -44,7 +44,7 @@
 #include "sched.h"
 
 int
-sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
+sched_setaffinity(pid_t pid, size_t cpusetsize, cpu_set_t *set)     
      /*
       * ------------------------------------------------------
       * DOCPUBLIC

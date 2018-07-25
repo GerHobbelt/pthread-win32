@@ -36,7 +36,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #include "pthread.h"
@@ -121,10 +121,11 @@ pthread_delay_np (struct timespec *interval)
    * because the variable type is unsigned, but we need to keep this
    * for some reason I can't recall now.
    */
-  if (0 > (wait_time = secs_in_millisecs + millisecs))
-    {
+#pragma warning(disable:4296)
+  if (0 > (wait_time = secs_in_millisecs + millisecs)) {
       return EINVAL;
     }
+#pragma warning(default:4296)
 
 #if defined(__WATCOMC__)
 #pragma enable_message (124)

@@ -36,7 +36,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #include "pthread.h"
@@ -260,7 +260,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
             }
           else
             {
-              pthread_t self = pthread_self();
+              /*pthread_t*/ self = pthread_self();
 
               if (0 == (PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
                            (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
