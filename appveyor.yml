@@ -1,0 +1,18 @@
+
+environment:
+   matrix:
+      - PLATFORM: x64
+        PTHREAD: x64
+      - PLATFORM: Win32
+        PTHREAD: x86
+
+os: Visual Studio 2015
+
+build_script:
+    - sed -i 's/4820;4668;4255;/4820;4668;4255;4711;4100;4312;/' pthread_lib.2015.vcxproj
+    - msbuild pthread.2015.sln /nologo /p:Configuration=Release /p:Platform=%PLATFORM% /t:pthread_lib
+
+notifications:
+
+  - provider: Email
+    on_build_status_changed: false
