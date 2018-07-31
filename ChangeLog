@@ -1,3 +1,11 @@
+2016-12-25  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Change all license notices to the Apache License 2.0
+	* LICENCE: New Apache License file
+	* NOTICE: New file.
+	* COPYING: Removed.
+	* COPYING.GPL: Removed.
+
 2016-12-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* implement.h (PThreadStateReuse): this thread state enum value

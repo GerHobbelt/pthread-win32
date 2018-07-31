@@ -1,3 +1,7 @@
+2016-12-25  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Change all license notices to the Apache License 2.0
+
 2016-12-21  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* mutex6.c: fix random failures by using a polling loop to replace

@@ -1,21 +1,37 @@
 RELEASE 3.0.0
 --------------
-(2016-12-20)
+(2017-01-01)
 
 General
 -------
-Note that this is a new major release and consolidates the already very
-stable version 2.10.0. The major version increment introduces two minor
-ABI changes along with other naming changes that will require
-recompilation of linking applications and possibly some textual changes
-to compile-time macro references in configuration and source files, e.g.
-PTW32_* to __PTW32_*, etc.
+Note that this is a new major release. The major version increment
+introduces two ABI changes along with other naming changes that will
+require recompilation of linking applications and possibly some textual
+changes to compile-time macro references in configuration and source
+files, e.g. PTW32_* changes to __PTW32_*, ptw32_* to __ptw32_*, etc.
+
+License Change
+--------------
+Pthreads4w version 3.0.0 is being released under the terms of the Apache
+License v2.0. The APLv2 is compatible with the GPLv3 and LGPLv3 licenses
+and therefore this code may continue to be legally included within GPLv3
+and LGPLv3 projects.
+
+Pthreads4w version 2 releases will remain LGPL but version 2.11 will be
+released under v3 of that license so that any additions to pthreads4w
+version 3 code that we backport to v2 will not pollute that code.
+
+Because this license compatibility is not reciprocal, future
+modifications to pthreads4w will only be accepted to version 3 (or
+later), i.e. the APLv2 code-base.
+
+Backporting and Support of Legacy Windows Releases
+--------------------------------------------------
+Some changes from 2011-02-26 onward may not be compatible with pre
+Windows 2000 systems.
 
 New bug fixes in all releases since 2.8.0 have NOT been applied to the
 1.x.x series.
-
-Some changes from 2011-02-26 onward may not be compatible with
-pre Windows 2000 systems.
 
 Testing and verification
 ------------------------
@@ -494,7 +510,7 @@ General
 The package now includes a reference documentation set consisting of
 HTML formatted Unix-style manual pages that have been edited for
 consistency with Pthreads-w32. The set can also be read online at:
-http://sources.redhat.com/pthreads-win32/manual/index.html
+https://sourceforge.net/projects/pthreads4w/manual/index.html
 
 Thanks again to Tim Theisen for running the test suite pre-release
 on an MP system.
