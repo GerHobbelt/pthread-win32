@@ -17,18 +17,23 @@ Some common non-portable functions are also implemented for
 additional compatibility, as are a few functions specific
 to pthreads4w for easier integration with Windows applications.
 
-Pthreads4w is free software. Version 3.0.0 is distributed under the
-Apache License version 2.0 (APLv2). The APLv2 is compatible with the GPLv3
-and LGPLv3 licenses and therefore this code may continue to be legally
-included within GPLv3 and LGPLv3 projects.
+Pthreads4w is free software. With the exception of four files noted later,
+Version 3.0.0 is distributed under the Apache License version 2.0 (APLv2).
+The APLv2 is compatible with the GPLv3 and LGPLv3 licenses and therefore
+this code may continue to be legally included within GPLv3 and LGPLv3
+projects.
 
 All version 1 and 2 releases will remain LGPL but version 2.11 will be
 released under v3 of that license so that any modifications to pthreads4w
 version 3 code that we backport to v2 will not pollute that code.
 
-Because this license compatibility is not reciprocal, future
-modifications to pthreads4w will only be accepted to version 3 (or
-later), i.e. the APLv2 code-base.
+The four files that will remain LGPL but change to v3 are files used to
+configure the GNU environment builds:
+
+	aclocal.m4
+	configure.ac
+	GNUmakefile.in
+	tests/GNUmakefile.in
 
 For those who want to try the most recent changes, the SourceForge Git
 repository is the one to use. The Sourceware CVS repository is synchronised
