@@ -1,6 +1,6 @@
 RELEASE 3.0.0
 --------------
-(2017-01-01)
+(2018-08-01)
 
 General
 -------
@@ -12,18 +12,33 @@ files, e.g. PTW32_* changes to __PTW32_*, ptw32_* to __ptw32_*, etc.
 
 License Change
 --------------
-Pthreads4w version 3.0.0 is being released under the terms of the Apache
-License v2.0. The APLv2 is compatible with the GPLv3 and LGPLv3 licenses
-and therefore this code may continue to be legally included within GPLv3
-and LGPLv3 projects.
+With the agreement of all substantial relevant contributors Pthreads4w
+version 3 is being released under the terms of the Apache License v2.0.
+The APLv2 is compatible with the GPLv3 and LGPLv3 licenses and therefore
+this code may continue to be legally included within GPLv3 and LGPLv3
+projects.
 
-Pthreads4w version 2 releases will remain LGPL but version 2.11 will be
-released under v3 of that license so that any additions to pthreads4w
-version 3 code that we backport to v2 will not pollute that code.
+A substantial relevant contributor was defined as one who has contributed
+original code that implements a complete capability or significant
+optimisation in the releases going forward. This excludes several
+contributors who have contributed code that has later been replaced, or
+have provided patches to fix bugs, reorganise code or improve build
+processes. This distinction was necessary in order to move forward in the
+high likelyhood that not all contributors would be contactable. All
+contributors are listed in the file CONTRIBUTORS.
 
-Because this license compatibility is not reciprocal, future
-modifications to pthreads4w will only be accepted to version 3 (or
-later), i.e. the APLv2 code-base.
+Contributors who have requested this change or agreed to it when consulted
+are:
+
+John Bossom
+Alexander Terekhov
+Vladimir Kliatchko
+Ross Johnson
+
+Pthreads4w version 2 releases will remain LGPL but version 2.11 and later
+will be released under v3 of that license so that any additions to
+pthreads4w version 3 code that is backported to v2 will not pollute that
+code.
 
 Backporting and Support of Legacy Windows Releases
 --------------------------------------------------
