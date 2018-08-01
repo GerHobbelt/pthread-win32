@@ -13,22 +13,30 @@ files, e.g. PTW32_* changes to __PTW32_*, ptw32_* to __ptw32_*, etc.
 License Change
 --------------
 With the agreement of all substantial relevant contributors Pthreads4w
-version 3 is being released under the terms of the Apache License v2.0.
-The APLv2 is compatible with the GPLv3 and LGPLv3 licenses and therefore
-this code may continue to be legally included within GPLv3 and LGPLv3
-projects.
+version 3, with the exception of four files, is being released under the
+terms of the Apache License v2.0. The APLv2 is compatible with the GPLv3
+and LGPLv3 licenses and therefore this code may continue to be legally
+included within GPLv3 and LGPLv3 projects.
 
 A substantial relevant contributor was defined as one who has contributed
-original code that implements a complete capability or significant
-optimisation in the releases going forward. This excludes several
-contributors who have contributed code that has later been replaced, or
-have provided patches to fix bugs, reorganise code or improve build
+original code that implements a capability present in the releases going
+forward. This excludes several contributors who have contributed code
+that has been obsoleted, or have provided patches that fix bugs,
+reorganise code for aesthetic or practical purposes, or improve build
 processes. This distinction was necessary in order to move forward in the
-high likelyhood that not all contributors would be contactable. All
+likelyhood that not all contributors would be contactable. All
 contributors are listed in the file CONTRIBUTORS.
 
-Contributors who have requested this change or agreed to it when consulted
-are:
+The four files that will remain LGPL but change to v3 are files used to
+configure the GNU environment builds:
+
+	aclocal.m4
+	configure.ac
+	GNUmakefile.in
+	tests/GNUmakefile.in
+
+Contributors who have either requested this change or agreed to it when
+consulted are:
 
 John Bossom
 Alexander Terekhov
