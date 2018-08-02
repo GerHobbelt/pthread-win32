@@ -1143,7 +1143,7 @@ __PTW32_DLLPORT int  __PTW32_CDECL pthreadCancelableTimedWait (void *waitHandle,
  *
  * http://social.msdn.microsoft.com/forums/en-US/vclanguage/thread/b4500c0d-1b69-40c7-9ef5-08da1025b5bf
  *
- * When pthreads-win32 is built with  __PTW32_USES_SEPARATE_CRT
+ * When pthreads4w is built with  __PTW32_USES_SEPARATE_CRT
  * defined, the following features are enabled:
  *
  * (1) In addition to setting the errno variable when errors
@@ -1161,7 +1161,7 @@ __PTW32_DLLPORT int  __PTW32_CDECL pthreadCancelableTimedWait (void *waitHandle,
  *
  * Note: "_DLL" implies the /MD compiler flag.
  */
-#if defined(_MSC_VER) && !defined(_DLL) && !defined (__PTW32_STATIC_LIB)
+#if defined(_MSC_VER) && !defined(_DLL) && !defined (__PTW32_STATIC_LIB) && !defined(__PTW32_STATIC_TLSLIB)
 #  define  __PTW32_USES_SEPARATE_CRT
 #endif
 
