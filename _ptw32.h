@@ -212,10 +212,6 @@
 #endif
 
 /* POSIX 2008 - related to robust mutexes */
-/*
- * FIXME: These should be changed for version 3.0.0 onward.
- * 42 clashes with EILSEQ.
- */
 #if  __PTW32_VERSION_MAJOR > 2
 #  if !defined(EOWNERDEAD)
 #    define EOWNERDEAD 1000
