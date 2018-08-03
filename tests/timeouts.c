@@ -213,6 +213,8 @@ int Wait(time_t sec, long nsec)
    * We don't need to check the CV.
    */
   result = pthread_cond_timedwait(&cv_, &mutex_, &abstime);
+  assert(result != 0);
+  assert(errno == ETIMEDOUT);
   pthread_mutex_unlock(&mutex_);
   return result;
 }
