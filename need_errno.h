@@ -59,9 +59,8 @@ extern "C" {
 #endif
 #endif
 
-#if defined (__PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400
-#  undef  __PTW32_STATIC_LIB
-#  define  __PTW32_STATIC_TLSLIB
+#if defined(__PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400
+#  define __PTW32_STATIC_TLSLIB
 #endif
 
 #if defined (__PTW32_STATIC_LIB) || defined (__PTW32_STATIC_TLSLIB)

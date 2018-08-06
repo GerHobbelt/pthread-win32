@@ -66,23 +66,8 @@
 # define __PTW32_END_C_DECLS
 #endif
 
-#if defined  (__PTW32_STATIC_LIB) && _MSC_VER >= 1400
-# undef  __PTW32_STATIC_LIB
-# define  __PTW32_STATIC_TLSLIB
-#endif
-
-/* When building the library, you should define  __PTW32_BUILD so that
- * the variables/functions are exported correctly. When using the library,
- * do NOT define  __PTW32_BUILD, and then the variables/functions will
- * be imported correctly.
- *
- * FIXME: Used defined feature test macros, such as  __PTW32_STATIC_LIB, (and
- * maybe even  __PTW32_BUILD), should be renamed with one initial underscore;
- * internally defined macros, such as  __PTW32_DLLPORT, should be renamed with
- * two initial underscores ... perhaps __PTW32_DECLSPEC is nicer anyway?
- */
-#if defined  __PTW32_STATIC_LIB || defined  __PTW32_STATIC_TLSLIB
-# define  __PTW32_DLLPORT
+#if defined __PTW32_STATIC_LIB
+# define __PTW32_DLLPORT
 
 #elif defined  __PTW32_BUILD
 # define  __PTW32_DLLPORT __declspec (dllexport)

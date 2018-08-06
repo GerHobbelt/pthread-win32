@@ -1161,8 +1161,8 @@ __PTW32_DLLPORT int  __PTW32_CDECL pthreadCancelableTimedWait (void *waitHandle,
  *
  * Note: "_DLL" implies the /MD compiler flag.
  */
-#if defined(_MSC_VER) && !defined(_DLL) && !defined (__PTW32_STATIC_LIB) && !defined(__PTW32_STATIC_TLSLIB)
-#  define  __PTW32_USES_SEPARATE_CRT
+#if defined(_MSC_VER) && !defined(_DLL) && !defined(__PTW32_STATIC_LIB)
+#  define __PTW32_USES_SEPARATE_CRT
 #endif
 
 #if defined (__PTW32_USES_SEPARATE_CRT) && (defined(__PTW32_CLEANUP_CXX) || defined(__PTW32_CLEANUP_SEH))

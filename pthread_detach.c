@@ -102,10 +102,14 @@ pthread_detach (pthread_t thread)
        */
       result = 0;
 
-      __ptw32_mcs_lock_acquire (&tp->stateLock, &stateLock);
-      if (tp->state != PThreadStateLast)
+      ptw32_mcs_lock_acquire (&tp->stateLock, &stateLock);
+      if (tp->state < PThreadStateLast)
         {
           tp->detachState = PTHREAD_CREATE_DETACHED;
+          if (tp->state == PThreadStateExiting)
+          {
+            destroyIt = PTW32_TRUE;
+          }
         }
       else if (tp->detachState != PTHREAD_CREATE_DETACHED)
         {
