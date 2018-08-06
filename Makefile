@@ -92,7 +92,7 @@ all:
 TEST_ENV = CFLAGS="$(CFLAGS) /DNO_ERROR_DIALOGS"
 
 all-tests:
-	$(MAKE) all-tests-dll all-tests-static
+	$(MAKE) all-tests-md all-tests-mt
 
 all-tests-dll:
 	$(MAKE) /E realclean VC$(XDBG) && cd tests
@@ -107,10 +107,6 @@ all-tests-static:
 	cd tests && $(MAKE) /E clean VCE-static$(XDBG) $(TEST_ENV)
 	cd tests && $(MAKE) /E clean VSE-static$(XDBG) $(TEST_ENV)
 	$(MAKE) realclean
-	@ echo $@ completed successfully.
-
-all-tests-cflags:
-	$(MAKE) all-tests-md all-tests-mt
 	@ echo $@ completed successfully.
 
 all-tests-md:
