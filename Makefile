@@ -5,7 +5,7 @@
 
 # PTW32_VER:
 # See pthread.h and README for the description of version numbering.
-PTW32_VER	= 2$(EXTRAVERSION)
+PTW32_VER	= 3$(EXTRAVERSION)
 PTW32_VER_DEBUG= $(PTW32_VER)d
 
 DESTROOT	= ..\PTHREADS-BUILT

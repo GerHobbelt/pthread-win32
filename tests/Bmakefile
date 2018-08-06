@@ -31,7 +31,7 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
-DLL_VER	= 2
+PTW32_VER	= 3
 
 CP	= copy
 RM	= erase
@@ -51,12 +51,12 @@ XXLIBS	= cw32mti.lib ws2_32.lib
 
 # C++ Exceptions
 BCEFLAGS	= -P -D__PtW32NoCatchWarn -D__PTW32_CLEANUP_CXX
-BCELIB	= pthreadBCE$(DLL_VER).lib
-BCEDLL	= pthreadBCE$(DLL_VER).dll
+BCELIB	= pthreadBCE$(PTW32_VER).lib
+BCEDLL	= pthreadBCE$(PTW32_VER).dll
 # C cleanup code
 BCFLAGS	= -D__PTW32_CLEANUP_C
-BCLIB	= pthreadBC$(DLL_VER).lib
-BCDLL	= pthreadBC$(DLL_VER).dll
+BCLIB	= pthreadBC$(PTW32_VER).lib
+BCDLL	= pthreadBC$(PTW32_VER).dll
 # C++ Exceptions in application - using VC version of pthreads dll
 BCXFLAGS	= -D__PTW32_CLEANUP_C
 

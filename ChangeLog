@@ -1,3 +1,18 @@
+2018-08-07  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile.in (DLL_VER): rename as PTW32_VER; increment version number.
+	* Makefile (DLL_VER): Likewise.
+	* Bmakefile (DLL_VER): Likewise; does anyone use this anymore?
+
+2018-07-22  Mark Pizzolato <markpizzolato dash pthreads dash win32 at subscriptions dot pizzolato dot net>
+
+	* _ptw32.h: Restore support for compiling as static (with /MT or /MTd);
+	define int64_t and uint64_t as typedefs rather than #defines.
+	* dll.c: Likewise.
+	* implement.h: Likewise.
+	* need_errno.h: Likewise.
+	* pthread_detach.c: Likewise.
+
 2018-07-22  Carlo Bramini <carlo underscore bramini at users dot sourceforge dot net>
 
 	* context.h (ARM): Additional macros checked for ARM processors.
@@ -11,11 +26,6 @@
 	* Makefile (all-tests-cflags): retain; require all-tests-md and
 	all-tests-mt.
 	
-2018-07-22  Mark Pizzolato <markpizzolato dash pthreads dash win32 at subscriptions dot pizzolato dot net>
-
-	* _ptw32.h (int64_t): change from #define to typedef.
-	* _ptw32.h (uint64_t): Likewise.
-
 2016-12-25  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* Change all license notices to the Apache License 2.0

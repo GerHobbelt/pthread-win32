@@ -1,7 +1,7 @@
 # Makefile for the pthreads test suite.
 # If all of the .pass files can be created, the test suite has passed.
 
-PTW32_VER	= 2$(EXTRAVERSION)
+PTW32_VER	= 3$(EXTRAVERSION)
 
 CC = cl /errorReport:none /nologo
 
