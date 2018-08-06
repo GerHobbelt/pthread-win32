@@ -80,7 +80,7 @@
  */
 
 enum {
-	NUMTHREADS = 10000
+	NUMTHREADS = PTHREAD_THREADS_MAX
 };
 
 
