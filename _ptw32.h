@@ -44,11 +44,11 @@
  * leading underscore to the macro names.
  */
 #define PTW32_VERSION_MAJOR 2
-#define PTW32_VERSION_MINOR 10
+#define PTW32_VERSION_MINOR 11
 #define PTW32_VERSION_MICRO 0
 #define PTW32_VERION_BUILD 0
-#define PTW32_VERSION 2,10,0,0
-#define PTW32_VERSION_STRING "2, 10, 0, 0\0"
+#define PTW32_VERSION 2,11,0,0
+#define PTW32_VERSION_STRING "2, 11, 0, 0\0"
 
 #if defined(__GNUC__)
 # pragma GCC system_header
