@@ -54,8 +54,10 @@ INCLUDES			= -I.
 BUILD_DIR			= ..
 
 EHFLAGS		=
-EHFLAGS_STATIC			= /MT /D__PTW32_STATIC_LIB -I.. /DHAVE_CONFIG_H /D__PTW32_BUILD_INLINED ..\pthread.c
-EHFLAGS_STATIC_DEBUG	= /MTd /D__PTW32_STATIC_LIB -I.. /DHAVE_CONFIG_H /D__PTW32_BUILD_INLINED ..\pthread.c
+EHFLAGS_DLL				= /MD
+EHFLAGS_DLL_DEBUG		= /MDd
+EHFLAGS_STATIC			= /MT /D__PTW32_STATIC_LIB -I$(BUILD_DIR) /DHAVE_CONFIG_H /D__PTW32_BUILD_INLINED $(BUILD_DIR)\pthread.c
+EHFLAGS_STATIC_DEBUG	= /MTd /D__PTW32_STATIC_LIB -I$(BUILD_DIR) /DHAVE_CONFIG_H /D__PTW32_BUILD_INLINED $(BUILD_DIR)\pthread.c
 
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.
@@ -108,28 +110,28 @@ help:
 	@ $(ECHO) nmake clean VSE-small-static-debug
 
 VC:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" allpassed
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS) $(EHFLAGS_DLL)" allpassed
 
 VCE:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" allpassed
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS) $(EHFLAGS_DLL)" allpassed
 
 VSE:	
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" allpassed
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS) $(EHFLAGS_DLL)" allpassed
 
 VCX:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" allpassed
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS) $(EHFLAGS_DLL)" allpassed
 
 VC-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS)" $(BENCHTESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCFLAGS) $(EHFLAGS_DLL)" $(BENCHTESTS)
 
 VCE-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS)" $(BENCHTESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIB)" CPDLL="$(VCEDLL)" EHFLAGS="$(VCEFLAGS) $(EHFLAGS_DLL)" $(BENCHTESTS)
 
 VSE-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS)" $(BENCHTESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIB)" CPDLL="$(VSEDLL)" EHFLAGS="$(VSEFLAGS) $(EHFLAGS_DLL)" $(BENCHTESTS)
 
 VCX-bench:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS)" $(BENCHTESTS)
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS) $(EHFLAGS_DLL)" $(BENCHTESTS)
 
 VC-static VC-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="" CPDLL="" EHFLAGS="$(VCFLAGS) $(EHFLAGS_STATIC)" allpassed
@@ -156,25 +158,25 @@ VCX-static-bench:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="" CPDLL="" EHFLAGS="$(VCXFLAGS) $(EHFLAGS_STATIC)" $(BENCHTESTS)
 
 VC-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS)" allpassed
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCFLAGS) $(EHFLAGS_DLL_DEBUG)" allpassed
 
 VC-static-debug VC-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="" EHFLAGS="$(VCFLAGS) $(EHFLAGS_STATIC_DEBUG)" allpassed
 
 VCE-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS)" allpassed
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="$(VCEDLLD)" EHFLAGS="$(VCEFLAGS) $(EHFLAGS_DLL_DEBUG)" allpassed
 
 VCE-static-debug VCE-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCELIBD)" CPDLL="" EHFLAGS="$(VCEFLAGS) $(EHFLAGS_STATIC_DEBUG)" allpassed
 
 VSE-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS)" allpassed
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VSELIBD)" CPDLL="$(VSEDLLD)" EHFLAGS="$(VSEFLAGS) $(EHFLAGS_DLL_DEBUG)" allpassed
 
 VSE-static-debug VSE-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="" CPDLL="" EHFLAGS="$(VSEFLAGS) $(EHFLAGS_STATIC_DEBUG)" allpassed
 
 VCX-debug:
-	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS)" allpassed
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIBD)" CPDLL="$(VCDLLD)" EHFLAGS="$(VCXFLAGS) $(EHFLAGS_DLL_DEBUG)" allpassed
 
 VCX-static-debug VCX-small-static-debug:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="" CPDLL="" EHFLAGS="$(VCXFLAGS) $(EHFLAGS_STATIC_DEBUG)" allpassed
