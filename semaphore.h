@@ -11,7 +11,7 @@
  *
  *      Pthreads4w - POSIX Threads for Windows
  *      Copyright 1998 John E. Bossom
- *      Copyright 1999-2016, Pthreads4w contributors
+ *      Copyright 1999-2018, Pthreads4w contributors
  *
  *      Homepage: https://sourceforge.net/projects/pthreads4w/
  *
