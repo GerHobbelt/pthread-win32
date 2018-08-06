@@ -32,7 +32,7 @@
 #
 
 
-DLL_VER	= 2
+PTW32_VER	= 2
 
 .EXTENSIONS:
 
@@ -53,12 +53,12 @@ XXLIBS	=
 
 # C++ Exceptions
 WCEFLAGS	= -xs -dPtW32NoCatchWarn -d__CLEANUP_CXX
-WCELIB	= pthreadWCE$(DLL_VER).lib
-WCEDLL	= pthreadWCE$(DLL_VER).dll
+WCELIB	= pthreadWCE$(PTW32_VER).lib
+WCEDLL	= pthreadWCE$(PTW32_VER).dll
 # C cleanup code
 WCFLAGS	= -d__CLEANUP_C
-WCLIB	= pthreadWC$(DLL_VER).lib
-WCDLL	= pthreadWC$(DLL_VER).dll
+WCLIB	= pthreadWC$(PTW32_VER).lib
+WCDLL	= pthreadWC$(PTW32_VER).dll
 # C++ Exceptions in application - using WC version of pthreads dll
 WCXFLAGS	= -xs -d__CLEANUP_C
 

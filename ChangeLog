@@ -1,3 +1,12 @@
+2018-07-22  Mark Pizzolato <markpizzolato dash pthreads dash win32 at subscriptions dot pizzolato dot net>
+
+	* _ptw32.h: Restore support for compiling as static (with /MT or /MTd);
+	define int64_t and uint64_t as typedefs rather than #defines.
+	* dll.c: Likewise.
+	* implement.h: Likewise.
+	* need_errno.h: Likewise.
+	* pthread_detach.c: Likewise.
+
 2018-07-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* Makefile (all-tests-md): New; run the /MD build and tests from
@@ -1225,10 +1234,10 @@
 
 	* pthread_cond_wait.c (ptw32_cond_wait_cleanup): Undo change
 	from 2004-11-02.
-	* Makefile (DLL_VER): Added for DLL naming suffix - see README.
-	* GNUmakefile (DLL_VER): Likewise.
-	* Wmakefile (DLL_VER): Likewise.
-	* Bmakefile (DLL_VER): Likewise.
+	* Makefile (PTW32_VER): Added for DLL naming suffix - see README.
+	* GNUmakefile (PTW32_VER): Likewise.
+	* Wmakefile (PTW32_VER): Likewise.
+	* Bmakefile (PTW32_VER): Likewise.
 	* pthread.dsw (version.rc): Added to MSVS workspace.
 
 2004-11-20  Boudewijn Dekker  <b.dekker at ellipsis.nl>
