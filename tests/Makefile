@@ -3,15 +3,15 @@
 #
 # --------------------------------------------------------------------------
 #
-#      Pthreads-win32 - POSIX Threads Library for Win32
+#      Pthreads4w - POSIX Threads Library for Win32
 #      Copyright(C) 1998 John E. Bossom
-#      Copyright(C) 1999,2012 Pthreads-win32 contributors
+#      Copyright(C) 1999,2012 Pthreads4w contributors
 # 
 #      The current list of contributors is contained
 #      in the file CONTRIBUTORS included with the source
 #      code distribution. The list can also be seen at the
 #      following World Wide Web location:
-#      http://sources.redhat.com/pthreads-win32/contributors.html
+#      https://sourceforge.net/projects/pthreads4w//contributors.html
 # 
 #      This library is free software; you can redistribute it and/or
 #      modify it under the terms of the GNU Lesser General Public
