@@ -38,11 +38,6 @@
 # include <config.h>
 #endif
 
-#if defined(PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400
-#  undef PTW32_STATIC_LIB
-#  define PTW32_STATIC_TLSLIB
-#endif
-
 #include "pthread.h"
 #include "implement.h"
 
@@ -62,12 +57,7 @@
  */
 extern "C"
 #endif				/* __cplusplus */
-  BOOL WINAPI
-#if defined(PTW32_STATIC_TLSLIB)
-PTW32_StaticLibMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
-#else
-DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
-#endif
+  BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
   BOOL result = PTW32_TRUE;
 
@@ -111,33 +101,6 @@ DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 typedef int foo;
 #endif
 
-/* Visual Studio 8+ can leverage PIMAGE_TLS_CALLBACK CRT segments, which
- * give a static lib its very own DllMain.
- */
-#ifdef PTW32_STATIC_TLSLIB
-
-static void WINAPI
-TlsMain(PVOID h, DWORD r, PVOID u)
-{
-  (void)PTW32_StaticLibMain((HINSTANCE)h, r, u);
-}
-
-#ifdef _M_X64
-# pragma comment (linker, "/INCLUDE:_tls_used")
-# pragma comment (linker, "/INCLUDE:_xl_b")
-# pragma const_seg(".CRT$XLB")
-EXTERN_C const PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
-# pragma const_seg()
-#else
-# pragma comment (linker, "/INCLUDE:__tls_used")
-# pragma comment (linker, "/INCLUDE:__xl_b")
-# pragma data_seg(".CRT$XLB")
-EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
-# pragma data_seg()
-#endif /* _M_X64 */
-
-#endif /* PTW32_STATIC_TLSLIB */
-
 #if defined(PTW32_STATIC_LIB)
 
 /*
@@ -165,13 +128,6 @@ EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
 
 static int on_process_init(void)
 {
-#if defined(_MSC_VER) && !defined(_DLL)
-    extern int __cdecl _heap_init (void);
-    extern int __cdecl _mtinit (void);
-
-    _heap_init();
-    _mtinit();
-#endif
     pthread_win32_process_attach_np ();
     return 0;
 }
@@ -187,7 +143,7 @@ static int on_process_exit(void)
 __attribute__((section(".ctors"), used)) static int (*gcc_ctor)(void) = on_process_init;
 __attribute__((section(".dtors"), used)) static int (*gcc_dtor)(void) = on_process_exit;
 #elif defined(_MSC_VER)
-#  if _MSC_VER >= 1400 /* MSVC8 */
+#  if _MSC_VER >= 1400 /* MSVC8+ */
 #    pragma section(".CRT$XCU", long, read)
 #    pragma section(".CRT$XPU", long, read)
 __declspec(allocate(".CRT$XCU")) static int (*msc_ctor)(void) = on_process_init;
