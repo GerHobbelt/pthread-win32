@@ -26,9 +26,9 @@ SMALL_STATIC_STAMPS		= pthreadVCE$(PTW32_VER).small_static_stamp pthreadVSE$(PTW
 
 CC	= cl /errorReport:none /nologo
 CPPFLAGS = /I. /DHAVE_CONFIG_H
-XCFLAGS = /W3 /MD /nologo
-CFLAGS	= /O2 /Ob2 $(XCFLAGS)
-CFLAGSD	= /Z7 $(XCFLAGS)
+XCFLAGS = 
+CFLAGS	= /W3 /O2 /Ob2 $(XCFLAGS)
+CFLAGSD	= /W3 /Z7 $(XCFLAGS)
 
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
 #XLIBS = wsock32.lib
@@ -95,28 +95,17 @@ all-tests:
 	$(MAKE) all-tests-dll all-tests-static
 
 all-tests-dll:
-#	$(MAKE) /E realclean VC-small-static$(XDBG)
-#	cd tests && $(MAKE) /E clean VC-small-static$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX-small-static$(XDBG) $(TEST_ENV)
-#	$(MAKE) /E realclean VCE-small-static$(XDBG)
-#	cd tests && $(MAKE) /E clean VCE-small-static$(XDBG) $(TEST_ENV)
-#	$(MAKE) /E realclean VSE-small-static$(XDBG)
-#	cd tests && $(MAKE) /E clean VSE-small-static$(XDBG) $(TEST_ENV)
-	$(MAKE) /E realclean VC$(XDBG)
-	cd tests && $(MAKE) /E clean VC$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VC$(XDBG) && cd tests
+	$(MAKE) /E clean VC$(XDBG) $(TEST_ENV)
 	$(MAKE) /E realclean VCE$(XDBG)
 	cd tests && $(MAKE) /E clean VCE$(XDBG) $(TEST_ENV)
 	$(MAKE) /E realclean VSE$(XDBG)
 	cd tests && $(MAKE) /E clean VSE$(XDBG) $(TEST_ENV)
 
 all-tests-static:
-#!IF DEFINED(EXHAUSTIVE)
-	$(MAKE) /E realclean VC-static$(XDBG)
-	cd tests && $(MAKE) /E clean VC-static$(XDBG) $(TEST_ENV) && $(MAKE) /E clean VCX-static$(XDBG) $(TEST_ENV)
-	$(MAKE) /E realclean VCE-static$(XDBG)
+	cd tests && $(MAKE) /E clean VC-static$(XDBG) $(TEST_ENV)
 	cd tests && $(MAKE) /E clean VCE-static$(XDBG) $(TEST_ENV)
-	$(MAKE) /E realclean VSE-static$(XDBG)
 	cd tests && $(MAKE) /E clean VSE-static$(XDBG) $(TEST_ENV)
-#!ENDIF
 	$(MAKE) realclean
 	@ echo $@ completed successfully.
 
@@ -126,16 +115,16 @@ all-tests-cflags:
 
 all-tests-md:
 	@ -$(SETENV)
-	$(MAKE) all-tests XCFLAGS="/W3 /WX /MD"
-!IF DEFINED(MORE_EXHAUSTIVE)
-	$(MAKE) all-tests XCFLAGS="/W3 /WX /MDd" XDBG="-debug"
+	$(MAKE) all-tests-dll XCFLAGS="/W3 /WX /MD"
+!IF DEFINED(EXHAUSTIVE)
+	$(MAKE) all-tests-dll XCFLAGS="/W3 /WX /MDd" XDBG="-debug"
 !ENDIF
 	@ echo $@ completed successfully.
 
 all-tests-mt:
 	@ -$(SETENV)
 	$(MAKE) all-tests-static XCFLAGS="/W3 /WX /MT"
-!IF DEFINED(MORE_EXHAUSTIVE)
+!IF DEFINED(EXHAUSTIVE)
 	$(MAKE) all-tests-static XCFLAGS="/W3 /WX /MTd" XDBG="-debug"
 !ENDIF
 	@ echo $@ completed successfully.
