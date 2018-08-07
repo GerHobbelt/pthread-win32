@@ -9,7 +9,6 @@ PTW32_VER	= 2$(EXTRAVERSION)
 PTW32_VER_DEBUG= $(PTW32_VER)d
 
 DESTROOT	= ..\PTHREADS-BUILT
-DEST_LIB_NAME = pthread.lib
 
 DLLDEST	= $(DESTROOT)\bin
 LIBDEST	= $(DESTROOT)\lib
@@ -214,8 +213,7 @@ clean:
 	if exist *.res del *.res
 	if exist *_stamp del *_stamp
 
-# Very basic install. It assumes "realclean" was done just prior to build target if
-# you want the installed $(DEVDEST_LIB_NAME) to match that build.
+# Very basic install. It assumes "realclean" was done just prior to build target.
 install:
 	if not exist $(DLLDEST) mkdir $(DLLDEST)
 	if not exist $(LIBDEST) mkdir $(LIBDEST)
