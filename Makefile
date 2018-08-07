@@ -9,7 +9,6 @@ PTW32_VER	= 3$(EXTRAVERSION)
 PTW32_VER_DEBUG= $(PTW32_VER)d
 
 DESTROOT	= ..\PTHREADS-BUILT
-DEST_LIB_NAME = pthread.lib
 
 DLLDEST	= $(DESTROOT)\bin
 LIBDEST	= $(DESTROOT)\lib
@@ -57,7 +56,10 @@ DLL_OBJS	= $(DLL_OBJS) $(RESOURCE_OBJS)
 STATIC_OBJS	= $(STATIC_OBJS) $(RESOURCE_OBJS)
 
 help:
-	@ echo Run one of the following command lines:
+	@ echo To just build all possible versions and install them in $(DESTROOT)
+	@ echo nmake all install
+	@ echo ------------------------------------------
+	@ echo Or run one of the following command lines:
 	@ echo nmake clean all-tests
 	@ echo nmake -DEXHAUSTIVE clean all-tests
 	@ echo nmake clean all-tests-md
@@ -66,28 +68,29 @@ help:
 	@ echo nmake clean VC-debug
 	@ echo nmake clean VC-static
 	@ echo nmake clean VC-static-debug
-#	@ echo nmake clean VC-small-static
-#	@ echo nmake clean VC-small-static-debug
 	@ echo nmake clean VCE
 	@ echo nmake clean VCE-debug
 	@ echo nmake clean VCE-static
 	@ echo nmake clean VCE-static-debug
-#	@ echo nmake clean VCE-small-static
-#	@ echo nmake clean VCE-small-static-debug
 	@ echo nmake clean VSE
 	@ echo nmake clean VSE-debug
 	@ echo nmake clean VSE-static
 	@ echo nmake clean VSE-static-debug
-#	@ echo nmake clean VSE-small-static
-#	@ echo nmake clean VSE-small-static-debug
 
 all:
+	$(MAKE) /E clean VC-static
+	$(MAKE) /E clean VCE-static
+	$(MAKE) /E clean VSE-static
+	$(MAKE) /E clean VC-static-debug
+	$(MAKE) /E clean VCE-static-debug
+	$(MAKE) /E clean VSE-static-debug
 	$(MAKE) /E clean VC
 	$(MAKE) /E clean VCE
 	$(MAKE) /E clean VSE
 	$(MAKE) /E clean VC-debug
 	$(MAKE) /E clean VCE-debug
 	$(MAKE) /E clean VSE-debug
+	$(MAKE) /E clean
 
 TEST_ENV = CFLAGS="$(CFLAGS) /DNO_ERROR_DIALOGS"
 
