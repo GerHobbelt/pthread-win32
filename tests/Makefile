@@ -133,6 +133,9 @@ VSE-bench:
 VCX-bench:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="$(VCDLL)" EHFLAGS="$(VCXFLAGS) $(EHFLAGS_DLL)" $(BENCHTESTS)
 
+VC-static-lib VC-small-static-lib:
+	@ $(MAKE) /E /nologo TEST="$@" CPLIB="$(VCLIB)" CPDLL="" EHFLAGS="$(VCFLAGS) /MT" allpassed
+
 VC-static VC-small-static:
 	@ $(MAKE) /E /nologo TEST="$@" CPLIB="" CPDLL="" EHFLAGS="$(VCFLAGS) $(EHFLAGS_STATIC)" allpassed
 
