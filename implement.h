@@ -60,6 +60,11 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 /*
  * Designed to allow error values to be set and retrieved in builds where
  * MSCRT libraries are statically linked to DLLs.
+ *
+ * This does not handle the case where a static pthreads4w lib is linked
+ * to a static linked app. Compiling and linking pthreads.c with app.c
+ * as one does work with the right macros defined. See tests/Makefile
+ * for clues or just "cd tests && nmake clean VC-static".
  */
 #if ! defined(WINCE) && \
     (( defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0800 ) || \
