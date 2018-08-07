@@ -7,7 +7,7 @@ benchtest3.bench:
 benchtest4.bench:
 benchtest5.bench:
 
-affinity1.pass: 
+affinity1.pass: errno0.pass
 affinity2.pass: affinity1.pass
 affinity3.pass: affinity2.pass self1.pass create3.pass
 affinity4.pass: affinity3.pass
@@ -57,6 +57,7 @@ delay1.pass: self1.pass create3.pass
 delay2.pass: delay1.pass
 detach1.pass: join0.pass
 equal1.pass: self1.pass create1.pass
+errno0.pass: sizes.pass
 errno1.pass: mutex3.pass
 exception1.pass: cancel4.pass
 exception2.pass: exception1.pass
@@ -126,9 +127,7 @@ rwlock4.pass: rwlock3.pass
 rwlock5.pass: rwlock4.pass
 rwlock6.pass: rwlock5.pass
 rwlock7.pass: rwlock6.pass
-rwlock7_1.pass: rwlock7.pass
 rwlock8.pass: rwlock7.pass
-rwlock8_1.pass: rwlock8.pass
 rwlock2_t.pass: rwlock2.pass
 rwlock3_t.pass: rwlock2_t.pass
 rwlock4_t.pass: rwlock3_t.pass

@@ -1,8 +1,11 @@
 2018-08-07  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
-	* GNUmakefile.in (DLL_VER): rename as PTW32_VER; increment version number.
+	* GNUmakefile.in (DLL_VER): rename as PTW32_VER.
 	* Makefile (DLL_VER): Likewise.
 	* Bmakefile (DLL_VER): Likewise; does anyone use this anymore?
+	* Makefile: Variable renaming: e.g. VCLIB to VCIMP for DLL import
+	library pthreadVC2.lib and VCLIB now holds static library name
+	libpthreadVC2.lib, and similar for the other cleanup method versions.
 
 2018-07-22  Mark Pizzolato <markpizzolato dash pthreads dash win32 at subscriptions dot pizzolato dot net>
 

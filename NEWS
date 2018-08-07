@@ -107,6 +107,30 @@ New bug fixes in all releases since 2.8.0 have NOT been applied to the
 Some changes from 2011-02-26 onward may not be compatible with
 pre Windows 2000 systems.
 
+License Change to LGPL v3
+-------------------------
+Pthreads4w version 2.11 and all future 2.x versions will be released
+under the Lesser GNU Public License version 3 (LGPLv3).
+
+Planned Release Under the Apache License v2
+-------------------------------------------
+The next major version of this software (version 3) will be released
+under the Apache License version 2.0 (ALv2). Releasing 2.11 under LGPLv3
+will allow modifications to version 3 of this software to be backported
+to version 2 going forward. Further to this, any GPL projects currently
+using this library will be able to continue to use either version 2 or 3
+of this code in their projects.
+
+For more information please see:
+https://www.apache.org/licenses/GPL-compatibility.html
+
+In order to remain consistent with this change, from this point on
+modifications to this library will only be accepted against version 3
+of this software under the terms of the ALv2. They will then, where
+appropriate, be backported to version 2.
+
+We hope to release version 3 at the same time as we release version 2.11.
+
 Testing and verification
 ------------------------
 This version has been tested on SMP architecture (Intel x64 Hex Core)
@@ -121,14 +145,34 @@ successfully. We recommend MinGW64 over MinGW32 for both 64 and 32 bit
 GNU CC builds. MinGW64 also includes its own independent pthreads
 implementation, which you may prefer to use.
 
-New Features
-------------
-The autoconf configuration added in 2.10.0 should be used for all GNU
-builds (MinGW, MinGW64, etc). The redundant GNUmakefiles have been
-removed.
+New Features or Changes
+-----------------------
+For Microsoft toolchain builds:
+(1) Static linking requires both this library and any linking
+libraries or applications to be compiled with /MT consistently.
+
+(2) Static libraries have been renamed as libpthreadV*.lib
+to differentiate them from DLL import libs pthreadV*.lib.
+
+(3) If you are using mixed linkage, e.g. linking the static /MT version
+of the library to an application linked with /MD you may be able to use
+GetLastError() to interrogate the error code because the library sets
+both errno (via _set_errno()) and SetLastError().
 
 Bug Fixes
 ---------
+Remove the attempt to set PTW32_USES_SEPARATE_CRT in the headers which
+can cause unexpected results. In certain situations a user may want to
+define it explicitly in their environment to invoke it's effects, either
+when buidling the library or an application or both. See README.NONPORTABLE.
+-- Ross Johnson
+
+The library should be more reliable under fully statically linked
+scenarios. Note: we have removed the PIMAGE_TLS_CALLBACK code and
+reverted to the earlier method that appears to be more reliable
+across all compiler editions.
+- Mark Pizzolato
+
 Various corrections to GNUmakefile. Although this file has been removed, 
 for completeness the changes have been recorded as commits to the
 repository.
@@ -630,7 +674,7 @@ semaphores, such as WinCE prior to version 3.0. An alternate implementation
 of POSIX semaphores is built using W32 events for these systems when
 NEED_SEM is defined. This code has been completely rewritten in this
 release to reuse most of the default POSIX semaphore code, and particularly,
-to implement all of the sem_* routines supported by pthreads-win32. Tim
+to implement all of the sem_* routines supported by Pthreads4w. Tim
 Theisen also run the test suite over the NEED_SEM code on his MP system. All
 tests passed.
 
@@ -640,7 +684,7 @@ New features
 ------------
 
 * pthread_mutex_timedlock() and all sem_* routines provided by
-pthreads-win32 are now implemented for WinCE versions prior to 3.0. Those
+Pthreads4w are now implemented for WinCE versions prior to 3.0. Those
 versions did not implement W32 semaphores. Define NEED_SEM in config.h when
 building the library for these systems.
 
@@ -833,7 +877,7 @@ New features
 * A Microsoft-style version resource has been added to the DLL for
 applications that wish to check DLL compatibility at runtime.
 
-* Pthreads-win32 DLL naming has been extended to allow incompatible DLL
+* Pthreads4w DLL naming has been extended to allow incompatible DLL
 versions to co-exist in the same filesystem. See the README file for details,
 but briefly: while the version information inside the DLL will change with
 each release from now on, the DLL version names will only change if the new
@@ -843,7 +887,7 @@ The versioning scheme has been borrowed from GNU Libtool, and the DLL
 naming scheme is from Cygwin. Provided the Libtool-style numbering rules are
 honoured, the Cygwin DLL naming scheme automatcally ensures that DLL name
 changes are minimal and that applications will not load an incompatible
-pthreads-win32 DLL.
+Pthreads4w DLL.
 
 Those who use the pre-built DLLs will find that the DLL/LIB names have a new
 suffix (1) in this snapshot. E.g. pthreadVC1.dll etc.
@@ -861,7 +905,7 @@ Certain POSIX macros have changed.
 
 These changes are intended to conform to the Single Unix Specification version 3,
 which states that, if set to 0 (zero) or not defined, then applications may use
-sysconf() to determine their values at runtime. Pthreads-win32 does not
+sysconf() to determine their values at runtime. Pthreads4w does not
 implement sysconf().
 
 The following macros are no longer undefined, but defined and set to -1
@@ -1056,7 +1100,7 @@ for implicit POSIX threads.
 New feature - cancellation of/by Win32 (non-POSIX) threads
 ---------------------------------------------------------
 Since John Bossom's original implementation, the library has allowed non-POSIX
-initialised threads (Win32 threads) to call pthreads-win32 routines and
+initialised threads (Win32 threads) to call Pthreads4w routines and
 therefore interact with POSIX threads. This is done by creating an on-the-fly
 POSIX thread ID for the Win32 thread that, once created, allows fully
 reciprical interaction. This did not extend to thread cancellation (async or
@@ -1266,7 +1310,7 @@ There are a few reasons:
   do the expected thing in that context. (There are equally respected
   people who believe it should not be easily accessible, if it's there
   at all, for unconditional conformity to other implementations.)
-- because pthreads-win32 is one of the few implementations that has
+- because Pthreads4w is one of the few implementations that has
   the choice, perhaps the only freely available one, and so offers
   a laboratory to people who may want to explore the effects;
 - although the code will always be around somewhere for anyone who
@@ -1405,7 +1449,7 @@ return an error (ESRCH).
 
 * errno: An incorrect compiler directive caused a local version
 of errno to be used instead of the Win32 errno. Both instances are
-thread-safe but applications checking errno after a pthreads-win32
+thread-safe but applications checking errno after a Pthreads4w
 call would be wrong. Fixing this also fixed a bad compiler
 option in the testsuite (/MT should have been /MD) which is
 needed to link with the correct library MSVCRT.LIB.
