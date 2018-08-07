@@ -222,16 +222,11 @@ install:
 	if not exist $(HDRDEST) mkdir $(HDRDEST)
 	if exist pthreadV*.dll copy pthreadV*.dll $(DLLDEST)
 	copy pthreadV*.lib $(LIBDEST)
+	copy libpthreadV*.lib $(LIBDEST)
 	copy _ptw32.h $(HDRDEST)
 	copy pthread.h $(HDRDEST)
 	copy sched.h $(HDRDEST)
 	copy semaphore.h $(HDRDEST)
-	if exist pthreadVC$(PTW32_VER).lib copy pthreadVC$(PTW32_VER).lib $(LIBDEST)\$(DEST_LIB_NAME)
-	if exist pthreadVC$(PTW32_VER_DEBUG).lib copy pthreadVC$(PTW32_VER_DEBUG).lib $(LIBDEST)\$(DEST_LIB_NAME)
-	if exist pthreadVCE$(PTW32_VER).lib copy pthreadVCE$(PTW32_VER).lib $(LIBDEST)\$(DEST_LIB_NAME)
-	if exist pthreadVCE$(PTW32_VER_DEBUG).lib copy pthreadVCE$(PTW32_VER_DEBUG).lib $(LIBDEST)\$(DEST_LIB_NAME)
-	if exist pthreadVSE$(PTW32_VER).lib copy pthreadVSE$(PTW32_VER).lib $(LIBDEST)\$(DEST_LIB_NAME)
-	if exist pthreadVSE$(PTW32_VER_DEBUG).lib copy pthreadVSE$(PTW32_VER_DEBUG).lib $(LIBDEST)\$(DEST_LIB_NAME)
 
 $(DLLS): $(DLL_OBJS)
 	$(CC) /LDd /Zi $(DLL_OBJS) /link /implib:$*.lib $(XLIBS) /out:$@
