@@ -1,4 +1,4 @@
-PTHREADS4W RELEASE 2.10.0 (2016-09-18)
+PTHREADS4W RELEASE 2.11.0 (2018-08-07)
 --------------------------------------
 Web Site:	https://sourceforge.net/projects/pthreads4w/
 Repository:	https://sourceforge.net/p/pthreads4w/code
@@ -13,12 +13,14 @@ Windows (x86 and x64). Some relevant functions from other sections
 of SUSV3 are also supported including semaphores and scheduling
 functions. See the Conformance section below for details.
 
-Some common non-portable functions are also implemented for
-additional compatibility, as are a few functions specific
-to pthreads4w for easier integration with Windows applications.
+Some common non-portable functions are also implemented for additional
+compatibility, as are a few functions specific to pthreads4w for easier
+integration with Windows applications.
 
-Pthreads4w is free software, distributed under the GNU Lesser
-General Public License (LGPL).
+Pthreads4w is free software, distributed under the GNU Lesser General
+Public License (LGPL). Version 2.11.0 moves to the LGPL v3 for compatibility
+with Pthreads4w version 3 which will be released under the Apache Licence
+v2.0.
 
 For those who want to try the most recent changes, the SourceForge Git repository
 is the one to use. The Sourceware CVS repository is synchronised much less often

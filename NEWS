@@ -48,14 +48,34 @@ successfully. We recommend MinGW64 over MinGW32 for both 64 and 32 bit
 GNU CC builds. MinGW64 also includes its own independent pthreads
 implementation, which you may prefer to use.
 
-New Features
-------------
-The autoconf configuration added in 2.10.0 should be used for all GNU
-builds (MinGW, MinGW64, etc). The redundant GNUmakefiles have been
-removed.
+New Features or Changes
+-----------------------
+For Microsoft toolchain builds:
+(1) Static linking requires both this library and any linking
+libraries or applications to be compiled with /MT consistently.
+
+(2) Static libraries have been renamed as libpthreadV*.lib
+to differentiate them from DLL import libs pthreadV*.lib.
+
+(3) If you are using mixed linkage, e.g. linking the static /MT version
+of the library to an application linked with /MD you may be able to use
+GetLastError() to interrogate the error code because the library sets
+both errno (via _set_errno()) and SetLastError().
 
 Bug Fixes
 ---------
+Remove the attempt to set PTW32_USES_SEPARATE_CRT in the headers which
+can cause unexpected results. In certain situations a user may want to
+define it explicitly in their environment to invoke it's effects, either
+when buidling the library or an application or both. See README.NONPORTABLE.
+-- Ross Johnson
+
+The library should be more reliable under fully statically linked
+scenarios. Note: we have removed the PIMAGE_TLS_CALLBACK code and
+reverted to the earlier method that appears to be more reliable
+across all compiler editions.
+- Mark Pizzolato
+
 Various corrections to GNUmakefile. Although this file has been removed, 
 for completeness the changes have been recorded as commits to the
 repository.
