@@ -227,13 +227,13 @@ $(DLLS): $(DLL_OBJS)
 	$(CC) /LDd /Zi $(DLL_OBJS) /link /implib:$*.lib $(XLIBS) /out:$@
 
 $(INLINED_STATIC_STAMPS): $(DLL_OBJS)
-	if exist $*.lib del $*.lib
-	lib $(DLL_OBJS) /out:$*.lib
+	if exist lib$*.lib del lib$*.lib
+	lib $(DLL_OBJS) /out:lib$*.lib
 	echo. >$@
 
 $(SMALL_STATIC_STAMPS): $(STATIC_OBJS)
-	if exist $*.lib del $*.lib
-	lib $(STATIC_OBJS) /out:$*.lib
+	if exist lib$*.lib del lib$*.lib
+	lib $(STATIC_OBJS) /out:lib$*.lib
 	echo. >$@
 
 .c.obj:

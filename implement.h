@@ -72,20 +72,20 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #  if defined(__MINGW32__)
 __attribute__((unused))
 #  endif
-static int ptw32_get_errno(void) { int err = 0; _get_errno(&err); return err; }
-#  define PTW32_GET_ERRNO() ptw32_get_errno()
+static int __ptw32_get_errno(void) { int err = 0; _get_errno(&err); return err; }
+#  define __PTW32_GET_ERRNO() __ptw32_get_errno()
 #  if defined(__MINGW32__)
 __attribute__((unused))
 #  endif
-static void ptw32_set_errno(int err) { _set_errno(err); SetLastError(err); }
-#    define PTW32_SET_ERRNO(err) ptw32_set_errno(err)
+static void __ptw32_set_errno(int err) { _set_errno(err); SetLastError(err); }
+#    define __PTW32_SET_ERRNO(err) __ptw32_set_errno(err)
 #else
-#  define PTW32_GET_ERRNO() (errno)
+#  define __PTW32_GET_ERRNO() (errno)
 #  if defined(__MINGW32__)
 __attribute__((unused))
 #  endif
-static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
-#    define PTW32_SET_ERRNO(err) ptw32_set_errno(err)
+static void __ptw32_set_errno(int err) { errno = err; SetLastError(err); }
+#    define __PTW32_SET_ERRNO(err) __ptw32_set_errno(err)
 #endif
 
 #if !defined(malloc)
