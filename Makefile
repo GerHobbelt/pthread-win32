@@ -103,8 +103,11 @@ all-tests-dll:
 	cd tests && $(MAKE) /E clean VSE$(XDBG) $(TEST_ENV)
 
 all-tests-static:
+	$(MAKE) /E realclean VC-static$(XDBG)
 	cd tests && $(MAKE) /E clean VC-static$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VCE-static$(XDBG)
 	cd tests && $(MAKE) /E clean VCE-static$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VSE-static$(XDBG)
 	cd tests && $(MAKE) /E clean VSE-static$(XDBG) $(TEST_ENV)
 	$(MAKE) realclean
 	@ echo $@ completed successfully.
@@ -204,24 +207,18 @@ clean:
 	if exist *.res del *.res
 	cd tests && $(MAKE) clean
 
-# Very basic install. It assumes "realclean" was done just prior to build target if
-# you want the installed $(DEVDEST_LIB_NAME) to match that build.
+# Very basic install. It assumes "realclean" was done just prior to build target.
 install:
 	if not exist $(DLLDEST) mkdir $(DLLDEST)
 	if not exist $(LIBDEST) mkdir $(LIBDEST)
 	if not exist $(HDRDEST) mkdir $(HDRDEST)
 	if exist pthreadV*.dll copy pthreadV*.dll $(DLLDEST)
 	copy pthreadV*.lib $(LIBDEST)
+	copy libpthreadV*.lib $(LIBDEST)
 	copy _ptw32.h $(HDRDEST)
 	copy pthread.h $(HDRDEST)
 	copy sched.h $(HDRDEST)
 	copy semaphore.h $(HDRDEST)
-	if exist pthreadVC$(PTW32_VER).lib copy pthreadVC$(PTW32_VER).lib $(LIBDEST)\$(DEST_LIB_NAME)
-	if exist pthreadVC$(PTW32_VER_DEBUG).lib copy pthreadVC$(PTW32_VER_DEBUG).lib $(LIBDEST)\$(DEST_LIB_NAME)
-	if exist pthreadVCE$(PTW32_VER).lib copy pthreadVCE$(PTW32_VER).lib $(LIBDEST)\$(DEST_LIB_NAME)
-	if exist pthreadVCE$(PTW32_VER_DEBUG).lib copy pthreadVCE$(PTW32_VER_DEBUG).lib $(LIBDEST)\$(DEST_LIB_NAME)
-	if exist pthreadVSE$(PTW32_VER).lib copy pthreadVSE$(PTW32_VER).lib $(LIBDEST)\$(DEST_LIB_NAME)
-	if exist pthreadVSE$(PTW32_VER_DEBUG).lib copy pthreadVSE$(PTW32_VER_DEBUG).lib $(LIBDEST)\$(DEST_LIB_NAME)
 
 $(DLLS): $(DLL_OBJS)
 	$(CC) /LDd /Zi $(DLL_OBJS) /link /implib:$*.lib $(XLIBS) /out:$@
