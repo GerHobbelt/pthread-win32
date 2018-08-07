@@ -1,5 +1,44 @@
 This file documents non-portable functions and other issues.
 
+
+MSVC: Errno and GetLastError
+----------------------------
+
+If Pthreads4w is compiled as a DLL with MSVC, and
+both it and the application are linked against the static
+C runtime (i.e. with the /MT compiler flag), then the
+application will not see the same C runtime globals as
+the library. These include the errno variable, and the
+termination routine called by terminate(). For details,
+refer to the following links:
+
+http://support.microsoft.com/kb/94248
+(Section 4: Problems Encountered When Using Multiple CRT Libraries)
+
+http://social.msdn.microsoft.com/forums/en-US/vclanguage/thread/b4500c0d-1b69-40c7-9ef5-08da1025b5bf
+
+Therefore the library does the following:
+
+(1) In addition to setting the errno variable when errors
+occur, the library will also call SetLastError() with the
+same value. The application can then use GetLastError()
+to obtain the value of errno. (This pair of routines are
+in kernel32.dll, and so are not affected by the use of
+multiple CRT libraries.)
+
+(2) If PTW32_USES_SEPARATE_CRT is defined, when C++ or SEH
+cleanup is used, the library defines a function
+pthread_win32_set_terminate_np(), which can be used to set
+the termination routine that should be called when an unhandled
+exception occurs in a thread function (or otherwise inside the
+library). E.g. see tests/exception3.c for usage.
+
+Note: The test suite recognises PTW32_USES_SEPARATE_CRT for
+the case (1) above but it still needs to be defined explicitly.
+At present there are no runs of the test suite that require
+that to be set because they use either /MD or /MT everywhere
+not mixed. E.g. see tests/errno0.c
+
 Non-portable functions included in Pthreads4w
 -------------------------------------------------
 
