@@ -82,12 +82,20 @@ help:
 #	@ echo nmake clean VSE-small-static-debug
 
 all:
+	$(MAKE) /E clean VC-static
+	$(MAKE) /E clean VCE-static
+	$(MAKE) /E clean VSE-static
+	$(MAKE) /E clean VC-static-debug
+	$(MAKE) /E clean VCE-static-debug
+	$(MAKE) /E clean VSE-static-debug
+	$(MAKE) /E clean
+	$(MAKE) /E clean VC
 	$(MAKE) /E clean VCE
 	$(MAKE) /E clean VSE
-	$(MAKE) /E clean VC
+	$(MAKE) /E clean VC-debug
 	$(MAKE) /E clean VCE-debug
 	$(MAKE) /E clean VSE-debug
-	$(MAKE) /E clean VC-debug
+	$(MAKE) /E clean
 
 TEST_ENV = CFLAGS="$(CFLAGS) /DNO_ERROR_DIALOGS"
 
@@ -95,16 +103,19 @@ all-tests:
 	$(MAKE) all-tests-md all-tests-mt
 
 all-tests-dll:
-	$(MAKE) /E realclean VC$(XDBG) && cd tests
-	$(MAKE) /E clean VC$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VC$(XDBG)
+	cd tests && $(MAKE) /E clean VC$(XDBG) $(TEST_ENV)
 	$(MAKE) /E realclean VCE$(XDBG)
 	cd tests && $(MAKE) /E clean VCE$(XDBG) $(TEST_ENV)
 	$(MAKE) /E realclean VSE$(XDBG)
 	cd tests && $(MAKE) /E clean VSE$(XDBG) $(TEST_ENV)
 
 all-tests-static:
+	$(MAKE) /E realclean VC-static$(XDBG)
 	cd tests && $(MAKE) /E clean VC-static$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VCE-static$(XDBG)
 	cd tests && $(MAKE) /E clean VCE-static$(XDBG) $(TEST_ENV)
+	$(MAKE) /E realclean VSE-static$(XDBG)
 	cd tests && $(MAKE) /E clean VSE-static$(XDBG) $(TEST_ENV)
 	$(MAKE) realclean
 	@ echo $@ completed successfully.
@@ -126,22 +137,22 @@ all-tests-mt:
 	@ echo $@ completed successfully.
 
 VCE:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(PTW32_VER).dll
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /MD /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(PTW32_VER).dll
 
 VCE-debug:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(PTW32_VER_DEBUG).dll
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /MDd /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(PTW32_VER_DEBUG).dll
 
 VSE:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(PTW32_VER).dll
+	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGS) /MD /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(PTW32_VER).dll
 
 VSE-debug:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(PTW32_VER_DEBUG).dll
+	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGSD) /MDd /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(PTW32_VER_DEBUG).dll
 
 VC:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGS) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(PTW32_VER).dll
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGS) /MD /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(PTW32_VER).dll
 
 VC-debug:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(PTW32_VER_DEBUG).dll
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /MDd /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(PTW32_VER_DEBUG).dll
 
 #
 # Static builds
@@ -165,22 +176,22 @@ VC-debug:
 #	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_STATIC_LIB" CLEANUP=__CLEANUP_C pthreadVC$(PTW32_VER_DEBUG).small_static_stamp
 
 VCE-static:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(PTW32_VER).inlined_static_stamp
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGS) /MT /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(PTW32_VER).inlined_static_stamp
 
 VCE-static-debug:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(PTW32_VER_DEBUG).inlined_static_stamp
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCEFLAGSD) /MTd /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_CXX pthreadVCE$(PTW32_VER_DEBUG).inlined_static_stamp
 
 VSE-static:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGS) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(PTW32_VER).inlined_static_stamp
+	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGS) /MT /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(PTW32_VER).inlined_static_stamp
 
 VSE-static-debug:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGSD) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(PTW32_VER_DEBUG).inlined_static_stamp
+	@ $(MAKE) /E /nologo EHFLAGS="$(VSEFLAGSD) /MTd /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_SEH pthreadVSE$(PTW32_VER_DEBUG).inlined_static_stamp
 
 VC-static:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGS) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(PTW32_VER).inlined_static_stamp
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGS) /MT /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(PTW32_VER).inlined_static_stamp
 
 VC-static-debug:
-	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(PTW32_VER_DEBUG).inlined_static_stamp
+	@ $(MAKE) /E /nologo EHFLAGS="$(VCFLAGSD) /MTd /DPTW32_STATIC_LIB /DPTW32_BUILD_INLINED" CLEANUP=__CLEANUP_C pthreadVC$(PTW32_VER_DEBUG).inlined_static_stamp
 
 
 realclean: clean
@@ -188,7 +199,6 @@ realclean: clean
 	if exist *.lib del *.lib
 	if exist *.a del *.a
 	if exist *.manifest del *.manifest
-	if exist *_stamp del *_stamp
 	if exist make.log.txt del make.log.txt
 	cd tests && $(MAKE) clean
 
@@ -202,6 +212,7 @@ clean:
 	if exist *.o del *.o
 	if exist *.i del *.i
 	if exist *.res del *.res
+	if exist *_stamp del *_stamp
 
 # Very basic install. It assumes "realclean" was done just prior to build target if
 # you want the installed $(DEVDEST_LIB_NAME) to match that build.
@@ -226,13 +237,13 @@ $(DLLS): $(DLL_OBJS)
 	$(CC) /LDd /Zi $(DLL_OBJS) /link /implib:$*.lib $(XLIBS) /out:$@
 
 $(INLINED_STATIC_STAMPS): $(DLL_OBJS)
-	if exist $*.lib del $*.lib
-	lib $(DLL_OBJS) /out:$*.lib
+	if exist lib$*.lib del lib$*.lib
+	lib $(DLL_OBJS) /out:lib$*.lib
 	echo. >$@
 
 $(SMALL_STATIC_STAMPS): $(STATIC_OBJS)
-	if exist $*.lib del $*.lib
-	lib $(STATIC_OBJS) /out:$*.lib
+	if exist lib$*.lib del lib$*.lib
+	lib $(STATIC_OBJS) /out:lib$*.lib
 	echo. >$@
 
 .c.obj:

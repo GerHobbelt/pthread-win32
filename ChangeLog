@@ -5,6 +5,9 @@
 	* Bmakefile (DLL_VER): Likewise; does anyone use this anymore?
 	* pthread.h: Move internal library stuff from pthread.h to _pthw32.h
 	* _ptw32.h: As above.
+	* ANNOUNCE: Update.
+	* NEWS: Update.
+	* Makefile: Static libraries renamed to libpthreadV*
 
 2018-07-22  Mark Pizzolato <markpizzolato dash pthreads dash win32 at subscriptions dot pizzolato dot net>
 
