@@ -182,19 +182,19 @@ pthread_cond_t cv_;
 
 int Init(void)
 {
-  pthread_mutexattr_init(&mattr_);
-  pthread_mutex_init(&mutex_, &mattr_);
-  pthread_condattr_init(&cattr_);
-  pthread_cond_init(&cv_, &cattr_);
+  assert(0 == pthread_mutexattr_init(&mattr_));
+  assert(0 == pthread_mutex_init(&mutex_, &mattr_));
+  assert(0 == pthread_condattr_init(&cattr_));
+  assert(0 == pthread_cond_init(&cv_, &cattr_));
   return 0;
 }
 
 int Destroy(void)
 {
-  pthread_cond_destroy(&cv_);
-  pthread_mutex_destroy(&mutex_);
-  pthread_mutexattr_destroy(&mattr_);
-  pthread_condattr_destroy(&cattr_);
+  assert(0 == pthread_cond_destroy(&cv_));
+  assert(0 == pthread_mutex_destroy(&mutex_));
+  assert(0 == pthread_mutexattr_destroy(&mattr_));
+  assert(0 == pthread_condattr_destroy(&cattr_));
   return 0;
 }
 
@@ -210,12 +210,12 @@ int Wait(time_t sec, long nsec)
       abstime.tv_sec += sc;
       abstime.tv_nsec %= 1000000000L;
   }
-  pthread_mutex_lock(&mutex_);
+  assert(0 == pthread_mutex_lock(&mutex_));
   /*
    * We don't need to check the CV.
    */
-  result = pthread_cond_timedwait(&cv_, &mutex_, &abstime);
-  pthread_mutex_unlock(&mutex_);
+  assert(ETIMEDOUT == (result = pthread_cond_timedwait(&cv_, &mutex_, &abstime)));
+  assert(0 == pthread_mutex_unlock(&mutex_));
   return result;
 }
 
