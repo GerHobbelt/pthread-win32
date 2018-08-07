@@ -1129,42 +1129,6 @@ PTW32_DLLPORT int PTW32_CDECL pthreadCancelableTimedWait (void *waitHandle,
 #  endif
 #endif
 
-/*
- * If Pthreads4w is compiled as a DLL with MSVC, and
- * both it and the application are linked against the static
- * C runtime (i.e. with the /MT compiler flag), then the
- * application will not see the same C runtime globals as
- * the library. These include the errno variable, and the
- * termination routine called by terminate(). For details,
- * refer to the following links:
- *
- * http://support.microsoft.com/kb/94248
- * (Section 4: Problems Encountered When Using Multiple CRT Libraries)
- *
- * http://social.msdn.microsoft.com/forums/en-US/vclanguage/thread/b4500c0d-1b69-40c7-9ef5-08da1025b5bf
- *
- * When Pthreads4w is built with PTW32_USES_SEPARATE_CRT
- * defined, the following features are enabled:
- *
- * (1) In addition to setting the errno variable when errors
- * occur, the library will also call SetLastError() with the
- * same value. The application can then use GetLastError()
- * to obtain the value of errno. (This pair of routines are
- * in kernel32.dll, and so are not affected by the use of
- * multiple CRT libraries.)
- *
- * (2) When C++ or SEH cleanup is used, the library defines
- * a function pthread_win32_set_terminate_np(), which can be
- * used to set the termination routine that should be called
- * when an unhandled exception occurs in a thread function
- * (or otherwise inside the library).
- *
- * Note: "_DLL" implies the /MD compiler flag.
- */
-#if defined(_MSC_VER) && !defined(_DLL) && !defined(PTW32_STATIC_LIB)
-#  define PTW32_USES_SEPARATE_CRT
-#endif
-
 #if defined(PTW32_USES_SEPARATE_CRT) && (defined(__CLEANUP_CXX) || defined(__CLEANUP_SEH))
 typedef void (*ptw32_terminate_handler)();
 PTW32_DLLPORT ptw32_terminate_handler PTW32_CDECL pthread_win32_set_terminate_np(ptw32_terminate_handler termFunction);

@@ -1,3 +1,9 @@
+2018-08-07  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile.in (DLL_VER): rename as PTW32_VER.
+	* Makefile (DLL_VER): Likewise.
+	* Bmakefile (DLL_VER): Likewise; does anyone use this anymore?
+
 2018-07-22  Mark Pizzolato <markpizzolato dash pthreads dash win32 at subscriptions dot pizzolato dot net>
 
 	* Makefile: Change the various static test runs to actually
@@ -6,11 +12,6 @@
 	because errno does not work across that linkage.
 	* sequence1.c: Use more reasonable number of threads to avoid
 	resource limits.
-
-2018-07-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
-
-	* reinit1.c: MSVC with /MT flag needs to explicitly call
-	pthread_win32_thread_detach_np().
 
 2016-12-21  Ross Johnson <ross dot johnson at homemail dot com dot au>
 

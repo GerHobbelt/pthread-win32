@@ -1,3 +1,11 @@
+2018-08-07  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile.in (DLL_VER): rename as PTW32_VER.
+	* Makefile (DLL_VER): Likewise.
+	* Bmakefile (DLL_VER): Likewise; does anyone use this anymore?
+	* pthread.h: Move internal library stuff from pthread.h to _pthw32.h
+	* _ptw32.h: As above.
+
 2018-07-22  Mark Pizzolato <markpizzolato dash pthreads dash win32 at subscriptions dot pizzolato dot net>
 
 	* _ptw32.h: Restore support for compiling as static (with /MT or /MTd);
