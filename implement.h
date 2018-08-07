@@ -71,26 +71,18 @@ __attribute__((unused))
 #  endif
 static int ptw32_get_errno(void) { int err = 0; _get_errno(&err); return err; }
 #  define PTW32_GET_ERRNO() ptw32_get_errno()
-#  if defined(PTW32_USES_SEPARATE_CRT)
-#    if defined(__MINGW32__)
+#  if defined(__MINGW32__)
 __attribute__((unused))
-#    endif
+#  endif
 static void ptw32_set_errno(int err) { _set_errno(err); SetLastError(err); }
 #    define PTW32_SET_ERRNO(err) ptw32_set_errno(err)
-#  else
-#    define PTW32_SET_ERRNO(err) _set_errno(err)
-#  endif
 #else
 #  define PTW32_GET_ERRNO() (errno)
-#  if defined(PTW32_USES_SEPARATE_CRT)
-#    if defined(__MINGW32__)
+#  if defined(__MINGW32__)
 __attribute__((unused))
-#    endif
+#  endif
 static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 #    define PTW32_SET_ERRNO(err) ptw32_set_errno(err)
-#  else
-#    define PTW32_SET_ERRNO(err) (errno = (err))
-#  endif
 #endif
 
 #if !defined(malloc)
