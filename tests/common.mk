@@ -19,7 +19,7 @@ ALL_KNOWN_TESTS = \
 	delay1 delay2 \
 	detach1 \
 	equal1 \
-	errno1 \
+	errno1 errno0 \
 	exception1 exception2 exception3_0 exception3 \
 	exit1 exit2 exit3 exit4 exit5 exit6 \
 	eyal1 \
