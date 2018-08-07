@@ -318,7 +318,7 @@ ptw32_threadStart (void *vthreadParms)
 # pragma optimize("", on)
 #endif
 
-#if defined (PTW32_USES_SEPARATE_CRT) && defined (__cplusplus)
+#if defined (PTW32_USES_SEPARATE_CRT) && (defined(__CLEANUP_CXX) || defined(__CLEANUP_SEH))
 ptw32_terminate_handler
 pthread_win32_set_terminate_np(ptw32_terminate_handler termFunction)
 {
