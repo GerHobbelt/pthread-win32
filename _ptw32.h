@@ -103,11 +103,17 @@
 
 /*
  * This is more or less a duplicate of what is in the autoconf config.h,
- * which is only used when building the pthread-win32 libraries. They
+ * which is only used when building the pthreads4w libraries.
  */
 
 #if !defined (__PTW32_CONFIG_H) && !defined(__PTW32_PSEUDO_CONFIG_H_SOURCED)
 #  define __PTW32_PSEUDO_CONFIG_H_SOURCED
+/*
+ * We define NEED_FTIME for all now. GetSystemTimeAsFileTime() is pretty
+ * much universal now and consistently higher resolution than _ftime64().
+ */
+#  define NEED_FTIME
+
 #  if defined(WINCE)
 #    undef  HAVE_CPU_AFFINITY
 #    define NEED_DUPLICATEHANDLE

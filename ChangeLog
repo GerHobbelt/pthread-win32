@@ -1,3 +1,13 @@
+2018-08-08  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile: "nmake realclean VC VC-static" and similar wasn't remaking pthread.obj.
+	* common.mk: changes to accommodate the above.
+	* config.h (NEED_FTIME): defined for all which uses GetSystemTimeAsFileTime()
+	* _ptw32.h (NEED_FTIME): Likewise.
+	* GNUmakefile: use changes in common.mk but still has problem with
+	"make realclean GC GC-static" and similar.
+	* configure.ac (AC_INIT): package name change.
+	
 2018-08-07  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* GNUmakefile.in (DLL_VER): rename as PTW32_VER.

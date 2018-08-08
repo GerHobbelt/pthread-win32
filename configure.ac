@@ -29,7 +29,7 @@
 #      if not, write to the Free Software Foundation, Inc.,
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
-AC_INIT([pthreads-win32],[git])
+AC_INIT([pthreads4w],[git])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for build tools.

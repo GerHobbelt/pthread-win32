@@ -47,13 +47,15 @@ VSEFLAGSD	= $(CPPFLAGS) $(CFLAGSD)
 VCFLAGS		= $(CPPFLAGS) $(CFLAGS)
 VCFLAGSD	= $(CPPFLAGS) $(CFLAGSD)
 
-OBJEXT = obj
-RESEXT = res
+OBJEXT	= obj
+OEXT	= o
+RESEXT	= res
  
 include common.mk
 
-DLL_OBJS	= $(DLL_OBJS) $(RESOURCE_OBJS)
-STATIC_OBJS	= $(STATIC_OBJS) $(RESOURCE_OBJS)
+DLL_OBJS			= $(DLL_OBJS) $(RESOURCE_OBJS)
+STATIC_OBJS			= $(STATIC_OBJS) $(RESOURCE_OBJS)
+STATIC_OBJS_SMALL	= $(STATIC_OBJS_SMALL) $(RESOURCE_OBJS)
 
 help:
 	@ echo To just build all possible versions and install them in $(DESTROOT)
@@ -226,18 +228,21 @@ install:
 $(DLLS): $(DLL_OBJS)
 	$(CC) /LDd /Zi $(DLL_OBJS) /link /implib:$*.lib $(XLIBS) /out:$@
 
-$(INLINED_STATIC_STAMPS): $(DLL_OBJS)
-	if exist lib$*.lib del lib$*.lib
-	lib $(DLL_OBJS) /out:lib$*.lib
-	echo. >$@
-
-$(SMALL_STATIC_STAMPS): $(STATIC_OBJS)
+$(INLINED_STATIC_STAMPS): $(STATIC_OBJS)
 	if exist lib$*.lib del lib$*.lib
 	lib $(STATIC_OBJS) /out:lib$*.lib
 	echo. >$@
 
+$(SMALL_STATIC_STAMPS): $(STATIC_OBJS_SMALL)
+	if exist lib$*.lib del lib$*.lib
+	lib $(STATIC_OBJS_SMALL) /out:lib$*.lib
+	echo. >$@
+
 .c.obj:
 	$(CC) $(XCFLAGS) $(EHFLAGS) /D$(CLEANUP) -c $<
+
+.c.o:
+	$(CC) $(XCFLAGS) $(EHFLAGS) /D$(CLEANUP) /Fo$*.$(OEXT) -c $<
 
 # TARGET_CPU is an environment variable set by Visual Studio Command Prompt
 # as provided by the SDK (VS 2010 Express plus SDK 7.1)
