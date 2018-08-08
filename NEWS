@@ -1,6 +1,6 @@
 RELEASE 3.0.0
 --------------
-(2018-08-01)
+(2018-08-08)
 
 General
 -------
@@ -80,9 +80,10 @@ either the SJLJ or SEH exception handling method should work.
 
 New Features
 ------------
-No major new features are introduced compared to version 2.10.0. This release
-introduces a change to pthread_t and pthread_once_t that will affect
-applications that link with the library.
+Other than the following, this release is feature-equivalent to v2.11.0.
+
+This release introduces a change to pthread_t and pthread_once_t that will
+affect applications that link with the library.
 
 pthread_t: remains a struct but extends the reuse counter from 32 bits to 64
 bits. On 64 bit machines the overall size of the object will not increase, we
@@ -97,7 +98,7 @@ pthread_once_t: removes two long-obsoleted elements and reduces it's size.
 
 RELEASE 2.11.0
 --------------
-(Upcoming release)
+(2018-08-08)
 
 General
 -------
