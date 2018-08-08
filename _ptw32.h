@@ -113,7 +113,6 @@
 #    define NEED_CREATETHREAD
 #    define NEED_ERRNO
 #    define NEED_CALLOC
-#    define NEED_FTIME
 #    define NEED_UNICODE_CONSTS
 #    define NEED_PROCESS_AFFINITY_MASK
 /* This may not be needed */

@@ -34,9 +34,6 @@
 /* Define if you don't have Win32 calloc. (eg. WinCE)  */
 #undef NEED_CALLOC
 
-/* Define if you don't have Win32 ftime. (eg. WinCE)  */
-#undef NEED_FTIME
-
 /* Define if you don't have Win32 semaphores. (eg. WinCE 2.1 or earlier)  */
 #undef NEED_SEM
 
@@ -117,7 +114,6 @@
 #  define NEED_CREATETHREAD
 #  define NEED_ERRNO
 #  define NEED_CALLOC
-#  define NEED_FTIME
 /* #  define NEED_SEM */
 #  define NEED_UNICODE_CONSTS
 #  define NEED_PROCESS_AFFINITY_MASK
