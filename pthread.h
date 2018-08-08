@@ -1134,14 +1134,6 @@ typedef void (*ptw32_terminate_handler)();
 PTW32_DLLPORT ptw32_terminate_handler PTW32_CDECL pthread_win32_set_terminate_np(ptw32_terminate_handler termFunction);
 #endif
 
-/*
- * Some compiler environments don't define some things.
- */
-#if defined(__BORLANDC__)
-#  define _ftime ftime
-#  define _timeb timeb
-#endif
-
 #if defined(__cplusplus)
 
 /*

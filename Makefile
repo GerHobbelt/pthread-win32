@@ -47,16 +47,21 @@ VSEFLAGSD	= $(CPPFLAGS) $(CFLAGSD)
 VCFLAGS		= $(CPPFLAGS) $(CFLAGS)
 VCFLAGSD	= $(CPPFLAGS) $(CFLAGSD)
 
-OBJEXT = obj
-RESEXT = res
+OBJEXT	= obj
+OEXT	= o
+RESEXT	= res
  
 include common.mk
 
-DLL_OBJS	= $(DLL_OBJS) $(RESOURCE_OBJS)
-STATIC_OBJS	= $(STATIC_OBJS) $(RESOURCE_OBJS)
+DLL_OBJS			= $(DLL_OBJS) $(RESOURCE_OBJS)
+STATIC_OBJS			= $(STATIC_OBJS) $(RESOURCE_OBJS)
+STATIC_OBJS_SMALL	= $(STATIC_OBJS_SMALL) $(RESOURCE_OBJS)
 
 help:
-	@ echo Run one of the following command lines:
+	@ echo To just build all possible versions and install them in $(DESTROOT)
+	@ echo nmake all install
+	@ echo ------------------------------------------
+	@ echo Or run one of the following command lines:
 	@ echo nmake clean all-tests
 	@ echo nmake -DEXHAUSTIVE clean all-tests
 	@ echo nmake clean all-tests-md
@@ -65,20 +70,14 @@ help:
 	@ echo nmake clean VC-debug
 	@ echo nmake clean VC-static
 	@ echo nmake clean VC-static-debug
-#	@ echo nmake clean VC-small-static
-#	@ echo nmake clean VC-small-static-debug
 	@ echo nmake clean VCE
 	@ echo nmake clean VCE-debug
 	@ echo nmake clean VCE-static
 	@ echo nmake clean VCE-static-debug
-#	@ echo nmake clean VCE-small-static
-#	@ echo nmake clean VCE-small-static-debug
 	@ echo nmake clean VSE
 	@ echo nmake clean VSE-debug
 	@ echo nmake clean VSE-static
 	@ echo nmake clean VSE-static-debug
-#	@ echo nmake clean VSE-small-static
-#	@ echo nmake clean VSE-small-static-debug
 
 all:
 	$(MAKE) /E clean VC-static
@@ -87,7 +86,6 @@ all:
 	$(MAKE) /E clean VC-static-debug
 	$(MAKE) /E clean VCE-static-debug
 	$(MAKE) /E clean VSE-static-debug
-	$(MAKE) /E clean
 	$(MAKE) /E clean VC
 	$(MAKE) /E clean VCE
 	$(MAKE) /E clean VSE
@@ -229,18 +227,21 @@ install:
 $(DLLS): $(DLL_OBJS)
 	$(CC) /LDd /Zi $(DLL_OBJS) /link /implib:$*.lib $(XLIBS) /out:$@
 
-$(INLINED_STATIC_STAMPS): $(DLL_OBJS)
-	if exist lib$*.lib del lib$*.lib
-	lib $(DLL_OBJS) /out:lib$*.lib
-	echo. >$@
-
-$(SMALL_STATIC_STAMPS): $(STATIC_OBJS)
+$(INLINED_STATIC_STAMPS): $(STATIC_OBJS)
 	if exist lib$*.lib del lib$*.lib
 	lib $(STATIC_OBJS) /out:lib$*.lib
 	echo. >$@
 
+$(SMALL_STATIC_STAMPS): $(STATIC_OBJS_SMALL)
+	if exist lib$*.lib del lib$*.lib
+	lib $(STATIC_OBJS_SMALL) /out:lib$*.lib
+	echo. >$@
+
 .c.obj:
 	$(CC) $(EHFLAGS) /D$(CLEANUP) -c $<
+
+.c.o:
+	$(CC) $(EHFLAGS) /D$(CLEANUP) -c $< /Fo$@
 
 # TARGET_CPU is an environment variable set by Visual Studio Command Prompt
 # as provided by the SDK (VS 2010 Express plus SDK 7.1)

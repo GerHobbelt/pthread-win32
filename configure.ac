@@ -28,7 +28,7 @@
  *    You should have received a copy of the GNU General Public License
  *    along with Pthreads4w.  If not, see <http://www.gnu.org/licenses/>. *
 #
-AC_INIT([Pthreads4w],[git])
+AC_INIT([pthreads4w],[git])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for build tools.
@@ -69,7 +69,6 @@ PTW32_AC_CHECK_TYPEDEF([struct timespec],[time.h])
 #
 PTW32_AC_NEED_ERRNO
 PTW32_AC_NEED_FUNC([NEED_CALLOC],[calloc])
-PTW32_AC_NEED_FUNC([NEED_FTIME],[ftime])
 PTW32_AC_NEED_FUNC([NEED_CREATETHREAD],[_beginthreadex])
 PTW32_AC_CHECK_CPU_AFFINITY
 
