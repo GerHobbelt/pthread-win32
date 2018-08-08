@@ -16,6 +16,7 @@
 	at the end.
 	* implement.h (NEED_FTIME): remove conditionals.
 	* pthread.h: Remove Borland compiler time types no longer needed.
+	* configure.ac (NEED_FTIME): Removed check.
 	
 2018-08-07  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
