@@ -701,10 +701,9 @@ __PTW32_BEGIN_C_DECLS
 
   void __ptw32_mcs_node_transfer (__ptw32_mcs_local_node_t * new_node, __ptw32_mcs_local_node_t * old_node);
 
-#if defined(NEED_FTIME)
   void __ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft);
+
   void __ptw32_filetime_to_timespec (const FILETIME * ft, struct timespec *ts);
-#endif
 
 /* Declared in pthw32_calloc.c */
 #if defined(NEED_CALLOC)

@@ -38,9 +38,6 @@
 
 #include "pthread.h"
 #include "implement.h"
-#if !defined(NEED_FTIME)
-#include <sys/timeb.h>
-#endif
 
 static const int64_t NANOSEC_PER_SEC = 1000000000;
 static const int64_t NANOSEC_PER_MILLISEC = 1000000;
@@ -53,23 +50,15 @@ DWORD
 __ptw32_relmillisecs (const struct timespec * abstime)
 {
   DWORD milliseconds;
-  int64_t tmpAbsMilliseconds;
   int64_t tmpAbsNanoseconds;
-  int64_t tmpCurrMilliseconds;
   int64_t tmpCurrNanoseconds;
 
-#if defined(NEED_FTIME)
   struct timespec currSysTime;
   FILETIME ft;
-#else /* ! NEED_FTIME */
-#if ( defined(_MSC_VER) && _MSC_VER >= 1300 ) /* MSVC7+ */ || \
-    ( defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601 )
-  struct __timeb64 currSysTime;
-#else
-  struct _timeb currSysTime;
-#endif
-#endif /* NEED_FTIME */
 
+# if defined(WINCE)
+  SYSTEMTIME st;
+#endif
 
   /*
    * Calculate timeout as milliseconds from current system time.
@@ -82,17 +71,11 @@ __ptw32_relmillisecs (const struct timespec * abstime)
    *
    * Assume all integers are unsigned, i.e. cannot test if less than 0.
    */
-  tmpAbsMilliseconds =  (int64_t)abstime->tv_sec * MILLISEC_PER_SEC;
-  tmpAbsMilliseconds += ((int64_t)abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
   tmpAbsNanoseconds = (int64_t)abstime->tv_nsec + ((int64_t)abstime->tv_sec * NANOSEC_PER_SEC);
 
   /* get current system time */
 
-#if defined(NEED_FTIME)
-
 # if defined(WINCE)
-
-  SYSTEMTIME st;
   GetSystemTime(&st);
   SystemTimeToFileTime(&st, &ft);
 # else
@@ -101,36 +84,21 @@ __ptw32_relmillisecs (const struct timespec * abstime)
 
   __ptw32_filetime_to_timespec(&ft, &currSysTime);
 
-  tmpCurrMilliseconds = (int64_t)currSysTime.tv_sec * MILLISEC_PER_SEC;
-  tmpCurrMilliseconds += ((int64_t)currSysTime.tv_nsec + (NANOSEC_PER_MILLISEC/2))
-			   / NANOSEC_PER_MILLISEC;
   tmpCurrNanoseconds = (int64_t)currSysTime.tv_nsec + ((int64_t)currSysTime.tv_sec * NANOSEC_PER_SEC);
 
-#else /* ! NEED_FTIME */
-
-#if defined(_MSC_VER) && _MSC_VER >= 1400  /* MSVC8+ */
-  _ftime64_s(&currSysTime);
-#elif ( defined(_MSC_VER) && _MSC_VER >= 1300 ) /* MSVC7+ */ || \
-      ( defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601 )
-  _ftime64(&currSysTime);
-#else
-  _ftime(&currSysTime);
-#endif
-
-  tmpCurrMilliseconds = (int64_t) currSysTime.time * MILLISEC_PER_SEC;
-  tmpCurrMilliseconds += (int64_t) currSysTime.millitm;
-  tmpCurrNanoseconds = tmpCurrMilliseconds * NANOSEC_PER_MILLISEC;
-
-#endif /* NEED_FTIME */
-
-  if (tmpAbsMilliseconds > tmpCurrMilliseconds)
+  if (tmpAbsNanoseconds > tmpCurrNanoseconds)
     {
-      milliseconds = (DWORD) (tmpAbsMilliseconds - tmpCurrMilliseconds);
-      if (milliseconds == INFINITE)
-        {
-          /* Timeouts must be finite */
-          milliseconds--;
-        }
+      int64_t deltaNanoseconds = tmpAbsNanoseconds - tmpCurrNanoseconds;
+
+      if (deltaNanoseconds >= ((int64_t)INFINITE * NANOSEC_PER_MILLISEC))
+         {
+           /* Timeouts must be finite */
+           milliseconds = INFINITE - 1;
+         }
+       else
+         {
+           milliseconds = (DWORD)(deltaNanoseconds / NANOSEC_PER_MILLISEC);
+         }
     }
   else
     {
@@ -161,21 +129,10 @@ pthread_win32_getabstime_np (struct timespec * abstime, const struct timespec * 
   int64_t sec;
   int64_t nsec;
 
-#if defined(NEED_FTIME)
   struct timespec currSysTime;
   FILETIME ft;
-#else /* ! NEED_FTIME */
-#if ( defined(_MSC_VER) && _MSC_VER >= 1300 ) /* MSVC7+ */ || \
-    ( defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601 )
-  struct __timeb64 currSysTime;
-#else
-  struct _timeb currSysTime;
-#endif
-#endif /* NEED_FTIME */
 
   /* get current system time */
-
-#if defined(NEED_FTIME)
 
 # if defined(WINCE)
 
@@ -190,22 +147,6 @@ pthread_win32_getabstime_np (struct timespec * abstime, const struct timespec * 
 
   sec = currSysTime.tv_sec;
   nsec = currSysTime.tv_nsec;
-
-#else /* ! NEED_FTIME */
-
-#if defined(_MSC_VER) && _MSC_VER >= 1400  /* MSVC8+ */
-  _ftime64_s(&currSysTime);
-#elif ( defined(_MSC_VER) && _MSC_VER >= 1300 ) /* MSVC7+ */ || \
-      ( defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601 )
-  _ftime64(&currSysTime);
-#else
-  _ftime(&currSysTime);
-#endif
-
-  sec = currSysTime.time;
-  nsec = currSysTime.millitm * NANOSEC_PER_MILLISEC;
-
-#endif /* NEED_FTIME */
 
   if (NULL != relative)
     {

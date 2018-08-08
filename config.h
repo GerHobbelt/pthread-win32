@@ -34,12 +34,6 @@
 /* Define if you don't have Win32 calloc. (eg. WinCE)  */
 #undef NEED_CALLOC
 
-/*
- * Define this now that all systems since Server 2000 support
- * GetSystemTimeAsFileTime() (and WINCE before that).
- */
-#define NEED_FTIME
-
 /* Define if you don't have Win32 semaphores. (eg. WinCE 2.1 or earlier)  */
 #undef NEED_SEM
 

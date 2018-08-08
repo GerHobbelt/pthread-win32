@@ -196,7 +196,6 @@ realclean: clean
 	if exist *.lib del *.lib
 	if exist *.a del *.a
 	if exist *.manifest del *.manifest
-	if exist *_stamp del *_stamp
 	if exist make.log.txt del make.log.txt
 	cd tests && $(MAKE) realclean
 
@@ -210,6 +209,7 @@ clean:
 	if exist *.o del *.o
 	if exist *.i del *.i
 	if exist *.res del *.res
+	if exist *_stamp del *_stamp
 	cd tests && $(MAKE) clean
 
 # Very basic install. It assumes "realclean" was done just prior to build target.

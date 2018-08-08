@@ -37,8 +37,6 @@
 # include <config.h>
 #endif
 
-#if defined(NEED_FTIME)
-
 #include "pthread.h"
 #include "implement.h"
 
@@ -80,5 +78,3 @@ __ptw32_filetime_to_timespec (const FILETIME * ft, struct timespec *ts)
     (int) ((*(uint64_t *) ft -  __PTW32_TIMESPEC_TO_FILETIME_OFFSET -
 	    ((uint64_t) ts->tv_sec * (uint64_t) 10000000UL)) * 100);
 }
-
-#endif

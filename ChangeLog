@@ -2,11 +2,21 @@
 
 	* Makefile: "nmake realclean VC VC-static" and similar wasn't remaking pthread.obj.
 	* common.mk: changes to accommodate the above.
-	* config.h (NEED_FTIME): defined for all which uses GetSystemTimeAsFileTime()
-	* _ptw32.h (NEED_FTIME): Likewise.
 	* GNUmakefile: use changes in common.mk but still has problem with
 	"make realclean GC GC-static" and similar.
 	* configure.ac (AC_INIT): package name change.
+
+2018-08-08  Mark Pizzolato <markpizzolato dash pthreads dash win32 at subscriptions dot pizzolato dot net>
+
+	* config.h (NEED_FTIME): Removed
+	* _ptw32.h (NEED_FTIME): Removed.
+	* ptw32_timespec.c (NEED_FTIME): Removed conditional.
+	* ptw32_relmillisecs: Fix long-standing bug in NEED_FTIME code; remove NEED_FTIME
+	and all !NEED_FTIME code; compare nanoseconds and convert to milliseconds
+	at the end.
+	* implement.h (NEED_FTIME): remove conditionals.
+	* pthread.h: Remove Borland compiler time types no longer needed.
+	* configure.ac (NEED_FTIME): Removed check.
 	
 2018-08-07  Ross Johnson <ross dot johnson at homemail dot com dot au>
 

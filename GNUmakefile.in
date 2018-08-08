@@ -340,7 +340,7 @@ install-headers: pthread.h sched.h semaphore.h _ptw32.h
 %.o: %.rc
 	$(RC) $(RC_TARGET) $(RCFLAGS) $(CLEANUP) -o $@ -i $<
 
-.SUFFIXES: .dll .rc .c .o ._o
+.SUFFIXES: .dll .rc .c .o
 
 .c.o:
 	$(CC) -c -o $@ $(CFLAGS) $(XC_FLAGS) $<
