@@ -197,6 +197,7 @@ clean:
 	if exist *.e $(RM) *.e
 	if exist *.i $(RM) *.i
 	if exist *.obj $(RM) *.obj
+	if exist *.idb $(RM) *.idb
 	if exist *.pdb $(RM) *.pdb
 	if exist *.o $(RM) *.o
 	if exist *.asm $(RM) *.asm

@@ -1,3 +1,7 @@
+2018-08-10  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile (clean): remove *.idb files.
+
 2018-08-07  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* GNUmakefile.in (DLL_VER): rename as PTW32_VER.
