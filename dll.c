@@ -51,7 +51,7 @@
 #pragma warning( disable : 4100 )
 #endif
 
-PTW32_BEGIN_C_DECLS
+__PTW32_BEGIN_C_DECLS
 
 BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
@@ -88,7 +88,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 
 }				/* DllMain */
 
-PTW32_END_C_DECLS
+__PTW32_END_C_DECLS
 
 #endif /* !PTW32_STATIC_LIB */
 
@@ -161,7 +161,7 @@ extern int (*msc_dtor)(void) = ptw32_on_process_exit;
 
 #endif /* defined(__MINGW32__) || defined(_MSC_VER) */
 
-PTW32_BEGIN_C_DECLS
+__PTW32_BEGIN_C_DECLS
 
 /* This dummy function exists solely to be referenced by other modules
  * (specifically, in implement.h), so that the linker can't optimize away
@@ -173,7 +173,7 @@ PTW32_BEGIN_C_DECLS
  */
 void ptw32_autostatic_anchor(void) { abort(); }
 
-PTW32_END_C_DECLS
+__PTW32_END_C_DECLS
 
 #endif /* PTW32_STATIC_LIB */
 
