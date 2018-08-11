@@ -132,11 +132,13 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
  * Don't allow the linker to optimize away dll.obj (dll.o) in static builds.
  */
 #if defined(PTW32_STATIC_LIB) && defined(PTW32_BUILD) && !defined(PTW32_TEST_SNEAK_PEEK)
+PTW32_BEGIN_C_DECLS
   void ptw32_autostatic_anchor(void);
 # if defined(__GNUC__)
     __attribute__((unused, used))
 # endif
   static void (*local_autostatic_anchor)(void) = ptw32_autostatic_anchor;
+PTW32_END_C_DECLS
 #endif
 
 typedef enum

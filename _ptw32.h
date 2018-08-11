@@ -39,16 +39,13 @@
 
 /* See the README file for an explanation of the Pthreads4w
  * version numbering scheme and how the DLL is named etc.
- *
- * FIXME: consider moving this to <_ptw32.h>; maybe also add a
- * leading underscore to the macro names.
  */
 #define PTW32_VERSION_MAJOR 2
 #define PTW32_VERSION_MINOR 11
-#define PTW32_VERSION_MICRO 0
+#define PTW32_VERSION_MICRO 1
 #define PTW32_VERION_BUILD 0
-#define PTW32_VERSION 2,11,0,0
-#define PTW32_VERSION_STRING "2, 11, 0, 0\0"
+#define PTW32_VERSION 2,11,1,0
+#define PTW32_VERSION_STRING "2, 11, 1, 0\0"
 
 #if defined(__GNUC__)
 # pragma GCC system_header
