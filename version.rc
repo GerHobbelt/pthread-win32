@@ -41,27 +41,44 @@
  */
 
 #if defined (__PTW32_RC_MSC)
+#  if defined(__PTW32_CLEANUP_C)
+#    define  __PTW32_VERSIONINFO_NAME "pthreadVC2.DLL\0"
+#  elif defined(__PTW32_CLEANUP_CXX)
+#    define  __PTW32_VERSIONINFO_NAME "pthreadVCE2.DLL\0"
+#  elif defined(__PTW32_CLEANUP_SEH)
+#    define  __PTW32_VERSIONINFO_NAME "pthreadVSE2.DLL\0"
+#  endif
 #  if defined (__PTW32_ARCHx64) || defined (__PTW32_ARCHX64) || defined (__PTW32_ARCHAMD64)
 #    if defined(__PTW32_CLEANUP_C)
-#      define  __PTW32_VERSIONINFO_NAME "pthreadVC2.DLL\0"
 #      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C x64\0"
 #    elif defined(__PTW32_CLEANUP_CXX)
-#      define  __PTW32_VERSIONINFO_NAME "pthreadVCE2.DLL\0"
 #      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C++ x64\0"
 #    elif defined(__PTW32_CLEANUP_SEH)
-#      define  __PTW32_VERSIONINFO_NAME "pthreadVSE2.DLL\0"
 #      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x64\0"
 #    endif
 #  elif defined (__PTW32_ARCHx86) || defined (__PTW32_ARCHX86)
 #    if defined(__PTW32_CLEANUP_C)
-#      define  __PTW32_VERSIONINFO_NAME "pthreadVC2.DLL\0"
 #      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C x86\0"
 #    elif defined(__PTW32_CLEANUP_CXX)
-#      define  __PTW32_VERSIONINFO_NAME "pthreadVCE2.DLL\0"
 #      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C++ x86\0"
 #    elif defined(__PTW32_CLEANUP_SEH)
-#      define  __PTW32_VERSIONINFO_NAME "pthreadVSE2.DLL\0"
 #      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x86\0"
+#    endif
+#  elif defined (__PTW32_ARCHarm) || defined (__PTW32_ARCHARM) || defined (__PTW32_AARCH32)
+#    if defined(__PTW32_CLEANUP_C)
+#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C ARM\0"
+#    elif defined(__PTW32_CLEANUP_CXX)
+#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C++ ARM\0"
+#    elif defined(__PTW32_CLEANUP_SEH)
+#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C SEH ARM\0"
+#    endif
+#  elif defined (__PTW32_ARCHarm64) || defined (__PTW32_ARCHARM64) || defined (__PTW32_AARCH64)
+#    if defined(__PTW32_CLEANUP_C)
+#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C ARM64\0"
+#    elif defined(__PTW32_CLEANUP_CXX)
+#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C++ ARM64\0"
+#    elif defined(__PTW32_CLEANUP_SEH)
+#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C SEH ARM64\0"
 #    endif
 #  endif
 #elif defined(__GNUC__)
