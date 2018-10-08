@@ -1,0 +1,93 @@
+version: 3.0.1.{build}
+
+cache:
+  - C:\Tools\ninja\ninja.exe
+
+shallow_clone: true
+clone_depth: 1
+
+branches:
+  only:
+  - cmake
+
+configuration:
+- MinSizeRel
+- Release
+- Debug
+
+environment:
+  DIST_DIR: '%APPVEYOR_BUILD_FOLDER%\dist'
+  CMAKE_DIST_DIR: C:/projects/pthreads4w/dist
+  NINJA_DIR: C:\Tools\ninja
+  matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
+      PLATFORM: x64
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
+      ARCHITECTURE: x86_amd64
+      ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
+      PLATFORM: x86
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
+      ARCHITECTURE: x86
+      ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
+      PLATFORM: x64
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"'
+      ARCHITECTURE: 
+      ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
+      PLATFORM: x86
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"'
+      ARCHITECTURE: 
+      ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+
+init:
+  - echo BUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
+
+install:
+  # Ninja
+  - if not exist %NINJA_DIR%\ mkdir %NINJA_DIR%
+  - cd %NINJA_DIR%
+  - if not exist ninja.exe appveyor DownloadFile https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-win.zip
+  - if not exist ninja.exe 7z x ninja-win.zip
+  - set PATH=%NINJA_DIR%;%PATH%
+  # CMake
+  - cmake --version
+
+build:
+  parallel: true
+
+build_script:
+  - call "%VCVARSALL%" %ARCHITECTURE%
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - mkdir build
+  - cd build
+  - cmake -G"%GENERATOR%"
+          -DCMAKE_BUILD_TYPE=%CONFIGURATION%
+          -DBUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
+          -DDIST_ROOT="%CMAKE_DIST_DIR%/%APPVEYOR_BUILD_WORKER_IMAGE%"
+          -DENABLE_TESTS=ON
+          ..
+  - cmake --build . --config %CONFIGURATION% --target install
+
+after_build:
+  - cd %DIST_DIR%
+  - 7z a -tzip %ARCHIVE%.zip "%APPVEYOR_BUILD_WORKER_IMAGE%"
+  - certutil -hashfile %ARCHIVE%.zip MD5 > %ARCHIVE%.md5
+
+artifacts:
+  - path: dist\$(ARCHIVE).zip
+  - path: dist\$(ARCHIVE).md5
+
+test:
+before_test:
+  - set PATH=%APPVEYOR_BUILD_FOLDER%\build;%PATH%
+test_script:
+  - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ cd %APPVEYOR_BUILD_FOLDER%\build\tests
+  - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ ctest -C %CONFIGURATION%
+after_test:
+  # TODO process CTest output
