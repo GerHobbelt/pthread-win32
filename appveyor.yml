@@ -83,8 +83,9 @@ install:
   # CMake
   - cmake --version
 
-  - dir /s '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\'
-  - type '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
+  - cd "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\"
+  - dir /s
+  - type vcvarsall.bat
 
 build:
   parallel: true
