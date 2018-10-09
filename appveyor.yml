@@ -20,30 +20,109 @@ environment:
   CMAKE_DIST_DIR: C:/projects/pthreads4w/dist
   NINJA_DIR: C:\Tools\ninja
   matrix:
+  
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2010'
+      PLATFORM: x86
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\VC\bin\vcvars32.bat'
+      ARCHITECTURE:
+      ARCHIVE: VS2010_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+      TESTING: ON
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2010'
+      PLATFORM: x64
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat'
+      ARCHITECTURE:
+      ARCHIVE: VS2010_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+      TESTING: ON
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2010'
+      PLATFORM: ARM
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 11.0\VC\bin\x86_arm\vcvarsx86_arm.bat'
+      ARCHITECTURE:
+      ARCHIVE: VS2010_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+      TESTING: OFF
+      
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2012'
+      PLATFORM: x86
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC\bin\amd64_x86\vcvarsamd64_x86.bat'
+      ARCHITECTURE:
+      ARCHIVE: VS2012_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+      TESTING: ON    
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2012'
+      PLATFORM: x64
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC\bin\amd64\vcvars64.bat'
+      ARCHITECTURE:
+      ARCHIVE: VS2012_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+      TESTING: ON
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2012'
+      PLATFORM: ARM
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC\bin\amd64_arm\vcvarsamd64_arm.bat'
+      ARCHITECTURE:
+      ARCHIVE: VS2012_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+      TESTING: OFF
+      
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2013'
+      PLATFORM: x86
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin\amd64_x86\vcvarsamd64_x86.bat'
+      ARCHITECTURE:
+      ARCHIVE: VS2013_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+      TESTING: ON
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2013'
+      PLATFORM: x64
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat'
+      ARCHITECTURE:
+      ARCHIVE: VS2013_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+      TESTING: ON
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2013'
+      PLATFORM: ARM
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin\amd64_arm\vcvarsamd64_arm.bat'
+      ARCHITECTURE:
+      ARCHIVE: VS2013_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+      TESTING: OFF
+
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       PLATFORM: x64
-      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
-      ARCHITECTURE: x86_amd64
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat'
+      ARCHITECTURE:
       ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
+      TESTING: ON
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       PLATFORM: x86
-      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
-      ARCHITECTURE: x86
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin\vcvars32.bat'
+      ARCHITECTURE:
       ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
+      TESTING: ON
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
+      PLATFORM: ARM
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin\x86_arm\vcvarsx86_arm.bat'
+      ARCHITECTURE:
+      ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: Ninja
+      TESTING: OFF
+      
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: x64
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"'
       ARCHITECTURE: 
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
+      TESTING: ON
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: x86
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"'
       ARCHITECTURE: 
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
+      TESTING: ON
 
 init:
   - echo BUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
@@ -57,6 +136,7 @@ install:
   - set PATH=%NINJA_DIR%;%PATH%
   # CMake
   - cmake --version
+  - cmake -G -?
 
 build:
   parallel: true
@@ -88,6 +168,6 @@ before_test:
   - set PATH=%APPVEYOR_BUILD_FOLDER%\build;%PATH%
 test_script:
   - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ cd %APPVEYOR_BUILD_FOLDER%\build\tests
-  - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ ctest -C %CONFIGURATION%
+  - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ ctest -C %CONFIGURATION% -v
 after_test:
   # TODO process CTest output

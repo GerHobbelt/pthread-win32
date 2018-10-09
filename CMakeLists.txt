@@ -12,7 +12,6 @@ include (get_version)
 message(STATUS "Generator ......... ${CMAKE_GENERATOR}")
 message(STATUS "Build Type ........ ${CMAKE_BUILD_TYPE}")
 message(STATUS "Version ........... ${PTHREADS4W_VERSION}")
-message(STATUS "Host .............. ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
 project(pthreads4w VERSION ${PTHREADS4W_VERSION} LANGUAGES C)
 
@@ -44,6 +43,8 @@ else()
     MESSAGE(ERROR "\"${TARGET_ARCH}\" not supported in version.rc")
 endif()
 message(STATUS "Target ............ ${TARGET_ARCH}")
+
+message(STATUS "Host .............. ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 if(MSVC)
     message(STATUS "MSVC Version ...... ${MSVC_VERSION}")
 endif()
