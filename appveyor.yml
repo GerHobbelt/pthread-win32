@@ -22,12 +22,12 @@ environment:
   matrix:
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
-      PLATFORM: amd64_x86
+      PLATFORM: x86
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
-      ARCHITECTURE:
+      ARCHITECTURE: amd64_x86
       ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
-      TESTING: OFF
+      TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       PLATFORM: x64
@@ -35,7 +35,7 @@ environment:
       ARCHITECTURE: amd64
       ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
-      TESTING: OFF
+      TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       PLATFORM: ARM
@@ -50,14 +50,14 @@ environment:
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat'
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
-      TESTING: OFF
+      TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: x64
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat'
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
-      TESTING: OFF
+      TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: ARM
@@ -71,12 +71,14 @@ init:
 
 install:
   # Depot Tools
-  - if not exist %DEPOT_TOOLS_DIR%\ mkdir %DEPOT_TOOLS_DIR%
+  - if "%GENERATOR%"=="Ninja" (
+    if not exist %DEPOT_TOOLS_DIR%\ mkdir %DEPOT_TOOLS_DIR%
 
-  - cd %DEPOT_TOOLS_DIR%
-  - if not exist %DEPOT_TOOLS_DIR%\depot_tools.zip ( appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip )
-  - 7z x depot_tools.zip
-  - set PATH=%DEPOT_TOOLS_DIR%;%PATH%
+    cd %DEPOT_TOOLS_DIR%
+    if not exist %DEPOT_TOOLS_DIR%\depot_tools.zip ( appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip )
+    7z x depot_tools.zip
+    set PATH=%DEPOT_TOOLS_DIR%;%PATH%
+  )
 
   # CMake
   - cmake --version
@@ -85,7 +87,7 @@ build:
   parallel: true
 
 build_script:
-  - if exist "%VCVARSALL%" call "%VCVARSALL%" %ARCHITECTURE%
+  - if exist "%VCVARSALL%" ( call "%VCVARSALL%" %ARCHITECTURE% )
 
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir build
@@ -97,7 +99,7 @@ build_script:
           -DENABLE_TESTS=%TESTING%
           ..
 
-  - if "%GENERATOR%" == "Ninja" ( autoninja install ) 
+  - if "%GENERATOR%" == "Ninja" ( autoninja install )
     else ( cmake --build . --config %CONFIGURATION% --target install )
 
 after_build:
