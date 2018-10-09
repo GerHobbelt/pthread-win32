@@ -82,7 +82,6 @@ install:
   - set PATH=%NINJA_DIR%;%PATH%
   # CMake
   - cmake --version
-  - cmake -G -?
 
 build:
   parallel: true
