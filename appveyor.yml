@@ -1,8 +1,5 @@
 version: 3.0.1.{build}
 
-#cache:
-  #- C:\Tools\ninja\ninja.exe
-
 shallow_clone: true
 clone_depth: 1
 
@@ -12,13 +9,12 @@ branches:
 
 configuration:
 - MinSizeRel
-#- Release
-#- Debug
+- Release
+- Debug
 
 environment:
   DIST_DIR: '%APPVEYOR_BUILD_FOLDER%\dist'
   CMAKE_DIST_DIR: C:/projects/pthreads4w/dist
-  #NINJA_DIR: C:\Tools\ninja
   matrix:
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
@@ -27,7 +23,7 @@ environment:
       ARCHITECTURE:
       ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
-      TESTING: OFF
+      TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       PLATFORM: x64
@@ -35,7 +31,7 @@ environment:
       ARCHITECTURE: amd64
       ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
-      TESTING: OFF
+      TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       PLATFORM: ARM
@@ -50,14 +46,14 @@ environment:
       VCVARSALL:
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'Visual Studio 15 2017'
-      TESTING: OFF
+      TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: x64
       VCVARSALL:
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'Visual Studio 15 2017 Win64'
-      TESTING: OFF
+      TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: ARM
@@ -70,13 +66,6 @@ init:
   - echo BUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
 
 install:
-  # Ninja
-  #- if not exist %NINJA_DIR%\ mkdir %NINJA_DIR%
-  #- cd %NINJA_DIR%
-  #- if not exist ninja.exe appveyor DownloadFile https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-win.zip
-  #- if not exist ninja.exe 7z x ninja-win.zip
-  #- set PATH=%NINJA_DIR%;%PATH%
-  # CMake
   - cmake --version
 
 build:
