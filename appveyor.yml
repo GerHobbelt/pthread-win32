@@ -1,7 +1,7 @@
 version: 3.0.1.{build}
 
 cache:
-  - '%TOOLS_DIR%\depot_tools.zip'
+  - '%DEPOT_TOOLS_DIR%\depot_tools.zip'
 
 shallow_clone: true
 clone_depth: 1
@@ -18,7 +18,6 @@ configuration:
 environment:
   DIST_DIR: '%APPVEYOR_BUILD_FOLDER%\dist'
   CMAKE_DIST_DIR: C:/projects/pthreads4w/dist
-  TOOLS_DIR: C:\Tools
   DEPOT_TOOLS_DIR: C:\Tools\depot_tools
   matrix:
 
@@ -72,10 +71,10 @@ init:
 
 install:
   # Depot Tools
-  - if not exist %TOOLS_DIR%\ mkdir %TOOLS_DIR%
-  - cd %TOOLS_DIR%
+  - if not exist %DEPOT_TOOLS_DIR%\ mkdir %DEPOT_TOOLS_DIR%
+  - cd %DEPOT_TOOLS_DIR%
   - dir
-  - if not exist .\depot_tools.zip appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip
+  - if not exist %DEPOT_TOOLS_DIR%\depot_tools.zip appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip
   - 7z x depot_tools.zip
   - dir
   - set PATH=%DEPOT_TOOLS_DIR%;%PATH%
