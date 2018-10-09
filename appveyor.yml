@@ -113,6 +113,6 @@ before_test:
   - set PATH=%APPVEYOR_BUILD_FOLDER%\build;%PATH%
 test_script:
   - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ cd %APPVEYOR_BUILD_FOLDER%\build\tests
-  - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ ctest -C %CONFIGURATION% -V
+  #- if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ ctest -C %CONFIGURATION% -V
 after_test:
   # TODO process CTest output
