@@ -25,12 +25,12 @@ macro(add_testcase test type def)
     endif()
 
     add_executable(${lib_test} ${test}.c ${c_dep})
-    target_link_libraries(${lib_test} ${lib_lib}${targ_suffix}.lib ${XXLIBS})
+    target_link_libraries(${lib_test} ${${lib_lib}${targ_suffix}} ${XXLIBS})
     target_compile_definitions(${lib_test} PUBLIC "/nologo -D_CONSOLE -D_MBCS -D${def} ${extra}")
     add_dependencies(${lib_test} ${lib_lib})
 
     add_executable(${dll_test} ${test}.c ${c_dep})
-    target_link_libraries(${dll_test} ${dll_lib}${targ_suffix}.lib ${XXLIBS})
+    target_link_libraries(${dll_test} ${${dll_lib}${targ_suffix}} ${XXLIBS})
     target_compile_definitions(${dll_test} PUBLIC "/nologo -D_CONSOLE -D_MBCS -D${def} ${extra}")
     add_dependencies(${dll_test} ${dll_lib})
 
