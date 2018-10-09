@@ -44,7 +44,6 @@ else()
 endif()
 message(STATUS "Target ............ ${TARGET_ARCH}")
 
-message(STATUS "Host .............. ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 if(MSVC)
     message(STATUS "MSVC Version ...... ${MSVC_VERSION}")
 endif()
