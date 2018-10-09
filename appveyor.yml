@@ -1,5 +1,8 @@
 version: 3.0.1.{build}
 
+cache:
+  - '%TOOLS_DIR%\depot_tools.zip'
+
 shallow_clone: true
 clone_depth: 1
 
@@ -70,11 +73,13 @@ init:
 install:
   # Depot Tools
   - if not exist %TOOLS_DIR%\ mkdir %TOOLS_DIR%
-  - appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip
+  - cd %TOOLS_DIR%
+  - dir
+  - if not exist .\depot_tools.zip appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip
   - 7z x depot_tools.zip
-  - dir /s
+  - dir
   - set PATH=%DEPOT_TOOLS_DIR%;%PATH%
-  
+
   # CMake    
   - cmake --version
 
