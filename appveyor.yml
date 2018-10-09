@@ -37,35 +37,35 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       PLATFORM: ARM
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin\x86_arm\vcvarsx86_arm.bat'
-      ARCHITECTURE:
+      ARCHITECTURE: store
       ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
       TESTING: OFF
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: x64
-      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"'
-      ARCHITECTURE: 
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\vcvarsall.bat"'
+      ARCHITECTURE: x64
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
       TESTING: ON
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: x86
-      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_x86.bat"'
-      ARCHITECTURE: 
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\vcvarsall.bat"'
+      ARCHITECTURE: amd64_x86
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
       TESTING: ON
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: ARM
-      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat"'
-      ARCHITECTURE: 
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\vcvarsall.bat"'
+      ARCHITECTURE: 'amd64_arm store'
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
       TESTING: OFF
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: ARM64
-      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat"'
-      ARCHITECTURE: 
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\vcvarsall.bat"'
+      ARCHITECTURE: 'amd64_arm64 store'
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
       TESTING: OFF
