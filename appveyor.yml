@@ -74,7 +74,7 @@ install:
   - if not exist %DEPOT_TOOLS_DIR%\ mkdir %DEPOT_TOOLS_DIR%
 
   - cd %DEPOT_TOOLS_DIR%
-  - if not exist %DEPOT_TOOLS_DIR%\depot_tools.zip appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip
+  - if not exist %DEPOT_TOOLS_DIR%\depot_tools.zip ( appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip )
   - 7z x depot_tools.zip
   - set PATH=%DEPOT_TOOLS_DIR%;%PATH%
 
@@ -97,7 +97,7 @@ build_script:
           -DENABLE_TESTS=%TESTING%
           ..
 
-  - if "%GENERATOR%"" == "Ninja" ( autoninja install ) 
+  - if "%GENERATOR%" == "Ninja" ( autoninja install ) 
     else ( cmake --build . --config %CONFIGURATION% --target install )
 
 after_build:
