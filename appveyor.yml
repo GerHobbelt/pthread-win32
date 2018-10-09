@@ -1,7 +1,7 @@
 version: 3.0.1.{build}
 
-cache:
-  - C:\Tools\ninja\ninja.exe
+#cache:
+  #- C:\Tools\ninja\ninja.exe
 
 shallow_clone: true
 clone_depth: 1
@@ -18,56 +18,57 @@ configuration:
 environment:
   DIST_DIR: '%APPVEYOR_BUILD_FOLDER%\dist'
   CMAKE_DIST_DIR: C:/projects/pthreads4w/dist
-  NINJA_DIR: C:\Tools\ninja
+  #NINJA_DIR: C:\Tools\ninja
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       PLATFORM: x64
-      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat'
-      ARCHITECTURE:
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
+      ARCHITECTURE: amd64
       ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: OFF
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
-      PLATFORM: x86
-      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin\vcvars32.bat'
+      PLATFORM: amd64_x86
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
       ARCHITECTURE:
       ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: OFF
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       PLATFORM: ARM
-      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin\x86_arm\vcvarsx86_arm.bat'
-      ARCHITECTURE: store
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
+      ARCHITECTURE: 'amd64_arm store'
       ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: OFF
+
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: x64
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"'
       ARCHITECTURE:
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
-      GENERATOR: Ninja
+      GENERATOR: 'NMake Makefiles'
       TESTING: OFF
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: x86
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"'
       ARCHITECTURE:
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
-      GENERATOR: Ninja
+      GENERATOR: 'NMake Makefiles'
       TESTING: OFF
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: ARM
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\vcvarsall.bat"'
       ARCHITECTURE: 'amd64_arm store'
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
-      GENERATOR: Ninja
+      GENERATOR: 'NMake Makefiles'
       TESTING: OFF
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       PLATFORM: ARM64
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\vcvarsall.bat"'
       ARCHITECTURE: 'amd64_arm64 store'
       ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
-      GENERATOR: Ninja
+      GENERATOR: 'NMake Makefiles'
       TESTING: OFF
 
 init:
@@ -75,17 +76,17 @@ init:
 
 install:
   # Ninja
-  - if not exist %NINJA_DIR%\ mkdir %NINJA_DIR%
-  - cd %NINJA_DIR%
-  - if not exist ninja.exe appveyor DownloadFile https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-win.zip
-  - if not exist ninja.exe 7z x ninja-win.zip
-  - set PATH=%NINJA_DIR%;%PATH%
+  #- if not exist %NINJA_DIR%\ mkdir %NINJA_DIR%
+  #- cd %NINJA_DIR%
+  #- if not exist ninja.exe appveyor DownloadFile https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-win.zip
+  #- if not exist ninja.exe 7z x ninja-win.zip
+  #- set PATH=%NINJA_DIR%;%PATH%
   # CMake
   - cmake --version
 
-  - cd "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\"
-  - dir /s
-  - type vcvarsall.bat
+  #- cd "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\"
+  #- dir /s
+  #- type vcvarsall.bat
 
 build:
   parallel: true
