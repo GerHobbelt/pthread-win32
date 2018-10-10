@@ -22,47 +22,41 @@ environment:
   matrix:
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
-      PLATFORM: x86
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
       ARCHITECTURE: amd64_x86
-      ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      ARCHIVE: VS2015_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
-      PLATFORM: x64
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
       ARCHITECTURE: amd64
-      ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      ARCHIVE: VS2015_%CONFIGURATION%_x64_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
       TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
-      PLATFORM: ARM
       VCVARSALL:
-      ARCHIVE: VS2015_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      ARCHIVE: VS2015_%CONFIGURATION%_ARM_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'Visual Studio 14 2015 ARM'
       TESTING: OFF
 
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
-      PLATFORM: x86
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat'
-      ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      ARCHIVE: VS2017_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
       TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
-      PLATFORM: x64
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat'
-      ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      ARCHIVE: VS2017_%CONFIGURATION%_x64_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: Ninja
       TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
-      PLATFORM: ARM
       VCVARSALL: 
-      ARCHIVE: VS2017_%CONFIGURATION%_%PLATFORM%_%APPVEYOR_BUILD_NUMBER%
+      ARCHIVE: VS2017_%CONFIGURATION%_ARM_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'Visual Studio 15 2017 ARM'
       TESTING: OFF
 
@@ -113,6 +107,6 @@ before_test:
   - set PATH=%APPVEYOR_BUILD_FOLDER%\build;%PATH%
 test_script:
   - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ cd %APPVEYOR_BUILD_FOLDER%\build\tests
-  #- if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ ctest -C %CONFIGURATION% -V
+  - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ ctest -C %CONFIGURATION% -V
 after_test:
   # TODO process CTest output
