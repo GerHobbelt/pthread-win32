@@ -1,8 +1,5 @@
 version: 3.0.1.{build}
 
-cache:
-  - C:\Tools\depot_tools -> appveyor.yml
-
 shallow_clone: true
 clone_depth: 1
 
@@ -18,7 +15,6 @@ configuration:
 environment:
   DIST_DIR: '%APPVEYOR_BUILD_FOLDER%\dist'
   CMAKE_DIST_DIR: C:/projects/pthreads4w/dist
-  DEPOT_TOOLS_DIR: C:\Tools\depot_tools
   APPVEYOR_SAVE_CACHE_ON_ERROR: true
 
   matrix:
@@ -34,51 +30,45 @@ environment:
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
       ARCHITECTURE: amd64
       ARCHIVE: VS2015_%CONFIGURATION%_x64_%APPVEYOR_BUILD_NUMBER%
-      GENERATOR: Ninja
+      GENERATOR: 'NMake Makefiles'
       TESTING: OFF
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
       ARCHITECTURE: amd64_arm
       ARCHIVE: VS2015_%CONFIGURATION%_ARM_%APPVEYOR_BUILD_NUMBER%
-      GENERATOR: Ninja
+      GENERATOR: 'NMake Makefiles'
       TESTING: OFF
 
-
-    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
-      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat'
-      ARCHIVE: VS2017_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
-      GENERATOR: Ninja
-      TESTING: OFF
-
-    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
-      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat'
-      ARCHIVE: VS2017_%CONFIGURATION%_x64_%APPVEYOR_BUILD_NUMBER%
-      GENERATOR: Ninja
-      TESTING: OFF
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat'
       ARCHIVE: VS2017_%CONFIGURATION%_ARM_%APPVEYOR_BUILD_NUMBER%
-      GENERATOR: Ninja
+      GENERATOR: 'NMake Makefiles'
       TESTING: OFF
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat'
       ARCHIVE: VS2017_%CONFIGURATION%_ARM64_%APPVEYOR_BUILD_NUMBER%
-      GENERATOR: Ninja
+      GENERATOR: 'NMake Makefiles'
       TESTING: OFF
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat'
+      ARCHIVE: VS2017_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: 'NMake Makefiles'
+      TESTING: ON
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
+      VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat'
+      ARCHIVE: VS2017_%CONFIGURATION%_x64_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: 'NMake Makefiles'
+      TESTING: ON
 
 init:
   - echo BUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
 
 install:
-  # Depot Tools
-  - if not exist %DEPOT_TOOLS_DIR%\ ( mkdir %DEPOT_TOOLS_DIR% )
-  - cd %DEPOT_TOOLS_DIR%
-  - if not exist %DEPOT_TOOLS_DIR%\autoninja.bat ( appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip )
-  - 7z x depot_tools.zip
-  - set PATH=%DEPOT_TOOLS_DIR%;%PATH%
 
   # CMake
   - cmake --version
@@ -99,8 +89,7 @@ build_script:
           -DENABLE_TESTS=%TESTING%
           ..
 
-  - if "%GENERATOR%" == "Ninja" ( autoninja install )
-    else ( cmake --build . --config %CONFIGURATION% --target install )
+    cmake --build . --config %CONFIGURATION% --target install
 
 after_build:
   - cd %DIST_DIR%
