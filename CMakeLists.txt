@@ -21,7 +21,6 @@ set(CMAKE_DEBUG_POSTFIX d)
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
 #set(XLIBS wsock32.lib)
 
-include (common)
 
 include_directories(.)
 
@@ -33,7 +32,9 @@ include (target_arch)
 get_target_arch(TARGET_ARCH)
 
 if(${TARGET_ARCH} STREQUAL "ARM")
-    add_definitions(-D__PTW32_ARCHARM)
+    add_definitions(-D__PTW32_ARCHARM -D_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
+elseif(${TARGET_ARCH} STREQUAL "ARM64")
+    add_definitions(-D__PTW32_ARCHARM64 -D_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
 elseif(${TARGET_ARCH} STREQUAL "x86_64")
     add_definitions(-D__PTW32_ARCHAMD64)
 elseif(${TARGET_ARCH} STREQUAL "x86")
@@ -42,6 +43,11 @@ elseif(${TARGET_ARCH} STREQUAL "x64")
     add_definitions(-D__PTW32_ARCHX64)
 else()
     MESSAGE(ERROR "\"${TARGET_ARCH}\" not supported in version.rc")
+endif()
+message(STATUS "Target ............ ${TARGET_ARCH}")
+
+if(MSVC)
+    message(STATUS "MSVC Version ...... ${MSVC_VERSION}")
 endif()
 
 #################################
