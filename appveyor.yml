@@ -76,7 +76,7 @@ install:
   # Depot Tools
   - if not exist %DEPOT_TOOLS_DIR%\ ( mkdir %DEPOT_TOOLS_DIR% )
   - cd %DEPOT_TOOLS_DIR%
-  - if not exist %DEPOT_TOOLS_DIR%\depot_tools.zip ( appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip )
+  - if not exist %DEPOT_TOOLS_DIR%\autoninja.bat ( appveyor DownloadFile https://storage.googleapis.com/chrome-infra/depot_tools.zip )
   - 7z x depot_tools.zip
   - set PATH=%DEPOT_TOOLS_DIR%;%PATH%
 
