@@ -1,7 +1,7 @@
 version: 3.0.1.{build}
 
 cache:
-  - C:\Tools\depot_tools\depot_tools.zip
+  - C:\Tools\depot_tools -> appveyor.yml
 
 shallow_clone: true
 clone_depth: 1
@@ -19,6 +19,8 @@ environment:
   DIST_DIR: '%APPVEYOR_BUILD_FOLDER%\dist'
   CMAKE_DIST_DIR: C:/projects/pthreads4w/dist
   DEPOT_TOOLS_DIR: C:\Tools\depot_tools
+  APPVEYOR_SAVE_CACHE_ON_ERROR: true
+
   matrix:
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
