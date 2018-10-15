@@ -32,7 +32,22 @@ before_script:
 
   # set enviromental variables
   - ls "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools/VC/Auxiliary/Build/"
-  - "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools/VC/Auxiliary/Build/vcvars${VS2017}.bat"
+    #vcvars32.bat
+    #vcvars64.bat
+    #vcvarsall.bat
+    #vcvarsamd64_arm.bat
+    #vcvarsamd64_arm64.bat
+    #vcvarsamd64_x86.bat
+    #vcvarsx86_amd64.bat
+    #vcvarsx86_arm.bat
+    #vcvarsx86_arm64.bat
+
+    #vcvars64.bat
+    #vcvarsamd64_x86.bat
+    #vcvarsamd64_arm.bat
+    #vcvarsamd64_arm64.bat
+  - "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools/VC/Auxiliary/Build/vcvars64.bat"
+
 
   # Visual Studio 2015
   - ls "/c/Progra~2/Microsoft Visual Studio 14.0/VC/"
