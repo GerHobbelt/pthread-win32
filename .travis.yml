@@ -51,16 +51,17 @@ before_script:
     #vcvarsx86_arm64.bat
   #- printenv
 
-  #- msvcenv="__print_ms_env.bat"
-  #- echo "@echo off" > "$msvcenv"
-  #- echo "call /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvarsall.bat ${VS2017}" >> "$msvcenv"
-  #- echo "set" >> "$msvcenv"
-  #- cmd "/C $msvcenv" > "$msenv.tmp"
+  - msvcenv="__msvc.bat"
+  - echo "@echo off" > "$msvcenv"
+  - echo "call C:\Progra~2\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat ${VS2017}" >> "$msvcenv"
+  - echo "set" >> "$msvcenv"
+  - cmd "/K $msvcenv"
+  # > "$msenv.tmp"
 
-  #- cat "$msvcenv"
-  #- rm -f "$msvcenv"
+  - cat "$msvcenv"
+  - rm -f "$msvcenv"
 
-  #- printenv
+  - printenv
 
   #- cat "$msenv.tmp"
 
@@ -75,10 +76,10 @@ before_script:
   #- cat "$msenv"
   #- source "$msenv"
 
-  - printenv
+  #- printenv
 
-  - call /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvarsall.bat ${VS2017} > "$msenv.tmp"
-  - cat "$msenv.tmp"
+  #- /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvarsall.bat ${VS2017} > "$msenv.tmp"
+  #- cat "$msenv.tmp"
   #- printenv
 
   # Visual Studio 2015
@@ -86,14 +87,14 @@ before_script:
   #- /c/Progra~2/Microsoft\ Visual\ Studio\ 14.0/VC/vcvarsall.bat amd64
 
   # generate the build files
-  #- cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
-  #- cmake -G"NMake Makefiles" -DCMAKE_VERBOSE_MAKEFILE=FALSE -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+  - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
+  - cmake -G"NMake Makefiles" -DCMAKE_VERBOSE_MAKEFILE=FALSE -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
           #-DBUILD_NUMBER=${TRAVIS_BUILD_NUMBER}
           #-DDIST_ROOT="${TRAVIS_BUILD_DIR}/build/dist"
           #-DENABLE_TESTS=${TESTING}
           #..
 script:
-  #- cmake --build . --config ${BUILD_TYPE} --target install
+  - cmake --build . --config ${BUILD_TYPE} --target install
 
 addons:
   coverity_scan:
