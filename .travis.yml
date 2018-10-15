@@ -23,30 +23,27 @@ install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir ${DEPS_DIR} && cd ${DEPS_DIR} && pwd
   - travis_retry wget --no-check-certificate https://cmake.org/files/v3.11/cmake-3.11.0-win64-x64.zip
-  - PowerShell -Command { if ($(CertUtil -hashfile cmake-3.11.0-win64-x64.zip MD5)[1] -replace " ","" -ne "615dfb0813443c1ff56ae0e9d6dbfc61") { throw "MD5 Mis-Match!" } }
-  - PowerShell -Command { 7z x -y cmake-3.11.0-win64-x64.zip }
-  - PowerShell -Command { PATH=${DEPS_DIR}/cmake-3.11.0-win64-x64:${DEPS_DIR}/cmake-3.11.0-win64-x64/bin:$PATH }
+  #- PowerShell -Command { if ($(CertUtil -hashfile cmake-3.11.0-win64-x64.zip MD5)[1] -replace " ","" -ne "615dfb0813443c1ff56ae0e9d6dbfc61") { throw "MD5 Mis-Match!" } }
+  - 7z x -y cmake-3.11.0-win64-x64.zip
+  - PATH=${DEPS_DIR}/cmake-3.11.0-win64-x64:${DEPS_DIR}/cmake-3.11.0-win64-x64/bin:$PATH
 
 before_script:
 
   # document the version
-  - PowerShell -Command { cmake --version }
+  - cmake --version
 
   # set enviromental variables
-  - PowerShell -Command { pushd ${env:ProgramFiles(x86)}\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build }
-  - PowerShell -Command { cmd /c "${VCVARS}.bat&set" | foreach { if ($_ -match "=") { $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])" } } }
-  - PowerShell -Command { popd }
-  - PowerShell -Command { Write-Host "Visual Studio 2017 (${VCVARS}) Command Prompt variables set." -ForegroundColor Yellow }
+  - "/c/Progra~2/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build/${VCVARS}.bat"
 
   # generate the build files
-  - PowerShell -Command { cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build }
-  - PowerShell -Command { cmake -G"NMake Makefiles" -DCMAKE_VERBOSE_MAKEFILE=FALSE -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+  - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
+  - cmake -G"NMake Makefiles" -DCMAKE_VERBOSE_MAKEFILE=FALSE -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
           -DBUILD_NUMBER=${TRAVIS_BUILD_NUMBER}
           -DDIST_ROOT="${TRAVIS_BUILD_DIR}/build/dist"
           -DENABLE_TESTS=${TESTING}
-          .. }
+          ..
 script:
-  - PowerShell -Command { cmake --build . --config ${BUILD_TYPE} --target install }
+  - cmake --build . --config ${BUILD_TYPE} --target install
 
 addons:
   coverity_scan:
