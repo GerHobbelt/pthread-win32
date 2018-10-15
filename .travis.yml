@@ -25,7 +25,7 @@ install:
   - travis_retry wget --no-check-certificate https://cmake.org/files/v3.11/cmake-3.11.0-win64-x64.zip
 #  - echo "96d67e21f0983ebf0fffc5b106ec338c *cmake-3.11.0-win64-x64.zip" > cmake_md5.txt
 #  - md5sum -c cmake_md5.txt
-  - 7z x -y -ocmake-install
+  - 7z x -y cmake-3.11.0-win64-x64.zip -o"cmake-install"
   - ls cmake-install
   - PATH=${DEPS_DIR}/cmake-install:${DEPS_DIR}/cmake-install/bin:$PATH
 
