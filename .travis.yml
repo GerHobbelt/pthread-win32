@@ -51,15 +51,15 @@ before_script:
     #vcvarsx86_arm64.bat
   #- printenv
 
-  - msvcenv="__msvc.bat"
-  - echo "@echo off" > "$msvcenv"
-  - echo "call /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvarsall.bat ${VS2017}" >> "$msvcenv"
-  - echo "set" >> "$msvcenv"
-  - cmd "/K $msvcenv"
+  #- msvcenv="__msvc.bat"
+  #- echo "@echo off" > "$msvcenv"
+  #- echo "call /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvarsall.bat ${VS2017}" >> "$msvcenv"
+  #- echo "set" >> "$msvcenv"
+  #- cmd "/K $msvcenv"
   # > "$msenv.tmp"
 
-  - cat "$msvcenv"
-  - rm -f "$msvcenv"
+  #- cat "$msvcenv"
+  #- rm -f "$msvcenv"
 
   - printenv
 
