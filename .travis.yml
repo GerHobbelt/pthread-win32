@@ -36,17 +36,13 @@ before_script:
   # set enviromental variables
   - ls /c
 
-  - echo "1"
-  - ls "/c/Progra~2"
+  - ls "/c/Progra~2/Microsoft Visual Studio 14.0"
+  - ls "/c/Progra~2/Microsoft Visual Studio/2017"
 
-  - echo "2"
-  - ls "/c/Progra~2/Microsoft Visual Studio"
+  - tree "/c/Progra~2/Microsoft Visual Studio 14.0"
+  - tree "/c/Progra~2/Microsoft Visual Studio/2017"
 
-  - echo "3"
-  - ls "/c/Progra~2/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build"
-  
-  - echo "${VCVARS}"
-  - "/c/Progra~2/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build/${VCVARS}.bat"
+  #- "/c/Progra~2/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build/${VCVARS}.bat"
 
   # generate the build files
   - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
