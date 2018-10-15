@@ -3,13 +3,14 @@ language: shell
 os: windows
 
 env:
+  - BUILD_TYPE=Debug VS2017=amd64_x86 ARCH=amd64 TESTING=OFF
+  - BUILD_TYPE=Release VS2017=amd64_x86 TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=amd64_x86 TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=amd64_x86 TESTING=OFF
+
   #- BUILD_TYPE=Debug ARCH=amd64_x86 TESTING=OFF
   #- BUILD_TYPE=Release ARCH=amd64_x86 TESTING=OFF
   #- BUILD_TYPE=MinSizeRel ARCH=amd64_x86 TESTING=OFF
-
-  - BUILD_TYPE=Debug ARCH=amd64 TESTING=OFF
-  - BUILD_TYPE=Release ARCH=amd64 TESTING=OFF
-  - BUILD_TYPE=MinSizeRel ARCH=amd64 TESTING=OFF
 
   #- BUILD_TYPE=Debug ARCH=amd64_arm TESTING=OFF
   #- BUILD_TYPE=Release ARCH=amd64_arm TESTING=OFF
@@ -30,10 +31,11 @@ before_script:
   - cmake --version
 
   # set enviromental variables
-  - ls "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools/VC"
+  - ls "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools/VC/Auxiliary/Build/"
+  - "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools/VC/Auxiliary/Build/${VS2017}.bat"
 
   # Visual Studio 2015
-  - "/c/Progra~2/Microsoft Visual Studio 14.0/VC/vcvarsall.bat amd64"
+  #- "/c/Progra~2/Microsoft Visual Studio 14.0/VC/vcvarsall.bat amd64"
 
   # generate the build files
   - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
