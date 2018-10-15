@@ -3,17 +3,17 @@ language: shell
 os: windows
 
 env:
-  - BUILD_TYPE=Debug ARCH=amd64_x86 TESTING=OFF
-  - BUILD_TYPE=Release ARCH=amd64_x86 TESTING=OFF
-  - BUILD_TYPE=MinSizeRel ARCH=amd64_x86 TESTING=OFF
+  #- BUILD_TYPE=Debug ARCH=amd64_x86 TESTING=OFF
+  #- BUILD_TYPE=Release ARCH=amd64_x86 TESTING=OFF
+  #- BUILD_TYPE=MinSizeRel ARCH=amd64_x86 TESTING=OFF
 
   - BUILD_TYPE=Debug ARCH=amd64 TESTING=OFF
   - BUILD_TYPE=Release ARCH=amd64 TESTING=OFF
   - BUILD_TYPE=MinSizeRel ARCH=amd64 TESTING=OFF
 
-  - BUILD_TYPE=Debug ARCH=amd64_arm TESTING=OFF
-  - BUILD_TYPE=Release ARCH=amd64_arm TESTING=OFF
-  - BUILD_TYPE=MinSizeRel ARCH=amd64_arm TESTING=OFF
+  #- BUILD_TYPE=Debug ARCH=amd64_arm TESTING=OFF
+  #- BUILD_TYPE=Release ARCH=amd64_arm TESTING=OFF
+  #- BUILD_TYPE=MinSizeRel ARCH=amd64_arm TESTING=OFF
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
@@ -31,9 +31,9 @@ before_script:
 
   # set enviromental variables
   - ls "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools/VC"
-  
+
   # Visual Studio 2015
-  - "/c/Progra~2/Microsoft Visual Studio 14.0/VC/vcvarsall.bat ${ARCH}"
+  - "/c/Progra~2/Microsoft Visual Studio 14.0/VC/vcvarsall.bat amd64"
 
   # generate the build files
   - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
