@@ -56,9 +56,12 @@ before_script:
   - echo "call C:\Progra~2\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat ${VS2017}" >> "$msenvbatch"
   - echo "set" >> "$msenvbatch"
   - cmd "/C $msenvbatch" > "$msenv.tmp"
-  - cat "$msenv.tmp"
-
+  - echo "#########################"
+  - cat "$msenvbatch"
   - rm -f "$msenvbatch"
+  - echo "#########################"
+  - cat "$msenv.tmp"
+  - echo "#########################"
 
   - grep -E '^PATH=' "$msenv.tmp"
   - grep -E '^(INCLUDE|LIB|LIBPATH)=' "$msenv.tmp"
