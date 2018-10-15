@@ -3,27 +3,28 @@ language: shell
 os: windows
 
 env:
-  - BUILD_TYPE=Debug VCVARS="vcvarsamd64_arm" TESTING=OFF
-  - BUILD_TYPE=Release VCVARS="vcvarsamd64_arm" TESTING=OFF
-  - BUILD_TYPE=MinSizeRel VCVARS="vcvarsamd64_arm TESTING=OFF
+  - BUILD_TYPE=Debug VCVARS=vcvarsamd64_arm TESTING=OFF
+  - BUILD_TYPE=Release VCVARS=vcvarsamd64_arm TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VCVARS=vcvarsamd64_arm TESTING=OFF
 
-#  - BUILD_TYPE=Debug VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat" TESTING=OFF
-#  - BUILD_TYPE=Release VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat" TESTING=OFF
-#  - BUILD_TYPE=MinSizeRel VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat TESTING=OFF
+  - BUILD_TYPE=Debug VCVARS=vcvarsamd64_arm64 TESTING=OFF
+  - BUILD_TYPE=Release VCVARS=vcvarsamd64_arm64 TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VCVARS=vcvarsamd64_arm64 TESTING=OFF
 
-#  - BUILD_TYPE=Debug VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat" TESTING=OFF
-#  - BUILD_TYPE=Release VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat" TESTING=OFF
-#  - BUILD_TYPE=MinSizeRel VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat TESTING=OFF
+  - BUILD_TYPE=Debug VCVARS=vcvars32 TESTING=OFF
+  - BUILD_TYPE=Release VCVARS=vcvars32 TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VCVARS=vcvars32 TESTING=OFF
 
-#  - BUILD_TYPE=Debug VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat" TESTING=OFF
-#  - BUILD_TYPE=Release VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat" TESTING=OFF
-#  - BUILD_TYPE=MinSizeRel VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat TESTING=OFF
+  - BUILD_TYPE=Debug VCVARS=vcvars64 TESTING=OFF
+  - BUILD_TYPE=Release VCVARS=vcvars64 TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VCVARS=vcvars64 TESTING=OFF
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir ${DEPS_DIR} && cd ${DEPS_DIR} && pwd
   - travis_retry wget --no-check-certificate https://cmake.org/files/v3.11/cmake-3.11.0-win64-x64.zip
-  #- PowerShell -Command { if ($(CertUtil -hashfile cmake-3.11.0-win64-x64.zip MD5)[1] -replace " ","" -ne "615dfb0813443c1ff56ae0e9d6dbfc61") { throw "MD5 Mis-Match!" } }
+  - echo "615dfb0813443c1ff56ae0e9d6dbfc61 *cmake-3.11.0-win64-x64.zip" > cmake_md5.txt
+  - md5sum -c cmake_md5.txt
   - 7z x -y cmake-3.11.0-win64-x64.zip
   - PATH=${DEPS_DIR}/cmake-3.11.0-win64-x64:${DEPS_DIR}/cmake-3.11.0-win64-x64/bin:$PATH
 
