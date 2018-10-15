@@ -36,11 +36,11 @@ before_script:
   # set enviromental variables
   - ls /c
 
-  - ls "/c/Progra~2/Microsoft Visual Studio 14.0"
   - ls "/c/Progra~2/Microsoft Visual Studio/2017"
+  - ls "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools"
 
-  - tree "/c/Progra~2/Microsoft Visual Studio 14.0"
-  - tree "/c/Progra~2/Microsoft Visual Studio/2017"
+  - ls "/c/Progra~2/Microsoft Visual Studio 14.0"
+  - ls "/c/Progra~2/Microsoft Visual Studio 14.0/VC"
 
   #- "/c/Progra~2/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build/${VCVARS}.bat"
 
