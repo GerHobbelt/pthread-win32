@@ -3,9 +3,9 @@ language: shell
 os: windows
 
 env:
-  - BUILD_TYPE=Debug VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat" TESTING=OFF
-  - BUILD_TYPE=Release VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat" TESTING=OFF
-  - BUILD_TYPE=MinSizeRel VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat TESTING=OFF
+  - BUILD_TYPE=Debug VCVARS="vcvarsamd64_arm" TESTING=OFF
+  - BUILD_TYPE=Release VCVARS="vcvarsamd64_arm" TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VCVARS="vcvarsamd64_arm TESTING=OFF
 
 #  - BUILD_TYPE=Debug VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat" TESTING=OFF
 #  - BUILD_TYPE=Release VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat" TESTING=OFF
@@ -23,15 +23,27 @@ install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir ${DEPS_DIR} && cd ${DEPS_DIR} && pwd
   - travis_retry wget --no-check-certificate https://cmake.org/files/v3.11/cmake-3.11.0-win64-x64.zip
-#  - echo "96d67e21f0983ebf0fffc5b106ec338c *cmake-3.11.0-win64-x64.zip" > cmake_md5.txt
-#  - md5sum -c cmake_md5.txt
+  - if ($(CertUtil -hashfile cmake-3.11.0-win64-x64.zip MD5)[1] -replace " ","" -ne "615dfb0813443c1ff56ae0e9d6dbfc61") { throw "MD5 Mis-Match!" }
   - 7z x -y cmake-3.11.0-win64-x64.zip
   - PATH=${DEPS_DIR}/cmake-3.11.0-win64-x64:${DEPS_DIR}/cmake-3.11.0-win64-x64/bin:$PATH
 
 before_script:
-  - start clean
+
+  # document the version
   - cmake --version
-  - call ${VCVARSALL}
+
+  # set enviromental variables
+  - pushd ${env:ProgramFiles(x86)}\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
+  - cmd /c "${VCVARS}.bat&set" |
+  - foreach {
+  -   if ($_ -match "=") {
+  -      $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
+  -   }
+  - }
+  - popd
+  - Write-Host "`nVisual Studio 2017 (${VCVARS}) Command Prompt variables set." -ForegroundColor Yellow
+
+  # generate the build files
   - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
   - cmake -G"NMake Makefiles" -DCMAKE_VERBOSE_MAKEFILE=FALSE -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
           -DBUILD_NUMBER=${TRAVIS_BUILD_NUMBER}
