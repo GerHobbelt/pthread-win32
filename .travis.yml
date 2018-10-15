@@ -31,7 +31,7 @@ install:
 
 before_script:
   - cmake --version
-  - call ${VCVARSALL}
+  - ${VCVARSALL}
   - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
   - cmake -G"NMake Makefiles" -DCMAKE_VERBOSE_MAKEFILE=FALSE -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
           -DBUILD_NUMBER=${TRAVIS_BUILD_NUMBER}
