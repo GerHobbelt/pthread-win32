@@ -3,18 +3,25 @@ language: shell
 os: windows
 
 env:
-  - BUILD_TYPE=Debug VS2017=amd64_x86 ARCH=amd64 TESTING=OFF
+  - BUILD_TYPE=Debug VS2017=64 TESTING=OFF
+  - BUILD_TYPE=Release VS2017=64 TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=64 TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=64 TESTING=OFF
+
+  - BUILD_TYPE=Debug VS2017=amd64_x86 TESTING=OFF
   - BUILD_TYPE=Release VS2017=amd64_x86 TESTING=OFF
   - BUILD_TYPE=MinSizeRel VS2017=amd64_x86 TESTING=OFF
   - BUILD_TYPE=MinSizeRel VS2017=amd64_x86 TESTING=OFF
 
-  #- BUILD_TYPE=Debug ARCH=amd64_x86 TESTING=OFF
-  #- BUILD_TYPE=Release ARCH=amd64_x86 TESTING=OFF
-  #- BUILD_TYPE=MinSizeRel ARCH=amd64_x86 TESTING=OFF
+  - BUILD_TYPE=Debug VS2017=amd64_arm TESTING=OFF
+  - BUILD_TYPE=Release VS2017=amd64_arm TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=amd64_arm TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=amd64_arm TESTING=OFF
 
-  #- BUILD_TYPE=Debug ARCH=amd64_arm TESTING=OFF
-  #- BUILD_TYPE=Release ARCH=amd64_arm TESTING=OFF
-  #- BUILD_TYPE=MinSizeRel ARCH=amd64_arm TESTING=OFF
+  - BUILD_TYPE=Debug VS2017=amd64_arm64 TESTING=OFF
+  - BUILD_TYPE=Release VS2017=amd64_arm64 TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=amd64_arm64 TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=amd64_arm64 TESTING=OFF
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
@@ -42,16 +49,12 @@ before_script:
     #vcvarsx86_arm.bat
     #vcvarsx86_arm64.bat
 
-    #vcvars64.bat
-    #vcvarsamd64_x86.bat
-    #vcvarsamd64_arm.bat
-    #vcvarsamd64_arm64.bat
-  - /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvars64.bat
-
+  - echo "Setting up VS2017 for ${VS2017}"
+  - /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvars${VS2017}.bat
 
   # Visual Studio 2015
-  - ls "/c/Progra~2/Microsoft Visual Studio 14.0/VC/"
-  #- "/c/Progra~2/Microsoft Visual Studio 14.0/VC/vcvarsall.bat" amd64
+  #- ls "/c/Progra~2/Microsoft Visual Studio 14.0/VC/"
+  #- /c/Progra~2/Microsoft\ Visual\ Studio\ 14.0/VC/vcvarsall.bat amd64
 
   # generate the build files
   - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
