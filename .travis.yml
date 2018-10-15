@@ -34,6 +34,8 @@ before_script:
   - cmake --version
 
   # set enviromental variables
+  - ls /c
+  - ls /c/Progra~2
   - "/c/Progra~2/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build/${VCVARS}.bat"
 
   # generate the build files
