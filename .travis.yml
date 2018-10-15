@@ -1,7 +1,6 @@
-language: c
+language: shell
 
-os: 
-  - windows
+os: windows
 
 env:
   - BUILD_TYPE=Debug VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat" TESTING=OFF
