@@ -23,20 +23,20 @@ env:
   #- BUILD_TYPE=MinSizeRel VS2017=amd64_arm64 TESTING=OFF
   #- BUILD_TYPE=MinSizeRel VS2017=amd64_arm64 TESTING=OFF
 
-install:
-  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
-  - mkdir ${DEPS_DIR} && cd ${DEPS_DIR} && pwd
-  - travis_retry wget --no-check-certificate https://cmake.org/files/v3.11/cmake-3.11.0-win64-x64.zip
-  - echo "615dfb0813443c1ff56ae0e9d6dbfc61 *cmake-3.11.0-win64-x64.zip" > cmake_md5.txt
-  - md5sum -c cmake_md5.txt
-  - 7z x -y cmake-3.11.0-win64-x64.zip
-  - PATH=${DEPS_DIR}/cmake-3.11.0-win64-x64:${DEPS_DIR}/cmake-3.11.0-win64-x64/bin:$PATH
+#install:
+  #- DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  #- mkdir ${DEPS_DIR} && cd ${DEPS_DIR} && pwd
+  #- travis_retry wget --no-check-certificate https://cmake.org/files/v3.11/cmake-3.11.0-win64-x64.zip
+  #- echo "615dfb0813443c1ff56ae0e9d6dbfc61 *cmake-3.11.0-win64-x64.zip" > cmake_md5.txt
+  #- md5sum -c cmake_md5.txt
+  #- 7z x -y cmake-3.11.0-win64-x64.zip
+  #- PATH=${DEPS_DIR}/cmake-3.11.0-win64-x64:${DEPS_DIR}/cmake-3.11.0-win64-x64/bin:$PATH
 
 before_script:
 
   # document the version
-  - cmake --version
-  - cmake --help  
+  #- cmake --version
+  #- cmake --help  
 
   # set enviromental variables
   - ls "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools/VC/Auxiliary/Build/"
@@ -51,35 +51,27 @@ before_script:
     #vcvarsx86_arm64.bat
   - printenv
 
-  - msenvbatch="__print_ms_env.bat"
-  #- echo "@echo off" > "$msenvbatch"
-  - echo "call C:\Progra~2\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat ${VS2017}" >> "$msenvbatch"
-  - echo "set" >> "$msenvbatch"
-  - cmd "/C $msenvbatch" > "$msenv.tmp"
+  - msvcenv="__print_ms_env.bat"
+  - echo "@echo on" > "$msvcenv"
+  - echo "call C:\Progra~2\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat ${VS2017}" >> "$msvcenv"
+  - echo "set" >> "$msvcenv"
+  - cmd "/V /C $msvcenv" > "$msenv.tmp"
+  
   - echo "#########################"
-  - cat "$msenvbatch"
-  - rm -f "$msenvbatch"
+  - cat "$msvcenv"
+  - rm -f "$msvcenv"
   - echo "#########################"
   - cat "$msenv.tmp"
   - echo "#########################"
-
-  - grep -E '^PATH=' "$msenv.tmp"
-  - grep -E '^(INCLUDE|LIB|LIBPATH)=' "$msenv.tmp"
-
-  - grep -E '^PATH=' "$msenv.tmp" | \
-    sed \
-      -e 's/\(.*\)=\(.*\)/export \1="\2"/g' \
+  - grep -e '^PATH=' "$msenv.tmp" | sed \
+      -e 's/\(.*\)=\(.*\)/export \1="\2:$PATH"/g' \
       -e 's/\([a-zA-Z]\):[\\\/]/\/\1\//g' \
       -e 's/\\/\//g' \
       -e 's/;\//:\//g' > "$msenv"
-
-  - grep -E '^(INCLUDE|LIB|LIBPATH)=' "$msenv.tmp" | \
-    sed -e 's/\(.*\)=\(.*\)/export \1="\2"/g' >> "$msenv"
-
+  - grep -e '^(INCLUDE|LIB|LIBPATH)=' "$msenv.tmp" | sed -e 's/\(.*\)=\(.*\)/export \1="\2"/g' >> "$msenv"
   - rm "$msenv.tmp"
   - cat "$msenv"
-  - export -f "$msenv"
-  #- source "$msenv"
+  - source "$msenv"
 
   - printenv
 
