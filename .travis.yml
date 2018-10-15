@@ -51,7 +51,7 @@ before_script:
     #vcvarsx86_arm64.bat
   - printenv
 
-  - local msenvbatch="__print_ms_env.bat"
+  - msenvbatch="__print_ms_env.bat"
   - echo "@echo off" > "$msenvbatch"
   - echo "call C:\Progra~2\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat ${VS2017}" >> "$msenvbatch"
   - echo "set" >> "$msenvbatch"
@@ -60,7 +60,9 @@ before_script:
   - grep -E '^PATH=' "$msenv.tmp" | sed -e 's/\(.*\)=\(.*\)/export \1="\2"/g' -e 's/\([a-zA-Z]\):[\\\/]/\/\1\//g' -e 's/\\/\//g' -e 's/;\//:\//g' > "$msenv"
   - grep -E '^(INCLUDE|LIB|LIBPATH)=' "$msenv.tmp" | sed -e 's/\(.*\)=\(.*\)/export \1="\2"/g' >> "$msenv"
   - rm "$msenv.tmp"
-  - source "$msenv"
+  - cat "$msenv"
+  - export -f "$msenv"
+  #- source "$msenv"
 
   - printenv
 
