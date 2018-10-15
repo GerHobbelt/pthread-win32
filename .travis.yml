@@ -52,13 +52,27 @@ before_script:
   - printenv
 
   - msenvbatch="__print_ms_env.bat"
-  - echo "@echo off" > "$msenvbatch"
+  #- echo "@echo off" > "$msenvbatch"
   - echo "call C:\Progra~2\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat ${VS2017}" >> "$msenvbatch"
   - echo "set" >> "$msenvbatch"
   - cmd "/C $msenvbatch" > "$msenv.tmp"
+  - cat "$msenv.tmp"
+
   - rm -f "$msenvbatch"
-  - grep -E '^PATH=' "$msenv.tmp" | sed -e 's/\(.*\)=\(.*\)/export \1="\2"/g' -e 's/\([a-zA-Z]\):[\\\/]/\/\1\//g' -e 's/\\/\//g' -e 's/;\//:\//g' > "$msenv"
-  - grep -E '^(INCLUDE|LIB|LIBPATH)=' "$msenv.tmp" | sed -e 's/\(.*\)=\(.*\)/export \1="\2"/g' >> "$msenv"
+
+  - grep -E '^PATH=' "$msenv.tmp"
+  - grep -E '^(INCLUDE|LIB|LIBPATH)=' "$msenv.tmp"
+
+  - grep -E '^PATH=' "$msenv.tmp" | \
+    sed \
+      -e 's/\(.*\)=\(.*\)/export \1="\2"/g' \
+      -e 's/\([a-zA-Z]\):[\\\/]/\/\1\//g' \
+      -e 's/\\/\//g' \
+      -e 's/;\//:\//g' > "$msenv"
+
+  - grep -E '^(INCLUDE|LIB|LIBPATH)=' "$msenv.tmp" | \
+    sed -e 's/\(.*\)=\(.*\)/export \1="\2"/g' >> "$msenv"
+
   - rm "$msenv.tmp"
   - cat "$msenv"
   - export -f "$msenv"
