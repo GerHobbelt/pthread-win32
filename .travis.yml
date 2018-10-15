@@ -31,7 +31,9 @@ before_script:
 
   # set enviromental variables
   - ls "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools/VC"
-  - "/c/Progra~2/Microsoft Visual Studio 14.0/VC/vcvarsall.bat ${ARCH}.bat"
+  
+  # Visual Studio 2015
+  - "/c/Progra~2/Microsoft Visual Studio 14.0/VC/vcvarsall.bat ${ARCH}"
 
   # generate the build files
   - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
