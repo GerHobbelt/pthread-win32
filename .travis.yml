@@ -49,35 +49,36 @@ before_script:
     #vcvarsx86_amd64.bat
     #vcvarsx86_arm.bat
     #vcvarsx86_arm64.bat
-  - printenv
+  #- printenv
 
-  - msvcenv="__print_ms_env.bat"
-  - echo "@echo off" > "$msvcenv"
-  - echo "call C:\Progra~2\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat ${VS2017}" >> "$msvcenv"
-  - echo "set" >> "$msvcenv"
-  - cmd "/C $msvcenv" > "$msenv.tmp"
+  #- msvcenv="__print_ms_env.bat"
+  #- echo "@echo off" > "$msvcenv"
+  #- echo "call /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvarsall.bat ${VS2017}" >> "$msvcenv"
+  #- echo "set" >> "$msvcenv"
+  #- cmd "/C $msvcenv" > "$msenv.tmp"
 
-  - cat "$msvcenv"
-  - rm -f "$msvcenv"
+  #- cat "$msvcenv"
+  #- rm -f "$msvcenv"
 
-  - printenv
-    
-  - cat "$msenv.tmp"
+  #- printenv
 
-  - grep -e '^PATH=' "$msenv.tmp" | \
-      sed \
-        -e 's/\(.*\)=\(.*\)/export \1="\2:$PATH"/g' \
-        -e 's/\([a-zA-Z]\):[\\\/]/\/\1\//g' \
-        -e 's/\\/\//g' -e 's/;\//:\//g'
+  #- cat "$msenv.tmp"
+
+  #- grep -e '^PATH=' "$msenv.tmp" | \
+      #sed \
+        #-e 's/\(.*\)=\(.*\)/export \1="\2:$PATH"/g' \
+        #-e 's/\([a-zA-Z]\):[\\\/]/\/\1\//g' \
+        #-e 's/\\/\//g' -e 's/;\//:\//g'
       # > "$msenv"
   #- grep -e '^(INCLUDE|LIB|LIBPATH)=' "$msenv.tmp" | sed -e 's/\(.*\)=\(.*\)/export \1="\2"/g' >> "$msenv"
-  - rm "$msenv.tmp"
-  - cat "$msenv"
-  - source "$msenv"
+  #- rm "$msenv.tmp"
+  #- cat "$msenv"
+  #- source "$msenv"
 
   - printenv
 
-  #- /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvarsall.bat ${VS2017}
+  - /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvarsall.bat ${VS2017} > "$msenv.tmp"
+  - cat "$msenv.tmp"
   #- printenv
 
   # Visual Studio 2015
