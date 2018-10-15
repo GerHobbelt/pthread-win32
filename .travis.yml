@@ -3,10 +3,10 @@ language: shell
 os: windows
 
 env:
-  - BUILD_TYPE=Debug VS2017=amd64 TESTING=OFF
-  - BUILD_TYPE=Release VS2017=amd64 TESTING=OFF
-  - BUILD_TYPE=MinSizeRel VS2017=amd64 TESTING=OFF
-  - BUILD_TYPE=MinSizeRel VS2017=amd64 TESTING=OFF
+  - BUILD_TYPE=Debug VS2017=arm TESTING=OFF
+  - BUILD_TYPE=Release VS2017=arm TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=arm TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=arm TESTING=OFF
 
   #- BUILD_TYPE=Debug VS2017=amd64_x86 TESTING=OFF
   #- BUILD_TYPE=Release VS2017=amd64_x86 TESTING=OFF
@@ -36,6 +36,7 @@ before_script:
 
   # document the version
   - cmake --version
+  - cmake --help  
 
   # set enviromental variables
   - ls "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools/VC/Auxiliary/Build/"
