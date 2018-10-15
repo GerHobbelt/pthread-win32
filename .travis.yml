@@ -36,7 +36,7 @@ before_script:
 
   # Visual Studio 2015
   - ls "/c/Progra~2/Microsoft Visual Studio 14.0/VC/"
-  - "/c/Progra~2/Microsoft Visual Studio 14.0/VC/vcvarsall.bat" amd64
+  #- "/c/Progra~2/Microsoft Visual Studio 14.0/VC/vcvarsall.bat" amd64
 
   # generate the build files
   - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
