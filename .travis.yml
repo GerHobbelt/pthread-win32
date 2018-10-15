@@ -77,7 +77,7 @@ before_script:
 
   - printenv
 
-  - /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvarsall.bat ${VS2017} > "$msenv.tmp"
+  - call /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvarsall.bat ${VS2017} > "$msenv.tmp"
   - cat "$msenv.tmp"
   #- printenv
 
