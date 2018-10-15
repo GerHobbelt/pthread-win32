@@ -52,23 +52,25 @@ before_script:
   - printenv
 
   - msvcenv="__print_ms_env.bat"
-  - echo "@echo on" > "$msvcenv"
+  - echo "@echo off" > "$msvcenv"
   - echo "call C:\Progra~2\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvarsall.bat ${VS2017}" >> "$msvcenv"
   - echo "set" >> "$msvcenv"
-  - cmd "/V /C $msvcenv" > "$msenv.tmp"
-  
-  - echo "#########################"
+  - cmd "/C $msvcenv" > "$msenv.tmp"
+
   - cat "$msvcenv"
   - rm -f "$msvcenv"
-  - echo "#########################"
+
+  - printenv
+    
   - cat "$msenv.tmp"
-  - echo "#########################"
-  - grep -e '^PATH=' "$msenv.tmp" | sed \
-      -e 's/\(.*\)=\(.*\)/export \1="\2:$PATH"/g' \
-      -e 's/\([a-zA-Z]\):[\\\/]/\/\1\//g' \
-      -e 's/\\/\//g' \
-      -e 's/;\//:\//g' > "$msenv"
-  - grep -e '^(INCLUDE|LIB|LIBPATH)=' "$msenv.tmp" | sed -e 's/\(.*\)=\(.*\)/export \1="\2"/g' >> "$msenv"
+
+  - grep -e '^PATH=' "$msenv.tmp" | \
+      sed \
+        -e 's/\(.*\)=\(.*\)/export \1="\2:$PATH"/g' \
+        -e 's/\([a-zA-Z]\):[\\\/]/\/\1\//g' \
+        -e 's/\\/\//g' -e 's/;\//:\//g'
+      # > "$msenv"
+  #- grep -e '^(INCLUDE|LIB|LIBPATH)=' "$msenv.tmp" | sed -e 's/\(.*\)=\(.*\)/export \1="\2"/g' >> "$msenv"
   - rm "$msenv.tmp"
   - cat "$msenv"
   - source "$msenv"
