@@ -37,16 +37,16 @@ before_script:
   - ls /c
 
   - echo "1"
-  - ls "/c/Progra~2/Microsoft\ Visual\ Studio"
+  - ls "/c/Progra~2"
 
   - echo "2"
-  - ls "/c/Progra~2/Microsoft\ Visual\ Studio/2017"
+  - ls "/c/Progra~2/Microsoft Visual Studio"
 
   - echo "3"
-  - ls "/c/Progra~2/Microsoft\ Visual\ Studio/2017/Community/VC/Auxiliary/Build"
+  - ls "/c/Progra~2/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build"
   
   - echo "${VCVARS}"
-  - "/c/Progra~2/Microsoft\ Visual\ Studio/2017/Community/VC/Auxiliary/Build/${VCVARS}.bat"
+  - "/c/Progra~2/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build/${VCVARS}.bat"
 
   # generate the build files
   - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
