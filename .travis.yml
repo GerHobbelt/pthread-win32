@@ -46,7 +46,7 @@ before_script:
     #vcvarsamd64_x86.bat
     #vcvarsamd64_arm.bat
     #vcvarsamd64_arm64.bat
-  - "/c/Progra~2/Microsoft Visual Studio/2017/BuildTools/VC/Auxiliary/Build/vcvars64.bat"
+  - /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvars64.bat
 
 
   # Visual Studio 2015
