@@ -29,8 +29,9 @@ install:
   - PATH=${DEPS_DIR}/cmake-3.11.0-win64-x64:${DEPS_DIR}/cmake-3.11.0-win64-x64/bin:$PATH
 
 before_script:
+  - start clean
   - cmake --version
-  #- ${VCVARSALL}
+  - call ${VCVARSALL}
   - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
   - cmake -G"NMake Makefiles" -DCMAKE_VERBOSE_MAKEFILE=FALSE -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
           -DBUILD_NUMBER=${TRAVIS_BUILD_NUMBER}
