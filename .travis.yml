@@ -1,0 +1,42 @@
+language: c
+
+os: 
+  - windows
+
+env:
+  - BUILD_TYPE=Debug VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat" TESTING=OFF
+  - BUILD_TYPE=Release VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat" TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat TESTING=OFF
+
+  - BUILD_TYPE=Debug VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat" TESTING=OFF
+  - BUILD_TYPE=Release VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat" TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat TESTING=OFF
+
+  - BUILD_TYPE=Debug VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat" TESTING=OFF
+  - BUILD_TYPE=Release VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat" TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat TESTING=OFF
+
+  - BUILD_TYPE=Debug VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat" TESTING=OFF
+  - BUILD_TYPE=Release VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat" TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VCVARSALL="%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat TESTING=OFF
+
+before_script:
+  - cmake --version
+  - call ${VCVARSALL}
+  - cd ${TRAVIS_BUILD_DIR} && mkdir build && cd build
+  - cmake -G"NMake Makefiles" -DCMAKE_VERBOSE_MAKEFILE=FALSE -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+          -DBUILD_NUMBER=${TRAVIS_BUILD_NUMBER}
+          -DDIST_ROOT="${TRAVIS_BUILD_DIR}/build/dist"
+          -DENABLE_TESTS=${TESTING}
+          ..
+script:
+  - cmake --build . --config ${BUILD_TYPE} --target install
+
+addons:
+  coverity_scan:
+    project:
+      name: “jwinarske/pthreads4w"
+    notification_email: joel.winarske@gmail.com
+    build_command_prepend: "mkdir build && cd build && cmake -DCMAKE_VERBOSE_MAKEFILE=TRUE -DDCMAKE_INSTALL_PREFIX=`pwd`/dist .."
+    build_command:   "cmake --build . --target install"
+    branch_pattern: coverity_scan
