@@ -8,10 +8,10 @@ env:
   - BUILD_TYPE=MinSizeRel VS2017=amd64 TESTING=OFF
   - BUILD_TYPE=MinSizeRel VS2017=amd64 TESTING=OFF
 
-  #- BUILD_TYPE=Debug VS2017=amd64_x86 TESTING=OFF
-  #- BUILD_TYPE=Release VS2017=amd64_x86 TESTING=OFF
-  #- BUILD_TYPE=MinSizeRel VS2017=amd64_x86 TESTING=OFF
-  #- BUILD_TYPE=MinSizeRel VS2017=amd64_x86 TESTING=OFF
+  - BUILD_TYPE=Debug VS2017=amd64_x86 TESTING=OFF
+  - BUILD_TYPE=Release VS2017=amd64_x86 TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=amd64_x86 TESTING=OFF
+  - BUILD_TYPE=MinSizeRel VS2017=amd64_x86 TESTING=OFF
 
   #- BUILD_TYPE=Debug VS2017=amd64_arm TESTING=OFF
   #- BUILD_TYPE=Release VS2017=amd64_arm TESTING=OFF
@@ -78,7 +78,7 @@ before_script:
 
   #- printenv
 
-  - cmd /K "c:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars32.bat"
+  - "c:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars32.bat" ${VS2017}
   #- cmd "/K C:\\Progra~2\\Microsoft\ Visual\ Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvarsall.bat ${VS2017}"
   #- /c/Progra~2/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvarsall.bat ${VS2017} > "$msenv.tmp"
   #- cat "$msenv.tmp"
