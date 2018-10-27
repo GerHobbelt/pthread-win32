@@ -4,32 +4,30 @@
  *
  * --------------------------------------------------------------------------
  *
- *      Pthreads-win32 - POSIX Threads Library for Win32
- *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
- *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *      Pthreads4w - POSIX Threads for Windows
+ *      Copyright 1998 John E. Bossom
+ *      Copyright 1999-2018, Pthreads4w contributors
+ *
+ *      Homepage: https://sourceforge.net/projects/pthreads4w/
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
- *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
- *      This library is free software; you can redistribute it and/or
- *      modify it under the terms of the GNU Lesser General Public
- *      License as published by the Free Software Foundation; either
- *      version 2 of the License, or (at your option) any later version.
- * 
- *      This library is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *      Lesser General Public License for more details.
- * 
- *      You should have received a copy of the GNU Lesser General Public
- *      License along with this library in the file COPYING.LIB;
- *      if not, write to the Free Software Foundation, Inc.,
- *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *
+ *      https://sourceforge.net/p/pthreads4w/wiki/Contributors/
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * --------------------------------------------------------------------------
  *
@@ -95,7 +93,7 @@ struct bag_t_ {
 
 static bag_t threadbag[NUMTHREADS + 1];
 
-static pthread_mutex_t waitLock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_barrier_t go = NULL;
 
 void *
 mythread(void * arg)
@@ -110,18 +108,8 @@ mythread(void * arg)
   /* Set to known state and type */
 
   assert(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == 0);
-
-  switch (bag->threadnum % 2)
-    {
-    case 0:
-      assert(pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL) == 0);
-      result = 0;
-      break;
-    case 1:
-      assert(pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL) == 0);
-      result = 1;
-      break;
-    }
+  assert(pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL) == 0);
+  result = 1;
 
 #if !defined(__cplusplus)
   __try
@@ -130,20 +118,16 @@ mythread(void * arg)
 #endif
     {
       /* Wait for go from main */
-      assert(pthread_mutex_lock(&waitLock) == 0);
-      assert(pthread_mutex_unlock(&waitLock) == 0);
-      sched_yield();
+      pthread_barrier_wait(&go);
+      pthread_barrier_wait(&go);
 
-      for (;;)
-	{
-	  pthread_testcancel();
-	}
+      pthread_testcancel();
     }
 #if !defined(__cplusplus)
   __except(EXCEPTION_EXECUTE_HANDLER)
 #else
-#if defined(PtW32CatchAll)
-  PtW32CatchAll
+#if defined(__PtW32CatchAll)
+  __PtW32CatchAll
 #else
   catch(...)
 #endif
@@ -160,7 +144,7 @@ mythread(void * arg)
    */
   result += 1000;
 
-  return (void *) (size_t)result;
+  return (void *)(size_t)result;
 }
 
 int
@@ -171,7 +155,7 @@ main()
   pthread_t t[NUMTHREADS + 1];
 
   assert((t[0] = pthread_self()).p != NULL);
-  assert(pthread_mutex_lock(&waitLock) == 0);
+  assert(pthread_barrier_init(&go, NULL, NUMTHREADS + 1) == 0);
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
@@ -181,23 +165,17 @@ main()
     }
 
   /*
-   * Code to control or munipulate child threads should probably go here.
+   * Code to control or manipulate child threads should probably go here.
    */
-  Sleep(500);
 
-  assert(pthread_mutex_unlock(&waitLock) == 0);
-
-  Sleep(500);
+  pthread_barrier_wait(&go);
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
       assert(pthread_cancel(t[i]) == 0);
     }
 
-  /*
-   * Give threads time to run.
-   */
-  Sleep(NUMTHREADS * 100);
+  pthread_barrier_wait(&go);
 
   /*
    * Standard check that all threads started.
@@ -223,19 +201,19 @@ main()
       void* result = (void*)0;
 
       assert(pthread_join(t[i], &result) == 0);
-      fail = ((int)(size_t)result != (int) PTHREAD_CANCELED);
+      fail = (result != PTHREAD_CANCELED);
       if (fail)
 	{
-	  fprintf(stderr, "Thread %d: started %d: location %d: cancel type %s\n",
+	  fprintf(stderr, "Thread %d: started %d: location %d\n",
 		  i,
 		  threadbag[i].started,
-		  (int)(size_t)result,
-		  (((int)(size_t)result % 2) == 0) ? "ASYNCHRONOUS" : "DEFERRED");
+		  (int)(size_t)result);
 	}
       failed |= fail;
     }
 
   assert(!failed);
+  assert(pthread_barrier_destroy(&go) == 0);
 
   /*
    * Success.

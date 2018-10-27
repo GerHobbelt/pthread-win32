@@ -102,13 +102,14 @@
       <AdditionalIncludeDirectories>..\..\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <EnablePREfast>false</EnablePREfast>
+      <ForcedIncludeFiles>config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>PTW32_RC_MSC;PTW32_STATIC_LIB;PTW32_BUILD;PTW32_ARCHx86</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__PTW32_RC_MSC;__PTW32_STATIC_LIB;__PTW32_BUILD;__PTW32_ARCHx86</PreprocessorDefinitions>
     </ResourceCompile>
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
@@ -127,13 +128,14 @@
       <AdditionalIncludeDirectories>..\..\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <EnablePREfast>false</EnablePREfast>
+      <ForcedIncludeFiles>config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>PTW32_RC_MSC;PTW32_STATIC_LIB;PTW32_BUILD;PTW32_ARCHx64</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__PTW32_RC_MSC;__PTW32_STATIC_LIB;__PTW32_BUILD;__PTW32_ARCHx64</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>postbuild $(IntDir) DLL</Command>
@@ -151,6 +153,7 @@
       <AdditionalIncludeDirectories>..\..\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnablePREfast>false</EnablePREfast>
+      <ForcedIncludeFiles>config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,7 +162,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>PTW32_RC_MSC;PTW32_STATIC_LIB;PTW32_BUILD;PTW32_ARCHx86</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__PTW32_RC_MSC;__PTW32_STATIC_LIB;__PTW32_BUILD;__PTW32_ARCHx86</PreprocessorDefinitions>
     </ResourceCompile>
     <Lib>
       <TargetMachine>MachineX86</TargetMachine>
@@ -180,6 +183,7 @@
       <AdditionalIncludeDirectories>..\..\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnablePREfast>false</EnablePREfast>
+      <ForcedIncludeFiles>config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -188,7 +192,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <ResourceCompile>
-      <PreprocessorDefinitions>PTW32_RC_MSC;PTW32_STATIC_LIB;PTW32_BUILD;PTW32_ARCHx64</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__PTW32_RC_MSC;__PTW32_STATIC_LIB;__PTW32_BUILD;__PTW32_ARCHx64</PreprocessorDefinitions>
     </ResourceCompile>
     <PostBuildEvent>
       <Command>postbuild $(IntDir) DLL</Command>
