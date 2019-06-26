@@ -115,6 +115,10 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 /* _tcsncat_s() et al: mapping to the correct TCHAR prototypes: */
 #include <tchar.h>
 
+#if defined(__BORLANDC__) && !defined(_tcsncat_s)
+  #define _tcsncat_s(arg1, arg2, arg3, arg4) _tcsncat(arg1, arg3, (arg2 < arg4 ? arg2 : arg4))
+#endif
+
 /* use local include files during development */
 #include "semaphore.h"
 #include "sched.h"
