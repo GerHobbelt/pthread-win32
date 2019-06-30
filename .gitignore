@@ -15,3 +15,4 @@ bin/
 obj/
 ipch/
 
+*.obj
