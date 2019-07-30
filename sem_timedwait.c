@@ -162,6 +162,8 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 	   * Calculate timeout as milliseconds from current system time. 
 	   */
 	  milliseconds = ptw32_relmillisecs (abstime);
+	  if (milliseconds < 0)
+		  milliseconds = 0;
 	}
 
       if ((result = pthread_mutex_lock (&s->lock)) == 0)
