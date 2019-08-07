@@ -103,7 +103,7 @@
  * Set event if an event handle has been stored in the flag, and
  * set flag to -1 otherwise. Note that -1 cannot be a valid handle value.
  */
-INLINE void
+static INLINE void
 __ptw32_mcs_flag_set (HANDLE * flag)
 {
   HANDLE e = (HANDLE) (__PTW32_INTERLOCKED_SIZE)__PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE(
@@ -133,7 +133,7 @@ __ptw32_mcs_flag_set (HANDLE * flag)
  * Store an event handle in the flag and wait on it if the flag has not been
  * set, and proceed without creating an event otherwise.
  */
-INLINE void
+static INLINE void
 __ptw32_mcs_flag_wait (HANDLE * flag)
 {
   if  ((__PTW32_INTERLOCKED_SIZE)0 ==

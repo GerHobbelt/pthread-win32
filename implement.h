@@ -109,7 +109,11 @@ static void __ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 #if defined (__PTW32_BUILD_INLINED)
 #  if defined(HAVE_C_INLINE) || defined(__cplusplus)
 #    undef INLINE
-#    define INLINE inline
+#    if defined(__GNUC__)
+#      define INLINE __inline__
+#    else
+#      define INLINE inline
+#    endif
 #  endif
 #endif
 

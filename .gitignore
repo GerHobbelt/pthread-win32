@@ -1,3 +1,5 @@
+*.un~
+*~
 *.obj
 *.dll.manifest
 *.dll
@@ -7,6 +9,10 @@
 *.pdb
 *.ilk
 *.exp
+config.log
+config.h.in
+config.status
+configure
 version.res
 tests/*.pass
 tests/*.bench
@@ -18,5 +24,9 @@ tests/SIZES.*
 tests/*.log
 /.project
 build
+cmake-build
+autom4te.cache
 PTHREADS-BUILT
 .vscode
+GNUmakefile
+tests/GNUmakefile
