@@ -58,7 +58,7 @@ endif()
 if (DIST_ROOT)
   set(CMAKE_INSTALL_PREFIX "${DIST_ROOT}")
 elseif (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/PTHREADS-BUILT")
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/PTHREADS-BUILT" CACHE PATH "${CMAKE_SOURCE_DIR}" FORCE)
 endif()
 
 message(STATUS "Install Path ${CMAKE_INSTALL_PREFIX}")
@@ -134,7 +134,6 @@ macro(shared_lib type def)
 	    target_compile_options(${targ} PUBLIC "-xc++")
 	    target_link_libraries(${targ} "-lstdc++")
 	endif (${type} STREQUAL "GCE")
-	set_target_properties(${targ} PROPERTIES COMPILE_FLAGS "${l_target_cflags}")
     endif (${type} STREQUAL "VCE")
 
     install(
@@ -176,7 +175,7 @@ if (MSVC)
   static_lib ( VCE __PTW32_CLEANUP_CXX )
   static_lib ( VSE __PTW32_CLEANUP_SEH )
   static_lib ( VC  __PTW32_CLEANUP_C )
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
+elseif (${CMAKE_C_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
   ## NOTE: MinGW64 does support SEH exception handling, BUT it does not yet
   ## have the MSVC keywords "__try", "__except" and "__finally".
   shared_lib ( GCE __PTW32_CLEANUP_CXX )

@@ -4,8 +4,11 @@ include (CTest)
 include_directories(..)
 
 set(XXLIBS	ws2_32.lib)
+set(TESTPREFIX  "${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}")
 
 set(VCEFLAGS "${VCEFLAGS} -D__PtW32NoCatchWarn")
+
+message(STATUS "Test destination prefix: ${TESTPREFIX}")
 
 macro(add_testcase test type def)
 
@@ -38,11 +41,23 @@ macro(add_testcase test type def)
     add_dependencies(${dll_test} ${dll_lib})
 
     if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
-        install(FILES ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/tests/${lib_test}.exe DESTINATION ${TESTDEST})
-        install(FILES ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/tests/${dll_test}.exe DESTINATION ${TESTDEST})
+        install(
+	    FILES ${CMAKE_BINARY_DIR}/$<CONFIG>/tests/${lib_test}.exe
+	    DESTINATION "${TESTPREFIX}/$<CONFIG>/tests"
+	)
+        install(
+	    FILES ${CMAKE_BINARY_DIR}/$<CONFIG>/tests/${dll_test}.exe
+	    DESTINATION "${TESTPREFIX}/$<CONFIG>/tests"
+	)
     else()
-        install(FILES ${CMAKE_BINARY_DIR}/tests/${lib_test}.exe DESTINATION ${TESTDEST})
-        install(FILES ${CMAKE_BINARY_DIR}/tests/${dll_test}.exe DESTINATION ${TESTDEST})
+        install(
+	    FILES ${CMAKE_BINARY_DIR}/tests/${lib_test}.exe
+	    DESTINATION "${TESTPREFIX}/$<CONFIG>/tests"
+	)
+        install(
+	    FILES ${CMAKE_BINARY_DIR}/tests/${dll_test}.exe
+	    DESTINATION "${TESTPREFIX}/$<CONFIG>/tests"
+	)
     endif()
 
     if(${type} MATCHES "VCE")
