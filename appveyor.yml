@@ -20,6 +20,7 @@ environment:
 
   matrix:
 
+    ## MSVC:
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
       ARCHITECTURE: amd64_x86
@@ -66,6 +67,51 @@ environment:
       GENERATOR: 'NMake Makefiles'
       TESTING: ON
 
+    ## MinGW GNU C Compiler:
+    ## x86 flavor:
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
+      ARCHITECTURE: amd64_x86
+      ARCHIVE: VS2015_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: 'MinGW Makefiles'
+      TESTING: ON
+      MINGW: C:\mingw-w64\i686-6.3.0-posix-dwarf-rt_v5-rev1\mingw32\bin
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
+      ARCHITECTURE: amd64_x86
+      ARCHIVE: VS2015_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: 'MinGW Makefiles'
+      TESTING: ON
+      MINGW: C:\mingw-w64\i686-6.3.0-posix-dwarf-rt_v5-rev1\mingw32\bin
+      
+    ## x64 flavor:
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
+      ARCHITECTURE: amd64_x86
+      ARCHIVE: VS2015_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: 'MinGW Makefiles'
+      TESTING: OFF
+      MINGW: C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
+      ARCHITECTURE: amd64_x86
+      ARCHIVE: VS2015_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: 'MinGW Makefiles'
+      TESTING: OFF
+      MINGW: C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
+      ARCHITECTURE: amd64_x86
+      ARCHIVE: VS2015_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: 'MinGW Makefiles'
+      TESTING: ON
+      MINGW: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
+      ARCHITECTURE: amd64_x86
+      ARCHIVE: VS2015_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
+      GENERATOR: 'MinGW Makefiles'
+      TESTING: ON
+      MINGW: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin
+
 init:
   - echo BUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
 
@@ -83,14 +129,18 @@ build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - mkdir build
   - cd build
+  ## Remove Git's MSYS from PATH, otherwise CMake borks.
+  - set PATH=%PATH:C:\Program Files (x86)\Git\bin;=% 
+  - set PATH=%PATH:C:\Program Files\Git\bin;=% 
+  - set PATH=%PATH:C:\Program Files\Git\usr\bin;=% 
+  - if defined MINGW set PATH=%MINGW%;%PATH%
   - cmake -G"%GENERATOR%"
           -DCMAKE_BUILD_TYPE=%CONFIGURATION%
           -DBUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
           -DDIST_ROOT="%CMAKE_DIST_DIR%/%APPVEYOR_BUILD_WORKER_IMAGE%"
           -DENABLE_TESTS=%TESTING%
           ..
-
-    cmake --build . --config %CONFIGURATION% --target install
+  - cmake --build . --config %CONFIGURATION% --target install
 
 after_build:
   - cd %DIST_DIR%
@@ -106,6 +156,6 @@ before_test:
   - set PATH=%APPVEYOR_BUILD_FOLDER%\build;%PATH%
 test_script:
   - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ cd %APPVEYOR_BUILD_FOLDER%\build\tests
-  - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ ctest -C %CONFIGURATION% -V
+  - if exist %APPVEYOR_BUILD_FOLDER%\build\tests\ ctest -C %CONFIGURATION% -V --timeout 600
 after_test:
   # TODO process CTest output

@@ -28,16 +28,17 @@ include_directories(.)
 include (target_arch)
 
 get_target_arch(TARGET_ARCH)
+set(build_defines "")
 if(${TARGET_ARCH} STREQUAL "ARM")
-    add_compile_definitions(__PTW32_ARCHARM _ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
+    set(build_defines __PTW32_ARCHARM _ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
 elseif(${TARGET_ARCH} STREQUAL "ARM64")
-    add_compile_definitions(__PTW32_ARCHARM64 _ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
+    set(build_defines __PTW32_ARCHARM64 _ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
 elseif(${TARGET_ARCH} STREQUAL "x86_64")
-    add_compile_definitions(__PTW32_ARCHAMD64)
+    set(build_defines __PTW32_ARCHAMD64)
 elseif(${TARGET_ARCH} STREQUAL "x86")
-    add_compile_definitions(__PTW32_ARCHX86)
+    set(build_defines __PTW32_ARCHX86)
 elseif(${TARGET_ARCH} STREQUAL "x64")
-    add_compile_definitions(__PTW32_ARCHX64)
+    set(build_defines __PTW32_ARCHX64)
 else()
     MESSAGE(ERROR "\"${TARGET_ARCH}\" not supported in version.rc")
 endif()
@@ -58,7 +59,7 @@ endif()
 if (DIST_ROOT)
   set(CMAKE_INSTALL_PREFIX "${DIST_ROOT}")
 elseif (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/PTHREADS-BUILT" CACHE PATH "${CMAKE_SOURCE_DIR}" FORCE)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/PTHREADS-BUILT" CACHE PATH "Install path prefix (default)" FORCE)
 endif()
 
 message(STATUS "Install Path ${CMAKE_INSTALL_PREFIX}")
@@ -96,7 +97,6 @@ endif (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
 #################################
 
 if(MSVC)
-    add_compile_definitions(__PTW32_BUILD_INLINED)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /errorReport:none /nologo ")
 
     # C++ Exceptions
@@ -108,9 +108,9 @@ if(MSVC)
         set(VCEFLAGS  "/EHs /TP ")
     endif()
 
-    add_compile_definitions(HAVE_CONFIG_H __PTW32_RC_MSC)
+    set(build_defines ${build_defines} HAVE_CONFIG_H)
 elseif (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
-    add_compile_definitions(__PTW32_BUILD_INLINED HAVE_CONFIG_H)
+    set(build_defines ${build_defines} HAVE_CONFIG_H)
 endif()
 
 # Update filename with proper version info
@@ -120,19 +120,25 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake/version.rc.in ${CMAKE_BINARY_DIR}/versi
 # Libraries                     #
 #################################
 
-macro(shared_lib type def)
+function(shared_lib type def)
     set(targ pthread${type}${PTW32_VER})
     add_library(${targ} SHARED pthread.c ${CMAKE_BINARY_DIR}/version.rc)
     message(STATUS ${targ})
-    target_compile_definitions(${targ} PUBLIC "${def}")
+    target_compile_definitions(${targ} PRIVATE ${def} ${build_defines} __PTW32_BUILD_INLINED)
     set_target_properties(${targ} PROPERTIES DEBUG_POSTFIX "d")
 
+    if (MSVC)
+      # Set resource compiler definition...
+      target_compile_definitions(${targ} PRIVATE __PTW32_RC_MSC)
+    endif ()
     if (${type} STREQUAL "VCE")
         set_target_properties(${targ} PROPERTIES COMPILE_FLAGS ${VCEFLAGS})
     elseif (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
+	target_compile_options(${targ} PRIVATE "-mthreads")
 	if (${type} STREQUAL "GCE")
-	    target_compile_options(${targ} PUBLIC "-xc++")
-	    target_link_libraries(${targ} "-lstdc++")
+	    target_compile_options(${targ} PRIVATE "-xc++")
+	    target_link_libraries(${targ} stdc++)
+	    target_link_options(${targ} PRIVATE "-shared-libgcc")
 	endif (${type} STREQUAL "GCE")
     endif (${type} STREQUAL "VCE")
 
@@ -142,20 +148,22 @@ macro(shared_lib type def)
       LIBRARY # DESTINATION ${TARGET_ARCH}/${CONFIG}/lib
       RUNTIME # DESTINATION ${TARGET_ARCH}/${CONFIG}/bin
     )
-endmacro()
+endfunction()
 
-macro(static_lib type def)
+function(static_lib type def)
     set(targ libpthread${type}${PTW32_VER})
     add_library(${targ} STATIC pthread.c)
     message(STATUS ${targ})
-    target_compile_definitions(${targ} PUBLIC "${def}" __PTW32_STATIC_LIB)
+    target_compile_definitions(${targ} PRIVATE "${def}" ${build_defines} __PTW32_STATIC_LIB __PTW32_BUILD_INLINED)
     set_target_properties(${targ} PROPERTIES DEBUG_POSTFIX "d")
 
     if(${type} STREQUAL "VCE")
         set_target_properties(${targ} PROPERTIES COMPILE_FLAGS ${VCEFLAGS})
     elseif (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
 	if (${type} STREQUAL "GCE")
-	    target_compile_options(${targ} PUBLIC "-xc++")
+	    target_compile_options(${targ} PRIVATE "-xc++")
+	    target_link_libraries(${targ} stdc++)
+	    target_link_options(${targ} PRIVATE "-shared-libgcc")
 	endif (${type} STREQUAL "GCE")
     endif()
 
@@ -165,7 +173,7 @@ macro(static_lib type def)
       LIBRARY # DESTINATION ${TARGET_ARCH}/${CONFIG}/lib
       RUNTIME # DESTINATION ${TARGET_ARCH}/${CONFIG}/bin
     )
-endmacro()
+endfunction()
 
 if (MSVC)
   shared_lib ( VCE __PTW32_CLEANUP_CXX )

@@ -145,7 +145,7 @@
 #if defined(__BORLANDC__)
 #  define int64_t LONGLONG
 #  define uint64_t ULONGLONG
-#elif !defined(__MINGW32__) || !defined(__x86_64__)
+#elif defined(_MSC_VER) && !defined(__x86_64__)
      typedef _int64 int64_t;
      typedef unsigned _int64 uint64_t;
 #  if defined (__PTW32_CONFIG_MSVC6)

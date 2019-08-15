@@ -61,6 +61,11 @@ set(PTHREAD_CONFIG_H "
 /* Define to 1 if you have the DuplicateHandle function. */
 #cmakedefine HAVE_DUPLICATEHANDLE 1
 
+/* Make sure that __PTW32_BUILD is defined. */
+#if !defined(__PTW32_BUILD)
+#define __PTW32_BUILD
+#endif
+
 /* Define if you do not have calloc */
 #if !defined(HAVE_CALLOC) || !HAVE_CALLOC
 #define NEED_CALLOC
