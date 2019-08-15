@@ -93,7 +93,7 @@ oldTrylockThread (void * arg)
 
 
 void
-runTest (char * testNameString, int mType)
+runTest (const char * testNameString, int mType)
 {
   pthread_t t;
 
