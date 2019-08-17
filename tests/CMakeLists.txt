@@ -75,13 +75,13 @@ function(add_testcase test type def)
     endif ()
     add_dependencies(${dll_test} ${dll_lib})
 
-    if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
+    if (${CMAKE_GENERATOR} MATCHES "Visual Studio")
         install(
-	    FILES ${CMAKE_BINARY_DIR}/$<CONFIG>/tests/${lib_test}.exe
+	    FILES "${CMAKE_BINARY_DIR}/tests/$<CONFIG>/${lib_test}.exe"
 	    DESTINATION "${TESTPREFIX}/$<CONFIG>/tests"
 	)
         install(
-	    FILES ${CMAKE_BINARY_DIR}/$<CONFIG>/tests/${dll_test}.exe
+	    FILES "${CMAKE_BINARY_DIR}/tests/$<CONFIG>/${dll_test}.exe"
 	    DESTINATION "${TESTPREFIX}/$<CONFIG>/tests"
 	)
     else()

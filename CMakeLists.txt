@@ -20,7 +20,9 @@ set(PTW32_VER ${PROJECT_VERSION_MAJOR}${EXTRAVERSION})
 #set(XLIBS wsock32.lib)
 
 
-include_directories(.)
+# Initial include path set. Look in the build directory first, where the
+# generated config.h resides, before looking in the source directory.
+include_directories("${CMAKE_BINARY_DIR}/" "${CMAKE_SOURCE_DIR}/")
 
 #################################
 # Target Arch                   #
@@ -45,6 +47,7 @@ endif()
 
 message(STATUS "Target ............ ${TARGET_ARCH}")
 set(CMAKE_C_LIBRARY_ARCHITECTURE ${TARGET_ARCH})
+set(CMAKE_CXX_LIBRARY_ARCHITECTURE ${TARGET_ARCH})
 set(CMAKE_LIBRARY_ARCHITECTURE ${TARGET_ARCH})
 
 if(MSVC)
@@ -68,28 +71,26 @@ message(STATUS "Install Path ${CMAKE_INSTALL_PREFIX}")
 #################################
 # configuration features    #
 #################################
-if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
-    check_include_file(errno.h HAVE_ERRNO_H)
-    check_include_file(inttypes.h HAVE_INTTYPES_H)
-    check_include_file(memory.h HAVE_MEMORY_H)
-    check_include_file(signal.h HAVE_SIGNAL_H)
-    check_include_file(stdint.h HAVE_STDINT_H)
-    check_include_file(stdlib.h HAVE_STDLIB_H)
-    check_include_file(strings.h HAVE_STRINGS_H)
-    check_include_file(string.h HAVE_STRING_H)
-    check_include_file(sys/stat.h HAVE_SYS_STAT_H)
-    check_include_file(sys/types.h HAVE_SYS_TYPES_H)
-    check_include_file(time.h HAVE_TIME_H)
-    check_include_file(unistd.h HAVE_UNISTD_H)
-    check_function_exists(calloc HAVE_CALLOC)
-    check_type_size(sigset_t HAVE_SIGSET_T)
-    check_type_size("struct timespec" HAVE_STRUCT_TIMESPEC)
-    check_symbol_exists(_beginthreadex process.h HAVE__BEGINTHREADEX)
-    check_symbol_exists(DuplicateHandle windows.h HAVE_DUPLICATEHANDLE)
+check_include_file(errno.h HAVE_ERRNO_H)
+check_include_file(inttypes.h HAVE_INTTYPES_H)
+check_include_file(memory.h HAVE_MEMORY_H)
+check_include_file(signal.h HAVE_SIGNAL_H)
+check_include_file(stdint.h HAVE_STDINT_H)
+check_include_file(stdlib.h HAVE_STDLIB_H)
+check_include_file(strings.h HAVE_STRINGS_H)
+check_include_file(string.h HAVE_STRING_H)
+check_include_file(sys/stat.h HAVE_SYS_STAT_H)
+check_include_file(sys/types.h HAVE_SYS_TYPES_H)
+check_include_file(time.h HAVE_TIME_H)
+check_include_file(unistd.h HAVE_UNISTD_H)
+check_function_exists(calloc HAVE_CALLOC)
+check_type_size(sigset_t HAVE_SIGSET_T)
+check_type_size("struct timespec" HAVE_STRUCT_TIMESPEC)
+check_symbol_exists(_beginthreadex process.h HAVE__BEGINTHREADEX)
+check_symbol_exists(DuplicateHandle windows.h HAVE_DUPLICATEHANDLE)
 
-    create_config_h_in()
-    configure_file("${CMAKE_BINARY_DIR}/config.h.in" "${CMAKE_SOURCE_DIR}/config.h")
-endif (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
+create_config_h_in()
+configure_file("${CMAKE_BINARY_DIR}/config.h.in" "${CMAKE_BINARY_DIR}/config.h")
 
 
 #################################
