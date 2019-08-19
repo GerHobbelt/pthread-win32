@@ -2,25 +2,30 @@
  * mutex8.c
  *
  *
- * Pthreads-win32 - POSIX Threads Library for Win32
- * Copyright (C) 1998 Ben Elliston and Ross Johnson
- * Copyright (C) 1999,2000,2001 Ross Johnson
+ *      Pthreads4w - POSIX Threads for Windows
+ *      Copyright 1998 John E. Bossom
+ *      Copyright 1999-2018, Pthreads4w contributors
  *
- * Contact Email: rpj@ise.canberra.edu.au
+ *      Homepage: https://sourceforge.net/projects/pthreads4w/
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ *      The current list of contributors is contained
+ *      in the file CONTRIBUTORS included with the source
+ *      code distribution. The list can also be seen at the
+ *      following World Wide Web location:
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ *      https://sourceforge.net/p/pthreads4w/wiki/Contributors/
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * --------------------------------------------------------------------------
  *
@@ -35,7 +40,6 @@
  */
 
 #include "test.h"
-#include <sys/timeb.h>
 
 static int lockCount = 0;
 
@@ -43,16 +47,9 @@ static pthread_mutex_t mutex;
 
 void * locker(void * arg)
 {
-  struct timespec abstime = { 0, 0 };
-  PTW32_STRUCT_TIMEB currSysTime;
-  const DWORD NANOSEC_PER_MILLISEC = 1000000;
+  struct timespec abstime, reltime = { 1, 0 };
 
-  PTW32_FTIME(&currSysTime);
-
-  abstime.tv_sec = (long)currSysTime.time;
-  abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
-
-  abstime.tv_sec += 1;
+  (void) pthread_win32_getabstime_np(&abstime, &reltime);
 
   assert(pthread_mutex_timedlock(&mutex, &abstime) == ETIMEDOUT);
 
@@ -72,7 +69,10 @@ main()
 
   assert(pthread_create(&t, NULL, locker, NULL) == 0);
 
-  Sleep(2000);
+  while (lockCount < 1)
+    {
+      Sleep(1);
+    }
 
   assert(lockCount == 1);
 
