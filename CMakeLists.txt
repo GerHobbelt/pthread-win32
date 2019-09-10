@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 3.8)
 project(pthread)
 
 # STATIC library pthread
-include_directories(".")
-set(PUBLIC_INTERFACE pthread.h)
+set(PUBLIC_INTERFACE pthread.h sched.h semaphore.h)
 file(GLOB PRIVATE_HEADERS *.h)
 file(GLOB PRIVATE_SOURCES  *.c)
 source_group(include FILES ${PRIVATE_HEADERS})
 source_group(src     FILES ${PRIVATE_SOURCES})
 
+include_directories(".")
 add_library(pthread STATIC ${PRIVATE_HEADERS} ${PRIVATE_SOURCES})
 target_compile_definitions(pthread PRIVATE
     -DPTW32_STATIC_LIB=1

@@ -316,8 +316,10 @@ enum {
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1900
-#define HAVE_STRUCT_TIMESPEC
-#define _TIMESPEC_DEFINED
+# define HAVE_STRUCT_TIMESPEC
+# ifndef _TIMESPEC_DEFINED
+#  define _TIMESPEC_DEFINED
+# endif
 #endif
 
 #if !defined(HAVE_STRUCT_TIMESPEC)
