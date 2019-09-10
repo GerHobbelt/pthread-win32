@@ -20,10 +20,9 @@ class pthread(mama.BuildTarget):
     def configure(self):
         pass
 
-    ## optional: customize package exports if repository doesn't have `include` or `src`
-    ##           default include and lib export works for most common static libs
-    #def package(self):
-    #    self.export_libs('.', ['.lib', '.a']) # export any .lib or .a from build folder
-    #    self.export_includes(['include'])     # export 'include' path from source folder
-
+    # optional: customize package exports if repository doesn't have `include` or `src`
+    #           default include and lib export works for most common static libs
+    def package(self):
+        self.export_include('include', build_dir=True)
+        self.export_libs('lib', ['.lib', '.a'])
 

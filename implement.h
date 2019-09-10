@@ -34,8 +34,8 @@
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
-
-#if !defined(_IMPLEMENT_H)
+#pragma once
+#ifndef _IMPLEMENT_H
 #define _IMPLEMENT_H
 
 #if !defined(PTW32_CONFIG_H) && !defined(_PTHREAD_TEST_H_)

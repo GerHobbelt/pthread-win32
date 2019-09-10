@@ -30,8 +30,8 @@
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
-
-#if !defined( PTHREAD_H )
+#pragma once
+#ifndef PTHREAD_H
 #define PTHREAD_H
 
 /*
@@ -561,14 +561,20 @@ extern "C"
  * do NOT define PTW32_BUILD, and then the variables/functions will
  * be imported correctly.
  */
-#if !defined(PTW32_STATIC_LIB)
-#  if defined(PTW32_BUILD)
-#    define PTW32_DLLPORT __declspec (dllexport)
+// OVERRIDE STATIC LIB for CMake/Mamafile version
+#ifndef PTW32_STATIC_LIB
+#  define PTW32_STATIC_LIB 1
+#endif
+#ifndef PTW32_DLLPORT
+#  ifndef PTW32_STATIC_LIB
+#    if defined(PTW32_BUILD)
+#      define PTW32_DLLPORT __declspec (dllexport)
+#    else
+#      define PTW32_DLLPORT __declspec (dllimport)
+#    endif
 #  else
-#    define PTW32_DLLPORT __declspec (dllimport)
+#    define PTW32_DLLPORT
 #  endif
-#else
-#  define PTW32_DLLPORT
 #endif
 
 #if defined(_UWIN) && PTW32_LEVEL >= PTW32_LEVEL_MAX

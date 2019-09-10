@@ -3,8 +3,8 @@ project(pthread)
 
 # STATIC library pthread
 set(PUBLIC_INTERFACE pthread.h sched.h semaphore.h)
+set(PRIVATE_SOURCES pthread.c) # everything is in pthread.c
 file(GLOB PRIVATE_HEADERS *.h)
-file(GLOB PRIVATE_SOURCES  *.c)
 source_group(include FILES ${PRIVATE_HEADERS})
 source_group(src     FILES ${PRIVATE_SOURCES})
 
