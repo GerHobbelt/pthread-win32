@@ -154,6 +154,13 @@ function(shared_lib type def)
       LIBRARY # DESTINATION ${TARGET_ARCH}/${CONFIG}/lib
       RUNTIME # DESTINATION ${TARGET_ARCH}/${CONFIG}/bin
     )
+
+    install(
+        FILES $<TARGET_PDB_FILE:${targ}>
+        CONFIGURATION Debug
+        DESTINATION lib
+        OPTIONAL
+    )
 endfunction()
 
 function(static_lib type def)
