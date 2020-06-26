@@ -14,8 +14,7 @@ string(REPLACE "-DNDEBUG" "-UNDEBUG" CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEA
 
 message(STATUS "Test destination prefix: ${TESTPREFIX}")
 
-function(add_testcase test type def)
-
+macro(add_testcase test type def)
     set(lib_test test-${test}${type}${PTW32_VER})
     set(dll_test test-dll-${test}${type}${PTW32_VER})
 
@@ -39,10 +38,10 @@ function(add_testcase test type def)
     add_executable(${lib_test} ${test}.c ${c_dep})
     target_link_libraries(${lib_test} ${lib_lib} ${XXLIBS})
     if(MSVC)
-      target_compile_options(${lib_test} PRIVATE "/nologo")
+      target_compile_options(${lib_test} PUBLIC "/nologo")
     endif()
-    target_compile_definitions(${lib_test} PRIVATE _CONSOLE _MBCS ${def})
-    target_compile_options(${lib_test} PRIVATE ${extra})
+    target_compile_definitions(${lib_test} PUBLIC _CONSOLE _MBCS ${def})
+    target_compile_options(${lib_test} PUBLIC ${extra})
     if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
 	# GNUmakefile compiles every test as C++:
 	target_compile_definitions(${lib_test} PRIVATE __PtW32NoCatchWarn)
@@ -59,7 +58,7 @@ function(add_testcase test type def)
     add_executable(${dll_test} ${test}.c ${c_dep})
     target_link_libraries(${dll_test} ${dll_lib} ${XXLIBS})
     if(MSVC)
-      target_compile_options(${dll_test} PRIVATE "/nologo")
+      target_compile_options(${dll_test} PUBLIC "/nologo")
     endif()
     target_compile_definitions(${dll_test} PRIVATE _CONSOLE _MBCS ${def})
     target_compile_options(${dll_test} PRIVATE ${extra})
@@ -103,7 +102,7 @@ function(add_testcase test type def)
     add_test(NAME ${lib_test} COMMAND ${lib_test})
     add_test(NAME ${dll_test} COMMAND ${dll_test})
 
-endfunction()
+endmacro()
 
 
 file(GLOB TESTS *.c)

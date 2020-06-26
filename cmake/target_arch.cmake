@@ -1,6 +1,5 @@
 
 set(TARGET_ARCH_DETECT_CODE "
-
 #if defined(_M_ARM)
 #  error cmake_arch ARM
 #elif defined(_M_ARM64)
