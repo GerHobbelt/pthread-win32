@@ -9,8 +9,6 @@ Changes done:
 
 2. Removed unused elements from pthread_once_t
 
-Some Changes can be toggled off
-
 PTHREADS-WIN32 Readme
 ==============
 
