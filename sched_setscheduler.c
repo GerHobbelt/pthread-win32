@@ -36,7 +36,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #include "pthread.h"
@@ -60,7 +60,7 @@ sched_setscheduler (pid_t pid, int policy)
       if (pid != selfPid)
 	{
 	  HANDLE h =
-	    OpenProcess (PROCESS_SET_INFORMATION, PTW32_FALSE, (DWORD) pid);
+	    OpenProcess (PROCESS_SET_INFORMATION, PTW32_FALSE, pid);
 
 	  if (NULL == h)
 	    {

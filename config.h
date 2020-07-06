@@ -7,9 +7,6 @@
  * Defaults: see target specific redefinitions below.
  *********************************************************************/
 
-/* We're building the pthreads-win32 library */
-#define PTW32_BUILD
-
 /* Do we know about the C type sigset_t? */
 #undef HAVE_SIGSET_T
 

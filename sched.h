@@ -162,7 +162,8 @@
  /* [i_a] fix for using pthread_win32 with mongoose code, which #define's its own pid_t akin to     typedef HANDLE pid_t; */
  #undef pid_t
 # if defined(_MSC_VER)
-  typedef void *pid_t;
+ // typedef void *pid_t;
+typedef unsigned long pid_t;
 # else
   typedef int pid_t;
 # endif

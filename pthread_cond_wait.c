@@ -259,7 +259,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #include "pthread.h"
@@ -441,7 +441,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
   /*
    * Always cleanup
    */
-  pthread_cleanup_pop (1);
+  pthread_cleanup_pop_execute();
 #if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth()
 #endif

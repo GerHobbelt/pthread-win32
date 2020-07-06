@@ -1,16 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread_dll", "pthread.2005.vcproj", "{5D459BA0-5EEB-47D3-A1C4-6B55C8D37EC0}"
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread_dll", "pthread.2008.vcproj", "{5D459BA0-5EEB-47D3-A1C4-6B55C8D37EC0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread_lib", "pthread_lib.2005.vcproj", "{A063DFAD-6995-4E1A-AFFF-E43DC11E95B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread_lib", "pthread_lib.2008.vcproj", "{A063DFAD-6995-4E1A-AFFF-E43DC11E95B1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{268FEBF5-90D9-4D50-8EA8-D712848A7A22}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread_test", "tests\Debug.2005.vcproj", "{510AAB56-492A-4EF6-85AC-AD0F02BF5639}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5D459BA0-5EEB-47D3-A1C4-6B55C8D37EC0} = {5D459BA0-5EEB-47D3-A1C4-6B55C8D37EC0}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread_test", "Debug.2008.vcproj", "{510AAB56-492A-4EF6-85AC-AD0F02BF5639}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,14 +41,12 @@ Global
 		{A063DFAD-6995-4E1A-AFFF-E43DC11E95B1}.Release|Win32.Build.0 = Release|Win32
 		{A063DFAD-6995-4E1A-AFFF-E43DC11E95B1}.Release|x64.ActiveCfg = Release|x64
 		{A063DFAD-6995-4E1A-AFFF-E43DC11E95B1}.Release|x64.Build.0 = Release|x64
-		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Debug|Itanium.ActiveCfg = Debug|Itanium
-		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Debug|Itanium.Build.0 = Debug|Itanium
+		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Debug|Itanium.ActiveCfg = Debug|x64
 		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Debug|Win32.ActiveCfg = Debug|Win32
 		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Debug|Win32.Build.0 = Debug|Win32
 		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Debug|x64.ActiveCfg = Debug|x64
 		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Debug|x64.Build.0 = Debug|x64
-		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Release|Itanium.ActiveCfg = Release|Itanium
-		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Release|Itanium.Build.0 = Release|Itanium
+		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Release|Itanium.ActiveCfg = Release|x64
 		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Release|Win32.ActiveCfg = Release|Win32
 		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Release|Win32.Build.0 = Release|Win32
 		{510AAB56-492A-4EF6-85AC-AD0F02BF5639}.Release|x64.ActiveCfg = Release|x64
@@ -61,8 +54,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{510AAB56-492A-4EF6-85AC-AD0F02BF5639} = {268FEBF5-90D9-4D50-8EA8-D712848A7A22}
 	EndGlobalSection
 EndGlobal
