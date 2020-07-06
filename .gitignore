@@ -15,4 +15,5 @@ bin/
 obj/
 ipch/
 
+*.obj
 mama.cmake
