@@ -3,14 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthreaddll", "pthread.2017.vcxproj", "{5D459BA0-5EEB-47D3-A1C4-6B55C8D37EC0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthreaddll", "pthread.vcxproj", "{5D459BA0-5EEB-47D3-A1C4-6B55C8D37EC0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A063DFAD-6995-4E1A-AFFF-E43DC11E95B1} = {A063DFAD-6995-4E1A-AFFF-E43DC11E95B1}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthreadlib", "pthread_lib.2017.vcxproj", "{A063DFAD-6995-4E1A-AFFF-E43DC11E95B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthreadlib", "pthread_lib.vcxproj", "{A063DFAD-6995-4E1A-AFFF-E43DC11E95B1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthreadtest", "Debug.2017.vcxproj", "{510AAB56-492A-4EF6-85AC-AD0F02BF5639}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthreadtest", "Debug.vcxproj", "{510AAB56-492A-4EF6-85AC-AD0F02BF5639}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5D459BA0-5EEB-47D3-A1C4-6B55C8D37EC0} = {5D459BA0-5EEB-47D3-A1C4-6B55C8D37EC0}
 		{A063DFAD-6995-4E1A-AFFF-E43DC11E95B1} = {A063DFAD-6995-4E1A-AFFF-E43DC11E95B1}
