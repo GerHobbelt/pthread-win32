@@ -19,12 +19,12 @@ set(TARGET_ARCH_DETECT_CODE "
 function(get_target_arch out)
 
     file(WRITE 
-        "${CMAKE_BINARY_DIR}/target_arch_detect.c"
+        "${CMAKE_CURRENT_BINARY_DIR}/target_arch_detect.c"
         "${TARGET_ARCH_DETECT_CODE}")
 
     try_run(
         run_result_unused compile_result_unused
-        "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/target_arch_detect.c"
+        "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/target_arch_detect.c"
         COMPILE_OUTPUT_VARIABLE TARGET_ARCH)
 
     # parse compiler output
