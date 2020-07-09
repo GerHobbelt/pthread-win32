@@ -85,7 +85,7 @@ build_script:
           -DCMAKE_BUILD_TYPE=%CONFIGURATION%
           -DBUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
           -DDIST_ROOT="%CMAKE_DIST_DIR%/%APPVEYOR_BUILD_WORKER_IMAGE%"
-          -DENABLE_TESTS=%TESTING%
+          -DBUILD_TESTING=%TESTING%
           ..
 
     cmake --build . --config %CONFIGURATION% --target install
