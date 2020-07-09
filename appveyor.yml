@@ -42,24 +42,28 @@ environment:
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat'
+      ARCHITECTURE:
       ARCHIVE: VS2017_%CONFIGURATION%_ARM_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: OFF
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat'
+      ARCHITECTURE:
       ARCHIVE: VS2017_%CONFIGURATION%_ARM64_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: OFF
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat'
+      ARCHITECTURE:
       ARCHIVE: VS2017_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat'
+      ARCHITECTURE:
       ARCHIVE: VS2017_%CONFIGURATION%_x64_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: ON
