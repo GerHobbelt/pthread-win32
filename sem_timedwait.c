@@ -140,10 +140,10 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
       */
 {
   int result = 0;
+  sem_t s = NULL;
+  DWORD milliseconds;
 
   pthread_testcancel();
-
-  sem_t s = NULL;
 
   if (sem == NULL || *sem == NULL)
     {
@@ -152,7 +152,6 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
   else
     {
       s = *sem;
-      DWORD milliseconds;
 
       if (abstime == NULL)
 	{
