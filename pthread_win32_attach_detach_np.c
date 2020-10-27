@@ -117,8 +117,9 @@ pthread_win32_process_attach_np ()
   else
     {
       /* Initialise QueueUserAPCEx */
-      BOOL (*queue_user_apc_ex_init) (VOID);
-
+      BOOL (*queue_user_apc_ex_init) (VOID) = NULL;
+	  if (ptw32_h_quserex != NULL)
+	  {
       queue_user_apc_ex_init = (BOOL (*)(VOID))
 #if defined(NEED_UNICODE_CONSTS)
 	GetProcAddress (ptw32_h_quserex,
@@ -126,13 +127,16 @@ pthread_win32_process_attach_np ()
 #else
 	GetProcAddress (ptw32_h_quserex, (LPCSTR) "QueueUserAPCEx_Init");
 #endif
+	  }
 
       if (queue_user_apc_ex_init == NULL || !queue_user_apc_ex_init ())
 	{
 	  ptw32_register_cancellation = ptw32_RegisterCancellation;
-
-	  (void) FreeLibrary (ptw32_h_quserex);
-	  ptw32_h_quserex = 0;
+	  if (ptw32_h_quserex != NULL)
+	  {
+		  (void)FreeLibrary(ptw32_h_quserex);
+		  ptw32_h_quserex = 0;
+	  }
 	}
     }
 
