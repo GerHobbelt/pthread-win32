@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
 
-if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "MinSizeRel" CACHE STRING "Choose the type of build, options are: Debug, Release, or MinSizeRel." FORCE)
-    message(STATUS "No build type specified, defaulting to MinSizeRel.")
-endif()
-
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/cmake")
 
 include (CheckIncludeFile)
@@ -14,12 +9,28 @@ include (CheckTypeSize)
 include (config_h_in)
 include (get_version)
 
-message(STATUS "Generator ......... ${CMAKE_GENERATOR}")
-message(STATUS "Version ........... ${PTHREADS4W_VERSION}")
-
 project(pthreads4w VERSION ${PTHREADS4W_VERSION} LANGUAGES C CXX)
 
 set(PTW32_VER ${PROJECT_VERSION_MAJOR}${EXTRAVERSION})
+
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "MinSizeRel" CACHE STRING "Choose the type of build, options are: Debug, Release, or MinSizeRel." FORCE)
+    message(STATUS "No build type specified, defaulting to MinSizeRel.")
+endif()
+
+message(STATUS "")
+message(STATUS "")
+message(STATUS "Generator ......... ${CMAKE_GENERATOR}")
+if(NOT CMAKE_CONFIGURATION_TYPES)
+    set(the_build_type ${CMAKE_BUILD_TYPE})
+else ()
+    set(the_build_type "Generator-defined, one of ${CMAKE_CONFIGURATION_TYPES}")
+endif ()
+message(STATUS "Build Type ........ ${the_build_type}")
+message(STATUS "Version ........... ${PTHREADS4W_VERSION}")
+
+## Deprecated
+## set(CMAKE_DEBUG_POSTFIX d)
 
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
 #set(XLIBS wsock32.lib)
@@ -70,8 +81,10 @@ elseif (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/PTHREADS-BUILT" CACHE PATH "Install path prefix (default)" FORCE)
 endif()
 
-message(STATUS "Install Path ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "Installing to ${CMAKE_INSTALL_PREFIX}")
 
+message(STATUS "")
+message(STATUS "")
 
 #################################
 # configuration features    #
@@ -97,7 +110,6 @@ check_symbol_exists(DuplicateHandle windows.h HAVE_DUPLICATEHANDLE)
 create_config_h_in()
 configure_file("${CMAKE_BINARY_DIR}/config.h.in" "${CMAKE_BINARY_DIR}/config.h")
 
-
 #################################
 # Defs                          #
 #################################
@@ -109,15 +121,16 @@ if(MSVC)
     # (Note: If you are using Microsoft VC++6.0, the library needs to be built
     # with /EHa instead of /EHs or else cancellation won't work properly.)
     if(MSVC_VERSION EQUAL 1200)
-        set(VCEFLAGS  "/EHa /TP ")
+        set(VCEFLAGS  "/EHa" "/TP")
     else()
-        set(VCEFLAGS  "/EHs /TP ")
+        set(VCEFLAGS  "/EHs" "/TP")
     endif()
 
-    set(build_defines ${build_defines} HAVE_CONFIG_H)
+    set(build_defines ${build_defines} HAVE_CONFIG_H __PTW32_RC_MSC)
 elseif (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
     set(build_defines ${build_defines} HAVE_CONFIG_H)
 endif()
+
 
 # Update filename with proper version info
 configure_file(${CMAKE_SOURCE_DIR}/cmake/version.rc.in ${CMAKE_BINARY_DIR}/version.rc @ONLY)
@@ -128,25 +141,32 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake/version.rc.in ${CMAKE_BINARY_DIR}/versi
 
 function(shared_lib type def)
     set(targ pthread${type}${PTW32_VER})
-    add_library(${targ} SHARED pthread.c ${CMAKE_BINARY_DIR}/version.rc)
-    message(STATUS ${targ})
-    target_compile_definitions(${targ} PRIVATE ${def} ${build_defines} __PTW32_BUILD_INLINED)
-    set_target_properties(${targ} PROPERTIES DEBUG_POSTFIX "d")
 
-    if (MSVC)
-      # Set resource compiler definition...
-      target_compile_definitions(${targ} PRIVATE __PTW32_RC_MSC)
-    endif ()
     if (${type} STREQUAL "VCE")
-        set_target_properties(${targ} PROPERTIES COMPILE_FLAGS ${VCEFLAGS})
+        add_library(${targ} SHARED pthread.cxx ${CMAKE_BINARY_DIR}/version.rc)
+        set_target_properties(${targ} PROPERTIES LINKER_LANGUAGE CXX)
+        target_compile_options(${targ} PUBLIC "${VCEFLAGS}")
     elseif (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
+        add_library(${targ} SHARED pthread.cxx ${CMAKE_BINARY_DIR}/version.rc)
 	target_compile_options(${targ} PRIVATE "-mthreads")
 	if (${type} STREQUAL "GCE")
+            set_target_properties(${targ} PROPERTIES LINKER_LANGUAGE CXX)
 	    target_compile_options(${targ} PRIVATE "-xc++")
 	    target_link_libraries(${targ} stdc++)
 	    target_link_options(${targ} PRIVATE "-shared-libgcc")
 	endif (${type} STREQUAL "GCE")
+    else ()
+        add_library(${targ} SHARED pthread.c ${CMAKE_BINARY_DIR}/version.rc)
     endif (${type} STREQUAL "VCE")
+
+    target_compile_definitions(${targ} PRIVATE ${def} ${build_defines} __PTW32_BUILD_INLINED)
+    if (MSVC)
+      # Set resource compiler definition...
+      target_compile_definitions(${targ} PRIVATE __PTW32_RC_MSC)
+    endif ()
+    set_target_properties(${targ} PROPERTIES DEBUG_POSTFIX "d")
+
+    message(STATUS "Shared library ${targ}")
 
     install(
       TARGETS ${targ}
@@ -165,20 +185,25 @@ endfunction()
 
 function(static_lib type def)
     set(targ libpthread${type}${PTW32_VER})
-    add_library(${targ} STATIC pthread.c)
-    message(STATUS ${targ})
-    target_compile_definitions(${targ} PRIVATE "${def}" ${build_defines} __PTW32_STATIC_LIB __PTW32_BUILD_INLINED)
-    set_target_properties(${targ} PROPERTIES DEBUG_POSTFIX "d")
 
     if(${type} STREQUAL "VCE")
-        set_target_properties(${targ} PROPERTIES COMPILE_FLAGS ${VCEFLAGS})
+        add_library(${targ} STATIC pthread.cxx)
+        target_compile_options(${targ} PRIVATE "/EHs")
     elseif (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
 	if (${type} STREQUAL "GCE")
+            add_library(${targ} STATIC pthread.cxx)
 	    target_compile_options(${targ} PRIVATE "-xc++")
 	    target_link_libraries(${targ} stdc++)
 	    target_link_options(${targ} PRIVATE "-shared-libgcc")
 	endif (${type} STREQUAL "GCE")
+    else ()
+        add_library(${targ} STATIC pthread.c)
     endif()
+
+    target_compile_definitions(${targ} PRIVATE "${def}" ${build_defines} __PTW32_STATIC_LIB __PTW32_BUILD_INLINED)
+    set_target_properties(${targ} PROPERTIES DEBUG_POSTFIX "d")
+
+    message(STATUS "Static library ${targ}")
 
     install(
       TARGETS ${targ}
@@ -217,6 +242,7 @@ install(FILES _ptw32.h pthread.h sched.h semaphore.h TYPE INCLUDE)
 option(ENABLE_TESTS "Enable Test code build" FALSE)
 
 #TODO determine if cross compile...
-if(ENABLE_TESTS)
-    add_subdirectory(tests)
+if(ENABLE_TESTS AND (NOT CMAKE_CROSSCOMPILING AND BUILD_TESTING))
+  include (CTest)
+  add_subdirectory(tests)
 endif()

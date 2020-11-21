@@ -16,11 +16,9 @@ configuration:
 environment:
   DIST_DIR: '%APPVEYOR_BUILD_FOLDER%\dist'
   CMAKE_DIST_DIR: C:/projects/pthreads4w/dist
-  APPVEYOR_SAVE_CACHE_ON_ERROR: true
 
   matrix:
 
-    ## MSVC:
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2015'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat'
       ARCHITECTURE: amd64_x86
@@ -45,24 +43,28 @@ environment:
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm.bat'
+      ARCHITECTURE:
       ARCHIVE: VS2017_%CONFIGURATION%_ARM_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: OFF
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat'
+      ARCHITECTURE:
       ARCHIVE: VS2017_%CONFIGURATION%_ARM64_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: OFF
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat'
+      ARCHITECTURE:
       ARCHIVE: VS2017_%CONFIGURATION%_x86_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: ON
 
     - APPVEYOR_BUILD_WORKER_IMAGE: 'Visual Studio 2017'
       VCVARSALL: '%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat'
+      ARCHITECTURE:
       ARCHIVE: VS2017_%CONFIGURATION%_x64_%APPVEYOR_BUILD_NUMBER%
       GENERATOR: 'NMake Makefiles'
       TESTING: ON

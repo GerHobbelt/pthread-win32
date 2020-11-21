@@ -40,7 +40,7 @@ macro(add_testcase test type def)
     if(MSVC)
       target_compile_options(${lib_test} PUBLIC "/nologo")
     endif()
-    target_compile_definitions(${lib_test} PUBLIC _CONSOLE _MBCS ${def})
+    target_compile_definitions(${lib_test} PUBLIC _CONSOLE _MBCS ${def} ${extras})
     target_compile_options(${lib_test} PUBLIC ${extra})
     if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
 	# GNUmakefile compiles every test as C++:
