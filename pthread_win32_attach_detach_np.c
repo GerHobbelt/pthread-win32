@@ -76,8 +76,10 @@ pthread_win32_process_attach_np ()
    *
    * This should take care of any security issues.
    */
+
+  UINT gsd_res = GetSystemDirectory(QuserExDLLPathBuf, QuserExDLLPathBufSize);
 #if defined(__GNUC__) || defined(PTW32_CONFIG_MSVC7)
-  if(GetSystemDirectory(QuserExDLLPathBuf, QuserExDLLPathBufSize))
+  if(gsd_res && gsd_res < QuserExDLLPathBufSize)
   {
     (void) strncat(QuserExDLLPathBuf,
                    "\\QUSEREX.DLL",
@@ -86,7 +88,7 @@ pthread_win32_process_attach_np ()
   }
 #else
   /* strncat is secure - this is just to avoid a warning */
-  if(GetSystemDirectory(QuserExDLLPathBuf, QuserExDLLPathBufSize) &&
+  if(gsd_res && gsd_res < QuserExDLLPathBufSize &&
      0 == _tcsncat_s(QuserExDLLPathBuf, QuserExDLLPathBufSize, _T("\\QUSEREX.DLL"), 12))
   {
     ptw32_h_quserex = LoadLibrary(QuserExDLLPathBuf);
