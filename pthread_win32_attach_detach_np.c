@@ -53,6 +53,7 @@ pthread_win32_process_attach_np ()
   TCHAR QuserExDLLPathBuf[1024];
   BOOL result = TRUE;
   const UINT QuserExDLLPathBufSize = sizeof(QuserExDLLPathBuf) / sizeof(QuserExDLLPathBuf[0]);
+  UINT gsd_res = 0;
 
   result = ptw32_processInitialize ();
 
@@ -77,7 +78,7 @@ pthread_win32_process_attach_np ()
    * This should take care of any security issues.
    */
 
-  UINT gsd_res = GetSystemDirectory(QuserExDLLPathBuf, QuserExDLLPathBufSize);
+  gsd_res = GetSystemDirectory(QuserExDLLPathBuf, QuserExDLLPathBufSize);
 #if defined(__GNUC__) || defined(PTW32_CONFIG_MSVC7)
   if(gsd_res && gsd_res < QuserExDLLPathBufSize)
   {
