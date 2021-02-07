@@ -2,22 +2,25 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{ddcae617-25bc-4bc8-a86e-2eac1b5cff07}</UniqueIdentifier>
+      <UniqueIdentifier>{561aef6d-d1e9-4fe0-b67a-281254de51e1}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{40973b82-2e91-4980-85ce-632bd47beede}</UniqueIdentifier>
+      <UniqueIdentifier>{e9264cbd-1168-4d79-94d8-3dde79f5e59a}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{711017af-6c4e-4af8-aa03-3da7b2f268fd}</UniqueIdentifier>
+      <UniqueIdentifier>{2447694f-01c5-49e0-9973-cfe57e8338d3}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
     <Filter Include="Documentation">
-      <UniqueIdentifier>{8c2f3157-28a1-42fa-b6ef-565d1330e9c4}</UniqueIdentifier>
+      <UniqueIdentifier>{50437b4d-d148-4c5f-b734-9275741881d3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="autostatic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="cleanup.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -31,6 +34,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="global.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pthread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pthread_attr_destroy.c">
@@ -282,6 +288,21 @@
     <ClCompile Include="pthread_setspecific.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pthread_spin_destroy.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pthread_spin_init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pthread_spin_lock.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pthread_spin_trylock.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pthread_spin_unlock.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="pthread_testcancel.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -334,6 +355,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ptw32_semwait.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ptw32_spinlock_check_need_init.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ptw32_threadDestroy.c">
@@ -408,34 +432,13 @@
     <ClCompile Include="w32_CancelableWait.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pthread.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="pthread_setaffinity.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pthread_spin_destroy.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pthread_spin_init.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pthread_spin_lock.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pthread_spin_trylock.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pthread_spin_unlock.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pthread_timedjoin_np.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pthread_tryjoin_np.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ptw32_spinlock_check_need_init.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sched_setaffinity.c">

@@ -88,16 +88,14 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
        * Creating condition variable that can be shared between
        * processes.
        */
-      result = ENOSYS;
-      goto DONE;
+      return ENOSYS;
     }
 
   cv = (pthread_cond_t) calloc (1, sizeof (*cv));
 
   if (cv == NULL)
     {
-      result = ENOMEM;
-      goto DONE;
+      return ENOMEM;
     }
 
   cv->nWaitersBlocked = 0;
@@ -141,7 +139,7 @@ FAIL0:
   cv = NULL;
 
 DONE:
-  if (0 == result)
+  if (NULL != cv && 0 == result)
     {
       ptw32_mcs_local_node_t node;
 

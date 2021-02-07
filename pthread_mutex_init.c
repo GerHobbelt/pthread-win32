@@ -108,6 +108,12 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
               mx->kind = -mx->kind - 1;
 
               mx->robustNode = (ptw32_robust_node_t*) malloc(sizeof(ptw32_robust_node_t));
+              if (NULL == mx->robustNode)
+              {
+                  free(mx);
+                  mx = NULL;
+                  return ENOMEM;
+              }
               mx->robustNode->stateInconsistent = PTW32_ROBUST_CONSISTENT;
               mx->robustNode->mx = mx;
               mx->robustNode->next = NULL;

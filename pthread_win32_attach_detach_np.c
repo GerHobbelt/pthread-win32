@@ -46,7 +46,7 @@
 /*
  * Handle to quserex.dll
  */
-static HINSTANCE ptw32_h_quserex;
+static HINSTANCE ptw32_h_quserex = NULL;
 
 BOOL
 pthread_win32_process_attach_np ()
@@ -54,6 +54,7 @@ pthread_win32_process_attach_np ()
   TCHAR QuserExDLLPathBuf[1024];
   BOOL result = TRUE;
   const UINT QuserExDLLPathBufSize = sizeof(QuserExDLLPathBuf) / sizeof(QuserExDLLPathBuf[0]);
+  UINT gsd_res = 0;
 
   result = ptw32_processInitialize ();
 
@@ -77,8 +78,11 @@ pthread_win32_process_attach_np ()
    *
    * This should take care of any security issues.
    */
+
+#if !defined(WINCE)
+  gsd_res = GetSystemDirectory(QuserExDLLPathBuf, QuserExDLLPathBufSize);
 #if defined(__GNUC__) || defined(PTW32_CONFIG_MSVC7)
-  if(GetSystemDirectory(QuserExDLLPathBuf, QuserExDLLPathBufSize))
+  if(gsd_res && gsd_res < QuserExDLLPathBufSize)
   {
     (void) strncat(QuserExDLLPathBuf,
                    "\\QUSEREX.DLL",
@@ -86,13 +90,13 @@ pthread_win32_process_attach_np ()
     ptw32_h_quserex = LoadLibrary(QuserExDLLPathBuf);
   }
 #else
-#  if ! defined(WINCE)
-  if(GetSystemDirectory(QuserExDLLPathBuf, QuserExDLLPathBufSize) &&
+  /* strncat is secure - this is just to avoid a warning */
+  if(gsd_res && gsd_res < QuserExDLLPathBufSize &&
      0 == _tcsncat_s(QuserExDLLPathBuf, QuserExDLLPathBufSize, _T("\\QUSEREX.DLL"), 12))
-    {
-      ptw32_h_quserex = LoadLibrary(QuserExDLLPathBuf);
-    }
-#  endif
+  {
+    ptw32_h_quserex = LoadLibrary(QuserExDLLPathBuf);
+  }
+#endif
 #endif
 
   if (ptw32_h_quserex != NULL)
@@ -119,8 +123,9 @@ pthread_win32_process_attach_np ()
   else
     {
       /* Initialise QueueUserAPCEx */
-      BOOL (*queue_user_apc_ex_init) (VOID);
-
+      BOOL (*queue_user_apc_ex_init) (VOID) = NULL;
+	  if (ptw32_h_quserex != NULL)
+	  {
       queue_user_apc_ex_init = (BOOL (*)(VOID))
 #if defined(NEED_UNICODE_CONSTS)
 	GetProcAddress (ptw32_h_quserex,
@@ -128,13 +133,16 @@ pthread_win32_process_attach_np ()
 #else
 	GetProcAddress (ptw32_h_quserex, (LPCSTR) "QueueUserAPCEx_Init");
 #endif
+	  }
 
       if (queue_user_apc_ex_init == NULL || !queue_user_apc_ex_init ())
 	{
 	  ptw32_register_cancellation = ptw32_RegisterCancellation;
-
-	  (void) FreeLibrary (ptw32_h_quserex);
-	  ptw32_h_quserex = 0;
+	  if (ptw32_h_quserex != NULL)
+	  {
+		  (void)FreeLibrary(ptw32_h_quserex);
+		  ptw32_h_quserex = 0;
+	  }
 	}
     }
 

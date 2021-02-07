@@ -27,10 +27,8 @@ configure       text eol=lf
 
 # (Possible) Source files
 *.inc           text eol=lf
-*.html          text eol=lf
 *.js            text eol=lf
 *.css           text eol=lf
-*.c             text eol=lf
 *.cc            text eol=lf
 *.cpp           text eol=lf
 *.h             text eol=lf

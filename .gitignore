@@ -16,3 +16,4 @@ bin/
 obj/
 ipch/
 
+*.obj

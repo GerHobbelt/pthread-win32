@@ -18,6 +18,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="autostatic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="cleanup.c">
       <Filter>Source Files</Filter>
     </ClCompile>
