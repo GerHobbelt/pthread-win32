@@ -99,6 +99,7 @@ pthread_win32_process_attach_np ()
   }
 #endif
 #endif
+#endif
 
   if (ptw32_h_quserex != NULL)
     {
