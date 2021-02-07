@@ -90,6 +90,7 @@ pthread_win32_process_attach_np ()
     ptw32_h_quserex = LoadLibrary(QuserExDLLPathBuf);
   }
 #else
+#ifndef ENABLE_WINRT
   /* strncat is secure - this is just to avoid a warning */
   if(gsd_res && gsd_res < QuserExDLLPathBufSize &&
      0 == _tcsncat_s(QuserExDLLPathBuf, QuserExDLLPathBufSize, _T("\\QUSEREX.DLL"), 12))
