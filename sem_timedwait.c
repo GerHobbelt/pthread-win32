@@ -138,13 +138,22 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
  * ------------------------------------------------------
  */
 {
-  ptw32_mcs_local_node_t node;
   DWORD milliseconds;
   int v;
   int result = 0;
-  sem_t s = *sem;
+  sem_t s = NULL;
 
   pthread_testcancel();
+
+  if (sem == NULL || *sem == NULL)
+    {
+      result = EINVAL;
+    }
+  else
+    {
+      ptw32_mcs_local_node_t node;
+
+      s = *sem;
 
   if (abstime == NULL)
     {
@@ -200,6 +209,8 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
         }
 
 #endif /* NEED_SEM */
+
+    }
 
     }
 

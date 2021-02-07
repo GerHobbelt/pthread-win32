@@ -134,17 +134,19 @@ ptw32_mcs_flag_wait (HANDLE * flag)
       /* the flag is not set. create event. */
 
       HANDLE e = CreateEvent(NULL, PTW32_FALSE, PTW32_FALSE, NULL);
+      if (e)
+      {
+          if ((PTW32_INTERLOCKED_SIZE)0 == PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE(
+              (PTW32_INTERLOCKED_SIZEPTR)flag,
+              (PTW32_INTERLOCKED_SIZE)e,
+              (PTW32_INTERLOCKED_SIZE)0))
+          {
+              /* stored handle in the flag. wait on it now. */
+              WaitForSingleObject(e, INFINITE);
+          }
 
-      if ((PTW32_INTERLOCKED_SIZE)0 == PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE(
-			                  (PTW32_INTERLOCKED_SIZEPTR)flag,
-			                  (PTW32_INTERLOCKED_SIZE)e,
-			                  (PTW32_INTERLOCKED_SIZE)0))
-	{
-	  /* stored handle in the flag. wait on it now. */
-	  WaitForSingleObject(e, INFINITE);
-	}
-
-      CloseHandle(e);
+          CloseHandle(e);
+      }
     }
 }
 
