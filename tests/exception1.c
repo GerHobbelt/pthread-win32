@@ -223,7 +223,7 @@ test_exception1(void)
   /*
    * Code to control or manipulate child threads should probably go here.
    */
-  Sleep(1000);
+  Sleep(100);
 
   for (i = 0; i < NUMTHREADS; i++)
     {
@@ -233,7 +233,7 @@ test_exception1(void)
   /*
    * Give threads time to run.
    */
-  Sleep(NUMTHREADS * 1000);
+  Sleep(NUMTHREADS * 100);
 
   /*
    * Check any results here. Set "failed" and only print output on failure.

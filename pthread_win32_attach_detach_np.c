@@ -18,17 +18,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -41,11 +41,12 @@
 
 #include "pthread.h"
 #include "implement.h"
+#include <tchar.h>
 
 /*
- * Handle to quserex.dll 
+ * Handle to quserex.dll
  */
-static HINSTANCE ptw32_h_quserex;
+static HINSTANCE ptw32_h_quserex = NULL;
 
 BOOL
 pthread_win32_process_attach_np ()
@@ -78,6 +79,7 @@ pthread_win32_process_attach_np ()
    * This should take care of any security issues.
    */
 
+#if !defined(WINCE)
   gsd_res = GetSystemDirectory(QuserExDLLPathBuf, QuserExDLLPathBufSize);
 #if defined(__GNUC__) || defined(PTW32_CONFIG_MSVC7)
   if(gsd_res && gsd_res < QuserExDLLPathBufSize)
@@ -88,12 +90,15 @@ pthread_win32_process_attach_np ()
     ptw32_h_quserex = LoadLibrary(QuserExDLLPathBuf);
   }
 #else
+#ifndef ENABLE_WINRT
   /* strncat is secure - this is just to avoid a warning */
   if(gsd_res && gsd_res < QuserExDLLPathBufSize &&
      0 == _tcsncat_s(QuserExDLLPathBuf, QuserExDLLPathBufSize, _T("\\QUSEREX.DLL"), 12))
   {
     ptw32_h_quserex = LoadLibrary(QuserExDLLPathBuf);
   }
+#endif
+#endif
 #endif
 
   if (ptw32_h_quserex != NULL)

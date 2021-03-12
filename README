@@ -304,21 +304,22 @@ Development Build Toolchains and Configurations
 As of Release 2.10 all build configurations pass the full test suite
 for the following toolchains and configurations:
 
-DLL and static library (full inlined and small) builds:
-VC, VCE, VSE
-GC, GCE
+All DLL and static library build targets enabled in the makefiles:
+VC, VCE, VSE (DLL, inlined statics only)
+GC, GCE (DLL, inlined and small statics)
 
 MSVS:
 Intel Core i7 (6 Core HT)
 Windows 7 64 bit
-MSVS 2010 Express with SDK 7.1 (using the SDK command shell)
-TARGET_CPU = x64 and x86
+MSVS 2010 Express with SDK 7.1 (using the SDK command shell TARGET_CPU = x64 or x86)
+MSVS 2013 Express Cross Tools for x64 Command Prompt
+MSVS 2013 Express Native Tools for x32 Command Prompt
 
 GNU:
 Intel Core i7 (6 Core HT)
 Windows 7 64 bit
-MinGW64 multilib enabled
-ARCH = -m32 and -m64
+MinGW64 multilib enabled (ARCH = -m64 or -m32)
+MinGW64 multilib disabled
 
 
 Building with MS Visual Studio (C, VC++ using C++ EH, or Structured EH)

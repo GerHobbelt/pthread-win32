@@ -25,17 +25,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -60,88 +60,88 @@ typedef struct {
 static void PTW32_CDECL
 ptw32_sem_timedwait_cleanup (void * args)
 {
+  ptw32_mcs_local_node_t node;
   sem_timedwait_cleanup_args_t * a = (sem_timedwait_cleanup_args_t *)args;
   sem_t s = a->sem;
 
-  if (pthread_mutex_lock (&s->lock) == 0)
+  ptw32_mcs_lock_acquire(&s->lock, &node);
+  /*
+   * We either timed out or were cancelled.
+   * If someone has posted between then and now we try to take the semaphore.
+   * Otherwise the semaphore count may be wrong after we
+   * return. In the case of a cancellation, it is as if we
+   * were cancelled just before we return (after taking the semaphore)
+   * which is ok.
+   */
+  if (WaitForSingleObject(s->sem, 0) == WAIT_OBJECT_0)
     {
-      /*
-       * We either timed out or were cancelled.
-       * If someone has posted between then and now we try to take the semaphore.
-       * Otherwise the semaphore count may be wrong after we
-       * return. In the case of a cancellation, it is as if we
-       * were cancelled just before we return (after taking the semaphore)
-       * which is ok.
-       */
-      if (WaitForSingleObject(s->sem, 0) == WAIT_OBJECT_0)
-	{
-	  /* We got the semaphore on the second attempt */
-	  *(a->resultPtr) = 0;
-	}
-      else
-	{
-	  /* Indicate we're no longer waiting */
-	  s->value++;
-#if defined(NEED_SEM)
-	  if (s->value > 0)
-	    {
-	      s->leftToUnblock = 0;
-	    }
-#else
-          /*
-           * Don't release the W32 sema, it doesn't need adjustment
-           * because it doesn't record the number of waiters.
-           */
-#endif
-	}
-      (void) pthread_mutex_unlock (&s->lock);
+      /* We got the semaphore on the second attempt */
+      *(a->resultPtr) = 0;
     }
+  else
+    {
+      /* Indicate we're no longer waiting */
+      s->value++;
+#if defined(NEED_SEM)
+      if (s->value > 0)
+        {
+          s->leftToUnblock = 0;
+        }
+#else
+      /*
+       * Don't release the W32 sema, it doesn't need adjustment
+       * because it doesn't record the number of waiters.
+       */
+#endif
+    }
+  ptw32_mcs_lock_release(&node);
 }
 
 
 int
 sem_timedwait (sem_t * sem, const struct timespec *abstime)
-     /*
-      * ------------------------------------------------------
-      * DOCPUBLIC
-      *      This function waits on a semaphore possibly until
-      *      'abstime' time.
-      *
-      * PARAMETERS
-      *      sem
-      *              pointer to an instance of sem_t
-      *
-      *      abstime
-      *              pointer to an instance of struct timespec
-      *
-      * DESCRIPTION
-      *      This function waits on a semaphore. If the
-      *      semaphore value is greater than zero, it decreases
-      *      its value by one. If the semaphore value is zero, then
-      *      the calling thread (or process) is blocked until it can
-      *      successfully decrease the value or until interrupted by
-      *      a signal.
-      *
-      *      If 'abstime' is a NULL pointer then this function will
-      *      block until it can successfully decrease the value or
-      *      until interrupted by a signal.
-      *
-      * RESULTS
-      *              0               successfully decreased semaphore,
-      *              -1              failed, error in errno
-      * ERRNO
-      *              EINVAL          'sem' is not a valid semaphore,
-      *              ENOSYS          semaphores are not supported,
-      *              EINTR           the function was interrupted by a signal,
-      *              EDEADLK         a deadlock condition was detected.
-      *              ETIMEDOUT       abstime elapsed before success.
-      *
-      * ------------------------------------------------------
-      */
+/*
+ * ------------------------------------------------------
+ * DOCPUBLIC
+ *      This function waits on a semaphore possibly until
+ *      'abstime' time.
+ *
+ * PARAMETERS
+ *      sem
+ *              pointer to an instance of sem_t
+ *
+ *      abstime
+ *              pointer to an instance of struct timespec
+ *
+ * DESCRIPTION
+ *      This function waits on a semaphore. If the
+ *      semaphore value is greater than zero, it decreases
+ *      its value by one. If the semaphore value is zero, then
+ *      the calling thread (or process) is blocked until it can
+ *      successfully decrease the value or until interrupted by
+ *      a signal.
+ *
+ *      If 'abstime' is a NULL pointer then this function will
+ *      block until it can successfully decrease the value or
+ *      until interrupted by a signal.
+ *
+ * RESULTS
+ *              0               successfully decreased semaphore,
+ *              -1              failed, error in errno
+ * ERRNO
+ *              EINVAL          'sem' is not a valid semaphore,
+ *              ENOSYS          semaphores are not supported,
+ *              EINTR           the function was interrupted by a signal,
+ *              EDEADLK         a deadlock condition was detected.
+ *              ETIMEDOUT       abstime elapsed before success.
+ *
+ * ------------------------------------------------------
+ */
 {
+  DWORD milliseconds;
+  int v;
   int result = 0;
   sem_t s = NULL;
-  DWORD milliseconds;
 
   pthread_testcancel();
 
@@ -151,77 +151,66 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
     }
   else
     {
+      ptw32_mcs_local_node_t node;
+
       s = *sem;
 
-      if (abstime == NULL)
-	{
-	  milliseconds = INFINITE;
-	}
-      else
-	{
-	  /* 
-	   * Calculate timeout as milliseconds from current system time. 
-	   */
-	  milliseconds = ptw32_relmillisecs (abstime);
-	}
+  if (abstime == NULL)
+    {
+      milliseconds = INFINITE;
+    }
+  else
+    {
+      /*
+       * Calculate timeout as milliseconds from current system time.
+       */
+      milliseconds = ptw32_relmillisecs (abstime);
+    }
 
-      if ((result = pthread_mutex_lock (&s->lock)) == 0)
-	{
-	  int v;
+  ptw32_mcs_lock_acquire(&s->lock, &node);
+  v = --s->value;
+  ptw32_mcs_lock_release(&node);
 
-	  /* See sem_destroy.c
-	   */
-
-	  v = --s->value;
-	  (void) pthread_mutex_unlock (&s->lock);
-
-	  if (v < 0)
-	    {
+  if (v < 0)
+    {
 #if defined(NEED_SEM)
-	      int timedout;
+      int timedout;
 #endif
-	      sem_timedwait_cleanup_args_t cleanup_args;
+      sem_timedwait_cleanup_args_t cleanup_args;
 
-	      cleanup_args.sem = s;
-	      cleanup_args.resultPtr = &result;
+      cleanup_args.sem = s;
+      cleanup_args.resultPtr = &result;
 
 #if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth(0)
 #endif
-	      /* Must wait */
-              pthread_cleanup_push(ptw32_sem_timedwait_cleanup, (void *) &cleanup_args);
+      /* Must wait */
+      pthread_cleanup_push(ptw32_sem_timedwait_cleanup, (void *) &cleanup_args);
 #if defined(NEED_SEM)
-	      timedout =
+      timedout =
 #endif
-	      result = pthreadCancelableTimedWait (s->sem, milliseconds);
-	      pthread_cleanup_pop(result);
+          result = pthreadCancelableTimedWait (s->sem, milliseconds);
+      pthread_cleanup_pop(result);
 #if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth()
 #endif
 
 #if defined(NEED_SEM)
 
-	      if (!timedout && pthread_mutex_lock (&s->lock) == 0)
-	        {
-        	  if (*sem == NULL)
-        	    {
-        	      (void) pthread_mutex_unlock (&s->lock);
-        	      PTW32_SET_ERRNO(EINVAL);
-        	      return -1;
-        	    }
-
-	          if (s->leftToUnblock > 0)
-	            {
-		      --s->leftToUnblock;
-		      SetEvent(s->sem);
-		    }
-	          (void) pthread_mutex_unlock (&s->lock);
-	        }
+      if (!timedout)
+        {
+          ptw32_mcs_lock_acquire(&s->lock, &node);
+          if (s->leftToUnblock > 0)
+            {
+              --s->leftToUnblock;
+              SetEvent(s->sem);
+            }
+          ptw32_mcs_lock_release(&node);
+        }
 
 #endif /* NEED_SEM */
 
-	    }
-	}
+    }
 
     }
 
