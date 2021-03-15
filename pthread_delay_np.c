@@ -116,12 +116,8 @@ pthread_delay_np (struct timespec *interval)
 #pragma disable_message (124)
 #endif
 
-  /*
-   * Most compilers will issue a warning 'comparison always 0'
-   * because the variable type is unsigned, but we need to keep this
-   * for some reason I can't recall now.
-   */
-  if (0 > (wait_time = secs_in_millisecs + millisecs))
+  wait_time = secs_in_millisecs + millisecs;
+  if (0 > (int)wait_time)
     {
       return EINVAL;
     }
