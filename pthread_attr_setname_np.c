@@ -67,7 +67,7 @@ pthread_attr_setname_np(pthread_attr_t * attr, const char *name, void *arg)
       return EINVAL;
     }
 
-  newname = _strdup(tmpbuf);
+  newname = ptw32_strdup(tmpbuf);
 
   oldname = (*attr)->thrname;
   (*attr)->thrname = newname;
@@ -85,7 +85,7 @@ pthread_attr_setname_np(pthread_attr_t * attr, const char *name)
   char * newname;
   char * oldname;
 
-  newname = _strdup(name);
+  newname = ptw32_strdup(name);
 
   oldname = (*attr)->thrname;
   (*attr)->thrname = newname;

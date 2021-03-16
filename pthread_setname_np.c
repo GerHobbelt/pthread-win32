@@ -111,7 +111,7 @@ pthread_setname_np(pthread_t thr, const char *name, void *arg)
       return EINVAL;
     }
 
-  newname = _strdup(tmpbuf);
+  newname = ptw32_strdup(tmpbuf);
 
 #if defined(_MSC_VER)
   Win32ThreadID = pthread_getw32threadid_np (thr);
@@ -156,7 +156,7 @@ pthread_setname_np(pthread_t thr, const char *name)
       return result;
     }
 
-  newname = _strdup(name);
+  newname = ptw32_strdup(name);
 
 #if defined(_MSC_VER)
   Win32ThreadID = pthread_getw32threadid_np (thr);

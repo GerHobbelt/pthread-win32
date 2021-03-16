@@ -760,6 +760,8 @@ extern "C"
   void *ptw32_calloc (size_t n, size_t s);
 #endif
 
+char *ptw32_strdup (const char *s);
+
 /* Declared in private.c */
 #if defined(_MSC_VER)
 /*
