@@ -68,6 +68,7 @@
 #include "ptw32_rwlock_check_need_init.c"
 #include "ptw32_rwlock_cancelwrwait.c"
 #include "ptw32_spinlock_check_need_init.c"
+#include "ptw32_strdup.c"
 #include "pthread_attr_init.c"
 #include "pthread_attr_destroy.c"
 #include "pthread_attr_getaffinity_np.c"
