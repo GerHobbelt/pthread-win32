@@ -67,7 +67,8 @@ test_loadfree(void)
 {
   HINSTANCE hinst;
 
-  assert((hinst = LoadLibraryA("pthread")) != (HINSTANCE) 0);
+  hinst = LoadLibraryA("pthread");
+  assert((hinst) != (HINSTANCE) 0);
 
   Sleep(100);
 
