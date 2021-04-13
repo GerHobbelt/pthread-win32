@@ -50,6 +50,10 @@
 
 #include "test.h"
 
+#if !defined(WINCE)
+#  include <signal.h>
+#endif
+
 static int lockCount = 0;
 
 static pthread_mutex_t mutex;
@@ -83,27 +87,50 @@ test_mutex6n(void)
   assert(pthread_mutexattr_init(&mxAttr) == 0);
 
   BEGIN_MUTEX_STALLED_ROBUST(mxAttr)
+  {
+	  lockCount = 0;
+	  assert(pthread_mutexattr_settype(&mxAttr, PTHREAD_MUTEX_NORMAL) == 0);
+	  assert(pthread_mutexattr_gettype(&mxAttr, &mxType) == 0);
+	  assert(mxType == PTHREAD_MUTEX_NORMAL);
 
-  lockCount = 0;
-  assert(pthread_mutexattr_settype(&mxAttr, PTHREAD_MUTEX_NORMAL) == 0);
-  assert(pthread_mutexattr_gettype(&mxAttr, &mxType) == 0);
-  assert(mxType == PTHREAD_MUTEX_NORMAL);
+	  assert(pthread_mutex_init(&mutex, &mxAttr) == 0);
 
-  assert(pthread_mutex_init(&mutex, &mxAttr) == 0);
+	  assert(pthread_create(&t, NULL, locker, NULL) == 0);
 
-  assert(pthread_create(&t, NULL, locker, NULL) == 0);
+	  Sleep(100);
 
-  Sleep(100);
+	  assert(lockCount == 1);
 
-  assert(lockCount == 1);
+	  assert(pthread_mutex_unlock(&mutex) == (IS_ROBUST ? EPERM : 0));
 
-  assert(pthread_mutex_unlock(&mutex) == (IS_ROBUST?EPERM:0));
+	  Sleep(100);
 
-  Sleep (100);
+	  assert(lockCount == (IS_ROBUST ? 1 : 2));
+	  
+	  Sleep(300);
 
-  assert(lockCount == (IS_ROBUST?1:2));
+	  // kill the deadlocked thread:
+	  assert(pthread_kill(t, SIGABRT) == 0);
+	  
+	  void* result = (void*)0;
 
+	  /*
+	   * The thread does not contain any cancellation points, so
+	   * a return value of PTHREAD_CANCELED confirms that async
+	   * cancellation succeeded.
+	   */
+	  assert(pthread_join(t, &result) == 0);
+	  assert(result == PTHREAD_CANCELED || result == (void *)555);
+
+	  // mutex is completely clobbered due to deadlock + thread kill:
+	  // its owwner is now dead and gone so we lost the mutex forever...
+	  (void)pthread_mutex_destroy(&mutex);
+	  
+	  //assert(mutex == NULL);
+  }
   END_MUTEX_STALLED_ROBUST(mxAttr)
+
+  assert(pthread_mutexattr_destroy(&mxAttr) == 0);
 
   return 0;
 }

@@ -100,9 +100,51 @@ pthread_kill (pthread_t thread, int sig)
   if (0 == result && 0 != sig)
     {
       /*
-       * Currently does not support any signals.
+       * Currently only supports direct thread termination via SIGABRT.
        */
-      result = EINVAL;
+      switch (sig)
+      {
+      default:
+          result = EINVAL;
+          break;
+
+      case SIGINT:
+      case SIGTERM:
+      case SIGBREAK:
+      case SIGABRT:
+      case SIGABRT_COMPAT:
+      {
+          ptw32_mcs_local_node_t stateLock;
+
+          /*
+           * Lock for async-cancel safety.
+           */
+          ptw32_mcs_lock_acquire(&tp->stateLock, &stateLock);
+
+          // Only terminate the thread when it is still running:
+          if (tp->state < PThreadStateLast)
+          {
+              tp->state = PThreadStateLast;
+              tp->cancelState = PTHREAD_CANCEL_DISABLE;
+              ptw32_mcs_lock_release(&stateLock);
+
+              result = TerminateThread(tp->threadH, (DWORD)(size_t)PTHREAD_CANCELED);
+              result = (result != 0) ? 0 : EINVAL;
+
+              // Set exit to CANCELED (KILLED) when it hasn't been set already.
+              if (tp->exitStatus == NULL)
+                  tp->exitStatus = PTHREAD_CANCELED;
+          }
+          else
+          {
+              ptw32_mcs_lock_release(&stateLock);
+
+              // TODO: ? flag the call as not-necessary-any-more because thread has already terminated ?
+              result = 0;
+          }
+      }
+          break;
+      }
     }
 
   return result;
