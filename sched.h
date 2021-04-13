@@ -156,7 +156,7 @@
    typedef int pid_t;
 # endif
 #else
- /* [i_a] fix for using pthread_win32 with mongoose code, which #define's its own pid_t akin to     typedef HANDLE pid_t; */
+ /* [i_a] fix for using pthread_win32 with civetweb code, which #define's its own pid_t akin to     typedef HANDLE pid_t; */
  #undef pid_t
 # if defined(_MSC_VER)
   typedef void *pid_t;
