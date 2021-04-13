@@ -46,8 +46,8 @@
  * See the README file for an explanation of the pthreads-win32 version
  * numbering scheme and how the DLL is named etc.
  */
-#define PTW32_VERSION 2,10,1,0
-#define PTW32_VERSION_STRING "2, 10, 1, 0\0"
+#define PTW32_VERSION 2,10,2,0
+#define PTW32_VERSION_STRING "2, 10, 2, 0\0"
 
 /* There are three implementations of cancel cleanup.
  * Note that pthread.h is included in both application
