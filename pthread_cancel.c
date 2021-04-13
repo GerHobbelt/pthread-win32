@@ -68,11 +68,12 @@ DWORD
 ptw32_RegisterCancellation (PAPCFUNC unused1, HANDLE threadH, DWORD unused2)
 {
   CONTEXT context;
-
+#ifndef ENABLE_WINRT
   context.ContextFlags = CONTEXT_CONTROL;
   GetThreadContext (threadH, &context);
   PTW32_PROGCTR (context) = (DWORD_PTR) ptw32_cancel_self;
   SetThreadContext (threadH, &context);
+#endif
   return 0;
 }
 

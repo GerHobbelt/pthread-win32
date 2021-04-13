@@ -160,8 +160,8 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
 			{
 			  result = EAGAIN;
 			}
+          CloseHandle(h);
 		}
-	  CloseHandle(h);
 	}
 
   if (result != 0)
@@ -261,8 +261,8 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
 		    {
 			  result = EAGAIN;
 		    }
+          CloseHandle(h);
 	    }
-	  CloseHandle(h);
 
 #else
 	  ((_sched_cpu_set_vector_*)set)->_cpuset = (size_t)0x1;

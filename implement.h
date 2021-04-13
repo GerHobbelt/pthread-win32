@@ -59,8 +59,9 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
  * Designed to allow error values to be set and retrieved in builds where
  * MSCRT libraries are statically linked to DLLs.
  */
-#if ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0800 ) || \
-    ( defined(_MSC_VER) && _MSC_VER >= 1400 )  /* MSVC8+ */
+#if ! defined(WINCE) && \
+    (( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0800 ) || \
+    ( defined(_MSC_VER) && _MSC_VER >= 1400 ))  /* MSVC8+ */
 #  if defined(PTW32_CONFIG_MINGW)
 __attribute__((unused))
 #  endif
@@ -114,6 +115,10 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 
 /* _tcsncat_s() et al: mapping to the correct TCHAR prototypes: */
 #include <tchar.h>
+
+#if defined(__BORLANDC__) && !defined(_tcsncat_s)
+  #define _tcsncat_s(arg1, arg2, arg3, arg4) _tcsncat(arg1, arg3, (arg2 < arg4 ? arg2 : arg4))
+#endif
 
 /* use local include files during development */
 #include "semaphore.h"
@@ -241,7 +246,10 @@ struct ptw32_thread_t_
   int cancelType;
   int implicit:1;
   DWORD thread;			/* Windows thread ID */
+#if defined(HAVE_CPU_AFFINITY)
   size_t cpuset;		/* Thread CPU affinity set */
+#endif
+  char * name;                  /* Thread name */
 #if defined(_UWIN)
   DWORD dummy[5];
 #endif
@@ -263,6 +271,8 @@ struct pthread_attr_t_
   struct sched_param param;
   int inheritsched;
   int contentionscope;
+  size_t cpuset;
+  char * thrname;
 #if defined(HAVE_SIGSET_T)
   sigset_t sigmask;
 #endif				/* HAVE_SIGSET_T */
@@ -280,7 +290,7 @@ struct pthread_attr_t_
 struct sem_t_
 {
   int value;
-  pthread_mutex_t lock;
+  ptw32_mcs_lock_t lock;
   HANDLE sem;
 #if defined(NEED_SEM)
   int leftToUnblock;
@@ -750,6 +760,8 @@ extern "C"
   void *ptw32_calloc (size_t n, size_t s);
 #endif
 
+char *ptw32_strdup (const char *s);
+
 /* Declared in private.c */
 #if defined(_MSC_VER)
 /*
@@ -788,8 +800,10 @@ extern "C"
 #       endif
 #   endif
 #else
-#       include <process.h>
+#   if ! defined(WINCE)
+#     include <process.h>
 #   endif
+#endif
 
 
 /*

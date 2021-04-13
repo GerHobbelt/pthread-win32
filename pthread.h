@@ -1,10 +1,10 @@
-/* This is an implementation of the threads API of POSIX 1003.1-2001.
+/* This is an implementation of the threads API of the Single Unix Specification.
  *
  * --------------------------------------------------------------------------
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2012 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2013 Pthreads-win32 contributors
  *
  *      Homepage1: http://sourceware.org/pthreads-win32/
  *      Homepage2: http://sourceforge.net/projects/pthreads4w/
@@ -121,6 +121,7 @@
 #define PTW32_LEVEL_MAX 3
 
 #if ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112 )  || !defined(PTW32_LEVEL)
+#undef PTW32_LEVEL
 #define PTW32_LEVEL PTW32_LEVEL_MAX	/* Include everything */
 #endif
 
@@ -359,7 +360,7 @@ extern "C"
  *
  * For conformance with the Single Unix Specification (version 3), all of the
  * options below are defined, and have a value of either -1 (not supported)
- * or 200112L (supported).
+ * or yyyymm[dd]L (supported).
  *
  * These options can neither be left undefined nor have a value of 0, because
  * either indicates that sysconf(), which is not implemented, may be used at
@@ -553,21 +554,24 @@ extern "C"
 # error Please upgrade your GNU compiler to one that supports __declspec.
 #endif
 
+#if defined(PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400 && defined(_WINDLL)
+#  undef PTW32_STATIC_LIB
+#  define PTW32_STATIC_TLSLIB
+#endif
+
 /*
  * When building the library, you should define PTW32_BUILD so that
  * the variables/functions are exported correctly. When using the library,
  * do NOT define PTW32_BUILD, and then the variables/functions will
  * be imported correctly.
  */
-#if !defined(PTW32_STATIC_LIB)
-#  if defined(PTW32_BUILD)
+#if defined(PTW32_STATIC_LIB) || defined(PTW32_STATIC_TLSLIB)
+#  define PTW32_DLLPORT
+#elif defined(PTW32_BUILD)
 #    define PTW32_DLLPORT __declspec (dllexport)
 #  else
 #    define PTW32_DLLPORT __declspec (dllimport)
 #  endif
-#else
-#  define PTW32_DLLPORT
-#endif
 
 #if defined(_UWIN) && PTW32_LEVEL >= PTW32_LEVEL_MAX
 #   include     <sys/types.h>
@@ -893,6 +897,10 @@ PTW32_DLLPORT int PTW32_CDECL pthread_attr_init (pthread_attr_t * attr);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_destroy (pthread_attr_t * attr);
 
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_getaffinity_np (const pthread_attr_t * attr,
+                                         size_t cpusetsize,
+                                         cpu_set_t * cpuset);
+
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_getdetachstate (const pthread_attr_t * attr,
                                          int *detachstate);
 
@@ -901,6 +909,10 @@ PTW32_DLLPORT int PTW32_CDECL pthread_attr_getstackaddr (const pthread_attr_t * 
 
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_getstacksize (const pthread_attr_t * attr,
                                        size_t * stacksize);
+
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_setaffinity_np (pthread_attr_t * attr,
+                                       size_t cpusetsize,
+                                       const cpu_set_t * cpuset);
 
 PTW32_DLLPORT int PTW32_CDECL pthread_attr_setdetachstate (pthread_attr_t * attr,
                                          int detachstate);
@@ -1230,6 +1242,22 @@ PTW32_DLLPORT HANDLE PTW32_CDECL pthread_getw32threadhandle_np(pthread_t thread)
  * Returns the win32 thread ID for POSIX thread.
  */
 PTW32_DLLPORT DWORD PTW32_CDECL pthread_getw32threadid_np (pthread_t thread);
+
+/*
+ * Sets the POSIX thread name. If _MSC_VER is defined the name should be displayed by
+ * the MSVS debugger.
+ */
+#if defined(PTW32_COMPATIBILITY_BSD) || defined(PTW32_COMPATIBILITY_TRU64)
+#define PTHREAD_MAX_NAMELEN_NP 16
+PTW32_DLLPORT int PTW32_CDECL pthread_setname_np (pthread_t thr, const char * name, void * arg);
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_setname_np (pthread_attr_t * attr, const char * name, void * arg);
+#else
+PTW32_DLLPORT int PTW32_CDECL pthread_setname_np (pthread_t thr, const char * name);
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_setname_np (pthread_attr_t * attr, const char * name);
+#endif
+
+PTW32_DLLPORT int PTW32_CDECL pthread_getname_np (pthread_t thr, char * name, int len);
+PTW32_DLLPORT int PTW32_CDECL pthread_attr_getname_np (pthread_attr_t * attr, char * name, int len);
 
 
 /*

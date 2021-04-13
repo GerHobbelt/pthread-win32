@@ -111,7 +111,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
        * In the event that both handles are signaled, the cancel will
        * be ignored (see case 0 comment).
        */
-      ResetEvent (handles[1]);
+      if(handles[1]) ResetEvent (handles[1]);
 
       if (sp != NULL)
 	{

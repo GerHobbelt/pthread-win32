@@ -71,6 +71,7 @@
 #define PTW32_SCHED_LEVEL_MAX 3
 
 #if ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112 )  || !defined(PTW32_SCHED_LEVEL)
+#undef PTW32_SCHED_LEVEL
 #define PTW32_SCHED_LEVEL PTW32_SCHED_LEVEL_MAX
 /* Include everything */
 #endif
@@ -80,21 +81,24 @@
 # error Please upgrade your GNU compiler to one that supports __declspec.
 #endif
 
+#if defined(PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400 && defined(_WINDLL)
+#  undef PTW32_STATIC_LIB
+#  define PTW32_STATIC_TLSLIB
+#endif
+
 /*
  * When building the library, you should define PTW32_BUILD so that
  * the variables/functions are exported correctly. When using the library,
  * do NOT define PTW32_BUILD, and then the variables/functions will
  * be imported correctly.
  */
-#if !defined(PTW32_STATIC_LIB)
-#  if defined(PTW32_BUILD)
+#if defined(PTW32_STATIC_LIB) || defined(PTW32_STATIC_TLSLIB)
+#  define PTW32_DLLPORT
+#elif defined(PTW32_BUILD)
 #    define PTW32_DLLPORT __declspec (dllexport)
 #  else
 #    define PTW32_DLLPORT __declspec (dllimport)
 #  endif
-#else
-#  define PTW32_DLLPORT
-#endif
 
 /*
  * The Open Watcom C/C++ compiler uses a non-standard calling convention
@@ -152,7 +156,7 @@
    typedef int pid_t;
 # endif
 #else
- /* [i_a] fix for using pthread_win32 with mongoose code, which #define's its own pid_t akin to     typedef HANDLE pid_t; */
+ /* [i_a] fix for using pthread_win32 with civetweb code, which #define's its own pid_t akin to     typedef HANDLE pid_t; */
  #undef pid_t
 # if defined(_MSC_VER)
   typedef void *pid_t;

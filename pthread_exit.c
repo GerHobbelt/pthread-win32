@@ -101,8 +101,8 @@ pthread_exit (void *value_ptr)
 
       /* Never reached */
     }
-
-  sp->exitStatus = value_ptr;
+  else
+    sp->exitStatus = value_ptr;
 
   ptw32_throw (PTW32_EPS_EXIT);
 

@@ -80,6 +80,9 @@ ptw32_pop_cleanup (int execute)
 {
   ptw32_cleanup_t *cleanup;
 
+  if (!ptw32_processInitialized)
+    ptw32_processInitialize();
+
   cleanup = (ptw32_cleanup_t *) pthread_getspecific (ptw32_cleanupKey);
 
   if (cleanup != NULL)
@@ -143,6 +146,9 @@ ptw32_push_cleanup (ptw32_cleanup_t * cleanup,
       * ------------------------------------------------------
       */
 {
+  if (!ptw32_processInitialized)
+    ptw32_processInitialize();
+
   cleanup->routine = routine;
   cleanup->arg = arg;
 

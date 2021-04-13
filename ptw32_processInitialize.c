@@ -19,17 +19,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -70,17 +70,13 @@ ptw32_processInitialize (void)
 {
   if (ptw32_processInitialized)
     {
-      /* 
-       * Ignore if already initialized. this is useful for 
-       * programs that uses a non-dll pthread
-       * library. Such programs must call ptw32_processInitialize() explicitly,
-       * since this initialization routine is automatically called only when
-       * the dll is loaded.
-       */
       return PTW32_TRUE;
     }
 
-  ptw32_processInitialized = PTW32_TRUE;
+  /*
+   * All variables from global.c are initialized in global.c !
+   * ptw32_processTerminate() could return global variables values to initial state if needed
+   */
 
   /*
    * Initialize Keys
@@ -90,6 +86,6 @@ ptw32_processInitialize (void)
     {
       ptw32_processTerminate ();
     }
-
+  ptw32_processInitialized = PTW32_TRUE;
   return (ptw32_processInitialized);
 }				/* processInitialize */

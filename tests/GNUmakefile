@@ -134,9 +134,7 @@ help:
 	@ $(ECHO) "$(MAKE) clean GCX-static         (to test using GC static lib with C++ applications)"
 	@ $(ECHO) "$(MAKE) clean GCX-static-debug   (to test using GC static lib with C++ applications)"
 	@ $(ECHO) "$(MAKE) clean GCX-debug          (to test using GCE dll with C++ (EH) applications)"
-	@ $(ECHO) "$(MAKE) clean GC-foo             (to build individual test \"foo.c\" with C and run using GC dll)"
-	@ $(ECHO) "$(MAKE) clean GCE-foo            (to build individual tests \"foo.c\" with C++ and run using GCE dll)" 
-	@ $(ECHO) "$(MAKE) clean GCX-foo            (to build individual tests \"foo.c\" with C++ and run using GC dll)"
+	@ $(ECHO) "$(MAKE) clean GC TESTS="foo bar" (to build individual tests \"foo.c and bar.c\" with C and run using GC dll)"
 
 GC:
 	@ $(MAKE) --no-builtin-rules TEST=$@ GCX="GC$(DLL_VER)" CC=$(CC) XXCFLAGS="-D__CLEANUP_C" allpassed

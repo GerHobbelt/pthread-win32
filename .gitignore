@@ -1,4 +1,5 @@
 cvs
+.vs
 
 *~
 *.bak
@@ -15,3 +16,4 @@ bin/
 obj/
 ipch/
 
+*.obj
