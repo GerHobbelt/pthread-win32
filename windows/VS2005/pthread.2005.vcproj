@@ -628,7 +628,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath=".\attr.c"
+				RelativePath="..\..\attr.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -680,63 +680,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\autostatic.c"
+				RelativePath="..\..\autostatic.c"
 				>
 			</File>
 			<File
-				RelativePath=".\barrier.c"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Itanium"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Itanium"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\cancel.c"
+				RelativePath="..\..\barrier.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -788,11 +736,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\cleanup.c"
-				>
-			</File>
-			<File
-				RelativePath=".\condvar.c"
+				RelativePath="..\..\cancel.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -844,19 +788,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\create.c"
+				RelativePath="..\..\cleanup.c"
 				>
 			</File>
 			<File
-				RelativePath=".\dll.c"
-				>
-			</File>
-			<File
-				RelativePath=".\errno.c"
-				>
-			</File>
-			<File
-				RelativePath=".\exit.c"
+				RelativePath="..\..\condvar.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -908,67 +844,19 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\fork.c"
+				RelativePath="..\..\create.c"
 				>
 			</File>
 			<File
-				RelativePath=".\global.c"
+				RelativePath="..\..\dll.c"
 				>
 			</File>
 			<File
-				RelativePath=".\misc.c"
+				RelativePath="..\..\errno.c"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Itanium"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Itanium"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\mutex.c"
+				RelativePath="..\..\exit.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1020,7 +908,15 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\nonportable.c"
+				RelativePath="..\..\fork.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\global.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\misc.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1072,7 +968,111 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\private.c"
+				RelativePath="..\..\mutex.c"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\nonportable.c"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\private.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1176,339 +1176,339 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_destroy.c"
+				RelativePath="..\..\pthread_attr_destroy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_getdetachstate.c"
+				RelativePath="..\..\pthread_attr_getdetachstate.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_getinheritsched.c"
+				RelativePath="..\..\pthread_attr_getinheritsched.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_getschedparam.c"
+				RelativePath="..\..\pthread_attr_getschedparam.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_getschedpolicy.c"
+				RelativePath="..\..\pthread_attr_getschedpolicy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_getscope.c"
+				RelativePath="..\..\pthread_attr_getscope.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_getstackaddr.c"
+				RelativePath="..\..\pthread_attr_getstackaddr.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_getstacksize.c"
+				RelativePath="..\..\pthread_attr_getstacksize.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_init.c"
+				RelativePath="..\..\pthread_attr_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_setdetachstate.c"
+				RelativePath="..\..\pthread_attr_setdetachstate.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_setinheritsched.c"
+				RelativePath="..\..\pthread_attr_setinheritsched.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_setschedparam.c"
+				RelativePath="..\..\pthread_attr_setschedparam.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_setschedpolicy.c"
+				RelativePath="..\..\pthread_attr_setschedpolicy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_setscope.c"
+				RelativePath="..\..\pthread_attr_setscope.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_setstackaddr.c"
+				RelativePath="..\..\pthread_attr_setstackaddr.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_attr_setstacksize.c"
+				RelativePath="..\..\pthread_attr_setstacksize.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_barrier_destroy.c"
+				RelativePath="..\..\pthread_barrier_destroy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_barrier_init.c"
+				RelativePath="..\..\pthread_barrier_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_barrier_wait.c"
+				RelativePath="..\..\pthread_barrier_wait.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_barrierattr_destroy.c"
+				RelativePath="..\..\pthread_barrierattr_destroy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_barrierattr_getpshared.c"
+				RelativePath="..\..\pthread_barrierattr_getpshared.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_barrierattr_init.c"
+				RelativePath="..\..\pthread_barrierattr_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_barrierattr_setpshared.c"
+				RelativePath="..\..\pthread_barrierattr_setpshared.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_cancel.c"
+				RelativePath="..\..\pthread_cancel.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_cond_destroy.c"
+				RelativePath="..\..\pthread_cond_destroy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_cond_init.c"
+				RelativePath="..\..\pthread_cond_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_cond_signal.c"
+				RelativePath="..\..\pthread_cond_signal.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_cond_wait.c"
+				RelativePath="..\..\pthread_cond_wait.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_condattr_destroy.c"
+				RelativePath="..\..\pthread_condattr_destroy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_condattr_getpshared.c"
+				RelativePath="..\..\pthread_condattr_getpshared.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_condattr_init.c"
+				RelativePath="..\..\pthread_condattr_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_condattr_setpshared.c"
+				RelativePath="..\..\pthread_condattr_setpshared.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_delay_np.c"
+				RelativePath="..\..\pthread_delay_np.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_detach.c"
+				RelativePath="..\..\pthread_detach.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_equal.c"
+				RelativePath="..\..\pthread_equal.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_exit.c"
+				RelativePath="..\..\pthread_exit.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_getconcurrency.c"
+				RelativePath="..\..\pthread_getconcurrency.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_getschedparam.c"
+				RelativePath="..\..\pthread_getschedparam.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_getspecific.c"
+				RelativePath="..\..\pthread_getspecific.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_getunique_np.c"
+				RelativePath="..\..\pthread_getunique_np.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_getw32threadhandle_np.c"
+				RelativePath="..\..\pthread_getw32threadhandle_np.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_join.c"
+				RelativePath="..\..\pthread_join.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_key_create.c"
+				RelativePath="..\..\pthread_key_create.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_key_delete.c"
+				RelativePath="..\..\pthread_key_delete.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_kill.c"
+				RelativePath="..\..\pthread_kill.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutex_consistent.c"
+				RelativePath="..\..\pthread_mutex_consistent.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutex_destroy.c"
+				RelativePath="..\..\pthread_mutex_destroy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutex_init.c"
+				RelativePath="..\..\pthread_mutex_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutex_lock.c"
+				RelativePath="..\..\pthread_mutex_lock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutex_timedlock.c"
+				RelativePath="..\..\pthread_mutex_timedlock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutex_trylock.c"
+				RelativePath="..\..\pthread_mutex_trylock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutex_unlock.c"
+				RelativePath="..\..\pthread_mutex_unlock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutexattr_destroy.c"
+				RelativePath="..\..\pthread_mutexattr_destroy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutexattr_getkind_np.c"
+				RelativePath="..\..\pthread_mutexattr_getkind_np.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutexattr_getpshared.c"
+				RelativePath="..\..\pthread_mutexattr_getpshared.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutexattr_getrobust.c"
+				RelativePath="..\..\pthread_mutexattr_getrobust.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutexattr_gettype.c"
+				RelativePath="..\..\pthread_mutexattr_gettype.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutexattr_init.c"
+				RelativePath="..\..\pthread_mutexattr_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutexattr_setkind_np.c"
+				RelativePath="..\..\pthread_mutexattr_setkind_np.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutexattr_setpshared.c"
+				RelativePath="..\..\pthread_mutexattr_setpshared.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutexattr_setrobust.c"
+				RelativePath="..\..\pthread_mutexattr_setrobust.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_mutexattr_settype.c"
+				RelativePath="..\..\pthread_mutexattr_settype.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_num_processors_np.c"
+				RelativePath="..\..\pthread_num_processors_np.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_once.c"
+				RelativePath="..\..\pthread_once.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlock_destroy.c"
+				RelativePath="..\..\pthread_rwlock_destroy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlock_init.c"
+				RelativePath="..\..\pthread_rwlock_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlock_rdlock.c"
+				RelativePath="..\..\pthread_rwlock_rdlock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlock_timedrdlock.c"
+				RelativePath="..\..\pthread_rwlock_timedrdlock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlock_timedwrlock.c"
+				RelativePath="..\..\pthread_rwlock_timedwrlock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlock_tryrdlock.c"
+				RelativePath="..\..\pthread_rwlock_tryrdlock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlock_trywrlock.c"
+				RelativePath="..\..\pthread_rwlock_trywrlock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlock_unlock.c"
+				RelativePath="..\..\pthread_rwlock_unlock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlock_wrlock.c"
+				RelativePath="..\..\pthread_rwlock_wrlock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlockattr_destroy.c"
+				RelativePath="..\..\pthread_rwlockattr_destroy.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlockattr_getpshared.c"
+				RelativePath="..\..\pthread_rwlockattr_getpshared.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlockattr_init.c"
+				RelativePath="..\..\pthread_rwlockattr_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_rwlockattr_setpshared.c"
+				RelativePath="..\..\pthread_rwlockattr_setpshared.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_self.c"
+				RelativePath="..\..\pthread_self.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_setcancelstate.c"
+				RelativePath="..\..\pthread_setcancelstate.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_setcanceltype.c"
+				RelativePath="..\..\pthread_setcanceltype.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_setconcurrency.c"
+				RelativePath="..\..\pthread_setconcurrency.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_setschedparam.c"
+				RelativePath="..\..\pthread_setschedparam.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_setspecific.c"
+				RelativePath="..\..\pthread_setspecific.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_spin_destroy.c"
+				RelativePath="..\..\pthread_spin_destroy.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1560,7 +1560,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\pthread_spin_init.c"
+				RelativePath="..\..\pthread_spin_init.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1612,7 +1612,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\pthread_spin_lock.c"
+				RelativePath="..\..\pthread_spin_lock.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1664,7 +1664,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\pthread_spin_trylock.c"
+				RelativePath="..\..\pthread_spin_trylock.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1716,7 +1716,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\pthread_spin_unlock.c"
+				RelativePath="..\..\pthread_spin_unlock.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1768,155 +1768,79 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\pthread_testcancel.c"
+				RelativePath="..\..\pthread_testcancel.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_timechange_handler_np.c"
+				RelativePath="..\..\pthread_timechange_handler_np.c"
 				>
 			</File>
 			<File
-				RelativePath=".\pthread_win32_attach_detach_np.c"
+				RelativePath="..\..\pthread_win32_attach_detach_np.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_calloc.c"
+				RelativePath="..\..\ptw32_calloc.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_callUserDestroyRoutines.c"
+				RelativePath="..\..\ptw32_callUserDestroyRoutines.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_cond_check_need_init.c"
+				RelativePath="..\..\ptw32_cond_check_need_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_getprocessors.c"
+				RelativePath="..\..\ptw32_getprocessors.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_is_attr.c"
+				RelativePath="..\..\ptw32_is_attr.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_MCS_lock.c"
+				RelativePath="..\..\ptw32_MCS_lock.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_mutex_check_need_init.c"
+				RelativePath="..\..\ptw32_mutex_check_need_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_new.c"
+				RelativePath="..\..\ptw32_new.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_processInitialize.c"
+				RelativePath="..\..\ptw32_processInitialize.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_processTerminate.c"
+				RelativePath="..\..\ptw32_processTerminate.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_relmillisecs.c"
+				RelativePath="..\..\ptw32_relmillisecs.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_reuse.c"
+				RelativePath="..\..\ptw32_reuse.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_rwlock_cancelwrwait.c"
+				RelativePath="..\..\ptw32_rwlock_cancelwrwait.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_rwlock_check_need_init.c"
+				RelativePath="..\..\ptw32_rwlock_check_need_init.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_semwait.c"
+				RelativePath="..\..\ptw32_semwait.c"
 				>
 			</File>
 			<File
-				RelativePath=".\ptw32_spinlock_check_need_init.c"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Itanium"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Itanium"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\ptw32_threadDestroy.c"
-				>
-			</File>
-			<File
-				RelativePath=".\ptw32_threadStart.c"
-				>
-			</File>
-			<File
-				RelativePath=".\ptw32_throw.c"
-				>
-			</File>
-			<File
-				RelativePath=".\ptw32_timespec.c"
-				>
-			</File>
-			<File
-				RelativePath=".\ptw32_tkAssocCreate.c"
-				>
-			</File>
-			<File
-				RelativePath=".\ptw32_tkAssocDestroy.c"
-				>
-			</File>
-			<File
-				RelativePath=".\rwlock.c"
+				RelativePath="..\..\ptw32_spinlock_check_need_init.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -1968,7 +1892,31 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\sched.c"
+				RelativePath="..\..\ptw32_threadDestroy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ptw32_threadStart.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ptw32_throw.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ptw32_timespec.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ptw32_tkAssocCreate.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ptw32_tkAssocDestroy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\rwlock.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2020,71 +1968,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\sched_get_priority_max.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sched_get_priority_min.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sched_getscheduler.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sched_setscheduler.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sched_yield.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sem_close.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sem_destroy.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sem_getvalue.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sem_init.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sem_open.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sem_post.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sem_post_multiple.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sem_timedwait.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sem_trywait.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sem_unlink.c"
-				>
-			</File>
-			<File
-				RelativePath=".\sem_wait.c"
-				>
-			</File>
-			<File
-				RelativePath=".\semaphore.c"
+				RelativePath="..\..\sched.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2136,15 +2020,71 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\signal.c"
+				RelativePath="..\..\sched_get_priority_max.c"
 				>
 			</File>
 			<File
-				RelativePath=".\spin.c"
+				RelativePath="..\..\sched_get_priority_min.c"
 				>
 			</File>
 			<File
-				RelativePath=".\sync.c"
+				RelativePath="..\..\sched_getscheduler.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sched_setscheduler.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sched_yield.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sem_close.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sem_destroy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sem_getvalue.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sem_init.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sem_open.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sem_post.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sem_post_multiple.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sem_timedwait.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sem_trywait.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sem_unlink.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sem_wait.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\semaphore.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2196,7 +2136,15 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\tsd.c"
+				RelativePath="..\..\signal.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\spin.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\sync.c"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -2248,7 +2196,59 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\w32_CancelableWait.c"
+				RelativePath="..\..\tsd.c"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\w32_CancelableWait.c"
 				>
 			</File>
 		</Filter>
@@ -2257,11 +2257,11 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath=".\config.h"
+				RelativePath="..\..\config.h"
 				>
 			</File>
 			<File
-				RelativePath=".\context.h"
+				RelativePath="..\..\context.h"
 				>
 			</File>
 			<File
@@ -2269,7 +2269,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\need_errno.h"
+				RelativePath="..\..\need_errno.h"
 				>
 			</File>
 			<File
@@ -2298,215 +2298,215 @@
 			Name="Documentation"
 			>
 			<File
-				RelativePath=".\manual\index.html"
+				RelativePath="..\..\manual\index.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\PortabilityIssues.html"
+				RelativePath="..\..\manual\PortabilityIssues.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_attr_init.html"
+				RelativePath="..\..\manual\pthread_attr_init.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_attr_setstackaddr.html"
+				RelativePath="..\..\manual\pthread_attr_setstackaddr.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_attr_setstacksize.html"
+				RelativePath="..\..\manual\pthread_attr_setstacksize.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_barrier_init.html"
+				RelativePath="..\..\manual\pthread_barrier_init.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_barrier_wait.html"
+				RelativePath="..\..\manual\pthread_barrier_wait.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_barrierattr_init.html"
+				RelativePath="..\..\manual\pthread_barrierattr_init.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_barrierattr_setpshared.html"
+				RelativePath="..\..\manual\pthread_barrierattr_setpshared.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_cancel.html"
+				RelativePath="..\..\manual\pthread_cancel.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_cleanup_push.html"
+				RelativePath="..\..\manual\pthread_cleanup_push.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_cond_init.html"
+				RelativePath="..\..\manual\pthread_cond_init.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_condattr_init.html"
+				RelativePath="..\..\manual\pthread_condattr_init.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_condattr_setpshared.html"
+				RelativePath="..\..\manual\pthread_condattr_setpshared.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_create.html"
+				RelativePath="..\..\manual\pthread_create.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_delay_np.html"
+				RelativePath="..\..\manual\pthread_delay_np.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_detach.html"
+				RelativePath="..\..\manual\pthread_detach.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_equal.html"
+				RelativePath="..\..\manual\pthread_equal.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_exit.html"
+				RelativePath="..\..\manual\pthread_exit.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_getw32threadhandle_np.html"
+				RelativePath="..\..\manual\pthread_getw32threadhandle_np.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_join.html"
+				RelativePath="..\..\manual\pthread_join.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_key_create.html"
+				RelativePath="..\..\manual\pthread_key_create.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_kill.html"
+				RelativePath="..\..\manual\pthread_kill.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_mutex_init.html"
+				RelativePath="..\..\manual\pthread_mutex_init.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_mutexattr_init.html"
+				RelativePath="..\..\manual\pthread_mutexattr_init.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_mutexattr_setpshared.html"
+				RelativePath="..\..\manual\pthread_mutexattr_setpshared.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_num_processors_np.html"
+				RelativePath="..\..\manual\pthread_num_processors_np.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_once.html"
+				RelativePath="..\..\manual\pthread_once.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_rwlock_init.html"
+				RelativePath="..\..\manual\pthread_rwlock_init.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_rwlock_rdlock.html"
+				RelativePath="..\..\manual\pthread_rwlock_rdlock.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_rwlock_timedrdlock.html"
+				RelativePath="..\..\manual\pthread_rwlock_timedrdlock.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_rwlock_timedwrlock.html"
+				RelativePath="..\..\manual\pthread_rwlock_timedwrlock.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_rwlock_unlock.html"
+				RelativePath="..\..\manual\pthread_rwlock_unlock.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_rwlock_wrlock.html"
+				RelativePath="..\..\manual\pthread_rwlock_wrlock.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_rwlockattr_init.html"
+				RelativePath="..\..\manual\pthread_rwlockattr_init.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_rwlockattr_setpshared.html"
+				RelativePath="..\..\manual\pthread_rwlockattr_setpshared.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_self.html"
+				RelativePath="..\..\manual\pthread_self.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_setcancelstate.html"
+				RelativePath="..\..\manual\pthread_setcancelstate.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_setcanceltype.html"
+				RelativePath="..\..\manual\pthread_setcanceltype.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_setconcurrency.html"
+				RelativePath="..\..\manual\pthread_setconcurrency.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_setschedparam.html"
+				RelativePath="..\..\manual\pthread_setschedparam.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_spin_init.html"
+				RelativePath="..\..\manual\pthread_spin_init.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_spin_lock.html"
+				RelativePath="..\..\manual\pthread_spin_lock.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_spin_unlock.html"
+				RelativePath="..\..\manual\pthread_spin_unlock.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_timechange_handler_np.html"
+				RelativePath="..\..\manual\pthread_timechange_handler_np.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_win32_attach_detach_np.html"
+				RelativePath="..\..\manual\pthread_win32_attach_detach_np.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthread_win32_test_features_np.html"
+				RelativePath="..\..\manual\pthread_win32_test_features_np.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\pthreadCancelableWait.html"
+				RelativePath="..\..\manual\pthreadCancelableWait.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\sched_get_priority_max.html"
+				RelativePath="..\..\manual\sched_get_priority_max.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\sched_getscheduler.html"
+				RelativePath="..\..\manual\sched_getscheduler.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\sched_setscheduler.html"
+				RelativePath="..\..\manual\sched_setscheduler.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\sched_yield.html"
+				RelativePath="..\..\manual\sched_yield.html"
 				>
 			</File>
 			<File
-				RelativePath=".\manual\sem_init.html"
+				RelativePath="..\..\manual\sem_init.html"
 				>
 			</File>
 		</Filter>

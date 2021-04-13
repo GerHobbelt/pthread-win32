@@ -711,7 +711,7 @@
     <None Include="..\..\manual\sem_init.html" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="version.rc">
+    <ResourceCompile Include="..\..\version.rc">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PTW32_RC_MSC;PTW32_ARCHx64;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PTW32_RC_MSC;PTW32_ARCHx64;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PTW32_RC_MSC;PTW32_ARCHx86;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
