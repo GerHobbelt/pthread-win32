@@ -1,3 +1,1487 @@
+
+
+
+2021-04-13
+----------
+
+			
+* (c3e68f2) rename docs to .md to have them render as MarkDown files in GitHub (easier to read)
+			
+* (b43f651) remove superfluous resource files
+
+  update MSVC project files to point at the sources again (after the MSVC project files were moved into the windows/VS20XX/ directory tree)
+			
+* (9c124bd) bump version to 2.10.2
+			
+* (046928e) augmented all mutex tests to properly clean up the mutexes and mutex attributes.
+			
+* (4c80f6f) added feature (undocumented): `pthread_kill(t, SIGABRT)` can now be used to kill a deadlocked (stuck) thread. This was previously NOT possible and caused the test wrapper to deadlock at the end: it would run all tests but never terminate.
+  
+  I guess that "ALL TESTS PASS' statement a few commits ago was a bit overzealous  :'-(
+			
+* (d563bbc) add new tests: thread cancelation point showcase and pthread_kill basic test
+			
+* (d979315) add missing tests
+
+  add the setup/destroy logic to each test call in the wrapper to help improve test stability across the board.
+			
+* (be4757e) cancel8 remains the most finicky test of all.   **ALL TESTS PASS**
+			
+* (f7e8a9f) correct wording to prevent confusion about the announcement message in the test
+			
+* (b886906) fix fatal bug in semaphore3 test: off-by-1 error in cleanup/join loop resulted in a crash due to invalid memory access attempt at the t[0] slot, which is uninitialized (intentionally).
+			
+* (318df6b) correct MSVC project target names to suit loadlibrary test: the DLL will be called `pthread.dll` instead of `pthread_dll.dll`, while the static library will be named `pthread_static_lib.lib` to prevent confusion with the DLL "import library" `pthread.lib` which the linker will produce neext to the `pthread.dll` target file.
+			
+* (f42f382) fix for exception2 test: when the thread raises an exception, abort the thread and flag it as canceled, just like we do in the setjmp/longjmp variant: abort the thread but DO NOT YET abort the application.
+			
+* (6f64d60) fixed a couple of compiler warnings
+			
+
+
+
+2021-04-03
+----------
+
+			
+* (17a7464) changed from using mongoose to civetweb webserver (it's MIT fork after it went the whole GNU)
+			
+
+
+
+2021-03-18
+----------
+
+			
+* (e70d6a5) init all variables from global.c in global.c
+			
+* (625eeb2) ptw32_processInitialize before cleanup
+			
+
+
+
+2021-03-16
+----------
+
+			
+* (a9a6d55) Update pthread.c
+			
+* (53f3d7b) _strdup -> ptw32_strdup
+			
+
+
+
+2021-03-15
+----------
+
+			
+* (c097e1c) remove obnoxious compiler warning; this will declare VERY LONG timeout…
+			
+* (fcbcf8a) undef PTW32_STATIC_LIB for MSVS builds if and only if _WINDLL is defined(dll build)
+			
+
+
+
+2021-02-25
+----------
+
+			
+* (034d9bd) remove obnoxious compiler warning; this will declare VERY LONG timeouts (> 2E6 seconds) on 32-bit builds illegal (EINVAL)
+			
+
+
+
+2021-02-07
+----------
+
+			
+* (1e5e82e) fix manual merge mistake
+			
+* (7837928) fix bungled commit SHA-1: 4675ec485184efec8c77fc040c98b23c317bdfd1 :: migrated to MSVC2019
+  
+  Make sure the 2013 & 2015 project files remain unchanged, i.e. REVERTING them to their original state now.
+			
+* (280a346..e672657) added MSVC2019 project files
+			
+* (8052a62) fixed fatal error in MSVC2019
+			
+* (4675ec4) migrated to MSVC2019
+			
+
+
+
+2021-01-13
+----------
+
+			
+* (ee0ccdc..3eb3806) Update pthread_win32_attach_detach_np.c
+			
+
+
+
+2020-12-30
+----------
+
+			
+* (77bbbf2) Update ptw32_throw.c
+  
+  deferencing pointer fix
+			
+
+
+
+2020-11-04
+----------
+
+			
+* (9361387) fix warning
+			
+
+
+
+2020-10-27
+----------
+
+			
+* (c1f38ad) fixed old c-style declaration errors
+			
+* (a229f3c) fixed static analysis errors
+			
+
+
+
+2020-07-06
+----------
+
+			
+* (7b1cf19) Updated project to VS2019 and removed redundant .VS2017 suffix
+			
+* (3573556) Removed line since see no need to enable switches
+			
+* (eea3c89) Combined Readme and added changes to readme
+			
+
+
+
+2019-09-10
+----------
+
+			
+* (46515ab) Fixed slow build, multiple symbol issue due to double *.c list, fixed macro redefinition warnings.
+			
+* (f9d2d14) fix: public interface pthread.h, sched.h, semaphore.h
+			
+* (98a45e5) Added CMakeLists.txt and mamafile.py for use with MAMA build tool
+			
+
+
+
+2019-07-30
+----------
+
+			
+* (9ff8b06) Revert "Update w32_CancelableWait.c"
+  
+  This reverts commit bf0e247aed35f05c5853cb630c716e3604c6e10e.
+			
+* (ef31ba8) Revert "Update sem_timedwait.c"
+  
+  This reverts commit f3ffb80a4c3805333abb9e27766de62a78a4d1ff.
+			
+* (f3ffb80) Update sem_timedwait.c
+  
+  check if milliseconds delay had expired
+			
+* (bf0e247) Update w32_CancelableWait.c
+  
+  check if timeout has expired already before call to WaitForMultipleObjects
+			
+
+
+
+2019-06-27
+----------
+
+			
+* (2a5245a) Update implement.h
+			
+
+
+
+2019-05-24
+----------
+
+			
+* (efe335b) -
+			
+
+
+
+2019-05-03
+----------
+
+			
+* (1ed67a4) support uwp platform
+			
+
+
+
+2018-08-13
+----------
+
+			
+* (85f21e7) pthread for windows updated
+			
+
+
+
+2018-07-25
+----------
+
+			
+* (89d7bd5..8d58eb2) Added VS2015 project files.
+			
+
+
+
+2018-04-24
+----------
+
+			
+* (5e8d630) add msvc2017
+			
+
+
+
+2017-06-05
+----------
+
+			
+* (8597c27) added project files for Visual Studio 2017
+    updated PlatformToolset to v141
+  added project files for pthread_lib_static - also for 2017,
+    for full static compilation
+    using PlatformToolset to v141_xp
+  
+  Signed-off-by: hayati ayguen <h_ayguen@web.de>
+			
+
+
+
+2015-10-20
+----------
+
+			
+* (19fd505..ede13ec) added `.gitattributes` to prevent further CRLF issues -- at least with most files -- when working on the sources on multiple platforms.
+			
+* (9d49293) line ending
+			
+
+
+
+2015-09-06
+----------
+
+			
+* (f790535) change msvc config after merge
+			
+
+
+
+2015-09-03
+----------
+
+			
+* (a1b1420) Fix dll compilation issue for Visual Studio using makefile
+  
+  The compilation sanity checks in dll.c are expecting _WINDLL to be
+  defined. In the Visual Studio project this definition is inherited
+  but is not present when building using the makefile. As _WINDLL is
+  referenced no where in the project other than the sanity checks it
+  seems safe to define it via the makefile.
+  
+  This resolves #5.
+			
+
+
+
+2015-08-30
+----------
+
+			
+* (07100a0) correcting tests
+			
+* (7953fbb) Added  MSVS2015 Solution + fix for MSVC2015
+			
+* (324b4e2) Fix use after free() and double free()
+			
+
+
+
+2015-08-21
+----------
+
+			
+* (c07fbcb) correcting tests
+			
+
+
+
+2015-08-04
+----------
+
+			
+* (e416712) Remove email address
+			
+
+
+
+2015-07-31
+----------
+
+			
+* (a79a060) Remove double free when NEED_SEM is defined.
+			
+
+
+
+2015-07-29
+----------
+
+			
+* (0a37afd) Fix use after free() and double free()
+			
+
+
+
+2015-05-07
+----------
+
+			
+* (950f452) Added  MSVS2015 Solution + avoid defining snprintf while compiling under VS2015, as the function is already available
+			
+
+
+
+2015-04-23
+----------
+
+			
+* (8134f2e) Email address change
+			
+
+
+
+2015-03-18
+----------
+
+			
+* (74c382b) 
+  - fix merge mistake in PthreadState enum
+  
+  - fix global find&replace for cancelation->cancellation: ptw32_RegisterCancellation() now has the proper case once again.
+			
+* (fac9c1c) fix merge: delete superfluous files that came in from the merge...
+			
+* (2c7a08a) fix MSVC2013 build (probably also erroneous in the MSVC2012 environment, but haven't got MSVC2012 installed on the current dev box :-( )
+			
+* (4e5d42e) created MSVC2013 projects/solution files (ported from MSVC2012)
+			
+* (c2410d6) adding the affinity tests (and other missing tests) to the monolithic wrapper
+			
+
+
+
+2015-02-03
+----------
+
+			
+* (f9e636d..de6cc3d) Fix documentation HREF URLs. Fix HEAD sections; TITLE corrections and editor META tag removal
+			
+
+
+
+2014-07-22
+----------
+
+			
+* (8f38a5f) Wait for threads to complete before exiting main()
+			
+
+
+
+2014-05-29
+----------
+
+			
+* (b73b3a6) Part of removing autostatic.c
+			
+* (8b00512) Merge autostatic.c into dll.c;
+			
+
+
+
+2014-05-28
+----------
+
+			
+* (80f6485) Fix a possible memory leak.
+			
+
+
+
+2013-12-12
+----------
+
+			
+* (1cfedb2) Fix conditional compilation.
+			
+
+
+
+2013-12-09
+----------
+
+			
+* (3c2e21b) Update for VS 2013 Express cross tools (x64)
+			
+
+
+
+2013-12-02
+----------
+
+			
+* (7af80e6) Add _np functions missing from non-portable section
+			
+
+
+
+2013-11-13
+----------
+
+			
+* (6dc36b1) Add missing function description.
+			
+* (8f9d90c) Test library reinitialisation within the same process.
+			
+
+
+
+2013-11-08
+----------
+
+			
+* (3280dfb) Allow library to be reinitialised.
+			
+
+
+
+2013-09-13
+----------
+
+			
+* (f4ab7c0) Cast for warning
+			
+* (0e13e9a) Type casts and warning fix for GCC
+			
+* (f3ebd1d) New test case to confirm timeouts are working as expected.
+			
+
+
+
+2013-09-12
+----------
+
+			
+* (df19775) PTW32_LEVEL and PTW32_SCHED_LEVEL was multiply defined if
+  _POSIX_C_SOURCE >= 200112L
+			
+
+
+
+2013-07-23
+----------
+
+			
+* (1f494c4) Fixes relating to WINCE non-support for CPU affinity
+			
+
+
+
+2013-07-17
+----------
+
+			
+* (180aa00) Support older MSVCRT.DLLs
+			
+
+
+
+2013-07-03
+----------
+
+			
+* (f61257f) Add tests/threestage.c to Copyright exceptions list
+			
+* (b191e75) define 'max' if not defined
+			
+
+
+
+2013-07-02
+----------
+
+			
+* (da8cee2) Cast values from malloc/calloc
+			
+* (63be0bc) Example code borrowed with permission.
+			
+
+
+
+2013-06-27
+----------
+
+			
+* (f6a7acf) Add new general test
+			
+* (cc89c36) Supply default runtime arguments
+			
+* (c3ba36c) MSVC: change WIN32 to _WIN32 for recognition
+			
+* (3b7c788) Updated to version from book 4th edition
+			
+* (6a918c6) Initial version: borrowed from Johnson M Hart
+			
+
+
+
+2013-06-20
+----------
+
+			
+* (db01337) Fix critical typo in change description of static linking dllMain
+  functionality.
+			
+* (2961396) Thread name documentation.
+			
+
+
+
+2013-06-19
+----------
+
+			
+* (b95f6ec..83b98f3) Set thread name.
+			
+
+
+
+2013-06-06
+----------
+
+			
+* (364131f) pthread_attr_[gs]etstackaddr() return ENOSYS consistent with the manual
+  page.
+  pthread_attr_[gs]etstacksize() have added precompiler condition but no
+  change to behaviour, i.e. these functions are supported.
+			
+* (5531f8c) Comments.
+			
+* (1cd7325) Additional pthread_attr_[gs]etaffinity_np changes, including a new test
+  case.
+			
+
+
+
+2013-06-05
+----------
+
+			
+* (3621d04) Added pthread_attr_[sg]etaffinity_np routines.
+			
+* (32844ef) Static linking enhancement to add TLS running of thread detach logic
+			
+
+
+
+2013-05-15
+----------
+
+			
+* (2324644) TLS Callback added to run thread exit processing when static linked
+  (MSVC 8 or above)
+			
+
+
+
+2013-04-17
+----------
+
+			
+* (9dff6a1) updated the MSVC2012 project file
+			
+
+
+
+2013-02-21
+----------
+
+			
+* (3c24537) Add comments
+			
+* (72bf898) Additional WinCE fixes
+			
+* (66c7ac0) Preprocessor define change
+			
+* (c6ba6ea) Comment edits
+			
+* (93bc4dc) WinCE does not support thread CPU affinity API
+			
+
+
+
+2012-12-19
+----------
+
+			
+* (6534c50) Add #include for _tcsncat_s()
+			
+* (831694b) Fix operations involving TCHAR.
+			
+
+
+
+2012-12-13
+----------
+
+			
+* (7d0306e) Spelling fix
+			
+
+
+
+2012-11-13
+----------
+
+			
+* (58e4930) fixing the MSVC project files: first phase.
+			
+
+
+
+2012-10-29
+----------
+
+			
+* (52fef8f) Remove NULL arg checks
+			
+* (432aa62) Reduce Sleeps
+			
+
+
+
+2012-10-28
+----------
+
+			
+* (17893c1) sem_t internal state mutex changed to MCS lock.
+			
+
+
+
+2012-10-26
+----------
+
+			
+* (6bcb606) WinCE changes.
+			
+
+
+
+2012-10-24
+----------
+
+			
+* (43976ea) Note the new bug fix.
+			
+* (2ffb96d) Bug fix in pthread_key_delete; new regression test for this bug.
+			
+
+
+
+2012-10-22
+----------
+
+			
+* (de8a8dc) Move utility-specific option to where utility is defined if it's used
+  via a variable, i.e. "objdump -p"; rename OBJDUMP variable to reflect
+  this.
+			
+* (1e3c9b4) Fix windres target for static builds
+			
+
+
+
+2012-10-21
+----------
+
+			
+* (4879733) Remove reliance on utility 'ls'
+			
+
+
+
+2012-10-19
+----------
+
+			
+* (7b1f41c) windres target setting for static libs fixed
+			
+* (441f0f0) Dynamicify the windres target setting to match code object file
+			
+
+
+
+2012-10-16
+----------
+
+			
+* (691340b) Makefile - remove SDK variables; GNUmakefile - add EXTRAVERSION
+			
+
+
+
+2012-10-14
+----------
+
+			
+* (2740214) remove debug code which was used to analyze the crashes
+			
+* (ca09e4d) pthread_self: fix odd crashes in user code due to pthread lib being spooked by incorrect (too late) init
+			
+* (fa17700) Fix
+			
+
+
+
+2012-10-13
+----------
+
+			
+* (52c6289) Windres target should not have a default
+			
+
+
+
+2012-10-12
+----------
+
+			
+* (4b79582) Makefile cleanup
+			
+* (b6e7a8d) Yet more reworking
+			
+* (98a1b59) New function
+			
+
+
+
+2012-10-11
+----------
+
+			
+* (cccd0f9..e838c15) makefile reworking; removed loadfree test.
+			
+
+
+
+2012-10-10
+----------
+
+			
+* (08b5cbf) Daniel patch and reworking
+			
+
+
+
+2012-10-05
+----------
+
+			
+* (911c14a) New test
+			
+
+
+
+2012-10-04
+----------
+
+			
+* (ca78956) Add pthread_tryjoin_np to API
+			
+* (6505ec2) Minor clarification
+			
+* (b7bbdd4) completing the older cdecl fix: SHA-1: ae46f236d4c411485d4a3c2a0eecee88bbf55559
+  
+  * cdecl missing in functions which are passed to pthread_cleanup_push(): fixed -- matches type ptw32_cleanup_callback_t this way.
+			
+* (fbc667f) Update: _POSIX_* defines; ANNOUNCE, NEWS, README doco.
+			
+* (0d12032) defensive programming and typo fix
+			
+* (e088f4b) mingw define and static function fixes for the tests
+			
+
+
+
+2012-10-03
+----------
+
+			
+* (3097d93) Remove target recommendation from help (no longer needed)
+			
+* (c72ec8d) Change reference to COPYING.LIB to COPYING.FSF
+			
+* (4d84d79) Update Copyright notices
+			
+* (c57a4d8) Initialise newmask to zero
+			
+* (83a488e) Comment edit
+			
+
+
+
+2012-10-02
+----------
+
+			
+* (42d1f75) Fix warning
+			
+* (23549c5) cpu_set_t opacity; fix GNUmakefile cancel9.pass build after changes
+			
+* (f27bae5) Fix tests build order; reorder some targets
+			
+* (9393b8d) Minor reorganisation
+			
+* (751da57) Use more GNU make features to simplify (?) the makefile
+			
+
+
+
+2012-10-01
+----------
+
+			
+* (256c59f) Remove unneccessary "ARCH ="
+			
+* (314e1aa) Yet more makefile fixups
+			
+* (fb76e67) Make realclean remove all generated files
+			
+* (0acaee6) Comment update re static linking of gcc runtime libs; add ARCH to
+  DLL_VER
+			
+* (93b5f01) Fixes around ARCH
+			
+* (468954c) Fix broken makefiles
+			
+* (333a384) More reworking of makefiles
+			
+
+
+
+2012-09-30
+----------
+
+			
+* (781ae52) Fix install target for static libs
+			
+* (be2dea7) Add ability to build 32 or 64 bit with MinGW64; Add targets to build
+  individual tests (GNU-only)
+			
+* (eebcc98) Another warning fix
+			
+* (bd6e6a8) Fix "too many rules" warnings
+			
+* (13276cd) Remove builds that are not useful
+			
+
+
+
+2012-09-29
+----------
+
+			
+* (c93f477) MSVC2010 projects adjusted to allow pthread.c concatenated source compile (for tighter builds) + corrections to prevent 'empty build unit' errors + added new tests to the monolithic test app.
+			
+
+
+
+2012-09-28
+----------
+
+			
+* (e4214c6) "[n]make install" target entries
+			
+* (e91d2cd) patches around config.h; improved "[n]make install" target
+			
+
+
+
+2012-09-27
+----------
+
+			
+* (37ac452) fix segfault due to NULL pointer dereference (caused by using NULL as a linked-list sentinel where PTW32_THREAD_REUSE_EMPTY was expected)
+			
+
+
+
+2012-09-25
+----------
+
+			
+* (40847f0) Corrected behaviour.
+			
+
+
+
+2012-09-24
+----------
+
+			
+* (8111575) Remove unused function
+			
+* (2c763d9) New test of fibers
+			
+* (afedf05) Starting to look at fibers for cancellation.
+			
+
+
+
+2012-09-23
+----------
+
+			
+* (72da8ce) Correct file name in comment.
+			
+* (68c8ccf) Output a little more information during "all-tests"
+			
+* (467dc2e) Remove reliance on min()
+			
+* (827cbdf) Implemented semi-opaque cpu_set_t
+			
+* (54684d2) Make output more informative; To-do notes for version 3
+			
+
+
+
+2012-09-22
+----------
+
+			
+* (5c3e7c6) Omnibus patch from Daniel Richard. G
+			
+* (29bf29f) Fix signed/unsigned comparison (GCE)
+			
+* (005c1e0) New make target for GC tests; Fix segfault bug
+			
+* (e4f2672) Minor changes; minor rewrite for CpuCount()
+			
+* (4e234e5) Remove unused variable.
+			
+* (bc61504) Found and fixed a bug while analysing another problem
+			
+
+
+
+2012-09-21
+----------
+
+			
+* (439ea8b) Add clean up
+			
+* (4b73cdf) Reorganise DWORD_PTR definition
+			
+* (0078897) New or modified tests
+			
+* (0cef671) Add CPU affinity inheritance
+			
+* (b19d1c4) Add cpu_set link.
+  Move sched_setaffinity links to main section.
+			
+* (1ef2192) Add and update for CPU affinity operations
+			
+
+
+
+2012-09-20
+----------
+
+			
+* (45da6d6) Add comment
+			
+* (17f42f6) Convert cpu_set_t support to macros where possible.
+  Rewrite tests.
+  Compatibility with older compilers.
+			
+* (c0f3dbd) New manual page
+			
+* (599ae3f) Cast and printf format change
+			
+
+
+
+2012-09-19
+----------
+
+			
+* (19be258) Sched Affinity tests and library fixes
+			
+
+
+
+2012-09-18
+----------
+
+			
+* (c487c43) Fix left-shift overrun
+			
+* (d664e12) Syntax fixes
+			
+* (c05b67c) New Linux compatibility routines
+			
+
+
+
+2012-09-16
+----------
+
+			
+* (e1115a4) Documentation
+			
+* (8dac93f) Missed errno change
+			
+
+
+
+2012-09-13
+----------
+
+			
+* (9824856..ece3a24) errno handling.
+			
+
+
+
+2012-09-12
+----------
+
+			
+* (8310637) Fixed and updated to reflect most recent release version info.
+			
+
+
+
+2012-09-09
+----------
+
+			
+* (8ca9cd4) Rework tests.
+			
+
+
+
+2012-09-05
+----------
+
+			
+* (9c3837b) Various minor patches.
+			
+
+
+
+2012-09-04
+----------
+
+			
+* (6dadd7e) Remove call to pthread_exit()
+			
+* (6db52ba) Resolve unused variable warning.
+			
+* (b4deb7d) Fix tests/cancel2.c
+			
+* (0d3a1ef) Change VC++ EH flags.
+			
+
+
+
+2012-09-03
+----------
+
+			
+* (e551d74) Add VC++ static targets.
+			
+* (a42a0ea) Debug make targets and updates.
+			
+
+
+
+2012-09-02
+----------
+
+			
+* (8b13563) Rename MCS node lock for clarity.
+			
+* (38165ca) Rewrite and add some comments.
+			
+
+
+
+2012-08-31
+----------
+
+			
+* (e5f2f84) Fixing some warnings and errors in some builds.
+			
+
+
+
+2012-08-30
+----------
+
+			
+* (4d2eb25) Corrects and additions to text.
+			
+* (67090e8) remove redundant casts
+			
+* (89c5ef5) Add casts
+			
+
+
+
+2012-08-29
+----------
+
+			
+* (247ea67) Fix casts
+			
+* (d209de4) Prevent displaying modal error dialog
+			
+* (56465f9) Remove assert statement that is never reached and return 1
+			
+* (ec5e5b9) replace static initialization of struct with memset
+			
+* (1bac207) Removed pointless exit(0) and never-reached comment
+			
+* (920ae14) Missing inits of robustness mutex attribute
+			
+* (2b70067) Fix type macros; fix cast
+			
+* (befde6a) Cast fix.
+			
+
+
+
+2012-08-21
+----------
+
+			
+* (d04279c) fixed dependency in MSVC2012 project
+			
+
+
+
+2012-08-20
+----------
+
+			
+* (a0aa8b8) add support for MSVC2012: solution + projects added
+			
+
+
+
+2012-08-19
+----------
+
+			
+* (1778a75) New test and fixups
+			
+* (808e7cb) Add pthread_timedjoin_np routine documentation
+			
+* (b7471d6) Comment spelling errors
+			
+* (a58d37d) New non-portable function
+			
+* (2b79bcb) Fix incorrect PTW32_CONFIG_MSVC8 to 7; extra tab in Makefile
+			
+
+
+
+2012-08-17
+----------
+
+			
+* (5c0ffaa) minimal modification to the MSVC2010 project files: include ;%(DisableSpecificWarnings)
+			
+* (cb6ef7f) Sub new macros.
+			
+* (2a299cf) Back out change.
+			
+
+
+
+2012-08-16
+----------
+
+			
+* (3345a7a) New simplified macros.
+			
+
+
+
+2012-08-11
+----------
+
+			
+* (3b4d714) Option to static link libgcc and minor improvements.
+			
+* (4f04b3d) Ensure autostatic is always linked in, plus other minor cleanups.
+			
+
+
+
+2012-07-20
+----------
+
+			
+* (61fd047) PTHREAD_CANCELED casts for C++
+			
+* (4cfa866) Fix interlocked pointer casts for VC++ x64
+			
+* (c86e8c4) Don't include RESOURCE_OBJS within other *_OBJS in common.mk
+			
+* (7f68d56) Fix missing forward declaration
+			
+
+
+
+2012-07-19
+----------
+
+			
+* (f52d061) Fix and rationalize - part 2
+			
+* (1f04d33) Rationalize and fix
+			
+
+
+
+2012-06-18
+----------
+
+			
+* (3bd39ef) MSVC2010 (non-SP1) complained about incompatible compiler settings
+			
+
+
+
+2012-06-15
+----------
+
+			
+* (9f35850) MSVC2010: remove custom build step (leftover from the migration from MSVC2008 and not useful any more, given the new bin+obj directory layout.
+			
+
+
+
+2012-06-07
+----------
+
+			
+* (e539174) MSVC2010 projects fixed: librarian didn't have its TargetMachine setting set --> lib failure for 64-bit builds
+			
+
+
+
+2012-06-06
+----------
+
+			
+* (3ef72b4) updated to v2.9.1 release
+			
+* (0aa374a) updated gitignore for MSVC2010 projects
+			
+
+
+
+2012-05-27
+----------
+
+			
+* (cc6ba2c) Minor build and test fixes.
+			
+
+
+
+2012-05-26
+----------
+
+			
+* (b9afb8d) Move recently incorrectly placed comment.
+			
+* (9f8c38b) Version 2.9.0 last changes.
+			
+
+
+
+2012-05-18
+----------
+
+			
+* (06de582) MSVC2010SP1 fix
+			
+
+
+
+2012-04-07
+----------
+
+			
+* (17f2ece) MSVC2010 project fix
+			
+
+
+
+2012-04-04
+----------
+
+			
+* (3db2d7b) fix type warning for MSVC2008/WIN64 build
+			
+
+
+
+2012-03-18
+----------
+
+			
+* (7452bc4) callbacks defined as cdecl
+			
+
+
+
+2012-03-01
+----------
+
+			
+* (c8fbc10) fix fatal run-time stack corruption/crash + Win32 API invocation error when compiling pthreads32 lib in Unicode.
+			
+
+
+
+2011-09-13
+----------
+
+			
+* (9adf27c) MSVC2010: shut up a couple of nauseating (and much less useful) warnings
+			
+
+
+
+2011-08-30
+----------
+
+			
+* (19975c5) updated MSVC project files: removed superfluous 'copy' post-build action
+			
+
+
+
+2011-08-22
+----------
+
+			
+* (727c127) added MSVC2010 project files + solution
+			
+* (274418d) updated/corrected the MSVC2008 project files
+			
+
+
+
+2011-07-28
+----------
+
+			
+* (d477dc8) removed superfluous copy operation (post-build action) from the MSVC2008 project
+			
+
+
+
+2011-07-27
+----------
+
+			
+* (339f9c4) fixed the pid_t type for Win32/64 so that it is an integral type which can be typecasted to/from an integer value. Also added a few typecasts in the code to remove a couple of compiler warnings related to this issue.
+			
+
+
+
+2011-07-22
+----------
+
+			
+* (06f5bb1) fix for using pthread_win32 with other code, which #define's its own pid_t (to something other than 'int', e.g. (for Win32/64 more appropriate) typedef HANDLE pid_t;
+			
+
+
+
+2011-07-20
+----------
+
+			
+* (e72c42b) [i_a] fix for apps using pthreads-Win32: when they do not define __CLEANUP_SEH themselves, they're screwed as they'll receive the '__CLEANUP_C' macros which do NOT work when the pthreads library code itself has actually been build with __CLEANUP_SEH, which is the case when building this stuff in MSVC.
+  
+  Hence this section is made to 'sensibly autodetect' the cleanup mode, when it hasn't been hardwired in the makefiles / project files.
+  
+  After all, who expects he MUST define one of these __CLEANUP_XXX defines in his own code when using pthreads-Win32, for whatever reason.
+			
+* (321adcd) added test case sequence2 for proving fix for monolithic bundling of test cases:
+  
+  the monolithic test case bundle fails when running sequence1 and reuse1 when other tests have been executed in the same process before either of these; the test bundle does not fail in these test cases when these are executed at start of run (you can only do this for one of them) - turns out to be due to the thread reuse logic kicking in and the test code not anticipating that
+  	  -->
+  introduction of test sequence2.c to showcase the fix for this, including augmentation of pthread_win32_process_attach_np() to prevent crashes.
+			
+* (8039228) when unlocking an unlocked mutex, pthread_mutex_unlock() should always produce EPERM for any type of mutex -- see test mutex7.c
+			
+* (7f260fc) corrected a few test cases, which had a few incorrect assert()s due to the previous merge of my old code and bleeding edge base.
+			
+* (ae46f23) cdecl missing in functions which are passed to pthread_cleanup_push(): fixed -- matches type ptw32_cleanup_callback_t this way.
+			
+* (ad791b6) removed type cast for function parameter in pthread_cleanup_push() macro: the typecast would silence subtle parameter differences; now the compiler will yap about those differences, even while the warning/error may be a bit odd.
+			
+* (eeb6097) fix openmp1 test function definition in test wrapper
+			
+* (a983f2f) preliminary merge-back of my old work on MSVC2005/MSVC2008 and pthreads-Win32 test cases.
+  
+  Also updated MSVC project files to 2011 bin/ + obj/ layout standard.
+			
+* (2b5d652) make sure openmp1 test case compiles with MSVC2008: no C99-style variable declarations in the middle of a scope block.
+			
+
+
+
+2011-07-19
+----------
+
+			
+* (de711ec..e20da8d) [i_a] import CVS repository into a separate git repo
+			
+
+
+
 2015-06-31  Dimitry <>
 
 	* sem_init.c: Remove double free() when NEED_SEM defined (for
