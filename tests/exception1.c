@@ -246,13 +246,15 @@ test_exception1(void)
 
 	/* Canceled thread */
       assert(pthread_join(ct[i], &result) == 0);
-      assert(!(fail = (result != PTHREAD_CANCELED)));
+      fail = (result != PTHREAD_CANCELED);
+      assert(!(fail));
 
       failed = (failed || fail);
 
       /* Exceptioned thread */
       assert(pthread_join(et[i], &result) == 0);
-      assert(!(fail = (result != (void*)((int)(size_t)PTHREAD_CANCELED + 2))));
+      fail = (result != (void*)((int)(size_t)PTHREAD_CANCELED + 2));
+      assert(!(fail));
 
       failed = (failed || fail);
     }

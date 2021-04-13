@@ -135,7 +135,7 @@ getValidPriorities(void * arg)
 	}
 	mode = GetPriorityClass(process);
 
-	printf("Using GetThreadPriority (class = $%05X: %s)\n", mode, (mode & REALTIME_PRIORITY_CLASS ? "REAL_TIME" : ""));
+	printf("Using GetThreadPriority (class = $%05X: %s)\n", (unsigned int)mode, (mode & REALTIME_PRIORITY_CLASS ? "REAL_TIME" : ""));
   printf("%10s %10s\n", "Set value", "Get value");
 
   for (prioSet = minPrio;

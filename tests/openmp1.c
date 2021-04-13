@@ -3,7 +3,7 @@
 #ifdef _OPENMP
 #  include <omp.h>
 #endif
-#include <pthread.h>
+#include "../pthread.h"
 
 enum {
   Size = 10000

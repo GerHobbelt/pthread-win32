@@ -36,7 +36,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #include "pthread.h"
@@ -97,7 +97,7 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
       */
 {
 #if ! defined(NEED_PROCESS_AFFINITY_MASK)
-
+  cpusetsize = sizeof(cpu_set_t);
   DWORD_PTR vProcessMask;
   DWORD_PTR vSystemMask;
   HANDLE h;
@@ -225,6 +225,8 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
       * ------------------------------------------------------
       */
 {
+  cpusetsize = sizeof(cpu_set_t);
+
   DWORD_PTR vProcessMask;
   DWORD_PTR vSystemMask;
   HANDLE h;

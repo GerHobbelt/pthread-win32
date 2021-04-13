@@ -39,9 +39,9 @@
 #ifndef _PTHREAD_TEST_H_
 #define _PTHREAD_TEST_H_
 
-#include "pthread.h"
-#include "sched.h"
-#include "semaphore.h"
+#include "../pthread.h"
+#include "../sched.h"
+#include "../semaphore.h"
 
 #include <windows.h>
 #include <stdio.h>

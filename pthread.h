@@ -1,10 +1,18 @@
+/*
+ * This is a fork of version 2.10.0.0 the pthreads-win32 package. The ABI of this
+ * fork is different from the original. Changes done:
+ * 1) The type of the reuse counter in ptw32_handle_t has been changed from 
+ *    int to size_t in order to facilitate long-running servers.
+ * 2) Removed unused elements from pthread_once_t
+ */
+
 /* This is an implementation of the threads API of the Single Unix Specification.
  *
  * --------------------------------------------------------------------------
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2013 Pthreads-win32 contributors
+ *      Copyright(C) 1999,2018 Pthreads-win32 contributors
  *
  *      Homepage1: http://sourceware.org/pthreads-win32/
  *      Homepage2: http://sourceforge.net/projects/pthreads4w/
@@ -30,7 +38,7 @@
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
-
+#pragma once
 #if !defined( PTHREAD_H )
 #define PTHREAD_H
 
@@ -38,8 +46,8 @@
  * See the README file for an explanation of the pthreads-win32 version
  * numbering scheme and how the DLL is named etc.
  */
-#define PTW32_VERSION 2,10,0,0
-#define PTW32_VERSION_STRING "2, 10, 0, 0\0"
+#define PTW32_VERSION 2,10,1,0
+#define PTW32_VERSION_STRING "2, 10, 1, 0\0"
 
 /* There are three implementations of cancel cleanup.
  * Note that pthread.h is included in both application
@@ -268,7 +276,7 @@ enum {
 #endif
 #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
 
-#include <sched.h>
+#include "sched.h"
 
 /*
  * Several systems don't define some error numbers.
@@ -317,8 +325,10 @@ enum {
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1900
-#define HAVE_STRUCT_TIMESPEC
-#define _TIMESPEC_DEFINED
+# define HAVE_STRUCT_TIMESPEC
+# ifndef _TIMESPEC_DEFINED
+#  define _TIMESPEC_DEFINED
+# endif
 #endif
 
 #if !defined(HAVE_STRUCT_TIMESPEC)
@@ -583,7 +593,7 @@ extern "C"
  */
 typedef struct {
     void * p;                   /* Pointer to actual object */
-    unsigned int x;             /* Extra information - reuse count etc */
+    size_t x;                   /* Extra information - reuse count etc */
 } ptw32_handle_t;
 
 typedef ptw32_handle_t pthread_t;
@@ -677,14 +687,12 @@ enum {
  * ====================
  * ====================
  */
-#define PTHREAD_ONCE_INIT       { PTW32_FALSE, 0, 0, 0}
+#define PTHREAD_ONCE_INIT       { PTW32_FALSE, 0 }
 
 struct pthread_once_t_
 {
   int          done;        /* indicates if user function has been executed */
   void *       lock;
-  int          reserved1;
-  int          reserved2;
 };
 
 
@@ -773,6 +781,14 @@ struct ptw32_cleanup_t
                       { \
                           (*(_cleanup.routine))( _cleanup.arg ); \
                       } \
+                } \
+        }
+
+#define pthread_cleanup_pop_execute( ) \
+              } \
+            __finally \
+                { \
+                    (*(_cleanup.routine))( _cleanup.arg ); \
                 } \
         }
 

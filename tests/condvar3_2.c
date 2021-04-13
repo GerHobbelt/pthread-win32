@@ -133,7 +133,6 @@ test_condvar3_2(void)
 {
   int i;
   pthread_t t[NUMTHREADS + 1];
-  void* result = (void*)0;
   PTW32_STRUCT_TIMEB currSysTime;
   const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
@@ -158,6 +157,7 @@ test_condvar3_2(void)
 
   for (i = 1; i <= NUMTHREADS; i++)
     {
+      void* result = (void*)0;
       assert(pthread_join(t[i], &result) == 0);
 	assert((int)(size_t)result == i);
       /*

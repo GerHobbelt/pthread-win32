@@ -37,7 +37,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #include "pthread.h"
@@ -116,7 +116,6 @@ using
  */
 #ifdef _MSC_VER
 # pragma optimize("g", off)
-# pragma warning( disable : 4748 )
 #endif
 
 #if ! defined (PTW32_CONFIG_MINGW) || (defined (__MSVCRT__) && ! defined (__DMC__))

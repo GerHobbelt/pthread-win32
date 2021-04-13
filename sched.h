@@ -37,6 +37,7 @@
  *      if not, write to the Free Software Foundation, Inc.,
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
+#pragma once
 #if !defined(_SCHED_H)
 #define _SCHED_H
 
@@ -159,7 +160,8 @@
  /* [i_a] fix for using pthread_win32 with civetweb code, which #define's its own pid_t akin to     typedef HANDLE pid_t; */
  #undef pid_t
 # if defined(_MSC_VER)
-  typedef void *pid_t;
+  // typedef void *pid_t;
+  typedef unsigned long pid_t;
 # else
   typedef int pid_t;
 # endif

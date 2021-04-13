@@ -74,7 +74,7 @@
  * Fail Criteria:
  */
 
-#include <sched.h>
+#include "../sched.h"
 #include "test.h"
 
 enum {

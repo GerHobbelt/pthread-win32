@@ -36,7 +36,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #if defined(PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400 && defined(_WINDLL)

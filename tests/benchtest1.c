@@ -109,7 +109,6 @@ int
 test_benchtest1(void)
 #endif
 {
-  int i = 0;
   CRITICAL_SECTION cs;
   old_mutex_t ox;
   pthread_mutexattr_init(&ma);
@@ -267,6 +266,5 @@ test_benchtest1(void)
 
   pthread_mutexattr_destroy(&ma);
 
-  one = i; /* Dummy assignment to avoid 'variable unused' warning */
   return 0;
 }

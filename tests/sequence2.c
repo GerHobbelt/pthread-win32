@@ -75,7 +75,7 @@
  */
 
 #include "test.h"
-#include "implement.h"
+#include "../implement.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -104,7 +104,7 @@ static long done = 0;
  */
 static UINT64 seqmap[NUMTHREADS+2];
 
-static ptw_assert(int boolean_expr, const char *expr_str, const char *fname, int lineno)
+static int ptw_assert(int boolean_expr, const char *expr_str, const char *fname, int lineno)
 {
 	if (!boolean_expr)
 	{
