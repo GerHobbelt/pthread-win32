@@ -73,11 +73,6 @@
  * - Process returns non-zero exit status.
  */
 
-/*
- * Don't know how to identify if we are using SEH so it's only C++ for now
- */
-#if defined(__cplusplus)
-
 #include "test.h"
 
 /*
@@ -228,19 +223,4 @@ test_cancel2(void)
    */
   return 0;
 }
-
-#else /* defined(__cplusplus) */
-
-#ifndef MONOLITHIC_PTHREAD_TESTS
-int
-main()
-#else
-int
-test_cancel2(void)
-#endif
-{
-  return 0;
-}
-
-#endif /* defined(__cplusplus) */
 

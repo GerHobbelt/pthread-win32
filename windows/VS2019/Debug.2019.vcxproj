@@ -281,6 +281,7 @@
   <ItemGroup>
     <None Include="..\..\tests\Bmakefile" />
     <None Include="..\..\tests\ChangeLog" />
+    <None Include="..\..\tests\Debug.plg" />
     <None Include="..\Debug.txt" />
     <None Include="..\..\tests\common.mk" />
     <None Include="..\..\tests\GNUmakefile" />
@@ -302,6 +303,7 @@
     <ClCompile Include="..\..\tests\affinity3.c" />
     <ClCompile Include="..\..\tests\affinity4.c" />
     <ClCompile Include="..\..\tests\affinity5.c" />
+    <ClCompile Include="..\..\tests\affinity6.c" />
     <ClCompile Include="..\..\tests\barrier1.c" />
     <ClCompile Include="..\..\tests\barrier2.c" />
     <ClCompile Include="..\..\tests\barrier3.c" />
@@ -315,6 +317,7 @@
     <ClCompile Include="..\..\tests\benchtest4.c" />
     <ClCompile Include="..\..\tests\benchtest5.c" />
     <ClCompile Include="..\..\tests\cancel1.c" />
+    <ClCompile Include="..\..\tests\cancel10.c" />
     <ClCompile Include="..\..\tests\cancel2.c" />
     <ClCompile Include="..\..\tests\cancel3.c" />
     <ClCompile Include="..\..\tests\cancel4.c" />
@@ -364,6 +367,7 @@
     <ClCompile Include="..\..\tests\exit3.c" />
     <ClCompile Include="..\..\tests\exit4.c" />
     <ClCompile Include="..\..\tests\exit5.c" />
+    <ClCompile Include="..\..\tests\exit6.c" />
     <ClCompile Include="..\..\tests\eyal1.c" />
     <ClCompile Include="..\..\tests\inherit1.c" />
     <ClCompile Include="..\..\tests\join0.c" />
@@ -372,6 +376,7 @@
     <ClCompile Include="..\..\tests\join3.c" />
     <ClCompile Include="..\..\tests\join4.c" />
     <ClCompile Include="..\..\tests\kill1.c" />
+    <ClCompile Include="..\..\tests\kill2.c" />
     <ClCompile Include="..\..\tests\loadfree.c" />
     <ClCompile Include="..\..\tests\mutex1.c" />
     <ClCompile Include="..\..\tests\mutex1e.c" />
@@ -400,6 +405,8 @@
     <ClCompile Include="..\..\tests\mutex8e.c" />
     <ClCompile Include="..\..\tests\mutex8n.c" />
     <ClCompile Include="..\..\tests\mutex8r.c" />
+    <ClCompile Include="..\..\tests\name_np1.c" />
+    <ClCompile Include="..\..\tests\name_np2.c" />
     <ClCompile Include="..\..\tests\once1.c" />
     <ClCompile Include="..\..\tests\once2.c" />
     <ClCompile Include="..\..\tests\once3.c" />
@@ -407,6 +414,7 @@
     <ClCompile Include="..\..\tests\openmp1.c" />
     <ClCompile Include="..\..\tests\priority1.c" />
     <ClCompile Include="..\..\tests\priority2.c" />
+    <ClCompile Include="..\..\tests\reinit1.c" />
     <ClCompile Include="..\..\tests\reuse1.c" />
     <ClCompile Include="..\..\tests\reuse2.c" />
     <ClCompile Include="..\..\tests\robust1.c" />
@@ -444,10 +452,13 @@
     <ClCompile Include="..\..\tests\spin3.c" />
     <ClCompile Include="..\..\tests\spin4.c" />
     <ClCompile Include="..\..\tests\stress1.c" />
+    <ClCompile Include="..\..\tests\threestage.c" />
+    <ClCompile Include="..\..\tests\timeouts.c" />
     <ClCompile Include="..\..\tests\tryentercs.c" />
     <ClCompile Include="..\..\tests\tryentercs2.c" />
     <ClCompile Include="..\..\tests\tsd1.c" />
     <ClCompile Include="..\..\tests\tsd2.c" />
+    <ClCompile Include="..\..\tests\tsd3.c" />
     <ClCompile Include="..\..\tests\valid1.c" />
     <ClCompile Include="..\..\tests\valid2.c" />
     <ClCompile Include="..\..\tests\wrapper4tests_1.c" />
@@ -460,6 +471,9 @@
     <ProjectReference Include=".\pthread.2019.vcxproj">
       <Project>{5d459ba0-5eeb-47d3-a1c4-6b55c8d37ec0}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\tests\Debug.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

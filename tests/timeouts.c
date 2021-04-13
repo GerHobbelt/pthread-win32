@@ -97,21 +97,21 @@ typedef long long cyg_tim_t; //msvc > 6.0
 typedef int64_t cyg_tim_t; //msvc 6.0
 #endif
 
-LARGE_INTEGER frequency;
-LARGE_INTEGER global_start;
+static LARGE_INTEGER frequency;
+static LARGE_INTEGER global_start;
 
-cyg_tim_t CYG_DIFFT(cyg_tim_t t1, cyg_tim_t t2)
+static cyg_tim_t CYG_DIFFT(cyg_tim_t t1, cyg_tim_t t2)
 {
   return (cyg_tim_t)((t2 - t1) * CYG_ONEBILLION / frequency.QuadPart); //nsec
 }
 
-void CYG_InitTimers()
+static void CYG_InitTimers()
 {
   QueryPerformanceFrequency(&frequency);
   global_start.QuadPart = 0;
 }
 
-void CYG_MARK1(cyg_tim_t *T)
+static void CYG_MARK1(cyg_tim_t *T)
 {
   LARGE_INTEGER curTime;
   QueryPerformanceCounter (&curTime);
@@ -122,7 +122,7 @@ void CYG_MARK1(cyg_tim_t *T)
 
 #if 1
 
-int GetTimestampTS(struct timespec *tv)
+static int GetTimestampTS(struct timespec *tv)
 {
   struct _timeb timebuffer;
 
@@ -139,7 +139,7 @@ int GetTimestampTS(struct timespec *tv)
 
 #else
 
-int GetTimestampTS(struct timespec *tv)
+static int GetTimestampTS(struct timespec *tv)
 {
   static LONGLONG     epoch = 0;
   SYSTEMTIME          local;
@@ -176,12 +176,12 @@ int GetTimestampTS(struct timespec *tv)
 #define USEC_F 1000L
 #define NSEC_F 1L
 
-pthread_mutexattr_t mattr_;
-pthread_mutex_t mutex_;
-pthread_condattr_t cattr_;
-pthread_cond_t cv_;
+static pthread_mutexattr_t mattr_;
+static pthread_mutex_t mutex_;
+static pthread_condattr_t cattr_;
+static pthread_cond_t cv_;
 
-int Init(void)
+static int Init(void)
 {
   pthread_mutexattr_init(&mattr_);
   pthread_mutex_init(&mutex_, &mattr_);
@@ -190,7 +190,7 @@ int Init(void)
   return 0;
 }
 
-int Destroy(void)
+static int Destroy(void)
 {
   pthread_cond_destroy(&cv_);
   pthread_mutex_destroy(&mutex_);
@@ -199,7 +199,7 @@ int Destroy(void)
   return 0;
 }
 
-int Wait(time_t sec, long nsec)
+static int Wait(time_t sec, long nsec)
 {
   struct timespec abstime;
   long sc;
@@ -207,7 +207,9 @@ int Wait(time_t sec, long nsec)
   GetTimestampTS(&abstime);
   abstime.tv_sec  += sec;
   abstime.tv_nsec += nsec;
-  if((sc = (abstime.tv_nsec / 1000000000L))){
+  sc = (abstime.tv_nsec / 1000000000L);
+  if(sc)
+  {
       abstime.tv_sec += sc;
       abstime.tv_nsec %= 1000000000L;
   }
@@ -220,14 +222,21 @@ int Wait(time_t sec, long nsec)
   return result;
 }
 
-char tbuf[128];
-void printtim(cyg_tim_t rt, cyg_tim_t dt, int wres)
+static char tbuf[128];
+
+static void printtim(cyg_tim_t rt, cyg_tim_t dt, int wres)
 {
   printf("wait result [%d]: timeout(ms) [expected/actual]: %ld/%ld\n", wres, (long)(rt/CYG_ONEMILLION), (long)(dt/CYG_ONEMILLION));
 }
 
 
-int main(int argc, char* argv[])
+#ifndef MONOLITHIC_PTHREAD_TESTS
+int
+main(void)
+#else 
+int
+test_timeouts(void)
+#endif
 {
   int i = 0;
   int wres = 0;

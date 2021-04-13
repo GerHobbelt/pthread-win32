@@ -62,7 +62,7 @@ static pthread_barrier_t sync;
 static int seqno = 0;
 #endif
 
-void * func(void * arg)
+static void * func(void * arg)
 {
   char buf[32];
   pthread_t self = pthread_self();
@@ -76,8 +76,13 @@ void * func(void * arg)
   return 0;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_namenp1(void)
+#endif
 {
   pthread_t t;
 

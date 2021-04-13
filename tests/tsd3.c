@@ -134,8 +134,13 @@ mythread(void * arg)
   return 0;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main()
+main(void)
+#else 
+int
+test_tsd3(void)
+#endif
 {
   int i;
   int fail = 0;

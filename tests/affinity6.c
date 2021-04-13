@@ -62,8 +62,13 @@ mythread(void * arg)
   return (void*) 0;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
 main()
+#else 
+int
+test_affinity6(void)
+#endif
 {
   unsigned int cpu;
   pthread_t tid;

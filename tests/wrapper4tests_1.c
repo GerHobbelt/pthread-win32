@@ -25,6 +25,7 @@ int test_affinity2(void);
 int test_affinity3(void);
 int test_affinity4(void);
 int test_affinity5(void);
+int test_affinity6(void);
 int test_barrier1(void);
 int test_barrier2(void);
 int test_barrier3(void);
@@ -46,6 +47,7 @@ int test_cancel6d(void);
 int test_cancel7(void);
 int test_cancel8(void);
 int test_cancel9(void);
+int test_cancel10(void);
 int test_cleanup0(void);
 int test_cleanup1(void);
 int test_cleanup2(void);
@@ -86,6 +88,7 @@ int test_exit2(void);
 int test_exit3(void);
 int test_exit4(void);
 int test_exit5(void);
+int test_exit6(void);
 int test_eyal1(void);
 int test_inherit1(void);
 int test_join0(void);
@@ -94,6 +97,7 @@ int test_join2(void);
 int test_join3(void);
 int test_join4(void);
 int test_kill1(void);
+int test_kill2(void);
 int test_loadfree(void);
 int test_mutex1(void);
 int test_mutex1e(void);
@@ -122,6 +126,8 @@ int test_mutex8(void);
 int test_mutex8e(void);
 int test_mutex8n(void);
 int test_mutex8r(void);
+int test_namenp1(void);
+int test_namenp2(void);
 int test_once1(void);
 int test_once2(void);
 int test_once3(void);
@@ -129,6 +135,7 @@ int test_once4(void);
 int test_openmp1(int argc, char *argv[]);
 int test_priority1(void);
 int test_priority2(void);
+int test_reinit1(void);
 int test_reuse1(void);
 int test_reuse2(void);
 int test_robust1(void);
@@ -166,10 +173,13 @@ int test_spin2(void);
 int test_spin3(void);
 int test_spin4(void);
 int test_stress1(void);
+int test_threestage(int argc, char* argv[]);
+int test_timeouts(void);
 int test_tryentercs(void);
 int test_tryentercs2(void);
 int test_tsd1(void);
 int test_tsd2(void);
+int test_tsd3(void);
 int test_valid1(void);
 int test_valid2(void);
 
@@ -206,6 +216,8 @@ static int Test_Wrapper(f_f * fp, const char *f_n)
 		printf("TEST %s FAILED\n", f_n);
 	}
 	Sleep(10);
+	pthread_win32_process_detach_np(); // ptw32_processTerminate();
+	pthread_win32_process_attach_np(); // ptw32_processInitialize();
 	return ret;
 }
 
@@ -224,6 +236,8 @@ static int Test_Wrapper_w_argv(fwa_f * fp, const char *f_n, int argc, char **arg
 		printf("TEST %s FAILED\n", f_n);
 	}
 	Sleep(10);
+	pthread_win32_process_detach_np(); // ptw32_processTerminate();
+	pthread_win32_process_attach_np(); // ptw32_processInitialize();
 	return ret;
 }
 
@@ -240,12 +254,6 @@ int main(int argc, char **argv)
 
 	atexit(&exit_handler);
 
-	TEST_WRAPPER(test_loadfree);
-	TEST_WRAPPER(test_cancel8);
-	TEST_WRAPPER(test_sequence2);
-
-	pthread_win32_process_detach_np(); // ptw32_processTerminate();
-	pthread_win32_process_attach_np(); // ptw32_processInitialize();
 	/*
 	  fails when run down below; does not fail when run at start of run - turns out to be
 	  due to the thread reuse logic kicking in and the test code not anticipating that
@@ -253,38 +261,33 @@ int main(int argc, char **argv)
 	  introduction of test sequence2.c above to showcase the fix for this, including
 	  augmentation of pthread_win32_process_attach_np() to prevent crashes.
 	*/
+	TEST_WRAPPER(test_loadfree);
+	TEST_WRAPPER(test_cancel8);
+	TEST_WRAPPER(test_sequence2);
+
 	TEST_WRAPPER(test_reuse1);
 
-    pthread_win32_process_detach_np(); // ptw32_processTerminate();
-	pthread_win32_process_attach_np(); // ptw32_processInitialize();
 	TEST_WRAPPER(test_sequence1); /* fails when run down below; does not fail when run at start of run - same issue as test reuse1 */
 
-    pthread_win32_process_detach_np(); // ptw32_processTerminate();
-	pthread_win32_process_attach_np(); // ptw32_processInitialize();
 	TEST_WRAPPER(test_cancel7);
-	//TEST_WRAPPER(test_cancel8);
 	TEST_WRAPPER(test_cleanup1);
 	TEST_WRAPPER(test_condvar7);
 	TEST_WRAPPER(test_condvar9);
 	TEST_WRAPPER(test_exception1);
-	//TEST_WRAPPER(test_sequence1);
+	TEST_WRAPPER(test_sequence1);
 
 	TEST_WRAPPER(test_affinity1);
 	TEST_WRAPPER(test_affinity2);
 	TEST_WRAPPER(test_affinity3);
 	TEST_WRAPPER(test_affinity4);
 	TEST_WRAPPER(test_affinity5);
+	TEST_WRAPPER(test_affinity6);
 	TEST_WRAPPER(test_barrier1);
 	TEST_WRAPPER(test_barrier2);
 	TEST_WRAPPER(test_barrier3);
 	TEST_WRAPPER(test_barrier4);
 	TEST_WRAPPER(test_barrier5);
 	TEST_WRAPPER(test_barrier6);
-	TEST_WRAPPER(test_benchtest1);
-	TEST_WRAPPER(test_benchtest2);
-	TEST_WRAPPER(test_benchtest3);
-	TEST_WRAPPER(test_benchtest4);
-	TEST_WRAPPER(test_benchtest5);
 	TEST_WRAPPER(test_cancel1);
 	TEST_WRAPPER(test_cancel2);
 	TEST_WRAPPER(test_cancel3);
@@ -295,6 +298,7 @@ int main(int argc, char **argv)
 //	TEST_WRAPPER(test_cancel7);
 //	TEST_WRAPPER(test_cancel8);
 	TEST_WRAPPER(test_cancel9);
+	TEST_WRAPPER(test_cancel10);
 	TEST_WRAPPER(test_cleanup0);
 //	TEST_WRAPPER(test_cleanup1);
 	TEST_WRAPPER(test_cleanup2);
@@ -320,12 +324,14 @@ int main(int argc, char **argv)
 	TEST_WRAPPER(test_create1);
 	TEST_WRAPPER(test_create2);
 	TEST_WRAPPER(test_create3);
+	TEST_WRAPPER_W_ARGV(test_create3a);
 	TEST_WRAPPER(test_delay1);
 	TEST_WRAPPER(test_delay2);
 	TEST_WRAPPER(test_detach1);
 	TEST_WRAPPER(test_equal1);
 	TEST_WRAPPER(test_errno1);
 //	TEST_WRAPPER(test_exception1);
+	TEST_WRAPPER_W_ARGV(test_exception2);
 	TEST_WRAPPER(test_exception3);
 	TEST_WRAPPER(test_exception3_0);
 	//TEST_WRAPPER(test_exit1);
@@ -333,6 +339,7 @@ int main(int argc, char **argv)
 	TEST_WRAPPER(test_exit3);
 	TEST_WRAPPER(test_exit4);
 	TEST_WRAPPER(test_exit5);
+	TEST_WRAPPER(test_exit6);
 	TEST_WRAPPER(test_eyal1);
 	TEST_WRAPPER(test_inherit1);
 	TEST_WRAPPER(test_join0);
@@ -341,7 +348,11 @@ int main(int argc, char **argv)
 	TEST_WRAPPER(test_join3);
 	TEST_WRAPPER(test_join4);
 	TEST_WRAPPER(test_kill1);
-//	TEST_WRAPPER(test_loadfree);
+	TEST_WRAPPER(test_kill2);
+	//	TEST_WRAPPER(test_loadfree);
+	TEST_WRAPPER(test_reinit1);
+	TEST_WRAPPER(test_namenp1);
+	TEST_WRAPPER(test_namenp2);
 	TEST_WRAPPER(test_mutex1);
 	TEST_WRAPPER(test_mutex1e);
 	TEST_WRAPPER(test_mutex1n);
@@ -412,15 +423,21 @@ int main(int argc, char **argv)
 	TEST_WRAPPER(test_spin3);
 	TEST_WRAPPER(test_spin4);
 	TEST_WRAPPER(test_stress1);
+	TEST_WRAPPER_W_ARGV(test_threestage);
+	TEST_WRAPPER(test_timeouts);
 	TEST_WRAPPER(test_tryentercs);
 	TEST_WRAPPER(test_tryentercs2);
 	TEST_WRAPPER(test_tsd1);
 	TEST_WRAPPER(test_tsd2);
+	TEST_WRAPPER(test_tsd3);
 	TEST_WRAPPER(test_valid1);
 	TEST_WRAPPER(test_valid2);
 
-	TEST_WRAPPER_W_ARGV(test_create3a);
-	TEST_WRAPPER_W_ARGV(test_exception2);
+	TEST_WRAPPER(test_benchtest1);
+	TEST_WRAPPER(test_benchtest2);
+	TEST_WRAPPER(test_benchtest3);
+	TEST_WRAPPER(test_benchtest4);
+	TEST_WRAPPER(test_benchtest5);
 
 	/* test_exit1 should be the VERY LAST test of the bunch as it will exit the application before it returns! */
 	TEST_WRAPPER(test_exit1);

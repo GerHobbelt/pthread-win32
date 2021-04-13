@@ -19,7 +19,7 @@ static int where;
 static unsigned __stdcall
 start_routine(void * arg)
 {
-  int *val = (int *) malloc(4);
+  int *val = (int *) malloc(sizeof(int));
 
   where = 2;
   //printf("start_routine: native thread\n");
@@ -40,7 +40,13 @@ key_dtor(void *arg)
   free(arg);
 }
 
-int main(int argc, char **argv)
+#ifndef MONOLITHIC_PTHREAD_TESTS
+int
+main()
+#else 
+int
+test_exit6(void)
+#endif
 {
   HANDLE hthread;
 

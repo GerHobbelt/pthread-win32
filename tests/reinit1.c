@@ -12,10 +12,7 @@
 
 #include "test.h"
 #include <sys/timeb.h>
-
-#ifdef __GNUC__
 #include <stdlib.h>
-#endif
 
 #define THREADS         5
 #define DATASIZE        7
@@ -49,7 +46,7 @@ static data_t data[DATASIZE];
 /*
  * Thread start routine that uses read-write locks
  */
-void *thread_routine (void *arg)
+static void *thread_routine (void *arg)
 {
   thread_t *self = (thread_t*)arg;
   int iteration;
@@ -102,18 +99,20 @@ void *thread_routine (void *arg)
   return NULL;
 }
 
+#ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main (int argc, char *argv[])
+main()
+#else 
+int
+test_reinit1(void)
+#endif
 {
   int count;
   int data_count;
   int reinit_count;
-  int thread_updates = 0;
-  int data_updates = 0;
   int seed = 1;
 
   PTW32_STRUCT_TIMEB currSysTime1;
-  PTW32_STRUCT_TIMEB currSysTime2;
 
   for (reinit_count = 0; reinit_count < LOOPS; reinit_count++)
     {

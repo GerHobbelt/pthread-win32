@@ -54,8 +54,13 @@
     <None Include="..\..\tests\Wmakefile">
       <Filter>Documentation</Filter>
     </None>
-    <None Include="..\Debug.txt" />
     <None Include="..\..\tests\Bmakefile">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\..\tests\Debug.plg">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\Debug.txt">
       <Filter>Documentation</Filter>
     </None>
   </ItemGroup>
@@ -520,13 +525,48 @@
     <ClCompile Include="..\..\tests\valid2.c">
       <Filter>TestSources</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\tests\affinity6.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\cancel10.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\exit6.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\kill2.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\name_np1.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\name_np2.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\reinit1.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\threestage.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\timeouts.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\tsd3.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tests\benchtest.h">
-      <Filter>TestSources</Filter>
+      <Filter>Headerfiles</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tests\test.h">
-      <Filter>TestSources</Filter>
+      <Filter>Headerfiles</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\tests\Debug.txt">
+      <Filter>Documentation</Filter>
+    </Text>
   </ItemGroup>
 </Project>
