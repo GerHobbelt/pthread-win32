@@ -116,6 +116,8 @@ Win32thread(void * arg)
 {
   bag_t * bag = (bag_t *) arg;
 
+  assert(bag->threadnum > 0);
+  assert(bag->threadnum <= NUMTHREADS);
   assert(bag == &threadbag[bag->threadnum]);
   assert(bag->started == 0);
   bag->started = 1;
@@ -146,6 +148,7 @@ test_cancel8(void)
   HANDLE h[NUMTHREADS + 1];
   unsigned thrAddr; /* Dummy variable to pass a valid location to _beginthreadex (Win98). */
 
+  memset(threadbag, 0, sizeof(threadbag));
   for (i = 1; i <= NUMTHREADS; i++)
     {
       threadbag[i].started = 0;
@@ -168,7 +171,10 @@ test_cancel8(void)
   for (i = 1; i <= NUMTHREADS; i++)
     {
       assert(pthread_kill(threadbag[i].self, 0) == 0);
-      assert(pthread_cancel(threadbag[i].self) == 0);
+      int rv = pthread_cancel(threadbag[i].self);
+      if (rv != 0)
+          fprintf(stderr, "Thread %d: rv = %d\n", i, rv);
+      assert(rv == 0 /* || rv == ESRCH */ );
     }
 
   /*
@@ -209,7 +215,10 @@ test_cancel8(void)
 #endif
 
       assert(threadbag[i].self.p != NULL);
-      assert(pthread_kill(threadbag[i].self, 0) == ESRCH);
+      int rv = pthread_kill(threadbag[i].self, 0);
+      if (rv != ESRCH)
+          fprintf(stderr, "Thread %d: rv = %d\n", i, rv);
+      assert(rv == ESRCH /* || rv == 0 */ );
 
       fail = (result != (int)(size_t)PTHREAD_CANCELED);
 

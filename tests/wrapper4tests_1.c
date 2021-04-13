@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
 
 #ifndef MONOLITHIC_PTHREAD_TESTS
@@ -204,6 +205,7 @@ static int Test_Wrapper(f_f * fp, const char *f_n)
 	{
 		printf("TEST %s FAILED\n", f_n);
 	}
+	Sleep(10);
 	return ret;
 }
 
@@ -221,6 +223,7 @@ static int Test_Wrapper_w_argv(fwa_f * fp, const char *f_n, int argc, char **arg
 	{
 		printf("TEST %s FAILED\n", f_n);
 	}
+	Sleep(10);
 	return ret;
 }
 
@@ -237,6 +240,8 @@ int main(int argc, char **argv)
 
 	atexit(&exit_handler);
 
+	TEST_WRAPPER(test_loadfree);
+	TEST_WRAPPER(test_cancel8);
 	TEST_WRAPPER(test_sequence2);
 
 	pthread_win32_process_detach_np(); // ptw32_processTerminate();
@@ -257,13 +262,12 @@ int main(int argc, char **argv)
     pthread_win32_process_detach_np(); // ptw32_processTerminate();
 	pthread_win32_process_attach_np(); // ptw32_processInitialize();
 	TEST_WRAPPER(test_cancel7);
-	TEST_WRAPPER(test_cancel8);
+	//TEST_WRAPPER(test_cancel8);
 	TEST_WRAPPER(test_cleanup1);
 	TEST_WRAPPER(test_condvar7);
 	TEST_WRAPPER(test_condvar9);
 	TEST_WRAPPER(test_exception1);
-	TEST_WRAPPER(test_loadfree);
-	TEST_WRAPPER(test_sequence1);
+	//TEST_WRAPPER(test_sequence1);
 
 	TEST_WRAPPER(test_affinity1);
 	TEST_WRAPPER(test_affinity2);
@@ -324,6 +328,7 @@ int main(int argc, char **argv)
 //	TEST_WRAPPER(test_exception1);
 	TEST_WRAPPER(test_exception3);
 	TEST_WRAPPER(test_exception3_0);
+	//TEST_WRAPPER(test_exit1);
 	TEST_WRAPPER(test_exit2);
 	TEST_WRAPPER(test_exit3);
 	TEST_WRAPPER(test_exit4);
@@ -413,7 +418,6 @@ int main(int argc, char **argv)
 	TEST_WRAPPER(test_tsd2);
 	TEST_WRAPPER(test_valid1);
 	TEST_WRAPPER(test_valid2);
-
 
 	TEST_WRAPPER_W_ARGV(test_create3a);
 	TEST_WRAPPER_W_ARGV(test_exception2);
