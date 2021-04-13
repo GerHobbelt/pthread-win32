@@ -95,7 +95,7 @@ test_semaphore3(void)
 {
   int value = 0;
   int i;
-  pthread_t t[MAX_COUNT+1];
+  pthread_t t[MAX_COUNT + 1];
 
   assert(sem_init(&s, PTHREAD_PROCESS_PRIVATE, 0) == 0);
   assert(sem_getvalue(&s, &value) == 0);
@@ -123,7 +123,7 @@ test_semaphore3(void)
       assert(-value == i);
     }
 
-  for (i = MAX_COUNT - 1; i >= 0; i--)
+  for (i = MAX_COUNT; i > 0; i--)
     {
       pthread_join(t[i], NULL);
     }
