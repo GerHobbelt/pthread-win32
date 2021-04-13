@@ -66,7 +66,7 @@
  * structures.
  *
  * pthread_kill() eventually calls a routine similar to
- * __ptw32_cancel_thread() which manipulates the target
+ * ptw32_cancel_thread() which manipulates the target
  * threads processor context to cause the thread to
  * run the handler launcher routine. pthread_kill() must
  * save the target threads current context so that the
@@ -89,12 +89,12 @@
 #if defined(HAVE_SIGSET_T)
 
 static void
-__ptw32_signal_thread ()
+ptw32_signal_thread ()
 {
 }
 
 static void
-__ptw32_signal_callhandler ()
+ptw32_signal_callhandler ()
 {
 }
 

@@ -76,21 +76,21 @@
 
 INLINE
 int
-__ptw32_robust_mutex_inherit(pthread_mutex_t * mutex)
+ptw32_robust_mutex_inherit(pthread_mutex_t * mutex)
 {
   int result;
   pthread_mutex_t mx = *mutex;
-  __ptw32_robust_node_t* robust = mx->robustNode;
+  ptw32_robust_node_t* robust = mx->robustNode;
 
-  switch ((LONG)__PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
-             (__PTW32_INTERLOCKED_LONGPTR)&robust->stateInconsistent,
-             (__PTW32_INTERLOCKED_LONG)__PTW32_ROBUST_INCONSISTENT,
-             (__PTW32_INTERLOCKED_LONG)-1 /* The terminating thread sets this */))
+  switch ((LONG)PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
+            (PTW32_INTERLOCKED_LONGPTR)&robust->stateInconsistent,
+            (PTW32_INTERLOCKED_LONG)PTW32_ROBUST_INCONSISTENT,
+            (PTW32_INTERLOCKED_LONG)-1 /* The terminating thread sets this */))
     {
       case -1L:
           result = EOWNERDEAD;
           break;
-      case (LONG)__PTW32_ROBUST_NOTRECOVERABLE:
+      case (LONG)PTW32_ROBUST_NOTRECOVERABLE:
           result = ENOTRECOVERABLE;
           break;
       default:
@@ -115,12 +115,12 @@ __ptw32_robust_mutex_inherit(pthread_mutex_t * mutex)
 
 INLINE
 void
-__ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self)
+ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self)
 {
-  __ptw32_robust_node_t** list;
+  ptw32_robust_node_t** list;
   pthread_mutex_t mx = *mutex;
-  __ptw32_thread_t* tp = (__ptw32_thread_t*)self.p;
-  __ptw32_robust_node_t* robust = mx->robustNode;
+  ptw32_thread_t* tp = (ptw32_thread_t*)self.p;
+  ptw32_robust_node_t* robust = mx->robustNode;
 
   list = &tp->robustMxList;
   mx->ownerThread = self;
@@ -141,13 +141,13 @@ __ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self)
 
 INLINE
 void
-__ptw32_robust_mutex_remove(pthread_mutex_t* mutex, __ptw32_thread_t* otp)
+ptw32_robust_mutex_remove(pthread_mutex_t* mutex, ptw32_thread_t* otp)
 {
-  __ptw32_robust_node_t** list;
+  ptw32_robust_node_t** list;
   pthread_mutex_t mx = *mutex;
-  __ptw32_robust_node_t* robust = mx->robustNode;
+  ptw32_robust_node_t* robust = mx->robustNode;
 
-  list = &(((__ptw32_thread_t*)mx->ownerThread.p)->robustMxList);
+  list = &(((ptw32_thread_t*)mx->ownerThread.p)->robustMxList);
   mx->ownerThread.p = otp;
   if (robust->next != NULL)
     {
@@ -179,10 +179,10 @@ pthread_mutex_consistent (pthread_mutex_t* mutex)
     }
 
   if (mx->kind >= 0
-        ||  (__PTW32_INTERLOCKED_LONG)__PTW32_ROBUST_INCONSISTENT !=  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
-                                                 (__PTW32_INTERLOCKED_LONGPTR)&mx->robustNode->stateInconsistent,
-                                                 (__PTW32_INTERLOCKED_LONG)__PTW32_ROBUST_CONSISTENT,
-                                                 (__PTW32_INTERLOCKED_LONG)__PTW32_ROBUST_INCONSISTENT))
+        || (PTW32_INTERLOCKED_LONG)PTW32_ROBUST_INCONSISTENT != PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
+                                                (PTW32_INTERLOCKED_LONGPTR)&mx->robustNode->stateInconsistent,
+                                                (PTW32_INTERLOCKED_LONG)PTW32_ROBUST_CONSISTENT,
+                                                (PTW32_INTERLOCKED_LONG)PTW32_ROBUST_INCONSISTENT))
     {
       result = EINVAL;
     }

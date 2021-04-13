@@ -80,7 +80,7 @@ static int washere = 0;
 void * func(void * arg)
 {
   washere = 1;
-  return (void *) 0; 
+  return (void *) 0;
 }
  
 int

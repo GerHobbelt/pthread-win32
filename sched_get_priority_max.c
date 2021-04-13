@@ -122,15 +122,15 @@ sched_get_priority_max (int policy)
 {
   if (policy < SCHED_MIN || policy > SCHED_MAX)
     {
-       __PTW32_SET_ERRNO(EINVAL);
+      PTW32_SET_ERRNO(EINVAL);
       return -1;
     }
 
 #if (THREAD_PRIORITY_LOWEST > THREAD_PRIORITY_NORMAL)
   /* WinCE? */
-  return  __PTW32_MAX (THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
+  return PTW32_MAX (THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
 #else
   /* This is independent of scheduling policy in Win32. */
-  return  __PTW32_MAX (THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
+  return PTW32_MAX (THREAD_PRIORITY_IDLE, THREAD_PRIORITY_TIME_CRITICAL);
 #endif
 }

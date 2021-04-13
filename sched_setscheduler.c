@@ -57,11 +57,11 @@ sched_setscheduler (pid_t pid, int policy)
       if (pid != selfPid)
 	{
 	  HANDLE h =
-	    OpenProcess (PROCESS_SET_INFORMATION,  __PTW32_FALSE, (DWORD) pid);
+	    OpenProcess (PROCESS_SET_INFORMATION,  PTW32_FALSE, (DWORD) pid);
 
 	  if (NULL == h)
 	    {
-	       __PTW32_SET_ERRNO((GetLastError () == (0xFF & ERROR_ACCESS_DENIED)) ? EPERM : ESRCH);
+	      PTW32_SET_ERRNO((GetLastError () == (0xFF & ERROR_ACCESS_DENIED)) ? EPERM : ESRCH);
 	      return -1;
 	    }
 	  else
@@ -71,7 +71,7 @@ sched_setscheduler (pid_t pid, int policy)
 
   if (SCHED_OTHER != policy)
     {
-       __PTW32_SET_ERRNO(ENOSYS);
+      PTW32_SET_ERRNO(ENOSYS);
       return -1;
     }
 

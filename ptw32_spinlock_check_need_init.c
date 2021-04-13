@@ -41,16 +41,16 @@
 
 
 INLINE int
-__ptw32_spinlock_check_need_init (pthread_spinlock_t * lock)
+ptw32_spinlock_check_need_init (pthread_spinlock_t * lock)
 {
   int result = 0;
-  __ptw32_mcs_local_node_t node;
+  ptw32_mcs_local_node_t node;
 
   /*
    * The following guarded test is specifically for statically
    * initialised spinlocks (via PTHREAD_SPINLOCK_INITIALIZER).
    */
-  __ptw32_mcs_lock_acquire(&__ptw32_spinlock_test_init_lock, &node);
+  ptw32_mcs_lock_acquire(&ptw32_spinlock_test_init_lock, &node);
 
   /*
    * We got here possibly under race
@@ -74,7 +74,7 @@ __ptw32_spinlock_check_need_init (pthread_spinlock_t * lock)
       result = EINVAL;
     }
 
-  __ptw32_mcs_lock_release(&node);
+  ptw32_mcs_lock_release(&node);
 
   return (result);
 }

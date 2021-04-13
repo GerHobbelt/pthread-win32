@@ -39,8 +39,8 @@
 #include <sys/timeb.h>
  
 pthread_spinlock_t lock = PTHREAD_SPINLOCK_INITIALIZER;
-__PTW32_STRUCT_TIMEB currSysTimeStart;
-__PTW32_STRUCT_TIMEB currSysTimeStop;
+PTW32_STRUCT_TIMEB currSysTimeStart;
+PTW32_STRUCT_TIMEB currSysTimeStop;
 
 #define GetDurationMilliSecs(_TStart, _TStop) ((_TStop.time*1000+_TStop.millitm) \
 					       - (_TStart.time*1000+_TStart.millitm))
@@ -49,11 +49,11 @@ static int washere = 0;
 
 void * func(void * arg)
 {
-   __PTW32_FTIME(&currSysTimeStart);
+   PTW32_FTIME(&currSysTimeStart);
   washere = 1;
   assert(pthread_spin_lock(&lock) == 0);
   assert(pthread_spin_unlock(&lock) == 0);
-   __PTW32_FTIME(&currSysTimeStop);
+   PTW32_FTIME(&currSysTimeStop);
 
   return (void *)(size_t)GetDurationMilliSecs(currSysTimeStart, currSysTimeStop);
 }
@@ -64,7 +64,7 @@ main()
   void* result = (void*)0;
   pthread_t t;
   int CPUs;
-   __PTW32_STRUCT_TIMEB sysTime;
+   PTW32_STRUCT_TIMEB sysTime;
 
   if ((CPUs = pthread_num_processors_np()) == 1)
     {
@@ -84,7 +84,7 @@ main()
   do
     {
       sched_yield();
-       __PTW32_FTIME(&sysTime);
+       PTW32_FTIME(&sysTime);
     }
   while (GetDurationMilliSecs(currSysTimeStart, sysTime) <= 1000);
 

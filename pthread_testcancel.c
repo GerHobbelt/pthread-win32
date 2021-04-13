@@ -70,9 +70,9 @@ pthread_testcancel (void)
       * ------------------------------------------------------
       */
 {
-  __ptw32_mcs_local_node_t stateLock;
+  ptw32_mcs_local_node_t stateLock;
   pthread_t self = pthread_self ();
-  __ptw32_thread_t * sp = (__ptw32_thread_t *) self.p;
+  ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
 
   if (sp == NULL)
     {
@@ -89,17 +89,17 @@ pthread_testcancel (void)
       return;
     }
 
-  __ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
+  ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
 
   if (sp->cancelState != PTHREAD_CANCEL_DISABLE)
     {
       ResetEvent(sp->cancelEvent);
       sp->state = PThreadStateCanceling;
       sp->cancelState = PTHREAD_CANCEL_DISABLE;
-      __ptw32_mcs_lock_release (&stateLock);
-      __ptw32_throw  (__PTW32_EPS_CANCEL);
+      ptw32_mcs_lock_release (&stateLock);
+      ptw32_throw (PTW32_EPS_CANCEL);
       /* Never returns here */
     }
 
-  __ptw32_mcs_lock_release (&stateLock);
+  ptw32_mcs_lock_release (&stateLock);
 }				/* pthread_testcancel */

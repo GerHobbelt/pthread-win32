@@ -55,12 +55,12 @@ pthread_rwlock_rdlock (pthread_rwlock_t * rwlock)
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static rwlock. We check
-   * again inside the guarded section of __ptw32_rwlock_check_need_init()
+   * again inside the guarded section of ptw32_rwlock_check_need_init()
    * to avoid race conditions.
    */
   if (*rwlock == PTHREAD_RWLOCK_INITIALIZER)
     {
-      result = __ptw32_rwlock_check_need_init (rwlock);
+      result = ptw32_rwlock_check_need_init (rwlock);
 
       if (result != 0 && result != EBUSY)
 	{
@@ -70,7 +70,7 @@ pthread_rwlock_rdlock (pthread_rwlock_t * rwlock)
 
   rwl = *rwlock;
 
-  if (rwl->nMagic !=  __PTW32_RWLOCK_MAGIC)
+  if (rwl->nMagic != PTW32_RWLOCK_MAGIC)
     {
       return EINVAL;
     }

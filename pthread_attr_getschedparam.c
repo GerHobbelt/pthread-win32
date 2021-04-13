@@ -44,7 +44,7 @@ int
 pthread_attr_getschedparam (const pthread_attr_t * attr,
 			    struct sched_param *param)
 {
-  if (__ptw32_is_attr (attr) != 0 || param == NULL)
+  if (ptw32_is_attr (attr) != 0 || param == NULL)
     {
       return EINVAL;
     }

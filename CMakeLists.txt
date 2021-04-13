@@ -32,15 +32,15 @@ include (target_arch)
 get_target_arch(TARGET_ARCH)
 
 if(${TARGET_ARCH} STREQUAL "ARM")
-    add_definitions(-D__PTW32_ARCHARM -D_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
+    add_definitions(-DPTW32_ARCHARM -D_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
 elseif(${TARGET_ARCH} STREQUAL "ARM64")
-    add_definitions(-D__PTW32_ARCHARM64 -D_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
+    add_definitions(-DPTW32_ARCHARM64 -D_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
 elseif(${TARGET_ARCH} STREQUAL "x86_64")
-    add_definitions(-D__PTW32_ARCHAMD64)
+    add_definitions(-DPTW32_ARCHAMD64)
 elseif(${TARGET_ARCH} STREQUAL "x86")
-    add_definitions(-D__PTW32_ARCHX86)
+    add_definitions(-DPTW32_ARCHX86)
 elseif(${TARGET_ARCH} STREQUAL "x64")
-    add_definitions(-D__PTW32_ARCHX64)
+    add_definitions(-DPTW32_ARCHX64)
 else()
     MESSAGE(ERROR "\"${TARGET_ARCH}\" not supported in version.rc")
 endif()
@@ -69,7 +69,7 @@ set(TESTDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/test)
 #################################
 # Defs                          #
 #################################
-add_definitions(-D__PTW32_BUILD_INLINED)
+add_definitions(-DPTW32_BUILD_INLINED)
 
 if(MSVC)
 
@@ -84,7 +84,7 @@ if(MSVC)
         set(VCEFLAGS  "/EHs /TP ")
     endif()
 
-    add_definitions(-DHAVE_CONFIG_H -D__PTW32_RC_MSC)
+    add_definitions(-DHAVE_CONFIG_H -DPTW32_RC_MSC)
 
 endif()
 
@@ -120,7 +120,7 @@ macro(static_lib type def)
     set(targ libpthread${type}${PTW32_VER})
     add_library(${targ} STATIC pthread.c)
     message(STATUS ${targ})
-    target_compile_definitions(${targ} PUBLIC "-D${def}" -D__PTW32_STATIC_LIB)
+    target_compile_definitions(${targ} PUBLIC "-D${def}" -DPTW32_STATIC_LIB)
     if(${type} STREQUAL "VCE")
         set_target_properties(${targ} PROPERTIES COMPILE_FLAGS ${VCEFLAGS})
     endif()
@@ -131,13 +131,13 @@ macro(static_lib type def)
     endif()
 endmacro()
 
-shared_lib ( VCE __PTW32_CLEANUP_CXX )
-shared_lib ( VSE __PTW32_CLEANUP_SEH )
-shared_lib ( VC  __PTW32_CLEANUP_C )
+shared_lib ( VCE PTW32_CLEANUP_CXX )
+shared_lib ( VSE PTW32_CLEANUP_SEH )
+shared_lib ( VC  PTW32_CLEANUP_C )
 
-static_lib ( VCE __PTW32_CLEANUP_CXX )
-static_lib ( VSE __PTW32_CLEANUP_SEH )
-static_lib ( VC  __PTW32_CLEANUP_C )
+static_lib ( VCE PTW32_CLEANUP_CXX )
+static_lib ( VSE PTW32_CLEANUP_SEH )
+static_lib ( VC  PTW32_CLEANUP_C )
 
 #################################
 # Install                       #

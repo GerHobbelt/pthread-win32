@@ -46,7 +46,7 @@ pthread_attr_setschedparam (pthread_attr_t * attr,
 {
   int priority;
 
-  if (__ptw32_is_attr (attr) != 0 || param == NULL)
+  if (ptw32_is_attr (attr) != 0 || param == NULL)
     {
       return EINVAL;
     }

@@ -52,10 +52,10 @@ struct old_mutexattr_t_ {
 
 typedef struct old_mutexattr_t_ * old_mutexattr_t;
 
-extern BOOL (WINAPI *__ptw32_try_enter_critical_section)(LPCRITICAL_SECTION);
-extern HINSTANCE __ptw32_h_kernel32;
+extern BOOL (WINAPI *ptw32_try_enter_critical_section)(LPCRITICAL_SECTION);
+extern HINSTANCE ptw32_h_kernel32;
 
-#define  __PTW32_OBJECT_AUTO_INIT ((void *) -1)
+#define  PTW32_OBJECT_AUTO_INIT ((void *) -1)
 
 void dummy_call(int * a);
 void interlocked_inc_with_conditionals(int *a);

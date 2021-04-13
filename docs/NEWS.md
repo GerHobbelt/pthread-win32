@@ -8,7 +8,7 @@ Note that this is a new major release. The major version increment
 introduces two ABI changes along with other naming changes that will
 require recompilation of linking applications and possibly some textual
 changes to compile-time macro references in configuration and source
-files, e.g. PTW32_* changes to __PTW32_*, ptw32_* to __ptw32_*, etc.
+files, e.g. PTW32_* changes to PTW32_*, ptw32_* to ptw32_*, etc.
 
 License Change
 --------------
@@ -240,8 +240,8 @@ pthread_attr_setname_np()
  - added for compatibility with other POSIX implementations. Because
    some implementations use different *_setname_np() prototypes
    you can define one of the following macros when building the library:
-      __PTW32_COMPATIBILITY_BSD (compatibility with NetBSD, FreeBSD)
-      __PTW32_COMPATIBILITY_TRU64
+      PTW32_COMPATIBILITY_BSD (compatibility with NetBSD, FreeBSD)
+      PTW32_COMPATIBILITY_TRU64
    If not defined then compatibility is with Linux and other equivalents.
    We don't impose a strict limit on the length of the thread name for the
    default compatibility case. Unlike Linux, no default thread name is set.
@@ -335,8 +335,8 @@ Fixed sub-millisecond timeouts, which caused the library to busy wait.
 - Mark Smith
 
 Fix a race condition and crash in MCS locks. The waiter queue management
-code in __ptw32_mcs_lock_acquire was racing with the queue management code
-in __ptw32_mcs_lock_release and causing a segmentation fault.
+code in ptw32_mcs_lock_acquire was racing with the queue management code
+in ptw32_mcs_lock_release and causing a segmentation fault.
 - Anurag Sharma
 - Jonathan Brown (also reported this bug and provided a fix)
 
@@ -897,7 +897,7 @@ suffix (1) in this snapshot. E.g. pthreadVC1.dll etc.
 has been kept as default, but the behaviour can now be controlled when the DLL
 is built to effectively switch it off. This makes the library much more
 sensitive to applications that assume that POSIX thread IDs are unique, i.e.
-are not strictly compliant with POSIX. See the  __PTW32_THREAD_ID_REUSE_INCREMENT
+are not strictly compliant with POSIX. See the  PTW32_THREAD_ID_REUSE_INCREMENT
 macro comments in config.h for details.
 
 Other changes
@@ -1017,7 +1017,7 @@ Bug fixes
 * Bug and memory leak in sem_init()
 - Alex Blanco  <Alex.Blanco at motorola.com>
 
-* __ptw32_getprocessors() now returns CPU count of 1 for WinCE.
+* ptw32_getprocessors() now returns CPU count of 1 for WinCE.
 - James Ewing  <james.ewing at sveasoft.com>
 
 * pthread_cond_wait() could be canceled at a point where it should not
@@ -1078,7 +1078,7 @@ SNAPSHOT 2003-09-04
 
 Bug fixes
 ---------
-* __ptw32_cancelableWait() now allows cancellation of waiting implicit POSIX
+* ptw32_cancelableWait() now allows cancellation of waiting implicit POSIX
 threads.
 
 New test
@@ -1207,13 +1207,13 @@ Bug fixes
 * sem_timedwait() now uses tighter checks for unreasonable
 abstime values - that would result in unexpected timeout values.
 
-* __ptw32_cond_wait_cleanup() no longer mysteriously consumes
+* ptw32_cond_wait_cleanup() no longer mysteriously consumes
 CV signals but may produce more spurious wakeups. It is believed
 that the sem_timedwait() call is consuming a CV signal that it
 shouldn't.
 - Alexander Terekhov  <TEREKHOV@de.ibm.com>
 
-* Fixed a memory leak in __ptw32_threadDestroy() for implicit threads.
+* Fixed a memory leak in ptw32_threadDestroy() for implicit threads.
 
 * Fixed potential for deadlock in pthread_cond_destroy().
 A deadlock could occur for statically declared CVs (PTHREAD_COND_INITIALIZER),
@@ -1230,13 +1230,13 @@ Cleanup code default style. (IMPORTANT)
 Previously, if not defined, the cleanup style was determined automatically
 from the compiler/language, and one of the following was defined accordingly:
 
-        __PTW32_CLEANUP_SEH   MSVC only
-        __PTW32_CLEANUP_CXX   C++, including MSVC++, GNU G++
-        __PTW32_CLEANUP_C             C, including GNU GCC, not MSVC
+        PTW32_CLEANUP_SEH   MSVC only
+        PTW32_CLEANUP_CXX   C++, including MSVC++, GNU G++
+        PTW32_CLEANUP_C             C, including GNU GCC, not MSVC
 
 These defines determine the style of cleanup (see pthread.h) and,
 most importantly, the way that cancellation and thread exit (via
-pthread_exit) is performed (see the routine __ptw32_throw() in private.c).
+pthread_exit) is performed (see the routine ptw32_throw() in private.c).
 
 In short, the exceptions versions of the library throw an exception
 when a thread is canceled or exits (via pthread_exit()), which is
@@ -1245,8 +1245,8 @@ the correct stack unwinding occurs regardless of where the thread
 is when it's canceled or exits via pthread_exit().
 
 In this and future snapshots, unless the build explicitly defines (e.g.
-via a compiler option) __PTW32_CLEANUP_SEH, __PTW32_CLEANUP_CXX, or __PTW32_CLEANUP_C, then
-the build NOW always defaults to __PTW32_CLEANUP_C style cleanup. This style
+via a compiler option) PTW32_CLEANUP_SEH, PTW32_CLEANUP_CXX, or PTW32_CLEANUP_C, then
+the build NOW always defaults to PTW32_CLEANUP_C style cleanup. This style
 uses setjmp/longjmp in the cancellation and pthread_exit implementations,
 and therefore won't do stack unwinding even when linked to applications
 that have it (e.g. C++ apps). This is for consistency with most
@@ -1254,17 +1254,17 @@ current commercial Unix POSIX threads implementations. Compaq's TRU64
 may be an exception (no pun intended) and possible future trend.
 
 Although it was not clearly documented before, it is still necessary to
-build your application using the same __PTW32_CLEANUP_* define as was
+build your application using the same PTW32_CLEANUP_* define as was
 used for the version of the library that you link with, so that the
 correct parts of pthread.h are included. That is, the possible
 defines require the following library versions:
 
-        __PTW32_CLEANUP_SEH   pthreadVSE.dll
-        __PTW32_CLEANUP_CXX   pthreadVCE.dll or pthreadGCE.dll
-        __PTW32_CLEANUP_C     pthreadVC.dll or pthreadGC.dll
+        PTW32_CLEANUP_SEH   pthreadVSE.dll
+        PTW32_CLEANUP_CXX   pthreadVCE.dll or pthreadGCE.dll
+        PTW32_CLEANUP_C     pthreadVC.dll or pthreadGC.dll
 
 E.g. regardless of whether your app is C or C++, if you link with
-pthreadVC.lib or libpthreadGC.a, then you must define __PTW32_CLEANUP_C.
+pthreadVC.lib or libpthreadGC.a, then you must define PTW32_CLEANUP_C.
 
 
 THE POINT OF ALL THIS IS: if you have not been defining one of these
@@ -1275,13 +1275,13 @@ THIS NOW CHANGES, as has been explained above, but to try to make this
 clearer here's an example:
 
 If you were building your application with MSVC++ i.e. using C++
-exceptions and not explicitly defining one of __PTW32_CLEANUP_*, then
-__PTW32_CLEANUP_C++ was automatically defined for you in pthread.h.
+exceptions and not explicitly defining one of PTW32_CLEANUP_*, then
+PTW32_CLEANUP_C++ was automatically defined for you in pthread.h.
 You should have been linking with pthreadVCE.dll, which does
 stack unwinding.
 
 If you now build your application as you had before, pthread.h will now
-automatically set __PTW32_CLEANUP_C as the default style, and you will need to
+automatically set PTW32_CLEANUP_C as the default style, and you will need to
 link with pthreadVC.dll. Stack unwinding will now NOT occur when a thread
 is canceled, or the thread calls pthread_exit().
 
@@ -1291,7 +1291,7 @@ instantiated objects may not be destroyed or cleaned up after a thread
 is canceled.
 
 If you want the same behaviour as before, then you must now define
-__PTW32_CLEANUP_C++ explicitly using a compiler option and link with
+PTW32_CLEANUP_C++ explicitly using a compiler option and link with
 pthreadVCE.dll as you did before.
 
 
@@ -1434,7 +1434,7 @@ consistent with Solaris.
 - Thomas Pfaff <tpfaff@gmx.net>
 
 * Found a fix for the library and workaround for applications for
-the known bug #2, i.e. where __PTW32_CLEANUP_CXX or __PTW32_CLEANUP_SEH is defined.
+the known bug #2, i.e. where PTW32_CLEANUP_CXX or PTW32_CLEANUP_SEH is defined.
 See the "Known Bugs in this snapshot" section below.
 
 This could be made transparent to applications by replacing the macros that

@@ -51,7 +51,7 @@
 HANDLE
 pthread_getw32threadhandle_np (pthread_t thread)
 {
-  return ((__ptw32_thread_t *)thread.p)->threadH;
+  return ((ptw32_thread_t *)thread.p)->threadH;
 }
 
 /*
@@ -63,5 +63,5 @@ pthread_getw32threadhandle_np (pthread_t thread)
 DWORD
 pthread_getw32threadid_np (pthread_t thread)
 {
-  return ((__ptw32_thread_t *)thread.p)->thread;
+  return ((ptw32_thread_t *)thread.p)->thread;
 }

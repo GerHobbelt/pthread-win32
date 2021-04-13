@@ -45,13 +45,13 @@
 
 #include "benchtest.h"
 
-#define  __PTW32_MUTEX_TYPES
+#define  PTW32_MUTEX_TYPES
 #define ITERATIONS      10000000L
 
 pthread_mutex_t mx;
 pthread_mutexattr_t ma;
-__PTW32_STRUCT_TIMEB currSysTimeStart;
-__PTW32_STRUCT_TIMEB currSysTimeStop;
+PTW32_STRUCT_TIMEB currSysTimeStart;
+PTW32_STRUCT_TIMEB currSysTimeStop;
 long durationMilliSecs;
 long overHeadMilliSecs = 0;
 int two = 2;
@@ -67,16 +67,16 @@ int iter;
  * when doing the overhead timing with an empty loop.
  */
 #define TESTSTART \
-  { int i, j = 0, k = 0;  __PTW32_FTIME(&currSysTimeStart); for (i = 0; i < ITERATIONS; i++) { j++;
+  { int i, j = 0, k = 0;  PTW32_FTIME(&currSysTimeStart); for (i = 0; i < ITERATIONS; i++) { j++;
 
 #define TESTSTOP \
-  };  __PTW32_FTIME(&currSysTimeStop); if (j + k == i) j++; }
+  };  PTW32_FTIME(&currSysTimeStop); if (j + k == i) j++; }
 
 
 void
 runTest (char * testNameString, int mType)
 {
-#ifdef  __PTW32_MUTEX_TYPES
+#ifdef  PTW32_MUTEX_TYPES
   assert(pthread_mutexattr_settype(&ma, mType) == 0);
 #endif
   assert(pthread_mutex_init(&mx, &ma) == 0);
@@ -222,7 +222,7 @@ main (int argc, char *argv[])
   /*
    * Now we can start the actual tests
    */
-#ifdef  __PTW32_MUTEX_TYPES
+#ifdef  PTW32_MUTEX_TYPES
   runTest("PTHREAD_MUTEX_DEFAULT", PTHREAD_MUTEX_DEFAULT);
 
   runTest("PTHREAD_MUTEX_NORMAL", PTHREAD_MUTEX_NORMAL);
@@ -238,7 +238,7 @@ main (int argc, char *argv[])
 
   pthread_mutexattr_setrobust(&ma, PTHREAD_MUTEX_ROBUST);
 
-#ifdef  __PTW32_MUTEX_TYPES
+#ifdef  PTW32_MUTEX_TYPES
   runTest("PTHREAD_MUTEX_DEFAULT (Robust)", PTHREAD_MUTEX_DEFAULT);
 
   runTest("PTHREAD_MUTEX_NORMAL (Robust)", PTHREAD_MUTEX_NORMAL);

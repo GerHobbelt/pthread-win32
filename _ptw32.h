@@ -35,18 +35,18 @@
  * --------------------------------------------------------------------------
  */
 
-#ifndef __PTW32_H
-#define __PTW32_H
+#ifndef PTW32_H
+#define PTW32_H
 
 /* See the README file for an explanation of the pthreads4w
  * version numbering scheme and how the DLL is named etc.
  */
-#define  __PTW32_VERSION_MAJOR 3
-#define  __PTW32_VERSION_MINOR 0
-#define  __PTW32_VERSION_MICRO 2
-#define  __PTW32_VERION_BUILD 0
-#define  __PTW32_VERSION 3,0,2,0
-#define  __PTW32_VERSION_STRING "3, 0, 2, 0\0"
+#define  PTW32_VERSION_MAJOR 3
+#define  PTW32_VERSION_MINOR 0
+#define  PTW32_VERSION_MICRO 2
+#define  PTW32_VERION_BUILD 0
+#define  PTW32_VERSION 3,0,2,0
+#define  PTW32_VERSION_STRING "3, 0, 2, 0\0"
 
 #if defined(__GNUC__)
 # pragma GCC system_header
@@ -56,23 +56,23 @@
 #endif
 
 #if defined (__cplusplus)
-# define __PTW32_BEGIN_C_DECLS  extern "C" {
-# define __PTW32_END_C_DECLS    }
+# define PTW32_BEGIN_C_DECLS  extern "C" {
+# define PTW32_END_C_DECLS    }
 #else
-# define __PTW32_BEGIN_C_DECLS
-# define __PTW32_END_C_DECLS
+# define PTW32_BEGIN_C_DECLS
+# define PTW32_END_C_DECLS
 #endif
 
-#if defined __PTW32_STATIC_LIB
-# define __PTW32_DLLPORT
+#if defined PTW32_STATIC_LIB
+# define PTW32_DLLPORT
 
-#elif defined  __PTW32_BUILD
-# define  __PTW32_DLLPORT __declspec (dllexport)
+#elif defined  PTW32_BUILD
+# define  PTW32_DLLPORT __declspec (dllexport)
 #else
-# define  __PTW32_DLLPORT /*__declspec (dllimport)*/
+# define  PTW32_DLLPORT /*__declspec (dllimport)*/
 #endif
 
-#ifndef  __PTW32_CDECL
+#ifndef  PTW32_CDECL
 /* FIXME: another internal macro; should have two initial underscores;
  * Nominally, we prefer to use __cdecl calling convention for all our
  * functions, but we map it through this macro alias to facilitate the
@@ -92,9 +92,9 @@
    * remember that this must be defined consistently, for both the DLL
    * build, and the application build.
    */
-#  define  __PTW32_CDECL
+#  define  PTW32_CDECL
 # else
-#  define  __PTW32_CDECL __cdecl
+#  define  PTW32_CDECL __cdecl
 # endif
 #endif
 
@@ -103,8 +103,8 @@
  * which is only used when building the pthreads4w libraries.
  */
 
-#if !defined (__PTW32_CONFIG_H) && !defined(__PTW32_PSEUDO_CONFIG_H_SOURCED)
-#  define __PTW32_PSEUDO_CONFIG_H_SOURCED
+#if !defined (PTW32_CONFIG_H) && !defined(PTW32_PSEUDO_CONFIG_H_SOURCED)
+#  define PTW32_PSEUDO_CONFIG_H_SOURCED
 #  if defined(WINCE)
 #    undef  HAVE_CPU_AFFINITY
 #    define NEED_DUPLICATEHANDLE
@@ -119,9 +119,9 @@
 #    if _MSC_VER >= 1900
 #      define HAVE_STRUCT_TIMESPEC
 #    elif _MSC_VER < 1300
-#      define  __PTW32_CONFIG_MSVC6
+#      define  PTW32_CONFIG_MSVC6
 #    elif _MSC_VER < 1400
-#      define  __PTW32_CONFIG_MSVC7
+#      define  PTW32_CONFIG_MSVC7
 #    endif
 #  elif defined(_UWIN)
 #    define HAVE_MODE_T
@@ -148,7 +148,7 @@
 #elif !defined(__MINGW32__)
      typedef _int64 int64_t;
      typedef unsigned _int64 uint64_t;
-#  if defined (__PTW32_CONFIG_MSVC6)
+#  if defined (PTW32_CONFIG_MSVC6)
      typedef long intptr_t;
 #  endif
 #elif defined(HAVE_STDINT_H) && HAVE_STDINT_H == 1
@@ -193,7 +193,7 @@
 #endif
 
 /* POSIX 2008 - related to robust mutexes */
-#if  __PTW32_VERSION_MAJOR > 2
+#if  PTW32_VERSION_MAJOR > 2
 #  if !defined(EOWNERDEAD)
 #    define EOWNERDEAD 1000
 #  endif
@@ -209,4 +209,4 @@
 #  endif
 #endif
 
-#endif	/* !__PTW32_H */
+#endif	/* !PTW32_H */

@@ -45,13 +45,13 @@
 
 
 /*
- * The functions __ptw32_pop_cleanup and __ptw32_push_cleanup
+ * The functions ptw32_pop_cleanup and ptw32_push_cleanup
  * are implemented here for applications written in C with no
  * SEH or C++ destructor support. 
  */
 
-__ptw32_cleanup_t *
-__ptw32_pop_cleanup (int execute)
+ptw32_cleanup_t *
+ptw32_pop_cleanup (int execute)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -77,9 +77,9 @@ __ptw32_pop_cleanup (int execute)
       * ------------------------------------------------------
       */
 {
-  __ptw32_cleanup_t *cleanup;
+  ptw32_cleanup_t *cleanup;
 
-  cleanup = (__ptw32_cleanup_t *) pthread_getspecific (__ptw32_cleanupKey);
+  cleanup = (ptw32_cleanup_t *) pthread_getspecific (ptw32_cleanupKey);
 
   if (cleanup != NULL)
     {
@@ -90,18 +90,18 @@ __ptw32_pop_cleanup (int execute)
 
 	}
 
-      pthread_setspecific (__ptw32_cleanupKey, (void *) cleanup->prev);
+      pthread_setspecific (ptw32_cleanupKey, (void *) cleanup->prev);
 
     }
 
   return (cleanup);
 
-}				/* __ptw32_pop_cleanup */
+}				/* ptw32_pop_cleanup */
 
 
 void
-__ptw32_push_cleanup (__ptw32_cleanup_t * cleanup,
-		    __ptw32_cleanup_callback_t routine, void *arg)
+ptw32_push_cleanup (ptw32_cleanup_t * cleanup,
+		    ptw32_cleanup_callback_t routine, void *arg)
      /*
       * ------------------------------------------------------
       * DOCPUBLIC
@@ -132,7 +132,7 @@ __ptw32_push_cleanup (__ptw32_cleanup_t * cleanup,
       *              b) when the thread acts on a cancellation request,
       *              c) or when the thrad calls pthread_cleanup_pop with a nonzero
       *                 'execute' argument
-      *      NOTE: pthread_push_cleanup, __ptw32_pop_cleanup must be paired
+      *      NOTE: pthread_push_cleanup, ptw32_pop_cleanup must be paired
       *                in the same lexical scope.
       *
       * RESULTS
@@ -145,8 +145,8 @@ __ptw32_push_cleanup (__ptw32_cleanup_t * cleanup,
   cleanup->routine = routine;
   cleanup->arg = arg;
 
-  cleanup->prev = (__ptw32_cleanup_t *) pthread_getspecific (__ptw32_cleanupKey);
+  cleanup->prev = (ptw32_cleanup_t *) pthread_getspecific (ptw32_cleanupKey);
 
-  pthread_setspecific (__ptw32_cleanupKey, (void *) cleanup);
+  pthread_setspecific (ptw32_cleanupKey, (void *) cleanup);
 
-}				/* __ptw32_push_cleanup */
+}				/* ptw32_push_cleanup */

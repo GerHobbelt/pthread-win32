@@ -40,16 +40,16 @@
 #include "implement.h"
 
 INLINE int
-__ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock)
+ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock)
 {
   int result = 0;
-  __ptw32_mcs_local_node_t node;
+  ptw32_mcs_local_node_t node;
 
   /*
    * The following guarded test is specifically for statically
    * initialised rwlocks (via PTHREAD_RWLOCK_INITIALIZER).
    */
-  __ptw32_mcs_lock_acquire(&__ptw32_rwlock_test_init_lock, &node);
+  ptw32_mcs_lock_acquire(&ptw32_rwlock_test_init_lock, &node);
 
   /*
    * We got here possibly under race
@@ -73,7 +73,7 @@ __ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock)
       result = EINVAL;
     }
 
-  __ptw32_mcs_lock_release(&node);
+  ptw32_mcs_lock_release(&node);
 
   return result;
 }

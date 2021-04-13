@@ -112,7 +112,7 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
 		  targetPid = (int) GetCurrentProcessId ();
 		}
 
-	  h = OpenProcess (PROCESS_QUERY_INFORMATION|PROCESS_SET_INFORMATION,  __PTW32_FALSE, (DWORD) targetPid);
+	  h = OpenProcess (PROCESS_QUERY_INFORMATION|PROCESS_SET_INFORMATION, PTW32_FALSE, (DWORD) targetPid);
 
 	  if (NULL == h)
 		{
@@ -163,7 +163,7 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
 
   if (result != 0)
     {
-	   __PTW32_SET_ERRNO(result);
+	  PTW32_SET_ERRNO(result);
 	  return -1;
     }
   else
@@ -173,7 +173,7 @@ sched_setaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
 
 #else
 
-   __PTW32_SET_ERRNO(ENOSYS);
+  PTW32_SET_ERRNO(ENOSYS);
   return -1;
 
 #endif
@@ -242,7 +242,7 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
 		  targetPid = (int) GetCurrentProcessId ();
 	    }
 
-	  h = OpenProcess (PROCESS_QUERY_INFORMATION,  __PTW32_FALSE, (DWORD) targetPid);
+	  h = OpenProcess (PROCESS_QUERY_INFORMATION, PTW32_FALSE, (DWORD) targetPid);
 
 	  if (NULL == h)
 	    {
@@ -269,7 +269,7 @@ sched_getaffinity (pid_t pid, size_t cpusetsize, cpu_set_t *set)
 
   if (result != 0)
     {
-	   __PTW32_SET_ERRNO(result);
+	  PTW32_SET_ERRNO(result);
 	  return -1;
     }
   else

@@ -77,11 +77,11 @@ pthread_detach (pthread_t thread)
       */
 {
   int result;
-  BOOL destroyIt =  __PTW32_FALSE;
-  __ptw32_thread_t * tp = (__ptw32_thread_t *) thread.p;
-  __ptw32_mcs_local_node_t reuseLock;
+  BOOL destroyIt = PTW32_FALSE;
+  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
+  ptw32_mcs_local_node_t reuseLock;
 
-  __ptw32_mcs_lock_acquire(&__ptw32_thread_reuse_lock, &reuseLock);
+  ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &reuseLock);
 
   if (NULL == tp
       || thread.x != tp->ptHandle.x)
@@ -94,21 +94,21 @@ pthread_detach (pthread_t thread)
     }
   else
     {
-      __ptw32_mcs_local_node_t stateLock;
+      ptw32_mcs_local_node_t stateLock;
       /*
-       * Joinable __ptw32_thread_t structs are not scavenged until
+       * Joinable ptw32_thread_t structs are not scavenged until
        * a join or detach is done. The thread may have exited already,
        * but all of the state and locks etc are still there.
        */
       result = 0;
 
-      __ptw32_mcs_lock_acquire (&tp->stateLock, &stateLock);
+      ptw32_mcs_lock_acquire (&tp->stateLock, &stateLock);
       if (tp->state < PThreadStateLast)
         {
           tp->detachState = PTHREAD_CREATE_DETACHED;
           if (tp->state == PThreadStateExiting)
           {
-            destroyIt = __PTW32_TRUE;
+            destroyIt = PTW32_TRUE;
           }
         }
       else if (tp->detachState != PTHREAD_CREATE_DETACHED)
@@ -116,12 +116,12 @@ pthread_detach (pthread_t thread)
           /*
            * Thread is joinable and has exited or is exiting.
            */
-          destroyIt =  __PTW32_TRUE;
+          destroyIt = PTW32_TRUE;
         }
-      __ptw32_mcs_lock_release (&stateLock);
+      ptw32_mcs_lock_release (&stateLock);
     }
 
-  __ptw32_mcs_lock_release(&reuseLock);
+  ptw32_mcs_lock_release(&reuseLock);
 
   if (result == 0)
     {
@@ -133,7 +133,7 @@ pthread_detach (pthread_t thread)
 	   * detached. Need to wait in case it's still exiting.
 	   */
 	  (void) WaitForSingleObject(tp->threadH, INFINITE);
-	  __ptw32_threadDestroy (thread);
+	  ptw32_threadDestroy (thread);
 	}
     }
 

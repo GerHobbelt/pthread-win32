@@ -1,6 +1,6 @@
 /*
  * sched_setschedparam.c
- *
+ * 
  * Description:
  * POSIX thread functions that deal with thread scheduling.
  *
@@ -69,17 +69,17 @@ pthread_setschedparam (pthread_t thread, int policy,
       return ENOTSUP;
     }
 
-  return (__ptw32_setthreadpriority (thread, policy, param->sched_priority));
+  return (ptw32_setthreadpriority (thread, policy, param->sched_priority));
 }
 
 
 int
-__ptw32_setthreadpriority (pthread_t thread, int policy, int priority)
+ptw32_setthreadpriority (pthread_t thread, int policy, int priority)
 {
   int prio;
-  __ptw32_mcs_local_node_t threadLock;
+  ptw32_mcs_local_node_t threadLock;
   int result = 0;
-  __ptw32_thread_t * tp = (__ptw32_thread_t *) thread.p;
+  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
 
   prio = priority;
 
@@ -107,7 +107,7 @@ __ptw32_setthreadpriority (pthread_t thread, int policy, int priority)
 
 #endif
 
-  __ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
+  ptw32_mcs_lock_acquire (&tp->threadLock, &threadLock);
 
   /* If this fails, the current priority is unchanged. */
   if (0 == SetThreadPriority (tp->threadH, prio))
@@ -123,7 +123,7 @@ __ptw32_setthreadpriority (pthread_t thread, int policy, int priority)
       tp->sched_priority = priority;
     }
 
-  __ptw32_mcs_lock_release (&threadLock);
+  ptw32_mcs_lock_release (&threadLock);
 
   return result;
 }

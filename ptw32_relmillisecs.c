@@ -43,11 +43,11 @@ static const int64_t NANOSEC_PER_SEC = 1000000000;
 static const int64_t NANOSEC_PER_MILLISEC = 1000000;
 static const int64_t MILLISEC_PER_SEC = 1000;
 
-#if defined (__PTW32_BUILD_INLINED)
+#if defined (PTW32_BUILD_INLINED)
 INLINE
-#endif /*  __PTW32_BUILD_INLINED */
+#endif /*  PTW32_BUILD_INLINED */
 DWORD
-__ptw32_relmillisecs (const struct timespec * abstime)
+ptw32_relmillisecs (const struct timespec * abstime)
 {
   DWORD milliseconds;
   int64_t tmpAbsNanoseconds;
@@ -82,7 +82,7 @@ __ptw32_relmillisecs (const struct timespec * abstime)
   GetSystemTimeAsFileTime(&ft);
 # endif
 
-  __ptw32_filetime_to_timespec(&ft, &currSysTime);
+  ptw32_filetime_to_timespec(&ft, &currSysTime);
 
   tmpCurrNanoseconds = (int64_t)currSysTime.tv_nsec + ((int64_t)currSysTime.tv_sec * NANOSEC_PER_SEC);
 
@@ -143,7 +143,7 @@ pthread_win32_getabstime_np (struct timespec * abstime, const struct timespec * 
   GetSystemTimeAsFileTime(&ft);
 # endif
 
-  __ptw32_filetime_to_timespec(&ft, &currSysTime);
+  ptw32_filetime_to_timespec(&ft, &currSysTime);
 
   sec = currSysTime.tv_sec;
   nsec = currSysTime.tv_nsec;

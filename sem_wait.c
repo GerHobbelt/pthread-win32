@@ -48,13 +48,13 @@
 #include "implement.h"
 
 
-static void  __PTW32_CDECL
-__ptw32_sem_wait_cleanup(void * sem)
+static void  PTW32_CDECL
+ptw32_sem_wait_cleanup(void * sem)
 {
   sem_t s = (sem_t) sem;
-  __ptw32_mcs_local_node_t node;
+  ptw32_mcs_local_node_t node;
 
-  __ptw32_mcs_lock_acquire(&s->lock, &node);
+  ptw32_mcs_lock_acquire(&s->lock, &node);
   /*
    * If sema is destroyed do nothing, otherwise:-
    * If the sema is posted between us being canceled and us locking
@@ -77,7 +77,7 @@ __ptw32_sem_wait_cleanup(void * sem)
        */
 #endif /* NEED_SEM */
     }
-  __ptw32_mcs_lock_release(&node);
+  ptw32_mcs_lock_release(&node);
 }
 
 int
@@ -111,28 +111,28 @@ sem_wait (sem_t * sem)
  * ------------------------------------------------------
  */
 {
-  __ptw32_mcs_local_node_t node;
+  ptw32_mcs_local_node_t node;
   int v;
   int result = 0;
   sem_t s = *sem;
 
   pthread_testcancel();
 
-  __ptw32_mcs_lock_acquire(&s->lock, &node);
+  ptw32_mcs_lock_acquire(&s->lock, &node);
   v = --s->value;
-  __ptw32_mcs_lock_release(&node);
+  ptw32_mcs_lock_release(&node);
 
   if (v < 0)
     {
-#if defined (__PTW32_CONFIG_MSVC7)
+#if defined (PTW32_CONFIG_MSVC7)
 #pragma inline_depth(0)
 #endif
       /* Must wait */
-      pthread_cleanup_push(__ptw32_sem_wait_cleanup, (void *) s);
+      pthread_cleanup_push(ptw32_sem_wait_cleanup, (void *) s);
       result = pthreadCancelableWait (s->sem);
       /* Cleanup if we're canceled or on any other error */
       pthread_cleanup_pop(result);
-#if defined (__PTW32_CONFIG_MSVC7)
+#if defined (PTW32_CONFIG_MSVC7)
 #pragma inline_depth()
 #endif
     }
@@ -140,24 +140,23 @@ sem_wait (sem_t * sem)
 
   if (!result)
     {
-      __ptw32_mcs_lock_acquire(&s->lock, &node);
+      ptw32_mcs_lock_acquire(&s->lock, &node);
 
       if (s->leftToUnblock > 0)
         {
           --s->leftToUnblock;
           SetEvent(s->sem);
         }
-      __ptw32_mcs_lock_release(&node);
+      ptw32_mcs_lock_release(&node);
     }
 
 #endif /* NEED_SEM */
 
   if (result != 0)
     {
-       __PTW32_SET_ERRNO(result);
+       PTW32_SET_ERRNO(result);
       return -1;
     }
 
   return 0;
-
 }				/* sem_wait */

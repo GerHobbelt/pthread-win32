@@ -42,7 +42,7 @@
 
 
 void
-__ptw32_processTerminate (void)
+ptw32_processTerminate (void)
      /*
       * ------------------------------------------------------
       * DOCPRIVATE
@@ -56,7 +56,7 @@ __ptw32_processTerminate (void)
       *      This function performs process wide termination for
       *      the pthread library.
       *      This routine sets the global variable
-      *      __ptw32_processInitialized to FALSE
+      *      ptw32_processInitialized to FALSE
       *
       * RESULTS
       *              N/A
@@ -64,44 +64,44 @@ __ptw32_processTerminate (void)
       * ------------------------------------------------------
       */
 {
-  if (__ptw32_processInitialized)
+  if (ptw32_processInitialized)
     {
-      __ptw32_thread_t * tp, * tpNext;
-      __ptw32_mcs_local_node_t node;
+      ptw32_thread_t * tp, * tpNext;
+      ptw32_mcs_local_node_t node;
 
-      if (__ptw32_selfThreadKey != NULL)
+      if (ptw32_selfThreadKey != NULL)
 	{
 	  /*
-	   * Release __ptw32_selfThreadKey
+	   * Release ptw32_selfThreadKey
 	   */
-	  pthread_key_delete (__ptw32_selfThreadKey);
+	  pthread_key_delete (ptw32_selfThreadKey);
 
-	  __ptw32_selfThreadKey = NULL;
+	  ptw32_selfThreadKey = NULL;
 	}
 
-      if (__ptw32_cleanupKey != NULL)
+      if (ptw32_cleanupKey != NULL)
 	{
 	  /*
-	   * Release __ptw32_cleanupKey
+	   * Release ptw32_cleanupKey
 	   */
-	  pthread_key_delete (__ptw32_cleanupKey);
+	  pthread_key_delete (ptw32_cleanupKey);
 
-	  __ptw32_cleanupKey = NULL;
+	  ptw32_cleanupKey = NULL;
 	}
 
-      __ptw32_mcs_lock_acquire(&__ptw32_thread_reuse_lock, &node);
+      ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
 
-      tp = __ptw32_threadReuseTop;
-      while (tp !=  __PTW32_THREAD_REUSE_EMPTY)
+      tp = ptw32_threadReuseTop;
+      while (tp != PTW32_THREAD_REUSE_EMPTY)
 	{
 	  tpNext = tp->prevReuse;
 	  free (tp);
 	  tp = tpNext;
 	}
 
-      __ptw32_mcs_lock_release(&node);
+      ptw32_mcs_lock_release(&node);
 
-      __ptw32_processInitialized =  __PTW32_FALSE;
+      ptw32_processInitialized = PTW32_FALSE;
     }
 
 }				/* processTerminate */

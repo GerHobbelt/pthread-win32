@@ -38,7 +38,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-#if defined (__PTW32_COMPATIBILITY_BSD) || defined (__PTW32_COMPATIBILITY_TRU64)
+#if defined (PTW32_COMPATIBILITY_BSD) || defined (PTW32_COMPATIBILITY_TRU64)
 int
 pthread_attr_setname_np(pthread_attr_t * attr, const char *name, void *arg)
 {

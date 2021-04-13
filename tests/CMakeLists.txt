@@ -73,8 +73,8 @@ foreach(t ${TESTS})
         continue()
     endif()
 
-    add_testcase(${test} VCE __PTW32_CLEANUP_CXX )
-    add_testcase(${test} VSE __PTW32_CLEANUP_SEH )
-    add_testcase(${test} VC  __PTW32_CLEANUP_C )
+    add_testcase(${test} VCE PTW32_CLEANUP_CXX )
+    add_testcase(${test} VSE PTW32_CLEANUP_SEH )
+    add_testcase(${test} VC  PTW32_CLEANUP_C )
 
 endforeach(t)

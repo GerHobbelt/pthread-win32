@@ -42,7 +42,7 @@
 
 #if defined(NEED_CALLOC)
 void *
-__ptw32_calloc (size_t n, size_t s)
+ptw32_calloc (size_t n, size_t s)
 {
   unsigned int m = n * s;
   void *p;

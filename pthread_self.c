@@ -63,14 +63,14 @@ pthread_self (void)
 {
   pthread_t self;
   pthread_t nil = {NULL, 0};
-  __ptw32_thread_t * sp;
+  ptw32_thread_t * sp;
 
 #if defined(_UWIN)
-  if (!__ptw32_selfThreadKey)
+  if (!ptw32_selfThreadKey)
     return nil;
 #endif
 
-  sp = (__ptw32_thread_t *) pthread_getspecific (__ptw32_selfThreadKey);
+  sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
   if (sp != NULL)
     {
@@ -78,14 +78,14 @@ pthread_self (void)
     }
   else
     {
-      int fail =  __PTW32_FALSE;
+	  int fail = PTW32_FALSE;
 
       /*
        * Need to create an implicit 'self' for the currently
        * executing thread.
        */
-      self = __ptw32_new ();
-      sp = (__ptw32_thread_t *) self.p;
+      self = ptw32_new ();
+      sp = (ptw32_thread_t *) self.p;
 
       if (sp != NULL)
         {
@@ -117,7 +117,7 @@ pthread_self (void)
 				&sp->threadH,
 				0, FALSE, DUPLICATE_SAME_ACCESS))
     	    {
-    		  fail =  __PTW32_TRUE;
+    		  fail = PTW32_TRUE;
     	    }
 #endif
 
@@ -141,16 +141,16 @@ pthread_self (void)
     	                {
     	                  sp->cpuset = (size_t) vThreadMask;
     	                }
-    	              else fail =  __PTW32_TRUE;
+    	              else fail = PTW32_TRUE;
     	            }
-    	          else fail =  __PTW32_TRUE;
+    	          else fail = PTW32_TRUE;
     	        }
-    	      else fail =  __PTW32_TRUE;
+    	      else fail = PTW32_TRUE;
 
 #endif
 
     	      sp->sched_priority = GetThreadPriority (sp->threadH);
-    	      pthread_setspecific (__ptw32_selfThreadKey, (void *) sp);
+    	      pthread_setspecific (ptw32_selfThreadKey, (void *) sp);
     	    }
         }
 
@@ -160,7 +160,7 @@ pthread_self (void)
     	   * Thread structs are never freed but are reused so if this
     	   * continues to fail at least we don't leak memory.
     	   */
-    	  __ptw32_threadReusePush (self);
+    	  ptw32_threadReusePush (self);
     	  /*
     	   * As this is a win32 thread calling us and we have failed,
     	   * return a value that makes sense to win32.

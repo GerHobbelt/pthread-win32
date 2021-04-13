@@ -42,16 +42,16 @@
 
 
 INLINE int
-__ptw32_cond_check_need_init (pthread_cond_t * cond)
+ptw32_cond_check_need_init (pthread_cond_t * cond)
 {
   int result = 0;
-  __ptw32_mcs_local_node_t node;
+  ptw32_mcs_local_node_t node;
 
   /*
    * The following guarded test is specifically for statically
    * initialised condition variables (via PTHREAD_OBJECT_INITIALIZER).
    */
-  __ptw32_mcs_lock_acquire(&__ptw32_cond_test_init_lock, &node);
+  ptw32_mcs_lock_acquire(&ptw32_cond_test_init_lock, &node);
 
   /*
    * We got here possibly under race
@@ -74,7 +74,7 @@ __ptw32_cond_check_need_init (pthread_cond_t * cond)
       result = EINVAL;
     }
 
-  __ptw32_mcs_lock_release(&node);
+  ptw32_mcs_lock_release(&node);
 
   return result;
 }

@@ -46,14 +46,14 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
   int result;
   pthread_barrier_t b;
 
-  __ptw32_mcs_local_node_t node;
+  ptw32_mcs_local_node_t node;
 
-  if (barrier == NULL || *barrier == (pthread_barrier_t)  __PTW32_OBJECT_INVALID)
+  if (barrier == NULL || *barrier == (pthread_barrier_t) PTW32_OBJECT_INVALID)
     {
       return EINVAL;
     }
 
-  __ptw32_mcs_lock_acquire(&(*barrier)->lock, &node);
+  ptw32_mcs_lock_acquire(&(*barrier)->lock, &node);
 
   b = *barrier;
   if (--b->nCurrentBarrierHeight == 0)
@@ -63,7 +63,7 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
        * Move our MCS local node to the global scope barrier handle so that the
        * last thread out (not necessarily us) can release the lock.
        */
-      __ptw32_mcs_node_transfer(&b->proxynode, &node);
+      ptw32_mcs_node_transfer(&b->proxynode, &node);
 
       /*
        * Any threads that have not quite entered sem_wait below when the
@@ -76,7 +76,7 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
     }
   else
     {
-      __ptw32_mcs_lock_release(&node);
+      ptw32_mcs_lock_release(&node);
       /*
        * Use the non-cancelable version of sem_wait().
        *
@@ -86,16 +86,16 @@ pthread_barrier_wait (pthread_barrier_t * barrier)
        * If pthread_barrier_destroy is called at that moment then the
        * barrier will be destroyed along with the semas.
        */
-      result = __ptw32_semwait (&(b->semBarrierBreeched));
+      result = ptw32_semwait (&(b->semBarrierBreeched));
     }
 
-  if  ((__PTW32_INTERLOCKED_LONG)__PTW32_INTERLOCKED_INCREMENT_LONG ((__PTW32_INTERLOCKED_LONGPTR)&b->nCurrentBarrierHeight)
-		  ==  (__PTW32_INTERLOCKED_LONG)b->nInitialBarrierHeight)
+  if ((PTW32_INTERLOCKED_LONG)PTW32_INTERLOCKED_INCREMENT_LONG((PTW32_INTERLOCKED_LONGPTR)&b->nCurrentBarrierHeight)
+		  == (PTW32_INTERLOCKED_LONG)b->nInitialBarrierHeight)
     {
       /*
        * We are the last thread to cross this barrier
        */
-      __ptw32_mcs_lock_release(&b->proxynode);
+      ptw32_mcs_lock_release(&b->proxynode);
       if (0 == result)
         {
           result = PTHREAD_BARRIER_SERIAL_THREAD;

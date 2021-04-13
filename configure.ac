@@ -48,8 +48,8 @@ AC_PROG_RANLIB
 # not normally support it.
 #
 AH_TOP(dnl
-[#ifndef __PTW32_CONFIG_H]
-[#define __PTW32_CONFIG_H]dnl
+[#ifndef PTW32_CONFIG_H]
+[#define PTW32_CONFIG_H]dnl
 )
 # FIXME: AC_C_INLINE defines 'inline' to work with any C compiler,
 # whether or not it supports inline code expansion, but it does NOT

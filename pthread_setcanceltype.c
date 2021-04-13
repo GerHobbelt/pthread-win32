@@ -81,10 +81,10 @@ pthread_setcanceltype (int type, int *oldtype)
       * ------------------------------------------------------
       */
 {
-  __ptw32_mcs_local_node_t stateLock;
+  ptw32_mcs_local_node_t stateLock;
   int result = 0;
   pthread_t self = pthread_self ();
-  __ptw32_thread_t * sp = (__ptw32_thread_t *) self.p;
+  ptw32_thread_t * sp = (ptw32_thread_t *) self.p;
 
   if (sp == NULL
       || (type != PTHREAD_CANCEL_DEFERRED
@@ -96,7 +96,7 @@ pthread_setcanceltype (int type, int *oldtype)
   /*
    * Lock for async-cancel safety.
    */
-  __ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
+  ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
 
   if (oldtype != NULL)
     {
@@ -115,13 +115,13 @@ pthread_setcanceltype (int type, int *oldtype)
       sp->state = PThreadStateCanceling;
       sp->cancelState = PTHREAD_CANCEL_DISABLE;
       ResetEvent (sp->cancelEvent);
-      __ptw32_mcs_lock_release (&stateLock);
-      __ptw32_throw  (__PTW32_EPS_CANCEL);
+      ptw32_mcs_lock_release (&stateLock);
+      ptw32_throw (PTW32_EPS_CANCEL);
 
       /* Never reached */
     }
 
-  __ptw32_mcs_lock_release (&stateLock);
+  ptw32_mcs_lock_release (&stateLock);
 
   return (result);
 

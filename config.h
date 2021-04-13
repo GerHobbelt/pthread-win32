@@ -1,14 +1,14 @@
 /* config.h  */
 
-#ifndef  __PTW32_CONFIG_H
-#define  __PTW32_CONFIG_H
+#ifndef  PTW32_CONFIG_H
+#define  PTW32_CONFIG_H
 
 /*********************************************************************
  * Defaults: see target specific redefinitions below.
  *********************************************************************/
 
 /* We're building the pthreads-win32 library */
-#define  __PTW32_BUILD
+#define  PTW32_BUILD
 
 /* CPU affinity */
 #define HAVE_CPU_AFFINITY
@@ -77,7 +77,7 @@
 # applications that make assumptions that POSIX does not guarantee are
 # not strictly compliant and may fail or misbehave with some settings.
 #
-#  __PTW32_THREAD_ID_REUSE_INCREMENT
+#  PTW32_THREAD_ID_REUSE_INCREMENT
 # Purpose:
 # POSIX says that applications should assume that thread IDs can be
 # recycled. However, Solaris (and some other systems) use a [very large]
@@ -95,11 +95,11 @@
 # (i.e. will wrap sooner). This might be useful to emulate some embedded
 # systems.
 #
-# define  __PTW32_THREAD_ID_REUSE_INCREMENT 0
+# define  PTW32_THREAD_ID_REUSE_INCREMENT 0
 #
 # ----------------------------------------------------------------------
  */
-#undef  __PTW32_THREAD_ID_REUSE_INCREMENT
+#undef  PTW32_THREAD_ID_REUSE_INCREMENT
 
 
 /*********************************************************************
@@ -147,4 +147,4 @@
 #define HAVE_STRUCT_TIMESPEC
 #endif
 
-#endif /*  __PTW32_CONFIG_H */
+#endif /*  PTW32_CONFIG_H */

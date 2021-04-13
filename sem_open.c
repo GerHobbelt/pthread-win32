@@ -60,6 +60,6 @@ sem_t
    * of ENOSYS as a resultant errno state; nevertheless, it makes sense
    * to retain the POSIX.1b-1993 conforming behaviour here.
    */
-   __PTW32_SET_ERRNO(ENOSYS);
+  PTW32_SET_ERRNO(ENOSYS);
   return SEM_FAILED;
 }				/* sem_open */

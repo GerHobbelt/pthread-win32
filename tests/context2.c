@@ -123,7 +123,7 @@ main()
 
   assert(pthread_create(&t, NULL, func, NULL) == 0);
 
-  hThread = ((__ptw32_thread_t *)t.p)->threadH;
+  hThread = ((ptw32_thread_t *)t.p)->threadH;
 
   Sleep(500);
 
@@ -139,7 +139,7 @@ main()
       context.ContextFlags = CONTEXT_CONTROL;
 
       GetThreadContext(hThread, &context);
-       __PTW32_PROGCTR (context) = (DWORD_PTR) anotherEnding;
+       PTW32_PROGCTR (context) = (DWORD_PTR) anotherEnding;
       SetThreadContext(hThread, &context);
       ResumeThread(hThread);
     }

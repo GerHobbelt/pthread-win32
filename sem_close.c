@@ -55,6 +55,6 @@
 int
 sem_close (sem_t * sem)
 {
-   __PTW32_SET_ERRNO(ENOSYS);
+  PTW32_SET_ERRNO(ENOSYS);
   return -1;
 }				/* sem_close */

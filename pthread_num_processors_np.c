@@ -49,7 +49,7 @@ pthread_num_processors_np (void)
 {
   int count;
 
-  if (__ptw32_getprocessors (&count) != 0)
+  if (ptw32_getprocessors (&count) != 0)
     {
       count = 1;
     }

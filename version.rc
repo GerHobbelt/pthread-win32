@@ -32,97 +32,97 @@
 #include "pthread.h"
 
 /*
- * Note: the correct __PTW32_CLEANUP_* macro must be defined corresponding to
+ * Note: the correct PTW32_CLEANUP_* macro must be defined corresponding to
  * the definition used for the object file builds. This is done in the
  * relevent makefiles for the command line builds, but users should ensure
  * that their resource compiler knows what it is too.
- * If using the default (no __PTW32_CLEANUP_* defined), pthread.h will define it
- * as __PTW32_CLEANUP_C.
+ * If using the default (no PTW32_CLEANUP_* defined), pthread.h will define it
+ * as PTW32_CLEANUP_C.
  */
 
-#if defined (__PTW32_RC_MSC)
-#  if defined(__PTW32_CLEANUP_C)
-#    define  __PTW32_VERSIONINFO_NAME "pthreadVC2.DLL\0"
-#  elif defined(__PTW32_CLEANUP_CXX)
-#    define  __PTW32_VERSIONINFO_NAME "pthreadVCE2.DLL\0"
-#  elif defined(__PTW32_CLEANUP_SEH)
-#    define  __PTW32_VERSIONINFO_NAME "pthreadVSE2.DLL\0"
+#if defined (PTW32_RC_MSC)
+#  if defined(PTW32_CLEANUP_C)
+#    define  PTW32_VERSIONINFO_NAME "pthreadVC2.DLL\0"
+#  elif defined(PTW32_CLEANUP_CXX)
+#    define  PTW32_VERSIONINFO_NAME "pthreadVCE2.DLL\0"
+#  elif defined(PTW32_CLEANUP_SEH)
+#    define  PTW32_VERSIONINFO_NAME "pthreadVSE2.DLL\0"
 #  endif
-#  if defined (__PTW32_ARCHx64) || defined (__PTW32_ARCHX64) || defined (__PTW32_ARCHAMD64)
-#    if defined(__PTW32_CLEANUP_C)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C x64\0"
-#    elif defined(__PTW32_CLEANUP_CXX)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C++ x64\0"
-#    elif defined(__PTW32_CLEANUP_SEH)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x64\0"
+#  if defined (PTW32_ARCHx64) || defined (PTW32_ARCHX64) || defined (PTW32_ARCHAMD64)
+#    if defined(PTW32_CLEANUP_C)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C x64\0"
+#    elif defined(PTW32_CLEANUP_CXX)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C++ x64\0"
+#    elif defined(PTW32_CLEANUP_SEH)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x64\0"
 #    endif
-#  elif defined (__PTW32_ARCHx86) || defined (__PTW32_ARCHX86)
-#    if defined(__PTW32_CLEANUP_C)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C x86\0"
-#    elif defined(__PTW32_CLEANUP_CXX)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C++ x86\0"
-#    elif defined(__PTW32_CLEANUP_SEH)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x86\0"
+#  elif defined (PTW32_ARCHx86) || defined (PTW32_ARCHX86)
+#    if defined(PTW32_CLEANUP_C)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C x86\0"
+#    elif defined(PTW32_CLEANUP_CXX)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C++ x86\0"
+#    elif defined(PTW32_CLEANUP_SEH)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x86\0"
 #    endif
-#  elif defined (__PTW32_ARCHarm) || defined (__PTW32_ARCHARM) || defined (__PTW32_AARCH32)
-#    if defined(__PTW32_CLEANUP_C)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C ARM\0"
-#    elif defined(__PTW32_CLEANUP_CXX)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C++ ARM\0"
-#    elif defined(__PTW32_CLEANUP_SEH)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C SEH ARM\0"
+#  elif defined (PTW32_ARCHarm) || defined (PTW32_ARCHARM) || defined (PTW32_AARCH32)
+#    if defined(PTW32_CLEANUP_C)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C ARM\0"
+#    elif defined(PTW32_CLEANUP_CXX)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C++ ARM\0"
+#    elif defined(PTW32_CLEANUP_SEH)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C SEH ARM\0"
 #    endif
-#  elif defined (__PTW32_ARCHarm64) || defined (__PTW32_ARCHARM64) || defined (__PTW32_AARCH64)
-#    if defined(__PTW32_CLEANUP_C)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C ARM64\0"
-#    elif defined(__PTW32_CLEANUP_CXX)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C++ ARM64\0"
-#    elif defined(__PTW32_CLEANUP_SEH)
-#      define  __PTW32_VERSIONINFO_DESCRIPTION "MS C SEH ARM64\0"
+#  elif defined (PTW32_ARCHarm64) || defined (PTW32_ARCHARM64) || defined (PTW32_AARCH64)
+#    if defined(PTW32_CLEANUP_C)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C ARM64\0"
+#    elif defined(PTW32_CLEANUP_CXX)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C++ ARM64\0"
+#    elif defined(PTW32_CLEANUP_SEH)
+#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C SEH ARM64\0"
 #    endif
 #  endif
 #elif defined(__GNUC__)
 #  if defined(_M_X64)
-#    define  __PTW32_ARCH "x64 (mingw64)"
+#    define  PTW32_ARCH "x64 (mingw64)"
 #  else
-#    define  __PTW32_ARCH "x86 (mingw32)"
+#    define  PTW32_ARCH "x86 (mingw32)"
 #  endif
-#  if defined(__PTW32_CLEANUP_C)
-#    define  __PTW32_VERSIONINFO_NAME "pthreadGC2.DLL\0"
-#    define  __PTW32_VERSIONINFO_DESCRIPTION "GNU C "  __PTW32_ARCH "\0"
-#  elif defined(__PTW32_CLEANUP_CXX)
-#    define  __PTW32_VERSIONINFO_NAME "pthreadGCE2.DLL\0"
-#    define  __PTW32_VERSIONINFO_DESCRIPTION "GNU C++ "  __PTW32_ARCH "\0"
+#  if defined(PTW32_CLEANUP_C)
+#    define  PTW32_VERSIONINFO_NAME "pthreadGC2.DLL\0"
+#    define  PTW32_VERSIONINFO_DESCRIPTION "GNU C "  PTW32_ARCH "\0"
+#  elif defined(PTW32_CLEANUP_CXX)
+#    define  PTW32_VERSIONINFO_NAME "pthreadGCE2.DLL\0"
+#    define  PTW32_VERSIONINFO_DESCRIPTION "GNU C++ "  PTW32_ARCH "\0"
 #  else
 #    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
 #elif defined(__BORLANDC__)
 #  if defined(_M_X64)
-#    define  __PTW32_ARCH "x64 (Borland)"
+#    define  PTW32_ARCH "x64 (Borland)"
 #  else
-#    define  __PTW32_ARCH "x86 (Borland)"
+#    define  PTW32_ARCH "x86 (Borland)"
 #  endif
-#  if defined(__PTW32_CLEANUP_C)
-#    define  __PTW32_VERSIONINFO_NAME "pthreadBC2.DLL\0"
-#    define  __PTW32_VERSIONINFO_DESCRIPTION "BORLAND C "  __PTW32_ARCH "\0"
-#  elif defined(__PTW32_CLEANUP_CXX)
-#    define  __PTW32_VERSIONINFO_NAME "pthreadBCE2.DLL\0"
-#    define  __PTW32_VERSIONINFO_DESCRIPTION "BORLAND C++ "  __PTW32_ARCH "\0"
+#  if defined(PTW32_CLEANUP_C)
+#    define  PTW32_VERSIONINFO_NAME "pthreadBC2.DLL\0"
+#    define  PTW32_VERSIONINFO_DESCRIPTION "BORLAND C "  PTW32_ARCH "\0"
+#  elif defined(PTW32_CLEANUP_CXX)
+#    define  PTW32_VERSIONINFO_NAME "pthreadBCE2.DLL\0"
+#    define  PTW32_VERSIONINFO_DESCRIPTION "BORLAND C++ "  PTW32_ARCH "\0"
 #  else
 #    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
 #elif defined(__WATCOMC__)
 #  if defined(_M_X64)
-#    define  __PTW32_ARCH "x64 (Watcom)"
+#    define  PTW32_ARCH "x64 (Watcom)"
 #  else
-#    define  __PTW32_ARCH "x86 (Watcom)"
+#    define  PTW32_ARCH "x86 (Watcom)"
 #  endif
-#  if defined(__PTW32_CLEANUP_C)
-#    define  __PTW32_VERSIONINFO_NAME "pthreadWC2.DLL\0"
-#    define  __PTW32_VERSIONINFO_DESCRIPTION "WATCOM C "  __PTW32_ARCH "\0"
-#  elif defined(__PTW32_CLEANUP_CXX)
-#    define  __PTW32_VERSIONINFO_NAME "pthreadWCE2.DLL\0"
-#    define  __PTW32_VERSIONINFO_DESCRIPTION "WATCOM C++ "  __PTW32_ARCH "\0"
+#  if defined(PTW32_CLEANUP_C)
+#    define  PTW32_VERSIONINFO_NAME "pthreadWC2.DLL\0"
+#    define  PTW32_VERSIONINFO_DESCRIPTION "WATCOM C "  PTW32_ARCH "\0"
+#  elif defined(PTW32_CLEANUP_CXX)
+#    define  PTW32_VERSIONINFO_NAME "pthreadWCE2.DLL\0"
+#    define  PTW32_VERSIONINFO_DESCRIPTION "WATCOM C++ "  PTW32_ARCH "\0"
 #  else
 #    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
@@ -132,8 +132,8 @@
 
 
 VS_VERSION_INFO VERSIONINFO
-  FILEVERSION     __PTW32_VERSION
-  PRODUCTVERSION  __PTW32_VERSION
+  FILEVERSION     PTW32_VERSION
+  PRODUCTVERSION  PTW32_VERSION
   FILEFLAGSMASK  VS_FFI_FILEFLAGSMASK
   FILEFLAGS      0
   FILEOS         VOS__WINDOWS32
@@ -144,11 +144,11 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "ProductName", "POSIX Threads for Windows\0"
-            VALUE "ProductVersion",  __PTW32_VERSION_STRING
-            VALUE "FileVersion",  __PTW32_VERSION_STRING
-            VALUE "FileDescription",  __PTW32_VERSIONINFO_DESCRIPTION
-            VALUE "InternalName",  __PTW32_VERSIONINFO_NAME
-            VALUE "OriginalFilename",  __PTW32_VERSIONINFO_NAME
+            VALUE "ProductVersion",  PTW32_VERSION_STRING
+            VALUE "FileVersion",  PTW32_VERSION_STRING
+            VALUE "FileDescription",  PTW32_VERSIONINFO_DESCRIPTION
+            VALUE "InternalName",  PTW32_VERSIONINFO_NAME
+            VALUE "OriginalFilename",  PTW32_VERSIONINFO_NAME
             VALUE "CompanyName", "Open Source Software community\0"
             VALUE "LegalCopyright", "Copyright - Project contributors 1999-2016\0"
             VALUE "Comments", "https://sourceforge.net/p/pthreads4w/wiki/Contributors/\0"

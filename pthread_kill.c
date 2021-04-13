@@ -88,12 +88,12 @@ pthread_kill (pthread_t thread, int sig)
     }
   else
     {
-      __ptw32_mcs_local_node_t node;
-      __ptw32_thread_t * tp;
+      ptw32_mcs_local_node_t node;
+      ptw32_thread_t * tp;
 
-      __ptw32_mcs_lock_acquire(&__ptw32_thread_reuse_lock, &node);
+      ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
 
-      tp = (__ptw32_thread_t *) thread.p;
+      tp = (ptw32_thread_t *) thread.p;
 
       if (NULL == tp
 	  || thread.x != tp->ptHandle.x
@@ -102,7 +102,7 @@ pthread_kill (pthread_t thread, int sig)
 	  result = ESRCH;
 	}
 
-      __ptw32_mcs_lock_release(&node);
+      ptw32_mcs_lock_release(&node);
     }
 
   return result;

@@ -83,10 +83,10 @@ sem_destroy (sem_t * sem)
     }
   else
     {
-      __ptw32_mcs_local_node_t node;
+      ptw32_mcs_local_node_t node;
       s = *sem;
 
-      if ((result = __ptw32_mcs_lock_try_acquire(&s->lock, &node)) == 0)
+      if ((result = ptw32_mcs_lock_try_acquire(&s->lock, &node)) == 0)
         {
           if (s->value < 0)
             {
@@ -104,13 +104,13 @@ sem_destroy (sem_t * sem)
                   result = EINVAL;
                 }
             }
-          __ptw32_mcs_lock_release(&node);
+          ptw32_mcs_lock_release(&node);
         }
     }
 
   if (result != 0)
     {
-       __PTW32_SET_ERRNO(result);
+      PTW32_SET_ERRNO(result);
       return -1;
     }
 

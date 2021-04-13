@@ -88,7 +88,7 @@ pthread_delay_np (struct timespec *interval)
   DWORD millisecs;
   DWORD status;
   pthread_t self;
-  __ptw32_thread_t * sp;
+  ptw32_thread_t * sp;
 
   if (interval == NULL)
     {
@@ -132,7 +132,7 @@ pthread_delay_np (struct timespec *interval)
       return ENOMEM;
     }
 
-  sp = (__ptw32_thread_t *) self.p;
+  sp = (ptw32_thread_t *) self.p;
 
   if (sp->cancelState == PTHREAD_CANCEL_ENABLE)
     {
@@ -143,21 +143,21 @@ pthread_delay_np (struct timespec *interval)
       if (WAIT_OBJECT_0 ==
 	  (status = WaitForSingleObject (sp->cancelEvent, wait_time)))
 	{
-          __ptw32_mcs_local_node_t stateLock;
+          ptw32_mcs_local_node_t stateLock;
 	  /*
 	   * Canceling!
 	   */
-	  __ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
+	  ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
 	  if (sp->state < PThreadStateCanceling)
 	    {
 	      sp->state = PThreadStateCanceling;
 	      sp->cancelState = PTHREAD_CANCEL_DISABLE;
-	      __ptw32_mcs_lock_release (&stateLock);
+	      ptw32_mcs_lock_release (&stateLock);
 
-	      __ptw32_throw  (__PTW32_EPS_CANCEL);
+	      ptw32_throw (PTW32_EPS_CANCEL);
 	    }
 
-	  __ptw32_mcs_lock_release (&stateLock);
+	  ptw32_mcs_lock_release (&stateLock);
 	  return ESRCH;
 	}
       else if (status != WAIT_TIMEOUT)

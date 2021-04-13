@@ -50,16 +50,16 @@
 
 2016-12-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
-	* all (PTW32_*): rename to __PTW32_*.
-	(ptw32_*): rename to __ptw32_*.
+	* all (PTW32_*): rename to PTW32_*.
+	(ptw32_*): rename to ptw32_*.
 	(PtW32*): rename to __PtW32*.
 	* GNUmakefile: removed; must now configure from GNUmakefile.in.
 
 2016-12-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
-	* test.c  (__PTW32_TEST_SNEAK_PEEK): #define this to prevent some
+	* test.c  (PTW32_TEST_SNEAK_PEEK): #define this to prevent some
 	tests from failing (specifically "make GCX-small-static") with
-	undefined __ptw32_autostatic_anchor. Checked in ../implement.h.
+	undefined ptw32_autostatic_anchor. Checked in ../implement.h.
 	* GNUMakfile.in: Rename testsuite log to test-specific name and
 	do not remove.
 	* GNUMakfile.in: Add realclean target
@@ -245,7 +245,7 @@
 2012-09-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_win32_attach_detach_np.c (pthread_win32_detach_thread_np):
-	Check for NULL __ptw32_selfThreadKey before call to TlsSetKey(). Need
+	Check for NULL ptw32_selfThreadKey before call to TlsSetKey(). Need
 	to find where this is being set to NULL before this point. Was
 	consistently failing tests/seamphore3.c in all GC static builds and
 	never seen in GC DLL builds. May also be responsible for

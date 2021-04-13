@@ -156,13 +156,13 @@ Up to and including snapshot 2001-07-12, if not defined, the cleanup
 style was determined automatically from the compiler used, and one
 of the following was defined accordingly:
 
-	__PTW32_CLEANUP_SEH	MSVC only
-	__PTW32_CLEANUP_CXX	C++, including MSVC++, GNU G++
-	__PTW32_CLEANUP_C		C, including GNU GCC, not MSVC
+	PTW32_CLEANUP_SEH	MSVC only
+	PTW32_CLEANUP_CXX	C++, including MSVC++, GNU G++
+	PTW32_CLEANUP_C		C, including GNU GCC, not MSVC
 
 These defines determine the style of cleanup (see pthread.h) and,
 most importantly, the way that cancellation and thread exit (via
-pthread_exit) is performed (see the routine __ptw32_throw() in private.c).
+pthread_exit) is performed (see the routine ptw32_throw() in private.c).
 
 In short, the exceptions versions of the library throw an exception
 when a thread is canceled or exits (via pthread_exit()), which is
@@ -171,22 +171,22 @@ the correct stack unwinding occurs regardless of where the thread
 is when it's canceled or exits via pthread_exit().
 
 After snapshot 2001-07-12, unless your build explicitly defines (e.g.
-via a compiler option) __PTW32_CLEANUP_SEH, __PTW32_CLEANUP_CXX, or __PTW32_CLEANUP_C, then
-the build now ALWAYS defaults to __PTW32_CLEANUP_C style cleanup. This style
+via a compiler option) PTW32_CLEANUP_SEH, PTW32_CLEANUP_CXX, or PTW32_CLEANUP_C, then
+the build now ALWAYS defaults to PTW32_CLEANUP_C style cleanup. This style
 uses setjmp/longjmp in the cancellation and pthread_exit implementations,
 and therefore won't do stack unwinding even when linked to applications
 that have it (e.g. C++ apps). This is for consistency with most/all
 commercial Unix POSIX threads implementations.
 
 Although it was not clearly documented before, it is still necessary to
-build your application using the same __PTW32_CLEANUP_* define as was
+build your application using the same PTW32_CLEANUP_* define as was
 used for the version of the library that you link with, so that the
 correct parts of pthread.h are included. That is, the possible
 defines require the following library versions:
 
-	__PTW32_CLEANUP_SEH	pthreadVSE.dll
-	__PTW32_CLEANUP_CXX	pthreadVCE.dll or pthreadGCE.dll
-	__PTW32_CLEANUP_C		pthreadVC.dll or pthreadGC.dll
+	PTW32_CLEANUP_SEH	pthreadVSE.dll
+	PTW32_CLEANUP_CXX	pthreadVCE.dll or pthreadGCE.dll
+	PTW32_CLEANUP_C		pthreadVC.dll or pthreadGC.dll
 
 THE POINT OF ALL THIS IS: if you have not been defining one of these
 explicitly, then the defaults have been set according to the compiler
@@ -197,12 +197,12 @@ THIS NOW CHANGES, as has been explained above. For example:
 
 If you were building your application with MSVC++ i.e. using C++
 exceptions (rather than SEH) and not explicitly defining one of
-__PTW32_CLEANUP_*, then __PTW32_CLEANUP_C++ was defined for you in pthread.h.
+PTW32_CLEANUP_*, then PTW32_CLEANUP_C++ was defined for you in pthread.h.
 You should have been linking with pthreadVCE.dll, which does
 stack unwinding.
 
 If you now build your application as you had before, pthread.h will now
-set __PTW32_CLEANUP_C as the default style, and you will need to link
+set PTW32_CLEANUP_C as the default style, and you will need to link
 with pthreadVC.dll. Stack unwinding will now NOT occur when a
 thread is canceled, nor when the thread calls pthread_exit().
 
@@ -212,7 +212,7 @@ objects may not be destroyed or cleaned up after a thread
 is canceled.
 
 If you want the same behaviour as before, then you must now define
-__PTW32_CLEANUP_C++ explicitly using a compiler option and link with
+PTW32_CLEANUP_C++ explicitly using a compiler option and link with
 pthreadVCE.dll as you did before.
 
 

@@ -46,7 +46,7 @@
 int
 pthread_create (pthread_t * tid,
     const pthread_attr_t * attr,
-    void * (__PTW32_CDECL *start) (void *), void *arg)
+    void * (PTW32_CDECL *start) (void *), void *arg)
 /*
  * ------------------------------------------------------
  * DOCPUBLIC
@@ -86,12 +86,12 @@ pthread_create (pthread_t * tid,
  */
 {
   pthread_t thread;
-  __ptw32_thread_t * tp;
-  __ptw32_thread_t * sp;
+  ptw32_thread_t * tp;
+  ptw32_thread_t * sp;
   register pthread_attr_t a;
   HANDLE threadH = 0;
   int result = EAGAIN;
-  int run =  __PTW32_TRUE;
+  int run = PTW32_TRUE;
   ThreadParms *parms = NULL;
   unsigned int stackSize;
   int priority;
@@ -104,7 +104,7 @@ pthread_create (pthread_t * tid,
    */
   tid->x = 0;
 
-  if (NULL == (sp = (__ptw32_thread_t *)pthread_self().p))
+  if (NULL == (sp = (ptw32_thread_t *)pthread_self().p))
     {
       goto FAIL0;
     }
@@ -118,13 +118,13 @@ pthread_create (pthread_t * tid,
       a = NULL;
     }
 
-  thread = __ptw32_new();
+  thread = ptw32_new();
   if (thread.p == NULL)
     {
       goto FAIL0;
     }
 
-  tp = (__ptw32_thread_t *) thread.p;
+  tp = (ptw32_thread_t *) thread.p;
 
   priority = tp->sched_priority;
 
@@ -206,7 +206,7 @@ pthread_create (pthread_t * tid,
 
   /*
    * State must be >= PThreadStateRunning before we return to the caller.
-   * __ptw32_threadStart will set state to PThreadStateRunning.
+   * ptw32_threadStart will set state to PThreadStateRunning.
    */
   tp->state = PThreadStateSuspended;
 
@@ -227,7 +227,7 @@ pthread_create (pthread_t * tid,
       threadH =
           (HANDLE) _beginthreadex ((void *) NULL,	/* No security info             */
               stackSize,		/* default stack size   */
-              __ptw32_threadStart,
+              ptw32_threadStart,
               parms,
               (unsigned)
               CREATE_SUSPENDED,
@@ -237,7 +237,7 @@ pthread_create (pthread_t * tid,
     {
       if (a != NULL)
         {
-          (void) __ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
+          (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
         }
 
 #if defined(HAVE_CPU_AFFINITY)
@@ -255,17 +255,17 @@ pthread_create (pthread_t * tid,
 #else
 
   {
-    __ptw32_mcs_local_node_t stateLock;
+    ptw32_mcs_local_node_t stateLock;
 
     /*
      * This lock will force pthread_threadStart() to wait until we have
      * the thread handle and have set the priority.
      */
-    __ptw32_mcs_lock_acquire(&tp->stateLock, &stateLock);
+    ptw32_mcs_lock_acquire(&tp->stateLock, &stateLock);
 
     tp->threadH =
         threadH =
-            (HANDLE) _beginthread (__ptw32_threadStart, stackSize,	/* default stack size   */
+            (HANDLE) _beginthread (ptw32_threadStart, stackSize,	/* default stack size   */
                 parms);
 
     /*
@@ -289,7 +289,7 @@ pthread_create (pthread_t * tid,
 
         if (a != NULL)
           {
-            (void) __ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
+            (void) ptw32_setthreadpriority (thread, SCHED_OTHER, priority);
           }
 
 #if defined(HAVE_CPU_AFFINITY)
@@ -300,7 +300,7 @@ pthread_create (pthread_t * tid,
 
       }
 
-    __ptw32_mcs_lock_release (&stateLock);
+    ptw32_mcs_lock_release (&stateLock);
   }
 #endif
 
@@ -319,8 +319,7 @@ pthread_create (pthread_t * tid,
   FAIL0:
   if (result != 0)
     {
-
-      __ptw32_threadDestroy (thread);
+      ptw32_threadDestroy (thread);
       tp = NULL;
 
       if (parms != NULL)

@@ -81,16 +81,16 @@ sem_getvalue (sem_t * sem, int *sval)
 {
   int result = 0;
 
-  __ptw32_mcs_local_node_t node;
+  ptw32_mcs_local_node_t node;
   register sem_t s = *sem;
 
-  __ptw32_mcs_lock_acquire(&s->lock, &node);
+  ptw32_mcs_lock_acquire(&s->lock, &node);
   *sval = s->value;
-  __ptw32_mcs_lock_release(&node);
+  ptw32_mcs_lock_release(&node);
 
   if (result != 0)
     {
-       __PTW32_SET_ERRNO(result);
+      PTW32_SET_ERRNO(result);
       return -1;
     }
 

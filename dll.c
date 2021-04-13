@@ -39,7 +39,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-#if !defined (__PTW32_STATIC_LIB)
+#if !defined (PTW32_STATIC_LIB)
 
 #if defined(_MSC_VER)
 /*
@@ -49,11 +49,11 @@
 #pragma warning( disable : 4100 )
 #endif
 
-__PTW32_BEGIN_C_DECLS
+PTW32_BEGIN_C_DECLS
 
 BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
-  BOOL result =  __PTW32_TRUE;
+  BOOL result = PTW32_TRUE;
 
   switch (fdwReason)
     {
@@ -83,21 +83,20 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     }
 
   return (result);
-
 }				/* DllMain */
 
-__PTW32_END_C_DECLS
+PTW32_END_C_DECLS
 
 #endif /* !PTW32_STATIC_LIB */
 
-#if ! defined (__PTW32_BUILD_INLINED)
+#if ! defined (PTW32_BUILD_INLINED)
 /*
  * Avoid "translation unit is empty" warnings
  */
 typedef int foo;
 #endif
 
-#if defined(__PTW32_STATIC_LIB)
+#if defined(PTW32_STATIC_LIB)
 
 /*
  * Note: MSVC 8 and higher use code in dll.c, which enables TLS cleanup
@@ -126,13 +125,13 @@ typedef int foo;
  * doing this deliberately.
  */
 
-extern int __ptw32_on_process_init(void)
+extern int ptw32_on_process_init(void)
 {
     pthread_win32_process_attach_np ();
     return 0;
 }
 
-extern int __ptw32_on_process_exit(void)
+extern int ptw32_on_process_exit(void)
 {
     pthread_win32_thread_detach_np  ();
     pthread_win32_process_detach_np ();
@@ -140,26 +139,26 @@ extern int __ptw32_on_process_exit(void)
 }
 
 #if defined(__GNUC__)
-__attribute__((section(".ctors"), used)) extern int (*gcc_ctor)(void) = __ptw32_on_process_init;
-__attribute__((section(".dtors"), used)) extern int (*gcc_dtor)(void) = __ptw32_on_process_exit;
+__attribute__((section(".ctors"), used)) extern int (*gcc_ctor)(void) = ptw32_on_process_init;
+__attribute__((section(".dtors"), used)) extern int (*gcc_dtor)(void) = ptw32_on_process_exit;
 #elif defined(_MSC_VER)
 #  if _MSC_VER >= 1400 /* MSVC8+ */
 #    pragma section(".CRT$XCU", long, read)
 #    pragma section(".CRT$XPU", long, read)
-__declspec(allocate(".CRT$XCU")) extern int (*msc_ctor)(void) = __ptw32_on_process_init;
-__declspec(allocate(".CRT$XPU")) extern int (*msc_dtor)(void) = __ptw32_on_process_exit;
+__declspec(allocate(".CRT$XCU")) extern int (*msc_ctor)(void) = ptw32_on_process_init;
+__declspec(allocate(".CRT$XPU")) extern int (*msc_dtor)(void) = ptw32_on_process_exit;
 #  else
 #    pragma data_seg(".CRT$XCU")
-extern int (*msc_ctor)(void) = __ptw32_on_process_init;
+extern int (*msc_ctor)(void) = ptw32_on_process_init;
 #    pragma data_seg(".CRT$XPU")
-extern int (*msc_dtor)(void) = __ptw32_on_process_exit;
+extern int (*msc_dtor)(void) = ptw32_on_process_exit;
 #    pragma data_seg() /* reset data segment */
 #  endif
 #endif
 
 #endif /* defined(__MINGW32__) || defined(_MSC_VER) */
 
-__PTW32_BEGIN_C_DECLS
+PTW32_BEGIN_C_DECLS
 
 /* This dummy function exists solely to be referenced by other modules
  * (specifically, in implement.h), so that the linker can't optimize away
@@ -169,9 +168,9 @@ __PTW32_BEGIN_C_DECLS
  * (whole library single translation unit)
  * Leaving it here in case it affects small-static builds.
  */
-void __ptw32_autostatic_anchor(void) { abort(); }
+void ptw32_autostatic_anchor(void) { abort(); }
 
-__PTW32_END_C_DECLS
+PTW32_END_C_DECLS
 
-#endif /*  __PTW32_STATIC_LIB */
+#endif /*  PTW32_STATIC_LIB */
 

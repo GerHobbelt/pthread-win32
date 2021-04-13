@@ -68,7 +68,7 @@ pthread_key_delete (pthread_key_t key)
  * ------------------------------------------------------
  */
 {
-  __ptw32_mcs_local_node_t keyLock;
+  ptw32_mcs_local_node_t keyLock;
   int result = 0;
 
   if (key != NULL)
@@ -76,7 +76,7 @@ pthread_key_delete (pthread_key_t key)
       if (key->threads != NULL && key->destructor != NULL)
         {
           ThreadKeyAssoc *assoc;
-          __ptw32_mcs_lock_acquire (&(key->keyLock), &keyLock);
+          ptw32_mcs_lock_acquire (&(key->keyLock), &keyLock);
           /*
            * Run through all Thread<-->Key associations
            * for this key.
@@ -87,8 +87,8 @@ pthread_key_delete (pthread_key_t key)
            */
           while ((assoc = (ThreadKeyAssoc *) key->threads) != NULL)
             {
-              __ptw32_mcs_local_node_t threadLock;
-              __ptw32_thread_t * thread = assoc->thread;
+              ptw32_mcs_local_node_t threadLock;
+              ptw32_thread_t * thread = assoc->thread;
 
               if (assoc == NULL)
                 {
@@ -96,25 +96,25 @@ pthread_key_delete (pthread_key_t key)
                   break;
                 }
 
-              __ptw32_mcs_lock_acquire (&(thread->threadLock), &threadLock);
+              ptw32_mcs_lock_acquire (&(thread->threadLock), &threadLock);
               /*
                * Since we are starting at the head of the key's threads
                * chain, this will also point key->threads at the next assoc.
                * While we hold key->keyLock, no other thread can insert
                * a new assoc for this key via pthread_setspecific.
                */
-              __ptw32_tkAssocDestroy (assoc);
-              __ptw32_mcs_lock_release (&threadLock);
+              ptw32_tkAssocDestroy (assoc);
+              ptw32_mcs_lock_release (&threadLock);
             }
-          __ptw32_mcs_lock_release (&keyLock);
+          ptw32_mcs_lock_release (&keyLock);
         }
 
       TlsFree (key->key);
       if (key->destructor != NULL)
         {
           /* A thread could be holding the keyLock */
-          __ptw32_mcs_lock_acquire (&(key->keyLock), &keyLock);
-          __ptw32_mcs_lock_release (&keyLock);
+          ptw32_mcs_lock_acquire (&(key->keyLock), &keyLock);
+          ptw32_mcs_lock_release (&keyLock);
         }
 
 #if defined( _DEBUG )

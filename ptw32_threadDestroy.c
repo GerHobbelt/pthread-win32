@@ -42,9 +42,9 @@
 
 
 void
-__ptw32_threadDestroy (pthread_t thread)
+ptw32_threadDestroy (pthread_t thread)
 {
-  __ptw32_thread_t * tp = (__ptw32_thread_t *) thread.p;
+  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
 
   if (tp != NULL)
     {
@@ -61,7 +61,7 @@ __ptw32_threadDestroy (pthread_t thread)
        * This also sets the thread state to PThreadStateInitial before
        * it is finally set to PThreadStateReuse.
        */
-      __ptw32_threadReusePush (thread);
+      ptw32_threadReusePush (thread);
 
       if (cancelEvent != NULL)
 	{
@@ -79,5 +79,5 @@ __ptw32_threadDestroy (pthread_t thread)
 #endif
 
     }
-}				/* __ptw32_threadDestroy */
+}				/* ptw32_threadDestroy */
 

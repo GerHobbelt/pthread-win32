@@ -40,12 +40,12 @@
 #include "pthread.h"
 #include "implement.h"
 
-#if defined(__PTW32_CLEANUP_C)
+#if defined(PTW32_CLEANUP_C)
 # include <setjmp.h>
 #endif
 
 /*
- * __ptw32_throw
+ * ptw32_throw
  *
  * All cancelled and explicitly exited POSIX threads go through
  * here. This routine knows how to exit both POSIX initiated threads and
@@ -53,21 +53,21 @@
  * C++, and SEH).
  */
 void
-__ptw32_throw (DWORD exception)
+ptw32_throw (DWORD exception)
 {
   /*
    * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
    * unnecessarily.
    */
-  __ptw32_thread_t * sp = (__ptw32_thread_t *) pthread_getspecific (__ptw32_selfThreadKey);
+  ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
-#if defined(__PTW32_CLEANUP_SEH)
+#if defined(PTW32_CLEANUP_SEH)
   DWORD exceptionInformation[3];
 #endif
 
   sp->state = PThreadStateExiting;
 
-  if (exception !=  __PTW32_EPS_CANCEL && exception !=  __PTW32_EPS_EXIT)
+  if (exception !=  PTW32_EPS_CANCEL && exception !=  PTW32_EPS_EXIT)
     {
       /* Should never enter here */
       exit (1);
@@ -82,23 +82,23 @@ __ptw32_throw (DWORD exception)
        * residue (i.e. cleanup handlers, POSIX thread handle etc).
        */
 #if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
-      unsigned exitCode = 0;
+      unsigned int exitCode = 0;
 
       switch (exception)
         {
-      	  case  __PTW32_EPS_CANCEL:
-      		exitCode = (unsigned)(size_t) PTHREAD_CANCELED;
+      	  case PTW32_EPS_CANCEL:
+      		exitCode = (unsigned int)(size_t) PTHREAD_CANCELED;
       		break;
-      	  case  __PTW32_EPS_EXIT:
+      	  case PTW32_EPS_EXIT:
       		if (NULL != sp)
       		  {
-      			exitCode = (unsigned)(size_t) sp->exitStatus;
+      			exitCode = (unsigned int)(size_t) sp->exitStatus;
       		  }
       		break;
         }
 #endif
 
-#if defined (__PTW32_STATIC_LIB)
+#if defined(PTW32_STATIC_LIB)
 
       pthread_win32_thread_detach_np ();
 
@@ -112,7 +112,7 @@ __ptw32_throw (DWORD exception)
 
     }
 
-#if defined(__PTW32_CLEANUP_SEH)
+#if defined(PTW32_CLEANUP_SEH)
 
 
   exceptionInformation[0] = (DWORD) (exception);
@@ -121,24 +121,24 @@ __ptw32_throw (DWORD exception)
 
   RaiseException (EXCEPTION_PTW32_SERVICES, 0, 3, (ULONG_PTR *) exceptionInformation);
 
-#else /* __PTW32_CLEANUP_SEH */
+#else /* PTW32_CLEANUP_SEH */
 
-#if defined(__PTW32_CLEANUP_C)
+#if defined(PTW32_CLEANUP_C)
 
-  __ptw32_pop_cleanup_all (1);
+  ptw32_pop_cleanup_all (1);
   longjmp (sp->start_mark, exception);
 
-#else /* __PTW32_CLEANUP_C */
+#else /* PTW32_CLEANUP_C */
 
-#if defined(__PTW32_CLEANUP_CXX)
+#if defined(PTW32_CLEANUP_CXX)
 
   switch (exception)
     {
-    case  __PTW32_EPS_CANCEL:
-      throw __ptw32_exception_cancel ();
+    case PTW32_EPS_CANCEL:
+      throw ptw32_exception_cancel ();
       break;
-    case  __PTW32_EPS_EXIT:
-      throw __ptw32_exception_exit ();
+    case PTW32_EPS_EXIT:
+      throw ptw32_exception_exit ();
       break;
     }
 
@@ -146,29 +146,29 @@ __ptw32_throw (DWORD exception)
 
 #error ERROR [__FILE__, line __LINE__]: Cleanup type undefined.
 
-#endif /* __PTW32_CLEANUP_CXX */
+#endif /* PTW32_CLEANUP_CXX */
 
-#endif /* __PTW32_CLEANUP_C */
+#endif /* PTW32_CLEANUP_C */
 
-#endif /* __PTW32_CLEANUP_SEH */
+#endif /* PTW32_CLEANUP_SEH */
 
   /* Never reached */
 }
 
 
 void
-__ptw32_pop_cleanup_all (int execute)
+ptw32_pop_cleanup_all (int execute)
 {
-  while (NULL != __ptw32_pop_cleanup (execute))
+  while (NULL != ptw32_pop_cleanup (execute))
     {
     }
 }
 
 
 DWORD
-__ptw32_get_exception_services_code (void)
+ptw32_get_exception_services_code (void)
 {
-#if defined(__PTW32_CLEANUP_SEH)
+#if defined(PTW32_CLEANUP_SEH)
 
   return EXCEPTION_PTW32_SERVICES;
 

@@ -83,7 +83,7 @@ pthread_attr_setstackaddr (pthread_attr_t * attr, void *stackaddr)
 {
 #if defined( _POSIX_THREAD_ATTR_STACKADDR ) && _POSIX_THREAD_ATTR_STACKADDR != -1
 
-  if (__ptw32_is_attr (attr) != 0)
+  if (ptw32_is_attr (attr) != 0)
     {
       return EINVAL;
     }

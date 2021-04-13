@@ -23,7 +23,7 @@ OPTIM	= /O2 /Ob0
 XXLIBS	= ws2_32.lib
 
 # C++ Exceptions
-VCEFLAGS	= /EHs /TP /D__PtW32NoCatchWarn /D__PTW32_CLEANUP_CXX
+VCEFLAGS	= /EHs /TP /D__PtW32NoCatchWarn /DPTW32_CLEANUP_CXX
 VCELIB	= libpthreadVCE$(PTW32_VER).lib
 VCEIMP	= pthreadVCE$(PTW32_VER).lib
 VCEDLL	= pthreadVCE$(PTW32_VER).dll
@@ -31,7 +31,7 @@ VCELIBD	= libpthreadVCE$(PTW32_VER)d.lib
 VCEIMPD	= pthreadVCE$(PTW32_VER)d.lib
 VCEDLLD	= pthreadVCE$(PTW32_VER)d.dll
 # Structured Exceptions
-VSEFLAGS	= /D__PTW32_CLEANUP_SEH
+VSEFLAGS	= /DPTW32_CLEANUP_SEH
 VSELIB	= libpthreadVSE$(PTW32_VER).lib
 VSEIMP	= pthreadVSE$(PTW32_VER).lib
 VSEDLL	= pthreadVSE$(PTW32_VER).dll
@@ -39,7 +39,7 @@ VSELIBD	= libpthreadVSE$(PTW32_VER)d.lib
 VSEIMPD	= pthreadVSE$(PTW32_VER)d.lib
 VSEDLLD	= pthreadVSE$(PTW32_VER)d.dll
 # C cleanup code
-VCFLAGS	= /D__PTW32_CLEANUP_C
+VCFLAGS	= /DPTW32_CLEANUP_C
 VCLIB	= libpthreadVC$(PTW32_VER).lib
 VCIMP	= pthreadVC$(PTW32_VER).lib
 VCDLL	= pthreadVC$(PTW32_VER).dll
@@ -47,7 +47,7 @@ VCLIBD	= libpthreadVC$(PTW32_VER)d.lib
 VCIMPD	= pthreadVC$(PTW32_VER)d.lib
 VCDLLD	= pthreadVC$(PTW32_VER)d.dll
 # C++ Exceptions in application - using VC version of pthreads dll
-VCXFLAGS	= /EHs /TP /D__PTW32_CLEANUP_C
+VCXFLAGS	= /EHs /TP /DPTW32_CLEANUP_C
 
 # Defaults
 CPLIB	= $(VCLIB)

@@ -42,7 +42,7 @@
 
 
 int
-__ptw32_processInitialize (void)
+ptw32_processInitialize (void)
      /*
       * ------------------------------------------------------
       * DOCPRIVATE
@@ -56,7 +56,7 @@ __ptw32_processInitialize (void)
       *      This function performs process wide initialization for
       *      the pthread library.
       *      If successful, this routine sets the global variable
-      *      __ptw32_processInitialized to TRUE.
+      *      ptw32_processInitialized to TRUE.
       *
       * RESULTS
       *              TRUE    if successful,
@@ -65,72 +65,72 @@ __ptw32_processInitialize (void)
       * ------------------------------------------------------
       */
 {
-  if (__ptw32_processInitialized)
+  if (ptw32_processInitialized)
     {
-      return  __PTW32_TRUE;
+      return PTW32_TRUE;
     }
 
   /*
    * Explicitly initialise all variables from global.c
    */
-  __ptw32_threadReuseTop =  __PTW32_THREAD_REUSE_EMPTY;
-  __ptw32_threadReuseBottom =  __PTW32_THREAD_REUSE_EMPTY;
-  __ptw32_selfThreadKey = NULL;
-  __ptw32_cleanupKey = NULL;
-  __ptw32_cond_list_head = NULL;
-  __ptw32_cond_list_tail = NULL;
+  ptw32_threadReuseTop =  PTW32_THREAD_REUSE_EMPTY;
+  ptw32_threadReuseBottom =  PTW32_THREAD_REUSE_EMPTY;
+  ptw32_selfThreadKey = NULL;
+  ptw32_cleanupKey = NULL;
+  ptw32_cond_list_head = NULL;
+  ptw32_cond_list_tail = NULL;
 
-  __ptw32_concurrency = 0;
+  ptw32_concurrency = 0;
 
   /* What features have been auto-detected */
-  __ptw32_features = 0;
+  ptw32_features = 0;
 
   /*
    * Global [process wide] thread sequence Number
    */
-  __ptw32_threadSeqNumber = 0;
+  ptw32_threadSeqNumber = 0;
 
   /*
    * Function pointer to QueueUserAPCEx if it exists, otherwise
    * it will be set at runtime to a substitute routine which cannot unblock
    * blocked threads.
    */
-  __ptw32_register_cancellation = NULL;
+  ptw32_register_cancellation = NULL;
 
   /*
    * Global lock for managing pthread_t struct reuse.
    */
-  __ptw32_thread_reuse_lock = 0;
+  ptw32_thread_reuse_lock = 0;
 
   /*
    * Global lock for testing internal state of statically declared mutexes.
    */
-  __ptw32_mutex_test_init_lock = 0;
+  ptw32_mutex_test_init_lock = 0;
 
   /*
    * Global lock for testing internal state of PTHREAD_COND_INITIALIZER
    * created condition variables.
    */
-  __ptw32_cond_test_init_lock = 0;
+  ptw32_cond_test_init_lock = 0;
 
   /*
    * Global lock for testing internal state of PTHREAD_RWLOCK_INITIALIZER
    * created read/write locks.
    */
-  __ptw32_rwlock_test_init_lock = 0;
+  ptw32_rwlock_test_init_lock = 0;
 
   /*
    * Global lock for testing internal state of PTHREAD_SPINLOCK_INITIALIZER
    * created spin locks.
    */
-  __ptw32_spinlock_test_init_lock = 0;
+  ptw32_spinlock_test_init_lock = 0;
 
   /*
    * Global lock for condition variable linked list. The list exists
    * to wake up CVs when a WM_TIMECHANGE message arrives. See
    * w32_TimeChangeHandler.c.
    */
-  __ptw32_cond_list_lock = 0;
+  ptw32_cond_list_lock = 0;
 
   #if defined(_UWIN)
   /*
@@ -139,18 +139,16 @@ __ptw32_processInitialize (void)
   pthread_count = 0;
   #endif
 
-  __ptw32_processInitialized =  __PTW32_TRUE;
+  ptw32_processInitialized =  PTW32_TRUE;
 
   /*
    * Initialize Keys
    */
-  if ((pthread_key_create (&__ptw32_selfThreadKey, NULL) != 0) ||
-      (pthread_key_create (&__ptw32_cleanupKey, NULL) != 0))
+  if ((pthread_key_create (&ptw32_selfThreadKey, NULL) != 0) ||
+      (pthread_key_create (&ptw32_cleanupKey, NULL) != 0))
     {
-
-      __ptw32_processTerminate ();
+      ptw32_processTerminate ();
     }
 
-  return (__ptw32_processInitialized);
-
+  return (ptw32_processInitialized);
 }				/* processInitialize */

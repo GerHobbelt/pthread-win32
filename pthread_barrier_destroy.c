@@ -44,14 +44,14 @@ pthread_barrier_destroy (pthread_barrier_t * barrier)
 {
   int result = 0;
   pthread_barrier_t b;
-  __ptw32_mcs_local_node_t node;
+  ptw32_mcs_local_node_t node;
 
-  if (barrier == NULL || *barrier == (pthread_barrier_t)  __PTW32_OBJECT_INVALID)
+  if (barrier == NULL || *barrier == (pthread_barrier_t) PTW32_OBJECT_INVALID)
     {
       return EINVAL;
     }
 
-  if (0 != __ptw32_mcs_lock_try_acquire(&(*barrier)->lock, &node))
+  if (0 != ptw32_mcs_lock_try_acquire(&(*barrier)->lock, &node))
     {
       return EBUSY;
     }
@@ -66,7 +66,7 @@ pthread_barrier_destroy (pthread_barrier_t * barrier)
 	{
       if (0 == (result = sem_destroy (&(b->semBarrierBreeched))))
         {
-          *barrier = (pthread_barrier_t)  __PTW32_OBJECT_INVALID;
+          *barrier = (pthread_barrier_t) PTW32_OBJECT_INVALID;
           /*
            * Release the lock before freeing b.
            *
@@ -77,7 +77,7 @@ pthread_barrier_destroy (pthread_barrier_t * barrier)
            * pthread_barrier_t_ to an instance. This is a change to the ABI
            * and will require a major version number increment.
            */
-          __ptw32_mcs_lock_release(&node);
+          ptw32_mcs_lock_release(&node);
 	  (void) free (b);
 	  return 0;
 	}
@@ -100,6 +100,6 @@ pthread_barrier_destroy (pthread_barrier_t * barrier)
         }
     }
 
-  __ptw32_mcs_lock_release(&node);
+  ptw32_mcs_lock_release(&node);
   return (result);
 }

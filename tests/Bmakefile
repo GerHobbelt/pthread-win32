@@ -50,15 +50,15 @@ OPTIM	= -O2
 XXLIBS	= cw32mti.lib ws2_32.lib
 
 # C++ Exceptions
-BCEFLAGS	= -P -D__PtW32NoCatchWarn -D__PTW32_CLEANUP_CXX
+BCEFLAGS	= -P -D__PtW32NoCatchWarn -DPTW32_CLEANUP_CXX
 BCELIB	= pthreadBCE$(PTW32_VER).lib
 BCEDLL	= pthreadBCE$(PTW32_VER).dll
 # C cleanup code
-BCFLAGS	= -D__PTW32_CLEANUP_C
+BCFLAGS	= -DPTW32_CLEANUP_C
 BCLIB	= pthreadBC$(PTW32_VER).lib
 BCDLL	= pthreadBC$(PTW32_VER).dll
 # C++ Exceptions in application - using VC version of pthreads dll
-BCXFLAGS	= -D__PTW32_CLEANUP_C
+BCXFLAGS	= -DPTW32_CLEANUP_C
 
 # Defaults
 CPLIB	= $(BCLIB)

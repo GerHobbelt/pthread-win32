@@ -44,7 +44,7 @@
 
 
 int
-__ptw32_semwait (sem_t * sem)
+ptw32_semwait (sem_t * sem)
 /*
  * ------------------------------------------------------
  * DESCRIPTION
@@ -68,14 +68,14 @@ __ptw32_semwait (sem_t * sem)
  * ------------------------------------------------------
  */
 {
-  __ptw32_mcs_local_node_t node;
+  ptw32_mcs_local_node_t node;
   int v;
   int result = 0;
   sem_t s = *sem;
 
-  __ptw32_mcs_lock_acquire(&s->lock, &node);
+  ptw32_mcs_lock_acquire(&s->lock, &node);
   v = --s->value;
-  __ptw32_mcs_lock_release(&node);
+  ptw32_mcs_lock_release(&node);
 
   if (v < 0)
     {
@@ -83,13 +83,13 @@ __ptw32_semwait (sem_t * sem)
       if (WaitForSingleObject (s->sem, INFINITE) == WAIT_OBJECT_0)
         {
 #if defined(NEED_SEM)
-          __ptw32_mcs_lock_acquire(&s->lock, &node);
+          ptw32_mcs_lock_acquire(&s->lock, &node);
           if (s->leftToUnblock > 0)
             {
               --s->leftToUnblock;
               SetEvent(s->sem);
             }
-          __ptw32_mcs_lock_release(&node);
+          ptw32_mcs_lock_release(&node);
 #endif
 return 0;
         }
@@ -101,10 +101,10 @@ return 0;
 
   if (result != 0)
     {
-       __PTW32_SET_ERRNO(result);
+       PTW32_SET_ERRNO(result);
       return -1;
     }
 
   return 0;
 
-}				/* __ptw32_semwait */
+}				/* ptw32_semwait */

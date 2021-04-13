@@ -103,13 +103,13 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
 
   if (sem_init (&(cv->semBlockLock), 0, 1) != 0)
     {
-      result =  __PTW32_GET_ERRNO();
+      result = PTW32_GET_ERRNO();
       goto FAIL0;
     }
 
   if (sem_init (&(cv->semBlockQueue), 0, 0) != 0)
     {
-      result =  __PTW32_GET_ERRNO();
+      result = PTW32_GET_ERRNO();
       goto FAIL1;
     }
 
@@ -140,26 +140,26 @@ FAIL0:
 DONE:
   if (0 == result)
     {
-      __ptw32_mcs_local_node_t node;
+      ptw32_mcs_local_node_t node;
 
-      __ptw32_mcs_lock_acquire(&__ptw32_cond_list_lock, &node);
+      ptw32_mcs_lock_acquire(&ptw32_cond_list_lock, &node);
 
       cv->next = NULL;
-      cv->prev = __ptw32_cond_list_tail;
+      cv->prev = ptw32_cond_list_tail;
 
-      if (__ptw32_cond_list_tail != NULL)
+      if (ptw32_cond_list_tail != NULL)
 	{
-	  __ptw32_cond_list_tail->next = cv;
+	  ptw32_cond_list_tail->next = cv;
 	}
 
-      __ptw32_cond_list_tail = cv;
+      ptw32_cond_list_tail = cv;
 
-      if (__ptw32_cond_list_head == NULL)
+      if (ptw32_cond_list_head == NULL)
 	{
-	  __ptw32_cond_list_head = cv;
+	  ptw32_cond_list_head = cv;
 	}
 
-      __ptw32_mcs_lock_release(&node);
+      ptw32_mcs_lock_release(&node);
     }
 
   *cond = cv;
