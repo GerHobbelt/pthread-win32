@@ -438,9 +438,6 @@
     <ClCompile Include="..\..\sched_setaffinity.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\autostatic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\pthread_attr_getaffinity_np.c">
       <Filter>Source Files</Filter>
     </ClCompile>

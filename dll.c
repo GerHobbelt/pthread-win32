@@ -3,6 +3,7 @@
  *
  * Description:
  * This translation unit implements DLL initialisation.
+ * This translation unit implements static auto-init and auto-exit logic.
  *
  * --------------------------------------------------------------------------
  *
