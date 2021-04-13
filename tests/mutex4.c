@@ -72,44 +72,46 @@ test_mutex4(void)
   assert(pthread_mutexattr_init(&ma) == 0);
 
   BEGIN_MUTEX_STALLED_ROBUST(ma)
+  {
+	  wasHere = 0;
+	  assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_DEFAULT) == 0);
+	  assert(pthread_mutex_init(&mutex1, &ma) == 0);
+	  assert(pthread_mutex_lock(&mutex1) == 0);
+	  assert(pthread_create(&t, NULL, unlocker, (void*)(size_t)(IS_ROBUST ? EPERM : 0)) == 0);
+	  assert(pthread_join(t, NULL) == 0);
+	  assert(pthread_mutex_unlock(&mutex1) == IS_ROBUST ? 0 : EPERM);
+	  assert(wasHere == 2);
 
-  wasHere = 0;
-  assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_DEFAULT) == 0);
-  assert(pthread_mutex_init(&mutex1, &ma) == 0);
-  assert(pthread_mutex_lock(&mutex1) == 0);
-  assert(pthread_create(&t, NULL, unlocker, (void *)(size_t)(IS_ROBUST?EPERM:0)) == 0);
-  assert(pthread_join(t, NULL) == 0);
-  assert(pthread_mutex_unlock(&mutex1) == IS_ROBUST?0:EPERM);
-  assert(wasHere == 2);
+	  wasHere = 0;
+	  assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_NORMAL) == 0);
+	  assert(pthread_mutex_init(&mutex1, &ma) == 0);
+	  assert(pthread_mutex_lock(&mutex1) == 0);
+	  assert(pthread_create(&t, NULL, unlocker, (void*)(size_t)(IS_ROBUST ? EPERM : 0)) == 0);
+	  assert(pthread_join(t, NULL) == 0);
+	  assert(pthread_mutex_unlock(&mutex1) == IS_ROBUST ? 0 : EPERM);
+	  assert(wasHere == 2);
 
-  wasHere = 0;
-  assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_NORMAL) == 0);
-  assert(pthread_mutex_init(&mutex1, &ma) == 0);
-  assert(pthread_mutex_lock(&mutex1) == 0);
-  assert(pthread_create(&t, NULL, unlocker, (void *)(size_t)(IS_ROBUST?EPERM:0)) == 0);
-  assert(pthread_join(t, NULL) == 0);
-  assert(pthread_mutex_unlock(&mutex1) == IS_ROBUST?0:EPERM);
-  assert(wasHere == 2);
+	  wasHere = 0;
+	  assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_ERRORCHECK) == 0);
+	  assert(pthread_mutex_init(&mutex1, &ma) == 0);
+	  assert(pthread_mutex_lock(&mutex1) == 0);
+	  assert(pthread_create(&t, NULL, unlocker, (void*)(size_t)EPERM) == 0);
+	  assert(pthread_join(t, NULL) == 0);
+	  assert(pthread_mutex_unlock(&mutex1) == 0);
+	  assert(wasHere == 2);
 
-  wasHere = 0;
-  assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_ERRORCHECK) == 0);
-  assert(pthread_mutex_init(&mutex1, &ma) == 0);
-  assert(pthread_mutex_lock(&mutex1) == 0);
-  assert(pthread_create(&t, NULL, unlocker, (void *)(size_t) EPERM) == 0);
-  assert(pthread_join(t, NULL) == 0);
-  assert(pthread_mutex_unlock(&mutex1) == 0);
-  assert(wasHere == 2);
-
-  wasHere = 0;
-  assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_RECURSIVE) == 0);
-  assert(pthread_mutex_init(&mutex1, &ma) == 0);
-  assert(pthread_mutex_lock(&mutex1) == 0);
-  assert(pthread_create(&t, NULL, unlocker, (void *)(size_t) EPERM) == 0);
-  assert(pthread_join(t, NULL) == 0);
-  assert(pthread_mutex_unlock(&mutex1) == 0);
-  assert(wasHere == 2);
-
+	  wasHere = 0;
+	  assert(pthread_mutexattr_settype(&ma, PTHREAD_MUTEX_RECURSIVE) == 0);
+	  assert(pthread_mutex_init(&mutex1, &ma) == 0);
+	  assert(pthread_mutex_lock(&mutex1) == 0);
+	  assert(pthread_create(&t, NULL, unlocker, (void*)(size_t)EPERM) == 0);
+	  assert(pthread_join(t, NULL) == 0);
+	  assert(pthread_mutex_unlock(&mutex1) == 0);
+	  assert(wasHere == 2);
+  }
   END_MUTEX_STALLED_ROBUST(ma)
+
+  assert(pthread_mutexattr_destroy(&ma) == 0);
 
   return 0;
 }

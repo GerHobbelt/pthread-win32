@@ -82,25 +82,30 @@ test_mutex8r(void)
   assert(pthread_mutexattr_init(&mxAttr) == 0);
 
   BEGIN_MUTEX_STALLED_ROBUST(mxAttr)
+  {
+	  lockCount = 0;
+	  assert(pthread_mutexattr_settype(&mxAttr, PTHREAD_MUTEX_RECURSIVE) == 0);
+	  assert(pthread_mutexattr_gettype(&mxAttr, &mxType) == 0);
+	  assert(mxType == PTHREAD_MUTEX_RECURSIVE);
 
-  lockCount = 0;
-  assert(pthread_mutexattr_settype(&mxAttr, PTHREAD_MUTEX_RECURSIVE) == 0);
-  assert(pthread_mutexattr_gettype(&mxAttr, &mxType) == 0);
-  assert(mxType == PTHREAD_MUTEX_RECURSIVE);
+	  assert(pthread_mutex_init(&mutex, &mxAttr) == 0);
 
-  assert(pthread_mutex_init(&mutex, &mxAttr) == 0);
+	  assert(pthread_mutex_lock(&mutex) == 0);
 
-  assert(pthread_mutex_lock(&mutex) == 0);
+	  assert(pthread_create(&t, NULL, locker, NULL) == 0);
 
-  assert(pthread_create(&t, NULL, locker, NULL) == 0);
+	  Sleep(2000);
 
-  Sleep(2000);
+	  assert(lockCount == 1);
 
-  assert(lockCount == 1);
+	  assert(pthread_mutex_unlock(&mutex) == 0);
 
-  assert(pthread_mutex_unlock(&mutex) == 0);
-
+      assert(pthread_mutex_destroy(&mutex) == 0);
+	  assert(mutex == NULL);
+  }
   END_MUTEX_STALLED_ROBUST(mxAttr)
+
+  assert(pthread_mutexattr_destroy(&mxAttr) == 0);
 
   return 0;
 }
