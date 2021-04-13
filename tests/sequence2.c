@@ -208,7 +208,7 @@ test_sequence2(void)
 	seqmap_set_value = 0;
 	assert(0 == run_a_sequence(NUMTHREADS));
 
-	printf("phase 2: notice the reuse linked list trigger a fault\n");
+	printf("phase 2: notice the reuse linked list will trigger a fault\n");
 	printf("         NOTE: the next ASSERT is EXPECTED!\n");
 	fflush(stdout);
 	
