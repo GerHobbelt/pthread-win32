@@ -87,6 +87,8 @@
 
 #include "test.h"
 
+#define NO_ERROR_DIALOGS 1
+
 /*
  * Create NUMTHREADS threads in addition to the Main thread.
  */
@@ -139,7 +141,7 @@ test_exception2(int argc, char **argv)
       /*
        * result should be 0, 1 or 3 depending on build settings
        */
-      exit((result == 0 || result == 1 || result == 3) ? 0 : 1);
+      return (result == 0 || result == 1 || result == 3) ? 0 : 1;
     }
 
 #if defined(NO_ERROR_DIALOGS)
@@ -153,7 +155,7 @@ test_exception2(int argc, char **argv)
       assert(pthread_create(&et[i], NULL, exceptionedThread, NULL) == 0);
     }
 
-  Sleep(100);
+  Sleep(1000);
 
   /*
    * Success.

@@ -68,7 +68,6 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, ULONG_PTR * ei)
 	  }
 
 	return EXCEPTION_EXECUTE_HANDLER;
-	break;
       }
     default:
       {
@@ -82,7 +81,6 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, ULONG_PTR * ei)
 	ptw32_callUserDestroyRoutines (self);
 
 	return EXCEPTION_CONTINUE_SEARCH;
-	break;
       }
     }
 }
@@ -174,36 +172,49 @@ ptw32_threadStart (void *vthreadParms)
 
   __try
   {
-    /*
-     * Run the caller's routine;
-     */
-    status = sp->exitStatus = (*start) (arg);
-    sp->state = PThreadStateExiting;
-
-#if defined(_UWIN)
-    if (--pthread_count <= 0)
-      exit (0);
-#endif
-
-  }
-  __except (ExceptionFilter (GetExceptionInformation (), ei))
-  {
-    switch (ei[0])
+      __try
       {
-        case PTW32_EPS_CANCEL:
-          status = sp->exitStatus = PTHREAD_CANCELED;
+          /*
+           * Run the caller's routine;
+           */
+          status = sp->exitStatus = (*start) (arg);
+          sp->state = PThreadStateExiting;
+
 #if defined(_UWIN)
           if (--pthread_count <= 0)
-        	exit (0);
+              exit(0);
 #endif
-          break;
-        case PTW32_EPS_EXIT:
-          status = sp->exitStatus;
-          break;
-        default:
-          status = sp->exitStatus = PTHREAD_CANCELED;
-          break;
+
       }
+      __except (ExceptionFilter(GetExceptionInformation(), ei))
+      {
+          switch (ei[0])
+          {
+          case PTW32_EPS_CANCEL:
+              status = sp->exitStatus = PTHREAD_CANCELED;
+#if defined(_UWIN)
+              if (--pthread_count <= 0)
+                  exit(0);
+#endif
+              break;
+          case PTW32_EPS_EXIT:
+              status = sp->exitStatus;
+              break;
+          default:
+              status = sp->exitStatus = PTHREAD_CANCELED;
+              break;
+          }
+      }
+  }
+  __except (EXCEPTION_EXECUTE_HANDLER)
+  {
+      /*
+       * Some other exception occurred. 
+	   * Abort the thread and mark it as canceled.
+	   * Do not terminate the application.
+       */
+      status = sp->exitStatus = PTHREAD_CANCELED;
+      //(void)pthread_win32_thread_detach_np();
   }
 
 #else /* __CLEANUP_SEH */
