@@ -4,7 +4,7 @@ PTHREADS4W (a.k.a. PTHREADS-WIN32)
 What is it?
 -----------
 
-Pthreads4w is an Open Source Software implementation of the Threads
+pthreads-w32 / Pthreads4w is an Open Source Software implementation of the Threads
 component of the POSIX 1003.1c 1995 Standard (or later) for Microsoft's
 Windows environment. Some functions from POSIX 1003.1b are also supported,
 including semaphores. Other related functions include the set of read-write
@@ -132,7 +132,7 @@ Microsoft version numbers use 4 integers:
 
 	0.0.0.0
 
-Pthreads4w uses the first 3 following the standard major.minor.micro
+pthreads-w32 uses the first 3 following the standard major.minor.micro
 system. We had claimed to follow the Libtool convention but this has
 not been the case with recent releases. Binary compatibility and
 consequently library file naming has not changed over this time either
@@ -171,7 +171,7 @@ applications can continue to be used. For pre .NET Windows systems,
 this inevitably requires incompatible versions of the same DLLs to have
 different names.
 
-Pthreads4w has adopted the Cygwin convention of appending a single
+pthreads-w32 has adopted the Cygwin convention of appending a single
 integer number to the DLL name. The number used is simply the library's
 major version number.
 

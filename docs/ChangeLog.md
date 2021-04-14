@@ -183,7 +183,7 @@
 
 2015-11-01	Mark Smith <masmith at fb dot com>
 
-	* ptw32_relnillisecs.c: Fix erroneous 0-time waits, symptomizing as
+	* ptw32_relmillisecs.c: Fix erroneous 0-time waits, symptomizing as
 	busy-spinning eating CPU. When the time to wait is specified to be less
 	than 1 millisecond were erroneously rounded down to 0; Modify WinCE
 	dependency.
