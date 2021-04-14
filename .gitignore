@@ -103,6 +103,7 @@ Release-64/
 *.scc
 *.exe
 *.a
+*.manifest
 
 # Visual C++ cache files
 ipch/

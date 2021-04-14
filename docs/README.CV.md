@@ -694,7 +694,7 @@ Sleep( 1 ); // @AT
       *      if we are canceled.
       */
       if (ptw32_sem_timedwait (&(cv->sema), abstime) == -1)         {
-          result = PTW32_GET_ERRNO();
+          result =  PTW32_GET_ERRNO();
         }
     }
 
@@ -1137,7 +1137,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
       return EINVAL;
     }
 
-  if (*cond != (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
+  if (*cond != (pthread_cond_t)  PTW32_OBJECT_AUTO_INIT)
     {(*cond
       cv = *cond;
 
@@ -1189,7 +1189,7 @@ pthread_cond_destroy (pthread_cond_t * cond)
       /*
        * Check again.
        */
-      if (*cond == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
+      if (*cond == (pthread_cond_t)  PTW32_OBJECT_AUTO_INIT)
         {(*cond
           /*
            * This is all we need to do to destroy a statically
@@ -1272,7 +1272,7 @@ ptw32_cond_wait_cleanup(void * args)
       */
       if (sem_post(&(cv->semBlockLock)) != 0)
         {(sem_post(&(cv->semBlockLock))
-          *resultPtr = PTW32_GET_ERRNO();
+          *resultPtr =  PTW32_GET_ERRNO();
           return;
         }
     }
@@ -1286,7 +1286,7 @@ ptw32_cond_wait_cleanup(void * args)
       */
       if (sem_post(&(cv->semBlockQueue)) != 0)
         {(sem_post(&(cv->semBlockQueue))
-          *resultPtr = PTW32_GET_ERRNO();
+          *resultPtr =  PTW32_GET_ERRNO();
           return;
         }
     }
@@ -1322,7 +1322,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
    * again inside the guarded section of ptw32_cond_check_need_init()
    * to avoid race conditions.
    */
-  if (*cond == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
+  if (*cond == (pthread_cond_t)  PTW32_OBJECT_AUTO_INIT)
     {(*cond
       result = ptw32_cond_check_need_init(cond);
     }
@@ -1385,7 +1385,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
        */
       if (ptw32_sem_timedwait (&(cv->semBlockQueue), abstime) != 0)
         {(ptw32_sem_timedwait
-          result = PTW32_GET_ERRNO();
+          result =  PTW32_GET_ERRNO();
         }
     }
 
@@ -1421,7 +1421,7 @@ ptw32_cond_unblock (pthread_cond_t * cond,
    * No-op if the CV is static and hasn't been initialised yet.
    * Assuming that any race condition is harmless.
    */
-  if (cv == (pthread_cond_t) PTW32_OBJECT_AUTO_INIT)
+  if (cv == (pthread_cond_t)  PTW32_OBJECT_AUTO_INIT)
     {(cv
       return 0;
     }

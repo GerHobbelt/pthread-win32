@@ -124,8 +124,8 @@ mythread(void * arg)
 #if !defined(__cplusplus)
   __except(EXCEPTION_EXECUTE_HANDLER)
 #else
-#if defined(PtW32CatchAll)
-  PtW32CatchAll
+#if defined(__PtW32CatchAll)
+  __PtW32CatchAll
 #else
   catch(...)
 #endif

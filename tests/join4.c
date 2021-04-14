@@ -16,17 +16,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- *
+ * 
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- *
+ * 
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- *
+ * 
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -55,10 +55,8 @@ int
 #endif
 {
         pthread_t id;
-        struct timespec abstime;
+        struct timespec abstime, reltime = { 1, 0 };
         void* result = (void*)-1;
-        PTW32_STRUCT_TIMEB currSysTime;
-        const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
         assert(pthread_create(&id, NULL, func, (void *)(size_t)999) == 0);
 
@@ -67,13 +65,9 @@ int
          */
         Sleep(100);
 
-        PTW32_FTIME(&currSysTime);
-
-        abstime.tv_sec = (long)currSysTime.time;
-        abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
+        (void) pthread_win32_getabstime_np(&abstime, &reltime);
 
         /* Test for pthread_timedjoin_np timeout */
-        abstime.tv_sec += 1;
         assert(pthread_timedjoin_np(id, &result, &abstime) == ETIMEDOUT);
         assert((int)(size_t)result == -1);
 

@@ -43,38 +43,30 @@
 
 #include "pthread.h"
 #include "implement.h"
-#if !defined(NEED_FTIME)
-#include <sys/timeb.h>
-#endif
 
+static const int64_t NANOSEC_PER_SEC = 1000000000;
+static const int64_t NANOSEC_PER_MILLISEC = 1000000;
+static const int64_t MILLISEC_PER_SEC = 1000;
 
-#if defined(PTW32_BUILD_INLINED)
-INLINE 
-#endif /* PTW32_BUILD_INLINED */
+#if defined (PTW32_BUILD_INLINED)
+INLINE
+#endif /*  PTW32_BUILD_INLINED */
 DWORD
 ptw32_relmillisecs (const struct timespec * abstime)
 {
-  const int64_t NANOSEC_PER_MILLISEC = 1000000;
-  const int64_t MILLISEC_PER_SEC = 1000;
   DWORD milliseconds;
-  int64_t tmpAbsMilliseconds;
-  int64_t tmpCurrMilliseconds;
-#if defined(NEED_FTIME)
+  int64_t tmpAbsNanoseconds;
+  int64_t tmpCurrNanoseconds;
+
   struct timespec currSysTime;
   FILETIME ft;
+
+# if defined(WINCE)
   SYSTEMTIME st;
-#else /* ! NEED_FTIME */
-#if ( defined(_MSC_VER) && _MSC_VER >= 1300 ) /* MSVC7+ */ || \
-    ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0601 )
-  struct __timeb64 currSysTime;
-#else
-  struct _timeb currSysTime;
 #endif
-#endif /* NEED_FTIME */
 
-
-  /* 
-   * Calculate timeout as milliseconds from current system time. 
+  /*
+   * Calculate timeout as milliseconds from current system time.
    */
 
   /*
@@ -84,50 +76,34 @@ ptw32_relmillisecs (const struct timespec * abstime)
    *
    * Assume all integers are unsigned, i.e. cannot test if less than 0.
    */
-  tmpAbsMilliseconds =  (int64_t)abstime->tv_sec * MILLISEC_PER_SEC;
-  tmpAbsMilliseconds += ((int64_t)abstime->tv_nsec + (NANOSEC_PER_MILLISEC/2)) / NANOSEC_PER_MILLISEC;
+  tmpAbsNanoseconds = (int64_t)abstime->tv_nsec + ((int64_t)abstime->tv_sec * NANOSEC_PER_SEC);
 
   /* get current system time */
 
-#if defined(NEED_FTIME)
-
+# if defined(WINCE)
   GetSystemTime(&st);
   SystemTimeToFileTime(&st, &ft);
-  /*
-   * GetSystemTimeAsFileTime(&ft); would be faster,
-   * but it does not exist on WinCE
-   */
+# else
+  GetSystemTimeAsFileTime(&ft);
+# endif
 
   ptw32_filetime_to_timespec(&ft, &currSysTime);
 
-  tmpCurrMilliseconds = (int64_t)currSysTime.tv_sec * MILLISEC_PER_SEC;
-  tmpCurrMilliseconds += ((int64_t)currSysTime.tv_nsec + (NANOSEC_PER_MILLISEC/2))
-			   / NANOSEC_PER_MILLISEC;
+  tmpCurrNanoseconds = (int64_t)currSysTime.tv_nsec + ((int64_t)currSysTime.tv_sec * NANOSEC_PER_SEC);
 
-#else /* ! NEED_FTIME */
-
-#if defined(_MSC_VER) && _MSC_VER >= 1400  /* MSVC8+ */
-  _ftime64_s(&currSysTime);
-#elif ( defined(_MSC_VER) && _MSC_VER >= 1300 ) /* MSVC7+ */ || \
-      ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0601 )
-  _ftime64(&currSysTime);
-#else
-  _ftime(&currSysTime);
-#endif
-
-  tmpCurrMilliseconds = (int64_t) currSysTime.time * MILLISEC_PER_SEC;
-  tmpCurrMilliseconds += (int64_t) currSysTime.millitm;
-
-#endif /* NEED_FTIME */
-
-  if (tmpAbsMilliseconds > tmpCurrMilliseconds)
+  if (tmpAbsNanoseconds > tmpCurrNanoseconds)
     {
-      milliseconds = (DWORD) (tmpAbsMilliseconds - tmpCurrMilliseconds);
-      if (milliseconds == INFINITE)
-        {
-          /* Timeouts must be finite */
-          milliseconds--;
-        }
+      int64_t deltaNanoseconds = tmpAbsNanoseconds - tmpCurrNanoseconds;
+
+      if (deltaNanoseconds >= ((int64_t)INFINITE * NANOSEC_PER_MILLISEC))
+         {
+           /* Timeouts must be finite */
+           milliseconds = INFINITE - 1;
+         }
+       else
+         {
+           milliseconds = (DWORD)(deltaNanoseconds / NANOSEC_PER_MILLISEC);
+         }
     }
   else
     {
@@ -135,5 +111,61 @@ ptw32_relmillisecs (const struct timespec * abstime)
       milliseconds = 0;
     }
 
+  if (milliseconds == 0 && tmpAbsNanoseconds > tmpCurrNanoseconds) {
+     /*
+      * millisecond granularity was too small to represent the wait time.
+      * return the minimum time in milliseconds.
+      */
+     milliseconds = 1;
+ }
+
   return milliseconds;
+}
+
+
+/*
+ * Return the first parameter "abstime" modified to represent the current system time.
+ * If "relative" is not NULL it represents an interval to add to "abstime".
+ */
+
+struct timespec *
+pthread_win32_getabstime_np (struct timespec * abstime, const struct timespec * relative)
+{
+  int64_t sec;
+  int64_t nsec;
+
+  struct timespec currSysTime;
+  FILETIME ft;
+
+  /* get current system time */
+
+# if defined(WINCE)
+
+  SYSTEMTIME st;
+  GetSystemTime(&st);
+  SystemTimeToFileTime(&st, &ft);
+# else
+  GetSystemTimeAsFileTime(&ft);
+# endif
+
+  ptw32_filetime_to_timespec(&ft, &currSysTime);
+
+  sec = currSysTime.tv_sec;
+  nsec = currSysTime.tv_nsec;
+
+  if (NULL != relative)
+    {
+      nsec += relative->tv_nsec;
+      if (nsec >= NANOSEC_PER_SEC)
+	{
+	  sec++;
+	  nsec -= NANOSEC_PER_SEC;
+	}
+      sec += relative->tv_sec;
+    }
+
+  abstime->tv_sec = (time_t) sec;
+  abstime->tv_nsec = (long) nsec;
+
+  return abstime;
 }

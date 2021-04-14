@@ -395,24 +395,33 @@ the API function pthread_equal() to test for equality.
 
 The problem
 
-Certain applications would like to be able to access only the 'pure' pthread_t
-id values, primarily to use as keys into data structures to manage threads or
+Certain applications would like to be able to access a scalar pthread_t,
+primarily to use as keys into data structures to manage threads or
 thread-related data, but this is not possible in a maximally portable and
 standards compliant way for current POSIX threads implementations.
 
-For implementations that define pthread_t as a scalar, programmers often employ
-direct relational and equality operators on pthread_t. This code will break when
-ported to an implementation that defines pthread_t as an aggregate type.
+This use is often required because pthread_t values are not unique through
+the life of the process and so it is necessary for the application to keep
+track of a threads status itself, and ironically this is because they are
+scalar types in the first place.
+
+To my knowledge the only platform that provides a scalar pthread_t that is
+unique through the life of a process is Solaris. Other platforms, including
+HPUX, will not provide support to applications that do this.
+
+For implementations that define pthread_t as a scalar, programmers often
+employ direct relational and equality operators with pthread_t. This code
+will break when ported to a standard-comforming implementation that defines
+pthread_t as an aggregate type.
 
 For implementations that define pthread_t as an aggregate, e.g. a struct,
 programmers can use memcmp etc., but then face the prospect that the struct may
 include alignment padding bytes or bits as well as extra implementation-specific
 members that are not part of the unique identifying value.
 
-[While this is not currently the case for pthreads-win32, opacity also
-means that an implementation is free to change the definition, which should
-generally only require that applications be recompiled and relinked, not
-rewritten.]
+Opacity also means that an implementation is free to change the definition,
+which should generally only require that applications be recompiled and relinked,
+not rewritten.
 
 
 Doesn't the compiler take care of padding?
@@ -456,9 +465,9 @@ How can we force the behaviour we need?
 Solutions
 
 Adding new functions to the standard API or as non-portable extentions is
-the only reliable and portable way to provide the necessary operations.
-Remember also that POSIX is not tied to the C language. The most common
-functions that have been suggested are:
+the only reliable to provide the necessary operations. Remember also that
+POSIX is not tied to the C language. The most common functions that have
+been suggested are:
 
 pthread_null()
 pthread_compare()
@@ -779,7 +788,8 @@ extention: provided the union contains a member of the same type as the
 object then the object may be cast to the union itself.
 
 We could use this feature to speed up the pthrcmp() function from example 2
-above by casting rather than assigning the pthread_t arguments to the union, e.g.:
+above by directly referencing rather than copying the pthread_t arguments to
+the local union variables, e.g.:
 
 int pthcmp(pthread_t left, pthread_t right)
 {

@@ -19,17 +19,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- *
+ * 
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- *
+ * 
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- *
+ * 
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -40,12 +40,6 @@
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
-#endif
-
-#if defined(PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400 && defined(_WINDLL)
-#  undef PTW32_STATIC_LIB
-#  define PTW32_STATIC_TLSLIB
-#endif
 
 /* [i_a] sanity build checks */
 #if defined(_MSC_VER) && (defined(_WIN32) || defined(_WIN64))
@@ -59,7 +53,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-#if !defined(PTW32_STATIC_LIB)
+#if !defined (PTW32_STATIC_LIB)
 
 #if defined(_MSC_VER)
 /*
@@ -69,14 +63,9 @@
 #pragma warning( disable : 4100 )
 #endif
 
-#if defined(__cplusplus)
-/*
- * Dear c++: Please don't mangle this name. -thanks
- */
-extern "C"
-#endif				/* __cplusplus */
-  BOOL WINAPI
-DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
+PTW32_BEGIN_C_DECLS
+
+BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
   BOOL result = PTW32_TRUE;
 
@@ -110,41 +99,16 @@ DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
   return (result);
 }				/* DllMain */
 
+PTW32_END_C_DECLS
+
 #endif /* !PTW32_STATIC_LIB */
 
-#if ! defined(PTW32_BUILD_INLINED)
+#if ! defined (PTW32_BUILD_INLINED)
 /*
  * Avoid "translation unit is empty" warnings
  */
 typedef int foo;
 #endif
-
-/* Visual Studio 8+ can leverage PIMAGE_TLS_CALLBACK CRT segments, which
- * give a static lib its very own DllMain.
- */
-#ifdef PTW32_STATIC_TLSLIB
-
-static void WINAPI
-TlsMain(PVOID h, DWORD r, PVOID u)
-{
-  (void)DllMain((HINSTANCE)h, r, u);
-}
-
-#ifdef _M_X64
-# pragma comment (linker, "/INCLUDE:_tls_used")
-# pragma comment (linker, "/INCLUDE:_xl_b")
-# pragma const_seg(".CRT$XLB")
-EXTERN_C const PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
-# pragma const_seg()
-#else
-# pragma comment (linker, "/INCLUDE:__tls_used")
-# pragma comment (linker, "/INCLUDE:__xl_b")
-# pragma data_seg(".CRT$XLB")
-EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
-# pragma data_seg()
-#endif /* _M_X64 */
-
-#endif /* PTW32_STATIC_TLSLIB */
 
 #if defined(PTW32_STATIC_LIB)
 
@@ -153,7 +117,7 @@ EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
  * on thread exit. Code here can only do process init and exit functions.
  */
 
-#if defined(PTW32_CONFIG_MINGW) || defined(_MSC_VER)
+#if defined(__MINGW32__) || defined(_MSC_VER)
 
 /* For an explanation of this code (at least the MSVC parts), refer to
  *
@@ -188,7 +152,7 @@ extern int ptw32_on_process_exit(void)
     return 0;
 }
 
-#if defined(PTW32_CONFIG_MINGW)
+#if defined(__GNUC__)
 __attribute__((section(".ctors"), used)) extern int (*gcc_ctor)(void) = ptw32_on_process_init;
 __attribute__((section(".dtors"), used)) extern int (*gcc_dtor)(void) = ptw32_on_process_exit;
 #elif defined(_MSC_VER)
@@ -206,7 +170,9 @@ extern int (*msc_dtor)(void) = ptw32_on_process_exit;
 #  endif
 #endif
 
-#endif /* defined(PTW32_CONFIG_MINGW) || defined(_MSC_VER) */
+#endif /* defined(__MINGW32__) || defined(_MSC_VER) */
+
+PTW32_BEGIN_C_DECLS
 
 /* This dummy function exists solely to be referenced by other modules
  * (specifically, in implement.h), so that the linker can't optimize away
@@ -218,5 +184,7 @@ extern int (*msc_dtor)(void) = ptw32_on_process_exit;
  */
 void ptw32_autostatic_anchor(void) { abort(); }
 
-#endif /* PTW32_STATIC_LIB */
+PTW32_END_C_DECLS
+
+#endif /*  PTW32_STATIC_LIB */
 

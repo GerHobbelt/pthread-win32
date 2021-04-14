@@ -81,7 +81,7 @@
 
 static pthread_cond_t cv;
 static pthread_mutex_t mutex;
-static struct timespec abstime = { 0, 0 };
+static struct timespec abstime = { 0, 0 }, reltime = { 5, 0 };
 
 enum {
   NUMTHREADS = 30
@@ -99,6 +99,8 @@ mythread(void * arg)
   return arg;
 }
 
+/* Cheating here - sneaking a peek at library internals */
+#include "../config.h"
 #include "../implement.h"
 
 #ifndef MONOLITHIC_PTHREAD_TESTS
@@ -111,20 +113,12 @@ test_condvar2_1(void)
 {
   int i;
   pthread_t t[NUMTHREADS + 1];
-  PTW32_STRUCT_TIMEB currSysTime;
-  const DWORD NANOSEC_PER_MILLISEC = 1000000;
 
   assert(pthread_cond_init(&cv, NULL) == 0);
 
   assert(pthread_mutex_init(&mutex, NULL) == 0);
 
-  /* get current system time */
-  PTW32_FTIME(&currSysTime);
-
-  abstime.tv_sec = (long)currSysTime.time;
-  abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
-
-  abstime.tv_sec += 5;
+  pthread_win32_getabstime_np(&abstime, &reltime);
 
   assert(pthread_mutex_lock(&mutex) == 0);
 

@@ -18,17 +18,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- *
+ * 
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- *
+ * 
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- *
+ * 
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -67,7 +67,6 @@ pthread_self (void)
       */
 {
   pthread_t self;
-  DWORD_PTR vThreadMask, vProcessMask, vSystemMask;
   pthread_t nil = {NULL, 0};
   ptw32_thread_t * sp;
 
@@ -88,6 +87,7 @@ pthread_self (void)
   else
     {
 	  int fail = PTW32_FALSE;
+
       /*
        * Need to create an implicit 'self' for the currently
        * executing thread.
@@ -139,6 +139,7 @@ pthread_self (void)
     	       * affinity to that of the process to get the old thread affinity,
     	       * then reset to the old affinity.
     	       */
+	      DWORD_PTR vThreadMask, vProcessMask, vSystemMask;
     	      if (GetProcessAffinityMask(GetCurrentProcess(), &vProcessMask, &vSystemMask))
     	        {
     	          vThreadMask = SetThreadAffinityMask(sp->threadH, vProcessMask);
@@ -156,10 +157,6 @@ pthread_self (void)
 
 #endif
 
-    	      /*
-    	       * No need to explicitly serialise access to sched_priority
-    	       * because the new handle is not yet public.
-    	       */
     	      sp->sched_priority = GetThreadPriority (sp->threadH);
     	      pthread_setspecific (ptw32_selfThreadKey, (void *) sp);
     	    }
@@ -179,6 +176,16 @@ pthread_self (void)
     	   */
     	  return nil;
         }
+      else
+	{
+	  /*
+	   * This implicit POSIX thread is running (it called us).
+	   * No other thread can reference us yet because all API calls
+	   * passing a pthread_t should recognise an invalid thread id
+	   * through the reuse counter inequality.
+	   */
+    	  sp->state = PThreadStateRunning;
+	}
     }
 
   return (self);

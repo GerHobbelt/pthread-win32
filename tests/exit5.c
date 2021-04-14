@@ -16,17 +16,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- *
+ * 
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- *
+ * 
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- *
+ * 
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -97,7 +97,7 @@ struct bag_t_ {
 static bag_t threadbag[NUMTHREADS + 1];
 
 static
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
 unsigned __stdcall
 #else
 void
@@ -139,7 +139,7 @@ test_exit5(void)
     {
       threadbag[i].started = 0;
       threadbag[i].threadnum = i;
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
       h[i] = (HANDLE) _beginthreadex(NULL, 0, Win32thread, (void *) &threadbag[i], 0, &thrAddr);
 #else
       h[i] = (HANDLE) _beginthread(Win32thread, 0, (void *) &threadbag[i]);
@@ -179,7 +179,7 @@ test_exit5(void)
       int fail = 0;
       int result = 0;
 
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__)
       assert(GetExitCodeThread(h[i], (LPDWORD) &result) == TRUE);
 #else
       /*

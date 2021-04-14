@@ -159,6 +159,22 @@
 * (3573556) Removed line since see no need to enable switches
 			
 * (eea3c89) Combined Readme and added changes to readme
+
+
+			
+
+
+
+2019-11-03
+----------
+
+2019-11-03  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* NOTICE: Remove third party code acknowledgments because files have been
+	removed from distro.
+
+			
+
 			
 
 
@@ -222,6 +238,18 @@
 
 			
 * (1ed67a4) support uwp platform
+
+
+
+
+
+2018-08-19
+----------
+
+2018-08-19  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* context.h (PTW32_PROCPTR): Added missing '__' prefix for v3.
+
 			
 
 
@@ -231,6 +259,72 @@
 
 			
 * (85f21e7) pthread for windows updated
+
+			
+
+
+
+2018-08-10
+----------
+
+2018-08-10  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile (clean): remove *.idb files.
+	* dll.c: replace 'extern "C"' with macros PTW32_BEGIN_C_DECLS/PTW32_BEGIN_C_DECLS
+	for consistency tidy-up; add comment re ptw32_autostatic_anchor() function;
+	make our static constructor/destructors "extern" to avoid optimisers.
+	* implement.h (ptw32_autostatic_anchor): add PTW32_BEGIN_C_DECLS/PTW32_BEGIN_C_DECLS
+	envelope.
+
+			
+
+
+
+2018-08-08
+----------
+
+2018-08-08  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile: "nmake realclean VC VC-static" and similar wasn't remaking pthread.obj.
+	* common.mk: changes to accommodate the above.
+	* GNUmakefile: use changes in common.mk but still has problem with
+	"make realclean GC GC-static" and similar.
+	* configure.ac (AC_INIT): package name change.
+
+2018-08-08  Mark Pizzolato <markpizzolato dash pthreads dash win32 at subscriptions dot pizzolato dot net>
+
+	* config.h (NEED_FTIME): Removed
+	* _ptw32.h (NEED_FTIME): Removed.
+	* ptw32_timespec.c (NEED_FTIME): Removed conditional.
+	* ptw32_relmillisecs: Fix long-standing bug in NEED_FTIME code; remove NEED_FTIME
+	and all !NEED_FTIME code; compare nanoseconds and convert to milliseconds
+	at the end.
+	* implement.h (NEED_FTIME): remove conditionals.
+	* pthread.h: Remove Borland compiler time types no longer needed.
+	* configure.ac (NEED_FTIME): Removed check.
+	
+			
+
+
+
+2018-08-07
+----------
+
+2018-08-07  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile.in (DLL_VER): rename as PTW32_VER.
+	* Makefile (DLL_VER): Likewise.
+	* Bmakefile (DLL_VER): Likewise; does anyone use this anymore?
+	* pthread.h: Move internal library stuff from pthread.h to _pthw32.h
+	* _ptw32.h: As above.
+	* ANNOUNCE: Update.
+	* NEWS: Update.
+	* Makefile: Static libraries renamed to libpthreadV*
+
+			
+
+
+
 			
 
 
@@ -240,6 +334,36 @@
 
 			
 * (89d7bd5..8d58eb2) Added VS2015 project files.
+
+
+
+
+
+2018-07-22
+----------
+
+2018-07-22  Mark Pizzolato <markpizzolato dash pthreads dash win32 at subscriptions dot pizzolato dot net>
+
+	* _ptw32.h: Restore support for compiling as static (with /MT or /MTd);
+	define int64_t and uint64_t as typedefs rather than #defines.
+	* dll.c: Likewise.
+	* implement.h: Likewise.
+	* need_errno.h: Likewise.
+	* pthread_detach.c: Likewise.
+
+2018-07-22  Carlo Bramini <carlo underscore bramini at users dot sourceforge dot net>
+
+	* context.h (ARM): Additional macros checked for ARM processors.
+
+2018-07-22  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Makefile (all-tests-md): New; run the /MD build and tests from
+	all-tests-cflags.
+	* Makefile (all-tests-mt): New; run the /MT build and tests from
+	all-tests-cflags.
+	* Makefile (all-tests-cflags): retain; require all-tests-md and
+	all-tests-mt.
+	
 			
 
 
@@ -265,6 +389,204 @@
   
   Signed-off-by: hayati ayguen <h_ayguen@web.de>
 			
+
+
+
+
+
+
+2016-12-25
+----------
+
+2016-12-25  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* Change all license notices to the Apache License 2.0
+	* LICENCE: New Apache License file
+	* NOTICE: New file.
+	* COPYING: Removed.
+	* COPYING.GPL: Removed.
+
+
+
+
+
+
+2016-12-20
+----------
+
+2016-12-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* implement.h (PThreadStateReuse): this thread state enum value
+	must be less than PThreadStateRunning to reflect an invalid thread
+	handle.
+	* pthread_kill.c: changed conditions for return of ESRCH.
+	* ptw32_destroy.c: copy HANDLEs rather than whole thread struct;
+	edit comment.
+	* pthread_self.c: set implicit thread handle state to PThreadStateRunning.
+	* pthread_create.c: set thread state to PThreadStateSuspended
+	regardless because it must have state >= PThreadStateRunning on return.
+
+2016-12-20  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* all (PTW32_*): rename to PTW32_*.
+	(ptw32_*): rename to ptw32_*.
+	(PtW32*): rename to __PtW32*.
+	* pthread.h (PTW32_VERSION_MAJOR): = 3
+	(PTW32_VERSION_MINOR): = 0
+	* GNUmakefile: removed; must now configure from GNUmakefile.in.
+	I.e. For either MinGW or MinGW-w64:
+		# autoheader
+		# autoconf
+		# ./configure
+	* pthread.h (PTHREAD_ONCE_INIT): for PTW32_VERSION_MAJOR > 2,
+	reverse element values to conform to new pthread_once_t.
+
+
+
+
+
+
+2016-12-18
+----------
+
+2016-12-18  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* implement.h  (PTW32_TEST_SNEAK_PEEK): Defined in tests/test.h
+	to control what some tests see when sneaking a peek inside this
+	header.
+	* GNUMakefile.in: call tests "make realclean"
+
+
+
+
+
+2016-12-17
+----------
+
+2016-12-17  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* _ptw32.h: MINGW(all) include stdint.h to define all specific
+	size integers (int64_t etc).
+	
+2016-12-17  Kyle Schwarz <kyle dot r dot schwarz at gmail dot com>
+
+	* _ptw32.h: MINGW6464 define pid_t as __int64.
+	
+
+
+
+
+2016-04-01
+----------
+
+2016-04-01  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* _ptw32.h: Move more header stuff into here.
+	* pthread.h: Move stuff from here into _ptw32.h.
+	* implement.h: Likewise.
+	* sched.h (struct timespec): Wrap with extra condition check.
+	* pthread_win32_attach_detach.c: Source stdlib.h to define
+	_countof et. al.
+
+
+
+
+
+2016-03-31
+----------
+
+2016-03-31  Keith Marshall <MinGW32 project>
+
+	* aclocal.m4: New from MinGW32 patches for autoconf.
+	* configure.ac: Likewise.
+	* GNUmakefile.in: Likewise.
+	* install-sh: Likewise.
+	* _ptw32.h: Likewise.
+	* implement.h: Patched.
+	* pthread.h: Patched.
+	* sched.h: Patched.
+	* sem_open.c: Patched.
+	* semaphore.h: Patched.
+	* pthread_self.c: Patched.
+
+
+
+
+
+2016-03-28
+----------
+
+2016-03-28  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* ptw32_relmillisecs.c (pthread_win32_getabstime_np): New
+	platform-aware function to return the current time plus optional
+	offset.
+	* pthread.h (pthread_win32_getabstime_np): New exported function.
+	* ptw32_timespec.c: Conditionally compile only if NEED_FTIME config
+	flagged.
+	* sched.h: Update platform config flags for applications.
+	* semaphore.h: Likewise.
+	* pthread.h: Likewise.
+
+
+
+
+2016-03-25
+----------
+
+
+2016-03-25  Bill Parker <wp02855 at gmail dot com>
+
+	* pthread_mutex_init.c: Memory allocation of robust mutex element
+	was not being checked.
+
+
+
+
+2016-02-29
+----------
+	
+2016-02-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
+
+	* GNUmakefile (MINGW_HAVE_SECURE_API): Moved to config.h. Undefined
+	for __MINGW32__; remove (make optional) forcing a specific C std.
+	* implement.h (uint64_t): Define for Visual Studio.
+
+2016-02-29	Keith Marshall <keithmarshall at users dot sourceforge dot net>
+
+	* ptw32_timespec.c: Fix C90 warnings from GCC; int64_t -> uint64_t
+
+
+
+
+2016-02-18
+----------
+
+2016-02-18	Carey Gister <careygister at outlook dot com>
+
+	* dll.c (DllMain): Should not be defined for static library builds.
+	Doing so prevents static linking with a dll library.
+
+
+
+
+2015-11-01
+----------
+
+2015-11-01	Anurag Sharma <anurags at fb dot com>
+
+	* ptw32_MCS_lock.c: Fix a race condition causing crashes.
+	This race condition was also analysed and reported with a slightly
+	different fix independently by Jonathan Brown at VMware.
+
+2015-11-01	Mark Smith <masmith at fb dot com>
+
+	* ptw32_relmillisecs.c: Fix erroneous 0-time waits, symptomizing as
+	busy-spinning eating CPU. When the time to wait is specified to be less
+	than 1 millisecond were erroneously rounded down to 0; Modify WinCE
+	dependency.
+	* ptw32_timespec.c: Remove NEED_FTIME conditionality.
+
 
 
 
@@ -1297,15 +1619,15 @@
 	* README.NONPORTABLE: It's "DllMain", not "dllMain".
 	* common.mk: Start of an attempt to define dependencies for
 	pthread.$(OBJEXT).
-	* implement.h: Generalized PTW32_BROKEN_ERRNO into
+	* implement.h: Generalized  PTW32_BROKEN_ERRNO into
 	PTW32_USES_SEPARATE_CRT; don't do the autostatic-anchoring thing
 	if we're not building the library!
-	* pthread.h: Moved the PTW32_CDECL bit into sched.h. pthread.h
+	* pthread.h: Moved the  PTW32_CDECL bit into sched.h. pthread.h
 	already #includes sched.h, so the latter is a good place to put
 	definitions that need to be shared in common; severely simplified
 	the errno declaration for Open Watcom, made it applicable only to
 	Open Watcom, and made the comment less ambiguous; updated the long
-	comment describing PTW32_BROK^WPTW32_USES_SEPARATE_CRT; added
+	comment describing  PTW32_BROK^WPTW32_USES_SEPARATE_CRT; added
 	(conditional) declaration of pthread_win32_set_terminate_np(), as
 	well as ptw32_terminate_handler (so that eh.h doesn't have to get
 	involved).
@@ -1317,25 +1639,25 @@
 	* ptw32_threadStart.c: Big rewrite of ptw32_threadStart().
 	Everything passes with this, except for GCE (and I can't figure
 	out why).
-	* sched.h: Moved the PTW32_CDECL section here (and made it
+	* sched.h: Moved the  PTW32_CDECL section here (and made it
 	idempotent); need to #include <stdlib.h> for size_t (one of the test
 	programs #includes sched.h as the very first thing); moved the
 	DWORD_PTR definition up, since it groups better with the pid_t
 	definition; also need ULONG_PTR, don't need PDWORD_PTR; can't use
 	PTW32_CONFIG_MSVC6, because if you only #include sched.h you
 	don't get that bit in pthread.h; use a cpp symbol
-	(PTW32_HAVE_DWORD_PTR) to inhibit defining *_PTR if needed. Note
+	 (PTW32_HAVE_DWORD_PTR) to inhibit defining *_PTR if needed. Note
 	that this isn't #defined inside the conditional, because there are
 	no other instances of these typedefs that need to be disabled, and
 	sched.h itself is already protected against multiple inclusion;
 	DWORD_PTR can't be size_t, because (on MSVC6) the former is "unsigned
 	long" and the latter is "unsigned int" and C++ doesn't see them as
 	interchangeable; minor edit to the comment... I don't like saying
-	"VC++" without the "Microsoft" qualifier; use PTW32_CDECL instead of
-	a literal __cdecl (this was why I moved the PTW32_CDECL bit into this
+	"VC++" without the "Microsoft" qualifier; use  PTW32_CDECL instead of
+	a literal __cdecl (this was why I moved the  PTW32_CDECL bit into this
 	file).
-	* semaphore.h: Put in another idempotentized PTW32_CDECL bit here;
-	use PTW32_CDECL instead of __cdecl, and fixed indentation of function
+	* semaphore.h: Put in another idempotentized  PTW32_CDECL bit here;
+	use  PTW32_CDECL instead of __cdecl, and fixed indentation of function
 	formal parameters.
 
 			
@@ -1482,7 +1804,7 @@
 2012-09-05  Daniel Richard. G <danielg at teragram dot com>
 
 	* implement.h: whitespace adjustment.
-	* dll.c: Facilitate PTW32_STATIC_LIB being defined in a header file.
+	* dll.c: Facilitate  PTW32_STATIC_LIB being defined in a header file.
 
 
 
@@ -1616,8 +1938,8 @@
 
 2012-08-29  Daniel Richard. G <danielg at teragram dot com>
 
-	* implement.h (PTW32_INTERLOCKED_SIZE): Define as long or LONGLONG.
-	(PTW32_INTERLOCKED_SIZEPTR): Define as long* or LONGLONG*.
+	* implement.h  (PTW32_INTERLOCKED_SIZE): Define as long or LONGLONG.
+	 (PTW32_INTERLOCKED_SIZEPTR): Define as long* or LONGLONG*.
 	* pthread_attr_getschedpolicy.c (SCHED_MAX): Fix cast.
 	* ptw32_mutex_check_need_init.c: Fix static mutexattr_t struct initializations.
 	* ptw32_threadStart.c (ExceptionFilter): Add cast.
@@ -1696,9 +2018,9 @@
 			
 2012-08-16  Daniel Richard. G <danielg at teragram dot com>
 
-	* pthread.h (PTW32_CONFIG_MINGW): Defined to simplify complex macro combination.
-	* (PTW32_CONFIG_MSVC6): Likewise.
-	* (PTW32_CONFIG_MSVC8): Likewise.
+	* pthread.h  (PTW32_CONFIG_MINGW): Defined to simplify complex macro combination.
+	*  (PTW32_CONFIG_MSVC6): Likewise.
+	*  (PTW32_CONFIG_MSVC8): Likewise.
 	* autostatic.c: Substitute new macros.
 	* create.c: Likewise.
 	* pthread_cond_wait.c: Likewise.
@@ -2059,7 +2381,7 @@
 
 2011-07-01  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
-	* *.[ch] (PTW32_INTERLOCKED_*): Redo 23 and 64 bit versions of these
+	* *.[ch]  (PTW32_INTERLOCKED_*): Redo 23 and 64 bit versions of these
 	macros and re-apply in code to undo the incorrect changes from
 	2011-06-29; remove some size_t casts which should not be required
 	and may be problematic.a
@@ -2095,7 +2417,7 @@
 
 2011-06-29  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
-	* *.[ch] (PTW32_INTERLOCKED_*): These macros should now work for
+	* *.[ch]  (PTW32_INTERLOCKED_*): These macros should now work for
 	both 32 and 64 bit builds. The MingW versions are all inlined asm
 	while the MSVC versions expand to their Interlocked* or Interlocked*64
 	counterparts appropriately. The argument type have also been changed
@@ -2111,7 +2433,7 @@
 	compilers such as the Intel compilter icl.
 	* implement.h (#if): Fix forms like #if HAVE_SOMETHING.
 	* pthread.h: Likewise.
-	* sched.h: Likewise; PTW32_LEVEL_* becomes PTW32_SCHED_LEVEL_*.
+	* sched.h: Likewise;  PTW32_LEVEL_* becomes  PTW32_SCHED_LEVEL_*.
 	* semaphore.h: Likewise.
 
 2011-05-11  Ross Johnson <ross.johnson at homemail.com.au>
@@ -2153,7 +2475,7 @@
 
 2011-03-11  Ross Johnson <ross.johnson at homemail.com.au>
 
-	* implement.h (PTW32_INTERLOCKED_*CREMENT macros): increment/decrement
+	* implement.h  (PTW32_INTERLOCKED_*CREMENT macros): increment/decrement
 	using ++/-- instead of add/subtract 1.
 	* ptw32_MCS_lock.c: Make casts consistent.
 
@@ -2194,7 +2516,7 @@
 
 2011-03-04  Ross Johnson <ross.johnson at homemail.com.au>
 
-	* implement.h (PTW32_INTERLOCKED_*): Mingw32 does not provide
+	* implement.h  (PTW32_INTERLOCKED_*): Mingw32 does not provide
 	the __sync_* intrinsics so implemented them here as macro
 	assembler routines. MSVS Interlocked* are emmitted as intrinsics
 	wherever possible, so we want mingw to match it; Extended to
@@ -2400,7 +2722,7 @@
 
 2007-01-04  Kip Streithorst <KSTREITH at ball dot com>
 
-	* implement.h (PTW32_INTERLOCKED_COMPARE_EXCHANGE): Add Win64
+	* implement.h  (PTW32_INTERLOCKED_COMPARE_EXCHANGE): Add Win64
 	support.
 
 2006-12-20  Ross Johnson <ross.johnson at homemail.com.au>
@@ -2691,7 +3013,7 @@
 	* pthread.h: Fix conditional defines for static linking.
 	* sched.h: Liekwise.
 	* semaphore.h: Likewise.
-	* dll.c (PTW32_STATIC_LIB): Module is conditionally included
+	* dll.c  (PTW32_STATIC_LIB): Module is conditionally included
 	in the build.
 
 2005-03-16  Ross Johnson  <ross at callisto.canberra.edu.au>^M
@@ -2808,14 +3130,14 @@
 
 2004-11-19  Ross Johnson  <rpj at callisto.canberra.edu.au>
 
-	* config.h (PTW32_THREAD_ID_REUSE_INCREMENT): Added to allow
+	* config.h  (PTW32_THREAD_ID_REUSE_INCREMENT): Added to allow
 	building the library for either unique thread IDs like Solaris
 	or non-unique thread IDs like Linux; allows application developers
 	to override the library's default insensitivity to some apps
 	that may not be strictly POSIX compliant.
 	* version.rc: New resource module to encode version information
 	within the DLL.
-	* pthread.h: Added PTW32_VERSION* defines and grouped sections
+	* pthread.h: Added  PTW32_VERSION* defines and grouped sections
 	required by resource compiler together; bulk of file is skipped
 	if RC_INVOKED. Defined some error numbers and other names for
 	Borland compiler.
@@ -2824,7 +3146,7 @@
 
 	* pthread_cond_wait.c (ptw32_cond_wait_cleanup): Lock CV mutex at
 	start of cleanup handler rather than at the end.
-	* implement.h (PTW32_THREAD_REUSE_EMPTY): Renamed from *_BOTTOM.
+	* implement.h  (PTW32_THREAD_REUSE_EMPTY): Renamed from *_BOTTOM.
 	(ptw32_threadReuseBottom): New global variable.
 	* global.c (ptw32_threadReuseBottom): Declare new variable.
 	* ptw32_reuse.c (ptw32_reuse): Change reuse LIFO stack to LILO queue
@@ -2952,9 +3274,9 @@
 	* pthread_mutex_unlock.c (pthread_mutex_unlock): Similarly.
 	* ptw32_InterlockedCompareExchange.c (ptw32_InterlockExchange): New
 	function.
-	(PTW32_INTERLOCKED_EXCHANGE): Sets up macro to use inlined
+	 (PTW32_INTERLOCKED_EXCHANGE): Sets up macro to use inlined
 	ptw32_InterlockedExchange.
-	* implement.h (PTW32_INTERLOCKED_EXCHANGE): Set default to
+	* implement.h  (PTW32_INTERLOCKED_EXCHANGE): Set default to
 	InterlockedExchange().
 	* Makefile: Building using /Ob2 so that asm sections within inline
 	functions are inlined.
@@ -2981,7 +3303,7 @@
 	* pthread_spin_unlock.c (pthread_spin_unlock):Likewise.
 	* ptw32_InterlockedCompareExchange.c: Sets up macro for inlined use.
 	* implement.h (pthread_mutex_t_): Remove Critical Section element.
-	(PTW32_INTERLOCKED_COMPARE_EXCHANGE): Set to default non-inlined
+	 (PTW32_INTERLOCKED_COMPARE_EXCHANGE): Set to default non-inlined
 	version of InterlockedCompareExchange().
 	* private.c: Include ptw32_InterlockedCompareExchange.c first for
 	inlining.
@@ -3439,7 +3761,7 @@
 	* errno.c: Compiler directive was incorrectly including code.
 	* pthread.h: Conditionally added some #defines from config.h
 	needed when not building the library. e.g. NEED_ERRNO, NEED_SEM.
-	(PTW32_DLLPORT): Now only defined if _DLL defined.
+	 (PTW32_DLLPORT): Now only defined if _DLL defined.
 	(_errno): Compiler directive was incorrectly including prototype.
 	* sched.h: Conditionally added some #defines from config.h
 	needed when not building the library.
@@ -3824,9 +4146,9 @@
 
 2002-01-15  Ross Johnson  <rpj at special.ise.canberra.edu.au>
 
-	* pthread.h: Unless the build explicitly defines __CLEANUP_SEH,
-	__CLEANUP_CXX, or __CLEANUP_C, then the build defaults to
-	__CLEANUP_C style cleanup. This style uses setjmp/longjmp
+	* pthread.h: Unless the build explicitly defines PTW32_CLEANUP_SEH,
+	PTW32_CLEANUP_CXX, or PTW32_CLEANUP_C, then the build defaults to
+	PTW32_CLEANUP_C style cleanup. This style uses setjmp/longjmp
 	in the cancellation and thread exit implementations and therefore
 	won't do stack unwinding if linked to applications that have it
 	(e.g. C++ apps). This is currently consistent with most/all
@@ -3915,9 +4237,9 @@
 	WSAGetLastError() and WSASetLastError().
 	* Makefile (wsock32.lib): Likewise.
 	* create.c: Minor mostly inert changes.
-	* implement.h (PTW32_MAX): Move into here and renamed
+	* implement.h  (PTW32_MAX): Move into here and renamed
 	from sched.h.
-	(PTW32_MIN): Likewise.
+	 (PTW32_MIN): Likewise.
 	* GNUmakefile (TEST_ICE): Define if testing internal
 	implementation of InterlockedCompareExchange.
 	* Makefile (TEST_ICE): Likewise.
@@ -3935,7 +4257,7 @@
 2001-10-17  Ross Johnson  <rpj at setup1.ise.canberra.edu.au>
 
 	* barrier.c: Move _LONG and _LPLONG defines into
-	implement.h; rename to PTW32_INTERLOCKED_LONG and
+	implement.h; rename to  PTW32_INTERLOCKED_LONG and
 	PTW32_INTERLOCKED_LPLONG respectively.
 	* spin.c: Likewise; ptw32_interlocked_compare_exchange used
 	in place of InterlockedCompareExchange directly.
@@ -4545,7 +4867,7 @@
 	(pthread_mutexattr_destroy): Set attribute to NULL
 	before freeing it's memory - to avoid contention.
 
-	* implement.h (PTW32_EPS_CANCEL/PTW32_EPS_EXIT):
+	* implement.h  (PTW32_EPS_CANCEL/PTW32_EPS_EXIT):
 	Must be defined for all compilers - used as generic
 	exception selectors by ptw32_throw().
 
@@ -4560,14 +4882,14 @@
 	* mutex.c (pthread_mutexattr_setforcecs_np):
 	Moved to new file "nonportable.c".
 
-	* pthread.h (PTW32_BUILD): Only	redefine __except
+	* pthread.h  (PTW32_BUILD): Only	redefine __except
 	and catch compiler keywords if we aren't building
-	the library (ie. PTW32_BUILD is not defined) - 
+	the library (ie.  PTW32_BUILD is not defined) - 
 	this is safer than defining and then undefining
 	if not building the library.
 	* implement.h: Remove __except and catch undefines.
-	* Makefile (CFLAGS): Define PTW32_BUILD.
-	* GNUmakefile (CFLAGS): Define PTW32_BUILD.
+	* Makefile (CFLAGS): Define  PTW32_BUILD.
+	* GNUmakefile (CFLAGS): Define  PTW32_BUILD.
 
 	* All appropriate: Change Pthread_exception* to
 	ptw32_exception* to be consistent with internal
@@ -4589,7 +4911,7 @@
 	(pthread_cancel): Ditto.
 	* misc.c (CancelableWait): Ditto.
 	* exit.c (pthread_exit): Ditto.
-	* All applicable: Change PTW32_ prefix to
+	* All applicable: Change  PTW32_ prefix to
 	PTW32_ prefix to remove leading underscores
 	from private library identifiers.
 
@@ -4626,7 +4948,7 @@
 	casting for functions that will be passed as parameters.
 	(~PThreadCleanup): add cast and group expression.
 	(_errno): Add _MD compile conditional.
-	(PtW32NoCatchWarn): Change pragma message.
+	(__PtW32NoCatchWarn): Change pragma message.
 
 	* implement.h: Move and change PT_STDCALL define.
 
@@ -4657,7 +4979,7 @@
 
 	* pthread.h: Add compile-time message when using
 	MSC_VER compiler and C++ EH to warn application
-	programmers to use PtW32Catch instead of catch(...)
+	programmers to use __PtW32Catch instead of catch(...)
 	if they want cancellation and pthread_exit to work.
 
 	* implement.h: Remove #include <semaphore.h>; we
@@ -4703,9 +5025,9 @@
 
 2000-08-05  Ross Johnson  <rpj at special.ise.canberra.edu.au>
 
-	* pthread.h (PtW32CatchAll): Add macro. When compiling
+	* pthread.h (__PtW32CatchAll): Add macro. When compiling
 	applications using VC++ with C++ EH rather than SEH
-	'PtW32CatchAll' must be used in place of any 'catch( ... )'
+	'__PtW32CatchAll' must be used in place of any 'catch( ... )'
 	if the application wants pthread cancellation or
 	pthread_exit() to work.
 
@@ -5107,14 +5429,14 @@ Tue Aug 17 20:00:08 1999  Mumit Khan  <khan at xraylith.wisc.edu>
 
 1999-07-09  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 
-	* misc.c (CancelableWait):  PTW32_EPS_CANCEL (SEH) and
+	* misc.c (CancelableWait):   PTW32_EPS_CANCEL (SEH) and
 	ptw32_exception_cancel (C++) used to identify the exception.
 
-	* cancel.c (pthread_testcancel): PTW32_EPS_CANCEL (SEH) and
+	* cancel.c (pthread_testcancel):  PTW32_EPS_CANCEL (SEH) and
 	ptw32_exception_cancel (C++) used to identify the exception.
 
 	* exit.c (pthread_exit): throw/raise an exception to return to
-	ptw32_threadStart() to exit the thread. PTW32_EPS_EXIT (SEH)
+	ptw32_threadStart() to exit the thread.  PTW32_EPS_EXIT (SEH)
 	and ptw32_exception_exit (C++) used to identify the exception.
 
 	* private.c (ptw32_threadStart): Add pthread_exit exception trap;
@@ -5436,7 +5758,7 @@ Tue Feb  2 18:07:43 1999  Kevin Ruland <Kevin.Ruland at anheuser-busch.com>
 	Reverse LHS/RHS bitwise assignments.
 
 	* pthread.h: Remove #include <semaphore.h>.
-	(PTW32_ATTR_VALID): Add cast.
+	 (PTW32_ATTR_VALID): Add cast.
 	(struct pthread_t_): Add sigmask element.
 
 	* dll.c: Add "extern C" for DLLMain.
@@ -5979,7 +6301,7 @@ Sat Oct 24 18:34:59 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 
 Fri Oct 23 00:08:09 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 
-	* implement.h (PTW32_TSD_KEY_REUSE): Add enum.
+	* implement.h  (PTW32_TSD_KEY_REUSE): Add enum.
 
 	* private.c (ptw32_delete_thread): Add call to
 	ptw32_destructor_run_all() to clean up the threads keys.
@@ -6065,8 +6387,8 @@ Mon Oct 12 00:00:44 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 	* implement.h (ptw32_destructor_push): Remove.
 	(ptw32_destructor_pop): Remove.
 	(ptw32_destructor_run_all): Rename from ptw32_destructor_pop_all.
-	(PTW32_TSD_KEY_DELETED): Add enum.
-	(PTW32_TSD_KEY_INUSE): Add enum.
+	 (PTW32_TSD_KEY_DELETED): Add enum.
+	 (PTW32_TSD_KEY_INUSE): Add enum.
 
 	* cleanup.c (ptw32_destructor_push): Remove.
 	(ptw32_destructor_pop): Remove.
@@ -6272,7 +6594,7 @@ Thu Aug  6 15:19:22 1998  Ross Johnson  <rpj at swan.canberra.edu.au>
 	* private.c (ptw32_new_thread): Typecast (HANDLE) NULL.
 	(ptw32_delete_thread): Ditto.
 
-	* implement.h: (PTW32_MAX_THREADS): Add define. This keeps
+	* implement.h:  (PTW32_MAX_THREADS): Add define. This keeps
 	changing in an attempt to make thread administration data types
 	opaque and cleanup DLL startup.
 
@@ -6418,9 +6740,9 @@ Mon Aug  3 21:19:57 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 	member initialisation - cancelstate, canceltype, cancel_pending.
 	(is_attr): Make arg "attr" a const.
 
-	* implement.h (PTW32_HANDLER_POP_LIFO): Remove definition.
-	(PTW32_HANDLER_POP_FIFO): Ditto.
-	(PTW32_VALID): Add missing newline escape (\).
+	* implement.h  (PTW32_HANDLER_POP_LIFO): Remove definition.
+	 (PTW32_HANDLER_POP_FIFO): Ditto.
+	 (PTW32_VALID): Add missing newline escape (\).
 	(ptw32_handler_node): Make element "next" a pointer.
 
 1998-08-02  Ben Elliston  <bje at cygnus.com>
@@ -6482,8 +6804,8 @@ Fri Jul 31 00:05:45 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 
 	* condvar.c (windows.h): Add include.
 
-	* implement.h (PTW32_THIS): Remove - no longer required.
-	(PTW32_STACK): Use pthread_self() instead of PTW32_THIS.
+	* implement.h  (PTW32_THIS): Remove - no longer required.
+	 (PTW32_STACK): Use pthread_self() instead of  PTW32_THIS.
 
 Thu Jul 30 23:12:45 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 
@@ -6500,7 +6822,7 @@ Thu Jul 30 23:12:45 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 	local storage.
 
 	* implement.h: Add ptw32_threadID_TlsIndex.
-	Add ()s around PTW32_VALID expression.
+	Add ()s around  PTW32_VALID expression.
 
 	* misc.c (pthread_self): Re-implement using Win32 TLS to store
 	the threads own ID.
@@ -6519,7 +6841,7 @@ Wed Jul 29 11:39:03 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 
 Tue Jul 28 14:04:29 1998  Ross Johnson  <rpj at swan.canberra.edu.au>
 
-	* implement.h: Add PTW32_VALID macro.
+	* implement.h: Add  PTW32_VALID macro.
 
 	* sync.c (pthread_join): Modify to use the new thread
 	type and ptw32_delete_thread(). Rename "target" to "thread".
@@ -6535,14 +6857,14 @@ Tue Jul 28 14:04:29 1998  Ross Johnson  <rpj at swan.canberra.edu.au>
 
 	* private.c (ptw32_find_thread): Fix return type and arg.
 
-	* implement.h: Remove PTW32_YES and PTW32_NO.
+	* implement.h: Remove  PTW32_YES and  PTW32_NO.
 	(ptw32_new_thread): Add prototype.
 	(ptw32_find_thread): Ditto.
 	(ptw32_delete_thread): Ditto.
 	(ptw32_new_thread_entry): Remove prototype.
 	(ptw32_find_thread_entry): Ditto.
 	(ptw32_delete_thread_entry): Ditto.
-	(  PTW32_NEW, PTW32_INUSE, PTW32_EXITED, PTW32_REUSE):
+	 (  PTW32_NEW,  PTW32_INUSE,  PTW32_EXITED,  PTW32_REUSE):
 	Add.
 
 
@@ -6725,7 +7047,7 @@ Sat Jul 25 00:00:13 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 
 	* exit.c (pthread_exit): Fix indirection mistake.
 
-	* implement.h (PTW32_THREADS_TABLE_INDEX): Add.
+	* implement.h  (PTW32_THREADS_TABLE_INDEX): Add.
 
 	* exit.c (ptw32_vacuum): Fix incorrect args to
 	ptw32_handler_pop_all() calls.
@@ -6733,7 +7055,7 @@ Sat Jul 25 00:00:13 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 
 	* sync.c (pthread_join): Add multiple join and async detach handling.
 
-	* implement.h (PTW32_THREADS_TABLE_INDEX): Add.
+	* implement.h  (PTW32_THREADS_TABLE_INDEX): Add.
 
 	* global.c (ptw32_threads_mutex_table): Add.
 
@@ -6771,8 +7093,8 @@ Fri Jul 24 21:13:55 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 	* exit.c (pthread_exit): Add comment explaining the longjmp().
 
 	* implement.h (ptw32_threads_thread_t): New member cancelthread.
-	(PTW32_YES): Define.
-	(PTW32_NO): Define.
+	 (PTW32_YES): Define.
+	 (PTW32_NO): Define.
 	(RND_SIZEOF): Remove.
 
 	* create.c (pthread_create): Rename cancelability to cancelstate.
@@ -6888,7 +7210,7 @@ Fri Jul 24 00:21:21 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 	(pthread_attr_getdetachstate): Implement.
 	(pthread_attr_setdetachstate): Likewise.
 
-	* implement.h (PTW32_CANCEL_DEFAULTS): Remove.  Bit fields
+	* implement.h  (PTW32_CANCEL_DEFAULTS): Remove.  Bit fields
 	proved to be too cumbersome.  Set the defaults in attr.c using the
 	public PTHREAD_CANCEL_* constants.
 
@@ -7074,7 +7396,7 @@ Mon Jul 20 02:31:05 1998  Ross Johnson  <rpj at ixobrychus.canberra.edu.au>
 	non-sharable static data within the pthread DLL.
 
 	* implement.h: Add ptw32_cleanup_stack_t, ptw32_cleanup_node_t
-	and PTW32_HASH_INDEX.
+	and  PTW32_HASH_INDEX.
 
 	* exit.c (pthread_exit): Begin work on cleanup and de-allocate
 	thread-private storage.

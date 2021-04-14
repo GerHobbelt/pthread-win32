@@ -45,31 +45,20 @@
 #include "pthread.h"
 #include "implement.h"
 
-#if defined(__CLEANUP_C)
+#if defined(PTW32_CLEANUP_C)
 # include <setjmp.h>
 #endif
 
 /*
  * ptw32_throw
  *
- * All canceled and explicitly exited POSIX threads go through
+ * All cancelled and explicitly exited POSIX threads go through
  * here. This routine knows how to exit both POSIX initiated threads and
  * 'implicit' POSIX threads for each of the possible language modes (C,
  * C++, and SEH).
  */
-#if defined(_MSC_VER)
-/*
- * Ignore the warning:
- * "C++ exception specification ignored except to indicate that
- * the function is not __declspec(nothrow)."
- */
-#pragma warning(disable:4290)
-#endif
 void
 ptw32_throw (DWORD exception)
-#if defined(__CLEANUP_CXX)
-  throw(ptw32_exception_cancel,ptw32_exception_exit)
-#endif
 {
   /*
    * Don't use pthread_self() to avoid creating an implicit POSIX thread handle
@@ -77,7 +66,7 @@ ptw32_throw (DWORD exception)
    */
   ptw32_thread_t * sp = (ptw32_thread_t *) pthread_getspecific (ptw32_selfThreadKey);
 
-#if defined(__CLEANUP_SEH)
+#if defined(PTW32_CLEANUP_SEH)
   ULONG_PTR exceptionInformation[3];
 #endif
   if( sp )
@@ -97,7 +86,7 @@ ptw32_throw (DWORD exception)
        * explicit thread exit here after cleaning up POSIX
        * residue (i.e. cleanup handlers, POSIX thread handle etc).
        */
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
       unsigned int exitCode = 0;
 
       switch (exception)
@@ -120,7 +109,7 @@ ptw32_throw (DWORD exception)
 
 #endif
 
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
       _endthreadex (exitCode);
 #else
       _endthread ();
@@ -128,7 +117,7 @@ ptw32_throw (DWORD exception)
 
     }
 
-#if defined(__CLEANUP_SEH)
+#if defined(PTW32_CLEANUP_SEH)
 
 
   exceptionInformation[0] = (ULONG_PTR) (exception);
@@ -137,16 +126,16 @@ ptw32_throw (DWORD exception)
 
   RaiseException (EXCEPTION_PTW32_SERVICES, 0, 3, (ULONG_PTR *) exceptionInformation);
 
-#else /* __CLEANUP_SEH */
+#else /* PTW32_CLEANUP_SEH */
 
-#if defined(__CLEANUP_C)
+#if defined(PTW32_CLEANUP_C)
 
   ptw32_pop_cleanup_all (1);
   longjmp (sp->start_mark, exception);
 
-#else /* __CLEANUP_C */
+#else /* PTW32_CLEANUP_C */
 
-#if defined(__CLEANUP_CXX)
+#if defined(PTW32_CLEANUP_CXX)
 
   switch (exception)
     {
@@ -162,11 +151,11 @@ ptw32_throw (DWORD exception)
 
 #error ERROR [__FILE__, line __LINE__]: Cleanup type undefined.
 
-#endif /* __CLEANUP_CXX */
+#endif /* PTW32_CLEANUP_CXX */
 
-#endif /* __CLEANUP_C */
+#endif /* PTW32_CLEANUP_C */
 
-#endif /* __CLEANUP_SEH */
+#endif /* PTW32_CLEANUP_SEH */
 
   /* Never reached */
 }
@@ -184,7 +173,7 @@ ptw32_pop_cleanup_all (int execute)
 DWORD
 ptw32_get_exception_services_code (void)
 {
-#if defined(__CLEANUP_SEH)
+#if defined(PTW32_CLEANUP_SEH)
 
   return EXCEPTION_PTW32_SERVICES;
 

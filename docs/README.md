@@ -1,23 +1,16 @@
-PTHREADS-WIN32
-==============
-
-pthreads-win32 is free software, distributed under the GNU Lesser
-General Public License (LGPL). See the file 'COPYING.LIB' for terms
-and conditions. Also see the file 'COPYING' for information
-specific to pthreads-win32, copyrights and the LGPL.
-
+PTHREADS4W (a.k.a. PTHREADS-WIN32)
+==================================
 
 What is it?
 -----------
 
-pthreads-win32 (a.k.a. pthreads4w) is an Open Source Software
-implementation of the Threads component of the POSIX 1003.1c 1995
-Standard (or later) for Microsoft's Windows environment. Some functions
-from POSIX 1003.1b are also supported, including semaphores. Other
-related functions include the set of read-write lock functions. The
-library also supports some of the functionality of the Open
-Group's Single Unix specification, namely mutex types, plus some common
-and pthreads-win32 specific non-portable routines (see README.NONPORTABLE).
+pthreads-win32 / pthreads4w is an Open Source Software implementation of the Threads
+component of the POSIX 1003.1c 1995 Standard (or later) for Microsoft's
+Windows environment. Some functions from POSIX 1003.1b are also supported,
+including semaphores. Other related functions include the set of read-write
+lock functions. The library also supports some of the functionality of the
+Open Group's Single Unix specification, namely mutex types, plus some common
+and pthreads4w specific non-portable routines (see README.NONPORTABLE).
 
 See the file "ANNOUNCE" for more information including standards
 conformance details and the list of supported and unsupported
@@ -26,7 +19,7 @@ routines.
 
 Prerequisites
 -------------
-MSVC or GNU C (MinGW32 or MinGW64 MSys development kit)
+MSVC or GNU C (MinGW or MinGW64 with AutoConf Tools)
 	To build from source.
 
 QueueUserAPCEx by Panagiotis E. Hadjidoukas
@@ -37,15 +30,15 @@ QueueUserAPCEx by Panagiotis E. Hadjidoukas
 	For true async cancellation of threads (including blocked threads).
 	This is a DLL and Windows driver that provides pre-emptive APC
 	by forcing threads into an alertable state when the APC is queued.
-	Both the DLL and driver are provided with the pthreads-win32.exe
-	self-unpacking ZIP, and on the pthreads-win32 FTP site  (in source
+	Both the DLL and driver are provided with the pthreads4w.exe
+	self-unpacking ZIP, and on the pthreads4w FTP site  (in source
 	and pre-built forms). Currently this is a separate LGPL package to
-	pthreads-win32. See the README in the QueueUserAPCEx folder for
+	pthreads4w. See the README in the QueueUserAPCEx folder for
 	installation instructions.
 
-	pthreads-win32 will automatically detect if the QueueUserAPCEx DLL
+	pthreads4w will automatically detect if the QueueUserAPCEx DLL
 	QuserEx.DLL is available and whether the driver AlertDrv.sys is
-	loaded. If it is not available, pthreads-win32 will simulate async
+	loaded. If it is not available, pthreads4w will simulate async
 	cancellation, which means that it can async cancel only threads that
 	are runnable. The simulated async cancellation cannot cancel blocked
 	threads.
@@ -206,16 +199,16 @@ of the library that use exceptions as part of the thread
 cancellation and exit implementation. The default version uses
 setjmp/longjmp.
 
-If you use either pthreadVCE or pthreadGCE:
+If you use either pthreadVCE[2] or pthreadGCE[2]:
 
 1. [See also the discussion in the FAQ file - Q2, Q4, and Q5]
 
 If your application contains catch(...) blocks in your POSIX
 threads then you will need to replace the "catch(...)" with the macro
-"PtW32Catch", eg.
+"__PtW32Catch", eg.
 
-	#ifdef PtW32Catch
-		PtW32Catch {
+	#ifdef __PtW32Catch
+		__PtW32Catch {
 			...
 		}
 	#else
@@ -227,6 +220,13 @@ threads then you will need to replace the "catch(...)" with the macro
 Otherwise neither pthreads cancellation nor pthread_exit() will work
 reliably when using versions of the library that use C++ exceptions
 for cancellation and thread exit.
+
+NB: [lib]pthreadGCE[2] does not support asynchronous cancellation. Any
+attempt to cancel a thread set for asynchronous cancellation using
+this version of the library will cause the applicaton to terminate.
+We believe this is due to the "unmanaged" context switch that is
+disrupting the stack unwinding mechanism and which is used
+to cancel blocked threads. See pthread_cancel.c
 
 
 Other name changes
@@ -252,9 +252,9 @@ Cleanup code default style
 Previously, if not defined, the cleanup style was determined automatically
 from the compiler used, and one of the following was defined accordingly:
 
-	__CLEANUP_SEH	MSVC only
-	__CLEANUP_CXX	C++, including MSVC++, GNU G++
-	__CLEANUP_C	C, including GNU GCC, not MSVC
+	PTW32_CLEANUP_SEH	MSVC only
+	PTW32_CLEANUP_CXX	C++, including MSVC++, GNU G++
+	PTW32_CLEANUP_C	C, including GNU GCC, not MSVC
 
 These defines determine the style of cleanup (see pthread.h) and,
 most importantly, the way that cancellation and thread exit (via
@@ -267,24 +267,24 @@ the correct stack unwinding occurs regardless of where the thread
 is when it's canceled or exits via pthread_exit().
 
 In this snapshot, unless the build explicitly defines (e.g. via a
-compiler option) __CLEANUP_SEH, __CLEANUP_CXX, or __CLEANUP_C, then
-the build NOW always defaults to __CLEANUP_C style cleanup. This style
+compiler option) PTW32_CLEANUP_SEH, PTW32_CLEANUP_CXX, or PTW32_CLEANUP_C, then
+the build NOW always defaults to PTW32_CLEANUP_C style cleanup. This style
 uses setjmp/longjmp in the cancellation and pthread_exit implementations,
 and therefore won't do stack unwinding even when linked to applications
 that have it (e.g. C++ apps). This is for consistency with most/all
 commercial Unix POSIX threads implementations.
 
 Although it was not clearly documented before, it is still necessary to
-build your application using the same __CLEANUP_* define as was
+build your application using the same PTW32_CLEANUP_* define as was
 used for the version of the library that you link with, so that the
 correct parts of pthread.h are included. That is, the possible
 defines require the following library versions:
 
-	__CLEANUP_SEH	pthreadVSE.dll
-	__CLEANUP_CXX	pthreadVCE.dll or pthreadGCE.dll
-	__CLEANUP_C	pthreadVC.dll or pthreadGC.dll
+	PTW32_CLEANUP_SEH	pthreadVSE.dll
+	PTW32_CLEANUP_CXX	pthreadVCE.dll or pthreadGCE.dll
+	PTW32_CLEANUP_C	pthreadVC.dll or pthreadGC.dll
 
-It is recommended that you let pthread.h use it's default __CLEANUP_C
+It is recommended that you let pthread.h use it's default PTW32_CLEANUP_C
 for both library and application builds. That is, don't define any of
 the above, and then link with pthreadVC.lib (MSVC or MSVC++) and
 libpthreadGC.a (MinGW GCC or G++). The reason is explained below, but
@@ -328,16 +328,23 @@ MinGW64 multilib disabled
 Building with MS Visual Studio (C, VC++ using C++ EH, or Structured EH)
 -----------------------------------------------------------------------
 
+NOTE: A VS project/solution/whatever file is included as a contributed
+work and is not used of maintained in development. All building and
+testing is done using makefiles. We use the native make system for each
+toolchain, which is 'nmake' in this case.
+
 From the source directory run nmake without any arguments to list
 help information. E.g.
 
 $ nmake
 
 As examples, as at Release 2.10 the pre-built DLLs and static libraries
-are built from the following command-lines:
+can be built using one of the following command-lines:
 
-[Note: "setenv" comes with the SDK. "/2003" is used to override my build
-system which is Win7 (at the time of writing) for backwards compatibility.]
+[Note: "setenv" comes with the SDK which is not required to build the library.
+I use it to build and test both 64 and 32 bit versions of the library.
+"/2003" is used to override my build system which is Win7 (at the time of
+writing) for backwards compatibility.]
 
 $ setenv /x64 /2003 /Release
 $ nmake realclean VC
@@ -354,7 +361,7 @@ $ nmake realclean VC-static
 $ nmake realclean VCE-static
 $ nmake realclean VSE-static
 
-If you want to differentiate between libraries by their names you can use,
+If you want to differentiate or customise library naming you can use,
 e.g.:
 
 $ nmake realclean VC EXTRAVERSION="-w64"
@@ -368,11 +375,6 @@ pthreadVC2-w64.lib
 To build and test all DLLs and static lib compatibility versions
 (VC, VCE, VSE):
 
-[Note that the EXTRAVERSION="..." option is passed to the tests Makefile
-when you target "all-tests". If you change to the tests directory and
-run the tests you will need to repeat the option explicitly to the test
-"nmake" command-line.]
-
 $ setenv /x64 /2003 /release
 $ nmake all-tests
 
@@ -381,6 +383,11 @@ running nmake. E.g.:
 
 $ cd tests
 $ nmake VC
+
+Note: the EXTRAVERSION="..." option is passed to the tests Makefile
+when you target "all-tests". If you build the library then change to the
+tests directory to run the tests you will need to repeat the option
+explicitly to the test "nmake" command-line.
 
 For failure analysis etc. individual tests can be built
 and run, e.g:
@@ -391,8 +398,7 @@ $ nmake VC TESTS="foo bar"
 This builds and runs all prerequisite tests as well as the individual
 tests listed. Prerequisite tests are defined in tests\runorder.mk.
 
-To build and run only those tests listed use, i.e. without the
-additional prerequistite dependency tests:
+To build and run only the tests listed use:
 
 $ cd tests
 $ nmake VC NO_DEPS=1 TESTS="foo bar"
@@ -401,13 +407,27 @@ $ nmake VC NO_DEPS=1 TESTS="foo bar"
 Building with MinGW
 -------------------
 
-Please use Mingw64 to build either 64 or 32 bit variants of the DLL that will
-run on 64 bit systems. We have found that Mingw32 builds of the GCE library
-variants fail when run on 64 bit systems.
+NOTE: All building and testing is done using makefiles. We use the native
+make system for each toolchain, which is 'make' in this case.
 
-From the source directory, run 'make' without arguments for help information.
+We have found that Mingw builds of the GCE library variants can fail when
+run on 64 bit systems, believed to be due to the DWARF2 exception handling
+being a 32 bit mechanism. The GC variants are fine. MinGW64 offers
+SJLJ or SEH exception handling so choose one of those.
 
-$ make
+From the source directory:
+
+run 'autoheader' to rewrite the config.h file
+run 'autoconf' to rewrite the GNUmakefiles (library and tests)
+run './configure' to create config.h and GNUmakefile.
+run 'make' without arguments to list possible targets.
+
+E.g.
+
+$ autoheader
+$ autoconf
+$ ./configure
+$ make realclean all-tests
 
 With MinGW64 multilib installed the following variables can be defined
 either on the make command line or in the shell environment:
@@ -442,11 +462,6 @@ libpthreadGC2-w64.a
 
 To build and test all DLLs and static lib compatibility variants (GC, GCE):
 
-Note that the ARCH="..." and/or EXTRAVERSION="..." options are passed to the
-tests GNUmakefile when you target "all-tests". If you change to the tests
-directory and run the tests you will need to repeat those options explicitly
-to the test "make" command-line.
-
 $ make all-tests
 or, with MinGW64 (multilib enabled):
 $ make all-tests ARCH=-m64
@@ -458,6 +473,11 @@ running make. E.g.:
 $ cd tests
 $ make GC
 
+Note that the ARCH="..." and/or EXTRAVERSION="..." options are passed to the
+tests GNUmakefile when you target "all-tests". If you change to the tests
+directory and run the tests you will need to repeat those options explicitly
+to the test "make" command-line.
+
 For failure analysis etc. individual tests can be built and run, e.g:
 
 $ cd tests
@@ -466,8 +486,7 @@ $ make GC TESTS="foo bar"
 This builds and runs all prerequisite tests as well as the individual
 tests listed. Prerequisite tests are defined in tests\runorder.mk.
 
-To build and run only those tests listed use, i.e. without the additional
-prerequistite dependency tests:
+To build and run only those tests listed use:
 
 $ cd tests
 $ make GC NO_DEPS=1 TESTS="foo bar"
@@ -512,98 +531,27 @@ Cygwin implements it's own POSIX threads routines and these
 will be the ones to use if you develop using Cygwin.
 
 
-Ready to run binaries
+Building applications
 ---------------------
 
-For convenience, the following ready-to-run files can be downloaded
-from the FTP site (see under "Availability" below):
+The files you will need for your application build are:
 
+The four header files:
+	_ptw32.h
 	pthread.h
 	semaphore.h
 	sched.h
-	pthreadVC2.dll		- built with MSVC compiler using C setjmp/longjmp
-	pthreadVC2.lib
-	pthreadVCE2.dll		- built with MSVC++ compiler using C++ EH
-	pthreadVCE2.lib
-	pthreadVSE2.dll		- built with MSVC compiler using SEH
-	pthreadVSE2.lib
-	pthreadGC2.dll		- built with Mingw32 GCC
-	libpthreadGC2.a		- derived from pthreadGC.dll
-	pthreadGCE2.dll		- built with Mingw32 G++
-	libpthreadGCE2.a	- derived from pthreadGCE.dll
 
-You may also need to include runtime DLLs from your SDK when
-distributing your applications.
+The DLL library files that you built:
+	pthread*.dll
+	plus the matching *.lib (MSVS) or *.a file (GNU)
 
-Building applications with GNU compilers
-----------------------------------------
+or, the static link library that you built:
+	pthread*.lib (MSVS) or libpthread*.a (GNU)
 
-If you're using pthreadGC2.dll:
-
-With the three header files, pthreadGC2.dll and libpthreadGC2.a in the
-same directory as your application myapp.c, you could compile, link
-and run myapp.c under MinGW as follows:
-
-	gcc -o myapp.exe myapp.c -I. -L. -lpthreadGC2
-	myapp
-
-Or put pthreadGC2.dll in an appropriate directory in your PATH,
-put libpthreadGC2.a in your system lib directory, and
-put the three header files in your system include directory,
-then use:
-
-	gcc -o myapp.exe myapp.c -lpthreadGC
-	myapp
-
-
-If you're using pthreadGCE2.dll:
-
-With the three header files, pthreadGCE2.dll and libpthreadGCE2.a
-in the same directory as your application myapp.c, you could compile,
-link and run myapp.c under Mingw32 as follows:
-
-	gcc -x c++ -o myapp.exe myapp.c -I. -L. -lpthreadGCE2
-	myapp
-
-Or put pthreadGCE.dll and gcc.dll in an appropriate directory in
-your PATH, put libpthreadGCE.a in your system lib directory, and
-put the three header files in your system include directory,
-then use:
-
-	gcc -x c++ -o myapp.exe myapp.c -lpthreadGCE
-	myapp
-
-
-Availability
-------------
-
-The complete source code in either unbundled, self-extracting
-Zip file, or tar/gzipped format can be found at:
-
-	ftp://sources.redhat.com/pub/pthreads-win32
-
-The pre-built DLL, export libraries and matching pthread.h can
-be found at:
-
-	ftp://sources.redhat.com/pub/pthreads-win32/dll-latest
-
-Home page:
-
-	http://sources.redhat.com/pthreads-win32/
-
-
-Mailing list
-------------
-
-There is a mailing list for discussing pthreads on Win32.
-To join, send email to:
-
-	pthreads-win32-subscribe@sources.redhat.com
-
-Unsubscribe by sending mail to:
-
-	pthreads-win32-unsubscribe@sources.redhat.com
-
+Place them in the appropriate directories for your build, which may be the
+standard compiler locations or, locations specific to your project (you
+might have a separate third-party dependency tree for example).
 
 Acknowledgements
 ----------------
@@ -621,12 +569,4 @@ industry can be measured by it's open standards.
 
 ----
 Ross Johnson
-<rpj@callisto.canberra.edu.au>
-
-
-
-
-
-
-
-
+<ross.johnson@loungebythelake.net>

@@ -51,7 +51,11 @@ pthread_setschedparam (pthread_t thread, int policy,
 {
   int result;
 
-  /* Validate the thread id. */
+  /*
+   * Validate the thread id. This method works for pthreads-win32 because
+   * pthread_kill and pthread_t are designed to accommodate it, but the
+   * method is not portable.
+   */
   result = pthread_kill (thread, 0);
   if (0 != result)
     {

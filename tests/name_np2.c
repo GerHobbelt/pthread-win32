@@ -16,17 +16,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- *
+ * 
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- *
+ * 
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- *
+ * 
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -60,7 +60,7 @@
 static int washere = 0;
 static pthread_attr_t attr;
 static pthread_barrier_t sync;
-#if defined(PTW32_COMPATIBILITY_BSD)
+#if defined (PTW32_COMPATIBILITY_BSD)
 static int seqno = 0;
 #endif
 
@@ -89,10 +89,10 @@ test_namenp2(void)
   pthread_t t;
 
   assert(pthread_attr_init(&attr) == 0);
-#if defined(PTW32_COMPATIBILITY_BSD)
+#if defined (PTW32_COMPATIBILITY_BSD)
   seqno++;
   assert(pthread_attr_setname_np(&attr, "MyThread%d", (void *)&seqno) == 0);
-#elif defined(PTW32_COMPATIBILITY_TRU64)
+#elif defined (PTW32_COMPATIBILITY_TRU64)
   assert(pthread_attr_setname_np(&attr, "MyThread1", NULL) == 0);
 #else
   assert(pthread_attr_setname_np(&attr, "MyThread1") == 0);

@@ -16,17 +16,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- *
+ * 
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- *
+ * 
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- *
+ * 
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -91,7 +91,7 @@
 #define CYG_ONEMILLION          1000000LL
 #define CYG_ONEKAPPA            1000LL
 
-#if !(_MSC_VER <= 1200)
+#if defined(_MSC_VER) && (_MSC_VER > 1200)
 typedef long long cyg_tim_t; //msvc > 6.0
 #else
 typedef int64_t cyg_tim_t; //msvc 6.0
@@ -183,19 +183,19 @@ static pthread_cond_t cv_;
 
 static int Init(void)
 {
-  pthread_mutexattr_init(&mattr_);
-  pthread_mutex_init(&mutex_, &mattr_);
-  pthread_condattr_init(&cattr_);
-  pthread_cond_init(&cv_, &cattr_);
+  assert(0 == pthread_mutexattr_init(&mattr_));
+  assert(0 == pthread_mutex_init(&mutex_, &mattr_));
+  assert(0 == pthread_condattr_init(&cattr_));
+  assert(0 == pthread_cond_init(&cv_, &cattr_));
   return 0;
 }
 
 static int Destroy(void)
 {
-  pthread_cond_destroy(&cv_);
-  pthread_mutex_destroy(&mutex_);
-  pthread_mutexattr_destroy(&mattr_);
-  pthread_condattr_destroy(&cattr_);
+  assert(0 == pthread_cond_destroy(&cv_));
+  assert(0 == pthread_mutex_destroy(&mutex_));
+  assert(0 == pthread_mutexattr_destroy(&mattr_));
+  assert(0 == pthread_condattr_destroy(&cattr_));
   return 0;
 }
 
@@ -213,11 +213,13 @@ static int Wait(time_t sec, long nsec)
       abstime.tv_sec += sc;
       abstime.tv_nsec %= 1000000000L;
   }
-  pthread_mutex_lock(&mutex_);
+  assert(0 == pthread_mutex_lock(&mutex_));
   /*
    * We don't need to check the CV.
    */
   result = pthread_cond_timedwait(&cv_, &mutex_, &abstime);
+  assert(result != 0);
+  assert(errno == ETIMEDOUT);
   pthread_mutex_unlock(&mutex_);
   return result;
 }

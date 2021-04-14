@@ -36,7 +36,6 @@
  *
  * Test Synopsis:
  * - that unique thread sequence numbers are generated.
- * - Analyse thread struct reuse.
  *
  * Test Method (Validation or Falsification):
  * -
@@ -81,7 +80,7 @@
  */
 
 enum {
-	NUMTHREADS = 10000
+	NUMTHREADS = PTHREAD_THREADS_MAX
 };
 
 

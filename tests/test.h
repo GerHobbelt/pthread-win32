@@ -39,6 +39,13 @@
 #ifndef _PTHREAD_TEST_H_
 #define _PTHREAD_TEST_H_
 
+/*
+ * Some tests sneak a peek at ../implement.h
+ * This is used inside ../implement.h to control
+ * what these test apps see and don't see.
+ */
+#define  PTW32_TEST_SNEAK_PEEK
+
 #include "../pthread.h"
 #include "../sched.h"
 #include "../semaphore.h"
@@ -46,16 +53,22 @@
 #include <windows.h>
 #include <stdio.h>
 #include <sys/timeb.h>
+/*
+ * FIXME: May not be available on all platforms.
+ */
+#include <errno.h>
 
-#define PTW32_THREAD_NULL_ID {NULL,0}
+#define  PTW32_THREAD_NULL_ID {NULL,0}
 
 /*
  * Some non-thread POSIX API substitutes
  */
-#define rand_r( _seed ) \
+#if !defined(__MINGW64_VERSION_MAJOR)
+#  define rand_r( _seed ) \
         ( _seed == _seed? rand() : rand() )
+#endif
 
-#if defined(PTW32_CONFIG_MINGW)
+#if defined(__MINGW32__)
 # include <stdint.h>
 #elif defined(__BORLANDC__)
 # define int64_t ULONGLONG
@@ -64,15 +77,15 @@
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
-#  define PTW32_FTIME(x) _ftime64_s(x)
-#  define PTW32_STRUCT_TIMEB struct __timeb64
+#  define  PTW32_FTIME(x) _ftime64_s(x)
+#  define  PTW32_STRUCT_TIMEB struct __timeb64
 #elif ( defined(_MSC_VER) && _MSC_VER >= 1300 ) || \
-      ( defined(PTW32_CONFIG_MINGW) && __MSVCRT_VERSION__ >= 0x0601 )
-#  define PTW32_FTIME(x) _ftime64(x)
-#  define PTW32_STRUCT_TIMEB struct __timeb64
+      ( defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0601 )
+#  define  PTW32_FTIME(x) _ftime64(x)
+#  define  PTW32_STRUCT_TIMEB struct __timeb64
 #else
-#  define PTW32_FTIME(x) _ftime(x)
-#  define PTW32_STRUCT_TIMEB struct _timeb
+#  define  PTW32_FTIME(x) _ftime(x)
+#  define  PTW32_STRUCT_TIMEB struct _timeb
 #endif
 
 
@@ -119,9 +132,12 @@ static const char * error_string[] = {
   "ENOLCK",
   "ENOSYS",
   "ENOTEMPTY",
+#if  PTW32_VERSION_MAJOR > 2
   "EILSEQ",
-  "EOWNERDEAD",
+#else
+  "EILSEQ_or_EOWNERDEAD",
   "ENOTRECOVERABLE"
+#endif
 };
 
 /*
@@ -156,8 +172,12 @@ int assertE;
 			            #e, __FILE__, (int) __LINE__), \
 	                            fflush(stderr) : \
                              0) : \
-          (fprintf(stderr, "Assertion failed: (%s %s %s), file %s, line %d, error %s\n", \
-                   #e,#o,#r, __FILE__, (int) __LINE__, error_string[assertE]), exit(1), 0))
+       (assertE <= (int) (sizeof(error_string)/sizeof(error_string[0]))) ? \
+	   (fprintf(stderr, "Assertion failed: (%s %s %s), file %s, line %d, error %s\n", \
+			    #e,#o,#r, __FILE__, (int) __LINE__, error_string[assertE]), exit(1), 0) :\
+		   (fprintf(stderr, \
+			    "Assertion failed: (%s %s %s), file %s, line %d, error %d\n", \
+		            #e,#o,#r, __FILE__, (int) __LINE__, assertE), exit(1), 0))
 
 #endif
 

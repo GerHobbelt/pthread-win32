@@ -77,7 +77,10 @@ test_mutex7(void)
 
   assert(pthread_create(&t, NULL, locker, NULL) == 0);
 
-  Sleep(1000);
+  while (lockCount < 2)
+    {
+      Sleep(1);
+    }
 
   assert(lockCount == 2);
 

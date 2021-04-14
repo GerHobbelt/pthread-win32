@@ -127,6 +127,9 @@ test_exception2(int argc, char **argv)
   pthread_t mt;
   pthread_t et[NUMTHREADS];
 
+  DWORD dwMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
+  SetErrorMode(dwMode | SEM_NOGPFAULTERRORBOX);
+
   if (argc >= 2 && (!strcmp(argv[1], "-?") || !strcmp(argv[1], "-h")))
     {
       int result;

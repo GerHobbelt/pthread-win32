@@ -87,7 +87,7 @@ thr(void * arg)
   if ( result == -1 )
   {
 	  int err =
-#if defined(PTW32_USES_SEPARATE_CRT)
+#if defined (PTW32_USES_SEPARATE_CRT)
 	  GetLastError();
 #else
       errno;
@@ -138,7 +138,7 @@ test_semaphore1(void)
   if (result2 == -1)
   {
     int err =
-#if defined(PTW32_USES_SEPARATE_CRT)
+#if defined (PTW32_USES_SEPARATE_CRT)
       GetLastError();
 #else
       errno;

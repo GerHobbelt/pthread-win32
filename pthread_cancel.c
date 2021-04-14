@@ -109,8 +109,12 @@ pthread_cancel (pthread_t thread)
   ptw32_thread_t * tp;
   ptw32_mcs_local_node_t stateLock;
 
+  /*
+   * Validate the thread id. This method works for pthreads-win32 because
+   * pthread_kill and pthread_t are designed to accommodate it, but the
+   * method is not portable.
+   */
   result = pthread_kill (thread, 0);
-
   if (0 != result)
     {
       return result;

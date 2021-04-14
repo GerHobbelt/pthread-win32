@@ -1,7 +1,7 @@
 /*
  * reinit1.c
  *
- * Same test as rwlock7.c but loop two or times reinitialising the library
+ * Same test as rwlock7.c but loop two or more times reinitialising the library
  * each time, to test reinitialisation. We use a rwlock test because rw locks
  * use CVs, mutexes and semaphores internally.
  *
@@ -56,7 +56,7 @@ static void *thread_routine (void *arg)
 
   self->changed = 0;
 
-  assert(pthread_getunique_np(self->thread_id) == (self->thread_num + 2));
+  assert(pthread_getunique_np(self->thread_id) == (unsigned __int64)(self->thread_num + 2));
 
   for (iteration = 0; iteration < ITERATIONS; iteration++)
     {
@@ -112,8 +112,6 @@ test_reinit1(void)
   int reinit_count;
   int seed = 1;
 
-  PTW32_STRUCT_TIMEB currSysTime1;
-
   for (reinit_count = 0; reinit_count < LOOPS; reinit_count++)
     {
       /*
@@ -126,8 +124,6 @@ test_reinit1(void)
 
           assert(pthread_rwlock_init (&data[data_count].lock, NULL) == 0);
         }
-
-      PTW32_FTIME(&currSysTime1);
 
       /*
        * Create THREADS threads to access shared data.

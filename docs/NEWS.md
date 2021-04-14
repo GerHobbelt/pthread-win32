@@ -1,3 +1,196 @@
+RELEASE 3.0.0
+--------------
+(2018-08-08)
+
+General
+-------
+Note that this is a new major release. The major version increment
+introduces two ABI changes along with other naming changes that will
+require recompilation of linking applications and possibly some textual
+changes to compile-time macro references in configuration and source
+files, e.g. PTW32_* changes to PTW32_*, ptw32_* to ptw32_*, etc.
+
+License Change
+--------------
+With the agreement of all substantial relevant contributors pthreads-win32
+version 3, with the exception of four files, is being released under the
+terms of the Apache License v2.0. The APLv2 is compatible with the GPLv3
+and LGPLv3 licenses and therefore this code may continue to be legally
+included within GPLv3 and LGPLv3 projects.
+
+A substantial relevant contributor was defined as one who has contributed
+original code that implements a capability present in the releases going
+forward. This excludes several contributors who have contributed code
+that has been obsoleted, or have provided patches that fix bugs,
+reorganise code for aesthetic or practical purposes, or improve build
+processes. This distinction was necessary in order to move forward in the
+likelyhood that not all contributors would be contactable. All
+contributors are listed in the file CONTRIBUTORS.
+
+The four files that will remain LGPL but change to v3 are files used to
+configure the GNU environment builds:
+
+	aclocal.m4
+	configure.ac
+	GNUmakefile.in
+	tests/GNUmakefile.in
+
+Contributors who have either requested this change or agreed to it when
+consulted are:
+
+John Bossom
+Alexander Terekhov
+Vladimir Kliatchko
+Ross Johnson
+
+pthreads-win32 version 2 releases will remain LGPL but version 2.11 and later
+will be released under v3 of that license so that any additions to
+pthreads4w version 3 code that is backported to v2 will not pollute that
+code.
+
+Backporting and Support of Legacy Windows Releases
+--------------------------------------------------
+Some changes from 2011-02-26 onward may not be compatible with pre
+Windows 2000 systems.
+
+New bug fixes in all releases since 2.8.0 have NOT been applied to the
+1.x.x series.
+
+Testing and verification
+------------------------
+The MSVC, MinGW and MinGW64 builds have been tested on SMP architecture
+(Intel x64 Hex Core) by completing the included test suite, as well as the
+stress and bench tests.
+
+Be sure to run your builds against the test suite. If you see failures
+then please consider how your toolchains might be contributing to the
+failure. See the README file for more detailed descriptions of the
+toolchains and test systems that we have used to get the tests to pass
+successfully.
+
+We recommend MinGW64 over MinGW for both 64 and 32 bit GNU CC builds
+only because the MinGW DWARF2 exception handling with C++ builds causes some
+problems with thread cancelation.
+
+MinGW64 also includes its own native pthreads implementation, which you may
+prefer to use. If you wish to build our library you will need to select the
+Win32 native threads option at install time. We recommend also selecting the
+SJLJ exception handling method for MinGW64-w32 builds. For MinGW64-w64 builds
+either the SJLJ or SEH exception handling method should work.
+
+New Features
+------------
+Other than the following, this release is feature-equivalent to v2.11.0.
+
+This release introduces a change to pthread_t and pthread_once_t that will
+affect applications that link with the library.
+
+pthread_t: remains a struct but extends the reuse counter from 32 bits to 64
+bits. On 64 bit machines the overall size of the object will not increase, we
+simply put 4 bytes of padding to good use reducing the risk that the counter
+could wrap around in very long-running applications from small to, effectively,
+zero. The 64 bit reuse counter extends risk-free run time from months
+(assuming an average thread lifetime of 1ms) to centuries (assuming an
+average thread lifetime of 1ns).
+
+pthread_once_t: removes two long-obsoleted elements and reduces it's size.
+
+
+RELEASE 2.11.0
+--------------
+(2018-08-08)
+
+General
+-------
+New bug fixes in all releases since 2.8.0 have NOT been applied to the
+1.x.x series.
+
+Some changes from 2011-02-26 onward may not be compatible with
+pre Windows 2000 systems.
+
+License Change to LGPL v3
+-------------------------
+pthreads-win32 version 2.11 and all future 2.x versions will be released
+under the Lesser GNU Public License version 3 (LGPLv3).
+
+Planned Release Under the Apache License v2
+-------------------------------------------
+The next major version of this software (version 3) will be released
+under the Apache License version 2.0 (ALv2). Releasing 2.11 under LGPLv3
+will allow modifications to version 3 of this software to be backported
+to version 2 going forward. Further to this, any GPL projects currently
+using this library will be able to continue to use either version 2 or 3
+of this code in their projects.
+
+For more information please see:
+https://www.apache.org/licenses/GPL-compatibility.html
+
+In order to remain consistent with this change, from this point on
+modifications to this library will only be accepted against version 3
+of this software under the terms of the ALv2. They will then, where
+appropriate, be backported to version 2.
+
+We hope to release version 3 at the same time as we release version 2.11.
+
+Testing and verification
+------------------------
+This version has been tested on SMP architecture (Intel x64 Hex Core)
+by completing the included test suite, as well as the stress and bench
+tests.
+
+Be sure to run your builds against the test suite. If you see failures
+then please consider how your toolchains might be contributing to the
+failure. See the README file for more detailed descriptions of the
+toolchains and test systems that we have used to get the tests to pass
+successfully. We recommend MinGW64 over MinGW32 for both 64 and 32 bit
+GNU CC builds. MinGW64 also includes its own independent pthreads
+implementation, which you may prefer to use.
+
+New Features or Changes
+-----------------------
+For Microsoft toolchain builds:
+(1) Static linking requires both this library and any linking
+libraries or applications to be compiled with /MT consistently.
+
+(2) Static libraries have been renamed as libpthreadV*.lib
+to differentiate them from DLL import libs pthreadV*.lib.
+
+(3) If you are using mixed linkage, e.g. linking the static /MT version
+of the library to an application linked with /MD you may be able to use
+GetLastError() to interrogate the error code because the library sets
+both errno (via _set_errno()) and SetLastError().
+
+Bug Fixes
+---------
+Remove the attempt to set PTW32_USES_SEPARATE_CRT in the headers which
+can cause unexpected results. In certain situations a user may want to
+define it explicitly in their environment to invoke it's effects, either
+when buidling the library or an application or both. See README.NONPORTABLE.
+-- Ross Johnson
+
+The library should be more reliable under fully statically linked
+scenarios. Note: we have removed the PIMAGE_TLS_CALLBACK code and
+reverted to the earlier method that appears to be more reliable
+across all compiler editions.
+- Mark Pizzolato
+
+Various corrections to GNUmakefile. Although this file has been removed, 
+for completeness the changes have been recorded as commits to the
+repository.
+- Kyle Schwarz
+
+MinGW64-w64 defines pid_t as __int64. sched.h now reflects that.
+- Kyle Schwarz
+
+Several tests have been fixed that were seen to fail on machines under
+load. Other tests that used similar crude mechanisms to synchronise
+threads (these are unit tests) had the same improvements applied:
+semaphore5.c recognises that sem_destroy can legitimately return
+EBUSY; mutex6*.c, mutex7*.c and mutex8*.c all replaced a single
+Sleep() with a polling loop.
+- Ross Johnson
+
+
 RELEASE 2.10.0
 --------------
 (2016-09-18)
@@ -21,8 +214,8 @@ then please consider how your toolchains might be contributing to the
 failure. See the README file for more detailed descriptions of the
 toolchains and test systems that we have used to get the tests to pass
 successfully. We recommend MinGW64 over MinGW32 for both 64 and 32 bit
-builds. MinGW also includes its own independent pthreads implementation,
-which you may prefer to use.
+GNU CC builds. MinGW64 also includes its own independent pthreads
+implementation, which you may prefer to use.
 
 New Features
 ------------
@@ -59,12 +252,21 @@ pthread_win32_getabstime_np()
  - Return the current time plus an optional offset in a platform-aware way
    that is compatible with POSIX timed calls (returns the struct timespec
    address which is the first argument). Intended primarily to make it
-   easier to write tests but may be useful for applications generally. 
+   easier to write tests but may be useful for applications generally.
+    
+GNU compiler environments (MinGW32 and MinGW64) now have the option of using
+autoconf to automatically configure the build.
 
 Builds:
 New makefile targets have been added and existing targets modified or
 removed. For example, targets to build and test all of the possible
 configurations of both dll and static libs.
+
+GNU compiler builds are now explicitly using ISO C and C++ 2011 standards
+compatibility. If your GNU compiler doesn't support this please consider
+updating. Auto configuration is now possible via 'configure' script. The
+script must be generated using autoconf - see the README file. Thanks to
+Keith Marshall from the MinGW project.
 
 Static linking:
 The autostatic functionality has been moved to dll.c, and extended so
@@ -1035,9 +1237,9 @@ Cleanup code default style. (IMPORTANT)
 Previously, if not defined, the cleanup style was determined automatically
 from the compiler/language, and one of the following was defined accordingly:
 
-        __CLEANUP_SEH   MSVC only
-        __CLEANUP_CXX   C++, including MSVC++, GNU G++
-        __CLEANUP_C             C, including GNU GCC, not MSVC
+        PTW32_CLEANUP_SEH   MSVC only
+        PTW32_CLEANUP_CXX   C++, including MSVC++, GNU G++
+        PTW32_CLEANUP_C             C, including GNU GCC, not MSVC
 
 These defines determine the style of cleanup (see pthread.h) and,
 most importantly, the way that cancellation and thread exit (via
@@ -1050,8 +1252,8 @@ the correct stack unwinding occurs regardless of where the thread
 is when it's canceled or exits via pthread_exit().
 
 In this and future snapshots, unless the build explicitly defines (e.g.
-via a compiler option) __CLEANUP_SEH, __CLEANUP_CXX, or __CLEANUP_C, then
-the build NOW always defaults to __CLEANUP_C style cleanup. This style
+via a compiler option) PTW32_CLEANUP_SEH, PTW32_CLEANUP_CXX, or PTW32_CLEANUP_C, then
+the build NOW always defaults to PTW32_CLEANUP_C style cleanup. This style
 uses setjmp/longjmp in the cancellation and pthread_exit implementations,
 and therefore won't do stack unwinding even when linked to applications
 that have it (e.g. C++ apps). This is for consistency with most
@@ -1059,17 +1261,17 @@ current commercial Unix POSIX threads implementations. Compaq's TRU64
 may be an exception (no pun intended) and possible future trend.
 
 Although it was not clearly documented before, it is still necessary to
-build your application using the same __CLEANUP_* define as was
+build your application using the same PTW32_CLEANUP_* define as was
 used for the version of the library that you link with, so that the
 correct parts of pthread.h are included. That is, the possible
 defines require the following library versions:
 
-        __CLEANUP_SEH   pthreadVSE.dll
-        __CLEANUP_CXX   pthreadVCE.dll or pthreadGCE.dll
-        __CLEANUP_C     pthreadVC.dll or pthreadGC.dll
+        PTW32_CLEANUP_SEH   pthreadVSE.dll
+        PTW32_CLEANUP_CXX   pthreadVCE.dll or pthreadGCE.dll
+        PTW32_CLEANUP_C     pthreadVC.dll or pthreadGC.dll
 
 E.g. regardless of whether your app is C or C++, if you link with
-pthreadVC.lib or libpthreadGC.a, then you must define __CLEANUP_C.
+pthreadVC.lib or libpthreadGC.a, then you must define PTW32_CLEANUP_C.
 
 
 THE POINT OF ALL THIS IS: if you have not been defining one of these
@@ -1080,13 +1282,13 @@ THIS NOW CHANGES, as has been explained above, but to try to make this
 clearer here's an example:
 
 If you were building your application with MSVC++ i.e. using C++
-exceptions and not explicitly defining one of __CLEANUP_*, then
-__CLEANUP_C++ was automatically defined for you in pthread.h.
+exceptions and not explicitly defining one of PTW32_CLEANUP_*, then
+PTW32_CLEANUP_C++ was automatically defined for you in pthread.h.
 You should have been linking with pthreadVCE.dll, which does
 stack unwinding.
 
 If you now build your application as you had before, pthread.h will now
-automatically set __CLEANUP_C as the default style, and you will need to
+automatically set PTW32_CLEANUP_C as the default style, and you will need to
 link with pthreadVC.dll. Stack unwinding will now NOT occur when a thread
 is canceled, or the thread calls pthread_exit().
 
@@ -1096,7 +1298,7 @@ instantiated objects may not be destroyed or cleaned up after a thread
 is canceled.
 
 If you want the same behaviour as before, then you must now define
-__CLEANUP_C++ explicitly using a compiler option and link with
+PTW32_CLEANUP_C++ explicitly using a compiler option and link with
 pthreadVCE.dll as you did before.
 
 
@@ -1239,7 +1441,7 @@ consistent with Solaris.
 - Thomas Pfaff <tpfaff@gmx.net>
 
 * Found a fix for the library and workaround for applications for
-the known bug #2, i.e. where __CLEANUP_CXX or __CLEANUP_SEH is defined.
+the known bug #2, i.e. where PTW32_CLEANUP_CXX or PTW32_CLEANUP_SEH is defined.
 See the "Known Bugs in this snapshot" section below.
 
 This could be made transparent to applications by replacing the macros that

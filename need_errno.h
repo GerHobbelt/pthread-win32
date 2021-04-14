@@ -64,12 +64,12 @@ extern "C" {
 #  define PTW32_STATIC_TLSLIB
 #endif
 
-#if defined(PTW32_STATIC_LIB) || defined(PTW32_STATIC_TLSLIB)
-#  define PTW32_DLLPORT
-#elif defined(PTW32_BUILD)
-#    define PTW32_DLLPORT __declspec (dllexport)
+#if defined (PTW32_STATIC_LIB) || defined (PTW32_STATIC_TLSLIB)
+#  define  PTW32_DLLPORT
+#elif defined (PTW32_BUILD)
+#    define  PTW32_DLLPORT __declspec (dllexport)
 #  else
-#    define PTW32_DLLPORT __declspec (dllimport)
+#    define  PTW32_DLLPORT __declspec (dllimport)
 #  endif
 
 /* declare reference to errno */
@@ -139,8 +139,21 @@ _CRTIMP extern int errno;
 /*
  * POSIX 2008 - robust mutexes.
  */
-#define EOWNERDEAD	43
-#define ENOTRECOVERABLE	44
+#if  PTW32_VERSION_MAJOR > 2
+#  if !defined(EOWNERDEAD)
+#    define EOWNERDEAD 1000
+#  endif
+#  if !defined(ENOTRECOVERABLE)
+#    define ENOTRECOVERABLE 1001
+#  endif
+#else
+#  if !defined(EOWNERDEAD)
+#    define EOWNERDEAD 43
+#  endif
+#  if !defined(ENOTRECOVERABLE)
+#    define ENOTRECOVERABLE 44
+#  endif
+#endif
 
 /*
  * Support EDEADLOCK for compatibility with older MS-C versions.

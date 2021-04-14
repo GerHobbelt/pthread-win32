@@ -132,6 +132,9 @@ test_cancel5(void)
   int i;
   pthread_t t[NUMTHREADS + 1];
 
+  DWORD dwMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
+  SetErrorMode(dwMode | SEM_NOGPFAULTERRORBOX);
+
   for (i = 1; i <= NUMTHREADS; i++)
     {
       threadbag[i].started = 0;

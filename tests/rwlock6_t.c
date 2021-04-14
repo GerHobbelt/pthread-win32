@@ -62,15 +62,9 @@ static void * wrfunc(void * arg)
 static void * rdfunc(void * arg)
 {
   int ba = -1;
-  struct timespec abstime = { 0, 0 };
-  PTW32_STRUCT_TIMEB currSysTime;
-  const DWORD NANOSEC_PER_MILLISEC = 1000000;
+  struct timespec abstime;
 
-  PTW32_FTIME(&currSysTime);
-
-  abstime.tv_sec = (long)currSysTime.time;
-  abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
-
+  (void) pthread_win32_getabstime_np(&abstime, NULL);
 
   if ((int) (size_t)arg == 1)
     {
@@ -149,5 +143,3 @@ test_rwlock6_t(void)
 
   return 0;
 }
-
-

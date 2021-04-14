@@ -45,7 +45,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-#if defined(__CLEANUP_CXX)
+#if defined(PTW32_CLEANUP_CXX)
 # if defined(_MSC_VER)
 #  include <eh.h>
 # elif defined(__WATCOMC__)

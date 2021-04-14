@@ -75,6 +75,8 @@
 #define _WIN32_WINNT 0x400
 
 #include "test.h"
+/* Cheating here - sneaking a peek at library internals */
+#include "../config.h"
 #include "../implement.h"
 #include "../context.h"
 
@@ -110,6 +112,9 @@ test_context1(void)
   pthread_t t;
   HANDLE hThread;
 
+  DWORD dwMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
+  SetErrorMode(dwMode | SEM_NOGPFAULTERRORBOX);
+
   assert(pthread_create(&t, NULL, func, NULL) == 0);
 
   hThread = ((ptw32_thread_t *)t.p)->threadH;
@@ -128,7 +133,7 @@ test_context1(void)
       context.ContextFlags = CONTEXT_CONTROL;
 
       GetThreadContext(hThread, &context);
-      PTW32_PROGCTR (context) = (DWORD_PTR) anotherEnding;
+       PTW32_PROGCTR (context) = (DWORD_PTR) anotherEnding;
       SetThreadContext(hThread, &context);
       ResumeThread(hThread);
     }

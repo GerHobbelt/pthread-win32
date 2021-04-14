@@ -78,7 +78,10 @@ test_mutex6s(void)
 
   assert(pthread_create(&t, NULL, locker, NULL) == 0);
 
-  Sleep(1000);
+  while (lockCount < 1)
+    {
+      Sleep(1);
+    }
 
   assert(lockCount == 1);
 
@@ -88,7 +91,10 @@ test_mutex6s(void)
    */
   assert(pthread_mutex_unlock(&mutex) == 0);
 
-  Sleep (1000);
+  while (lockCount < 2)
+    {
+      Sleep(1);
+    }
 
   assert(lockCount == 2);
 

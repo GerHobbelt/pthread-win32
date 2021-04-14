@@ -3,19 +3,23 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
 	<TITLE>PTHREAD_ATTR_INIT(3) manual page</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.1  (Win32)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGEDBY" CONTENT="Ross Johnson">
+	<META NAME="CHANGED" CONTENT="20160229;19521095">
 	<STYLE TYPE="text/css">
 	<!--
+		H3.cjk { font-family: "SimSun" }
+		H3.ctl { font-family: "Mangal" }
 		H4.cjk { font-family: "SimSun" }
 		H4.ctl { font-family: "Mangal" }
 		H2.cjk { font-family: "SimSun" }
 		H2.ctl { font-family: "Mangal" }
-		H3.cjk { font-family: "SimSun" }
-		H3.ctl { font-family: "Mangal" }
 	-->
 	</STYLE>
 </HEAD>
 <BODY LANG="en-GB" BGCOLOR="#ffffff" DIR="LTR">
-<H4 CLASS="western">POSIX Threads for Windows &ndash; REFERENCE -
+<H4 CLASS="western">POSIX Threads for Windows &ndash; REFERENCE &ndash;
 <A HREF="http://sources.redhat.com/pthreads-win32">pthreads-win32</A></H4>
 <P><A HREF="index.html">Reference Index</A></P>
 <P><A HREF="#toc">Table of Contents</A></P>
@@ -37,16 +41,14 @@ attributes
 <P><B>int pthread_attr_destroy(pthread_attr_t *</B><I>attr</I><B>);</B>
 </P>
 <P><B>int pthread_attr_setaffinity_np(pthread_attr_t *</B><I>attr</I><B>,
-size_t </B><SPAN STYLE="font-variant: normal"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">cpusetsize,
-</SPAN></SPAN></SPAN><SPAN STYLE="font-variant: normal"><SPAN STYLE="font-style: normal"><B>cpu_set_t
-</B></SPAN></SPAN><SPAN STYLE="font-variant: normal"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">*
-</SPAN></SPAN></SPAN><I><SPAN STYLE="font-weight: normal">cpuset</SPAN></I><SPAN STYLE="font-variant: normal"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">);</SPAN></SPAN></SPAN>
+size_t </B><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">cpusetsize,
+</SPAN></SPAN><SPAN STYLE="font-style: normal"><B>cpu_set_t </B></SPAN><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">*
+</SPAN></SPAN><I><SPAN STYLE="font-weight: normal">cpuset</SPAN></I><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">);</SPAN></SPAN>
 </P>
 <P><B>int pthread_attr_getaffinity_np(const pthread_attr_t *</B><I>attr</I><B>,
-size_t </B><SPAN STYLE="font-variant: normal"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">cpusetsize,
-</SPAN></SPAN></SPAN><SPAN STYLE="font-variant: normal"><SPAN STYLE="font-style: normal"><B>cpu_set_t
-</B></SPAN></SPAN><SPAN STYLE="font-variant: normal"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">*
-</SPAN></SPAN></SPAN><I><SPAN STYLE="font-weight: normal">cpuset</SPAN></I><SPAN STYLE="font-variant: normal"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">);</SPAN></SPAN></SPAN>
+size_t </B><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">cpusetsize,
+</SPAN></SPAN><SPAN STYLE="font-style: normal"><B>cpu_set_t </B></SPAN><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">*
+</SPAN></SPAN><I><SPAN STYLE="font-weight: normal">cpuset</SPAN></I><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">);</SPAN></SPAN>
 </P>
 <P><B>int pthread_attr_setdetachstate(pthread_attr_t *</B><I>attr</I><B>,
 int </B><I>detachstate</I><B>);</B> 
@@ -54,12 +56,12 @@ int </B><I>detachstate</I><B>);</B>
 <P><B>int pthread_attr_getdetachstate(const pthread_attr_t *</B><I>attr</I><B>,
 int *</B><I>detachstate</I><B>);</B> 
 </P>
-<P><B>int pthread_attr_</B><B>s</B><B>et</B><B>name_np</B><B>(const
-pthread_attr_t *</B><I>attr</I><B>, </B><B>const char * </B><I><SPAN STYLE="font-weight: normal">name</SPAN></I><B>,</B><B>
-</B><B>void</B><B> *</B><I><B> </B></I><I><SPAN STYLE="font-weight: normal">arg</SPAN></I><B>);</B></P>
-<P><B>int pthread_attr_get</B><B>name_np</B><B>(const pthread_attr_t
-*</B><I>attr</I><B>, </B><B>char * </B><I><SPAN STYLE="font-weight: normal">name</SPAN></I><B>,</B><B>
-</B><I><B>int </B></I><I><SPAN STYLE="font-weight: normal">len</SPAN></I><B>);</B></P>
+<P><B>int pthread_attr_setname_np(const pthread_attr_t *</B><I>attr</I><B>,
+const char * </B><I><SPAN STYLE="font-weight: normal">name</SPAN></I><B>,</B>
+<B>void</B> <B>*</B> <I><SPAN STYLE="font-weight: normal">arg</SPAN></I><B>);</B></P>
+<P><B>int pthread_attr_getname_np(const pthread_attr_t *</B><I>attr</I><B>,
+char * </B><I><SPAN STYLE="font-weight: normal">name</SPAN></I><B>,</B>
+<I><B>int </B></I><I><SPAN STYLE="font-weight: normal">len</SPAN></I><B>);</B></P>
 <P><B>int pthread_attr_setschedpolicy(pthread_attr_t *</B><I>attr</I><B>,
 int </B><I>policy</I><B>);</B> 
 </P>

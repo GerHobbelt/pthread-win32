@@ -7,8 +7,11 @@ RESOURCE_OBJS	= \
 DLL_OBJS	= \
 		pthread.$(OBJEXT)
 
-# Separate modules for minimising the size of statically linked images
 STATIC_OBJS	= \
+		pthread.$(OEXT)
+
+# Separate modules for minimising the size of statically linked images
+STATIC_OBJS_SMALL	= \
 		cleanup.$(OBJEXT) \
 		create.$(OBJEXT) \
 		dll.$(OBJEXT) \
@@ -153,7 +156,6 @@ STATIC_OBJS	= \
 		sem_trywait.$(OBJEXT) \
 		sem_unlink.$(OBJEXT) \
 		sem_wait.$(OBJEXT) \
-		signal.$(OBJEXT) \
 		w32_CancelableWait.$(OBJEXT)
 
 PTHREAD_SRCS	= \

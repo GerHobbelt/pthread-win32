@@ -115,13 +115,17 @@ int
 pthread_mutex_timedlock (pthread_mutex_t * mutex,
 			 const struct timespec *abstime)
 {
-  pthread_mutex_t mx;
-  int kind;
-  int result = 0;
-
   /*
    * Let the system deal with invalid pointers.
    */
+  pthread_mutex_t mx = *mutex;
+  int kind;
+  int result = 0;
+
+  if (mx == NULL)
+    {
+      return EINVAL;
+    }
 
   /*
    * We do a quick check to see if we need to do more work
@@ -129,15 +133,15 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
    * again inside the guarded section of ptw32_mutex_check_need_init()
    * to avoid race conditions.
    */
-  if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
+  if (mx >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
       if ((result = ptw32_mutex_check_need_init (mutex)) != 0)
 	{
 	  return (result);
 	}
+      mx = *mutex;
     }
 
-  mx = *mutex;
   kind = mx->kind;
 
   if (kind >= 0)

@@ -48,22 +48,19 @@
 int PTW32_CDECL
 pthread_mutex_unlock (pthread_mutex_t * mutex)
 {
-  int result = 0;
-  int kind;
-  pthread_mutex_t mx;
-
   /*
    * Let the system deal with invalid pointers.
    */
-
-  mx = *mutex;
+  pthread_mutex_t mx = *mutex;
+  int kind;
+  int result = 0;
 
   /*
    * If the thread calling us holds the mutex then there is no
    * race condition. If another thread holds the
    * lock then we shouldn't be in here.
    */
-  if (mx < PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
+  if (mx < PTHREAD_ERRORCHECK_MUTEX_INITIALIZER) // Remember, pointers are unsigned.
     {
       kind = mx->kind;
 
@@ -179,6 +176,11 @@ pthread_mutex_unlock (pthread_mutex_t * mutex)
     }
   else if (mx != PTHREAD_MUTEX_INITIALIZER)
     {
+      /*
+       * If mx is PTHREAD_ERRORCHECK_MUTEX_INITIALIZER or PTHREAD_RECURSIVE_MUTEX_INITIALIZER
+       * we need to know we are doing something unexpected. For PTHREAD_MUTEX_INITIALIZER
+       * (normal) mutexes we can just silently ignore it.
+       */
       result = EINVAL;
     }
 

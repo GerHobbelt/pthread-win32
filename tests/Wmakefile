@@ -13,7 +13,7 @@
 #      in the file CONTRIBUTORS included with the source
 #      code distribution. The list can also be seen at the
 #     following World Wide Web location:
-#      http://sources.redhat.com/pthreads-win32/contributors.html
+#      http://sources.redhat.com/pthreads-win32contributors.html
 # 
 #      This library is free software; you can redistribute it and/or
 #      modify it under the terms of the GNU Lesser General Public
@@ -54,15 +54,15 @@ OPTIM	= -od
 XXLIBS	=
 
 # C++ Exceptions
-WCEFLAGS	= -xs -dPtW32NoCatchWarn -d__CLEANUP_CXX
+WCEFLAGS	= -xs -d__PtW32NoCatchWarn -dPTW32_CLEANUP_CXX
 WCELIB	= pthreadWCE$(DLL_VER).lib
 WCEDLL	= pthreadWCE$(DLL_VER).dll
 # C cleanup code
-WCFLAGS	= -d__CLEANUP_C
+WCFLAGS	= -dPTW32_CLEANUP_C
 WCLIB	= pthreadWC$(DLL_VER).lib
 WCDLL	= pthreadWC$(DLL_VER).dll
 # C++ Exceptions in application - using WC version of pthreads dll
-WCXFLAGS	= -xs -d__CLEANUP_C
+WCXFLAGS	= -xs -dPTW32_CLEANUP_C
 
 CFLAGS= -w4 -e25 -d_REENTRANT -zq -bm $(OPTIM) -5r -bt=nt -mf -d2
 

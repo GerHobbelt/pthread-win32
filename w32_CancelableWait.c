@@ -52,7 +52,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
       * This provides an extra hook into the pthread_cancel
       * mechanism that will allow you to wait on a Windows handle and make it a
       * cancellation point. This function blocks until the given WIN32 handle is
-      * signaled or pthread_cancel has been called. It is implemented using
+      * signalled or pthread_cancel has been called. It is implemented using
       * WaitForMultipleObjects on 'waitHandle' and a manually reset WIN32
       * event used to implement pthread_cancel.
       * 
@@ -92,7 +92,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
       handles[1] = NULL;
     }
 
-  status = WaitForMultipleObjects (nHandles, handles, PTW32_FALSE, timeout);
+  status = WaitForMultipleObjects (nHandles, handles,  PTW32_FALSE, timeout);
 
   switch (status - WAIT_OBJECT_0)
     {
@@ -110,7 +110,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
     case 1:
       /*
        * Got cancel request.
-       * In the event that both handles are signaled, the cancel will
+       * In the event that both handles are signalled, the cancel will
        * be ignored (see case 0 comment).
        */
       if(handles[1]) ResetEvent (handles[1]);
@@ -119,8 +119,8 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 	{
           ptw32_mcs_local_node_t stateLock;
 	  /*
-	   * Should handle POSIX and implicit POSIX threads..
-	   * Make sure we haven't been async-canceled in the meantime.
+	   * Should handle POSIX and implicit POSIX threads.
+	   * Make sure we haven't been async-cancelled in the meantime.
 	   */
 	  ptw32_mcs_lock_acquire (&sp->stateLock, &stateLock);
 	  if (sp->state < PThreadStateCanceling)
@@ -128,7 +128,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 	      sp->state = PThreadStateCanceling;
 	      sp->cancelState = PTHREAD_CANCEL_DISABLE;
 	      ptw32_mcs_lock_release (&stateLock);
-	      ptw32_throw (PTW32_EPS_CANCEL);
+	      ptw32_throw  (PTW32_EPS_CANCEL);
 
 	      /* Never reached */
 	    }

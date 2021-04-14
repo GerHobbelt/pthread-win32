@@ -18,7 +18,9 @@ ALL_KNOWN_TESTS = \
 	create1 create2 create3 \
 	delay1 delay2 \
 	detach1 \
+	equal0 \
 	equal1 \
+	errno0 \
 	errno1 \
 	exception1 exception2 exception3_0 exception3 \
 	exit1 exit2 exit3 exit4 exit5 exit6 \
@@ -39,7 +41,7 @@ ALL_KNOWN_TESTS = \
 	robust1 robust2 robust3 robust4 robust5 \
 	rwlock1 rwlock2 rwlock3 rwlock4 \
 	rwlock2_t rwlock3_t rwlock4_t rwlock5_t rwlock6_t rwlock6_t2 \
-	rwlock5 rwlock6 rwlock7 rwlock8 \
+	rwlock5 rwlock6 \
 	self1 self2 \
 	semaphore1 semaphore2 semaphore3 \
 	semaphore4 semaphore4t semaphore5 \

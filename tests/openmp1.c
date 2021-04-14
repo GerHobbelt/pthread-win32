@@ -100,9 +100,6 @@ test_openmp1(int argc, char *argv[])
 	memset(&a_thr, 0, sizeof(a_thr)); /* [i_a] fix valid MSVC complaint about unitialized a_thr / b_thr */
 	memset(&b_thr, 0, sizeof(b_thr)); /* [i_a] fix valid MSVC complaint about unitialized a_thr / b_thr */
 
-    printf("%s:%d - %s - a_thr:%p - b_thr:%p\n",
-           __FILE__,__LINE__,__FUNCTION__,a_thr.p,b_thr.p);
-
     status = pthread_create(&a_thr, NULL, _thread, (void*) 1 );
     if ( status != 0 ) {
       printf("Failed to create thread 1\n");
@@ -114,6 +111,9 @@ test_openmp1(int argc, char *argv[])
       printf("Failed to create thread 2\n");
       return (-1);
     }
+
+    printf("%s:%d - %s - a_thr:%p - b_thr:%p\n",
+           __FILE__,__LINE__,__FUNCTION__,a_thr.p,b_thr.p);
 
     status = pthread_join(a_thr, NULL);
     if ( status != 0 ) {

@@ -1,3 +1,9 @@
+2016-12-25  Ross Johnson  <ross at homemail dot com dot au>
+
+	* Change all references to "pthreads-win32" etc. to "pthreads-win32"
+	* Change all references to the sourceware projects web page to the
+	SourceForge project web page.
+
 2015-02-03  Ross Johnson  <ross at homemail dot com dot au>
 
 	* *.html: Fix HEAD section inconsistencies and remove editor meta tags.

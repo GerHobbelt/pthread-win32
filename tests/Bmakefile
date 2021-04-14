@@ -13,7 +13,7 @@
 #      in the file CONTRIBUTORS included with the source
 #      code distribution. The list can also be seen at the
 #      following World Wide Web location:
-#      http://sources.redhat.com/pthreads-win32/contributors.html
+#      http://sources.redhat.com/pthreads-win32contributors.html
 # 
 #      This library is free software; you can redistribute it and/or
 #      modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
 #
 
-DLL_VER	= 2
+PTW32_VER	= 3
 
 CP	= copy
 RM	= erase
@@ -50,15 +50,15 @@ OPTIM	= -O2
 XXLIBS	= cw32mti.lib ws2_32.lib
 
 # C++ Exceptions
-BCEFLAGS	= -P -DPtW32NoCatchWarn -D__CLEANUP_CXX
-BCELIB	= pthreadBCE$(DLL_VER).lib
-BCEDLL	= pthreadBCE$(DLL_VER).dll
+BCEFLAGS	= -P -D__PtW32NoCatchWarn -DPTW32_CLEANUP_CXX
+BCELIB	= pthreadBCE$(PTW32_VER).lib
+BCEDLL	= pthreadBCE$(PTW32_VER).dll
 # C cleanup code
-BCFLAGS	= -D__CLEANUP_C
-BCLIB	= pthreadBC$(DLL_VER).lib
-BCDLL	= pthreadBC$(DLL_VER).dll
+BCFLAGS	= -DPTW32_CLEANUP_C
+BCLIB	= pthreadBC$(PTW32_VER).lib
+BCDLL	= pthreadBC$(PTW32_VER).dll
 # C++ Exceptions in application - using VC version of pthreads dll
-BCXFLAGS	= -D__CLEANUP_C
+BCXFLAGS	= -DPTW32_CLEANUP_C
 
 # Defaults
 CPLIB	= $(BCLIB)

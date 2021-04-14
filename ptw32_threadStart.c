@@ -19,17 +19,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- *
+ * 
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- *
+ * 
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- *
+ * 
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -46,11 +46,11 @@
 #include "implement.h"
 #include <stdio.h>
 
-#if defined(__CLEANUP_C)
+#if defined(PTW32_CLEANUP_C)
 # include <setjmp.h>
 #endif
 
-#if defined(__CLEANUP_SEH)
+#if defined(PTW32_CLEANUP_SEH)
 
 static DWORD
 ExceptionFilter (EXCEPTION_POINTERS * ep, ULONG_PTR * ei)
@@ -87,7 +87,7 @@ ExceptionFilter (EXCEPTION_POINTERS * ep, ULONG_PTR * ei)
     }
 }
 
-#elif defined(__CLEANUP_CXX)
+#elif defined(PTW32_CLEANUP_CXX)
 
 #if defined(_MSC_VER)
 # include <eh.h>
@@ -106,7 +106,7 @@ using
 # endif
 #endif
 
-#endif /* __CLEANUP_CXX */
+#endif /* PTW32_CLEANUP_CXX */
 
 /*
  * MSVC6 does not optimize ptw32_threadStart() safely
@@ -118,7 +118,7 @@ using
 # pragma optimize("g", off)
 #endif
 
-#if ! defined (PTW32_CONFIG_MINGW) || (defined (__MSVCRT__) && ! defined (__DMC__))
+#if ! defined (__MINGW32__) || (defined (__MSVCRT__) && ! defined (__DMC__))
 unsigned
   __stdcall
 #else
@@ -132,12 +132,12 @@ ptw32_threadStart (void *vthreadParms)
   void * (PTW32_CDECL *start) (void *);
   void * arg;
 
-#if defined(__CLEANUP_SEH)
+#if defined(PTW32_CLEANUP_SEH)
   ULONG_PTR
   ei[] = { 0, 0, 0 };
 #endif
 
-#if defined(__CLEANUP_C)
+#if defined(PTW32_CLEANUP_C)
   int setjmp_rc;
 #endif
 
@@ -151,7 +151,7 @@ ptw32_threadStart (void *vthreadParms)
 
   free (threadParms);
 
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
 #else
   /*
    * _beginthread does not return the thread id and is running
@@ -170,7 +170,7 @@ ptw32_threadStart (void *vthreadParms)
   sp->state = PThreadStateRunning;
   ptw32_mcs_lock_release (&stateLock);
 
-#if defined(__CLEANUP_SEH)
+#if defined(PTW32_CLEANUP_SEH)
 
   __try
   {
@@ -219,9 +219,9 @@ ptw32_threadStart (void *vthreadParms)
       //(void)pthread_win32_thread_detach_np();
   }
 
-#else /* __CLEANUP_SEH */
+#else /* PTW32_CLEANUP_SEH */
 
-#if defined(__CLEANUP_C)
+#if defined(PTW32_CLEANUP_C)
 
   setjmp_rc = setjmp (sp->start_mark);
 
@@ -249,9 +249,9 @@ ptw32_threadStart (void *vthreadParms)
         }
     }
 
-#else /* __CLEANUP_C */
+#else /* PTW32_CLEANUP_C */
 
-#if defined(__CLEANUP_CXX)
+#if defined(PTW32_CLEANUP_CXX)
 
   try
   {
@@ -286,11 +286,11 @@ ptw32_threadStart (void *vthreadParms)
 
 #error ERROR [__FILE__, line __LINE__]: Cleanup type undefined.
 
-#endif /* __CLEANUP_CXX */
-#endif /* __CLEANUP_C */
-#endif /* __CLEANUP_SEH */
+#endif /* PTW32_CLEANUP_CXX */
+#endif /* PTW32_CLEANUP_C */
+#endif /* PTW32_CLEANUP_SEH */
 
-#if defined(PTW32_STATIC_LIB)
+#if defined (PTW32_STATIC_LIB)
   /*
    * We need to cleanup the pthread now if we have
    * been statically linked, in which case the cleanup
@@ -308,7 +308,7 @@ ptw32_threadStart (void *vthreadParms)
   (void) pthread_win32_thread_detach_np ();
 #endif
 
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
   _endthreadex ((unsigned)(size_t) status);
 #else
   _endthread ();
@@ -318,7 +318,7 @@ ptw32_threadStart (void *vthreadParms)
    * Never reached.
    */
 
-#if ! defined (PTW32_CONFIG_MINGW) || defined (__MSVCRT__) || defined (__DMC__)
+#if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
   return (unsigned)(size_t) status;
 #endif
 
@@ -331,7 +331,7 @@ ptw32_threadStart (void *vthreadParms)
 # pragma optimize("", on)
 #endif
 
-#if defined (PTW32_USES_SEPARATE_CRT) && defined (__cplusplus)
+#if defined  (PTW32_USES_SEPARATE_CRT) && (defined(PTW32_CLEANUP_CXX) || defined(PTW32_CLEANUP_SEH))
 ptw32_terminate_handler
 pthread_win32_set_terminate_np(ptw32_terminate_handler termFunction)
 {

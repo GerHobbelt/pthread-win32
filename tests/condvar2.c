@@ -82,6 +82,8 @@
 static pthread_cond_t cv;
 static pthread_mutex_t mutex;
 
+/* Cheating here - sneaking a peek at library internals */
+#include "../config.h"
 #include "../implement.h"
 
 #ifndef MONOLITHIC_PTHREAD_TESTS
@@ -92,9 +94,7 @@ int
 test_condvar2(void)
 #endif
 {
-  struct timespec abstime = { 0, 0 };
-  PTW32_STRUCT_TIMEB currSysTime;
-  const DWORD NANOSEC_PER_MILLISEC = 1000000;
+  struct timespec abstime = { 0, 0 }, reltime = { 1, 0 };
 
   assert(pthread_cond_init(&cv, NULL) == 0);
 
@@ -102,13 +102,7 @@ test_condvar2(void)
 
   assert(pthread_mutex_lock(&mutex) == 0);
 
-  /* get current system time */
-  PTW32_FTIME(&currSysTime);
-
-  abstime.tv_sec = (long)currSysTime.time;
-  abstime.tv_nsec = NANOSEC_PER_MILLISEC * currSysTime.millitm;
-
-  abstime.tv_sec += 1;
+  (void) pthread_win32_getabstime_np(&abstime, &reltime);
 
   assert(pthread_cond_timedwait(&cv, &mutex, &abstime) == ETIMEDOUT);
 
