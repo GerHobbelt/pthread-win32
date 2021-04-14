@@ -236,6 +236,32 @@ pthreadCancelableTimedWait (HANDLE waitHandle, DWORD timeout);
 	WaitForMultipleObjects on 'waitHandle' and a manually
 	reset w32 event used to implement pthread_cancel.
 
+int
+pthread_getname_np(pthread_t thr, char *name, int len);
+
+If  PTW32_COMPATIBILITY_BSD or  PTW32_COMPATIBILITY_TRU64 defined
+int
+pthread_setname_np(pthread_t thr, const char *name, void *arg);
+
+Otherwise:
+int
+pthread_setname_np(pthread_t thr, const char *name);
+
+	Set and get thread names. Compatibility.
+
+
+struct timespec *
+pthread_win32_getabstime_np (struct timespec * abstime, const struct timespec * relative);
+
+	Primarily to facilitate writing unit tests but exported for convenience.
+	The struct timespec pointed to by the first parameter is modified to represent the
+	time 'now' plus an optional offset value timespec in a platform optimal way.
+	Returns the first parameter so is compatible as the struct timespec * parameter in
+	POSIX timed function calls, e.g.
+	
+	struct timespec abstime, reltime = { 0, 5000000 } /* 5 ms */; 
+	pthread_mutex_timedwait(&mtx, pthread_win32_getabstime_np(&abstime, &reltime));
+
 
 Non-portable issues
 -------------------
@@ -468,7 +494,7 @@ within the pthread_t that don't uniquely identify the thread, including padding,
 such that client code can return consistent results from operations done on the
 result. If the additional bits are a pointer to an associate structure then
 this function would ensure that the memory used to store that associate
-structure does not leak. After normalization the following compare would be
+structure does not leak. With normalization the following compare would be
 valid and repeatable:
 
 memcmp(pthread_normalize(&t1),pthread_normalize(&t2),sizeof(pthread_t))

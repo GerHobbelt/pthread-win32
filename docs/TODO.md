@@ -3,6 +3,9 @@
 
 1. Implement PTHREAD_PROCESS_SHARED for semaphores, mutexes,
    condition variables, read/write locks, barriers.
+   
+   IMO, to do this in a source code compatible way requires implementation of
+   POSIX shared memory functions, etc.
 
 2. For version 3 onwards: the following types need to change, resulting in an ABI
    change:

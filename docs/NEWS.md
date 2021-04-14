@@ -1,6 +1,6 @@
 RELEASE 2.10.0
 --------------
-(2014-05-29)
+(2016-09-18)
 
 General
 -------
@@ -55,6 +55,11 @@ pthread_attr_setname_np()
    For MSVC builds, the thread name if set is made available for use by the
    MSVS debugger, i.e. it should be displayed within the debugger to
    identify the thread in place of/as well as a threadID.
+pthread_win32_getabstime_np()
+ - Return the current time plus an optional offset in a platform-aware way
+   that is compatible with POSIX timed calls (returns the struct timespec
+   address which is the first argument). Intended primarily to make it
+   easier to write tests but may be useful for applications generally. 
 
 Builds:
 New makefile targets have been added and existing targets modified or
@@ -124,6 +129,15 @@ pthread_attr_getstackaddr() returns ENOSYS correspondingly.
 Fixed a potential memory leak in pthread_mutex_init(). The leak would
 only occur if the mutex initialisation failed (extremely rare if ever).
 - Jaeeun Choi
+
+Fixed sub-millisecond timeouts, which caused the library to busy wait.
+- Mark Smith
+
+Fix a race condition and crash in MCS locks. The waiter queue management
+code in ptw32_mcs_lock_acquire was racing with the queue management code
+in ptw32_mcs_lock_release and causing a segmentation fault.
+- Anurag Sharma
+- Jonathan Brown (also reported this bug and provided a fix)
 
 RELEASE 2.9.1
 -------------

@@ -203,43 +203,39 @@ in the location pointed to by their second argument.
 error codes on error: 
 </P>
 <DL>
-	<DL>
 		<DT STYLE="margin-right: 1cm; margin-bottom: 0.5cm"><B>EINVAL</B></DT><DD STYLE="margin-right: 1cm; margin-bottom: 0.5cm">
 		one or both of the specified <I>attribute</I> or <I>cpuset</I>
-		argument is invalid.</DD></DL>
+		argument is invalid.</DD>
 </DL>
 <P>
 The <B>pthread_attr_setdetachstate</B> function returns the following
 error codes on error: 
 </P>
 <DL>
-	<DL>
 		<DT STYLE="margin-right: 1cm; margin-bottom: 0.5cm"><B>EINVAL</B> 
 		</DT><DD STYLE="margin-right: 1cm; margin-bottom: 0.5cm">
 		the specified <I>detachstate</I> is not one of
 		<B>PTHREAD_CREATE_JOINABLE</B> or <B>PTHREAD_CREATE_DETACHED</B>. 
-		</DD></DL>
+		</DD>
 </DL>
 <P>
 The <B>pthread_attr_setschedparam</B> function returns the following
 error codes on error: 
 </P>
 <DL>
-	<DL>
 		<DT STYLE="margin-right: 1cm; margin-bottom: 0.5cm"><B>EINVAL</B> 
 		</DT><DD STYLE="margin-right: 1cm; margin-bottom: 0.5cm">
 		the priority specified in <I>param</I> is outside the range of
 		allowed priorities for the scheduling policy currently in <I>attr</I>
 		(1 to 99 for <B>SCHED_FIFO</B> and <B>SCHED_RR</B>; 0 for
 		<B>SCHED_OTHER</B>). 
-		</DD></DL>
+		</DD>
 </DL>
 <P>
 The <B>pthread_attr_setschedpolicy</B> function returns the following
 error codes on error: 
 </P>
 <DL>
-	<DL>
 		<DT STYLE="margin-right: 1cm; margin-bottom: 0.5cm"><B>EINVAL</B> 
 		</DT><DD STYLE="margin-right: 1cm; margin-bottom: 0.5cm">
 		the specified <I>policy</I> is not one of <B>SCHED_OTHER</B>,
@@ -248,26 +244,24 @@ error codes on error:
 		<B>ENOTSUP</B> 
 		</DT><DD STYLE="margin-right: 1cm; margin-bottom: 0.5cm">
 		<I>policy</I> is not <B>SCHED_OTHER</B>, the only value supported
-		by <B>Pthreads-w32</B>.</DD></DL>
+		by <B>Pthreads-w32</B>.</DD>
 </DL>
 <P>
 The <B>pthread_attr_setinheritsched</B> function returns the
 following error codes on error: 
 </P>
 <DL>
-	<DL>
 		<DT STYLE="margin-right: 1cm; margin-bottom: 0.5cm"><B>EINVAL</B> 
 		</DT><DD STYLE="margin-right: 1cm; margin-bottom: 0.5cm">
 		the specified <I>inherit</I> is not one of <B>PTHREAD_INHERIT_SCHED</B>
 		or <B>PTHREAD_EXPLICIT_SCHED</B>. 
-		</DD></DL>
+		</DD>
 </DL>
 <P>
 The <B>pthread_attr_setscope</B> function returns the following error
 codes on error: 
 </P>
 <DL>
-	<DL>
 		<DT STYLE="margin-right: 1cm; margin-bottom: 0.5cm"><B>EINVAL</B> 
 		</DT><DD STYLE="margin-right: 1cm; margin-bottom: 0.5cm">
 		the specified <I>scope</I> is not one of <B>PTHREAD_SCOPE_SYSTEM</B>
@@ -277,7 +271,7 @@ codes on error:
 		</DT><DD STYLE="margin-right: 1cm; margin-bottom: 0.5cm">
 		the specified <I>scope</I> is <B>PTHREAD_SCOPE_PROCESS</B> (not
 		supported by <B>Pthreads-w32</B>). 
-		</DD></DL>
+		</DD>
 </DL>
 <H2 CLASS="western">
 <A HREF="#toc10" NAME="sect10">Author</A></H2>

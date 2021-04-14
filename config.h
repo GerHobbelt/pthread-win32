@@ -128,6 +128,7 @@
 #if defined(_UWIN)
 #define HAVE_MODE_T
 #define HAVE_STRUCT_TIMESPEC
+#define HAVE_SIGNAL_H
 #endif
 
 #if defined(__GNUC__)
@@ -150,6 +151,10 @@
 #if defined(__DMC__)
 #define HAVE_SIGNAL_H
 #define HAVE_C_INLINE
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+#define HAVE_STRUCT_TIMESPEC
 #endif
 
 #endif /* PTW32_CONFIG_H */

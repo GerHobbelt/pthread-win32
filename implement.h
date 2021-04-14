@@ -177,9 +177,9 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 #endif
 
 /*
- * Don't allow the linker to optimize away autostatic.obj in static builds.
+ * Don't allow the linker to optimize away dll.obj (dll.o) in static builds.
  */
-#if defined(PTW32_STATIC_LIB) && defined(PTW32_BUILD)
+#if defined (PTW32_STATIC_LIB) && defined (PTW32_BUILD) && !defined (PTW32_TEST_SNEAK_PEEK)
   void ptw32_autostatic_anchor(void);
 # if defined(PTW32_CONFIG_MINGW)
     __attribute__((unused, used))
@@ -191,22 +191,22 @@ typedef enum
 {
   /*
    * This enumeration represents the state of the thread;
-   * The thread is still "alive" if the numeric value of the
+   * The thread is still valid if the numeric value of the
    * state is greater or equal "PThreadStateRunning".
    */
   PThreadStateInitial = 0,	/* Thread not running                   */
+  PThreadStateReuse,            /* In reuse pool.                       */
   PThreadStateRunning,		/* Thread alive & kicking               */
   PThreadStateSuspended,	/* Thread alive but suspended           */
   PThreadStateCancelPending,	/* Thread alive but                     */
-                                /* has cancellation pending.             */
+                                /* has cancellation pending.            */
   PThreadStateCanceling,	/* Thread alive but is                  */
                                 /* in the process of terminating        */
                                 /* due to a cancellation request        */
   PThreadStateExiting,		/* Thread alive but exiting             */
                                 /* due to an exception                  */
-  PThreadStateLast,             /* All handlers have been run and now   */
+  PThreadStateLast              /* All handlers have been run and now   */
                                 /* final cleanup can be done.           */
-  PThreadStateReuse             /* In reuse pool.                       */
 }
 PThreadState;
 

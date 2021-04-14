@@ -207,6 +207,10 @@ pthread_create (pthread_t * tid,
       stackSize = PTHREAD_STACK_MIN;
     }
 
+  /*
+   * State must be >= PThreadStateRunning before we return to the caller.
+   * ptw32_threadStart will set state to PThreadStateRunning.
+   */
   tp->state = run ? PThreadStateInitial : PThreadStateSuspended;
 
   tp->keys = NULL;

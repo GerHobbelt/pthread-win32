@@ -50,7 +50,7 @@ QueueUserAPCEx by Panagiotis E. Hadjidoukas
 	are runnable. The simulated async cancellation cannot cancel blocked
 	threads.
 
-        [FOR SECURITY] To be found Quserex.dll MUST be installed in the
+    [FOR SECURITY] To be found Quserex.dll MUST be installed in the
 	Windows System Folder. This is not an unreasonable constraint given a
 	driver must also be installed and loaded at system startup.
 
@@ -144,6 +144,9 @@ system. We had claimed to follow the Libtool convention but this has
 not been the case with recent releases. Binary compatibility and
 consequently library file naming has not changed over this time either
 so it should not cause any problems.
+
+NOTE: Changes to the platform ABI can cause the library ABI to change
+and the current version numbering system does not account for this.
 
 The fourth is commonly used for the build number, but will be reserved
 for future use.

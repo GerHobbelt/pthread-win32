@@ -160,9 +160,9 @@ The following functions are implemented:
       pthread_mutexattr_setpshared
       pthread_mutexattr_gettype
       pthread_mutexattr_settype (types: PTHREAD_MUTEX_DEFAULT
-					PTHREAD_MUTEX_NORMAL
-					PTHREAD_MUTEX_ERRORCHECK
-					PTHREAD_MUTEX_RECURSIVE  )
+										PTHREAD_MUTEX_NORMAL
+										PTHREAD_MUTEX_ERRORCHECK
+										PTHREAD_MUTEX_RECURSIVE  )
       pthread_mutexattr_getrobust
       pthread_mutexattr_setrobust (values: PTHREAD_MUTEX_STALLED
                                            PTHREAD_MUTEX_ROBUST)
@@ -296,6 +296,7 @@ The following functions are implemented:
 						PTHREAD_MUTEX_ADAPTIVE_NP,
 						PTHREAD_MUTEX_TIMED_NP)
       pthread_num_processors_np
+      pthread_win32_getabstime_np
       (The following four routines may be required when linking statically.
        The process_* routines should not be needed for MSVC or GCC.)
       pthread_win32_process_attach_np

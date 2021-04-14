@@ -451,45 +451,45 @@ extern "C"
 /*
  * POSIX Options
  */
-#undef _POSIX_THREADS
-#define _POSIX_THREADS 200809L
+#undef  _POSIX_THREADS
+#define _POSIX_THREADS  200809L
 
-#undef _POSIX_READER_WRITER_LOCKS
-#define _POSIX_READER_WRITER_LOCKS 200809L
+#undef  _POSIX_READER_WRITER_LOCKS
+#define _POSIX_READER_WRITER_LOCKS  200809L
 
-#undef _POSIX_SPIN_LOCKS
-#define _POSIX_SPIN_LOCKS 200809L
+#undef  _POSIX_SPIN_LOCKS
+#define _POSIX_SPIN_LOCKS  200809L
 
-#undef _POSIX_BARRIERS
-#define _POSIX_BARRIERS 200809L
+#undef  _POSIX_BARRIERS
+#define _POSIX_BARRIERS  200809L
 
-#undef _POSIX_THREAD_SAFE_FUNCTIONS
-#define _POSIX_THREAD_SAFE_FUNCTIONS 200809L
+#undef  _POSIX_THREAD_SAFE_FUNCTIONS
+#define _POSIX_THREAD_SAFE_FUNCTIONS  200809L
 
-#undef _POSIX_THREAD_ATTR_STACKSIZE
-#define _POSIX_THREAD_ATTR_STACKSIZE 200809L
+#undef  _POSIX_THREAD_ATTR_STACKSIZE
+#define _POSIX_THREAD_ATTR_STACKSIZE  200809L
 
-#undef _POSIX_ROBUST_MUTEXES
-#define _POSIX_ROBUST_MUTEXES 200809L
+#undef  _POSIX_ROBUST_MUTEXES
+#define _POSIX_ROBUST_MUTEXES  200809L
 
 /*
  * The following options are not supported
  */
-#undef _POSIX_THREAD_ATTR_STACKADDR
-#define _POSIX_THREAD_ATTR_STACKADDR -1
+#undef  _POSIX_THREAD_ATTR_STACKADDR
+#define _POSIX_THREAD_ATTR_STACKADDR  -1
 
-#undef _POSIX_THREAD_PRIO_INHERIT
-#define _POSIX_THREAD_PRIO_INHERIT -1
+#undef  _POSIX_THREAD_PRIO_INHERIT
+#define _POSIX_THREAD_PRIO_INHERIT  -1
 
-#undef _POSIX_THREAD_PRIO_PROTECT
-#define _POSIX_THREAD_PRIO_PROTECT -1
+#undef  _POSIX_THREAD_PRIO_PROTECT
+#define _POSIX_THREAD_PRIO_PROTECT  -1
 
 /* TPS is not fully supported.  */
-#undef _POSIX_THREAD_PRIORITY_SCHEDULING
-#define _POSIX_THREAD_PRIORITY_SCHEDULING -1
+#undef  _POSIX_THREAD_PRIORITY_SCHEDULING
+#define _POSIX_THREAD_PRIORITY_SCHEDULING  -1
 
-#undef _POSIX_THREAD_PROCESS_SHARED
-#define _POSIX_THREAD_PROCESS_SHARED -1
+#undef  _POSIX_THREAD_PROCESS_SHARED
+#define _POSIX_THREAD_PROCESS_SHARED  -1
 
 
 /*
@@ -524,39 +524,39 @@ extern "C"
  *                      (must be at least 32767)
  *
  */
-#undef _POSIX_THREAD_DESTRUCTOR_ITERATIONS
+#undef  _POSIX_THREAD_DESTRUCTOR_ITERATIONS
 #define _POSIX_THREAD_DESTRUCTOR_ITERATIONS     4
 
-#undef PTHREAD_DESTRUCTOR_ITERATIONS
+#undef  PTHREAD_DESTRUCTOR_ITERATIONS
 #define PTHREAD_DESTRUCTOR_ITERATIONS           _POSIX_THREAD_DESTRUCTOR_ITERATIONS
 
-#undef _POSIX_THREAD_KEYS_MAX
+#undef  _POSIX_THREAD_KEYS_MAX
 #define _POSIX_THREAD_KEYS_MAX                  128
 
-#undef PTHREAD_KEYS_MAX
+#undef  PTHREAD_KEYS_MAX
 #define PTHREAD_KEYS_MAX                        _POSIX_THREAD_KEYS_MAX
 
-#undef PTHREAD_STACK_MIN
+#undef  PTHREAD_STACK_MIN
 #define PTHREAD_STACK_MIN                       0
 
-#undef _POSIX_THREAD_THREADS_MAX
+#undef  _POSIX_THREAD_THREADS_MAX
 #define _POSIX_THREAD_THREADS_MAX               64
 
-  /* Arbitrary value */
-#undef PTHREAD_THREADS_MAX
+/* Arbitrary value */
+#undef  PTHREAD_THREADS_MAX
 #define PTHREAD_THREADS_MAX                     2019
 
-#undef _POSIX_SEM_NSEMS_MAX
+#undef  _POSIX_SEM_NSEMS_MAX
 #define _POSIX_SEM_NSEMS_MAX                    256
 
-  /* Arbitrary value */
-#undef SEM_NSEMS_MAX
+/* Arbitrary value */
+#undef  SEM_NSEMS_MAX
 #define SEM_NSEMS_MAX                           1024
 
-#undef _POSIX_SEM_VALUE_MAX
+#undef  _POSIX_SEM_VALUE_MAX
 #define _POSIX_SEM_VALUE_MAX                    32767
 
-#undef SEM_VALUE_MAX
+#undef  SEM_VALUE_MAX
 #define SEM_VALUE_MAX                           INT_MAX
 
 
@@ -586,12 +586,22 @@ extern "C"
 #if defined(_UWIN) && PTW32_LEVEL >= PTW32_LEVEL_MAX
 #   include     <sys/types.h>
 #else
-/*
- * Generic handle type - intended to extend uniqueness beyond
- * that available with a simple pointer. It should scale for either
- * IA-32 or IA-64.
+/* Generic handle type - intended to provide the lifetime-uniqueness that
+ * a simple pointer can't. It should scale for either
+ * 32 or 64 bit systems.
+ *
+ * The constraint with this approach is that applications must
+ * strictly comply with POSIX, e.g. not assume scalar type, only
+ * compare pthread_t using the API function pthread_equal(), etc.
+ *
+ * Non-conforming applications could use the element 'p' to compare,
+ * e.g. for sorting, but it will be up to the application to determine
+ * if handles are live or dead, or resurrected for an entirely
+ * new/different thread. I.e. the thread is valid iff
+ * x == p->ptHandle.x
  */
-typedef struct {
+typedef struct 
+{
     void * p;                   /* Pointer to actual object */
     size_t x;                   /* Extra information - reuse count etc */
 } ptw32_handle_t;
@@ -620,7 +630,8 @@ typedef struct pthread_barrierattr_t_ * pthread_barrierattr_t;
  * ====================
  */
 
-enum {
+enum 
+{
 /*
  * pthread_attr_{get,set}detachstate
  */
@@ -743,13 +754,14 @@ typedef struct ptw32_cleanup_t ptw32_cleanup_t;
 
 #if defined(_MSC_VER)
 /* Disable MSVC 'anachronism used' warning */
+#pragma warning( push )
 #pragma warning( disable : 4229 )
 #endif
 
 typedef void (* PTW32_CDECL ptw32_cleanup_callback_t)(void *);
 
 #if defined(_MSC_VER)
-#pragma warning( default : 4229 )
+#pragma warning( pop )
 #endif
 
 struct ptw32_cleanup_t
@@ -1228,10 +1240,20 @@ PTW32_DLLPORT int PTW32_CDECL pthread_win32_thread_attach_np(void);
 PTW32_DLLPORT int PTW32_CDECL pthread_win32_thread_detach_np(void);
 
 /*
+ * Returns the first parameter "abstime" modified to represent the current system time.
+ * If "relative" is not NULL it represents an interval to add to "abstime".
+ */
+
+PTW32_DLLPORT struct timespec * PTW32_CDECL pthread_win32_getabstime_np(
+						      struct timespec * abstime,
+						      const struct timespec * relative);
+
+/*
  * Features that are auto-detected at load/run time.
  */
 PTW32_DLLPORT int PTW32_CDECL pthread_win32_test_features_np(int);
-enum ptw32_features {
+enum ptw32_features 
+{
   PTW32_SYSTEM_INTERLOCKED_COMPARE_EXCHANGE = 0x0001,	/* System provides it. */
   PTW32_ALERTABLE_ASYNC_CANCEL              = 0x0002	/* Can cancel blocked threads. */
 };
