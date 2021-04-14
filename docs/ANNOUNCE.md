@@ -7,7 +7,7 @@ Maintainer: Ross Johnson <firstname dot lastname at loungebythelake dot net>
 
 
 We are pleased to announce the availability of a new release of pthreads-win32
-(a.k.a. Pthreads-win32), an Open Source Software implementation of
+(a.k.a. pthreads-win32), an Open Source Software implementation of
 the Threads component of the SUSV3 Standard for Microsoft's Windows
 (x86 and x64). Some relevant functions from other sections of SUSV3 are
 also supported including semaphores and scheduling functions. See the

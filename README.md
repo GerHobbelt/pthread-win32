@@ -12,7 +12,7 @@ files, e.g. PTW32_* changes to PTW32_*, ptw32_* to ptw32_*, etc.
 
 License Change
 --------------
-With the agreement of all substantial relevant contributors pthreads-win32 / Pthreads4w
+With the agreement of all substantial relevant contributors pthreads-win32 / pthreads4w
 version 3, with the exception of four files, is being released under the
 terms of the Apache License v2.0. The APLv2 is compatible with the GPLv3
 and LGPLv3 licenses and therefore this code may continue to be legally
@@ -43,7 +43,7 @@ Alexander Terekhov
 Vladimir Kliatchko
 Ross Johnson
 
-pthreads-win32 / Pthreads4w version 2 releases will remain LGPL but version 2.11 and later
+pthreads-win32 / pthreads4w version 2 releases will remain LGPL but version 2.11 and later
 will be released under v3 of that license so that any additions to
 pthreads4w version 3 code that is backported to v2 will not pollute that
 code.
@@ -110,7 +110,7 @@ pre Windows 2000 systems.
 
 License Change to LGPL v3
 -------------------------
-pthreads-win32 / Pthreads4w version 2.11 and all future 2.x versions will be released
+pthreads-win32 / pthreads4w version 2.11 and all future 2.x versions will be released
 under the Lesser GNU Public License version 3 (LGPLv3).
 
 Planned Release Under the Apache License v2

@@ -4,7 +4,7 @@ PTHREADS4W (a.k.a. PTHREADS-WIN32)
 What is it?
 -----------
 
-pthreads-win32 / Pthreads4w is an Open Source Software implementation of the Threads
+pthreads-win32 / pthreads4w is an Open Source Software implementation of the Threads
 component of the POSIX 1003.1c 1995 Standard (or later) for Microsoft's
 Windows environment. Some functions from POSIX 1003.1b are also supported,
 including semaphores. Other related functions include the set of read-write

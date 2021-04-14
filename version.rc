@@ -2,9 +2,9 @@
  *
  * --------------------------------------------------------------------------
  *
- *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2012 Pthreads-win32 contributors
+ *      Copyright(C) 1999-2021 pthreads-win32 / pthreads4w contributors
  *
  *      Homepage1: http://sourceware.org/pthreads-win32/
  *      Homepage2: http://sourceforge.net/projects/pthreads4w/
@@ -155,7 +155,7 @@ BEGIN
             VALUE "InternalName",  PTW32_VERSIONINFO_NAME
             VALUE "OriginalFilename",  PTW32_VERSIONINFO_NAME
             VALUE "CompanyName", "Open Source Software community\0"
-            VALUE "LegalCopyright", "Copyright - Project contributors 1999-2016\0"
+            VALUE "LegalCopyright(C) 1999-2021 pthreads-win32 / pthreads4w contributors 1999-2016\0"
             VALUE "Comments", "https://sourceforge.net/p/pthreads4w/wiki/Contributors/\0"
         END
     END

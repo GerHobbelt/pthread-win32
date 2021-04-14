@@ -375,7 +375,7 @@
 
 2012-09-28  Daniel Richard. G <danielg at teragram dot com>
 
-	* all: #include<config.h>; renamed HAVE_PTW32_CONFIG_H define in
+	* all: #include"config.h"; renamed HAVE_PTW32_CONFIG_H define in
 	build files to HAVE_CONFIG_H since we no longer need a
 	uniquely-named symbol for this.
 	* Bmakefile: Removed _WIN32_WINNT assignment from build files since
