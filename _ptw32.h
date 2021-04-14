@@ -2,7 +2,7 @@
  * Module: _ptw32.h
  *
  * Purpose:
- *      pthreads-w32 internal macros, to be shared by other headers
+ *      pthreads-win32 internal macros, to be shared by other headers
  *      comprising the pthreads4w package.
  *
  * --------------------------------------------------------------------------

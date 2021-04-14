@@ -82,7 +82,7 @@ main(int argc, char * argv[])
 	/*
 	 * Check that all threads are now invalid.
 	 * This relies on unique thread IDs - e.g. works with
-	 * pthreads-w32 or Solaris, but may not work for Linux, BSD etc.
+	 * pthreads-win32 or Solaris, but may not work for Linux, BSD etc.
 	 */
 	for (i = 0; i < NUMTHREADS; i++)
 	  {

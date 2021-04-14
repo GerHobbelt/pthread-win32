@@ -6,7 +6,7 @@ Releases:	http://sources.redhat.com/pthreads-win32files
 Maintainer: Ross Johnson <firstname dot lastname at loungebythelake dot net>
 
 
-We are pleased to announce the availability of a new release of pthreads-w32
+We are pleased to announce the availability of a new release of pthreads-win32
 (a.k.a. Pthreads-win32), an Open Source Software implementation of
 the Threads component of the SUSV3 Standard for Microsoft's Windows
 (x86 and x64). Some relevant functions from other sections of SUSV3 are
@@ -17,7 +17,7 @@ Some common non-portable functions are also implemented for
 additional compatibility, as are a few functions specific
 to pthreads4w for easier integration with Windows applications.
 
-pthreads-w32 is free software. With the exception of four files noted later,
+pthreads-win32 is free software. With the exception of four files noted later,
 Version 3.0.0 is distributed under the Apache License version 2.0 (APLv2).
 The APLv2 is compatible with the GPLv3 and LGPLv3 licenses and therefore
 this code may continue to be legally included within GPLv3 and LGPLv3

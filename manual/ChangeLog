@@ -1,6 +1,6 @@
 2016-12-25  Ross Johnson  <ross at homemail dot com dot au>
 
-	* Change all references to "pthreads-w32" etc. to "pthreads-w32"
+	* Change all references to "pthreads-win32" etc. to "pthreads-win32"
 	* Change all references to the sourceware projects web page to the
 	SourceForge project web page.
 
@@ -44,7 +44,7 @@
 
 	* PortabilityIssues.html: Was nonPortableIssues.html.
 	* index.html: Updated; add table of contents at top.
-	* *.html: Add pthreads-w32 header info; add link back to the
+	* *.html: Add pthreads-win32 header info; add link back to the
 	index page 'index.html'.
 
 2005-05-06  Ross Johnson  <ross at callisto.canberra.edu.au>
