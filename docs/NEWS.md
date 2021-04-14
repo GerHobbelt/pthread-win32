@@ -382,7 +382,7 @@ General
 
 The package now includes a reference documentation set consisting of
 HTML formatted Unix-style manual pages that have been edited for
-consistency with Pthreads-w32. The set can also be read online at:
+consistency with pthreads-w32. The set can also be read online at:
 http://sources.redhat.com/pthreads-win32/manual/index.html
 
 Thanks again to Tim Theisen for running the test suite pre-release

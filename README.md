@@ -1,7 +1,7 @@
 
 ### PThreadWindows
 Combined pthread-win32 fork of RedFox20 + Oktonion + WinBuild
-PThreadhttps://github.com/WinBuilds/pthread-win32 changes:
+PThread https://github.com/WinBuilds/pthread-win32 changes:
 This is a fork of version 2.10.0.0 the [pthreads-win32](https://sourceforge.net/projects/pthreads4w/ "https://sourceforge.net/projects/pthreads4w/") package. The ABI of this fork is different from the original. 
 Changes done:
 1. The type of the reuse counter in ptw32_handle_t has been changed from
