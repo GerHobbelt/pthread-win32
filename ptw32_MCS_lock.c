@@ -38,7 +38,6 @@
  */
 
 /*
-
  * About MCS locks:
  *
  * MCS locks are queue-based locks, where the queue nodes are local to the
@@ -91,7 +90,6 @@
  *   }
  *   return (void *)0;
  * }
- *
  */
 
 #ifdef HAVE_CONFIG_H
@@ -192,7 +190,7 @@ ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node)
   if (0 != pred)
     {
       /* the lock was not free. link behind predecessor. */
-      PTW32_INTERLOCKED_EXCHANGE_PTR ((PTW32_INTERLOCKED_PVOID_PTR)&pred->next,  (PTW32_INTERLOCKED_PVOID)node);
+      PTW32_INTERLOCKED_EXCHANGE_PTR((PTW32_INTERLOCKED_PVOID_PTR)&pred->next, (PTW32_INTERLOCKED_PVOID)node);
       ptw32_mcs_flag_set(&pred->nextFlag);
       ptw32_mcs_flag_wait(&node->readyFlag);
     }
@@ -233,7 +231,7 @@ ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node)
       /* wait for successor */
       ptw32_mcs_flag_wait(&node->nextFlag);
       next = (ptw32_mcs_local_node_t *)
-	PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE ((PTW32_INTERLOCKED_SIZEPTR)&node->next,  (PTW32_INTERLOCKED_SIZE)0); /* MBR fence */
+	PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE((PTW32_INTERLOCKED_SIZEPTR)&node->next, (PTW32_INTERLOCKED_SIZE)0); /* MBR fence */
     }
   else
     {

@@ -53,11 +53,11 @@ static int washere = 0;
 
 static void * func(void * arg)
 {
-   PTW32_FTIME(&currSysTimeStart);
+  PTW32_FTIME(&currSysTimeStart);
   washere = 1;
   assert(pthread_spin_lock(&lock) == 0);
   assert(pthread_spin_unlock(&lock) == 0);
-   PTW32_FTIME(&currSysTimeStop);
+  PTW32_FTIME(&currSysTimeStop);
 
   return (void *)(size_t)GetDurationMilliSecs(currSysTimeStart, currSysTimeStop);
 }
@@ -73,7 +73,7 @@ test_spin4(void)
   void* result = (void*)0;
   pthread_t t;
   int CPUs;
-   PTW32_STRUCT_TIMEB sysTime;
+  PTW32_STRUCT_TIMEB sysTime;
 
   if ((CPUs = pthread_num_processors_np()) == 1)
     {
@@ -93,7 +93,7 @@ test_spin4(void)
   do
     {
       sched_yield();
-       PTW32_FTIME(&sysTime);
+      PTW32_FTIME(&sysTime);
     }
   while (GetDurationMilliSecs(currSysTimeStart, sysTime) <= 1000);
 

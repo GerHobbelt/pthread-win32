@@ -290,7 +290,7 @@ ptw32_threadStart (void *vthreadParms)
 #endif /* PTW32_CLEANUP_C */
 #endif /* PTW32_CLEANUP_SEH */
 
-#if defined (PTW32_STATIC_LIB)
+#if defined(PTW32_STATIC_LIB)
   /*
    * We need to cleanup the pthread now if we have
    * been statically linked, in which case the cleanup

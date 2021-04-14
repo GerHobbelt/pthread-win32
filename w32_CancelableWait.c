@@ -92,7 +92,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
       handles[1] = NULL;
     }
 
-  status = WaitForMultipleObjects (nHandles, handles,  PTW32_FALSE, timeout);
+  status = WaitForMultipleObjects (nHandles, handles, PTW32_FALSE, timeout);
 
   switch (status - WAIT_OBJECT_0)
     {
@@ -128,7 +128,7 @@ ptw32_cancelable_wait (HANDLE waitHandle, DWORD timeout)
 	      sp->state = PThreadStateCanceling;
 	      sp->cancelState = PTHREAD_CANCEL_DISABLE;
 	      ptw32_mcs_lock_release (&stateLock);
-	      ptw32_throw  (PTW32_EPS_CANCEL);
+	      ptw32_throw (PTW32_EPS_CANCEL);
 
 	      /* Never reached */
 	    }

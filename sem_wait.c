@@ -53,7 +53,7 @@
 #include "implement.h"
 
 
-static void  PTW32_CDECL
+static void PTW32_CDECL
 ptw32_sem_wait_cleanup(void * sem)
 {
   sem_t s = (sem_t) sem;
@@ -129,7 +129,7 @@ sem_wait (sem_t * sem)
 
   if (v < 0)
     {
-#if defined (PTW32_CONFIG_MSVC7)
+#if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth(0)
 #endif
       /* Must wait */
@@ -137,7 +137,7 @@ sem_wait (sem_t * sem)
       result = pthreadCancelableWait (s->sem);
       /* Cleanup if we're canceled or on any other error */
       pthread_cleanup_pop(result);
-#if defined (PTW32_CONFIG_MSVC7)
+#if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth()
 #endif
     }
@@ -159,7 +159,7 @@ sem_wait (sem_t * sem)
 
   if (result != 0)
     {
-       PTW32_SET_ERRNO(result);
+      PTW32_SET_ERRNO(result);
       return -1;
     }
 

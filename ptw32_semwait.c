@@ -106,7 +106,7 @@ return 0;
 
   if (result != 0)
     {
-       PTW32_SET_ERRNO(result);
+      PTW32_SET_ERRNO(result);
       return -1;
     }
 

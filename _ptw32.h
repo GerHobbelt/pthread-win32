@@ -130,6 +130,11 @@
 #    define HAVE_MODE_T
 #    define HAVE_STRUCT_TIMESPEC
 #    define HAVE_SIGNAL_H
+#  elif defined(__MINGW64__)
+#    define HAVE_STRUCT_TIMESPEC
+#    define HAVE_MODE_T
+#  elif defined(__MINGW32__)
+#    define HAVE_MODE_T
 #  endif
 #endif
 
@@ -181,6 +186,10 @@
  */
 #if !defined(ENOTSUP)
 #  define ENOTSUP 48   /* This is the value in Solaris. */
+#endif
+
+#if !defined(ETIMEDOUT)
+#  define ETIMEDOUT 10060 /* Same as WSAETIMEDOUT */
 #endif
 
 #if !defined(ENOSYS)

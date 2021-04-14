@@ -68,6 +68,7 @@ ptw32_threadDestroy (pthread_t thread)
        */
       ptw32_threadReusePush (thread);
 
+      /* Now work on the copies as the `tp` instance has already been nulled. */
       if (cancelEvent != NULL)
 	{
 	  CloseHandle (cancelEvent);

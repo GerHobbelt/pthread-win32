@@ -48,9 +48,9 @@ static const int64_t NANOSEC_PER_SEC = 1000000000;
 static const int64_t NANOSEC_PER_MILLISEC = 1000000;
 static const int64_t MILLISEC_PER_SEC = 1000;
 
-#if defined (PTW32_BUILD_INLINED)
-INLINE
-#endif /*  PTW32_BUILD_INLINED */
+#if defined(PTW32_BUILD_INLINED)
+INLINE 
+#endif /* PTW32_BUILD_INLINED */
 DWORD
 ptw32_relmillisecs (const struct timespec * abstime)
 {
@@ -140,7 +140,6 @@ pthread_win32_getabstime_np (struct timespec * abstime, const struct timespec * 
   /* get current system time */
 
 # if defined(WINCE)
-
   SYSTEMTIME st;
   GetSystemTime(&st);
   SystemTimeToFileTime(&st, &ft);

@@ -77,7 +77,7 @@ test_affinity2(void)
   if (result != 0)
 	{
 	  int err =
-#if defined (PTW32_USES_SEPARATE_CRT)
+#if defined(PTW32_USES_SEPARATE_CRT)
 	  GetLastError();
 #else
       errno;

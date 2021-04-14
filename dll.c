@@ -40,6 +40,12 @@
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
+#endif
+
+#if defined(PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400 && defined(_WINDLL)
+#  undef PTW32_STATIC_LIB
+#  define PTW32_STATIC_TLSLIB
+#endif
 
 /* [i_a] sanity build checks */
 #if defined(_MSC_VER) && (defined(_WIN32) || defined(_WIN64))
@@ -53,7 +59,7 @@
 #include "pthread.h"
 #include "implement.h"
 
-#if !defined (PTW32_STATIC_LIB)
+#if !defined(PTW32_STATIC_LIB)
 
 #if defined(_MSC_VER)
 /*
@@ -103,12 +109,39 @@ PTW32_END_C_DECLS
 
 #endif /* !PTW32_STATIC_LIB */
 
-#if ! defined (PTW32_BUILD_INLINED)
+#if ! defined(PTW32_BUILD_INLINED)
 /*
  * Avoid "translation unit is empty" warnings
  */
 typedef int foo;
 #endif
+
+/* Visual Studio 8+ can leverage PIMAGE_TLS_CALLBACK CRT segments, which
+ * give a static lib its very own DllMain.
+ */
+#ifdef PTW32_STATIC_TLSLIB
+
+static void WINAPI
+TlsMain(PVOID h, DWORD r, PVOID u)
+{
+  (void)DllMain((HINSTANCE)h, r, u);
+}
+
+#ifdef _M_X64
+# pragma comment (linker, "/INCLUDE:_tls_used")
+# pragma comment (linker, "/INCLUDE:_xl_b")
+# pragma const_seg(".CRT$XLB")
+EXTERN_C const PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
+# pragma const_seg()
+#else
+# pragma comment (linker, "/INCLUDE:__tls_used")
+# pragma comment (linker, "/INCLUDE:__xl_b")
+# pragma data_seg(".CRT$XLB")
+EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = TlsMain;
+# pragma data_seg()
+#endif /* _M_X64 */
+
+#endif /* PTW32_STATIC_TLSLIB */
 
 #if defined(PTW32_STATIC_LIB)
 

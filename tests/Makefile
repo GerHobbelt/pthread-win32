@@ -92,8 +92,8 @@ BUILD_DIR			= ..
 EHFLAGS		=
 EHFLAGS_DLL				= /MD
 EHFLAGS_DLL_DEBUG		= /MDd
-EHFLAGS_STATIC			= /MT
-EHFLAGS_STATIC_DEBUG	= /MTd
+EHFLAGS_STATIC			= /MT /DPTW32_STATIC_LIB
+EHFLAGS_STATIC_DEBUG	= /MTd /DPTW32_STATIC_LIB
 
 # If a test case returns a non-zero exit code to the shell, make will
 # stop.

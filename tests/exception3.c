@@ -200,7 +200,7 @@ test_exception3(void)
   assert(caught == NUMTHREADS);
 
   /*
-   * Should never be reached.
+   * Fail. Should never be reached.
    */
   return 1;
 }

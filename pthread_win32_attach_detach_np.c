@@ -86,7 +86,7 @@ pthread_win32_process_attach_np ()
 
 #if !defined(WINCE)
   gsd_res = GetSystemDirectory(QuserExDLLPathBuf, QuserExDLLPathBufSize);
-#if defined(__GNUC__) || defined (PTW32_CONFIG_MSVC7)
+#if defined(__GNUC__) || defined(PTW32_CONFIG_MSVC7)
   if(gsd_res && gsd_res < QuserExDLLPathBufSize)
   {
     (void) strncat(QuserExDLLPathBuf,

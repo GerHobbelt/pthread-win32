@@ -64,12 +64,12 @@ extern "C" {
 #  define PTW32_STATIC_TLSLIB
 #endif
 
-#if defined (PTW32_STATIC_LIB) || defined (PTW32_STATIC_TLSLIB)
-#  define  PTW32_DLLPORT
-#elif defined (PTW32_BUILD)
-#    define  PTW32_DLLPORT __declspec (dllexport)
+#if defined(PTW32_STATIC_LIB) || defined(PTW32_STATIC_TLSLIB)
+#  define PTW32_DLLPORT
+#elif defined(PTW32_BUILD)
+#    define PTW32_DLLPORT __declspec (dllexport)
 #  else
-#    define  PTW32_DLLPORT __declspec (dllimport)
+#    define PTW32_DLLPORT __declspec (dllimport)
 #  endif
 
 /* declare reference to errno */

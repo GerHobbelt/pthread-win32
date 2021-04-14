@@ -83,8 +83,23 @@ pthread_kill (pthread_t thread, int sig)
       */
 {
   int result = 0;
+  ptw32_thread_t * tp;
+  ptw32_mcs_local_node_t node;
 
-  if (0 != sig)
+  ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
+
+  tp = (ptw32_thread_t *) thread.p;
+
+  if (NULL == tp
+      || thread.x != tp->ptHandle.x
+      || NULL == tp->threadH)
+    {
+      result = ESRCH;
+    }
+
+  ptw32_mcs_lock_release(&node);
+
+  if (0 == result && 0 != sig)
     {
       /*
        * Currently only supports direct thread termination via SIGABRT.
@@ -132,24 +147,6 @@ pthread_kill (pthread_t thread, int sig)
       }
           break;
       }
-    }
-  else
-    {
-      ptw32_mcs_local_node_t node;
-      ptw32_thread_t * tp;
-
-      ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
-
-      tp = (ptw32_thread_t *) thread.p;
-
-      if (NULL == tp
-	  || thread.x != tp->ptHandle.x
-	  || tp->state < PThreadStateRunning)
-	{
-	  result = ESRCH;
-	}
-
-      ptw32_mcs_lock_release(&node);
     }
 
   return result;

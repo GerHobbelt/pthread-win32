@@ -133,7 +133,7 @@ test_context1(void)
       context.ContextFlags = CONTEXT_CONTROL;
 
       GetThreadContext(hThread, &context);
-       PTW32_PROGCTR (context) = (DWORD_PTR) anotherEnding;
+      PTW32_PROGCTR (context) = (DWORD_PTR) anotherEnding;
       SetThreadContext(hThread, &context);
       ResumeThread(hThread);
     }

@@ -45,7 +45,7 @@
  * as PTW32_CLEANUP_C.
  */
 
-#if defined (PTW32_RC_MSC)
+#if defined(PTW32_RC_MSC)
 #  if defined(PTW32_ARCHx64)
 #    define PTW32_ARCH "x64"
 #  elif defined(PTW32_ARCHx86)
@@ -54,87 +54,87 @@
 #    error "PTW32_ARCHx64 / PTW32_ARCHx86 has not been defined"
 #  endif
 #  if defined(PTW32_CLEANUP_C)
-#    define  PTW32_VERSIONINFO_NAME "pthreadVC2.DLL\0"
+#    define PTW32_VERSIONINFO_NAME "pthreadVC2.DLL\0"
 #  elif defined(PTW32_CLEANUP_CXX)
-#    define  PTW32_VERSIONINFO_NAME "pthreadVCE2.DLL\0"
+#    define PTW32_VERSIONINFO_NAME "pthreadVCE2.DLL\0"
 #  elif defined(PTW32_CLEANUP_SEH)
-#    define  PTW32_VERSIONINFO_NAME "pthreadVSE2.DLL\0"
+#    define PTW32_VERSIONINFO_NAME "pthreadVSE2.DLL\0"
 #  endif
 #  if defined (PTW32_ARCHx64) || defined (PTW32_ARCHX64) || defined (PTW32_ARCHAMD64)
 #    if defined(PTW32_CLEANUP_C)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C x64\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C x64\0"
 #    elif defined(PTW32_CLEANUP_CXX)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C++ x64\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C++ x64\0"
 #    elif defined(PTW32_CLEANUP_SEH)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x64\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x64\0"
 #    endif
 #  elif defined (PTW32_ARCHx86) || defined (PTW32_ARCHX86)
 #    if defined(PTW32_CLEANUP_C)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C x86\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C x86\0"
 #    elif defined(PTW32_CLEANUP_CXX)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C++ x86\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C++ x86\0"
 #    elif defined(PTW32_CLEANUP_SEH)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x86\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x86\0"
 #    endif
 #  elif defined (PTW32_ARCHarm) || defined (PTW32_ARCHARM) || defined (PTW32_AARCH32)
 #    if defined(PTW32_CLEANUP_C)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C ARM\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C ARM\0"
 #    elif defined(PTW32_CLEANUP_CXX)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C++ ARM\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C++ ARM\0"
 #    elif defined(PTW32_CLEANUP_SEH)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C SEH ARM\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C SEH ARM\0"
 #    endif
 #  elif defined (PTW32_ARCHarm64) || defined (PTW32_ARCHARM64) || defined (PTW32_AARCH64)
 #    if defined(PTW32_CLEANUP_C)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C ARM64\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C ARM64\0"
 #    elif defined(PTW32_CLEANUP_CXX)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C++ ARM64\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C++ ARM64\0"
 #    elif defined(PTW32_CLEANUP_SEH)
-#      define  PTW32_VERSIONINFO_DESCRIPTION "MS C SEH ARM64\0"
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS C SEH ARM64\0"
 #    endif
 #  endif
 #elif defined(__GNUC__)
 #  if defined(_M_X64)
-#    define  PTW32_ARCH "x64 (mingw64)"
+#    define PTW32_ARCH "x64 (mingw64)"
 #  else
-#    define  PTW32_ARCH "x86 (mingw32)"
+#    define PTW32_ARCH "x86 (mingw32)"
 #  endif
 #  if defined(PTW32_CLEANUP_C)
-#    define  PTW32_VERSIONINFO_NAME "pthreadGC2.DLL\0"
-#    define  PTW32_VERSIONINFO_DESCRIPTION "GNU C "  PTW32_ARCH "\0"
+#    define PTW32_VERSIONINFO_NAME "pthreadGC2.DLL\0"
+#    define PTW32_VERSIONINFO_DESCRIPTION "GNU C " PTW32_ARCH "\0"
 #  elif defined(PTW32_CLEANUP_CXX)
-#    define  PTW32_VERSIONINFO_NAME "pthreadGCE2.DLL\0"
-#    define  PTW32_VERSIONINFO_DESCRIPTION "GNU C++ "  PTW32_ARCH "\0"
+#    define PTW32_VERSIONINFO_NAME "pthreadGCE2.DLL\0"
+#    define PTW32_VERSIONINFO_DESCRIPTION "GNU C++ " PTW32_ARCH "\0"
 #  else
 #    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
 #elif defined(__BORLANDC__)
 #  if defined(_M_X64)
-#    define  PTW32_ARCH "x64 (Borland)"
+#    define PTW32_ARCH "x64 (Borland)"
 #  else
-#    define  PTW32_ARCH "x86 (Borland)"
+#    define PTW32_ARCH "x86 (Borland)"
 #  endif
 #  if defined(PTW32_CLEANUP_C)
-#    define  PTW32_VERSIONINFO_NAME "pthreadBC2.DLL\0"
-#    define  PTW32_VERSIONINFO_DESCRIPTION "BORLAND C "  PTW32_ARCH "\0"
+#    define PTW32_VERSIONINFO_NAME "pthreadBC2.DLL\0"
+#    define PTW32_VERSIONINFO_DESCRIPTION "BORLAND C " PTW32_ARCH "\0"
 #  elif defined(PTW32_CLEANUP_CXX)
-#    define  PTW32_VERSIONINFO_NAME "pthreadBCE2.DLL\0"
-#    define  PTW32_VERSIONINFO_DESCRIPTION "BORLAND C++ "  PTW32_ARCH "\0"
+#    define PTW32_VERSIONINFO_NAME "pthreadBCE2.DLL\0"
+#    define PTW32_VERSIONINFO_DESCRIPTION "BORLAND C++ " PTW32_ARCH "\0"
 #  else
 #    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
 #elif defined(__WATCOMC__)
 #  if defined(_M_X64)
-#    define  PTW32_ARCH "x64 (Watcom)"
+#    define PTW32_ARCH "x64 (Watcom)"
 #  else
-#    define  PTW32_ARCH "x86 (Watcom)"
+#    define PTW32_ARCH "x86 (Watcom)"
 #  endif
 #  if defined(PTW32_CLEANUP_C)
-#    define  PTW32_VERSIONINFO_NAME "pthreadWC2.DLL\0"
-#    define  PTW32_VERSIONINFO_DESCRIPTION "WATCOM C "  PTW32_ARCH "\0"
+#    define PTW32_VERSIONINFO_NAME "pthreadWC2.DLL\0"
+#    define PTW32_VERSIONINFO_DESCRIPTION "WATCOM C " PTW32_ARCH "\0"
 #  elif defined(PTW32_CLEANUP_CXX)
-#    define  PTW32_VERSIONINFO_NAME "pthreadWCE2.DLL\0"
-#    define  PTW32_VERSIONINFO_DESCRIPTION "WATCOM C++ "  PTW32_ARCH "\0"
+#    define PTW32_VERSIONINFO_NAME "pthreadWCE2.DLL\0"
+#    define PTW32_VERSIONINFO_DESCRIPTION "WATCOM C++ " PTW32_ARCH "\0"
 #  else
 #    error Resource compiler doesn't know which cleanup style you're using - see version.rc
 #  endif
