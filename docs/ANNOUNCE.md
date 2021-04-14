@@ -1,8 +1,8 @@
 PTHREADS4W RELEASE 3.0.0 (2017-01-01)
 --------------------------------------
-Web Site:	https://sourceforge.net/projects/pthreads4w/
+Web Site:	http://sources.redhat.com/pthreads-win32
 Repository:	https://sourceforge.net/p/pthreads4w/code
-Releases:	https://sourceforge.net/projects/pthreads4w/files
+Releases:	http://sources.redhat.com/pthreads-win32files
 Maintainer: Ross Johnson <firstname dot lastname at loungebythelake dot net>
 
 

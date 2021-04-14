@@ -5,7 +5,7 @@
 #      Copyright 1998 John E. Bossom
 #      Copyright 1999-2018, Pthreads4w contributors
 #
-#      Homepage: https://sourceforge.net/projects/pthreads4w/
+#      Homepage: http://sources.redhat.com/pthreads-win32
 #
 #      The current list of contributors is contained
 #      in the file CONTRIBUTORS included with the source

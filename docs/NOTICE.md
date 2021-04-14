@@ -1,4 +1,4 @@
-PThreads4W - POSIX threads for Windows
+pthreads-w32 - POSIX threads for Windows
 Copyright 1998 John E. Bossom
 Copyright 1999-2018, Pthreads4w contributors
 
