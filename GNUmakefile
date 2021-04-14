@@ -1,9 +1,9 @@
 #
 # --------------------------------------------------------------------------
 #
-#      Pthreads-win32 - POSIX Threads Library for Win32
+#      pthreads-win32 - POSIX Threads Library for Win32
 #      Copyright(C) 1998 John E. Bossom
-#      Copyright(C) 1999,2012 Pthreads-win32 contributors
+#      Copyright(C) 1999-2021 pthreads-win32 / pthreads4w contributors
 # 
 #      The current list of contributors is contained
 #      in the file CONTRIBUTORS included with the source
@@ -25,6 +25,8 @@
 #      License along with this library in the file COPYING.LIB;
 #      if not, write to the Free Software Foundation, Inc.,
 #      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+#
+# --------------------------------------------------------------------------
 #
 
 DLL_VER	= 2$(EXTRAVERSION)
@@ -119,7 +121,7 @@ LFLAGS	= $(ARCH)
 # POSIX says that applications should assume that thread IDs can be
 # recycled. However, Solaris and some other systems use a [very large]
 # sequence number as the thread ID, which provides virtual uniqueness.
-# Pthreads-win32 provides pseudo-unique IDs when the default increment
+# pthreads-win32 provides pseudo-unique IDs when the default increment
 # (1) is used, but pthread_t is not a scalar type like Solaris's.
 #
 # Usage:

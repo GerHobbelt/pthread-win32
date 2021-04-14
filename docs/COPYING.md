@@ -12,19 +12,19 @@ This file is Copyrighted
 	Everyone is permitted to copy and distribute verbatim copies
 	of this license document, but changing it is not allowed.
 
-Pthreads-win32 is covered by the GNU Lesser General Public License
+pthreads-win32 is covered by the GNU Lesser General Public License
 ------------------------------------------------------------------
 
-    Pthreads-win32 is open software; you can redistribute it and/or
+    pthreads-win32 is open software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public License
     as published by the Free Software Foundation version 2.1 of the
     License.
 
-    Pthreads-win32 is several binary link libraries, several modules,
+    pthreads-win32 is several binary link libraries, several modules,
     associated interface definition files and scripts used to control
     its compilation and installation.
 
-    Pthreads-win32 is distributed in the hope that it will be useful,
+    pthreads-win32 is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
@@ -52,16 +52,16 @@ Pthreads-win32 is covered by the GNU Lesser General Public License
 
 
 
-Pthreads-win32 copyrights and exception files
+pthreads-win32 copyrights and exception files
 ---------------------------------------------
 
-    With the exception of the files listed below, Pthreads-win32
+    With the exception of the files listed below, pthreads-win32
     is covered under the following GNU Lesser General Public License
     Copyrights:
 
-	Pthreads-win32 - POSIX Threads Library for Win32
+	pthreads-win32 - POSIX Threads Library for Win32
 	Copyright(C) 1998 John E. Bossom
-	Copyright(C) 1999,2006 Pthreads-win32 contributors
+	Copyright(C) 1999-2021 pthreads-win32 / pthreads4w contributors
 
 	The current list of contributors is contained
         in the file CONTRIBUTORS included with the source
@@ -86,7 +86,7 @@ Pthreads-win32 copyrights and exception files
     The file COPYING.LIB, which contains a copy of the version 2.1
     GNU Lesser General Public License, is itself copyrighted by the
     Free Software Foundation, Inc.  Please note that the Free Software
-    Foundation, Inc. does NOT have a copyright over Pthreads-win32,
+    Foundation, Inc. does NOT have a copyright over pthreads-win32,
     only the COPYING.LIB that is supplied with pthreads-win32.
 
     The file tests/rwlock7.c is derived from code written by
@@ -126,14 +126,14 @@ Why pthreads-win32 did not use the GNU General Public License
     example, some functions and features, such as those based
     on POSIX signals, are missing.
 
-    Pthreads-win32 is a library, available in several different
+    pthreads-win32 is a library, available in several different
     versions depending on supported compilers, and may be used
     as a dynamically linked module or a statically linked set of
     binary modules. It is not an application on it's own.
 
     It was fully intended that pthreads-win32 be usable with
     commercial software not covered by either the GPL or the LGPL
-    licenses. Pthreads-win32 has many contributors to it's
+    licenses. pthreads-win32 has many contributors to it's
     code base, many of whom have done so because they have
     used the library in commercial or proprietry software
     projects.

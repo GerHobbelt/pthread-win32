@@ -38,7 +38,7 @@ Q 11    Why isn't pthread_t defined as a scalar (e.g. pointer or int)
 Q 1	What is it?
 ---
 
-Pthreads-win32 is an Open Source Software implementation of the
+pthreads-win32 is an Open Source Software implementation of the
 Threads component of the POSIX 1003.1c 1995 Standard for Microsoft's
 Win32 environment. Some functions from POSIX 1003.1b are also
 supported including semaphores. Other related functions include
@@ -384,7 +384,7 @@ cancellation points in pthreads-win32:
 	pthread_rwlock_rdlock
 	pthread_rwlock_timedrdlock
 
-Pthreads-win32 also provides two functions that allow you to create
+pthreads-win32 also provides two functions that allow you to create
 cancellation points within your application, but only for cases where
 a thread is going to block on a Win32 handle. These are:
 

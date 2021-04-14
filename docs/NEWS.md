@@ -382,7 +382,7 @@ General
 
 The package now includes a reference documentation set consisting of
 HTML formatted Unix-style manual pages that have been edited for
-consistency with pthreads-w32. The set can also be read online at:
+consistency with pthreads-win32. The set can also be read online at:
 http://sources.redhat.com/pthreads-win32/manual/index.html
 
 Thanks again to Tim Theisen for running the test suite pre-release
@@ -589,7 +589,7 @@ to applications built on pthreads-win32 version 1.x.x.
 
 The package naming has changed, replacing the snapshot date with 
 the version number + descriptive information. E.g. this
-release is "pthreads-w32-2-0-0-release".
+release is "pthreads-win32-2-0-0-release".
 
 Bugs fixed
 ----------
@@ -683,7 +683,7 @@ New features
 * A Microsoft-style version resource has been added to the DLL for
 applications that wish to check DLL compatibility at runtime.
 
-* Pthreads-win32 DLL naming has been extended to allow incompatible DLL
+* pthreads-win32 DLL naming has been extended to allow incompatible DLL
 versions to co-exist in the same filesystem. See the README file for details,
 but briefly: while the version information inside the DLL will change with
 each release from now on, the DLL version names will only change if the new
@@ -711,7 +711,7 @@ Certain POSIX macros have changed.
 
 These changes are intended to conform to the Single Unix Specification version 3,
 which states that, if set to 0 (zero) or not defined, then applications may use
-sysconf() to determine their values at runtime. Pthreads-win32 does not
+sysconf() to determine their values at runtime. pthreads-win32 does not
 implement sysconf().
 
 The following macros are no longer undefined, but defined and set to -1

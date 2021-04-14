@@ -2,7 +2,7 @@
  * File: cancel6d.c
  *
  *
- * Pthreads-win32 - POSIX Threads Library for Win32
+ * pthreads-win32 - POSIX Threads Library for Win32
  * Copyright (C) 1998 Ben Elliston and Ross Johnson
  * Copyright (C) 1999,2000,2001 Ross Johnson
  *

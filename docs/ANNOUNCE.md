@@ -10,7 +10,7 @@ Maintainer: Ross Johnson <firstname dot lastname at loungebythelake dot net>
 
 
 We are pleased to announce the availability of a new release of
-Pthreads4w (a.k.a. Pthreads-win32), an Open Source Software implementation of the
+pthreads4w (a.k.a. pthreads-win32), an Open Source Software implementation of the
 Threads component of the SUSV3 Standard for Microsoft's
 Windows (x86 and x64). Some relevant functions from other sections
 of SUSV3 are also supported including semaphores and scheduling
@@ -20,7 +20,7 @@ Some common non-portable functions are also implemented for
 additional compatibility, as are a few functions specific
 to pthreads4w for easier integration with Windows applications.
 
-Pthreads4w is free software, distributed under the GNU Lesser
+pthreads4w is free software, distributed under the GNU Lesser
 General Public License (LGPL).
 
 For those who want to try the most recent changes, the SourceForge Git repository
@@ -455,7 +455,7 @@ support. Refer to its documentation for details and extent.
 
 
 UWIN:
-UWIN is a complete Unix-like environment for Windows from AT&T. Pthreads-win32
+UWIN is a complete Unix-like environment for Windows from AT&T. pthreads-win32
 doesn't currently support UWIN (and vice versa), but that may change in the
 future.
 

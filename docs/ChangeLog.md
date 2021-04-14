@@ -1182,7 +1182,7 @@
 
 2012-09-28  Daniel Richard. G <danielg at teragram dot com>
 
-	* all: #include<config.h>; renamed HAVE_PTW32_CONFIG_H define in
+	* all: `#include "config.h"`; renamed HAVE_PTW32_CONFIG_H define in
 	build files to HAVE_CONFIG_H since we no longer need a
 	uniquely-named symbol for this.
 	* Bmakefile: Removed _WIN32_WINNT assignment from build files since
@@ -1190,7 +1190,7 @@
 	* Wmakefile: Likewise.
 	* Makefile: Added mkdir invocations to "install" target.
 	* common.mk: Elaborated the pthread.$(OBJEXT) dependency list.
-	* pthread.h: Removed the #include"config.h" bit.
+	* pthread.h: Removed the `#include "config.h"` bit.
 
 
 			
@@ -2537,7 +2537,7 @@
 
 	* PortabilityIssues.html: Was nonPortableIssues.html.
 	* index.html: Updated; add table of contents at top.
-	* *.html: Add Pthreads-win32 header info; add link back to the
+	* *.html: Add pthreads-win32 header info; add link back to the
 	index page 'index.html'.
 
 2005-05-06  Ross Johnson  <ross at callisto.canberra.edu.au>

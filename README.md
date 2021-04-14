@@ -12,7 +12,7 @@ Changes done:
 PTHREADS-WIN32 Readme
 ==============
 
-Pthreads-win32 is free software, distributed under the GNU Lesser
+pthreads-win32 is free software, distributed under the GNU Lesser
 General Public License (LGPL). See the file 'COPYING.LIB' for terms
 and conditions. Also see the file 'COPYING' for information
 specific to pthreads-win32, copyrights and the LGPL.
@@ -21,7 +21,7 @@ specific to pthreads-win32, copyrights and the LGPL.
 What is it?
 -----------
 
-Pthreads-win32 (a.k.a. pthreads4w) is an Open Source Software
+pthreads-win32 (a.k.a. pthreads4w) is an Open Source Software
 implementation of the Threads component of the POSIX 1003.1c 1995
 Standard (or later) for Microsoft's Windows environment. Some functions
 from POSIX 1003.1b are also supported, including semaphores. Other
@@ -54,7 +54,7 @@ QueueUserAPCEx by Panagiotis E. Hadjidoukas
 	pthreads-win32. See the README in the QueueUserAPCEx folder for
 	installation instructions.
 
-	Pthreads-win32 will automatically detect if the QueueUserAPCEx DLL
+	pthreads-win32 will automatically detect if the QueueUserAPCEx DLL
 	QuserEx.DLL is available and whether the driver AlertDrv.sys is
 	loaded. If it is not available, pthreads-win32 will simulate async
 	cancellation, which means that it can async cancel only threads that
@@ -150,7 +150,7 @@ Microsoft version numbers use 4 integers:
 
 	0.0.0.0
 
-Pthreads-win32 uses the first 3 following the standard major.minor.micro
+pthreads-win32 uses the first 3 following the standard major.minor.micro
 system. We had claimed to follow the Libtool convention but this has
 not been the case with recent releases. Binary compatibility and
 consequently library file naming has not changed over this time either
@@ -186,7 +186,7 @@ applications can continue to be used. For pre .NET Windows systems,
 this inevitably requires incompatible versions of the same DLLs to have
 different names.
 
-Pthreads-win32 has adopted the Cygwin convention of appending a single
+pthreads-win32 has adopted the Cygwin convention of appending a single
 integer number to the DLL name. The number used is simply the library's
 major version number.
 

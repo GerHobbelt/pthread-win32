@@ -6,9 +6,9 @@
  *
  * --------------------------------------------------------------------------
  *
- *      Pthreads-win32 - POSIX Threads Library for Win32
+ *      pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2021 Pthreads-win32 contributors
+ *      Copyright(C) 1999-2021 pthreads-win32 / pthreads4w contributors
  *
  *      Homepage1: http://sourceware.org/pthreads-win32/
  *      Homepage2: http://sourceforge.net/projects/pthreads4w/
