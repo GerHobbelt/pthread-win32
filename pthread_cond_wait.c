@@ -441,7 +441,7 @@ ptw32_cond_timedwait (pthread_cond_t * cond,
   /*
    * Always cleanup
    */
-  pthread_cleanup_pop_execute();
+  pthread_cleanup_pop(1);
 #if defined(PTW32_CONFIG_MSVC7)
 #pragma inline_depth()
 #endif

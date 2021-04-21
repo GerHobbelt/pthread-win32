@@ -33,8 +33,71 @@
  * --------------------------------------------------------------------------
  */
 
-#include <winver.h>
-#include "pthread.h"
+/* #include <winver.h> --> #include <verrsrc.h> but these cause a lot of trouble wwith CMake+MSVC+RC at least. (Also without CMake it's one big effin' b0rk; !@#$%^&* Resource Compiler Piece Of Sh*te.) */
+#define VS_VERSION_INFO         1
+#define VS_FFI_STRUCVERSION     0x00010000L
+#define VS_FFI_FILEFLAGSMASK    0x0000003FL
+
+/* ----- VS_VERSION.dwFileFlags ----- */
+#define VS_FF_DEBUG             0x00000001L
+#define VS_FF_PRERELEASE        0x00000002L
+#define VS_FF_PATCHED           0x00000004L
+#define VS_FF_PRIVATEBUILD      0x00000008L
+#define VS_FF_INFOINFERRED      0x00000010L
+#define VS_FF_SPECIALBUILD      0x00000020L
+
+/* ----- VS_VERSION.dwFileOS ----- */
+#define VOS_UNKNOWN             0x00000000L
+#define VOS_DOS                 0x00010000L
+#define VOS_OS216               0x00020000L
+#define VOS_OS232               0x00030000L
+#define VOS_NT                  0x00040000L
+#define VOS_WINCE               0x00050000L
+
+#define VOS__BASE               0x00000000L
+#define VOS__WINDOWS16          0x00000001L
+#define VOS__PM16               0x00000002L
+#define VOS__PM32               0x00000003L
+#define VOS__WINDOWS32          0x00000004L
+
+#define VOS_DOS_WINDOWS16       0x00010001L
+#define VOS_DOS_WINDOWS32       0x00010004L
+#define VOS_OS216_PM16          0x00020002L
+#define VOS_OS232_PM32          0x00030003L
+#define VOS_NT_WINDOWS32        0x00040004L
+
+/* ----- VS_VERSION.dwFileType ----- */
+#define VFT_UNKNOWN             0x00000000L
+#define VFT_APP                 0x00000001L
+#define VFT_DLL                 0x00000002L
+#define VFT_DRV                 0x00000003L
+#define VFT_FONT                0x00000004L
+#define VFT_VXD                 0x00000005L
+#define VFT_STATIC_LIB          0x00000007L
+
+/* ----- VS_VERSION.dwFileSubtype for VFT_WINDOWS_DRV ----- */
+#define VFT2_UNKNOWN            0x00000000L
+#define VFT2_DRV_PRINTER        0x00000001L
+#define VFT2_DRV_KEYBOARD       0x00000002L
+#define VFT2_DRV_LANGUAGE       0x00000003L
+#define VFT2_DRV_DISPLAY        0x00000004L
+#define VFT2_DRV_MOUSE          0x00000005L
+#define VFT2_DRV_NETWORK        0x00000006L
+#define VFT2_DRV_SYSTEM         0x00000007L
+#define VFT2_DRV_INSTALLABLE    0x00000008L
+#define VFT2_DRV_SOUND          0x00000009L
+#define VFT2_DRV_COMM           0x0000000AL
+#define VFT2_DRV_INPUTMETHOD    0x0000000BL
+#define VFT2_DRV_VERSIONED_PRINTER    0x0000000CL
+
+/* ----- VS_VERSION.dwFileSubtype for VFT_WINDOWS_FONT ----- */
+#define VFT2_FONT_RASTER        0x00000001L
+#define VFT2_FONT_VECTOR        0x00000002L
+#define VFT2_FONT_TRUETYPE      0x00000003L
+
+
+#include "config.h"
+#include "_ptw32.h"
 
 /*
  * Note: the correct PTW32_CLEANUP_* macro must be defined corresponding to
@@ -46,10 +109,14 @@
  */
 
 #if defined(PTW32_RC_MSC)
-#  if defined(PTW32_ARCHx64)
+#  if defined (PTW32_ARCHx64) || defined (PTW32_ARCHX64) || defined (PTW32_ARCHAMD64)
 #    define PTW32_ARCH "x64"
-#  elif defined(PTW32_ARCHx86)
+#  elif defined (PTW32_ARCHx86) || defined (PTW32_ARCHX86)
 #    define PTW32_ARCH "x86"
+#  elif defined (PTW32_ARCHarm) || defined (PTW32_ARCHARM) || defined (PTW32_AARCH32)
+#    define PTW32_ARCH "ARM"
+#  elif defined (PTW32_ARCHarm64) || defined (PTW32_ARCHARM64) || defined (PTW32_AARCH64)
+#    define PTW32_ARCH "ARM64"
 #  else
 #    error "PTW32_ARCHx64 / PTW32_ARCHx86 has not been defined"
 #  endif
@@ -59,6 +126,8 @@
 #    define PTW32_VERSIONINFO_NAME "pthreadVCE2.DLL\0"
 #  elif defined(PTW32_CLEANUP_SEH)
 #    define PTW32_VERSIONINFO_NAME "pthreadVSE2.DLL\0"
+#  else
+#    define PTW32_VERSIONINFO_NAME "pthread.DLL\0"
 #  endif
 #  if defined (PTW32_ARCHx64) || defined (PTW32_ARCHX64) || defined (PTW32_ARCHAMD64)
 #    if defined(PTW32_CLEANUP_C)
@@ -67,6 +136,8 @@
 #      define PTW32_VERSIONINFO_DESCRIPTION "MS C++ x64\0"
 #    elif defined(PTW32_CLEANUP_SEH)
 #      define PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x64\0"
+#    else
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS x64\0"
 #    endif
 #  elif defined (PTW32_ARCHx86) || defined (PTW32_ARCHX86)
 #    if defined(PTW32_CLEANUP_C)
@@ -75,6 +146,8 @@
 #      define PTW32_VERSIONINFO_DESCRIPTION "MS C++ x86\0"
 #    elif defined(PTW32_CLEANUP_SEH)
 #      define PTW32_VERSIONINFO_DESCRIPTION "MS C SEH x86\0"
+#    else
+#      define PTW32_VERSIONINFO_DESCRIPTION "MS x86\0"
 #    endif
 #  elif defined (PTW32_ARCHarm) || defined (PTW32_ARCHARM) || defined (PTW32_AARCH32)
 #    if defined(PTW32_CLEANUP_C)
@@ -162,7 +235,7 @@ BEGIN
             VALUE "InternalName", PTW32_VERSIONINFO_NAME
             VALUE "OriginalFilename", PTW32_VERSIONINFO_NAME
             VALUE "CompanyName", "Open Source Software community\0"
-            VALUE "LegalCopyright(C) 1999-2021 pthreads-win32 / pthreads4w contributors 1999-2021\0"
+            VALUE "LegalCopyright", "Copyright(C) 1999-2021 pthreads-win32 / pthreads4w contributors 1999-2021\0"
             VALUE "Comments", "https://sourceforge.net/p/pthreads4w/wiki/Contributors/\0"
         END
     END
@@ -358,10 +431,10 @@ langID
     0x0411 	Japanese 		0x080A 	Mexican Spanish
     0x0412 	Korean 			0x080C 	Belgian French
     0x0413 	Dutch 			0x0C0C 	Canadian French
-    0x0414 	Norwegian â€“ Bokmal 	0x100C 	Swiss French
+    0x0414 	Norwegian – Bokmal 	0x100C 	Swiss French
     0x0810 	Swiss Italian 		0x0816 	Portuguese (Portugal)
     0x0813 	Belgian Dutch 		0x081A 	Serbo-Croatian (Cyrillic)
-    0x0814 	Norwegian â€“ Nynorsk 	  	 
+    0x0814 	Norwegian – Nynorsk 	  	 
 
 charsetID
     One of the following character-set identifiers.
@@ -369,8 +442,8 @@ charsetID
     Identifier 	Character Set
 
     0 		7-bit ASCII
-    932 	Japan (Shift %Gâ€“%@ JIS X-0208)
-    949 	Korea (Shift %Gâ€“%@ KSC 5601)
+    932 	Japan (Shift %G–%@ JIS X-0208)
+    949 	Korea (Shift %G–%@ KSC 5601)
     950 	Taiwan (Big5)
     1200 	Unicode
     1250 	Latin-2 (Eastern European)
@@ -388,25 +461,25 @@ string-name
 
     Comments 		Additional information that should be displayed for
 			diagnostic purposes.
-    CompanyName 	Company that produced the file%Gâ€”%@for example,
+    CompanyName 	Company that produced the file%G—%@for example,
 			"Microsoft Corporation" or "Standard Microsystems
 			Corporation, Inc." This string is required.
     FileDescription 	File description to be presented to users. This
 			string may be displayed in a list box when the user
-			is choosing files to install%Gâ€”%@for example,
+			is choosing files to install%G—%@for example,
 			"Keyboard Driver for AT-Style Keyboards". This
 			string is required.
-    FileVersion 	Version number of the file%Gâ€”%@for example,
+    FileVersion 	Version number of the file%G—%@for example,
 			"3.10" or "5.00.RC2". This string is required.
-    InternalName 	Internal name of the file, if one exists â€” for
+    InternalName 	Internal name of the file, if one exists — for
 			example, a module name if the file is a dynamic-link
 			library. If the file has no internal name, this
 			string should be the original filename, without
 			extension. This string is required.
     LegalCopyright 	Copyright notices that apply to the file. This
 			should include the full text of all notices, legal
-			symbols, copyright dates, and so on â€” for example,
-			"Copyright (C) Microsoft Corporation 1990â€“1999".
+			symbols, copyright dates, and so on — for example,
+			"Copyright (C) Microsoft Corporation 1990–1999".
 			This string is optional.
     LegalTrademarks 	Trademarks and registered trademarks that apply to
 			the file. This should include the full text of all
@@ -417,7 +490,7 @@ string-name
 			whether a file has been renamed by a user. The
 			format of the name depends on the file system for
 			which the file was created. This string is required.
-    PrivateBuild 	Information about a private version of the file â€” for
+    PrivateBuild 	Information about a private version of the file — for
 			example, "Built by TESTER1 on \TESTBED". This string
 			should be present only if VS_FF_PRIVATEBUILD is
 			specified in the fileflags parameter of the root
@@ -425,12 +498,13 @@ string-name
     ProductName 	Name of the product with which the file is
 			distributed. This string is required.
     ProductVersion 	Version of the product with which the file is
-			distributed â€” for example, "3.10" or "5.00.RC2".
+			distributed — for example, "3.10" or "5.00.RC2".
 			This string is required.
     SpecialBuild 	Text that indicates how this version of the file
-			differs from the standard version â€” for example,
+			differs from the standard version — for example,
 			"Private build for TESTER1 solving mouse problems
 			on M250 and M250E computers". This string should be
 			present only if VS_FF_SPECIALBUILD is specified in
 			the fileflags parameter of the root block.
  */
+

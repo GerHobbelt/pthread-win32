@@ -632,14 +632,6 @@ struct ptw32_cleanup_t
                 } \
         }
 
-#define pthread_cleanup_pop_execute( ) \
-              } \
-            __finally \
-                { \
-                    (*(_cleanup.routine))( _cleanup.arg ); \
-                } \
-        }
-
 #else /* PTW32_CLEANUP_SEH */
 
 #if defined(PTW32_CLEANUP_C)

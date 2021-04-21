@@ -75,6 +75,8 @@
  */
 
 #include "test.h"
+/* Cheating here - sneaking a peek at library internals */
+#include "../config.h"
 #include "../implement.h"
 
 #include <stdlib.h>
