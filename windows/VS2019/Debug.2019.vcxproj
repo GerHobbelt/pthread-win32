@@ -356,7 +356,9 @@
     <ClCompile Include="..\..\tests\delay1.c" />
     <ClCompile Include="..\..\tests\delay2.c" />
     <ClCompile Include="..\..\tests\detach1.c" />
+    <ClCompile Include="..\..\tests\equal0.c" />
     <ClCompile Include="..\..\tests\equal1.c" />
+    <ClCompile Include="..\..\tests\errno0.c" />
     <ClCompile Include="..\..\tests\errno1.c" />
     <ClCompile Include="..\..\tests\exception1.c" />
     <ClCompile Include="..\..\tests\exception2.c" />

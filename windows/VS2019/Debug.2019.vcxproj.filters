@@ -555,6 +555,12 @@
     <ClCompile Include="..\..\tests\tsd3.c">
       <Filter>TestSources</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\tests\equal0.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tests\errno0.c">
+      <Filter>TestSources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tests\benchtest.h">
