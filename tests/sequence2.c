@@ -186,7 +186,7 @@ static int run_a_sequence(int numthreads)
   PTW_ASSERT(seqmap[0] == 0);
   for (i = 1; i < numthreads+2; i++)
     {
-      PTW_ASSERT(seqmap[i] == seqmap_set_value);
+      PTW_ASSERT(seqmap[i] == (UNINT64)seqmap_set_value);
     }
   for ( ; i < NUMTHREADS+2; i++)
     {
