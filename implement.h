@@ -88,9 +88,10 @@ static void ptw32_set_errno(int err) { errno = err; SetLastError(err); }
 #endif
 
 /*
- * note: ETIMEDOUT is correctly defined in winsock.h
+ * note: ETIMEDOUT is correctly defined in winsock.h or errno.h
  */
 #include <winsock.h>
+#include <errno.h>
 
 /*
  * In case ETIMEDOUT hasn't been defined above somehow.
