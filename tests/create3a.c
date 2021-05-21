@@ -123,6 +123,9 @@ test_create3a(int argc, char **argv)
 #endif
     {
 	      assert(pthread_create(NULL, NULL, threadFunc, NULL) == 0);
+
+		  // Should never get here!
+		  return EXIT_FAILURE;
     }
 #if defined(_MSC_VER)
   __except(EXCEPTION_EXECUTE_HANDLER)
@@ -141,6 +144,6 @@ test_create3a(int argc, char **argv)
   /*
    * Success.
    */
-  return 0;
+  return EXIT_SUCCESS;
 }
 
