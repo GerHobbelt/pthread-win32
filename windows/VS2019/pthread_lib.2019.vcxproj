@@ -296,6 +296,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\cleanup.c" />
     <ClCompile Include="..\..\create.c" />
+    <ClCompile Include="..\..\dll.c" />
     <ClCompile Include="..\..\errno.c" />
     <ClCompile Include="..\..\global.c" />
     <ClCompile Include="..\..\pthread.c">

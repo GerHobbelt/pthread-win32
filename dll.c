@@ -207,6 +207,7 @@ extern int (*msc_dtor)(void) = ptw32_on_process_exit;
 
 PTW32_BEGIN_C_DECLS
 
+#if defined (PTW32_STATIC_LIB) && defined (PTW32_BUILD) && !defined (PTW32_TEST_SNEAK_PEEK)
 /* This dummy function exists solely to be referenced by other modules
  * (specifically, in implement.h), so that the linker can't optimize away
  * this module. Don't call it.
@@ -216,6 +217,7 @@ PTW32_BEGIN_C_DECLS
  * Leaving it here in case it affects small-static builds.
  */
 void ptw32_autostatic_anchor(void) { abort(); }
+#endif
 
 PTW32_END_C_DECLS
 
