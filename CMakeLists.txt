@@ -39,15 +39,14 @@ ENDIF (CMAKE_CL_64)
 SET_PROPERTY (SOURCE version.rc PROPERTY COMPILE_DEFINITIONS ${RESOURCE_COMPILE_DEFINITIONS})
 
 SET (SOURCE_FILES
-  implement.h
-  pthread.c
   pthread.h
   sched.h
   semaphore.h
+  _ptw32.h
   #version.rc
 )
 
-ADD_LIBRARY (pthreads ${SOURCE_FILES})
+ADD_LIBRARY (pthreads ${SOURCE_FILES} pthread.c)
 
 # Workaround for issue 0011240: VS 2010 Win64 does not correctly set /MACHINE:x64
 # in the solution project files.
@@ -93,7 +92,7 @@ install(
 )
 
 install(
-    FILES pthread.h
+    FILES ${SOURCE_FILES}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/
 )
 
