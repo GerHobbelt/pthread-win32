@@ -130,6 +130,8 @@ pthread_cond_destroy (pthread_cond_t * cond)
     {
       return EINVAL;
     }
+    
+  ptw32_processInitialize ();
 
   if (*cond != PTHREAD_COND_INITIALIZER)
     {
