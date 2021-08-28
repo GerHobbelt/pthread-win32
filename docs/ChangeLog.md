@@ -1,3 +1,10 @@
+2021-08-16  Ingo
+----------
+
+
+* Makefile (install target): add checks for file existance.
+* README: fix some out of date instructions or descriptions.
+
 
 
 
