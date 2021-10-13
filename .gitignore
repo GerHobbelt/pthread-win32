@@ -271,3 +271,5 @@ pip-log.txt
 /windows/VS2019/Debug-*/
 /windows/VS2019/Release-*/
 
+.idea
+cmake-build*
