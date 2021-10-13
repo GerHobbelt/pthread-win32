@@ -53,18 +53,20 @@ endif()
 #################################
 # Install Path                  #
 #################################
-if(DIST_ROOT)
-    set(CMAKE_INSTALL_PREFIX "${DIST_ROOT}")
-else()
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/PTHREADS-BUILT")
+if (NOT DEFINED CMAKE_INSTALL_PREFIX)
+    if(DIST_ROOT)
+        set(CMAKE_INSTALL_PREFIX "${DIST_ROOT}")
+    else()
+        set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/PTHREADS-BUILT")
+    endif()
 endif()
 message(STATUS "Install Path ${CMAKE_INSTALL_PREFIX}")
 
 
-set(DLLDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/bin)
-set(LIBDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/lib)
-set(HDRDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/include)
-set(TESTDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/test)
+set(DLLDEST ${CMAKE_INSTALL_PREFIX}/bin)
+set(LIBDEST ${CMAKE_INSTALL_PREFIX}/lib)
+set(HDRDEST ${CMAKE_INSTALL_PREFIX}/include)
+set(TESTDEST ${CMAKE_INSTALL_PREFIX}/test)
 
 #################################
 # Defs                          #
@@ -131,18 +133,30 @@ macro(static_lib type def)
     endif()
 endmacro()
 
-shared_lib ( VCE PTW32_CLEANUP_CXX )
-shared_lib ( VSE PTW32_CLEANUP_SEH )
-shared_lib ( VC  PTW32_CLEANUP_C )
 
-static_lib ( VCE PTW32_CLEANUP_CXX )
-static_lib ( VSE PTW32_CLEANUP_SEH )
-static_lib ( VC  PTW32_CLEANUP_C )
+option(PTHREAD_BUILD_SHARED_LIBRARY "Build shared library" OFF)
+set(_build_shared_library ${PTHREAD_BUILD_SHARED_LIBRARY})
+set(PTHREAD_BUILD_TYPE "VC" CACHE STRING "VC/VSE/VCE")
+
+if (PTHREAD_BUILD_TYPE STREQUAL "VC")
+    set(def_ PTW32_CLEANUP_C)
+elseif(PTHREAD_BUILD_TYPE STREQUAL "VSE" OR PTHREAD_BUILD_TYPE STREQUAL "VCE")
+    set(def_ PTW32_CLEANUP_C)
+else()
+    message(FATAL_ERROR "Not support pthread type")
+endif()
+
+if (_build_shared_library)
+    shared_lib (${PTHREAD_BUILD_TYPE} PTW32_CLEANUP_C)
+else()
+    static_lib (${PTHREAD_BUILD_TYPE} PTW32_CLEANUP_C)
+endif()
 
 #################################
 # Install                       #
 #################################
 install(FILES _ptw32.h pthread.h sched.h semaphore.h DESTINATION ${HDRDEST})
+message(STATUS "${HDRDEST}")
 
 #################################
 # Test                          #
