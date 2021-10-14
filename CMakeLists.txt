@@ -16,7 +16,9 @@ message(STATUS "Version ........... ${PTHREADS4W_VERSION}")
 project(pthreads4w VERSION ${PTHREADS4W_VERSION} LANGUAGES C)
 
 set(PTW32_VER ${PROJECT_VERSION_MAJOR}${EXTRAVERSION})
-set(CMAKE_DEBUG_POSTFIX d)
+if(NOT CMAKE_DEBUG_POSTFIX)
+    set(CMAKE_DEBUG_POSTFIX d)
+endif(NOT CMAKE_DEBUG_POSTFIX)
 
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
 #set(XLIBS wsock32.lib)
@@ -61,10 +63,18 @@ endif()
 message(STATUS "Install Path ${CMAKE_INSTALL_PREFIX}")
 
 
-set(DLLDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/bin)
-set(LIBDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/lib)
-set(HDRDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/include)
-set(TESTDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/test)
+if(NOT DLLDEST)
+    set(DLLDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/bin)
+endif(NOT DLLDEST)
+if(NOT LIBDEST)
+    set(LIBDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/lib)
+endif(NOT LIBDEST)
+if(NOT HDRDEST)
+    set(HDRDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/include)
+endif(NOT HDRDEST)
+if(NOT TESTDEST)
+    set(TESTDEST ${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}/${CMAKE_BUILD_TYPE}/test)
+endif(NOT TESTDEST)
 
 #################################
 # Defs                          #
@@ -89,7 +99,7 @@ if(MSVC)
 endif()
 
 # Update filename with proper version info
-configure_file(${CMAKE_SOURCE_DIR}/cmake/version.rc.in ${CMAKE_BINARY_DIR}/version.rc @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
 
 #################################
 # Libraries                     #
@@ -101,18 +111,18 @@ endif()
 
 macro(shared_lib type def)
     set(targ pthread${type}${PTW32_VER})
-    add_library(${targ} SHARED pthread.c ${CMAKE_BINARY_DIR}/version.rc)
+    add_library(${targ} SHARED pthread.c ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
     message(STATUS ${targ})
     target_compile_definitions(${targ} PUBLIC "-D${def}")
     if(${type} STREQUAL "VCE")
         set_target_properties(${targ} PROPERTIES COMPILE_FLAGS ${VCEFLAGS})
     endif()
     if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
-        install(FILES ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${targ}${targ_suffix}.dll DESTINATION ${DLLDEST})
-        install(FILES ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${targ}${targ_suffix}.lib DESTINATION ${LIBDEST})
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${targ}${targ_suffix}.dll DESTINATION ${DLLDEST})
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${targ}${targ_suffix}.lib DESTINATION ${LIBDEST})
     else()
-        install(FILES ${CMAKE_BINARY_DIR}/${targ}${targ_suffix}.dll DESTINATION ${DLLDEST})
-        install(FILES ${CMAKE_BINARY_DIR}/${targ}${targ_suffix}.lib DESTINATION ${LIBDEST})
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${targ}${targ_suffix}.dll DESTINATION ${DLLDEST})
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${targ}${targ_suffix}.lib DESTINATION ${LIBDEST})
     endif()
 endmacro()
 
@@ -125,9 +135,9 @@ macro(static_lib type def)
         set_target_properties(${targ} PROPERTIES COMPILE_FLAGS ${VCEFLAGS})
     endif()
     if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
-        install(FILES ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${targ}${targ_suffix}.lib DESTINATION ${LIBDEST})
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${targ}${targ_suffix}.lib DESTINATION ${LIBDEST})
     else()
-        install(FILES ${CMAKE_BINARY_DIR}/${targ}${targ_suffix}.lib DESTINATION ${LIBDEST})
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${targ}${targ_suffix}.lib DESTINATION ${LIBDEST})
     endif()
 endmacro()
 
