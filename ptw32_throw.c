@@ -137,16 +137,12 @@ ptw32_throw (DWORD exception)
 
   RaiseException (EXCEPTION_PTW32_SERVICES, 0, 3, (ULONG_PTR *) exceptionInformation);
 
-#else /* PTW32_CLEANUP_SEH */
-
-#if defined(PTW32_CLEANUP_C)
+#elif defined(PTW32_CLEANUP_C)
 
   ptw32_pop_cleanup_all (1);
   longjmp (sp->start_mark, exception);
 
-#else /* PTW32_CLEANUP_C */
-
-#if defined(PTW32_CLEANUP_CXX)
+#elif defined(PTW32_CLEANUP_CXX)
 
   switch (exception)
     {
@@ -162,11 +158,7 @@ ptw32_throw (DWORD exception)
 
 #error ERROR [__FILE__, line __LINE__]: Cleanup type undefined.
 
-#endif /* PTW32_CLEANUP_CXX */
-
-#endif /* PTW32_CLEANUP_C */
-
-#endif /* PTW32_CLEANUP_SEH */
+#endif /* PTW32_CLEANUP_CXX, PTW32_CLEANUP_C, PTW32_CLEANUP_SEH */
 
   /* Never reached */
 }
