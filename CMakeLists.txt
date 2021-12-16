@@ -33,18 +33,18 @@ include (target_arch)
 
 get_target_arch(TARGET_ARCH)
 
-if(${TARGET_ARCH} STREQUAL "ARM")
+if(TARGET_ARCH STREQUAL "ARM")
     add_definitions(-DPTW32_ARCHARM -D_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
-elseif(${TARGET_ARCH} STREQUAL "ARM64")
+elseif(TARGET_ARCH STREQUAL "ARM64")
     add_definitions(-DPTW32_ARCHARM64 -D_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1)
-elseif(${TARGET_ARCH} STREQUAL "x86_64")
+elseif(TARGET_ARCH STREQUAL "x86_64")
     add_definitions(-DPTW32_ARCHAMD64)
-elseif(${TARGET_ARCH} STREQUAL "x86")
+elseif(TARGET_ARCH STREQUAL "x86")
     add_definitions(-DPTW32_ARCHX86)
-elseif(${TARGET_ARCH} STREQUAL "x64")
+elseif(TARGET_ARCH STREQUAL "x64")
     add_definitions(-DPTW32_ARCHX64)
 else()
-    MESSAGE(ERROR "\"${TARGET_ARCH}\" not supported in version.rc")
+    MESSAGE(FATAL_ERROR "\"${TARGET_ARCH}\" not supported in version.rc")
 endif()
 message(STATUS "Target ............ ${TARGET_ARCH}")
 
@@ -55,10 +55,12 @@ endif()
 #################################
 # Install Path                  #
 #################################
-if(DIST_ROOT)
-    set(CMAKE_INSTALL_PREFIX "${DIST_ROOT}")
-else()
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/PTHREADS-BUILT")
+if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+    if(DIST_ROOT)
+        set(CMAKE_INSTALL_PREFIX "${DIST_ROOT}")
+    else()
+        set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/PTHREADS-BUILT")
+    endif()
 endif()
 message(STATUS "Install Path ${CMAKE_INSTALL_PREFIX}")
 
@@ -141,18 +143,33 @@ macro(static_lib type def)
     endif()
 endmacro()
 
-shared_lib ( VCE PTW32_CLEANUP_CXX )
-shared_lib ( VSE PTW32_CLEANUP_SEH )
-shared_lib ( VC  PTW32_CLEANUP_C )
 
-static_lib ( VCE PTW32_CLEANUP_CXX )
-static_lib ( VSE PTW32_CLEANUP_SEH )
-static_lib ( VC  PTW32_CLEANUP_C )
+option(PTHREAD_BUILD_SHARED_LIBRARY "Build shared library" OFF)
+set(_build_shared_library ${PTHREAD_BUILD_SHARED_LIBRARY})
+set(PTHREAD_BUILD_TYPE "VC" CACHE STRING "VC/VSE/VCE")
+
+if(PTHREAD_BUILD_TYPE STREQUAL "VC")
+    set(def_ PTW32_CLEANUP_C)
+elseif(PTHREAD_BUILD_TYPE STREQUAL "VSE" OR PTHREAD_BUILD_TYPE STREQUAL "VCE")
+    set(def_ PTW32_CLEANUP_C)
+else()
+    message(FATAL_ERROR "Unsupported pthread type ${PTHREAD_BUILD_TYPE}")
+endif()
+
+if(_build_shared_library)
+    shared_lib (${PTHREAD_BUILD_TYPE} PTW32_CLEANUP_C)
+else()
+    static_lib (${PTHREAD_BUILD_TYPE} PTW32_CLEANUP_C)
+endif()
 
 #################################
 # Install                       #
 #################################
 install(FILES _ptw32.h pthread.h sched.h semaphore.h DESTINATION ${HDRDEST})
+
+message(STATUS "DLLDEST  = ${DLLDEST}")
+message(STATUS "LIBDEST  = ${LIBDEST}")
+message(STATUS "HDRDEST  = ${HDRDEST}")
 
 #################################
 # Test                          #
@@ -162,4 +179,6 @@ option(ENABLE_TESTS "Enable Test code build" FALSE)
 #TODO determine if cross compile...
 if(ENABLE_TESTS)
     add_subdirectory(tests)
+
+    message(STATUS "TESTDEST = ${TESTDEST}")
 endif()
