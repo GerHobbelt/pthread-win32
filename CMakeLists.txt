@@ -5,7 +5,7 @@ if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type specified, defaulting to MinSizeRel.")
 endif()
 
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include (get_version)
 
