@@ -644,11 +644,17 @@ struct ThreadKeyAssoc
 #define PTW32_MIN(a,b)  ((a)>(b)?(b):(a))
 
 
+PTW32_BEGIN_C_DECLS
+
 /* Declared in pthread_cancel.c */
 extern DWORD (*ptw32_register_cancellation) (PAPCFUNC, HANDLE, DWORD);
 
+PTW32_END_C_DECLS
+
 /* Thread Reuse stack bottom marker. Must not be NULL or any valid pointer to memory. */
 #define PTW32_THREAD_REUSE_EMPTY ((ptw32_thread_t *)(size_t) 1)
+
+PTW32_BEGIN_C_DECLS
 
 extern int ptw32_processInitialized;
 extern ptw32_thread_t * ptw32_threadReuseTop;
@@ -676,6 +682,8 @@ extern ptw32_mcs_lock_t ptw32_spinlock_test_init_lock;
 #if defined(_UWIN)
 extern int pthread_count;
 #endif
+
+PTW32_END_C_DECLS
 
 PTW32_BEGIN_C_DECLS
 
@@ -769,7 +777,7 @@ char *ptw32_strdup (const char *s);
 #pragma warning(disable:4290)
 #endif
 void ptw32_throw (DWORD exception)
-#if defined(PTW32_CLEANUP_CXX)
+#if defined(__cplusplus)
     throw(ptw32_exception_cancel,ptw32_exception_exit)
 #endif
 ;
