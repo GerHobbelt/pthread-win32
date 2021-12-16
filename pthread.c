@@ -2,7 +2,7 @@
  * pthread.c
  *
  * Description:
- * This translation unit agregates pthreads-win32 translation units.
+ * This translation unit aggregates pthreads-win32 translation units.
  * It is used for inline optimisation of the library,
  * maximising for speed at the expense of size.
  *
@@ -38,6 +38,9 @@
  *
  * --------------------------------------------------------------------------
  */
+
+// See pthread-EH.cpp and pthread-JMP.c: prevent double definitions in monolithic (automated) builds
+#ifdef __PTHREAD_JUMBO_BUILD__
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -194,3 +197,5 @@
 #include "pthread_setname_np.c"
 #include "pthread_setspecific.c"
 #include "pthread_getspecific.c"
+
+#endif

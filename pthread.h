@@ -86,7 +86,7 @@
 #else
 # define PTW32_CLEANUP_C
 #endif
-#endif
+#endif // SEH || CXX || C
 
 #if defined( PTW32_CLEANUP_SEH ) && ( !defined( _MSC_VER ) && !defined (PTW32_RC_MSC))
 #error ERROR [__FILE__, line __LINE__]: SEH is not supported for this compiler.
