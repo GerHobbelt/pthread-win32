@@ -299,6 +299,7 @@ New routines:
 pthread_timedjoin_np()
 pthread_tryjoin_np()
  - added for compatibility with Linux.
+  
 sched_getaffinity()
 sched_setaffinity()
 pthread_getaffinity_np()
@@ -309,6 +310,7 @@ pthread_attr_setaffinity_np()
    The macros to manipulate cpu_set_t objects (the cpu affinity mask
    vector) are also defined: CPU_ZERO, CPU_CLR, CPU_SET, CPU_EQUAL,
    CPU_AND, CPU_OR, CPU_XOR, CPU_COUNT, CPU_ISSET.
+
 pthread_getname_np()
 pthread_setname_np()
 pthread_attr_getname_np()
@@ -324,6 +326,7 @@ pthread_attr_setname_np()
    For MSVC builds, the thread name if set is made available for use by the
    MSVS debugger, i.e. it should be displayed within the debugger to
    identify the thread in place of/as well as a threadID.
+
 pthread_win32_getabstime_np()
  - Return the current time plus an optional offset in a platform-aware way
    that is compatible with POSIX timed calls (returns the struct timespec
@@ -453,7 +456,7 @@ tab will show the compiler and architecture in the description field, e.g.
 - Ross Johnson
 
 Dependence on the winsock library is now discretionary via
-#define RETAIN_WSALASTERROR in config.h. It is undefined by default unless
+`#define RETAIN_WSALASTERROR` in config.h. It is undefined by default unless
 WINCE is defined (because I (RJ) am unsure of the dependency there).
 - Ramiro Polla
 
@@ -534,7 +537,7 @@ for x64.
 Other changes
 -------------
 Dependence on the winsock library is now discretionary via
-#define RETAIN_WSALASTERROR in config.h. It is undefined by default unless
+`#define RETAIN_WSALASTERROR` in config.h. It is undefined by default unless
 WINCE is defined (because RJ is unsure of the dependency there).
 - Ramiro Polla
 
@@ -1412,7 +1415,7 @@ source code files.
 This is being done in such a way as to be backward compatible.
 The old source files are reused to congregate the individual
 routine files into larger translation units (via a bunch of
-# includes) so that the compiler can still optimise wherever
+\#includes) so that the compiler can still optimise wherever
 possible, e.g. through inlining, which can only be done
 within the same translation unit.
 
@@ -1433,12 +1436,15 @@ using your existing project files without modification.
 
 New non-portable functions
 --------------------------
+
 pthread_num_processors_np():
+
   Returns the number of processors in the system that are
   available to the process, as determined from the processor
   affinity mask.
 
 pthread_timechange_handler_np():
+
   To improve tolerance against operator or time service initiated
   system clock changes.
 
@@ -1481,7 +1487,7 @@ As defined in the new POSIX standard, and the Single Unix Spec version 3:
 
 pthread.h no longer includes windows.h
 --------------------------------------
-[Not yet for G++]
+\[Not yet for G++]
 
 This was done to prevent conflicts.
 
