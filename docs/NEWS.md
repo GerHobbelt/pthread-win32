@@ -1,8 +1,27 @@
+
+RELEASE 3.0.3.1
+--------------
+(2021-12-17)
+
+General
+-------
+
+This is a micro release with mostly administrative fixes.
+
+Fixes
+-----
+
+- incorporated several CMake fixes and tweaks. Should now be a bit easier to use it as a submodule, I hope.
+- Tested stand-alone using `mkdir b && cd b && cmake -G "Visual Studio 16 2019" ..`: OK. This means that several lurking bugs have been fixed and we've included a work-around for the CMake crap (I still don't like that tool) when C sources are to be conditionally compiled as C++ (see also pthread-EH.cpp and pthread-JMP.c: two new wrapper source files).
+
+
+
 RELEASE 3.0.3
 --------------
 (2021-09-02)
 General
 -------
+
 This is a micro release with mostly administrative fixes.
 
 Testing and verification
@@ -42,7 +61,7 @@ files, e.g. PTW32_* changes to PTW32_*, ptw32_* to ptw32_*, etc.
 
 License Change
 --------------
-With the agreement of all substantial relevant contributors pthreads-win32
+With the agreement of all substantial relevant contributors pthreads-win32 / pthreads4w
 version 3, with the exception of four files, is being released under the
 terms of the Apache License v2.0. The APLv2 is compatible with the GPLv3
 and LGPLv3 licenses and therefore this code may continue to be legally
@@ -73,7 +92,7 @@ Alexander Terekhov
 Vladimir Kliatchko
 Ross Johnson
 
-pthreads-win32 version 2 releases will remain LGPL but version 2.11 and later
+pthreads-win32 / pthreads4w version 2 releases will remain LGPL but version 2.11 and later
 will be released under v3 of that license so that any additions to
 pthreads4w version 3 code that is backported to v2 will not pollute that
 code.
@@ -140,7 +159,7 @@ pre Windows 2000 systems.
 
 License Change to LGPL v3
 -------------------------
-pthreads-win32 version 2.11 and all future 2.x versions will be released
+pthreads-win32 / pthreads4w version 2.11 and all future 2.x versions will be released
 under the Lesser GNU Public License version 3 (LGPLv3).
 
 Planned Release Under the Apache License v2

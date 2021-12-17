@@ -1,3 +1,52 @@
+3.0.3.1 :: 2021-December-17
+---------------------------
+
+- fix MSVC error: ptw32_callUserDestroyRoutines.c(212,9): error C3861: 'terminate': identifier not found
+
+- make sure the pthread_win32 global variables are `extern "C"` just like thee API (functions), even while we forcibly compile the source in C++ mode when in VCE/VSE build mode (CMake)
+
+- CMake !@#$%^&*()*&^5 sh*te fixes and tweaks:
+    - https://gitlab.kitware.com/cmake/cmake/-/issues/21476
+    
+    Work-around for that does not fly without:
+    https://stackoverflow.com/questions/11801186/cmake-unable-to-determine-linker-language-with-c/11802004#answer-11802004
+    as you'ld otherwise end up with missing default libs for the linker in MSVC in CXX/C++ mode.
+    
+    And, NO, https://stackoverflow.com/questions/56462415/cmake-error-cannot-determine-link-language-for-target (`set_target_properties($target PROPERTIES LINKER_LANGUAGE CXX)`) does NOT suffice!
+
+- CMake: Support building from a subdirectory of a larger project.
+
+
+
+
+3.0.2.1 :: 2021-August-14
+-------------------------
+
+- Bump micro version number and prepare for a code release.
+- Documentation fixes
+
+General Note:
+
+    [Copied from teesseract library, which triggered this while being compiled with this lib and several others in a monolithic build.]
+    
+    fix very nasty obscure crashes inside system std::xhash code when executing Tesseract Init code, loading the 'tesseract_best' English language file(s):
+    
+    - https://stackoverflow.com/questions/17885060/passing-reference-to-stl-vector-over-dll-boundary
+    
+    Though we DO NOT cross a DLL boundary with that stuff (all the relevant code is included in one single "monolithic" DLL and none of that C++ stuff got outside!) we still got inexplicable crashes this way.
+    
+    The KEY to fixing this: you MUST MAKE SURE ALL RELEVANT MSVC PROJECT FILES HAVE THE **EXACT** **SAME** COMPILER SETTINGS: this has now been 'fixed' for Debug/Win32 build mode only as a PoC: we haven't updated all libraries yet, but this was plenty enough to make the basic bulktest run succeed again (instead of crash fatally) when executing mudraw commands, writing to *.ocr.html output files.
+    
+    Also note another consequence of our C++ compiler settings fiddling:
+    
+    - https://stackoverflow.com/questions/5004858/why-is-stdmin-failing-when-windows-h-is-included
+    
+    we applied the `std::max<int>(a, b)` tweak mentioned there instead of looking for the propr place to plonk a NOMINMAX for windows.h as this was faster and easier, also when we consider future compiler settings changing again as we work on our 'update' script for vcxproj files (TODO!)
+
+
+
+
+
 2021-08-16  Ingo
 ----------
 
@@ -82,7 +131,7 @@
 ----------
 
 			
-* (c097e1c) remove obnoxious compiler warning; this will declare VERY LONG timeoutâ€¦
+* (c097e1c) remove obnoxious compiler warning; this will declare VERY LONG timeout…
 			
 * (fcbcf8a) undef PTW32_STATIC_LIB for MSVS builds if and only if _WINDLL is defined(dll build)
 			
