@@ -99,6 +99,8 @@ pthread_timechange_handler_np (void *arg)
   pthread_cond_t cv;
   ptw32_mcs_local_node_t node;
 
+  (void)arg;
+
   ptw32_mcs_lock_acquire(&ptw32_cond_list_lock, &node);
 
   cv = ptw32_cond_list_head;

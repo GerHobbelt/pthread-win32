@@ -216,6 +216,12 @@ typedef struct ptw32_mcs_node_t_*    ptw32_mcs_lock_t;
 typedef struct ptw32_robust_node_t_  ptw32_robust_node_t;
 typedef struct ptw32_thread_t_       ptw32_thread_t;
 
+#ifdef _MSC_VER
+  // Suppress warnings about padding changes due to alignment.
+  #pragma warning(push)
+  #pragma warning(disable: 4324)
+#endif // _MSC_VER
+
 struct ptw32_thread_t_
 {
   unsigned __int64 seqNumber;	/* Process-unique thread sequence number */
@@ -256,6 +262,10 @@ struct ptw32_thread_t_
 #endif
   size_t align;			/* Force alignment if this struct is packed */
 };
+
+#ifdef _MSC_VER
+  #pragma warning(pop)
+#endif // _MSC_VER
 
 
 /*

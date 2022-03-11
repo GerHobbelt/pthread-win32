@@ -83,7 +83,7 @@ typedef struct sem_t_ * sem_t;
  * returned on failure of sem_open(); (our implementation is a
  * stub, which will always return this).
  */
-#define SEM_FAILED  (sem_t *)(-1)
+#define SEM_FAILED  (sem_t *)(intptr_t)(-1)
 
 PTW32_BEGIN_C_DECLS
 

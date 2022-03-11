@@ -56,7 +56,8 @@ ptw32_cancel_self (void)
 static void CALLBACK
 ptw32_cancel_callback (ULONG_PTR unused)
 {
-  ptw32_throw (PTW32_EPS_CANCEL);
+ (void)unused;
+ ptw32_throw (PTW32_EPS_CANCEL);
 
   /* Never reached */
 }
@@ -70,6 +71,8 @@ DWORD
 ptw32_RegisterCancellation (PAPCFUNC unused1, HANDLE threadH, DWORD unused2)
 {
   CONTEXT context;
+  (void)unused1;
+  (void)unused2;
 #ifndef ENABLE_WINRT
   context.ContextFlags = CONTEXT_CONTROL;
   GetThreadContext (threadH, &context);
