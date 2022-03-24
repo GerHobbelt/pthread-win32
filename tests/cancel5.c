@@ -97,7 +97,7 @@ static bag_t threadbag[NUMTHREADS + 1];
 static void *
 mythread (void *arg)
 {
-  void* result = (void*)((int)(size_t)PTHREAD_CANCELED + 1);
+  void* result = (void*)((intptr_t)PTHREAD_CANCELED + 1);
   bag_t *bag = (bag_t *) arg;
 
   assert (bag == &threadbag[bag->threadnum]);
@@ -180,7 +180,7 @@ test_cancel5(void)
   for (i = 1; i <= NUMTHREADS; i++)
     {
       int fail = 0;
-      void* result = (void*)((int)(size_t)PTHREAD_CANCELED + 1);
+      void* result = (void*)((intptr_t)PTHREAD_CANCELED + 1);
 
       /*
        * The thread does not contain any cancellation points, so

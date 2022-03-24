@@ -99,7 +99,7 @@ static bag_t threadbag[NUMTHREADS + 1];
 static void *
 mythread(void * arg)
 {
-  void* result = (void*)((int)(size_t)PTHREAD_CANCELED + 1);
+  void* result = (void*)((intptr_t)PTHREAD_CANCELED + 1);
   bag_t * bag = (bag_t *) arg;
 
   assert(bag == &threadbag[bag->threadnum]);

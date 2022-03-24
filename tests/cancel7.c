@@ -203,7 +203,7 @@ test_cancel7(void)
       assert(threadbag[i].self.p != NULL);
       assert(pthread_kill(threadbag[i].self, 0) == ESRCH);
 
-      fail = (result != (int)(size_t)PTHREAD_CANCELED);
+      fail = (result != (int)(intptr_t)PTHREAD_CANCELED);
 
       if (fail)
 	{

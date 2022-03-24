@@ -87,7 +87,7 @@ static void *
 exceptionedThread(void * arg)
 {
   int dummy = 0;
-  void* result = (void*)((int)(size_t)PTHREAD_CANCELED + 1);
+  void* result = (void*)((intptr_t)PTHREAD_CANCELED + 1);
   /* Set to async cancelable */
 
   assert(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == 0);
@@ -111,7 +111,7 @@ exceptionedThread(void * arg)
   __except (EXCEPTION_EXECUTE_HANDLER)
   {
     /* Should get into here. */
-    result = (void*)((int)(size_t)PTHREAD_CANCELED + 2);
+    result = (void*)((intptr_t)PTHREAD_CANCELED + 2);
   }
 #elif defined(__cplusplus)
   try
@@ -150,7 +150,7 @@ exceptionedThread(void * arg)
 static void *
 canceledThread(void * arg)
 {
-  void* result = (void*)((int)(size_t)PTHREAD_CANCELED + 1);
+  void* result = (void*)((intptr_t)PTHREAD_CANCELED + 1);
   int count;
 
   /* Set to async cancelable */
@@ -172,7 +172,7 @@ canceledThread(void * arg)
   __except (EXCEPTION_EXECUTE_HANDLER)
   {
     /* Should NOT get into here. */
-    result = (void*)((int)(size_t)PTHREAD_CANCELED + 2);
+    result = (void*)((intptr_t)PTHREAD_CANCELED + 2);
   }
 #elif defined(__cplusplus)
   try
@@ -256,7 +256,7 @@ test_exception1(void)
 
       /* Exceptioned thread */
       assert(pthread_join(et[i], &result) == 0);
-      fail = (result != (void*)((int)(size_t)PTHREAD_CANCELED + 2));
+      fail = (result != (void*)((intptr_t)PTHREAD_CANCELED + 2));
       assert(!(fail));
 
       failed = (failed || fail);
