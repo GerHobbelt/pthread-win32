@@ -103,12 +103,12 @@ ptw32_throw (DWORD exception)
       switch (exception)
         {
       	  case PTW32_EPS_CANCEL:
-      		exitCode = (unsigned int)(intptr_t) PTHREAD_CANCELED;
+      		exitCode = (unsigned int)(int) PTHREAD_CANCELED;
       		break;
       	  case PTW32_EPS_EXIT:
       		if (NULL != sp)
       		  {
-      			exitCode = (unsigned int)(intptr_t) sp->exitStatus;
+      			exitCode = (unsigned int)(int) sp->exitStatus;
       		  }
       		break;
         }
