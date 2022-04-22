@@ -123,7 +123,7 @@ ptw32_mcs_flag_set (HANDLE * flag)
    *       when the above interlocked-compare-and-exchange
    *       is executed.
    */
-  if (((HANDLE)0 != e) && ((HANDLE)-1 != e))
+  if (((HANDLE)(intptr_t)0 != e) && ((HANDLE)(intptr_t)-1 != e))
     {
       /* another thread has already stored an event handle in the flag */
       SetEvent(e);

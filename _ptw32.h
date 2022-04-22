@@ -47,11 +47,11 @@
 #define  PTW32_VERSION_MAJOR 3
 #define  PTW32_VERSION_MINOR 0
 #define  PTW32_VERSION_MICRO 3
-#define  PTW32_VERION_BUILD 0
-#define  PTW32_VERSION 3,0,3,0
-#define  PTW32_VERSION_STRING "3, 0, 3, 0\0"
+#define  PTW32_VERION_BUILD 1
+#define  PTW32_VERSION 3,0,3,1
+#define  PTW32_VERSION_STRING "3, 0, 3, 1\0"
 
-// skip the rest when running this through the Microsoft Resource Compiler, which is a VERY brittle pieece of machinery! -> RC2188  & RC1116 cryptic failures will be your part! 
+// skip the rest when running this through the Microsoft Resource Compiler, which is a VERY brittle piece of machinery! -> RC2188 & RC1116 cryptic failures will be your part! 
 #ifndef RC_INVOKED
 
 #if defined(__GNUC__)

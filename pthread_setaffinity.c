@@ -98,6 +98,8 @@ pthread_setaffinity_np (pthread_t thread, size_t cpusetsize,
   ptw32_mcs_local_node_t node;
   cpu_set_t processCpuset;
 
+  (void)cpusetsize;
+
   ptw32_mcs_lock_acquire (&ptw32_thread_reuse_lock, &node);
 
   tp = (ptw32_thread_t *) thread.p;
@@ -202,6 +204,8 @@ pthread_getaffinity_np (pthread_t thread, size_t cpusetsize, cpu_set_t *cpuset)
   int result = 0;
   ptw32_thread_t * tp;
   ptw32_mcs_local_node_t node;
+
+  (void)cpusetsize;
 
   ptw32_mcs_lock_acquire(&ptw32_thread_reuse_lock, &node);
 

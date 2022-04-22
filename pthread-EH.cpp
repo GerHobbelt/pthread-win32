@@ -1,8 +1,17 @@
 /*
- * pthread_attr_getaffinity_np.c
+ * pthread-EH.cpp
  *
  * Description:
- * POSIX thread functions that deal with thread CPU affinity.
+ * Work-around for https://gitlab.kitware.com/cmake/cmake/-/issues/21476 and
+ * other rigs where 'compile C source file as C++' enforcement is a problem.
+ * 
+ * Quoting the CMake issue (remark by Kevin Puetz, 2020):
+ *
+ *     One answer that just came to mind: create a pthread.cxx, that just 
+ *     consists of #include "pthread.c", and let the preprocessor paste the 
+ *     code in. Then CMake just sees two files and it's all normal. [...]
+ *
+ * See also https://discourse.cmake.org/t/compiling-c-as-c-in-cmake-3-18/2172.
  *
  * --------------------------------------------------------------------------
  *
@@ -41,20 +50,5 @@
 # include "config.h"
 #endif
 
-#include "pthread.h"
-#include "implement.h"
-#include "sched.h"
-
-int
-pthread_attr_getaffinity_np (const pthread_attr_t * attr, size_t cpusetsize, cpu_set_t * cpuset)
-{
-  (void)cpusetsize;
-  if (ptw32_is_attr (attr) != 0 || cpuset == NULL)
-    {
-      return EINVAL;
-    }
-
-  ((_sched_cpu_set_vector_*)cpuset)->_cpuset = (*attr)->cpuset;
-
-  return 0;
-}
+#define __PTHREAD_JUMBO_BUILD__ 1
+#include "pthread.c"

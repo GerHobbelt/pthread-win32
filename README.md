@@ -26,6 +26,54 @@ Changes done:
 ---------
 
 
+RELEASE 3.0.3.1
+--------------
+(2021-12-17)
+
+General
+-------
+
+This is a micro release with mostly administrative fixes.
+
+Fixes
+-----
+
+- incorporated several CMake fixes and tweaks. Should now be a bit easier to use it as a submodule, I hope.
+- Tested stand-alone using `mkdir b && cd b && cmake -G "Visual Studio 16 2019" ..`: OK. This means that several lurking bugs have been fixed and we've included a work-around for the CMake crap (I still don't like that tool) when C sources are to be conditionally compiled as C++ (see also pthread-EH.cpp and pthread-JMP.c: two new wrapper source files).
+
+
+
+RELEASE 3.0.3
+--------------
+(2021-09-02)
+General
+-------
+
+This is a micro release with mostly administrative fixes.
+
+Testing and verification
+------------------------
+The MSVC and MinGW64 builds have been tested on SMP architecture
+(Intel x64 Hex Core) by completing the included test suite, as well as the
+stress and bench tests.
+
+Be sure to run your builds against the test suite. If you see failures
+then please consider how your toolchains might be contributing to the
+failure. See the README file for more detailed descriptions of the
+toolchains and test systems that we have used to get the tests to pass
+successfully.
+
+We recommend MinGW64 over MinGW for both 64 and 32 bit GNU CC builds
+only because the MinGW DWARF2 exception handling with C++ builds causes some
+problems with thread cancelation.
+
+MinGW64 also includes its own native pthreads implementation, which you may
+prefer to use. If you wish to build our library you will need to select the
+Win32 native threads option at install time. We recommend also selecting the
+SJLJ exception handling method for MinGW64-w32 builds. For MinGW64-w64 builds
+either the SJLJ or SEH exception handling method should work.
+
+
 RELEASE 3.0.0
 --------------
 (2018-08-08)
@@ -251,6 +299,7 @@ New routines:
 pthread_timedjoin_np()
 pthread_tryjoin_np()
  - added for compatibility with Linux.
+  
 sched_getaffinity()
 sched_setaffinity()
 pthread_getaffinity_np()
@@ -261,6 +310,7 @@ pthread_attr_setaffinity_np()
    The macros to manipulate cpu_set_t objects (the cpu affinity mask
    vector) are also defined: CPU_ZERO, CPU_CLR, CPU_SET, CPU_EQUAL,
    CPU_AND, CPU_OR, CPU_XOR, CPU_COUNT, CPU_ISSET.
+
 pthread_getname_np()
 pthread_setname_np()
 pthread_attr_getname_np()
@@ -268,19 +318,21 @@ pthread_attr_setname_np()
  - added for compatibility with other POSIX implementations. Because
    some implementations use different *_setname_np() prototypes
    you can define one of the following macros when building the library:
-      PTW32_COMPATIBILITY_BSD (compatibility with NetBSD, FreeBSD)
-      PTW32_COMPATIBILITY_TRU64
+     PTW32_COMPATIBILITY_BSD (compatibility with NetBSD, FreeBSD)
+     PTW32_COMPATIBILITY_TRU64
    If not defined then compatibility is with Linux and other equivalents.
    We don't impose a strict limit on the length of the thread name for the
    default compatibility case. Unlike Linux, no default thread name is set.
    For MSVC builds, the thread name if set is made available for use by the
    MSVS debugger, i.e. it should be displayed within the debugger to
    identify the thread in place of/as well as a threadID.
+
 pthread_win32_getabstime_np()
  - Return the current time plus an optional offset in a platform-aware way
    that is compatible with POSIX timed calls (returns the struct timespec
    address which is the first argument). Intended primarily to make it
-   easier to write tests but may be useful for applications generally. 
+   easier to write tests but may be useful for applications generally.
+    
 GNU compiler environments (MinGW32 and MinGW64) now have the option of using
 autoconf to automatically configure the build.
 
@@ -396,11 +448,17 @@ by completing the included test suite, stress and bench tests.
 
 New Features
 ------------
+
 DLL properties now properly includes the target architecture, i.e.
 right-click on the file pthreadVC2.dll in explorer and choose the Detail
 tab will show the compiler and architecture in the description field, e.g.
 "MS C x64" or "MS C x86".
 - Ross Johnson
+
+Dependence on the winsock library is now discretionary via
+`#define RETAIN_WSALASTERROR` in config.h. It is undefined by default unless
+WINCE is defined (because I (RJ) am unsure of the dependency there).
+- Ramiro Polla
 
 (MSC and GNU builds) The statically linked library now automatically
 initialises and cleans up on program start/exit, i.e. statically linked
@@ -479,7 +537,7 @@ for x64.
 Other changes
 -------------
 Dependence on the winsock library is now discretionary via
-#define RETAIN_WSALASTERROR in config.h. It is undefined by default unless
+`#define RETAIN_WSALASTERROR` in config.h. It is undefined by default unless
 WINCE is defined (because RJ is unsure of the dependency there).
 - Ramiro Polla
 
@@ -606,7 +664,7 @@ General
 The package now includes a reference documentation set consisting of
 HTML formatted Unix-style manual pages that have been edited for
 consistency with pthreads-win32. The set can also be read online at:
-http://sources.redhat.com/pthreads-win32manual/index.html
+http://sources.redhat.com/pthreads-win32/manual/index.html
 
 Thanks again to Tim Theisen for running the test suite pre-release
 on an MP system.
@@ -925,7 +983,7 @@ suffix (1) in this snapshot. E.g. pthreadVC1.dll etc.
 has been kept as default, but the behaviour can now be controlled when the DLL
 is built to effectively switch it off. This makes the library much more
 sensitive to applications that assume that POSIX thread IDs are unique, i.e.
-are not strictly compliant with POSIX. See the  PTW32_THREAD_ID_REUSE_INCREMENT
+are not strictly compliant with POSIX. See the PTW32_THREAD_ID_REUSE_INCREMENT
 macro comments in config.h for details.
 
 Other changes
@@ -1357,7 +1415,7 @@ source code files.
 This is being done in such a way as to be backward compatible.
 The old source files are reused to congregate the individual
 routine files into larger translation units (via a bunch of
-# includes) so that the compiler can still optimise wherever
+\#includes) so that the compiler can still optimise wherever
 possible, e.g. through inlining, which can only be done
 within the same translation unit.
 
@@ -1378,12 +1436,15 @@ using your existing project files without modification.
 
 New non-portable functions
 --------------------------
+
 pthread_num_processors_np():
+
   Returns the number of processors in the system that are
   available to the process, as determined from the processor
   affinity mask.
 
 pthread_timechange_handler_np():
+
   To improve tolerance against operator or time service initiated
   system clock changes.
 
@@ -1426,7 +1487,7 @@ As defined in the new POSIX standard, and the Single Unix Spec version 3:
 
 pthread.h no longer includes windows.h
 --------------------------------------
-[Not yet for G++]
+\[Not yet for G++]
 
 This was done to prevent conflicts.
 

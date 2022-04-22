@@ -1,8 +1,27 @@
+
+RELEASE 3.0.3.1
+--------------
+(2021-12-17)
+
+General
+-------
+
+This is a micro release with mostly administrative fixes.
+
+Fixes
+-----
+
+- incorporated several CMake fixes and tweaks. Should now be a bit easier to use it as a submodule, I hope.
+- Tested stand-alone using `mkdir b && cd b && cmake -G "Visual Studio 16 2019" ..`: OK. This means that several lurking bugs have been fixed and we've included a work-around for the CMake crap (I still don't like that tool) when C sources are to be conditionally compiled as C++ (see also pthread-EH.cpp and pthread-JMP.c: two new wrapper source files).
+
+
+
 RELEASE 3.0.3
 --------------
 (2021-09-02)
 General
 -------
+
 This is a micro release with mostly administrative fixes.
 
 Testing and verification
@@ -42,7 +61,7 @@ files, e.g. PTW32_* changes to PTW32_*, ptw32_* to ptw32_*, etc.
 
 License Change
 --------------
-With the agreement of all substantial relevant contributors pthreads-win32
+With the agreement of all substantial relevant contributors pthreads-win32 / pthreads4w
 version 3, with the exception of four files, is being released under the
 terms of the Apache License v2.0. The APLv2 is compatible with the GPLv3
 and LGPLv3 licenses and therefore this code may continue to be legally
@@ -73,7 +92,7 @@ Alexander Terekhov
 Vladimir Kliatchko
 Ross Johnson
 
-pthreads-win32 version 2 releases will remain LGPL but version 2.11 and later
+pthreads-win32 / pthreads4w version 2 releases will remain LGPL but version 2.11 and later
 will be released under v3 of that license so that any additions to
 pthreads4w version 3 code that is backported to v2 will not pollute that
 code.
@@ -140,7 +159,7 @@ pre Windows 2000 systems.
 
 License Change to LGPL v3
 -------------------------
-pthreads-win32 version 2.11 and all future 2.x versions will be released
+pthreads-win32 / pthreads4w version 2.11 and all future 2.x versions will be released
 under the Lesser GNU Public License version 3 (LGPLv3).
 
 Planned Release Under the Apache License v2
@@ -253,6 +272,7 @@ New routines:
 pthread_timedjoin_np()
 pthread_tryjoin_np()
  - added for compatibility with Linux.
+  
 sched_getaffinity()
 sched_setaffinity()
 pthread_getaffinity_np()
@@ -263,6 +283,7 @@ pthread_attr_setaffinity_np()
    The macros to manipulate cpu_set_t objects (the cpu affinity mask
    vector) are also defined: CPU_ZERO, CPU_CLR, CPU_SET, CPU_EQUAL,
    CPU_AND, CPU_OR, CPU_XOR, CPU_COUNT, CPU_ISSET.
+
 pthread_getname_np()
 pthread_setname_np()
 pthread_attr_getname_np()
@@ -278,6 +299,7 @@ pthread_attr_setname_np()
    For MSVC builds, the thread name if set is made available for use by the
    MSVS debugger, i.e. it should be displayed within the debugger to
    identify the thread in place of/as well as a threadID.
+
 pthread_win32_getabstime_np()
  - Return the current time plus an optional offset in a platform-aware way
    that is compatible with POSIX timed calls (returns the struct timespec
@@ -407,7 +429,7 @@ tab will show the compiler and architecture in the description field, e.g.
 - Ross Johnson
 
 Dependence on the winsock library is now discretionary via
-#define RETAIN_WSALASTERROR in config.h. It is undefined by default unless
+`#define RETAIN_WSALASTERROR` in config.h. It is undefined by default unless
 WINCE is defined (because I (RJ) am unsure of the dependency there).
 - Ramiro Polla
 
@@ -488,7 +510,7 @@ for x64.
 Other changes
 -------------
 Dependence on the winsock library is now discretionary via
-#define RETAIN_WSALASTERROR in config.h. It is undefined by default unless
+`#define RETAIN_WSALASTERROR` in config.h. It is undefined by default unless
 WINCE is defined (because RJ is unsure of the dependency there).
 - Ramiro Polla
 
@@ -1366,7 +1388,7 @@ source code files.
 This is being done in such a way as to be backward compatible.
 The old source files are reused to congregate the individual
 routine files into larger translation units (via a bunch of
-# includes) so that the compiler can still optimise wherever
+\#includes) so that the compiler can still optimise wherever
 possible, e.g. through inlining, which can only be done
 within the same translation unit.
 
@@ -1387,12 +1409,15 @@ using your existing project files without modification.
 
 New non-portable functions
 --------------------------
+
 pthread_num_processors_np():
+
   Returns the number of processors in the system that are
   available to the process, as determined from the processor
   affinity mask.
 
 pthread_timechange_handler_np():
+
   To improve tolerance against operator or time service initiated
   system clock changes.
 
@@ -1435,7 +1460,7 @@ As defined in the new POSIX standard, and the Single Unix Spec version 3:
 
 pthread.h no longer includes windows.h
 --------------------------------------
-[Not yet for G++]
+\[Not yet for G++]
 
 This was done to prevent conflicts.
 

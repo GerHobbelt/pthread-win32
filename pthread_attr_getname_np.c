@@ -50,7 +50,11 @@ pthread_attr_getname_np(pthread_attr_t * attr, char *name, int len)
 # pragma warning(suppress:4996)
   strncpy(name, (*attr)->thrname, len - 1);
   (*attr)->thrname[len - 1] = '\0';
-#endif
+#else // _MSVCRT_
+  (void)attr;
+  (void)name;
+  (void)len;
+#endif // _MSVCRT_
 
   return 0;
 }

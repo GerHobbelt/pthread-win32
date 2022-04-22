@@ -98,6 +98,8 @@ pthread_attr_setstackaddr (pthread_attr_t * attr, void *stackaddr)
 
 #else
 
+  (void)stackaddr;
+  (void)attr;
   return ENOSYS;
 
 #endif /* _POSIX_THREAD_ATTR_STACKADDR */

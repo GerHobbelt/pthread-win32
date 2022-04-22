@@ -1,8 +1,12 @@
 /*
- * pthread_attr_getaffinity_np.c
+ * pthread-JMP.c
  *
  * Description:
- * POSIX thread functions that deal with thread CPU affinity.
+ * Addition to the work-around for https://gitlab.kitware.com/cmake/cmake/-/issues/21476 and
+ * other rigs where 'compile C source file as C++' enforcement is a problem.
+ * 
+ * This is the master 'jumbo' C loader file, which will only expand `pthread.c`
+ * contents when those DO NOT require C++ compiler mode.
  *
  * --------------------------------------------------------------------------
  *
@@ -41,20 +45,5 @@
 # include "config.h"
 #endif
 
-#include "pthread.h"
-#include "implement.h"
-#include "sched.h"
-
-int
-pthread_attr_getaffinity_np (const pthread_attr_t * attr, size_t cpusetsize, cpu_set_t * cpuset)
-{
-  (void)cpusetsize;
-  if (ptw32_is_attr (attr) != 0 || cpuset == NULL)
-    {
-      return EINVAL;
-    }
-
-  ((_sched_cpu_set_vector_*)cpuset)->_cpuset = (*attr)->cpuset;
-
-  return 0;
-}
+#define __PTHREAD_JUMBO_BUILD__ 1
+#include "pthread.c"
