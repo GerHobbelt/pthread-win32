@@ -109,12 +109,21 @@ pthread_kill (pthread_t thread, int sig)
       default:
           result = EINVAL;
           break;
-
+#ifdef SIGINT
       case SIGINT:
+#endif      
+#ifdef SIGTERM
       case SIGTERM:
+#endif      
+#ifdef SIGBREAK
       case SIGBREAK:
+#endif            
+#ifdef SIGABRT
       case SIGABRT:
+#endif
+#ifdef SIGABRT_COMPAT
       case SIGABRT_COMPAT:
+#endif
       {
           ptw32_mcs_local_node_t stateLock;
 
@@ -130,7 +139,7 @@ pthread_kill (pthread_t thread, int sig)
               tp->cancelState = PTHREAD_CANCEL_DISABLE;
               ptw32_mcs_lock_release(&stateLock);
 
-              result = TerminateThread(tp->threadH, (DWORD)(intptr_t)PTHREAD_CANCELED);
+              result = TerminateThread(tp->threadH, (DWORD)(int)PTHREAD_CANCELED);
               result = (result != 0) ? 0 : EINVAL;
 
               // Set exit to CANCELED (KILLED) when it hasn't been set already.

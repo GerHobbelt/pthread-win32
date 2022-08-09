@@ -83,6 +83,8 @@ pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
       return EINVAL;
     }
 
+  ptw32_processInitialize ();
+
   if ((attr != NULL && *attr != NULL) &&
       ((*attr)->pshared == PTHREAD_PROCESS_SHARED))
     {
