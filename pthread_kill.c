@@ -139,7 +139,7 @@ pthread_kill (pthread_t thread, int sig)
               tp->cancelState = PTHREAD_CANCEL_DISABLE;
               ptw32_mcs_lock_release(&stateLock);
 
-              result = TerminateThread(tp->threadH, (DWORD)(int)PTHREAD_CANCELED);
+              result = TerminateThread(tp->threadH, (DWORD)(ptrdiff_t)PTHREAD_CANCELED);
               result = (result != 0) ? 0 : EINVAL;
 
               // Set exit to CANCELED (KILLED) when it hasn't been set already.
