@@ -148,7 +148,7 @@ static void* func2(void* p)
     }
     pthread_cleanup_pop(1 /* always call cleanup handler */);
 
-    // return NULL; // igrone: warning C4702
+    return NULL; // ignore: warning C4702
 }
 
 #ifndef MONOLITHIC_PTHREAD_TESTS
