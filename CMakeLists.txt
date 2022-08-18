@@ -14,9 +14,9 @@ message(STATUS "Build Type ........ ${CMAKE_BUILD_TYPE}")
 message(STATUS "Version ........... ${PTHREADS4W_VERSION}")
 
 option(BUILD_STATIC "Build Static Libs" ON)
-option(BUILD_DYNAMIC "Build Static Libs" OFF)
-option(BUILD_CXX "Build C++ Library" OFF)
-option(BUILD_SE "Build SE Library" OFF)
+option(BUILD_DYNAMIC "Build Dynamic Libs" ON)
+option(BUILD_CXX "Build C++ Library" ON)
+option(BUILD_SE "Build SEH Library" ON)
 option(BUILD_C "Build C Library" ON)
 
 project(pthreads4w VERSION ${PTHREADS4W_VERSION} LANGUAGES C CXX)
