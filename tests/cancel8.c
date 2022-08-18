@@ -220,7 +220,7 @@ test_cancel8(void)
           fprintf(stderr, "Thread %d: rv = %d\n", i, rv);
       assert(rv == ESRCH /* || rv == 0 */ );
 
-      fail = (result != (int)(size_t)PTHREAD_CANCELED);
+      fail = (result != (intptr_t)PTHREAD_CANCELED);
 
       if (fail)
 	{
