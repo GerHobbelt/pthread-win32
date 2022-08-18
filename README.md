@@ -114,10 +114,10 @@ configure the GNU environment builds:
 Contributors who have either requested this change or agreed to it when
 consulted are:
 
-John Bossom
-Alexander Terekhov
-Vladimir Kliatchko
-Ross Johnson
+- John Bossom
+- Alexander Terekhov
+- Vladimir Kliatchko
+- Ross Johnson
 
 pthreads-win32 / pthreads4w version 2 releases will remain LGPL but version 2.11 and later
 will be released under v3 of that license so that any additions to
