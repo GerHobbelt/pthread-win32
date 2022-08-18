@@ -274,3 +274,5 @@ pip-log.txt
 
 .idea
 cmake-build*
+
+.vscode
