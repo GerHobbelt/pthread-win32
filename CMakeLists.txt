@@ -60,27 +60,27 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 if(BUILD_SHARED_LIBS)
   add_library(pthreadVCE3 SHARED pthread-EH.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
   target_compile_definitions(pthreadVCE3 PUBLIC _WINDLL)
-  target_compile_definitions(pthreadVCE3 PRIVATE PTW32_CLEANUP_CXX)
+  target_compile_definitions(pthreadVCE3 PUBLIC PTW32_CLEANUP_CXX)
 
   add_library(pthreadVSE3 SHARED pthread-EH.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
   target_compile_definitions(pthreadVSE3 PUBLIC _WINDLL)
-  target_compile_definitions(pthreadVSE3 PRIVATE PTW32_CLEANUP_SEH)
+  target_compile_definitions(pthreadVSE3 PUBLIC PTW32_CLEANUP_SEH)
 
   add_library(pthreadVC3 SHARED pthread-JMP.c ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
   target_compile_definitions(pthreadVC3 PUBLIC _WINDLL)
-  target_compile_definitions(pthreadVC3 PRIVATE PTW32_CLEANUP_C)
+  target_compile_definitions(pthreadVC3 PUBLIC PTW32_CLEANUP_C)
 else()
   add_library(pthreadVCE3 STATIC pthread-EH.cpp)
   target_compile_definitions(pthreadVCE3 PUBLIC PTW32_STATIC_LIB)
-  target_compile_definitions(pthreadVCE3 PRIVATE PTW32_CLEANUP_CXX)
+  target_compile_definitions(pthreadVCE3 PUBLIC PTW32_CLEANUP_CXX)
 
   add_library(pthreadVSE3 STATIC pthread-EH.cpp)
   target_compile_definitions(pthreadVSE3 PUBLIC PTW32_STATIC_LIB)
-  target_compile_definitions(pthreadVSE3 PRIVATE PTW32_CLEANUP_SEH)
+  target_compile_definitions(pthreadVSE3 PUBLIC PTW32_CLEANUP_SEH)
 
   add_library(pthreadVC3 STATIC pthread-JMP.c)
   target_compile_definitions(pthreadVC3 PUBLIC PTW32_STATIC_LIB)
-  target_compile_definitions(pthreadVC3 PRIVATE PTW32_CLEANUP_C)
+  target_compile_definitions(pthreadVC3 PUBLIC PTW32_CLEANUP_C)
 endif()
 
 #################################
@@ -131,6 +131,6 @@ install(FILES
 #################################
 option(BUILD_TESTING "Enable Test code build" False)
 
-if(BUILD_TESTING)
+# if(BUILD_TESTING)
   add_subdirectory(tests)
-endif()
+# endif()
