@@ -1,0 +1,17 @@
+[
+{
+  "directory": "C:/Users/antoi/dev/forks/pthread-win32/build/Debug",
+  "command": "C:\\PROGRA~1\\MIB055~1\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1433~1.316\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DHAVE_CONFIG_H -DPTW32_ARCHAMD64 -DPTW32_BUILD_INLINED -DPTW32_CLEANUP_CXX -DPTW32_RC_MSC -DPTW32_STATIC_LIB -IC:\\Users\\antoi\\dev\\forks\\pthread-win32\\build\\Debug -IC:\\Users\\antoi\\dev\\forks\\pthread-win32 /DWIN32 /D_WINDOWS /W3 /GR /EHsc /EHs /MDd /Zi /Ob0 /Od /RTC1 /FoCMakeFiles\\pthreadVCE3.dir\\pthread-EH.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\antoi\\dev\\forks\\pthread-win32\\pthread-EH.cpp",
+  "file": "C:\\Users\\antoi\\dev\\forks\\pthread-win32\\pthread-EH.cpp"
+},
+{
+  "directory": "C:/Users/antoi/dev/forks/pthread-win32/build/Debug",
+  "command": "C:\\PROGRA~1\\MIB055~1\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1433~1.316\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DHAVE_CONFIG_H -DPTW32_ARCHAMD64 -DPTW32_BUILD_INLINED -DPTW32_CLEANUP_SEH -DPTW32_RC_MSC -DPTW32_STATIC_LIB -IC:\\Users\\antoi\\dev\\forks\\pthread-win32\\build\\Debug -IC:\\Users\\antoi\\dev\\forks\\pthread-win32 /DWIN32 /D_WINDOWS /W3 /GR /EHsc /EHs /MDd /Zi /Ob0 /Od /RTC1 /FoCMakeFiles\\pthreadVSE3.dir\\pthread-EH.cpp.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\antoi\\dev\\forks\\pthread-win32\\pthread-EH.cpp",
+  "file": "C:\\Users\\antoi\\dev\\forks\\pthread-win32\\pthread-EH.cpp"
+},
+{
+  "directory": "C:/Users/antoi/dev/forks/pthread-win32/build/Debug",
+  "command": "C:\\PROGRA~1\\MIB055~1\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1433~1.316\\bin\\Hostx64\\x64\\cl.exe  /nologo -DHAVE_CONFIG_H -DPTW32_ARCHAMD64 -DPTW32_BUILD_INLINED -DPTW32_CLEANUP_C -DPTW32_RC_MSC -DPTW32_STATIC_LIB -IC:\\Users\\antoi\\dev\\forks\\pthread-win32\\build\\Debug -IC:\\Users\\antoi\\dev\\forks\\pthread-win32 /DWIN32 /D_WINDOWS /W3 /errorReport:none /nologo /MDd /Zi /Ob0 /Od /RTC1 /FoCMakeFiles\\pthreadVC3.dir\\pthread-JMP.c.obj /FdTARGET_COMPILE_PDB /FS -c C:\\Users\\antoi\\dev\\forks\\pthread-win32\\pthread-JMP.c",
+  "file": "C:\\Users\\antoi\\dev\\forks\\pthread-win32\\pthread-JMP.c"
+}
+]

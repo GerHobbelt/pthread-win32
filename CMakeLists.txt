@@ -125,6 +125,6 @@ install(FILES
 #################################
 option(BUILD_TESTING "Enable Test code build" False)
 
-# if(BUILD_TESTING)
+if(BUILD_TESTING)
   add_subdirectory(tests)
-# endif()
+endif()
