@@ -15,6 +15,7 @@ list(REMOVE_ITEM test_srcs
     "context2.c"
     "tryentercs2.c"
     "openmp1.c"
+    "wrapper4tests_1.c"
 )
 
 foreach(test_src ${test_srcs})
