@@ -1,20 +1,12 @@
 
 include(CTest)
 
-set(libs
-    pthreadVCE3
-    pthreadVSE3
-    pthreadVC3
-)
-
-macro(add_testcases name srcs)
-    foreach(lib ${libs})
-        set(test_name test-${name}-${lib})
-        add_executable(${test_name} ${srcs})
-        target_link_libraries(${test_name} PUBLIC ${lib} ws2_32)
-        target_compile_definitions(${test_name} PUBLIC _CONSOLE _MBCS __PtW32NoCatchWarn)
-        add_test(NAME ${test_name} COMMAND ${test_name})
-    endforeach()
+macro(add_testcase name srcs lib)
+    set(test_name test-${name}-${lib})
+    add_executable(${test_name} ${srcs})
+    target_link_libraries(${test_name} PUBLIC ${lib} ws2_32)
+    target_compile_definitions(${test_name} PUBLIC _CONSOLE _MBCS __PtW32NoCatchWarn)
+    add_test(NAME ${test_name} COMMAND ${test_name})
 endmacro()
 
 file(GLOB test_srcs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.c)
@@ -32,5 +24,7 @@ foreach(test_src ${test_srcs})
         list(APPEND test_src "benchlib.c")
     endif()
     
-    add_testcases(${test_name} ${test_src})
+    add_testcase(${test_name} "${test_src}" pthreadVCE3)
+    add_testcase(${test_name} "${test_src}" pthreadVSE3)
+    add_testcase(${test_name} "${test_src}" pthreadVC3)
 endforeach()
