@@ -14,7 +14,7 @@ jobs:
           - link_type: static
             BUILD_SHARED_LIBS: OFF
           - link_type: shared
-            BUILD_SHARED_LIBS: OFF
+            BUILD_SHARED_LIBS: ON
 
     steps:
     - uses: actions/checkout@v3
