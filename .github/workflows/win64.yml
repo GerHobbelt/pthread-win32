@@ -9,6 +9,7 @@ jobs:
       matrix:
         os: [windows-2022]
         build_type: ['Release', 'Debug']
+        link_type: ['static', 'shared']
         include:
           - link_type: static
             BUILD_SHARED_LIBS: OFF
