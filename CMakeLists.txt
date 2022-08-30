@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.11)
 include(cmake/get_version.cmake)
 
 project(pthreads4w VERSION ${PTHREADS4W_VERSION} LANGUAGES C CXX)
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # Add support for standard installation
 include(GNUInstallDirs)
