@@ -56,8 +56,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.rc.in ${CMAKE_CURRENT_B
 # Libraries                     #
 #################################
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
 if(BUILD_SHARED_LIBS)
   add_library(pthreadVCE3 SHARED pthread-EH.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
   target_compile_definitions(pthreadVCE3 PUBLIC PTW32_CLEANUP_CXX _WINDLL)
@@ -77,6 +75,21 @@ else()
   add_library(pthreadVC3 STATIC pthread-JMP.c)
   target_compile_definitions(pthreadVC3 PUBLIC PTW32_CLEANUP_C PTW32_STATIC_LIB)
 endif()
+
+target_include_directories(pthreadVCE3 PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+target_include_directories(pthreadVSE3 PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+target_include_directories(pthreadVC3 PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
 
 #################################
 # Install                       #
