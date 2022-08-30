@@ -276,3 +276,5 @@ pip-log.txt
 cmake-build*
 
 .vscode
+
+compile_commands.json
