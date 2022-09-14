@@ -34,12 +34,13 @@
  * Depends on API functions: pthread_create().
  */
 
+#include <stdint.h>
 #include "test.h"
 
 void *
 func(void * arg)
 {
-	int failed = (int) arg;
+        ptrdiff_t failed = (ptrdiff_t) arg;
 
 	pthread_exit(arg);
 
@@ -47,7 +48,7 @@ func(void * arg)
         /*
          * assert(0) in a way to prevent warning or optimising away.
          */
-	assert(failed - (int) arg);
+	assert(failed - (ptrdiff_t) arg);
 
 	return NULL;
 }

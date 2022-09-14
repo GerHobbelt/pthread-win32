@@ -41,7 +41,8 @@
 void *
 func(void * arg)
 {
-  int failed = (int) arg;
+  ptrdiff_t failed = (ptrdiff_t) arg;
+  /* int failed = (int) arg; */
 
   pthread_exit(arg);
 
@@ -49,7 +50,7 @@ func(void * arg)
   /*
    * Trick gcc compiler into not issuing a warning here
    */
-  assert(failed - (int)arg);
+  assert(failed - (ptrdiff_t) arg);
 
   return NULL;
 }

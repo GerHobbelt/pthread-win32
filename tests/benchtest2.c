@@ -138,7 +138,7 @@ CSThread(void * arg)
 }
 
 void
-runTest (char * testNameString, int mType)
+runTest (const char * testNameString, int mType)
 {
 #ifdef  __PTW32_MUTEX_TYPES
   assert(pthread_mutexattr_settype(&ma, mType) == 0);

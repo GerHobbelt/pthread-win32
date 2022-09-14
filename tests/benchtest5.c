@@ -72,7 +72,7 @@ int zero = 0;
 
 
 void
-reportTest (char * testNameString)
+reportTest (const char * testNameString)
 {
   durationMilliSecs = GetDurationMilliSecs(currSysTimeStart, currSysTimeStop) - overHeadMilliSecs;
 
