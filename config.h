@@ -140,6 +140,7 @@
 #endif
 
 #if defined(__BORLANDC__)
+#define NEED_CREATETHREAD
 #endif
 
 #if defined(__WATCOMC__)
