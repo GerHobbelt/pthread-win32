@@ -12,13 +12,13 @@ Changes done:
 1. The type of the reuse counter in `ptw32_handle_t` has been changed from
    `int` to `size_t` in order to facilitate long-running servers.
 
-2. Removed unused elements from pthread_once_t
+2. Removed unused elements from `pthread_once_t`
 
 ## Developer Notes
 
-- This library is tested frequently with our other Visual Studio 2019 projects.
-- Generally I use (and have used) the MSVC201x project files for my work. The Makefiles have been used *much* less frequently and may be out of date. 
-- Please note commit message [d4b0ef6b](https://github.com/GerHobbelt/pthread-win32/commit/d4b0ef6be0fc4c5193ecf9cd63d23e40edac19b1): while the MSVC2019 project has been configured to suit *my* in-house settings throughout, it may not suite yours.
+- This library is tested frequently with our other Visual Studio 2022 projects.
+- Generally I use (and have used) the MSVC20xx project files for my work. The Makefiles have been used *much* less frequently and may be out of date. 
+- Please note commit message [d4b0ef6b](https://github.com/GerHobbelt/pthread-win32/commit/d4b0ef6be0fc4c5193ecf9cd63d23e40edac19b1): while the MSVC2022/2019 project has been configured to suit *my* in-house settings throughout, it may not suite yours.
 
   You can, of course, always edit the settings by hand, but when you need to do this for many `vcxproj` project files, scripting the task *might* be the way to go. See [`update-vcxproj.js`](https://github.com/GerHobbelt/mupdf/blob/master/platform/win32/update-vcxproj.js) and [`patch-vcxproj.js`](https://github.com/GerHobbelt/mupdf/blob/master/platform/win32/patch-vcxproj.js) for sample scripts that do this sort of thing. I use those to make sure all my C/C++ projects have the exact same build settings so I do not get any nasty run-time surprises because some project decided to build with ever so slightly different Debug/Release Static/DLL Run Time Libraries, etc.etc.: the zillion ways you can get 🐖🌵 by your build system in a Windows environment. Fun! 🤡
   
