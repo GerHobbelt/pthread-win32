@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread_dll", "pthread.2010
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread_lib", "pthread_lib.2010.vcxproj", "{A063DFAD-6995-4E1A-AFFF-E43DC11E95B1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread_test", "tests\Debug.2010.vcxproj", "{510AAB56-492A-4EF6-85AC-AD0F02BF5639}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread_test", "Debug.2010.vcxproj", "{510AAB56-492A-4EF6-85AC-AD0F02BF5639}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
