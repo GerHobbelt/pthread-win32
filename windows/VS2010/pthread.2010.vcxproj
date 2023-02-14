@@ -582,6 +582,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\pthread_attr_getaffinity_np.c" />
     <ClCompile Include="..\..\pthread_attr_getdetachstate.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
@@ -614,6 +615,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\pthread_attr_setaffinity_np.c" />
     <ClCompile Include="..\..\pthread_attr_setdetachstate.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
@@ -622,6 +624,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\pthread_attr_setname_np.c" />
     <ClCompile Include="..\..\pthread_attr_setschedparam.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
@@ -726,6 +729,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\pthread_getname_np.c" />
     <ClCompile Include="..\..\pthread_getschedparam.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
@@ -906,6 +910,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\pthread_setname_np.c" />
     <ClCompile Include="..\..\pthread_setschedparam.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">true</ExcludedFromBuild>

@@ -435,6 +435,21 @@
     <ClCompile Include="..\..\ptw32_strdup.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\pthread_attr_getaffinity_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\pthread_getname_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\pthread_setname_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\pthread_attr_setname_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\pthread_attr_setaffinity_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\config.h">

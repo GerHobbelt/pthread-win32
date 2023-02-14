@@ -118,6 +118,7 @@ test_mutex6n(void)
 	  // kill the deadlocked thread:
 	  assert(pthread_kill(t, SIGABRT) == 0);
 	  
+      {
 	  void* result = (void*)0;
 
 	  /*
@@ -127,6 +128,7 @@ test_mutex6n(void)
 	   */
 	  assert(pthread_join(t, &result) == 0);
 	  assert(result == PTHREAD_CANCELED || result == (void *)555);
+      }
 
 	  // mutex is completely clobbered due to deadlock + thread kill:
 	  // its owwner is now dead and gone so we lost the mutex forever...
