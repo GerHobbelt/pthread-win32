@@ -450,6 +450,9 @@
     <ClCompile Include="..\..\pthread_attr_setaffinity_np.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sched_setaffinity.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\config.h">
