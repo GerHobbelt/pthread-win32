@@ -18,22 +18,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\attr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\autostatic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\barrier.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\cancel.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\cleanup.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\condvar.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\create.c">
@@ -45,25 +30,7 @@
     <ClCompile Include="..\..\errno.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\exit.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\fork.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\global.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\misc.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mutex.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\nonportable.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\private.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\pthread.c">
@@ -408,12 +375,6 @@
     <ClCompile Include="..\..\ptw32_tkAssocDestroy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\rwlock.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\sched.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sched_get_priority_max.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -462,25 +423,34 @@
     <ClCompile Include="..\..\sem_wait.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\semaphore.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\signal.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\spin.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\sync.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tsd.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\w32_CancelableWait.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\pthread_timedjoin_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ptw32_strdup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\pthread_attr_getaffinity_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\pthread_getname_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\pthread_setname_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\pthread_attr_setname_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\pthread_attr_setaffinity_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sched_setaffinity.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -506,11 +476,6 @@
     <ClInclude Include="..\..\semaphore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\..\version.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\manual\index.html">

@@ -171,10 +171,12 @@ test_cancel8(void)
   for (i = 1; i <= NUMTHREADS; i++)
     {
       assert(pthread_kill(threadbag[i].self, 0) == 0);
+      {
       int rv = pthread_cancel(threadbag[i].self);
       if (rv != 0)
           fprintf(stderr, "Thread %d: rv = %d\n", i, rv);
       assert(rv == 0 /* || rv == ESRCH */ );
+      }
     }
 
   /*
@@ -215,10 +217,12 @@ test_cancel8(void)
 #endif
 
       assert(threadbag[i].self.p != NULL);
+      {
       int rv = pthread_kill(threadbag[i].self, 0);
       if (rv != ESRCH)
           fprintf(stderr, "Thread %d: rv = %d\n", i, rv);
       assert(rv == ESRCH /* || rv == 0 */ );
+      }
 
       fail = (result != (intptr_t)PTHREAD_CANCELED);
 
