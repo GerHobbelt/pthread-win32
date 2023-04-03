@@ -109,6 +109,9 @@ old_mutex_init(old_mutex_t *mutex, const old_mutexattr_t *attr)
     {
         CRITICAL_SECTION cs;
 
+#if (_WIN32_WINNT >= 0x0400)
+		ptw32_try_enter_critical_section = &TryEnterCriticalSection;
+#else
         /*
          * Load KERNEL32 and try to get address of TryEnterCriticalSection
          */
@@ -121,6 +124,7 @@ old_mutex_init(old_mutex_t *mutex, const old_mutexattr_t *attr)
 #else
         GetProcAddress(ptw32_h_kernel32,
                        (LPCSTR) "TryEnterCriticalSection");
+#endif
 #endif
 
         if (ptw32_try_enter_critical_section != NULL)
@@ -140,11 +144,14 @@ old_mutex_init(old_mutex_t *mutex, const old_mutexattr_t *attr)
             DeleteCriticalSection(&cs);
           }
 
+#if (_WIN32_WINNT >= 0x0400)
+#else
         if (ptw32_try_enter_critical_section == NULL)
           {
             (void) FreeLibrary(ptw32_h_kernel32);
             ptw32_h_kernel32 = 0;
           }
+#endif
 
       if (old_mutex_use == OLD_WIN32CS)
 	{

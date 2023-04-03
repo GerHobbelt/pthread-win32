@@ -80,6 +80,9 @@ test_tryentercs2(void)
 
   printf("Last Error [main enter] %ld\n", (long) GetLastError());
 
+#if (_WIN32_WINNT >= 0x0400)
+  _try_enter_critical_section = &TryEnterCriticalSection;
+#else
   /*
    * Load KERNEL32 and try to get address of TryEnterCriticalSection
    */
@@ -88,6 +91,7 @@ test_tryentercs2(void)
         (TryEnterCriticalSection_f *)
         GetProcAddress(_h_kernel32,
                          (LPCSTR) "TryEnterCriticalSection");
+#endif
 
   if (_try_enter_critical_section != NULL)
     {
@@ -121,7 +125,10 @@ test_tryentercs2(void)
       printf("Last Error [try enter] %ld\n", (long) GetLastError());
     }
 
+#if (_WIN32_WINNT >= 0x0400)
+#else
   (void) FreeLibrary(_h_kernel32);
+#endif
 
   printf("This system %s TryEnterCriticalSection.\n",
          (_try_enter_critical_section == NULL) ? "DOES NOT SUPPORT" : "SUPPORTS");
