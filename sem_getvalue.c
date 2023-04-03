@@ -87,7 +87,7 @@ sem_getvalue (sem_t * sem, int *sval)
   int result = 0;
 
   ptw32_mcs_local_node_t node;
-  register sem_t s = *sem;
+  sem_t s = *sem;
 
   ptw32_mcs_lock_acquire(&s->lock, &node);
   *sval = s->value;

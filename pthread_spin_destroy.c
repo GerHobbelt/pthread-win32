@@ -48,7 +48,7 @@
 int
 pthread_spin_destroy (pthread_spinlock_t * lock)
 {
-  register pthread_spinlock_t s;
+  pthread_spinlock_t s;
   int result = 0;
 
   if (lock == NULL || *lock == NULL)

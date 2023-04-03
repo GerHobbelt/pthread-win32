@@ -93,7 +93,7 @@ pthread_create (pthread_t * tid,
   pthread_t thread = { 0 };		// init to shut up MSVC2013: warning C4701 : potentially uninitialized local variable 'thread' used
   ptw32_thread_t * tp;
   ptw32_thread_t * sp;
-  register pthread_attr_t a;
+  pthread_attr_t a;
   HANDLE threadH = 0;
   int result = EAGAIN;
   int run = PTW32_TRUE;
