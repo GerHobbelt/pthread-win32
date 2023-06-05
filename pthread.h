@@ -654,6 +654,8 @@ struct ptw32_cleanup_t
 
 #if defined(PTW32_CLEANUP_CXX)
 
+#if defined(__cplusplus)
+
         /*
          * C++ version of cancel cleanup.
          * - John E. Bossom.
@@ -727,6 +729,8 @@ struct ptw32_cleanup_t
 #define pthread_cleanup_pop( _execute ) \
             cleanup.execute( _execute ); \
         }
+
+#endif  // __cplusplus
 
 #else
 
