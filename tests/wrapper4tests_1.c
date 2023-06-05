@@ -11,6 +11,11 @@
 #include <windows.h>
 
 
+#if defined(BUILD_MONOLITHIC)
+#define main      pthw32_all_tests_main
+#endif
+
+
 #ifndef MONOLITHIC_PTHREAD_TESTS
 
 int main(int argc, char **argv)
