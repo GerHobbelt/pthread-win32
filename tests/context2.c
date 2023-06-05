@@ -100,7 +100,9 @@ static void * func(void * arg)
 {
   washere = 1;
 
-  return (void *) tree(64);
+  void *rv = (void *) tree(64);
+  fprintf(stderr, "func: done\n");
+  return rv;
 }
 
 static void
@@ -110,6 +112,7 @@ anotherEnding ()
    * Switched context
    */
   washere++;
+  fprintf(stderr, "another ending!\n");
   pthread_exit(0);
 }
 
@@ -144,6 +147,8 @@ test_context2(void)
        */
       CONTEXT context;
 
+	  fprintf(stderr, "wait: done\n");
+
       context.ContextFlags = CONTEXT_CONTROL;
 
       GetThreadContext(hThread, &context);
@@ -160,6 +165,7 @@ test_context2(void)
   Sleep(1000);
 
   assert(washere == 2);
+  fprintf(stderr, "assertion check: done\n");
 
   return 0;
 }
