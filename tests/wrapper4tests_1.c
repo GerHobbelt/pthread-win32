@@ -25,6 +25,11 @@ int main(int argc, char **argv)
 
 #else
 
+// fix/hack the error about duplicate definitions of the assertion code in (forced) C++ mode (for pthread-EH.cpp); this does NOT affect the other build modes; the default build mode remains as-is.
+#if defined(PTW32_CLEANUP_CXX) && defined(__PTHREAD_JUMBO_BUILD__)
+int assertE;
+#endif
+
 int test_affinity1(void);
 int test_affinity2(void);
 int test_affinity3(void);

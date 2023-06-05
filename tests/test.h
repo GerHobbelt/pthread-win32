@@ -162,7 +162,13 @@ static const char * error_string[] = {
           (fprintf(stderr, "Assertion failed: (%s), file %s, line %d\n", \
                    #e, __FILE__, (int) __LINE__), exit(1), 0))
 
+#if defined(PTW32_CLEANUP_CXX) && defined(__PTHREAD_JUMBO_BUILD__) && defined(MONOLITHIC_PTHREAD_TESTS)
+// fix/hack the error about duplicate definitions of the assertion code in (forced) C++ mode (for pthread-EH.cpp); this does NOT affect the other build modes; the default build mode remains as-is.
+extern int assertE;
+#else
 int assertE;
+#endif
+
 # define assert_e(e, o, r) \
    (((assertE = e) o (r)) ? ((ASSERT_TRACE) ? fprintf(stderr, \
                                     "Assertion succeeded: (%s), file %s, line %d\n", \
