@@ -56,7 +56,7 @@
  */
 #if ! defined __MINGW32__ || ! defined __have_typedef_pid_t
 
-# if defined __MINGW64__
+# if defined __MINGW64__ || defined WIN64 || defined _WIN64
     typedef __int64 pid_t;
 # else
     typedef int pid_t;

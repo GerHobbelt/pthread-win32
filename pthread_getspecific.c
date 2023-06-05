@@ -78,9 +78,9 @@ pthread_getspecific (pthread_key_t key)
     }
   else
     {
-      int lasterror = GetLastError ();
+      DWORD lasterror = GetLastError ();
 #if defined(RETAIN_WSALASTERROR)
-      int lastWSAerror = WSAGetLastError ();
+      DWORD lastWSAerror = WSAGetLastError ();
 #endif
       ptr = TlsGetValue (key->key);
 
