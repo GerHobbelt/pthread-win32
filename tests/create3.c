@@ -88,10 +88,10 @@ static void * func(void * arg)
 
 #ifndef MONOLITHIC_PTHREAD_TESTS
 int
-main(int argc, char **argv)
+main(void)
 #else
 int
-test_create3(int argc, char **argv)
+test_create3(void)
 #endif
 {
   pthread_t t;
