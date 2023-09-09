@@ -1,5 +1,5 @@
 
-# pthread-win32 for Windows
+# pthread-win32 for Windows (a.k.a. pthreads4W)
 
 Combined `pthread-win32` fork of RedFox20 + Oktonion + WinBuild
 
