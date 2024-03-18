@@ -788,7 +788,11 @@ char *ptw32_strdup (const char *s);
 #endif
 void ptw32_throw (DWORD exception)
 #if defined(__cplusplus)
+#if __cplusplus <= 201402L
     throw(ptw32_exception_cancel,ptw32_exception_exit)
+#else
+	noexcept(false)
+#endif
 #endif
 ;
 
