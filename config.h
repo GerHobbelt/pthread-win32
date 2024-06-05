@@ -156,6 +156,8 @@
 #endif
 #define __PTW32_CONFIG_MSVC7
 #endif /*  __PTW32_CONFIG_H */
+
+#if defined(__TINYC__)
 #define NO_OLDNAMES 1
 
 #ifdef HAVE_HIDDEN_VISIBILITY_ATTRIBUTE
@@ -187,10 +189,8 @@
 #define FFI_UNIX64
 #endif
 
-#if defined(__TINYC__)
 typedef long long int64_t;
 typedef unsigned long long uint64_t;
-#endif
 #if defined(__TINYC__) && (defined(WIN64) || defined(_WIN64))
 #include <atomic.h>
 #endif
@@ -265,16 +265,6 @@ typedef unsigned long long uint64_t;
 #define __NO_ISOCEXT
 #define __MINGW_ATTRIB_DEPRECATED_SEC_WARN
 
-#define PACKAGE_BUGREPORT "https://github.com/zelang-dev/tinycc/issues"
-#define VERSION "0.9.28"
-#define PACKAGE_COPYRIGHT_YEAR 2022
-#define LOCALEDIR ""
-#define PACKAGE_STRING "tinycc"
-#define PACKAGE_URL "https://github.com/zelang-dev/tinycc"
-#define PACKAGE ""
-#define PACKAGE_VERSION "0.9.28"
-#define PACKAGE_NAME "tinycc"
-#define PKGDATADIR "data"
 #define RENAME_OPEN_FILE_WORKS 1
 
 #define _SH_COMPAT 0x00
@@ -328,3 +318,5 @@ int ffs(int i);
 #   define GNULIB_defined_TIME_UTC 1
 #  endif
 #endif /* __TINY_LIBC */
+
+#endif
