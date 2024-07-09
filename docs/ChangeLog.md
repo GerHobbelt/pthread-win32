@@ -2399,7 +2399,7 @@ General Note:
 2011-07-06  Ross Johnson <ross dot johnson at homemail dot com dot au>
 
 	* pthread_cond_wait.c (pragma inline_depth): this is almost redundant
-	now nevertheless fixed thei controlling MSC_VER from "< 800" to
+	now nevertheless fixed thei controlling _MSC_VER from "< 800" to
 	"< 1400" (i.e. any prior to VC++ 8.0).
 	* pthread_once.ci (pragma inline_depth): Likewise.
 	* pthread_rwlock_timedwrlock.ci (pragma inline_depth): Likewise.
@@ -5034,7 +5034,7 @@ General Note:
 2000-08-12  Ross Johnson  <rpj at special.ise.canberra.edu.au>
 
 	* pthread.h: Add compile-time message when using
-	MSC_VER compiler and C++ EH to warn application
+	_MSC_VER compiler and C++ EH to warn application
 	programmers to use __PtW32Catch instead of catch(...)
 	if they want cancellation and pthread_exit to work.
 

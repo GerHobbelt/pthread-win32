@@ -467,7 +467,7 @@ pre-merge-with-mingw-patches / Wed, 30 Mar 2016
   * [b9afb8d2] Move recently incorrectly placed comment. (`Ross Johnson`)
   * [9f8c38b1] Version 2.9.0 last changes. (`Ross Johnson`)
   * [7452bc46] callbacks defined as cdecl (`Ross Johnson`)
-  * [473862a0] Fix MSC_VER related to item 2 in BUGS (`rpj`)
+  * [473862a0] Fix _MSC_VER related to item 2 in BUGS (`rpj`)
   * [b83397a7] Remove compile warning; fix bug (`rpj`)
   * [07078828] *** empty log message *** (`rpj`)
   * [d0616e87] Reorganisation of #defines (`rpj`)
