@@ -1,43 +1,27 @@
-
-set(TARGET_ARCH_DETECT_CODE "
-    int main() {
-        #if defined(_M_ARM)
-            return 2;
-        #elif defined(_M_ARM64)
-            return 3;
-        #elif defined(_M_AMD64)
-            return 4;
-        #elif defined(_M_X64)
-            return 5;
-        #elif defined(_M_IX86)
-            return 6;
-        #else
-            return 0;
-    #endif
-}
-")
-
 function(get_target_arch out)
+  if(CMAKE_SYSTEM_PROCESSOR)
+    set(_processor "${CMAKE_SYSTEM_PROCESSOR}")
+  elseif(CMAKE_HOST_SYSTEM_PROCESSOR)
+    set(_processor "${CMAKE_HOST_SYSTEM_PROCESSOR}")
+  elseif(UNIX AND NOT APPLE)
+    # Fallback to uname for Unix-like systems
+    execute_process(
+      COMMAND uname -m OUTPUT_VARIABLE _uname_processor OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    set(_processor "${_uname_processor}")
+  else()
+    set(_processor "unknown")
+  endif()
 
-    file(WRITE 
-        "${CMAKE_BINARY_DIR}/target_arch_detect.c"
-        "${TARGET_ARCH_DETECT_CODE}")
-
-    try_run(
-        run_result compile_result_unused
-        "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/target_arch_detect.c")
-
-    if (run_result STREQUAL 2)
-        set(${out} "ARM" PARENT_SCOPE)
-    elseif (run_result STREQUAL 3)
-        set(${out} "ARM64" PARENT_SCOPE)
-    elseif (run_result STREQUAL 4)
-        set(${out} "x86_64" PARENT_SCOPE)
-    elseif (run_result STREQUAL 5)
-        set(${out} "x64" PARENT_SCOPE)
-    elseif (run_result STREQUAL 6)
-        set(${out} "x86" PARENT_SCOPE)
-    else()
-        set(${out} "unknown" PARENT_SCOPE)
-    endif()
+  if(_processor MATCHES "^(arm|ARM)")
+    set(${out} "ARM" PARENT_SCOPE)
+  elseif(_processor MATCHES "^(aarch64|AARCH64|arm64|ARM64)")
+    set(${out} "ARM64" PARENT_SCOPE)
+  elseif(_processor MATCHES "^(x86_64|X86_64|amd64|AMD64)")
+    set(${out} "x86_64" PARENT_SCOPE)
+  elseif(_processor MATCHES "^(x86|X86|i386|I386|i686|I686)")
+    set(${out} "x86" PARENT_SCOPE)
+  else()
+    set(${out} "unknown" PARENT_SCOPE)
+  endif()
 endfunction()
