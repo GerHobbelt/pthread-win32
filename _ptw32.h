@@ -19,17 +19,17 @@
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -51,7 +51,7 @@
 #define  PTW32_VERSION 3,0,3,1
 #define  PTW32_VERSION_STRING "3, 0, 3, 1\0"
 
-// skip the rest when running this through the Microsoft Resource Compiler, which is a VERY brittle piece of machinery! -> RC2188 & RC1116 cryptic failures will be your part! 
+// skip the rest when running this through the Microsoft Resource Compiler, which is a VERY brittle piece of machinery! -> RC2188 & RC1116 cryptic failures will be your part!
 #ifndef RC_INVOKED
 
 #if defined(__GNUC__)
@@ -160,8 +160,13 @@
 #  define int64_t LONGLONG
 #  define uint64_t ULONGLONG
 #elif !defined(__MINGW32__)
-     typedef _int64 int64_t;
-     typedef unsigned _int64 uint64_t;
+#if defined(__TINYC__)
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
+#else
+typedef _int64 int64_t;
+typedef unsigned _int64 uint64_t;
+#endif
 #  if defined (PTW32_CONFIG_MSVC6)
      typedef long intptr_t;
 #  endif
