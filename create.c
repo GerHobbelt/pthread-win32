@@ -228,6 +228,12 @@ pthread_create (pthread_t * tid,
 
 #if ! defined (__MINGW32__) || defined (__MSVCRT__) || defined (__DMC__)
 
+#if defined (__BORLANDC__)
+  typedef unsigned long* _beginthreadex_thread_ptr;
+#else
+  typedef unsigned* _beginthreadex_thread_ptr;
+#endif
+
   tp->threadH =
       threadH =
           (HANDLE) _beginthreadex ((void *) NULL,	/* No security info             */
@@ -236,7 +242,7 @@ pthread_create (pthread_t * tid,
               parms,
               (unsigned)
               CREATE_SUSPENDED,
-              (unsigned *) &(tp->thread));
+              (_beginthreadex_thread_ptr) &(tp->thread));
 
   if (threadH != 0)
     {
