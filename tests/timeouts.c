@@ -105,7 +105,7 @@ static cyg_tim_t CYG_DIFFT(cyg_tim_t t1, cyg_tim_t t2)
   return (cyg_tim_t)((t2 - t1) * CYG_ONEBILLION / frequency.QuadPart); //nsec
 }
 
-static void CYG_InitTimers()
+static void CYG_InitTimers(void)
 {
   QueryPerformanceFrequency(&frequency);
   global_start.QuadPart = 0;

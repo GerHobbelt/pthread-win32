@@ -190,6 +190,9 @@ __attribute__((section(".ctors"), used)) extern int (*gcc_ctor)(void) = ptw32_on
 __attribute__((section(".dtors"), used)) extern int (*gcc_dtor)(void) = ptw32_on_process_exit;
 #elif defined(_MSC_VER)
 #  if _MSC_VER >= 1400 /* MSVC8+ */
+// warning C5247 : section '.CRT$XCU' is reserved for C++ dynamic initialization.Manually creating the section will interfere with C++ dynamic initialization and may lead to undefined behavior
+// warning C5248 : section '.CRT$XCU' is reserved for C++ dynamic initialization.Variables manually put into the section may be optimized out and their order relative to compiler generated dynamic initializers is unspecified
+#    pragma warning(disable: 5247 5248)
 #    pragma section(".CRT$XCU", long, read)
 #    pragma section(".CRT$XPU", long, read)
 __declspec(allocate(".CRT$XCU")) extern int (*msc_ctor)(void) = ptw32_on_process_init;

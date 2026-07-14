@@ -106,7 +106,7 @@ static void * func(void * arg)
 }
 
 static void
-anotherEnding ()
+anotherEnding (void)
 {
   /*
    * Switched context

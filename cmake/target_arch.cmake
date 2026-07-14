@@ -1,6 +1,6 @@
 
 set(TARGET_ARCH_DETECT_CODE "
-    int main() {
+    int main(void) {
         #if defined(_M_ARM)
             return 2;
         #elif defined(_M_ARM64)

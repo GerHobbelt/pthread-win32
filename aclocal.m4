@@ -68,7 +68,7 @@ AC_LINK_IFELSE([AC_LANG_SOURCE([[
 #ifdef HAVE_ERRNO_H
 # include <errno.h>
 #endif
-int main(){ return errno; }
+int main(void){ return errno; }
 ]])],dnl
 [AC_MSG_RESULT([yes])],dnl
 [AC_DEFINE([NEED_ERRNO],[1],[Define if you do not have errno])

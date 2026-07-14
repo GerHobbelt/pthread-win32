@@ -52,7 +52,7 @@ static void *_thread(void* Id) {
 }
 
 // MainThread
-static void MainThread() {
+static void MainThread(void) {
   int i;
 
 #ifdef _OPENMP

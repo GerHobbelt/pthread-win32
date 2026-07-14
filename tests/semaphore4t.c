@@ -119,7 +119,7 @@ timeoutwithnanos(sem_t sem, int nanoseconds)
 }
 
 static int
-testtimeout()
+testtimeout(void)
 {
   int rc = 0;
   sem_t s2;
@@ -137,7 +137,7 @@ testtimeout()
 }
 
 static int
-testmainstuff()
+testmainstuff(void)
 {
   int value = 0;
   int i;
