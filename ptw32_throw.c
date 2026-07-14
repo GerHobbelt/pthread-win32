@@ -67,7 +67,7 @@
 #endif
 void
 ptw32_throw (DWORD exception)
-#if defined(__CLEANUP_CXX)
+#if defined(__cplusplus)
   throw(ptw32_exception_cancel,ptw32_exception_exit)
 #endif
 {
